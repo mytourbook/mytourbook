@@ -386,13 +386,13 @@ public class SplashManager {
 
    public void setSplashImagePath(final String splashPath) {
 
-      Assert.isLegal(!StringUtils.isNullOrEmpty(splashPath));
+      Assert.isLegal(StringUtils.hasContent(splashPath));
       this.splashPath = splashPath;
    }
 
    public void setSplashPluginId(final String pluginId) {
 
-      Assert.isLegal(!StringUtils.isNullOrEmpty(pluginId));
+      Assert.isLegal(StringUtils.hasContent(pluginId));
       this.pluginId = pluginId;
    }
 

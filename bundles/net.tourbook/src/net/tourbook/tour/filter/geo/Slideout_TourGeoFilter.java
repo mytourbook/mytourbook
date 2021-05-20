@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,8 @@ import java.util.LinkedHashMap;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.dialog.MessageDialogWithToggleState_Customized;
@@ -40,7 +42,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -101,7 +102,7 @@ import org.eclipse.ui.IViewPart;
 /**
  * Slideout with the tour geo filters.
  */
-public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener {
+public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener, IActionResetToDefault {
 
    private static final String            COLUMN_CREATED_DATE_TIME   = "createdDateTime";                      //$NON-NLS-1$
    private static final String            COLUMN_FILTER_NAME         = "filterName";                           //$NON-NLS-1$
@@ -127,7 +128,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private ToolItem                       _tourFilterItem;
 
-   private Action                         _actionRestoreDefaults;
+   private ActionResetToDefaults          _actionRestoreDefaults;
 
    private SelectionAdapter               _columnSortListener;
    private IPropertyChangeListener        _defaultChangePropertyListener;
@@ -360,15 +361,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
    private void createActions() {
 
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -1446,7 +1439,8 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       updateUI_Viewer();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
    // SET_FORMATTING_OFF
 

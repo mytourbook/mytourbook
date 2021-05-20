@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.DialogSelectMeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
@@ -38,6 +39,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -475,7 +477,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       });
    }
 
-   @SuppressWarnings("deprecation")
    @Override
    public void preWindowOpen() {
 
@@ -494,18 +495,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       final IPreferenceStore uiPrefStore = PlatformUI.getPreferenceStore();
 
-      uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);//not supported since the 4.x migration
       uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
       // show memory monitor
-      final boolean isMemoryMonitorVisible = _prefStore
-            .getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
+      final boolean isMemoryMonitorVisible = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
       uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isMemoryMonitorVisible);
 
       hookTitleUpdateListeners(configurer);
 
       /*
-       * display the progress dialog for UI jobs, when pressing the hide button there is no other
+       * Display the progress dialog for UI jobs, when pressing the hide button there is no other
        * way to display the dialog again
        */
       WorkbenchPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.RUN_IN_BACKGROUND, false);
@@ -514,6 +513,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourPhotoManager.restoreState();
 
       FormatManager.updateDisplayFormats();
+
+      ThemeUtil.setupTheme();
+
+      // this MUST be called AFTER the theme is set, otherwise static images are not from a theme !!!
+      UI.setupThemedImages();
+      PhotoUI.setupThemedImages();
    }
 
    @Override
@@ -591,6 +596,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          }
       });
    }
+
+
 
    /**
     * Updates the window title. Format will be:

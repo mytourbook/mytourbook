@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.core.runtime.IPath;
@@ -64,8 +64,7 @@ public class ThumbnailStore {
    public static final String         ORIGINAL_IMAGE_WIDTH      = "OriginalImageWidth";   //$NON-NLS-1$
    public static final String         ORIGINAL_IMAGE_HEIGHT     = "OriginalImageHeight";  //$NON-NLS-1$
 
-   private static IPreferenceStore    _prefStore                = Activator.getDefault()  //
-         .getPreferenceStore();
+   private static IPreferenceStore    _prefStore                = PhotoActivator.getPrefStore();
 
    private static IPath               _storePath                = getThumbnailStorePath();
 
@@ -190,7 +189,7 @@ public class ThumbnailStore {
 
    /**
     * Cleanup store files for a specific folder.
-    * 
+    *
     * @param folderPath
     */
    public static void cleanupStoreFiles(final File[] imageFiles) {
@@ -306,7 +305,7 @@ public class ThumbnailStore {
 
    /**
     * recursively delete directory
-    * 
+    *
     * @param directory
     * @param monitor
     */
@@ -346,7 +345,7 @@ public class ThumbnailStore {
     * <br>
     * <br>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-    * 
+    *
     * @param fileOrFolder
     * @param monitor
     * @return Returns number of deleted files

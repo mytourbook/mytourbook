@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -69,7 +70,6 @@ import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -224,7 +224,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionExport                        _actionExportTour;
    private ActionMenuSetAllTagStructures       _actionSetAllTagStructures;
    private ActionMenuSetTagStructure           _actionSetTagStructure;
-   private ActionModifyColumns                 _actionModifyColumns;
    private ActionOpenTour                      _actionOpenTour;
    private ActionOpenPrefDialog                _actionOpenTagPrefs;
    private ActionRefreshView                   _actionRefreshView;
@@ -235,9 +234,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    /*
     * UI resources
     */
-   private final Image _imgTagCategory = TourbookPlugin.getImage(Messages.Image__tag_category);
-   private final Image _imgTag         = TourbookPlugin.getImage(Messages.Image__tag);
-   private final Image _imgTagRoot     = TourbookPlugin.getImage(Messages.Image__tag_root);
+   private final Image _imgTagCategory = TourbookPlugin.getImage(Images.Tag_Category);
+   private final Image _imgTag         = TourbookPlugin.getImage(Images.Tag);
+   private final Image _imgTagRoot     = TourbookPlugin.getImage(Images.Tag_Root);
 
    /*
     * UI controls
@@ -271,8 +270,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -287,8 +286,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -327,7 +326,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          super(Messages.action_tagView_flat_layout, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
       }
 
       @Override
@@ -672,7 +671,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionEditTour = new ActionEditTour(this);
       _actionExpandSelection = new ActionExpandSelection(this);
       _actionExportTour = new ActionExport(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionOpenTour = new ActionOpenTour(this);
       _actionRefreshView = new ActionRefreshView(this);
@@ -1694,10 +1692,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       /*
        * fill view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
    }
 
@@ -2512,16 +2507,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          // hierarchy is displayed -> show icon/tooltip for flat view
 
          _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
-         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
-         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat_Disabled));
+         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
+         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat_Disabled));
 
       } else {
 
          // flat view is displayed -> show icon/tooltip for hierarchy view
 
          _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
-         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
-         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical_Disabled));
+         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical));
+         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 

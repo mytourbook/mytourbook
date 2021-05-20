@@ -120,15 +120,17 @@ public class Util {
    }
 
    /**
-    * disposes a resource
+    * Disposes a resource
     *
     * @param image
-    * @return
+    * @return <code>null</code>
     */
    public static Image disposeResource(final Image resource) {
+
       if ((resource != null) && !resource.isDisposed()) {
          resource.dispose();
       }
+
       return null;
    }
 

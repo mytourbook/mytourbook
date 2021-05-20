@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,14 +16,14 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.ui.views.SmoothingUI;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -38,177 +38,166 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 /**
  * Tour chart properties slideout.
  */
-public class SlideoutTourChartSmoothing extends ToolbarSlideout {
+public class SlideoutTourChartSmoothing extends ToolbarSlideout implements IActionResetToDefault {
 
-	private ActionOpenPrefDialog	_actionPrefDialog;
+   private ActionOpenPrefDialog _actionPrefDialog;
 
-	private Action					_actionRestoreDefaults;
-	/*
-	 * UI controls
-	 */
-	private TourChart				_tourChart;
+   private ActionResetToDefaults _actionRestoreDefaults;
+   /*
+    * UI controls
+    */
+   private TourChart            _tourChart;
 
-	private SmoothingUI				_smoothingUI;
-	private FormToolkit				_tk;
+   private SmoothingUI          _smoothingUI;
+   private FormToolkit          _tk;
 
-	private Composite				_parent;
+   private Composite            _parent;
 
-	public class SlideoutSmoothingUI extends SmoothingUI {
+   public class SlideoutSmoothingUI extends SmoothingUI {
 
-		public SlideoutSmoothingUI(final FormToolkit tk, final ToolbarSlideout slideout) {
-			super(tk, slideout);
-		}
+      public SlideoutSmoothingUI(final FormToolkit tk, final ToolbarSlideout slideout) {
+         super(tk, slideout);
+      }
 
-		@Override
-		protected void onModifySmoothingAlgo() {
+      @Override
+      protected void onModifySmoothingAlgo() {
 
-			// pack the UI, it could have been changed
-			_parent.getShell().pack(true);
+         // pack the UI, it could have been changed
+         _parent.getShell().pack(true);
 
-			_parent.update();
-		}
-	}
+         _parent.update();
+      }
+   }
 
-	public SlideoutTourChartSmoothing(final Control ownerControl, final ToolBar toolBar, final TourChart tourChart) {
+   public SlideoutTourChartSmoothing(final Control ownerControl, final ToolBar toolBar, final TourChart tourChart) {
 
-		super(ownerControl, toolBar);
+      super(ownerControl, toolBar);
 
-		_tourChart = tourChart;
-	}
+      _tourChart = tourChart;
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-		/*
-		 * Action: Restore default
-		 */
-		_actionRestoreDefaults = new Action() {
-			@Override
-			public void run() {
-				resetToDefaults();
-			}
-		};
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
-		_actionRestoreDefaults.setImageDescriptor(//
-				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionPrefDialog = new ActionOpenPrefDialog(
+            Messages.Tour_Action_EditSmoothingPreferences,
+            PrefPageComputedValues.ID);
+      _actionPrefDialog.closeThisTooltip(this);
+      _actionPrefDialog.setShell(_tourChart.getShell());
 
-		_actionPrefDialog = new ActionOpenPrefDialog(
-				Messages.Tour_Action_EditSmoothingPreferences,
-				PrefPageComputedValues.ID);
-		_actionPrefDialog.closeThisTooltip(this);
-		_actionPrefDialog.setShell(_tourChart.getShell());
+      // select smoothing folder when opened
+      _actionPrefDialog.setPrefData(PrefPageComputedValues.TAB_FOLDER_SMOOTHING);
+   }
 
-		// select smoothing folder when opened
-		_actionPrefDialog.setPrefData(PrefPageComputedValues.TAB_FOLDER_SMOOTHING);
-	}
+   @Override
+   protected Composite createToolTipContentArea(final Composite parent) {
 
-	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+      _parent = parent;
 
-		_parent = parent;
+      initUI(parent);
 
-		initUI(parent);
+      createActions();
 
-		createActions();
+      final Composite ui = createUI(parent);
 
-		final Composite ui = createUI(parent);
+      restoreState();
 
-		restoreState();
+      return ui;
+   }
 
-		return ui;
-	}
+   private Composite createUI(final Composite parent) {
 
-	private Composite createUI(final Composite parent) {
+      _tk = new FormToolkit(parent.getDisplay());
 
-		_tk = new FormToolkit(parent.getDisplay());
+      // set background color to a dialog background color otherwise it would be white
+      _tk.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-		// set background color to a dialog background color otherwise it would be white
-		_tk.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
-		{
-			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults()//
-					.numColumns(2)
-					.applyTo(container);
+      final Composite shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+      {
+         final Composite container = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults()//
+               .numColumns(2)
+               .applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_10_Title(container);
-				createUI_12_Actions(container);
-			}
+         {
+            createUI_10_Title(container);
+            createUI_12_Actions(container);
+         }
 
-			final Composite smoothingContainer = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(smoothingContainer);
-			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(smoothingContainer);
-			{
-				_smoothingUI = new SlideoutSmoothingUI(_tk, this);
-				_smoothingUI.createUI(smoothingContainer, false, false);
-			}
-		}
+         final Composite smoothingContainer = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(smoothingContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(smoothingContainer);
+         {
+            _smoothingUI = new SlideoutSmoothingUI(_tk, this);
+            _smoothingUI.createUI(smoothingContainer, false, false);
+         }
+      }
 
-		return shellContainer;
-	}
+      return shellContainer;
+   }
 
-	private void createUI_10_Title(final Composite parent) {
+   private void createUI_10_Title(final Composite parent) {
 
-		/*
-		 * Label: Slideout title
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_TourChartSmoothing_Label_Title);
-		MTFont.setBannerFont(label);
-	}
+      /*
+       * Label: Slideout title
+       */
+      final Label label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(label);
+      label.setText(Messages.Slideout_TourChartSmoothing_Label_Title);
+      MTFont.setBannerFont(label);
+   }
 
-	private void createUI_12_Actions(final Composite parent) {
+   private void createUI_12_Actions(final Composite parent) {
 
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.BEGINNING)
-				.applyTo(toolbar);
+      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .align(SWT.END, SWT.BEGINNING)
+            .applyTo(toolbar);
 
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
+      final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-		tbm.add(_actionRestoreDefaults);
-		tbm.add(_actionPrefDialog);
+      tbm.add(_actionRestoreDefaults);
+      tbm.add(_actionPrefDialog);
 
-		tbm.update(true);
-	}
+      tbm.update(true);
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-	}
+   }
 
-	private void onChangeUI() {
+   private void onChangeUI() {
 
-		saveState();
+      saveState();
 
-		// update chart with new settings
-		_tourChart.updateTourChart();
-	}
+      // update chart with new settings
+      _tourChart.updateTourChart();
+   }
 
-	@Override
-	protected void onDispose() {
+   @Override
+   protected void onDispose() {
 
-		_smoothingUI.dispose();
-	}
+      _smoothingUI.dispose();
+   }
 
-	private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
-		_smoothingUI.performDefaults();
+      _smoothingUI.performDefaults();
 
-		onChangeUI();
-	}
+      onChangeUI();
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-	}
+   }
 
-	private void saveState() {
+   private void saveState() {
 
-	}
+   }
 
 }

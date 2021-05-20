@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
@@ -40,7 +41,6 @@ import org.eclipse.swt.widgets.ToolBar;
 public class RefTour_YearStatistic_TooltipUI {
 
    private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-   private static final String IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
 
    private static final int    VERTICAL_LINE_SPACE      = 8;
    private static final int    SHELL_MARGIN             = 5;
@@ -84,7 +84,7 @@ public class RefTour_YearStatistic_TooltipUI {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_APP_CLOSE));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -104,7 +104,7 @@ public class RefTour_YearStatistic_TooltipUI {
             // set index for the tab folder which should be selected when dialog is opened and applied
             // in net.tourbook.preferences.PrefPageAppearanceDisplayFormat.applyData(Object)
             // -> select single tour formatting
-            new Integer(0));
+            Integer.valueOf(0));
    }
 
    /**

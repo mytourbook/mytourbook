@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
@@ -33,8 +34,8 @@ public class ActionSyncMapWith_ValuePoint extends Action {
 
       setToolTipText(Messages.Map_Action_SynchWith_ValuePoint);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_ValuePoint));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_ValuePoint_Disabled));
    }
 
    @Override

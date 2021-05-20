@@ -18,6 +18,8 @@ package net.tourbook.chart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
@@ -92,13 +94,11 @@ public class ChartComponentAxis extends Canvas {
 
       _chart = chart;
 
-      _moveMarkerColor = new Color(parent.getDisplay(), 0x8B, 0xC6, 0xFF);
+      _moveMarkerColor = new Color(0x8B, 0xC6, 0xFF);
 
       addDisposeListener(disposeEvent -> onDispose());
 
       addPaintListener(paintEvent -> onPaint(paintEvent.gc));
-
-      addDisposeListener(disposeEvent -> _axisImage = Util.disposeResource(_axisImage));
 
       addMouseListener(new MouseAdapter() {
          @Override
@@ -203,10 +203,14 @@ public class ChartComponentAxis extends Canvas {
          _axisImage = Util.createImage(_display, _axisImage, axisRect);
       }
 
+      final Color backgroundColor = UI.isDarkTheme()
+            ? ThemeUtil.getDarkestBackgroundColor()
+            : _chart.getBackgroundColor();
+
       // draw into the image
       final GC gc = new GC(_axisImage);
       {
-         gc.setBackground(_chart.getBackgroundColor());
+         gc.setBackground(backgroundColor);
          gc.fillRectangle(_axisImage.getBounds());
 
          draw_10_ZoomMarker(gc, axisRect);
@@ -232,6 +236,7 @@ public class ChartComponentAxis extends Canvas {
 
       final double zoomRatio = _componentGraph.getZoomRatio();
       if (zoomRatio == 1.0) {
+
          // chart is not zoomed
          return;
       }
@@ -256,7 +261,7 @@ public class ChartComponentAxis extends Canvas {
 
          final int devZoomMarkerWidth = (int) (devAxisWidth * moveRatio);
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                0,
                devYMarker,
                devZoomMarkerWidth,
@@ -280,7 +285,7 @@ public class ChartComponentAxis extends Canvas {
 
          final int devZoomMarkerWidth = (int) (devAxisWidth * moveValue);
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                devAxisWidth - devZoomMarkerWidth,
                devYMarker,
                devZoomMarkerWidth,
@@ -407,6 +412,8 @@ public class ChartComponentAxis extends Canvas {
          /*
           * Draw y units
           */
+         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+
          int devY;
 
          for (final ChartUnit yUnit : yUnits) {
@@ -420,7 +427,6 @@ public class ChartComponentAxis extends Canvas {
                devY = devYTop + (int) devYUnit;
             }
 
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
             final String valueLabel = yUnit.valueLabel;
 
@@ -449,7 +455,6 @@ public class ChartComponentAxis extends Canvas {
 
             // draw unit line only when units are available
 
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
             gc.drawLine(devX, devYBottom, devX, devYTop);
          }
       }
@@ -477,9 +482,7 @@ public class ChartComponentAxis extends Canvas {
 
    private void onDispose() {
 
-      if (_moveMarkerColor != null) {
-         _moveMarkerColor.dispose();
-      }
+      _axisImage = Util.disposeResource(_axisImage);
    }
 
    private void onMouseDown() {

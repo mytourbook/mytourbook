@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,13 @@ package net.tourbook.ui.views.tourDataEditor;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -43,13 +44,13 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour data editor options.
  */
-public class Slideout_TourEditor_Options extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_TourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private TourDataEditorView    _tourEditorView;
 
-   private Action                _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    private PixelConverter        _pc;
 
@@ -84,15 +85,7 @@ public class Slideout_TourEditor_Options extends ToolbarSlideout implements ICol
       /*
        * Action: Restore default
        */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -135,7 +128,7 @@ public class Slideout_TourEditor_Options extends ToolbarSlideout implements ICol
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Slideout_StatisticOptions_Label_Title);
+      label.setText(Messages.Slideout_TourEditor_Label_Title);
       GridDataFactory.fillDefaults().applyTo(label);
       MTFont.setBannerFont(label);
    }
@@ -251,7 +244,8 @@ public class Slideout_TourEditor_Options extends ToolbarSlideout implements ICol
       _tourEditorView.updateUI_DescriptionNumLines(numLines);
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       final int descriptionNumberOfLines = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
       final int latLonDigits = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;

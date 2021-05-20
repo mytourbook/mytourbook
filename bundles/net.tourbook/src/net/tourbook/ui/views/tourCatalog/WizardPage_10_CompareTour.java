@@ -27,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
@@ -290,42 +291,13 @@ public class WizardPage_10_CompareTour extends WizardPage {
     */
    private void defineAllColumns(final TreeColumnLayout treeLayout) {
 
-      defineColumn_Date(treeLayout);
-      defineColumn_Distance(treeLayout);
-      defineColumn_AltitudeUp(treeLayout);
-      defineColumn_ElapsedTime(treeLayout);
+      defineColumn_10_Date(treeLayout);
+      defineColumn_20_Distance(treeLayout);
+      defineColumn_30_ElevationUp(treeLayout);
+      defineColumn_40_ElapsedTime(treeLayout);
    }
 
-   private void defineColumn_AltitudeUp(final TreeColumnLayout treeLayout) {
-
-      final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof TVIWizardCompareTour) {
-
-               final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
-
-               final long value = (long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ELEVATION);
-               cell.setText(Long.toString(value));
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-
-      final TreeColumn tc = tvc.getColumn();
-      tc.setText(UI.UNIT_LABEL_ELEVATION);
-      tc.setToolTipText(Messages.tourCatalog_wizard_Column_altitude_up_tooltip);
-      treeLayout.setColumnData(tc, new ColumnWeightData(10));
-   }
-
-   private void defineColumn_Date(final TreeColumnLayout treeLayout) {
+   private void defineColumn_10_Date(final TreeColumnLayout treeLayout) {
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.LEAD);
       tvc.setLabelProvider(new CellLabelProvider() {
@@ -351,7 +323,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
       treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(20)));
    }
 
-   private void defineColumn_Distance(final TreeColumnLayout treeLayout) {
+   private void defineColumn_20_Distance(final TreeColumnLayout treeLayout) {
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
       tvc.setLabelProvider(new CellLabelProvider() {
@@ -376,12 +348,41 @@ public class WizardPage_10_CompareTour extends WizardPage {
       });
 
       final TreeColumn tc = tvc.getColumn();
-      tc.setText(UI.UNIT_LABEL_DISTANCE);
+      tc.setText(ThemeUtil.getThemedTreeHeaderLabel(UI.UNIT_LABEL_DISTANCE));
       tc.setToolTipText(Messages.tourCatalog_wizard_Column_distance_tooltip);
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }
 
-   private void defineColumn_ElapsedTime(final TreeColumnLayout treeLayout) {
+   private void defineColumn_30_ElevationUp(final TreeColumnLayout treeLayout) {
+
+      final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIWizardCompareTour) {
+
+               final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
+
+               final long value = (long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ELEVATION);
+               cell.setText(Long.toString(value));
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+
+      final TreeColumn tc = tvc.getColumn();
+      tc.setText(ThemeUtil.getThemedTreeHeaderLabel(UI.UNIT_LABEL_ELEVATION));
+      tc.setToolTipText(Messages.tourCatalog_wizard_Column_altitude_up_tooltip);
+      treeLayout.setColumnData(tc, new ColumnWeightData(10));
+   }
+
+   private void defineColumn_40_ElapsedTime(final TreeColumnLayout treeLayout) {
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
       tvc.setLabelProvider(new CellLabelProvider() {
@@ -411,7 +412,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       final TreeColumn tc = tvc.getColumn();
 
-      tc.setText(Messages.tourCatalog_wizard_Column_h);
+      tc.setText(ThemeUtil.getThemedTreeHeaderLabel(Messages.tourCatalog_wizard_Column_h));
       tc.setToolTipText(Messages.tourCatalog_wizard_Column_h_tooltip);
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }

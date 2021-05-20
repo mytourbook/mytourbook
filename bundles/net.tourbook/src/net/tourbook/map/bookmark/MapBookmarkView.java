@@ -27,14 +27,12 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -84,7 +82,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
    private IContextMenuProvider  _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
    private ActionDeleteBookmark  _actionDeleteBookmark;
-   private ActionModifyColumns   _actionModifyColumns;
    private ActionRenameBookmark  _actionRenameBookmark;
 
    private final NumberFormat    _nf0                            = NumberFormat.getNumberInstance();
@@ -246,7 +243,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
    private void createActions() {
 
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionDeleteBookmark = new ActionDeleteBookmark();
       _actionRenameBookmark = new ActionRenameBookmark();
    }
@@ -706,10 +702,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       /*
        * Fill view menu
        */
-      final IMenuManager menuMgr = actionBars.getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = actionBars.getMenuManager();
+//
+//      menuMgr.add(new Separator());
 
       /*
        * Fill view toolbar

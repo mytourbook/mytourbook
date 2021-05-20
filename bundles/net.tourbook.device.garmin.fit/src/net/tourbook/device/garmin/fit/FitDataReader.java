@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ import com.garmin.fit.MesgListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -61,7 +61,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class FitDataReader extends TourbookDevice {
 
-   private static final String SYS_PROP__LOG_FIT_DATA = "logFitData"; //$NON-NLS-1$
+   private static final String SYS_PROP__LOG_FIT_DATA = "logFitData";                                      //$NON-NLS-1$
    private static boolean      _isLogging_FitData     = System.getProperty(SYS_PROP__LOG_FIT_DATA) != null;
 
    static {
@@ -77,13 +77,7 @@ public class FitDataReader extends TourbookDevice {
 
    private void addDebugLogListener(final MesgBroadcaster broadcaster) {
 
-      broadcaster.addListener(new MesgListener() {
-         @Override
-         public void onMesg(final Mesg mesg) {
-            onMessage_Mesg(mesg);
-         }
-      });
-
+      broadcaster.addListener((MesgListener) this::onMessage_Mesg);
    }
 
    @Override
@@ -440,7 +434,7 @@ public class FitDataReader extends TourbookDevice {
             continue;
          }
 
-         final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
+         final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
          System.out.println(
                String.format(UI.EMPTY_STRING
@@ -504,7 +498,7 @@ public class FitDataReader extends TourbookDevice {
             continue;
          }
 
-         final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
+         final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
          System.out.println(
                String.format(UI.EMPTY_STRING
@@ -544,8 +538,9 @@ public class FitDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       boolean returnValue = false;
 

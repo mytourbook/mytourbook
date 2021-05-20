@@ -52,6 +52,7 @@ import org.eclipse.osgi.util.NLS;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.shredzone.commons.suncalc.SunTimes;
 
 public class TimeTools {
 
@@ -266,6 +267,20 @@ public class TimeTools {
       return dtYMDhms;
    }
 
+   private static SunTimes createSunTimes(final ZonedDateTime zonedDateTime, final double latitude, final double longitude) {
+
+      // Because giving a date with a specific hour could result into getting the
+      // sunset of the previous day,
+      // we adjust the date to the beginning of the day
+
+      final SunTimes times = SunTimes.compute()
+            .on(zonedDateTime.getYear(), zonedDateTime.getMonthValue(), zonedDateTime.getDayOfMonth())
+            .timezone(zonedDateTime.getZone())
+            .at(latitude, longitude)
+            .execute();
+      return times;
+   }
+
    /**
     * Creates a tour date time with the tour time zone.
     *
@@ -316,6 +331,24 @@ public class TimeTools {
             - 1;
 
       return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
+   }
+
+   public static ZonedDateTime determineSunRiseTimes(final ZonedDateTime zonedDateTime,
+                                                     final double latitude,
+                                                     final double longitude) {
+
+      final SunTimes times = createSunTimes(zonedDateTime, latitude, longitude);
+
+      return times.getRise();
+   }
+
+   public static ZonedDateTime determineSunsetTimes(final ZonedDateTime zonedDateTime,
+                                                    final double latitude,
+                                                    final double longitude) {
+
+      final SunTimes times = createSunTimes(zonedDateTime, latitude, longitude);
+
+      return times.getSet();
    }
 
    /**
@@ -576,7 +609,7 @@ public class TimeTools {
     */
    public static ZonedDateTime getZonedDateTime(final long epochOfMilli) {
 
-      return ZonedDateTime.ofInstant(//
+      return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             getDefaultTimeZone());
    }
@@ -588,7 +621,7 @@ public class TimeTools {
     */
    public static ZonedDateTime getZonedDateTimeWithUTC(final long epochOfMilli) {
 
-      return ZonedDateTime.ofInstant(//
+      return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             ZoneOffset.UTC);
    }
@@ -599,6 +632,14 @@ public class TimeTools {
    public static ZonedDateTime now() {
 
       return ZonedDateTime.now(getDefaultTimeZone());
+   }
+
+   /**
+    * @return Return now with the default time zone in milliseconds
+    */
+   public static long nowInMilliseconds() {
+
+      return now().toInstant().toEpochMilli();
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2021 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.views.calendar;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -292,10 +293,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       _actionCalendarOptions = new ActionCalendarOptions(this);
       _actionTourInfo = new ActionTourInfo(this, _parent);
 
-      /*
-       * Back
-       */
       {
+         /*
+          * Back
+          */
          _actionBack = new Action() {
             @Override
             public void run() {
@@ -304,13 +305,13 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          };
          _actionBack.setText(Messages.Calendar_View_Action_Back);
          _actionBack.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
-         _actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
-      }
 
-      /*
-       * Forward
-       */
+         _actionBack.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ArrowUp));
+      }
       {
+         /*
+          * Forward
+          */
          _actionForward = new Action() {
             @Override
             public void run() {
@@ -319,13 +320,13 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          };
          _actionForward.setText(Messages.Calendar_View_Action_Forward);
          _actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
-         _actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
-      }
 
-      /*
-       * Link with other views
-       */
+         _actionForward.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ArrowDown));
+      }
       {
+         /*
+          * Link with other views
+          */
          _actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
             @Override
             public void run() {
@@ -333,14 +334,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
-         _actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews));
+
+         _actionSetLinked.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncViews));
          _actionSetLinked.setChecked(true);
       }
-
-      /*
-       * Go to today
-       */
       {
+         /*
+          * Go to today
+          */
          _actionGotoToday = new Action() {
             @Override
             public void run() {
@@ -348,7 +349,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Today));
+         _actionGotoToday.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today));
       }
    }
 

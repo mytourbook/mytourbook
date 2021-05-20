@@ -169,6 +169,8 @@ public class StravaUploader extends TourbookCloudUploader {
 
          if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
             return new ObjectMapper().readValue(response.body(), StravaTokens.class);
+         } else {
+            StatusUtil.logError(response.body());
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
@@ -212,6 +214,12 @@ public class StravaUploader extends TourbookCloudUploader {
       monitor.worked(1);
    }
 
+   private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
+
+      tourFiles.keySet().forEach(tourFilePath -> FilesUtils.deleteIfExists(Paths.get(
+            tourFilePath)));
+   }
+
    private String exportTcxGzFile(final TourData tourData, final String absoluteTourFilePath) {
 
       _tourExporter.useTourData(tourData);
@@ -230,12 +238,6 @@ public class StravaUploader extends TourbookCloudUploader {
       _tourExporter.export(absoluteTourFilePath);
 
       return gzipFile(absoluteTourFilePath);
-   }
-
-   private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
-
-      tourFiles.keySet().forEach(tourFilePath -> FilesUtils.deleteIfExists(Paths.get(
-            tourFilePath)));
    }
 
    private String getAccessToken() {

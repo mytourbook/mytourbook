@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.view.Map3View;
@@ -33,8 +34,8 @@ public class ActionSyncMapWithTour extends Action {
 
       setToolTipText(Messages.map_action_synch_with_tour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour_disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour_Disabled));
    }
 
    @Override

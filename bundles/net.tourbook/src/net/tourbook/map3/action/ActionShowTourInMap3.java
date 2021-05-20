@@ -1,20 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -39,242 +40,238 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDialog {
 
-	private static final String		ID			= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
+   private static final String   ID        = "ACTION_TRACK_LAYER_PROPERTIES_ID"; //$NON-NLS-1$
 
-	private Map3View				_map3View;
+   private Map3View              _map3View;
 
-	private DialogTourTrackConfig	_tourTrackConfigDialog;
+   private DialogTourTrackConfig _tourTrackConfigDialog;
 
-	private ToolBar					_toolBar;
-	private ToolItem				_actionTrackLayer;
+   private ToolBar               _toolBar;
+   private ToolItem              _actionTrackLayer;
 
-	private boolean					_isActionEnabled;
-	private boolean					_isActionSelected;
+   private boolean               _isActionEnabled;
+   private boolean               _isActionSelected;
 
-	private String					_dialogId	= getClass().getCanonicalName();
+   private String                _dialogId = getClass().getCanonicalName();
 
-	/*
-	 * UI controls
-	 */
-	private Control					_parent;
+   /*
+    * UI controls
+    */
+   private Control _parent;
 
-	/*
-	 * UI resources
-	 */
-	private Image					_actionImage;
-	private Image					_actionImageDisabled;
+   /*
+    * UI resources
+    */
+   private Image _actionImage;
+   private Image _actionImageDisabled;
 
-	public ActionShowTourInMap3(final Map3View map3View, final Control parent) {
+   public ActionShowTourInMap3(final Map3View map3View, final Control parent) {
 
-		super(ID);
+      super(ID);
 
-		_map3View = map3View;
+      _map3View = map3View;
 
-		_parent = parent;
+      _parent = parent;
 
-		_actionImage = TourbookPlugin//
-				.getImageDescriptor(Messages.Image__Tour)
-				.createImage();
-		_actionImageDisabled = TourbookPlugin//
-				.getImageDescriptor(Messages.Image__Tour_Disabled)
-				.createImage();
-	}
+      _actionImage = TourbookPlugin.getThemedImageDescriptor(Images.TourChart).createImage();
+      _actionImageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled).createImage();
+   }
 
-	@Override
-	public void fill(final ToolBar toolbar, final int index) {
+   @Override
+   public void fill(final ToolBar toolbar, final int index) {
 
-		if (_actionTrackLayer == null && toolbar != null) {
+      if (_actionTrackLayer == null && toolbar != null) {
 
-			// action is not yet created
+         // action is not yet created
 
-			_toolBar = toolbar;
+         _toolBar = toolbar;
 
-			toolbar.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent e) {
-					onDispose();
-				}
-			});
+         toolbar.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               onDispose();
+            }
+         });
 
-			toolbar.addMouseMoveListener(new MouseMoveListener() {
-				@Override
-				public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(final MouseEvent e) {
 
-					final Point mousePosition = new Point(e.x, e.y);
-					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+               final Point mousePosition = new Point(e.x, e.y);
+               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-					onMouseMove(hoveredItem, e);
-				}
-			});
+               onMouseMove(hoveredItem, e);
+            }
+         });
 
-			_actionTrackLayer = new ToolItem(toolbar, SWT.CHECK);
+         _actionTrackLayer = new ToolItem(toolbar, SWT.CHECK);
 
-			// !!! image must be set before enable state is set
-			_actionTrackLayer.setImage(_actionImage);
-			_actionTrackLayer.setDisabledImage(_actionImageDisabled);
+         // !!! image must be set before enable state is set
+         _actionTrackLayer.setImage(_actionImage);
+         _actionTrackLayer.setDisabledImage(_actionImageDisabled);
 
-			_actionTrackLayer.setSelection(_isActionSelected);
-			_actionTrackLayer.setEnabled(_isActionEnabled);
+         _actionTrackLayer.setSelection(_isActionSelected);
+         _actionTrackLayer.setEnabled(_isActionEnabled);
 
-			_actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
+         _actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
 
-			_actionTrackLayer.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelect();
-				}
-			});
+         _actionTrackLayer.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelect();
+            }
+         });
 
-			_tourTrackConfigDialog = new DialogTourTrackConfig(_parent, _toolBar, _map3View);
+         _tourTrackConfigDialog = new DialogTourTrackConfig(_parent, _toolBar, _map3View);
 
-			updateUI_Tooltip();
-		}
-	}
+         updateUI_Tooltip();
+      }
+   }
 
-	@Override
-	public String getDialogId() {
+   @Override
+   public String getDialogId() {
 
-		return _dialogId;
-	}
+      return _dialogId;
+   }
 
-	@Override
-	public void hideDialog() {
+   @Override
+   public void hideDialog() {
 
-		_tourTrackConfigDialog.hideNow();
-	}
+      _tourTrackConfigDialog.hideNow();
+   }
 
-	private void onDispose() {
+   private void onDispose() {
 
-		_actionImage.dispose();
-		_actionImageDisabled.dispose();
+      _actionImage.dispose();
+      _actionImageDisabled.dispose();
 
-		_actionTrackLayer.dispose();
-		_actionTrackLayer = null;
-	}
+      _actionTrackLayer.dispose();
+      _actionTrackLayer = null;
+   }
 
-	private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
+   private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
 
-		if (_actionTrackLayer.getSelection() == false || _actionTrackLayer.isEnabled() == false) {
+      if (_actionTrackLayer.getSelection() == false || _actionTrackLayer.isEnabled() == false) {
 
-			// tour track is not displayed is not active
+         // tour track is not displayed is not active
 
-			return;
-		}
+         return;
+      }
 
-		final boolean isToolItemHovered = hoveredItem == _actionTrackLayer;
+      final boolean isToolItemHovered = hoveredItem == _actionTrackLayer;
 
-		Rectangle itemBounds = null;
+      Rectangle itemBounds = null;
 
-		if (isToolItemHovered) {
+      if (isToolItemHovered) {
 
-			itemBounds = hoveredItem.getBounds();
+         itemBounds = hoveredItem.getBounds();
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-			openConfigDialog(itemBounds, true);
-		}
-	}
+         openConfigDialog(itemBounds, true);
+      }
+   }
 
-	private void onSelect() {
+   private void onSelect() {
 
-		updateUI_Tooltip();
+      updateUI_Tooltip();
 
-		final boolean isTrackVisible = _actionTrackLayer.getSelection();
+      final boolean isTrackVisible = _actionTrackLayer.getSelection();
 
-		/*
-		 * show/hide tour track layer
-		 */
-		if (isTrackVisible) {
+      /*
+       * show/hide tour track layer
+       */
+      if (isTrackVisible) {
 
-			final Rectangle itemBounds = _actionTrackLayer.getBounds();
+         final Rectangle itemBounds = _actionTrackLayer.getBounds();
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-			openConfigDialog(itemBounds, false);
+         openConfigDialog(itemBounds, false);
 
-		} else {
+      } else {
 
-			_tourTrackConfigDialog.close();
-		}
+         _tourTrackConfigDialog.close();
+      }
 
-		_map3View.actionShowTour(isTrackVisible);
-	}
+      _map3View.actionShowTour(isTrackVisible);
+   }
 
-	private void openConfigDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
+   private void openConfigDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-		// ensure other dialogs are closed
-		_map3View.closeOpenedDialogs(this);
+      // ensure other dialogs are closed
+      _map3View.closeOpenedDialogs(this);
 
-		_tourTrackConfigDialog.open(itemBounds, isOpenDelayed);
-	}
+      _tourTrackConfigDialog.open(itemBounds, isOpenDelayed);
+   }
 
-	/**
-	 * Set enable/disable and selection for this action.
-	 * 
-	 * @param isSelected
-	 * @param isEnabled
-	 */
-	public void setEnabled(final boolean isEnabled) {
-		
-		if (_actionTrackLayer == null) {
-			
-			_isActionEnabled = isEnabled;
-			
-		} else {
-			
-			_actionTrackLayer.setEnabled(isEnabled);
-		}
-		
-		updateUI_Tooltip();
-	}
+   /**
+    * Set enable/disable and selection for this action.
+    *
+    * @param isSelected
+    * @param isEnabled
+    */
+   public void setEnabled(final boolean isEnabled) {
 
-	/**
-	 * Set enable/disable and selection for this action.
-	 * 
-	 * @param isSelected
-	 * @param isEnabled
-	 */
-	public void setSelection(final boolean isSelected) {
+      if (_actionTrackLayer == null) {
 
-		if (_actionTrackLayer == null) {
+         _isActionEnabled = isEnabled;
 
-			_isActionSelected = isSelected;
+      } else {
 
-		} else {
+         _actionTrackLayer.setEnabled(isEnabled);
+      }
 
-			_actionTrackLayer.setSelection(isSelected);
-		}
+      updateUI_Tooltip();
+   }
 
-		updateUI_Tooltip();
-	}
+   /**
+    * Set enable/disable and selection for this action.
+    *
+    * @param isSelected
+    * @param isEnabled
+    */
+   public void setSelection(final boolean isSelected) {
 
-	public void updateMeasurementSystem() {
+      if (_actionTrackLayer == null) {
 
-		if (_tourTrackConfigDialog == null) {
-			return;
-		}
+         _isActionSelected = isSelected;
 
-		_tourTrackConfigDialog.updateMeasurementSystem();
-	}
+      } else {
 
-	private void updateUI_Tooltip() {
+         _actionTrackLayer.setSelection(isSelected);
+      }
 
-		if (_actionTrackLayer.getSelection()) {
+      updateUI_Tooltip();
+   }
 
-			// hide tooltip because the track properties dialog is displayed
+   public void updateMeasurementSystem() {
 
-			_actionTrackLayer.setToolTipText(UI.EMPTY_STRING);
+      if (_tourTrackConfigDialog == null) {
+         return;
+      }
 
-		} else {
+      _tourTrackConfigDialog.updateMeasurementSystem();
+   }
 
-			_actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
-		}
-	}
+   private void updateUI_Tooltip() {
+
+      if (_actionTrackLayer.getSelection()) {
+
+         // hide tooltip because the track properties dialog is displayed
+
+         _actionTrackLayer.setToolTipText(UI.EMPTY_STRING);
+
+      } else {
+
+         _actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
+      }
+   }
 
 }

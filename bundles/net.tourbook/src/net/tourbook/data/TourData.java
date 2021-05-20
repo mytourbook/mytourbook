@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -217,7 +216,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private static final NumberForm     srtmNumberForm                    = new NumberForm();
 
    @Transient
-   private static final ElevationSRTM3 elevationSRTM3                    = new ElevationSRTM3();
+   private static final ElevationSRTM3 _elevationSRTM3                   = new ElevationSRTM3();
 
    @Transient
    private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
@@ -1010,23 +1009,35 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               _pulseSerie_Smoothed;
 
    /**
-    * Pulse values computed from the pulse times in {@link #pulseTimeSerie}
+    * Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}.
+    * One pulse value is the average of all pulse times within one timeslice.
     */
    @Transient
    public float[]                pulseSerie_FromTime;
 
    /**
+    * One time slice contains all of it's R-R interval values.
+    */
+   @Transient
+   public String[]               pulseSerie_RRIntervals;
+
+   /**
+    * This value is contained in the saved {@link SerieData}
+    * <p>
     * Pulse times in milliseconds.
     * <p>
     * <b>This data serie has not the same serie length as the other data series because 1 second can
     * have multiple values, depending on the heartrate.</b>
     */
    @Transient
-   public int[]                  pulseTimeSerie;
+   public int[]                  pulseTime_Milliseconds;
 
    /**
-    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTimeSerie}
-    */
+    * This value is contained in the saved {@link SerieData}
+    * <p>
+    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTime_Milliseconds}.
+    * A time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
+   */
    @Transient
    public int[]                  pulseTime_TimeIndex;
 
@@ -1395,7 +1406,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private HrZoneContext      _hrZoneContext;
 
    /**
-    * Copy of {@link #timeSerie} with floating type, this is used for the chart x-axis.
+    * Copy of {@link #timeSerie} with double type, this is used for the chart x-axis to support history tours
     */
    @Transient
    private double[]            timeSerieDouble;
@@ -1462,10 +1473,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public int[]               multipleTourStartIndex;
 
    /**
-    * Contains the tour start time for each tour.
+    * Contains the tour start time with a time zone for each tour.
     */
    @Transient
-   public long[]              multipleTourStartTime;
+   public ZonedDateTime[]     multipleTourZonedStartTime;
 
    /**
     * Contains tour titles for each tour.
@@ -2029,8 +2040,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       breakTimeSerie = null;
 
-      pulseSerie_FromTime = null;
       _pulseSerie_Smoothed = null;
+      pulseSerie_FromTime = null;
+      pulseSerie_RRIntervals = null;
 
       gradientSerie = null;
 
@@ -3381,14 +3393,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
+         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
                this,
                btConfig.breakTimeMethodId,
                btConfig.breakMinSliceSpeed);
 
       } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
+         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
                this,
                btConfig.breakTimeMethodId,
                btConfig.breakMinAvgSpeed);
@@ -5693,63 +5705,59 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private void createSRTMDataSerie() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-         @Override
-         public void run() {
+         int serieIndex = 0;
+         float lastValidSRTM = 0;
+         boolean isSRTMValid = false;
 
-            int serieIndex = 0;
-            float lastValidSRTM = 0;
-            boolean isSRTMValid = false;
+         final int serieLength = timeSerie.length;
 
-            final int serieLength = timeSerie.length;
+         final float[] newSRTMSerie = new float[serieLength];
+         final float[] newSRTMSerieImperial = new float[serieLength];
 
-            final float[] newSRTMSerie = new float[serieLength];
-            final float[] newSRTMSerieImperial = new float[serieLength];
+         for (final double latitude : latitudeSerie) {
 
-            for (final double latitude : latitudeSerie) {
+            final double longitude = longitudeSerie[serieIndex];
 
-               final double longitude = longitudeSerie[serieIndex];
+            float srtmValue = 0;
 
-               float srtmValue = 0;
-
-               // ignore lat/lon 0/0, this is in the ocean
-               if (latitude != 0 || longitude != 0) {
-                  srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-               }
-
-               /*
-                * set invalid values to the previous valid value
-                */
-               if (srtmValue == Float.MIN_VALUE) {
-                  // invalid data
-                  srtmValue = lastValidSRTM;
-               } else {
-                  // valid data are available
-                  isSRTMValid = true;
-                  lastValidSRTM = srtmValue;
-               }
-
-               // adjust wrong values
-               if (srtmValue < -1000) {
-                  srtmValue = 0;
-               } else if (srtmValue > 10000) {
-                  srtmValue = 10000;
-               }
-
-               newSRTMSerie[serieIndex] = srtmValue;
-               newSRTMSerieImperial[serieIndex] = srtmValue / UI.UNIT_FOOT;
-
-               serieIndex++;
+            // ignore lat/lon 0/0, this is in the ocean
+            if (latitude != 0 || longitude != 0) {
+               srtmValue = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
             }
 
-            if (isSRTMValid) {
-               srtmSerie = newSRTMSerie;
-               srtmSerieImperial = newSRTMSerieImperial;
+            /*
+             * set invalid values to the previous valid value
+             */
+            if (srtmValue == Float.MIN_VALUE) {
+               // invalid data
+               srtmValue = lastValidSRTM;
             } else {
-               // set state that srtm altitude is invalid
-               srtmSerie = new float[0];
+               // valid data are available
+               isSRTMValid = true;
+               lastValidSRTM = srtmValue;
             }
+
+            // adjust wrong values
+            if (srtmValue < -1000) {
+               srtmValue = 0;
+            } else if (srtmValue > 10000) {
+               srtmValue = 10000;
+            }
+
+            newSRTMSerie[serieIndex] = srtmValue;
+            newSRTMSerieImperial[serieIndex] = srtmValue / UI.UNIT_FOOT;
+
+            serieIndex++;
+         }
+
+         if (isSRTMValid) {
+            srtmSerie = newSRTMSerie;
+            srtmSerieImperial = newSRTMSerieImperial;
+         } else {
+            // set state that srtm altitude is invalid
+            srtmSerie = new float[0];
          }
       });
    }
@@ -6516,7 +6524,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       Arrays.fill(allPulseTime_TimeIndex, -1);
 
-//      final int sumPulseTime = 0;
       int pulseTimesIndex = 0;
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
@@ -6526,9 +6533,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          if (timeSlice_AllPulseTimes != null) {
 
-            int addedPulseTimeIndex = -1;
+            boolean isTimeIndexSet = false;
 
+            // loop: all pulse times within one time slice
             for (final int pulseTimeMS : timeSlice_AllPulseTimes) {
+
                if (pulseTimeMS != 0) {
 
                   if (pulseTimeMS == 65535) {
@@ -6539,40 +6548,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                      allPulseTimes.add(pulseTimeMS);
 
-                     if (addedPulseTimeIndex < 0) {
+                     if (!isTimeIndexSet) {
 
                         // set index only for the first pulse time
-                        addedPulseTimeIndex = timeIndex;
+                        isTimeIndexSet = true;
 
                         allPulseTime_TimeIndex[timeIndex] = pulseTimesIndex;
                      }
 
                      pulseTimesIndex++;
-
-//                     sumPulseTime += pulseTimeMS;
-//                     final int relativeTime = timeSerie[timeIndex];
-//
-//                     final float pulseFromDevice = pulseSerie[timeIndex];
-//                     final double pulseTimeSeconds = pulseTimeMS / 1000.0;
-//                     final double pulseFromPulseTime = 60.0 / pulseTimeSeconds;
-//
-//                     final String pulseFlag = pulseTimeMS > 1000
-//                           ? String.format("> 1000 ms  %6.3f", pulseTimeSeconds / 2)
-//                           : "";
-//
-//                     System.out.println((String.format("%5d  %6.0f sum    %6.3f       %5.1f  %5.1f       %s",
-//
-//                           relativeTime,
-//                           sumPulseTime / 1000.0,
-//                           pulseTimeSeconds,
-//
-//                           pulseFromDevice,
-//                           pulseFromPulseTime,
-//                           pulseFlag
-//
-//                     )));
-                     // xTODO remove SYSTEM.OUT.PRINTLN
-
                   }
                }
             }
@@ -6581,7 +6565,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (allPulseTimes.size() > 0) {
 
-         pulseTimeSerie = allPulseTimes.toArray();
+         pulseTime_Milliseconds = allPulseTimes.toArray();
          pulseTime_TimeIndex = allPulseTime_TimeIndex;
       }
    }
@@ -7959,9 +7943,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns beat values computed from the R-R intervals
+    * @return Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}.
+    *         One pulse value is the average of all pulse times within one timeslice.
     */
-   public float[] getPulse_RRIntervals() {
+   public float[] getPulse_AvgBpmFromRRIntervals() {
 
       if (pulseSerie_FromTime != null) {
          return pulseSerie_FromTime;
@@ -7970,8 +7955,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /**
        * !!! VERY IMPORTANT !!!
        * <P>
+       * The check for
+       * <P>
        * <code>
-       *    pulseTimeSerie == null || pulseTime_TimeIndex == null
+       *    pulseTime_Milliseconds == null || pulseTime_TimeIndex == null
        * </code>
        * MUST BE AFTER
        * <code>
@@ -7981,7 +7968,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
 
       // ensure that needed data are available
-      if (pulseTimeSerie == null || pulseTime_TimeIndex == null) {
+      if (pulseTime_Milliseconds == null || pulseTime_TimeIndex == null) {
          return null;
       }
 
@@ -7993,75 +7980,178 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       pulseSerie_FromTime = new float[numTimeSlices];
 
-      for (int timeIndex = 0; timeIndex < numTimeSlices - 1; timeIndex++) {
+      /*
+       * Garmin Edge 1030 creates R-R intervals with 5000 ms when there is no heartbeat value or
+       * the devices signal is interrupted !!!
+       */
 
-         final int time2Time_Index = pulseTime_TimeIndex[timeIndex];
-         final int time2Time_NextIndex = pulseTime_TimeIndex[timeIndex + 1];
+      for (int serieIndex = 0; serieIndex < numTimeSlices - 1; serieIndex++) {
 
-         if (time2Time_Index < 0 || time2Time_NextIndex < 0) {
+         final int rrIndex_FromTimeSerie = pulseTime_TimeIndex[serieIndex];
+         final int rrIndex_FromTimeSerie_Next = pulseTime_TimeIndex[serieIndex + 1];
 
-            // time index can be -1 when a values is not available
+         if (serieIndex > 0 && (rrIndex_FromTimeSerie < 0 || rrIndex_FromTimeSerie_Next < 0)) {
+
+            // time index can be -1 -> heartbeat is below 60 bpm -> use value from the previous time slice
+
+            if (rrIndex_FromTimeSerie == -1) {
+
+               pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
+
+            } else {
+
+               final int pulseTimeMS = pulseTime_Milliseconds[rrIndex_FromTimeSerie];
+
+               if (pulseTimeMS == 5_000) {
+
+                  pulseSerie_FromTime[serieIndex] = 0;
+
+               } else {
+
+                  pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
+               }
+            }
+
             continue;
          }
 
-         final int pulseTimeMS_First = pulseTimeSerie[time2Time_Index];
-         final int pulseTimeMS_Last = pulseTimeSerie[time2Time_NextIndex];
+         if (rrIndex_FromTimeSerie < 0 || rrIndex_FromTimeSerie_Next < 0) {
 
-         final int numPulseTimes = time2Time_NextIndex - time2Time_Index;
+            continue;
+         }
+
+         float pulseFromPulseTime = 0;
+
+         final int numPulseTimes = rrIndex_FromTimeSerie_Next - rrIndex_FromTimeSerie;
 
          if (numPulseTimes == 0) {
 
             // there is only 1 pulse time
 
-            final float pulseFromPulseTime = 60.0f / (pulseTimeMS_First / 1000.0f);
+            final int pulseTimeMS = pulseTime_Milliseconds[rrIndex_FromTimeSerie];
 
-            pulseSerie_FromTime[timeIndex] = pulseFromPulseTime;
+            if (pulseTimeMS > 0 && pulseTimeMS != 5_000) {
+
+               pulseFromPulseTime = 60.0f / (pulseTimeMS / 1000.0f);
+            }
 
          } else {
 
-            final PulseTimeAlgorithm pulseTimeAlgoithm = PulseTimeAlgorithm.AVERAGE;
+            long sumPulseTimeMS = 0;
 
-            switch (pulseTimeAlgoithm) {
+            for (int avgSerieIndex = rrIndex_FromTimeSerie; avgSerieIndex < rrIndex_FromTimeSerie_Next; avgSerieIndex++) {
 
-            case MAX:
+               final int pulseTimeMS = pulseTime_Milliseconds[avgSerieIndex];
 
-               break;
-
-            case MIN:
-
-               break;
-
-            case FIRST:
-
-               pulseSerie_FromTime[timeIndex] = 60.0f / (pulseTimeMS_First / 1000.0f);
-
-               break;
-
-            case LAST:
-
-               pulseSerie_FromTime[timeIndex] = 60.0f / (pulseTimeMS_Last / 1000.0f);
-
-               break;
-
-            case AVERAGE:
-            default:
-
-               long sumPulseTimeMS = 0;
-
-               for (int avgSerieIndex = time2Time_Index; avgSerieIndex < time2Time_NextIndex; avgSerieIndex++) {
-                  sumPulseTimeMS += pulseTimeSerie[avgSerieIndex];
+               if (pulseTimeMS != 5_000) {
+                  sumPulseTimeMS += pulseTimeMS;
                }
 
-               final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
-               final float pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
+            }
 
-               pulseSerie_FromTime[timeIndex] = pulseFromPulseTime;
-               break;
+            if (sumPulseTimeMS > 0) {
+
+               final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
+               pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
             }
          }
+
+         pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
       }
 
       return pulseSerie_FromTime;
+   }
+
+   public String[] getPulse_RRIntervals() {
+
+      if (pulseTime_TimeIndex == null) {
+         return null;
+      }
+
+      if (pulseSerie_RRIntervals != null) {
+         return pulseSerie_RRIntervals;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+
+      pulseSerie_RRIntervals = new String[numTimeSlices];
+
+      for (int serieIndex = 0; serieIndex < numTimeSlices - 1; serieIndex++) {
+
+         int rrIndex_Current = pulseTime_TimeIndex[serieIndex];
+         final int rrIndex_Next = pulseTime_TimeIndex[serieIndex + 1];
+
+         if (serieIndex > 0 && rrIndex_Current == -1) {
+
+            final int rrIndex_Prev = pulseTime_TimeIndex[serieIndex - 1];
+
+            if (rrIndex_Prev != -1) {
+
+               final int rrIndexDiff = rrIndex_Next - rrIndex_Prev;
+
+               if (rrIndexDiff > 2) {
+
+                  /**
+                   * Adjust current index when there is a gap between previous and next index,
+                   * otherwise these values are not displayed
+                   * <p>
+                   * Example:
+                   * <p>
+                   * <code>
+                   *
+                   *     rrIndex_Current  = -1
+                   *     rrIndex_Next     = 4162
+                   *     rrIndex_Prev     = 4107
+                   *     rrIndexDiff      = 55
+                   *
+                   * </code>
+                   */
+
+                  rrIndex_Current = rrIndex_Prev + 1;
+               }
+            }
+         }
+
+         final StringBuilder sb = new StringBuilder();
+
+         if (rrIndex_Current >= 0 && rrIndex_Next >= 0) {
+
+            final int numRR = rrIndex_Next - rrIndex_Current;
+            if (numRR > 4) {
+               sb.append(numRR + " ∑  ");
+            }
+
+            for (int rrIndex = rrIndex_Current; rrIndex < rrIndex_Next; rrIndex++) {
+
+               final int rrValue = pulseTime_Milliseconds[rrIndex];
+
+               final String space = rrIndex < rrIndex_Next - 1
+                     ? UI.SPACE1
+                     : UI.EMPTY_STRING;
+
+               sb.append(rrValue + space);
+            }
+
+         } else if (rrIndex_Current >= 0) {
+
+            final int rrValue = pulseTime_Milliseconds[rrIndex_Current];
+
+            sb.append(rrValue);
+
+         } else if (rrIndex_Current < 0) {
+
+            sb.append(rrIndex_Current);
+
+         } else if (rrIndex_Next < 0) {
+
+            sb.append("Next: " + rrIndex_Next);
+
+         }
+
+         pulseSerie_RRIntervals[serieIndex] = sb.toString();
+      }
+
+      return pulseSerie_RRIntervals;
    }
 
    public float[] getPulse_SmoothedSerie() {
@@ -8811,12 +8901,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // sort markers by serie index
       _sortedMarkers = new ArrayList<>(tourMarkers);
 
-      Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
-         @Override
-         public int compare(final TourMarker marker1, final TourMarker marker2) {
-            return marker1.getSerieIndex() - marker2.getSerieIndex();
-         }
-      });
+      Collections.sort(
+            _sortedMarkers,
+            (tourMarker1, tourMarker2) -> tourMarker1.getSerieIndex() - tourMarker2.getSerieIndex());
 
       return _sortedMarkers;
    }
@@ -9418,10 +9505,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
       computeGeo_Grid();
 
-      gearSerie            = serieData.gears;
+      gearSerie               = serieData.gears;
 
-      pulseTimeSerie       = serieData.pulseTimes;
-      pulseTime_TimeIndex  = serieData.pulseTime_TimeIndex;
+      pulseTime_Milliseconds  = serieData.pulseTimes;
+      pulseTime_TimeIndex     = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
          isPowerSerieFromDevice = true;
@@ -9446,7 +9533,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       swim_Strokes               = serieData.swim_Strokes;
       swim_StrokeStyle           = serieData.swim_StrokeStyle;
       swim_Time                  = serieData.swim_Time;
-      isSwimCadence = swim_Cadence != null;
+      isSwimCadence              = swim_Cadence != null;
 
       // currently only surfing data can be made visible/hidden
       visibleDataPointSerie      = serieData.visiblePoints_Surfing;
@@ -9497,7 +9584,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       serieData.gears         = gearSerie;
 
-      serieData.pulseTimes    = pulseTimeSerie;
+      serieData.pulseTimes          = pulseTime_Milliseconds;
       serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
 
       // running dynamics
@@ -9638,7 +9725,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * @param bodyWeight
-    *           Sets the body weight.
+    *           Sets the body weight in kilograms.
     */
    public void setBodyWeight(final float bodyWeight) {
       this.bodyWeight = bodyWeight;

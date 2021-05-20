@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,30 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionShowPhotoName extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionShowPhotoName(final PhotoGallery photoGallery) {
+   public ActionShowPhotoName(final PhotoGallery photoGallery) {
 
-		super(Messages.Pic_Dir_Action_ShowPhotoFileName, AS_CHECK_BOX);
+      super(Messages.Pic_Dir_Action_ShowPhotoFileName, AS_CHECK_BOX);
 
-		_photoGallery = photoGallery;
+      _photoGallery = photoGallery;
 
-		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoFileName_Tooltip);
+      setToolTipText(Messages.Pic_Dir_Action_ShowPhotoFileName_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoInfoName));
-	}
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionShowPhotoInfo(this);
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionShowPhotoInfo(this);
+   }
 }

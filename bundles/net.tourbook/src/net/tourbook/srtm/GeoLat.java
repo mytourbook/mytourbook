@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,72 +20,72 @@ package net.tourbook.srtm;
 
 public class GeoLat extends GeoCoord {
 
-	static final char	DIRECTION_NORTH	= 'N';
-	static final char	DIRECTION_SOUTH	= 'S';
+   static final char DIRECTION_NORTH = 'N';
+   static final char DIRECTION_SOUTH = 'S';
 
-	public static void main(final String[] args) {
+   public static void main(final String[] args) {
 
-	}
+   }
 
-	public GeoLat() {
-		super();
-	}
+   public GeoLat() {
+      super();
+   }
 
-	public GeoLat(final double d) {
-		super();
-		set(d);
-	}
+   public GeoLat(final double d) {
+      super();
+      set(d);
+   }
 
-	public GeoLat(final GeoLat lat) {
-		super();
-		set(lat);
-	}
+   public GeoLat(final GeoLat lat) {
+      super();
+      set(lat);
+   }
 
-	public GeoLat(final String s) {
-		super();
-		set(s);
-	}
+   public GeoLat(final String s) {
+      super();
+      set(s);
+   }
 
-	public void add(final GeoLat lat) {
+   public void add(final GeoLat lat) {
 
-		decimal += lat.decimal;
-		if (decimal > 90 * faktg)
-			decimal = 180 * faktg - decimal;
+      decimal += lat.decimal;
+      if (decimal > 90 * FACTOR_DEGREES)
+         decimal = 180 * FACTOR_DEGREES - decimal;
 
-		updateDegrees();
-	}
+      updateDegrees();
+   }
 
-	public void add(final GeoLat lat, final GeoLat a) {
-		decimal = lat.decimal;
-		this.add(a);
-	}
+   public void add(final GeoLat lat, final GeoLat a) {
+      decimal = lat.decimal;
+      this.add(a);
+   }
 
-	@Override
-	public char directionMinus() {
-		return 'S';
-	}
+   @Override
+   public char directionMinus() {
+      return 'S';
+   }
 
-	@Override
-	public char directionPlus() {
-		return 'N';
-	}
+   @Override
+   public char directionPlus() {
+      return 'N';
+   }
 
-	public void set(final GeoLat lat) {
-		super.set(lat);
-	}
+   public void set(final GeoLat lat) {
+      super.set(lat);
+   }
 
-	public void sub(final GeoLat lat) {
+   public void sub(final GeoLat lat) {
 
-		decimal -= lat.decimal;
-		if (decimal < -90 * faktg)
-			decimal = -180 * faktg - decimal;
+      decimal -= lat.decimal;
+      if (decimal < -90 * FACTOR_DEGREES)
+         decimal = -180 * FACTOR_DEGREES - decimal;
 
-		updateDegrees();
-	}
+      updateDegrees();
+   }
 
-	public void sub(final GeoLat lat, final GeoLat s) {
-		decimal = lat.decimal;
-		this.sub(s);
-	}
+   public void sub(final GeoLat lat, final GeoLat s) {
+      decimal = lat.decimal;
+      this.sub(s);
+   }
 
 }

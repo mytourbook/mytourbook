@@ -21,11 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.dialog.MessageDialog_Customized;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ITreeViewer;
@@ -226,7 +227,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          super(Messages.action_tagView_flat_layout, AS_RADIO_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
       }
 
       @Override
@@ -241,7 +242,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical));
       }
 
       @Override
@@ -258,8 +259,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          setToolTipText(Messages.Slideout_TourTagFilter_Action_CheckAllTags_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Checkbox_Checked));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Checkbox_Checked_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked_Disabled));
       }
 
       @Override
@@ -276,8 +277,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          setToolTipText(Messages.Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Checkbox_Uncheck));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Checkbox_Uncheck_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck_Disabled));
       }
 
       @Override
@@ -1544,9 +1545,9 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       _pc = new PixelConverter(parent);
 
-      _imgTag = TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
-      _imgTagRoot = TourbookPlugin.getImageDescriptor(Messages.Image__tag_root).createImage();
-      _imgTagCategory = TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage();
+      _imgTag = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
+      _imgTagRoot = TourbookPlugin.getImageDescriptor(Images.Tag_Root).createImage();
+      _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Tag_Category).createImage();
 
       parent.addDisposeListener(new DisposeListener() {
          @Override
@@ -1674,7 +1675,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         MessageDialog_Customized dialog = new MessageDialog_Customized(
+         MessageDialog_OnTop dialog = new MessageDialog_OnTop(
 
                getToolTipShell(),
 

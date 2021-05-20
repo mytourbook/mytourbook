@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourPerson;
@@ -31,19 +35,15 @@ import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.preferences.PrefPagePeopleData;
 import net.tourbook.preferences.PrefPage_Appearance_Swimming;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -52,38 +52,33 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Tour chart properties slideout.
+ * Tour chart properties slideout
  */
-public class Slideout_GraphBackground extends ToolbarSlideout {
+public class Slideout_GraphBackground extends ToolbarSlideout implements IActionResetToDefault {
 
-   private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final String           APP_THEME_VALUE_FOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_ValueFor_Light_Tooltip;
+   private static final String           APP_THEME_VALUE_FOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_ValueFor_Dark_Tooltip;
+
+   private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
 
    /**
     * Contains all {@link GraphBgSourceType}s which can be displayed for the current tour
     */
-   private ArrayList<GraphBgSourceType>  _availableGraphBgSourceTypes = new ArrayList<>();
+   private ArrayList<GraphBgSourceType>  _availableGraphBgSourceTypes      = new ArrayList<>();
 
-   private Action                        _actionRestoreDefaults;
+   private ActionResetToDefaults         _actionRestoreDefaults;
    private ActionOpenPrefDialog          _actionPrefDialog;
 
-   private SelectionAdapter              _defaultSelectionListener;
+   private SelectionListener             _defaultSelectionListener;
    private MouseWheelListener            _defaultMouseWheelListener;
    private FocusListener                 _keepOpenListener;
 
    {
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
 
       _keepOpenListener = new FocusListener() {
@@ -115,12 +110,12 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    private Label     _lblGraphBgStyle;
 
-   private Spinner   _spinnerGraphTransparencyFilling;
+   private Spinner   _spinnerGraphTransparencyFilling_Light;
+   private Spinner   _spinnerGraphTransparencyFilling_Dark;
 
    public Slideout_GraphBackground(final Control ownerControl,
                                    final ToolBar toolBar,
-                                   final TourChart tourChart,
-                                   final IDialogSettings state) {
+                                   final TourChart tourChart) {
 
       super(ownerControl, toolBar);
 
@@ -129,18 +124,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Slideout_TourChartGraphBackground_Action_Colors_Tooltip,
@@ -273,23 +257,46 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
           * label: graph filling transparency
           */
          final Label label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(label);
          label.setText(Messages.Pref_Graphs_Label_GraphTransparency);
          label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(label);
 
-         /*
-          * spinner: graph filling transparence
-          */
-         _spinnerGraphTransparencyFilling = new Spinner(parent, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_spinnerGraphTransparencyFilling);
-         _spinnerGraphTransparencyFilling.setMinimum(0x00);
-         _spinnerGraphTransparencyFilling.setMaximum(0xff);
-         _spinnerGraphTransparencyFilling.addMouseWheelListener(_defaultMouseWheelListener);
-         _spinnerGraphTransparencyFilling.addSelectionListener(_defaultSelectionListener);
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+            /*
+             * Graph filling transparency: light
+             */
+            _spinnerGraphTransparencyFilling_Light = new Spinner(container, SWT.BORDER);
+            _spinnerGraphTransparencyFilling_Light.setMinimum(0);
+            _spinnerGraphTransparencyFilling_Light.setMaximum(100);
+            _spinnerGraphTransparencyFilling_Light.setIncrement(1);
+            _spinnerGraphTransparencyFilling_Light.setPageIncrement(10);
+            _spinnerGraphTransparencyFilling_Light.setToolTipText(APP_THEME_VALUE_FOR_LIGHT_TOOLTIP);
+            _spinnerGraphTransparencyFilling_Light.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinnerGraphTransparencyFilling_Light.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerGraphTransparencyFilling_Light);
+
+            /*
+             * Graph filling transparency: dark
+             */
+            _spinnerGraphTransparencyFilling_Dark = new Spinner(container, SWT.BORDER);
+            _spinnerGraphTransparencyFilling_Dark.setMinimum(0);
+            _spinnerGraphTransparencyFilling_Dark.setMaximum(100);
+            _spinnerGraphTransparencyFilling_Dark.setIncrement(1);
+            _spinnerGraphTransparencyFilling_Dark.setPageIncrement(10);
+            _spinnerGraphTransparencyFilling_Dark.setToolTipText(APP_THEME_VALUE_FOR_DARK_TOOLTIP);
+            _spinnerGraphTransparencyFilling_Dark.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinnerGraphTransparencyFilling_Dark.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerGraphTransparencyFilling_Dark);
+         }
       }
    }
 
@@ -354,9 +361,11 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
-      _spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+      _spinnerGraphTransparencyFilling_Light.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+      _spinnerGraphTransparencyFilling_Dark.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK));
 
       select_GraphBgSource(TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
       select_GraphBgStyle(TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
@@ -370,7 +379,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    private void restoreState() {
 
-      _spinnerGraphTransparencyFilling.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+      _spinnerGraphTransparencyFilling_Light.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+      _spinnerGraphTransparencyFilling_Dark.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK));
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
@@ -384,11 +394,16 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, _spinnerGraphTransparencyFilling.getSelection());
+// SET_FORMATTING_OFF
+
+      /*
+       * Update pref store
+       */
+      _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING,       _spinnerGraphTransparencyFilling_Light.getSelection());
+      _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK,  _spinnerGraphTransparencyFilling_Dark.getSelection());
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
-// SET_FORMATTING_OFF
 
 		final GraphBgSourceType graphBgSourceType 	= _availableGraphBgSourceTypes.get(_comboGraphBgSource.getSelectionIndex());
 		final GraphBgStyleType graphBgStyleType 		= TourChartConfiguration.GRAPH_BACKGROUND_STYLE_TYPE[_comboGraphBgStyle.getSelectionIndex()];
@@ -396,11 +411,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 		final GraphBackgroundSource graphBgSource 	= graphBgSourceType.graphBgSource;
 		final GraphBackgroundStyle graphBgStyle 		= graphBgStyleType.graphBgStyle;
 
-		/*
-		 * Update pref store
-		 */
-		_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE, graphBgSource.name());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_STYLE, graphBgStyle.name());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE,  graphBgSource.name());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_BACKGROUND_STYLE,   graphBgStyle.name());
 
 		/*
 		 * Update chart config

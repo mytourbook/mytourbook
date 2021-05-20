@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -114,7 +115,7 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -195,25 +196,6 @@ public class Map2View extends ViewPart implements
 
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
-   private static final String   IMAGE_GRAPH                                           = net.tourbook.Messages.Image__Graph;
-   private static final String   IMAGE_GRAPH_DISABLED                                  = net.tourbook.Messages.Image__Graph_Disabled;
-   private static final String   IMAGE_GRAPH_ALTITUDE                                  = net.tourbook.Messages.Image__graph_altitude;
-   private static final String   IMAGE_GRAPH_ALTITUDE_DISABLED                         = net.tourbook.Messages.Image__graph_altitude_disabled;
-   private static final String   IMAGE_GRAPH_GRADIENT                                  = net.tourbook.Messages.Image__graph_gradient;
-   private static final String   IMAGE_GRAPH_GRADIENT_DISABLED                         = net.tourbook.Messages.Image__graph_gradient_disabled;
-   private static final String   IMAGE_GRAPH_PACE                                      = net.tourbook.Messages.Image__graph_pace;
-   private static final String   IMAGE_GRAPH_PACE_DISABLED                             = net.tourbook.Messages.Image__graph_pace_disabled;
-   private static final String   IMAGE_GRAPH_PULSE                                     = net.tourbook.Messages.Image__graph_heartbeat;
-   private static final String   IMAGE_GRAPH_PULSE_DISABLED                            = net.tourbook.Messages.Image__graph_heartbeat_disabled;
-   private static final String   IMAGE_GRAPH_SPEED                                     = net.tourbook.Messages.Image__graph_speed;
-   private static final String   IMAGE_GRAPH_SPEED_DISABLED                            = net.tourbook.Messages.Image__graph_speed_disabled;
-   private static final String   IMAGE_GRAPH_RUN_DYN_STEP_LENGTH                       = net.tourbook.Messages.Image__Graph_RunDyn_StepLength;
-   private static final String   IMAGE_GRAPH_RUN_DYN_STEP_LENGTH_DISABLED              = net.tourbook.Messages.Image__Graph_RunDyn_StepLength_Disabled;
-   private static final String   IMAGE_SEARCH_TOURS_BY_LOCATION                        = net.tourbook.Messages.Image__SearchToursByLocation;
-   private static final String   IMAGE_MAP_OPTIONS                                     = net.tourbook.Messages.Image__MapOptions;
-   private static final String   IMAGE_MAP_OPTIONS_DISABLED                            = net.tourbook.Messages.Image__MapOptions_Disabled;
-   private static final String   IMAGE_SYNC_MAP_WITH_OTHER_MAP                         = net.tourbook.Messages.Image__SyncMapWithOtherMap;
-   //
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
    static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
@@ -225,7 +207,7 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT             = true;
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
-   //
+
    private static final String   STATE_IS_SHOW_SCALE_IN_MAP                            = "STATE_IS_SHOW_SCALE_IN_MAP";                          //$NON-NLS-1$
    static final String           STATE_IS_SHOW_SLIDER_IN_MAP                           = "STATE_IS_SHOW_SLIDER_IN_MAP";                         //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT                   = true;
@@ -236,24 +218,24 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
    private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
-   //
+
    private static final String   STATE_MAP_DIM_LEVEL                                   = "STATE_MAP_DIM_LEVEL";                                 //$NON-NLS-1$
    private static final String   STATE_MAP_SYNC_MODE                                   = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
    private static final String   STATE_MAP_SYNC_MODE_IS_ACTIVE                         = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
-   //
+
    private static final String   STATE_ZOOM_LEVEL_ADJUSTMENT                           = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
    private static final String   STATE_SELECTED_MAP_PROVIDER_ID                        = "selected.map-provider-id";                            //$NON-NLS-1$
-   //
+
    private static final String   STATE_DEFAULT_POSITION_ZOOM                           = "STATE_DEFAULT_POSITION_ZOOM";                         //$NON-NLS-1$
    private static final String   STATE_DEFAULT_POSITION_LATITUDE                       = "STATE_DEFAULT_POSITION_LATITUDE";                     //$NON-NLS-1$
    private static final String   STATE_DEFAULT_POSITION_LONGITUDE                      = "STATE_DEFAULT_POSITION_LONGITUDE";                    //$NON-NLS-1$
    private static final String   STATE_TOUR_COLOR_ID                                   = "STATE_TOUR_COLOR_ID";                                 //$NON-NLS-1$
-   //
+
    static final String           PREF_DEBUG_MAP_DIM_LEVEL                              = "PREF_DEBUG_MAP_DIM_LEVEL";                            //$NON-NLS-1$
    static final String           PREF_DEBUG_MAP_SHOW_GEO_GRID                          = "PREF_DEBUG_MAP_SHOW_GEO_GRID";                        //$NON-NLS-1$
    static final String           PREF_SHOW_TILE_INFO                                   = "PREF_SHOW_TILE_INFO";                                 //$NON-NLS-1$
    static final String           PREF_SHOW_TILE_BORDER                                 = "PREF_SHOW_TILE_BORDER";                               //$NON-NLS-1$
-   //
+
    static final String           STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE                     = "STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE";                   //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_GRADIENT                     = "STATE_IS_SHOW_IN_TOOLBAR_GRADIENT";                   //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_PACE                         = "STATE_IS_SHOW_IN_TOOLBAR_PACE";                       //$NON-NLS-1$
@@ -261,7 +243,7 @@ public class Map2View extends ViewPart implements
    static final String           STATE_IS_SHOW_IN_TOOLBAR_SPEED                        = "STATE_IS_SHOW_IN_TOOLBAR_SPEED";                      //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE                      = "STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE";                    //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH          = "STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH";        //$NON-NLS-1$
-   //
+
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT             = true;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT             = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT                 = false;
@@ -269,25 +251,25 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT                = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT              = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT  = true;
-   //
+
    static final String           STATE_IS_SHOW_SLIDER_PATH                             = "STATE_IS_SHOW_SLIDER_PATH";                           //$NON-NLS-1$
    static final String           STATE_SLIDER_PATH_LINE_WIDTH                          = "STATE_SLIDER_PATH_LINE_WIDTH";                        //$NON-NLS-1$
    static final String           STATE_SLIDER_PATH_OPACITY                             = "STATE_SLIDER_PATH_OPACITY";                           //$NON-NLS-1$
    static final String           STATE_SLIDER_PATH_SEGMENTS                            = "STATE_SLIDER_PATH_SEGMENTS";                          //$NON-NLS-1$
    static final String           STATE_SLIDER_PATH_COLOR                               = "STATE_SLIDER_PATH_COLOR";                             //$NON-NLS-1$
-   //
+
    static final boolean          STATE_IS_SHOW_SLIDER_PATH_DEFAULT                     = true;
    static final int              STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT                  = 30;
    static final int              STATE_SLIDER_PATH_OPACITY_DEFAULT                     = 60;
    static final int              STATE_SLIDER_PATH_SEGMENTS_DEFAULT                    = 200;
    static final RGB              STATE_SLIDER_PATH_COLOR_DEFAULT                       = new RGB(0xff, 0xff, 0x80);
-   //
+
    private static final String   STATE_IS_PHOTO_FILTER_ACTIVE                          = "STATE_IS_PHOTO_FILTER_ACTIVE";                        //$NON-NLS-1$
    private static final String   STATE_PHOTO_FILTER_RATING_STARS                       = "STATE_PHOTO_FILTER_RATING_STARS";                     //$NON-NLS-1$
    private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR               = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
-   //
+
    private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
-   //
+
    private static final MapGraphId[]         _allGraphContribId       = {
 
          MapGraphId.Altitude,
@@ -418,7 +400,7 @@ public class Map2View extends ViewPart implements
    private boolean                           _isMapSyncWith_ValuePoint;
    //
    private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
-   private ActionTourColor                   _actionTourColor_Altitude;
+   private ActionTourColor                   _actionTourColor_Elevation;
    private ActionTourColor                   _actionTourColor_Gradient;
    private ActionTourColor                   _actionTourColor_Pulse;
    private ActionTourColor                   _actionTourColor_Speed;
@@ -487,8 +469,8 @@ public class Map2View extends ViewPart implements
 
       public ActionMap2_Graphs() {
 
-         super(TourbookPlugin.getImageDescriptor(IMAGE_GRAPH),
-               TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_DISABLED));
+         super(TourbookPlugin.getImageDescriptor(Images.Graph),
+               TourbookPlugin.getImageDescriptor(Images.Graph_Disabled));
 
          setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
       }
@@ -509,8 +491,8 @@ public class Map2View extends ViewPart implements
 
       public ActionMap2_Options() {
 
-         super(TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS),
-               TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS_DISABLED));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions),
+               TourbookPlugin.getImageDescriptor(Images.MapOptions_Disabled));
       }
 
       @Override
@@ -531,7 +513,7 @@ public class Map2View extends ViewPart implements
 
          setText(Messages.Map_Action_SearchTourByLocation);
          setToolTipText(Messages.Map_Action_SearchTourByLocation_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
       }
 
       @Override
@@ -545,8 +527,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowPhotos() {
 
-         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap),
-               TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
+               TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
@@ -575,8 +557,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getImageDescriptor(Messages.Image__Tour),
-               TourbookPlugin.getImageDescriptor(Messages.Image__Tour_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart),
+               TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.map_action_show_tour_in_map;
@@ -607,8 +589,8 @@ public class Map2View extends ViewPart implements
 
       public ActionSyncMap() {
 
-         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncMap),
-               TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncMap),
+               TourbookPlugin.getThemedImageDescriptor(Images.SyncMap_Disabled));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
@@ -618,22 +600,22 @@ public class Map2View extends ViewPart implements
           */
 
          // image 0: tour
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
 
          // image 1: value point
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint));
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_ValuePoint));
 
          // image 2: one slider
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider));
 
          // image 3: centered sliders
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_Slider_Centered));
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered));
 
          // image 4: other map
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(IMAGE_SYNC_MAP_WITH_OTHER_MAP));
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_OtherMap));
 
          // image 5: photo
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_Map_SyncPhotoWithMap));
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Photo));
       }
 
       @Override
@@ -1299,7 +1281,7 @@ public class Map2View extends ViewPart implements
             final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
             final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
 
-            _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
+            _map.setTourPaintMethodEnhanced(PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
          } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
                || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
@@ -1532,64 +1514,64 @@ public class Map2View extends ViewPart implements
 
    private void createActions() {
 
-      _actionTourColor_Altitude = new ActionTourColor(
+      _actionTourColor_Elevation = new ActionTourColor(
             this,
             MapGraphId.Altitude,
             Messages.map_action_tour_color_altitude_tooltip,
-            IMAGE_GRAPH_ALTITUDE,
-            IMAGE_GRAPH_ALTITUDE_DISABLED);
+            Images.Graph_Elevation,
+            Images.Graph_Elevation_Disabled);
 
       _actionTourColor_Gradient = new ActionTourColor(
             this,
             MapGraphId.Gradient,
             Messages.map_action_tour_color_gradient_tooltip,
-            IMAGE_GRAPH_GRADIENT,
-            IMAGE_GRAPH_GRADIENT_DISABLED);
+            Images.Graph_Gradient,
+            Images.Graph_Gradient_Disabled);
 
       _actionTourColor_Pulse = new ActionTourColor(
             this,
             MapGraphId.Pulse,
             Messages.map_action_tour_color_pulse_tooltip,
-            IMAGE_GRAPH_PULSE,
-            IMAGE_GRAPH_PULSE_DISABLED);
+            Images.Graph_Heartbeat,
+            Images.Graph_Heartbeat_Disabled);
 
       _actionTourColor_Speed = new ActionTourColor(
             this,
             MapGraphId.Speed,
             Messages.map_action_tour_color_speed_tooltip,
-            IMAGE_GRAPH_SPEED,
-            IMAGE_GRAPH_SPEED_DISABLED);
+            Images.Graph_Speed,
+            Images.Graph_Speed_Disabled);
 
       _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
             Messages.map_action_tour_color_pase_tooltip,
-            IMAGE_GRAPH_PACE,
-            IMAGE_GRAPH_PACE_DISABLED);
+            Images.Graph_Pace,
+            Images.Graph_Pace_Disabled);
 
       _actionTourColor_RunDyn_StepLength = new ActionTourColor(
             this,
             MapGraphId.RunDyn_StepLength,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
-            IMAGE_GRAPH_RUN_DYN_STEP_LENGTH,
-            IMAGE_GRAPH_RUN_DYN_STEP_LENGTH_DISABLED);
+            Images.Graph_RunDyn_StepLength,
+            Images.Graph_RunDyn_StepLength_Disabled);
 
       _actionTourColor_HrZone = new ActionTourColor(
             this,
             MapGraphId.HrZone,
             Messages.Tour_Action_ShowHrZones_Tooltip,
-            Messages.Image__PulseZones,
-            Messages.Image__PulseZones_Disabled);
+            Images.PulseZones,
+            Images.PulseZones_Disabled);
 
 // SET_FORMATTING_OFF
 
-      _allTourColor_Actions.put(MapGraphId.Altitude, _actionTourColor_Altitude);
-      _allTourColor_Actions.put(MapGraphId.Gradient, _actionTourColor_Gradient);
-      _allTourColor_Actions.put(MapGraphId.Pulse, _actionTourColor_Pulse);
-      _allTourColor_Actions.put(MapGraphId.Speed, _actionTourColor_Speed);
-      _allTourColor_Actions.put(MapGraphId.Pace, _actionTourColor_Pace);
-      _allTourColor_Actions.put(MapGraphId.HrZone, _actionTourColor_HrZone);
-      _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength, _actionTourColor_RunDyn_StepLength);
+      _allTourColor_Actions.put(MapGraphId.Altitude,           _actionTourColor_Elevation);
+      _allTourColor_Actions.put(MapGraphId.Gradient,           _actionTourColor_Gradient);
+      _allTourColor_Actions.put(MapGraphId.Pulse,              _actionTourColor_Pulse);
+      _allTourColor_Actions.put(MapGraphId.Speed,              _actionTourColor_Speed);
+      _allTourColor_Actions.put(MapGraphId.Pace,               _actionTourColor_Pace);
+      _allTourColor_Actions.put(MapGraphId.HrZone,             _actionTourColor_HrZone);
+      _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength,  _actionTourColor_RunDyn_StepLength);
 
       // map2 slideouts
       _actionMap2_Bookmarks               = new ActionMapBookmarks(this._parent, this);
@@ -1608,7 +1590,7 @@ public class Map2View extends ViewPart implements
 
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionDimMap_SubMenu                       = new ActionDimMap(this);
-      _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
+      _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPage_Map2_Appearance.ID);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -1632,10 +1614,10 @@ public class Map2View extends ViewPart implements
       _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
 
       // map sync actions
-      _actionSyncMapWith_Photo            = new ActionSyncMapWith_Photo(this);
       _actionSyncMapWith_OtherMap         = new ActionSyncMapWith_OtherMap(this);
-      _actionSyncMapWith_Slider_One       = new ActionSyncMapWith_Slider_One(this);
+      _actionSyncMapWith_Photo            = new ActionSyncMapWith_Photo(this);
       _actionSyncMapWith_Slider_Centered  = new ActionSyncMapWith_Slider_Centered(this);
+      _actionSyncMapWith_Slider_One       = new ActionSyncMapWith_Slider_One(this);
       _actionSyncMapWith_Tour             = new ActionSyncMapWith_Tour(this);
       _actionSyncMapWith_ValuePoint       = new ActionSyncMapWith_ValuePoint(this);
 
@@ -1772,7 +1754,7 @@ public class Map2View extends ViewPart implements
 
       final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
       final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
-      _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
+      _map.setTourPaintMethodEnhanced(PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
@@ -1998,7 +1980,7 @@ public class Map2View extends ViewPart implements
 
       if (numberOfTours == 0) {
 
-         _actionTourColor_Altitude.setEnabled(false);
+         _actionTourColor_Elevation.setEnabled(false);
          _actionTourColor_Gradient.setEnabled(false);
          _actionTourColor_Pulse.setEnabled(false);
          _actionTourColor_Speed.setEnabled(false);
@@ -2008,7 +1990,7 @@ public class Map2View extends ViewPart implements
 
       } else if (isForceTourColor) {
 
-         _actionTourColor_Altitude.setEnabled(true);
+         _actionTourColor_Elevation.setEnabled(true);
          _actionTourColor_Gradient.setEnabled(true);
          _actionTourColor_Pulse.setEnabled(true);
          _actionTourColor_Speed.setEnabled(true);
@@ -2022,7 +2004,7 @@ public class Map2View extends ViewPart implements
          final boolean isPulse = oneTourData.pulseSerie != null;
          final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
 
-         _actionTourColor_Altitude.setEnabled(true);
+         _actionTourColor_Elevation.setEnabled(true);
          _actionTourColor_Gradient.setEnabled(oneTourData.getGradientSerie() != null);
          _actionTourColor_Pulse.setEnabled(isPulse);
          _actionTourColor_Speed.setEnabled(oneTourData.getSpeedSerie() != null);
@@ -2032,7 +2014,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         _actionTourColor_Altitude.setEnabled(false);
+         _actionTourColor_Elevation.setEnabled(false);
          _actionTourColor_Gradient.setEnabled(false);
          _actionTourColor_Pulse.setEnabled(false);
          _actionTourColor_Speed.setEnabled(false);
@@ -2758,7 +2740,7 @@ public class Map2View extends ViewPart implements
 
                      // tour is not in the database, try to get it from the raw data manager
 
-                     final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+                     final java.util.Map<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
                      tourData = rawData.get(tourId);
                   }
                }
@@ -3708,7 +3690,7 @@ public class Map2View extends ViewPart implements
 
          switch (colorId) {
          case Altitude:
-            _actionTourColor_Altitude.setChecked(true);
+            _actionTourColor_Elevation.setChecked(true);
             break;
 
          case Gradient:
@@ -3736,14 +3718,14 @@ public class Map2View extends ViewPart implements
             break;
 
          default:
-            _actionTourColor_Altitude.setChecked(true);
+            _actionTourColor_Elevation.setChecked(true);
             break;
          }
 
          setTourPainterColorProvider(colorId);
 
       } catch (final NumberFormatException e) {
-         _actionTourColor_Altitude.setChecked(true);
+         _actionTourColor_Elevation.setChecked(true);
       }
 
       // draw tour with default color

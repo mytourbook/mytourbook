@@ -19,9 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.map2.messages";    //$NON-NLS-1$
-
-   public static String        Image__floppy_disk;
+   private static final String BUNDLE_NAME = "net.tourbook.map2.messages";   //$NON-NLS-1$
 
    public static String        App_Action_Apply;
 
@@ -30,54 +28,17 @@ public class Messages extends NLS {
    public static String        graph_label_gradient_unit;
    public static String        graph_label_heartbeat_unit;
 
-   public static String        Image__PulseZones;
-   public static String        Image__PulseZones_Disabled;
-
-   public static String        Image_Action_Map_SyncPhotoWithMap;
-   public static String        Image_Action_Map_SyncPhotoWithMap_Disabled;
-   public static String        Image_Action_POI;
-   public static String        Image_Action_POI_Disabled;
-   public static String        Image_Action_ShowAllPhotosInMap;
-   public static String        Image_Action_ShowAllPhotosInMap_Disabled;
-   public static String        Image_Action_ShowPhotosInMap;
-   public static String        Image_Action_ShowPhotosInMap_Disabled;
+   /*
+    * These image names are translatable, any other images are constants and NOT translated
+    */
    public static String        Image_Action_ShowSliderInMap;
    public static String        Image_Action_ShowSliderInMap_Left;
    public static String        Image_Action_ShowStartEndInMap;
-   public static String        Image_Action_ShowValuePoint;
-   public static String        Image_Action_SyncWith_Slider_Centered;
-   public static String        Image_Action_SyncWith_Slider_Centered_Disabled;
-   public static String        Image_Action_SyncWith_ValuePoint;
-   public static String        Image_Action_SyncWith_ValuePoint_Disabled;
-   public static String        Image_Action_SyncMap;
-   public static String        Image_Action_SyncMap_Disabled;
-   public static String        Image_Action_TourWayPoint;
-   public static String        Image_Action_TourWayPoint_Disabled;
-   public static String        Image_Action_Zoom_CenterTour;
-   public static String        Image_Action_Zoom_ShowEntireMap;
 
    public static String        Image_Map_MarkerSliderLeft;
    public static String        Image_Map_MarkerSliderRight;
    public static String        Image_Map_TourEndMarker;
    public static String        Image_Map_TourStartMarker;
-   public static String        Image_Map_ValuePoint;
-   public static String        Image_Map_WayPoint;
-   public static String        Image_Map_WayPoint_Hovered;
-
-   public static String        image_action_change_tile_factory;
-   public static String        image_action_reload_map;
-   public static String        Image__Tour;
-   public static String        Image__Tour_Disabled;
-   public static String        image_action_synch_with_slider;
-   public static String        image_action_synch_with_slider_disabled;
-   public static String        image_action_synch_with_tour;
-   public static String        image_action_synch_with_tour_disabled;
-   public static String        image_action_zoom_in;
-   public static String        image_action_zoom_in_disabled;
-   public static String        image_action_zoom_out;
-   public static String        image_action_zoom_out_disabled;
-   public static String        image_action_zoom_show_entire_tour;
-   public static String        image_action_zoom_show_entire_tour_disabled;
 
    public static String        LegendColor_Dialog_Check_LiveUpdate;
    public static String        LegendColor_Dialog_Check_LiveUpdate_Tooltip;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,11 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourSegmenter;
+
+import net.tourbook.Images;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -30,14 +35,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-
 public class ActionTourChartSegmenterConfig extends ContributionItem {
-
-   private static final String                  IMAGE_TOUR_SEGMENTS          = Messages.Image__TourSegments;
-   private static final String                  IMAGE_TOUR_SEGMENTS_DISABLED = Messages.Image__TourSegments_Disabled;
 
    private TourSegmenterView                    _tourSegmenterView;
 
@@ -61,8 +59,8 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
       _tourSegmenterView = tourSegmenterView;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_SEGMENTS_DISABLED).createImage();
+      _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments).createImage();
+      _imageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments_Disabled).createImage();
 
       _parent.addDisposeListener(new DisposeListener() {
 

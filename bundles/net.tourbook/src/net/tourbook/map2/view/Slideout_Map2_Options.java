@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,14 +19,15 @@ import java.util.LinkedHashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -46,14 +47,14 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Map 2D properties slideout
  */
-public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    final private IDialogSettings _state;
 
    private SelectionAdapter      _defaultState_SelectionListener;
 
-   private Action                _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    private Map2View              _map2View;
 
@@ -90,15 +91,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
    private void createActions() {
 
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -250,7 +243,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
          // get current painting method
          final String prefPaintingMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-         final boolean isEnhancedPainting = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
+         final boolean isEnhancedPainting = PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
 
          if (isEnhancedPainting) {
 
@@ -284,7 +277,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
                   // set painting method to basic
                   _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-                        PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+                        PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
                }
             }
             setIsAnotherDialogOpened(false);
@@ -294,7 +287,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       onChangeUI_MapUpdate();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
 // SET_FORMATTING_OFF
 

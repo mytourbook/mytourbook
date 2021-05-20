@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -23,22 +24,19 @@ import net.tourbook.tag.tour.filter.SlideoutTourTagFilter;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourTagFilter extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor         = TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter);
-   private static final ImageDescriptor _actionImageDisabledDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter_Disabled);
-
-   private static final IDialogSettings _state                         = TourbookPlugin.getState("TourTagFilterSlideout");                         //$NON-NLS-1$
+   private static final IDialogSettings _state = TourbookPlugin.getState("TourTagFilterSlideout"); //$NON-NLS-1$
 
    private AdvancedSlideout             _slideoutTourTagFilter;
 
    public ActionTourTagFilter() {
 
-      super(_actionImageDescriptor, _actionImageDisabledDescriptor);
+      super(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter),
+            TourbookPlugin.getImageDescriptor(Images.TourTagFilter_Disabled));
 
       isToggleAction = true;
       notSelectedTooltip = Messages.Tour_Tag_Filter_Action_Tooltip;

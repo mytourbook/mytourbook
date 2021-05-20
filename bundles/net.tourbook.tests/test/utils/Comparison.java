@@ -69,8 +69,7 @@ public class Comparison {
             new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("startTimeOfDay", (o1, o2) -> true)); //$NON-NLS-1$
+				new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 

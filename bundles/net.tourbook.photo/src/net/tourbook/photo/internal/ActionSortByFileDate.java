@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,30 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionSortByFileDate extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionSortByFileDate(final PhotoGallery photoGallery) {
+   public ActionSortByFileDate(final PhotoGallery photoGallery) {
 
-		super(Messages.Pic_Dir_Action_SortByDate, AS_CHECK_BOX);
+      super(Messages.Pic_Dir_Action_SortByDate, AS_CHECK_BOX);
 
-		_photoGallery = photoGallery;
+      _photoGallery = photoGallery;
 
-		setToolTipText(Messages.Pic_Dir_Action_SortByDate_Tooltip);
+      setToolTipText(Messages.Pic_Dir_Action_SortByDate_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoSortByDate));
-	}
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoSort_ByDate));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoSort_ByDate_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionSortByDate();
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionSortByDate();
+   }
 }

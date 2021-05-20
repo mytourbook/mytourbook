@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,9 +27,11 @@ import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.time.TimeTools;
@@ -113,11 +115,6 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITourViewer, IMapProviderListener {
 
-// SET_FORMATTING_OFF
-
-   private static final String IMAGE_APP_NO                                   = net.tourbook.common.Messages.Image__App_No;
-   private static final String IMAGE_APP_YES                                  = net.tourbook.common.Messages.Image__App_Yes;
-
    private static final String MAP_ACTION_MANAGE_MAP_PROVIDERS                = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
 
    private static final String PREF_MAP2_VIEWER_COLUMN_CATEGORY               = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_Category;
@@ -200,7 +197,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
          super(text, prefPageId);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions_Dark));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MapOptions_Dark));
       }
    }
 
@@ -473,8 +470,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark));
-         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark_Disabled));
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Blue));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Blue_Disabled));
          _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
       }
       {
@@ -488,8 +485,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Dark));
-         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Dark_Disabled));
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue_Disabled));
          _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
       }
    }
@@ -1301,8 +1298,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       _pc = new PixelConverter(parent);
 
-      _imageYes = CommonActivator.getImageDescriptor(IMAGE_APP_YES).createImage();
-      _imageNo = CommonActivator.getImageDescriptor(IMAGE_APP_NO).createImage();
+      _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
+      _imageNo = CommonActivator.getImageDescriptor(CommonImages.App_No).createImage();
 
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }

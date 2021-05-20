@@ -398,6 +398,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private void doExport() {
 
+      // disable buttons
+      getButton(IDialogConstants.OK_ID).setEnabled(false);
+      getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+
       final String exportFileName = _txtFilePath.getText();
 
       _exportState_FileCollisionBehavior = new FileCollisionBehavior();
@@ -487,6 +491,8 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       BusyIndicator.showWhile(Display.getCurrent(), this::doExport);
 
       if (_exportState_FileCollisionBehavior.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
+         getButton(IDialogConstants.OK_ID).setEnabled(true);
+         getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
          return;
       }
 

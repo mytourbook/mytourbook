@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,24 +22,24 @@ import java.util.ArrayList;
  */
 public class ChartDrawingData {
 
-	public ArrayList<GraphDrawingData>	graphDrawingData;
+   public ArrayList<GraphDrawingData>  graphDrawingData;
 
-	ChartDataModel						chartDataModel;
+   ChartDataModel                      chartDataModel;
 
-	int									devMarginTop;
-	int									devXTitelBarHeight;
-	int									devSliderBarHeight;
-	int									devXAxisHeight;
+   int                                 devMarginTop;
+   int                                 devXTitelBarHeight;
+   int                                 devSliderBarHeight;
+   int                                 devXAxisHeight;
 
-	public int							devVisibleChartWidth;
+   public int                          devVisibleChartWidth;
 
-	/**
-	 * Contains the painted chart titles and their positons.
-	 */
-	public ArrayList<ChartTitleSegment>	chartTitleSegments	= new ArrayList<ChartTitleSegment>();
+   /**
+    * Contains the painted chart titles and their positons.
+    */
+   public ArrayList<ChartTitleSegment> chartTitleSegments = new ArrayList<>();
 
-	ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
+   ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
 
-		this.graphDrawingData = graphDrawingData;
-	}
+      this.graphDrawingData = graphDrawingData;
+   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -181,7 +182,7 @@ public class HeartRateVariabilityView extends ViewPart {
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setToolTipText(Messages.HRV_View_Action_ShowAllValues);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_FitGraph));
       }
 
       @Override
@@ -198,8 +199,8 @@ public class HeartRateVariabilityView extends ViewPart {
 
          setToolTipText(Messages.HRV_View_Action_SynchChartScale);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
       }
 
       @Override
@@ -389,7 +390,7 @@ public class HeartRateVariabilityView extends ViewPart {
             continue;
          }
 
-         final int[] tdPulseTimeSerie = tourData.pulseTimeSerie;
+         final int[] tdPulseTimeSerie = tourData.pulseTime_Milliseconds;
 
          // check if required data series are available
          if (tdPulseTimeSerie != null && tdPulseTimeSerie.length > 1) {
@@ -409,17 +410,9 @@ public class HeartRateVariabilityView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-
-      final RGB rgbPrefDark = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-
-      final RGB rgbPrefBright = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
       final double[][] rr0Series = new double[validDataLength][];
       final float[][] rr1Series = new float[validDataLength][];
@@ -441,7 +434,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
          final TourData tourData = validTours[tourIndex];
 
-         final int[] pulseTimeSerie = tourData.pulseTimeSerie;
+         final int[] pulseTimeSerie = tourData.pulseTime_Milliseconds;
          final int numPulseTimes = pulseTimeSerie.length - 1;
 
          final double[] rr0Values = new double[numPulseTimes];

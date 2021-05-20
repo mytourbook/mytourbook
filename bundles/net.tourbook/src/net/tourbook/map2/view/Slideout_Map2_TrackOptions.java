@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,15 +19,16 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -53,7 +54,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String     MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -67,7 +68,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
    private MouseWheelListener      _defaultState_MouseWheelListener;
    private IPropertyChangeListener _defaultState_ChangePropertyListener;
 
-   private Action                  _actionRestoreDefaults;
+   private ActionResetToDefaults   _actionRestoreDefaults;
    private ActionOpenPrefDialog    _actionPrefDialog;
 
    private PixelConverter          _pc;
@@ -134,18 +135,9 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
    private void createActions() {
 
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(
-            Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-
-      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPageMap2Appearance.ID);
+      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPage_Map2_Appearance.ID);
       _actionPrefDialog.closeThisTooltip(this);
       _actionPrefDialog.setShell(_parent.getShell());
    }
@@ -284,7 +276,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
             {
                // spinner
                _spinnerTrackOpacity = new Spinner(group, SWT.BORDER);
-               _spinnerTrackOpacity.setMinimum(PrefPageMap2Appearance.MAP_OPACITY_MINIMUM);
+               _spinnerTrackOpacity.setMinimum(PrefPage_Map2_Appearance.MAP_OPACITY_MINIMUM);
                _spinnerTrackOpacity.setMaximum(100);
                _spinnerTrackOpacity.setIncrement(1);
                _spinnerTrackOpacity.setPageIncrement(10);
@@ -543,10 +535,10 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
    private int getBorderType() {
 
       final int borderType = _rdoBorderColorColor.getSelection() //
-            ? PrefPageMap2Appearance.BORDER_TYPE_COLOR
+            ? PrefPage_Map2_Appearance.BORDER_TYPE_COLOR
             : _rdoBorderColorDarker.getSelection() //
-                  ? PrefPageMap2Appearance.BORDER_TYPE_DARKER
-                  : PrefPageMap2Appearance.DEFAULT_BORDER_TYPE;
+                  ? PrefPage_Map2_Appearance.BORDER_TYPE_DARKER
+                  : PrefPage_Map2_Appearance.DEFAULT_BORDER_TYPE;
 
       return borderType;
    }
@@ -556,13 +548,13 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       final String plotType;
 
       if (_rdoSymbolDot.getSelection()) {
-         plotType = PrefPageMap2Appearance.PLOT_TYPE_DOT;
+         plotType = PrefPage_Map2_Appearance.PLOT_TYPE_DOT;
       } else if (_rdoSymbolLine.getSelection()) {
-         plotType = PrefPageMap2Appearance.PLOT_TYPE_LINE;
+         plotType = PrefPage_Map2_Appearance.PLOT_TYPE_LINE;
       } else if (_rdoSymbolSquare.getSelection()) {
-         plotType = PrefPageMap2Appearance.PLOT_TYPE_SQUARE;
+         plotType = PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE;
       } else {
-         plotType = PrefPageMap2Appearance.DEFAULT_PLOT_TYPE;
+         plotType = PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE;
       }
 
       return plotType;
@@ -637,7 +629,8 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _map2View.restoreState_Map2_TrackOptions(true);
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
 // SET_FORMATTING_OFF
 
@@ -672,8 +665,8 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       // painting method
       final String paintingMethod =             _prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
       _chkShowEnhancedWarning.setSelection(     _prefStore.getDefaultBoolean( ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
-      _rdoPainting_Simple.setSelection(         PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
-      _rdoPainting_Complex.setSelection(        PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
+      _rdoPainting_Simple.setSelection(         PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
+      _rdoPainting_Complex.setSelection(        PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
 
 // SET_FORMATTING_ON
 
@@ -713,7 +706,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _colorBorderColor.setColorValue(PreferenceConverter.getColor( _prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
       // painting method
-      final boolean isComplex = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+      final boolean isComplex = PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
       _chkShowEnhancedWarning.setSelection(     _prefStore.getBoolean(  ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
       _rdoPainting_Simple.setSelection(         isComplex==false);
       _rdoPainting_Complex.setSelection(        isComplex);
@@ -756,34 +749,34 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       // painting method
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   _chkShowEnhancedWarning.getSelection());
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           _rdoPainting_Complex.getSelection()
-               ? PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX
-               : PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+               ? PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX
+               : PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
 
 // SET_FORMATTING_ON
    }
 
    private void updateUI_SetBorderType(int borderType) {
 
-      if (borderType != PrefPageMap2Appearance.BORDER_TYPE_COLOR
-            && borderType != PrefPageMap2Appearance.BORDER_TYPE_DARKER) {
-         borderType = PrefPageMap2Appearance.DEFAULT_BORDER_TYPE;
+      if (borderType != PrefPage_Map2_Appearance.BORDER_TYPE_COLOR
+            && borderType != PrefPage_Map2_Appearance.BORDER_TYPE_DARKER) {
+         borderType = PrefPage_Map2_Appearance.DEFAULT_BORDER_TYPE;
       }
 
-      _rdoBorderColorColor.setSelection(borderType == PrefPageMap2Appearance.BORDER_TYPE_COLOR);
-      _rdoBorderColorDarker.setSelection(borderType == PrefPageMap2Appearance.BORDER_TYPE_DARKER);
+      _rdoBorderColorColor.setSelection(borderType == PrefPage_Map2_Appearance.BORDER_TYPE_COLOR);
+      _rdoBorderColorDarker.setSelection(borderType == PrefPage_Map2_Appearance.BORDER_TYPE_DARKER);
    }
 
    private void updateUI_SetPlotType(String plotType) {
 
-      if (plotType.equals(PrefPageMap2Appearance.PLOT_TYPE_DOT) == false
-            && plotType.equals(PrefPageMap2Appearance.PLOT_TYPE_LINE) == false
-            && plotType.equals(PrefPageMap2Appearance.PLOT_TYPE_SQUARE) == false) {
+      if (plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_DOT) == false
+            && plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE) == false
+            && plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE) == false) {
 
-         plotType = PrefPageMap2Appearance.DEFAULT_PLOT_TYPE;
+         plotType = PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE;
       }
 
-      _rdoSymbolDot.setSelection(plotType.equals(PrefPageMap2Appearance.PLOT_TYPE_DOT));
-      _rdoSymbolLine.setSelection(plotType.equals(PrefPageMap2Appearance.PLOT_TYPE_LINE));
-      _rdoSymbolSquare.setSelection(plotType.equals(PrefPageMap2Appearance.PLOT_TYPE_SQUARE));
+      _rdoSymbolDot.setSelection(plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_DOT));
+      _rdoSymbolLine.setSelection(plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE));
+      _rdoSymbolSquare.setSelection(plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE));
    }
 }

@@ -15,9 +15,12 @@
  *******************************************************************************/
 package net.tourbook.cloud.strava;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.net.URISyntaxException;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.LocalHostServer;
@@ -26,6 +29,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -35,8 +39,6 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -57,17 +59,19 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
-   public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
-   public static final int         CALLBACK_PORT = 4918;
+   public static final String      ID                  = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
+   public static final int         CALLBACK_PORT       = 4918;
 
-   public static final String      ClientId      = "55536";                                    //$NON-NLS-1$
+   public static final String      ClientId            = "55536";                                                                     //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore        _prefStore          = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
 
    private String                  _athleteId;
    private long                    _accessTokenExpiresAt;
+
+   private Image                   _imageStravaConnect = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
 
    /*
     * UI controls
@@ -155,15 +159,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          // No variations or modifications are acceptable."
 
          final Button buttonConnect = new Button(container, SWT.NONE);
-         final Image imageConnect = Activator.getImageDescriptor(Messages.Image__Connect_With_Strava).createImage();
-         buttonConnect.setImage(imageConnect);
-         buttonConnect.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onClickAuthorize();
-            }
-         });
+         buttonConnect.setImage(_imageStravaConnect);
+         buttonConnect.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(buttonConnect);
       }
    }
@@ -183,12 +180,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             final Link linkWebPage = new Link(group, SWT.NONE);
             linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_Strava_WebPage + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
-            linkWebPage.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(Messages.PrefPage_AccountInformation_Link_Strava_WebPage);
-               }
-            });
+            linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+                  Messages.PrefPage_AccountInformation_Link_Strava_WebPage)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
@@ -206,12 +199,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
             _linkAthleteWebPage = new Link(group, SWT.NONE);
             _linkAthleteWebPage.setEnabled(true);
-            _linkAthleteWebPage.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(constructAthleteWebPageLink(_athleteId));
-               }
-            });
+            _linkAthleteWebPage.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> WEB.openUrl(constructAthleteWebPageLink(_athleteId))));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkAthleteWebPage);
          }
          {
@@ -239,6 +228,14 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
       }
+   }
+
+   @Override
+   public void dispose() {
+
+      Util.disposeResource(_imageStravaConnect);
+
+      super.dispose();
    }
 
    private String getLocalExpireAtDateTime() {

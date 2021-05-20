@@ -55,7 +55,7 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
             continue;
          }
 
-         // add pulse time in ms, sec -> ms
+         // add pulse time in ms, sec -> ms, time values are not more precise than 1 ms
          pulseTime.add((int) (time * 1_000));
       }
 

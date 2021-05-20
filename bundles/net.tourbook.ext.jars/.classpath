@@ -3,19 +3,19 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="c3p0-0.9.1.2.jar" sourcepath="c:/e/java-resources/c3p0/c3p0-0.9.1.2.src.zip"/>
-	<classpathentry exported="true" kind="lib" path="caffeine-2.8.1.jar" sourcepath="jar-sources/caffeine-2.8.1.zip"/> <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+	<classpathentry exported="true" kind="lib" path="c3p0-0.9.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="caffeine-3.0.1.jar"/> <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
 	<classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
 	<classpathentry exported="true" kind="lib" path="core-3.1.0.jar" sourcepath="jar-sources/core-3.1.0-sources.jar"/> <!-- https://mvnrepository.com/artifact/net.sf.trove4j/core -->
-	<classpathentry exported="true" kind="lib" path="edtftpj.jar"/> <!-- https://mvnrepository.com/artifact/com.enterprisedt/edtFTPj -->
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/> <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
-	<classpathentry exported="true" kind="lib" path="jackson-core-2.12.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
-	<classpathentry exported="true" kind="lib" path="jackson-databind-2.12.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.12.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
-	<classpathentry exported="true" kind="lib" path="joda-time-2.10.5.jar"/> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
-	<classpathentry exported="true" kind="lib" path="json-20201115.jar"/> <!-- https://mvnrepository.com/artifact/org.json/json -->
+	<classpathentry exported="true" kind="lib" path="jackson-core-2.12.2.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+	<classpathentry exported="true" kind="lib" path="jackson-databind-2.12.2.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.12.2.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+	<classpathentry exported="true" kind="lib" path="joda-time-2.10.10.jar"/> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+	<classpathentry exported="true" kind="lib" path="json-20210307.jar"/> <!-- https://mvnrepository.com/artifact/org.json/json -->
 	<classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" /> <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
 	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="simplelatlng-1.3.1.jar"/> <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
+	<classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/> <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,28 +15,30 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionShowAnnotations extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionShowAnnotations(final PhotoGallery photoGallery) {
+   public ActionShowAnnotations(final PhotoGallery photoGallery) {
 
-		super(Messages.Pic_Dir_Action_ShowAnnotations, AS_CHECK_BOX);
+      super(Messages.Pic_Dir_Action_ShowAnnotations, AS_CHECK_BOX);
 
-		_photoGallery = photoGallery;
+      _photoGallery = photoGallery;
 
-		setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
+      setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowAnnotation));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__Photo_Action_ShowAnnotation_Disabled));
-	}
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.Photo_ShowAnnotation));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.Photo_ShowAnnotation_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionShowPhotoInfo(this);
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionShowPhotoInfo(this);
+   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,28 +15,30 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionPhotoFilterNoGPS extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionPhotoFilterNoGPS(final PhotoGallery photoGallery) {
+   public ActionPhotoFilterNoGPS(final PhotoGallery photoGallery) {
 
-		super(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS, AS_CHECK_BOX);
+      super(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS_Tooltip);
+      setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPS));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterNoGPSDisabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_NoGPS));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_NoGPS_Disabled));
 
-		_photoGallery = photoGallery;
-	}
+      _photoGallery = photoGallery;
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionImageFilterGPS(this);
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionImageFilterGPS(this);
+   }
 }

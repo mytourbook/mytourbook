@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -23,23 +24,19 @@ import net.tourbook.tour.filter.SlideoutTourFilter;
 import net.tourbook.tour.filter.TourFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor          = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
-   private static final ImageDescriptor _actionImageDescriptor_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
-
-   private static final IDialogSettings _state                          = TourbookPlugin.getState("TourFilter");                                 //$NON-NLS-1$
+   private static final IDialogSettings _state = TourbookPlugin.getState("TourFilter"); //$NON-NLS-1$
 
    private SlideoutTourFilter           _slideoutTourFilter;
 
    public ActionTourDataFilter() {
 
-      super(_actionImageDescriptor, _actionImageDescriptor_Disabled);
-//      super(_actionImageDescriptor, _actionImageDescriptor_Disabled, _actionImageDescriptor_Selected);
+      super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter),
+            TourbookPlugin.getImageDescriptor(Images.TourFilter_Disabled));
 
       isToggleAction = true;
       notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;

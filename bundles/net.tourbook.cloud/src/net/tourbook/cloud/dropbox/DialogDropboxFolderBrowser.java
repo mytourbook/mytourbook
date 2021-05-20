@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.cloud.dropbox;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
@@ -26,11 +28,13 @@ import java.util.stream.Collectors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -45,11 +49,8 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -61,27 +62,33 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
-   private static final String   ROOT_FOLDER    = "/";                                                   //$NON-NLS-1$
+   private static final String   ROOT_FOLDER               = "/";                                                                               //$NON-NLS-1$
 
    private String                _accessToken;
    private String                _workingDirectory;
 
-   final IPreferenceStore        _prefStore     = CommonActivator.getPrefStore();
+   final IPreferenceStore        _prefStore                = CommonActivator.getPrefStore();
 
    private List<Metadata>        _folderList;
    private TableViewer           _contentViewer;
    private String                _selectedFolder;
 
-   private ArrayList<String>     _selectedFiles = new ArrayList<>();
+   private ArrayList<String>     _selectedFiles            = new ArrayList<>();
 
    private boolean               _isInErrorState;
 
-   private final IDialogSettings _state         = TourbookPlugin.getState("DialogDropboxFolderBrowser"); //$NON-NLS-1$
+   private final IDialogSettings _state                    = TourbookPlugin.getState("DialogDropboxFolderBrowser");                             //$NON-NLS-1$
+
+   private Image                 _imageDropboxLogo         = Activator.getImageDescriptor(CloudImages.Cloud_Dropbox_Logo).createImage();
+   private Image                 _imageDropboxParentFolder = Activator.getImageDescriptor(CloudImages.Cloud_Dropbox_Parentfolder).createImage();
+   private Image                 _imageDropboxFolder       = Activator.getImageDescriptor(CloudImages.Cloud_Dropbox_Folder).createImage();
+   private Image                 _imageDropboxFile         = Activator.getImageDescriptor(CloudImages.Cloud_Dropbox_File).createImage();
+
    /*
     * Browser UI controls
     */
-   private Text                  _textSelectedAbsolutePath;
-   private Button                _buttonParentFolder;
+   private Text   _textSelectedAbsolutePath;
+   private Button _buttonParentFolder;
 
    public DialogDropboxFolderBrowser(final Shell parentShell, final String accessToken, final String workingDirectory) {
 
@@ -92,7 +99,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       _accessToken = accessToken;
       _workingDirectory = workingDirectory;
 
-      setDefaultImage(Activator.getImageDescriptor(Messages.Image__Dropbox_Logo).createImage());
+      setDefaultImage(_imageDropboxLogo);
    }
 
    @Override
@@ -135,7 +142,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       final String dropboxResult = updateViewers();
 
-      if (!StringUtils.isNullOrEmpty(dropboxResult)) {
+      if (StringUtils.hasContent(dropboxResult)) {
          _isInErrorState = true;
 
          dialogAreaContainer.dispose();
@@ -143,6 +150,13 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
          createErrorMessageUI(dialogAreaContainer, dropboxResult);
       }
+
+      parent.addDisposeListener(disposeEvent -> {
+         Util.disposeResource(_imageDropboxLogo);
+         Util.disposeResource(_imageDropboxParentFolder);
+         Util.disposeResource(_imageDropboxFolder);
+         Util.disposeResource(_imageDropboxFile);
+      });
 
       return dialogAreaContainer;
    }
@@ -183,14 +197,9 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
           */
          _buttonParentFolder = new Button(container, SWT.LEFT);
          _buttonParentFolder.setToolTipText(Messages.Dialog_DropboxBrowser_Button_ParentFolder_Tooltip);
-         _buttonParentFolder.setImage(Activator.getImageDescriptor(Messages.Image__Dropbox_Parentfolder).createImage());
+         _buttonParentFolder.setImage(_imageDropboxParentFolder);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_buttonParentFolder);
-         _buttonParentFolder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-               onClickParentFolder();
-            }
-         });
+         _buttonParentFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickParentFolder()));
          _buttonParentFolder.setEnabled(false);
 
          /*
@@ -227,17 +236,15 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
             final Metadata entry = ((Metadata) cell.getElement());
 
-            String imageName = UI.EMPTY_STRING;
+            Image entryImage = null;
 
             if (entry instanceof FolderMetadata) {
 
-               imageName = Messages.Image__Dropbox_Folder;
+               entryImage = _imageDropboxFolder;
             } else if (entry instanceof FileMetadata) {
 
-               imageName = Messages.Image__Dropbox_File;
+               entryImage = _imageDropboxFile;
             }
-
-            final Image entryImage = StringUtils.hasContent(imageName) ? Activator.getImageDescriptor(imageName).createImage() : null;
 
             cell.setText(entry.getName());
             cell.setImage(entryImage);
@@ -245,19 +252,10 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       });
       layouter.addColumnData(new ColumnWeightData(1));
 
-      _contentViewer.setContentProvider(new IStructuredContentProvider() {
-         @Override
-         public void dispose() {}
-
-         @Override
-         public Object[] getElements(final Object inputElement) {
-            final Object[] sortedElements = _folderList.stream().sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName())).collect(Collectors
-                  .toList()).toArray();
-            return sortedElements;
-         }
-
-         @Override
-         public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      _contentViewer.setContentProvider((IStructuredContentProvider) inputElement -> {
+         final Object[] sortedElements = _folderList.stream().sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName())).collect(Collectors
+               .toList()).toArray();
+         return sortedElements;
       });
 
       _contentViewer.addDoubleClickListener(event -> onSelectItem(event.getSelection()));
@@ -349,7 +347,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       final String dropboxResult = selectFolder(_workingDirectory);
 
-      if (!StringUtils.isNullOrEmpty(dropboxResult)) {
+      if (StringUtils.hasContent(dropboxResult)) {
          return dropboxResult;
       }
 

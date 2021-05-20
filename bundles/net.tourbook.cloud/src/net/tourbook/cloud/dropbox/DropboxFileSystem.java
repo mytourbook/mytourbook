@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Messages;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
@@ -166,7 +166,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
    @Override
    public ImageDescriptor getFileSystemImageDescriptor() {
-      return Activator.getImageDescriptor(Messages.Image__Dropbox_Logo);
+      return Activator.getImageDescriptor(CloudImages.Cloud_Dropbox_Logo);
    }
 
    /**
@@ -213,7 +213,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
       if (folderChooserResult[0] == Window.OK) {
 
          final String selectedFolder = dropboxFolderChooser[0].getSelectedFolder();
-         if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+         if (StringUtils.hasContent(selectedFolder)) {
             FILE_SYSTEM_FOLDER = selectedFolder;
 
             return getDisplayId() + selectedFolder;

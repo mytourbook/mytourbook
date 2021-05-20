@@ -199,6 +199,8 @@ public class DropboxClient {
             token = new ObjectMapper().readValue(response.body(), DropboxTokens.class);
 
             return token;
+         } else {
+            StatusUtil.logError(response.body());
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);

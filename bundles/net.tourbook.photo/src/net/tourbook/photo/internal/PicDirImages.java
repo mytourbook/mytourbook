@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,11 @@ import java.util.Collections;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.photo.PicDirView;
@@ -295,7 +297,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
        * toolbar actions
        */
       _galleryToolbar = new ToolBar(galleryActionBarContainer, SWT.FLAT);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
             .applyTo(_galleryToolbar);
 
@@ -314,7 +316,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
    private void createUI_30_ComboHistory(final Composite parent) {
 
       _comboHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.FILL, SWT.CENTER)
             .applyTo(_comboHistory);
@@ -656,8 +658,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
          _actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
          _actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
-         _actionToggleFolderGallery.setImageDescriptor(Activator
-               .getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
+
+         _actionToggleFolderGallery.setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFolderGallery_OnlyPhotos));
 
       } else {
 
@@ -665,8 +667,8 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
          _actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery);
          _actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_Tooltip);
-         _actionToggleFolderGallery.setImageDescriptor(Activator
-               .getImageDescriptor(Messages.Image__PhotoFolderGallery));
+
+         _actionToggleFolderGallery.setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFolderGallery));
       }
 
       _picDirView.setMaximizedControl(_isShowOnlyPhotos);

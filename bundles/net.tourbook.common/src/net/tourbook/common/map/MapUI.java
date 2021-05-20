@@ -16,7 +16,7 @@
 package net.tourbook.common.map;
 
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.resource.ImageRegistry;
@@ -40,13 +40,13 @@ public class MapUI {
 
 // SET_FORMATTING_OFF
 
-      imageRegistry.put(MAP_PROVIDER_CUSTOM,             CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Custom));
-      imageRegistry.put(MAP_PROVIDER_CUSTOM_HILL,        CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Custom_Hill));
-      imageRegistry.put(MAP_PROVIDER_INTERNAL,           CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Internal));
-      imageRegistry.put(MAP_PROVIDER_PROFILE,            CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Profile));
-      imageRegistry.put(MAP_PROVIDER_PROFILE_HILL,       CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Profile_Hill));
-      imageRegistry.put(MAP_PROVIDER_TRANSPARENT,        CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Transparent));
-      imageRegistry.put(MAP_PROVIDER_TRANSPARENT_HILL,   CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Transparent_Hill));
+      imageRegistry.put(MAP_PROVIDER_CUSTOM,             CommonActivator.getImageDescriptor(CommonImages.MapProvider_Custom));
+      imageRegistry.put(MAP_PROVIDER_CUSTOM_HILL,        CommonActivator.getImageDescriptor(CommonImages.MapProvider_Custom_Hill));
+      imageRegistry.put(MAP_PROVIDER_INTERNAL,           CommonActivator.getImageDescriptor(CommonImages.MapProvider_Internal));
+      imageRegistry.put(MAP_PROVIDER_PROFILE,            CommonActivator.getImageDescriptor(CommonImages.MapProvider_Profile));
+      imageRegistry.put(MAP_PROVIDER_PROFILE_HILL,       CommonActivator.getImageDescriptor(CommonImages.MapProvider_Profile_Hill));
+      imageRegistry.put(MAP_PROVIDER_TRANSPARENT,        CommonActivator.getImageDescriptor(CommonImages.MapProvider_Transparent));
+      imageRegistry.put(MAP_PROVIDER_TRANSPARENT_HILL,   CommonActivator.getImageDescriptor(CommonImages.MapProvider_Transparent_Hill));
 
 // SET_FORMATTING_ON
 

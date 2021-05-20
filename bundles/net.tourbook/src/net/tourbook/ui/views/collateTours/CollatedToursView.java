@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,10 +70,9 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionJoinTours;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
+import net.tourbook.ui.action.ActionSetElevationValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
@@ -207,11 +206,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
    private ActionJoinTours                            _actionJoinTours;
    private ActionMergeTour                            _actionMergeTour;
-   private ActionModifyColumns                        _actionModifyColumns;
    private ActionPrint                                _actionPrintTour;
    private ActionRefreshView                          _actionRefreshView;
    private ActionReimportTours                        _actionReimport_Tours;
-   private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
+   private ActionSetElevationValuesFromSRTM           _actionSetElevationFromSRTM;
    private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionSetPerson                            _actionSetOtherPerson;
 
@@ -485,12 +483,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
       _actionMergeTour = new ActionMergeTour(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
       _actionRefreshView = new ActionRefreshView(this);
       _actionReimport_Tours = new ActionReimportTours(this);
-      _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
+      _actionSetElevationFromSRTM = new ActionSetElevationValuesFromSRTM(this);
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
 
@@ -1860,7 +1857,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
       _actionReimport_Tours.setEnabled(isTourSelected);
-      _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
+      _actionSetElevationFromSRTM.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
@@ -1884,9 +1881,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       /*
        * fill view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-      menuMgr.add(_actionModifyColumns);
 
       /*
        * fill view toolbar
@@ -1918,7 +1914,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       menuMgr.add(new Separator());
       menuMgr.add(_actionComputeElevationGain);
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionSetElevationFromSRTM);
 
       _tagMenuManager.fillTagMenu(menuMgr, true);
 

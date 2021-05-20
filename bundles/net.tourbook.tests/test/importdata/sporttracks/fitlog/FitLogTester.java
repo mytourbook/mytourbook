@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLogSAXHandler;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -34,7 +35,7 @@ import utils.Initializer;
 
 public class FitLogTester {
 
-   private static final String            IMPORT_PATH = "/importdata/sporttracks/fitlog/files/"; //$NON-NLS-1$
+	private static final String IMPORT_PATH = "/importdata/sporttracks/fitlog/files/"; //$NON-NLS-1$
 
    private static SAXParser               parser;
    private static HashMap<Long, TourData> newlyImportedTours;
@@ -51,6 +52,12 @@ public class FitLogTester {
       deviceDataReader = new FitLogDeviceDataReader();
    }
 
+	@AfterEach
+	void tearDown() {
+		newlyImportedTours.clear();
+		alreadyImportedTours.clear();
+	}
+
    @Test
    void testImportTimothyLake() throws SAXException, IOException {
       final String filePathWithoutExtension = IMPORT_PATH +
@@ -63,6 +70,7 @@ public class FitLogTester {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
+				false,
             false);
 
       parser.parse(fitLogFile, handler);

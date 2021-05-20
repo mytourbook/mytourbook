@@ -142,12 +142,12 @@ public class TourChartConfiguration {
    /**
     * Is <code>true</code> when tour markers are displayed.
     */
-   public Boolean                 isShowTourMarker        = true;
+   public boolean                 isShowTourMarker        = true;
 
    /**
     * Is <code>true</code> when tour pauses are displayed.
     */
-   public Boolean                 isShowTourPauses        = true;
+   public boolean                 isShowTourPauses        = true;
 
    /**
     * When <code>true</code>, hidden markers are also visible.
@@ -205,17 +205,20 @@ public class TourChartConfiguration {
    /**
     * Color for the tour marker point and label.
     */
-   public RGB                     markerColorDefault;
+   public RGB                     markerColorDefault_Light;
+   public RGB                     markerColorDefault_Dark;
 
    /**
     * Color for the tour marker point which is created by the device and not with the marker editor.
     */
-   public RGB                     markerColorDevice;
+   public RGB                     markerColorDevice_Light;
+   public RGB                     markerColorDevice_Dark;
 
    /**
     * Color for tour markers which are hidden, visibility is false.
     */
-   public RGB                     markerColorHidden;
+   public RGB                     markerColorHidden_Light;
+   public RGB                     markerColorHidden_Dark;
 
    /**
     * Is <code>true</code> when graph values are displayed when they are recorded when a break time
@@ -325,9 +328,12 @@ public class TourChartConfiguration {
       isShowTooltipData_DistanceDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE);
       isShowTooltipData_DurationDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE);
 
-      markerColorDefault            = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
-      markerColorDevice             = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
-      markerColorHidden             = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
+      markerColorDefault_Light      = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
+      markerColorDefault_Dark       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK);
+      markerColorDevice_Light       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
+      markerColorDevice_Dark        = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK);
+      markerColorHidden_Light       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
+      markerColorHidden_Dark        = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK);
 
       /*
        * Tour pauses

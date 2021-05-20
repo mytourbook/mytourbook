@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TFloatArrayList;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -64,6 +67,8 @@ import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
+import net.tourbook.srtm.IPreferences;
+import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -71,6 +76,7 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.GraphBackgroundSource;
 import net.tourbook.ui.tourChart.GraphBackgroundStyle;
 import net.tourbook.ui.tourChart.IValueLabelProvider;
+import net.tourbook.ui.tourChart.PulseGraph;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
@@ -96,6 +102,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -104,8 +111,18 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class TourManager {
+
+   private static final String SYS_PROP__LOG_RR_ERRORS = "logRRErrors";                                      //$NON-NLS-1$
+   private static boolean      _isLogging_RR_Errors    = System.getProperty(SYS_PROP__LOG_RR_ERRORS) != null;
+
+   static {
+      if (_isLogging_RR_Errors) {
+         Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_RR_ERRORS, "R-R errors are logged"); //$NON-NLS-1$
+      }
+   }
 
    private static final String GRAPH_LABEL_ALTIMETER                           = net.tourbook.common.Messages.Graph_Label_Altimeter;
    private static final String GRAPH_LABEL_ALTITUDE                            = net.tourbook.common.Messages.Graph_Label_Altitude;
@@ -162,9 +179,6 @@ public class TourManager {
    public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TIME                                = "time";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
@@ -172,6 +186,10 @@ public class TourManager {
    public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                     //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                       //$NON-NLS-1$
+
+   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
    //
    public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
@@ -846,7 +864,7 @@ public class TourManager {
       final Long[] allTourIds = joinedTourData.multipleTourIds = new Long[numTours];
       final float[] allTours_CadenceMultiplier = joinedTourData.multipleTours_CadenceMultiplier = new float[numTours];
       final int[] allStartIndex = joinedTourData.multipleTourStartIndex = new int[numTours];
-      final long[] allStartTime = joinedTourData.multipleTourStartTime = new long[numTours];
+      final ZonedDateTime[] allStartTime = joinedTourData.multipleTourZonedStartTime = new ZonedDateTime[numTours];
       final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
       final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
       final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
@@ -911,7 +929,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
-         final float[] fromPulse_TimeSerie = fromTourData.getPulse_RRIntervals();
+         final float[] fromPulse_BpmFromRRIntervals = fromTourData.getPulse_AvgBpmFromRRIntervals();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -1017,9 +1035,9 @@ public class TourManager {
             isPulseSerie = true;
             System.arraycopy(fromPulseSerie, 0, toPulseSerie, toStartIndex, fromSerieLength);
          }
-         if (fromPulse_TimeSerie != null) {
+         if (fromPulse_BpmFromRRIntervals != null) {
             isPulseSerie_FromTime = true;
-            System.arraycopy(fromPulse_TimeSerie, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
+            System.arraycopy(fromPulse_BpmFromRRIntervals, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
          }
          if (fromTemperaturSerie != null) {
             isTempSerie = true;
@@ -1129,7 +1147,7 @@ public class TourManager {
          // tour titles
          final long tourStartTime = fromTourData.getTourStartTimeMS();
          allTourTitle[tourIndex] = TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Date_S);
-         allStartTime[tourIndex] = tourStartTime;
+         allStartTime[tourIndex] = fromTourData.getTourStartTime();
 
          // cadence multiplier
          allTours_CadenceMultiplier[tourIndex] = fromTourData.getCadenceMultiplier();
@@ -1763,6 +1781,53 @@ public class TourManager {
       return true;
 
 //      return tourData.hasGeoData();
+   }
+
+   /**
+    * @return <code>true</code> when the user has validated the SRTM server account
+    */
+   private static boolean isSrtmAccountValid() {
+
+      String message = null;
+      String focusField = null;
+
+      final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
+      final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+
+      if (password.trim().length() == 0 || username.trim().length() == 0) {
+
+         message = Messages.SRTM_Download_Info_UsernamePasswordIsEmpty;
+         focusField = PrefPageSRTMData.FOCUS_USER_NAME;
+      }
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+      if (message == null && validationDate < 0) {
+
+         message = Messages.SRTM_Download_Info_NoDownloadValidation;
+         focusField = PrefPageSRTMData.FOCUS_VALIDATE_DOWNLOAD;
+      }
+
+      if (message != null && message.length() > 0) {
+
+         // SRTM download is not valid
+
+         final Shell shell = Display.getCurrent().getActiveShell();
+
+         MessageDialog.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+
+         // show SRTM pref page
+         PreferencesUtil.createPreferenceDialogOn(
+               shell,
+               PrefPageSRTMData.ID,
+               null,
+
+               // set focus to a control
+               focusField).open();
+
+         return false;
+      }
+
+      return true;
    }
 
    /**
@@ -2657,35 +2722,39 @@ public class TourManager {
       }
    }
 
-   public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
+   public static boolean setElevationValuesFromSRTM(final ArrayList<TourData> allTourData) {
 
-      if (tourDataList == null || tourDataList.isEmpty()) {
+      if (allTourData == null || allTourData.isEmpty()) {
          return false;
       }
+
+      if (isSrtmAccountValid() == false) {
+         return false;
+      }
+
+      final Display display = Display.getCurrent();
 
       if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
+            display.getActiveShell(),
             Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Title,
             Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Message) == false) {
+
          return false;
       }
 
-      final boolean[] retValue = { false };
+      final boolean[] returnValue = { false };
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(display, () -> {
 
-            for (final TourData tourData : tourDataList) {
+         for (final TourData tourData : allTourData) {
 
-               final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
+            final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
 
-               retValue[0] = retValue[0] || isReplaced;
-            }
+            returnValue[0] = returnValue[0] || isReplaced;
          }
       });
 
-      return retValue[0];
+      return returnValue[0];
    }
 
    /**
@@ -2701,21 +2770,10 @@ public class TourManager {
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-      final RGB prefLineColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-
-      final RGB prefTextColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
-
-      final RGB prefDarkColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-
-      final RGB prefBrightColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
+      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3511,7 +3569,7 @@ public class TourManager {
       computeValueClipping(tourData);
 
       /*
-       * distance
+       * Distance
        */
       final double[] distanceSerie = tourData.getDistanceSerieDouble();
       ChartDataXSerie xDataDist = null;
@@ -3536,7 +3594,7 @@ public class TourManager {
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*
-       * show the distance on the x-axis when a distance is available, otherwise the time is
+       * Show the distance on the x-axis when a distance is available, otherwise the time is
        * displayed
        */
       boolean isShowTimeOnXAxis;
@@ -3567,7 +3625,7 @@ public class TourManager {
          xDataTime.setStartDateTime(tourStartTime);
 
          /*
-          * when time is displayed, the x-axis can show the start time starting from 0 or from the
+          * When time is displayed, the x-axis can show the start time starting from 0 or from the
           * current time of the day
           */
          final int tourTimeOfDay = tourStartTime.get(ChronoField.SECOND_OF_DAY);
@@ -3575,10 +3633,11 @@ public class TourManager {
          final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
 
          final X_AXIS_START_TIME configXAxisTime = tcc.xAxisTime;
-
          final double xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
                ? 0
-               : configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME ? tourTimeOfDay : photoTimeOfDay;
+               : configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME
+                     ? tourTimeOfDay
+                     : photoTimeOfDay;
 
          xDataTime.setUnitStartValue(xAxisStartValue);
 
@@ -3656,7 +3715,7 @@ public class TourManager {
 // SET_FORMATTING_OFF
 
       final ChartDataYSerie yDataAltitude       = createModelData_Altitude(   tourData, chartDataModel, chartType, useCustomBackground, tcc);
-      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
+      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
       final ChartDataYSerie yDataSpeed          = createModelData_Speed(      tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPace           = createModelData_Pace(       tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPower          = createModelData_Power(      tourData, chartDataModel, chartType, useCustomBackground);
@@ -4146,65 +4205,351 @@ public class TourManager {
 
    /**
     * Heartbeat
+    *
+    * @param isShowTimeOnXAxis
     */
    private ChartDataYSerie createModelData_Heartbeat(final TourData tourData,
                                                      final ChartDataModel chartDataModel,
                                                      final ChartType chartType,
                                                      final boolean useGraphBgStyle,
-                                                     final TourChartConfiguration tcc) {
+                                                     final TourChartConfiguration tcc,
+                                                     final boolean isShowTimeOnXAxis) {
 
       ChartDataYSerie yDataPulse = null;
 
       final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
-      final float[] pulseTimeSerie = tourData.getPulse_RRIntervals();
+      final float[] avgBpmFromRRIntervals = tourData.getPulse_AvgBpmFromRRIntervals();
 
-      final boolean isPulseSerie = pulseSerie != null;
-      final boolean isPulseTimeSerie = pulseTimeSerie != null;
+      final boolean isAvailable_PulseSerie = pulseSerie != null;
+      final boolean isAvailable_AvgBpmFromRRIntervals = avgBpmFromRRIntervals != null;
 
-      tcc.canShowPulseSerie = isPulseSerie;
-      tcc.canShowPulseTimeSerie = isPulseTimeSerie;
+      tcc.canShowPulseSerie = isAvailable_PulseSerie;
+      tcc.canShowPulseTimeSerie = isAvailable_AvgBpmFromRRIntervals;
 
       // set graph/line according to the selection
       switch (tcc.pulseGraph) {
-      case DEVICE_BPM_ONLY:
 
-         if (isPulseSerie) {
-            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+      case RR_AVERAGE_ONLY:
+
+         if (isAvailable_AvgBpmFromRRIntervals) {
+            yDataPulse = createChartDataSerie(new float[][] { avgBpmFromRRIntervals }, chartType);
          }
          break;
 
       case RR_INTERVALS_ONLY:
+      case RR_INTERVALS___2ND_RR_AVERAGE:
+      case RR_INTERVALS___2ND_DEVICE_BPM:
 
-         if (isPulseTimeSerie) {
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+         final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
+
+         if (isAvailable_AvgBpmFromRRIntervals && allRRTimesInMilliseconds != null) {
+
+            // data serie which has the same number of slices as the time serie
+            final float[] dataSerie = tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM
+                  ? pulseSerie
+                  : avgBpmFromRRIntervals;
+
+            if (isShowTimeOnXAxis == false) {
+
+               // distance is displayed on the x-axis
+               //
+               // -> too complicated to show the correct RR graph
+               // -> show RR avg or device bpm graph
+
+               yDataPulse = createChartDataSerieNoZero(dataSerie, ChartType.LINE);
+
+               break;
+            }
+
+            final ChartType rrChartType = tcc.pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+
+                  ? ChartType.VARIABLE_X_AXIS
+
+                  // used for RR average and device bpm
+                  : ChartType.VARIABLE_X_AXIS_WITH_2ND_LINE;
+
+            // set a data serie for the 2nd line when it's displayed,
+            // when not displayed it is used to compute visible graph min/max values
+            yDataPulse = createChartDataSerieNoZero(dataSerie, rrChartType);
+
+            final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
+
+            // length: numTimeSlices
+            final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;
+
+            final int numTimeSlices = timeSerie.length;
+            final int numRRTimes = allRRTimesInMilliseconds.length;
+
+            final TDoubleArrayList xData_PulseTime = new TDoubleArrayList((int) (numRRTimes * 1.05));
+            final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
+
+            /**
+             * Syncronize 2 time series which can contain gaps
+             *
+             * <pre>
+             *
+             * x-axis     0----1----2----3----4----5----6----7----10----11----12----13---15-  seconds
+             *
+             * RR times   ------------320---1434-------762---763-------561--785-------1006--  milliseconds
+             *
+             * .
+             * </pre>
+             */
+
+            boolean areInitialRRValuesInvalid = false;
+
+            /*
+             * Adjust all values with the first value, otherwise the graph looks like it is shifted
+             * compared with the device bpm value. This value helps sometimes, but sometimes not.
+             */
+            double firstValueOffset = 0;
+            for (final int rrTimeMS : allRRTimesInMilliseconds) {
+               final double rrSliceTime = rrTimeMS / 1000.0;
+               if (rrSliceTime > 0) {
+                  firstValueOffset = rrSliceTime;
+                  break;
+               }
+            }
+
+            int rrIndex = 0;
+
+            double xAxisRRTime = 0;
+
+            // loop: x-axis time
+            for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+
+               final int xAxisTime = timeSerie[timeIndex];
+               final int rrIndex_FromTimeSerie = timeSerie_WithRRIndex[timeIndex];
+
+               if (rrIndex_FromTimeSerie == -1) {
+
+                  // RR time index is not valid
+
+                  if (xAxisRRTime == 0) {
+
+                     // keep time before RR values are available
+
+                     areInitialRRValuesInvalid = true;
+                  }
+
+               } else {
+
+                  // RR time index is valid
+
+                  // check if the first RR values are invalid
+                  if (areInitialRRValuesInvalid && xAxisRRTime == 0) {
+
+                     // initial RR values are invalid -> adjust start of x-axis RR time
+
+                     xAxisRRTime += xAxisTime;
+
+                     xData_PulseTime.add(xAxisTime);
+                     yData_PulseTime.add(0);
+                  }
+
+                  final int minXAxisDiff = 1;
+
+                  if (xAxisRRTime < xAxisTime) {
+
+                     while (rrIndex < numRRTimes
+
+                           && rrIndex <= rrIndex_FromTimeSerie
+
+                           && xAxisRRTime < xAxisTime
+
+                     ) {
+
+                        final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
+
+                        xAxisRRTime += rrSliceTime;
+                        final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
+
+                        final double xAxisDiff = xAxisRRTime - xAxisTime;
+
+                        if (xAxisDiff > 5) {
+
+                           /**
+                            * <code>
+                            *
+                            * timeIndex               = 8767
+                            * rrIndex                 = 12054
+                            * rrIndex_FromTimeSerie   = 12054
+                            * xAxisRRTime             = 16349.82
+                            * xAxisTime               = 16339
+                            *
+                            * </code>
+                            */
+
+                           xAxisRRTime = xAxisTime;
+
+                           if (_isLogging_RR_Errors) {
+                              System.out.println((System.currentTimeMillis() + " xAxisDiff 1: " + xAxisDiff));//$NON-NLS-1$
+                           }
+                        }
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(bpmFromRRTime);
+
+                        rrIndex++;
+                     }
+
+                     if (xAxisRRTime < xAxisTime - minXAxisDiff) {
+
+                        // RR time is still too small -> adjust RR time to x-Axis time
+
+                        xAxisRRTime += xAxisTime - xAxisRRTime;
+
+                        float yPulseTime = 0;
+                        if (_isLogging_RR_Errors) {
+
+                           yPulseTime = -100;
+
+                        } else {
+
+                           // show previous time
+
+                           final int numPulseTimes = yData_PulseTime.size();
+
+                           if (numPulseTimes > 0) {
+                              yPulseTime = yData_PulseTime.get(numPulseTimes - 1);
+                           }
+                        }
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(yPulseTime);
+                     }
+
+                  } else if (xAxisRRTime > xAxisTime) {
+
+                     // this occured when bpm < 60
+
+                     while (rrIndex < numRRTimes // check array bounds
+
+                           && rrIndex <= rrIndex_FromTimeSerie
+
+                           && xAxisRRTime > xAxisTime
+
+                     ) {
+
+                        final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
+
+                        xAxisRRTime += rrSliceTime;
+                        final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(bpmFromRRTime);
+
+                        rrIndex++;
+                     }
+
+                     final double xAxisDiff = xAxisRRTime - xAxisTime;
+                     if (xAxisDiff > 5) {
+
+                        /**
+                         * <code>
+                         *
+                         * timeIndex               = 8767
+                         * rrIndex                 = 12054
+                         * rrIndex_FromTimeSerie   = 12054
+                         * xAxisRRTime             = 16349.82
+                         * xAxisTime               = 16339
+                         *
+                         * </code>
+                         */
+
+                        xAxisRRTime = xAxisTime;
+
+                        if (_isLogging_RR_Errors) {
+                           System.out.println((System.currentTimeMillis() + " xAxisDiff 2: " + xAxisDiff));//$NON-NLS-1$
+                        }
+                     }
+
+                     if (xAxisRRTime - minXAxisDiff > xAxisTime) {
+
+                        // RR time is still too small -> adjust RR time to x-Axis time
+
+                        rrIndex = rrIndex_FromTimeSerie;
+
+                        xAxisRRTime += xAxisTime - xAxisRRTime;
+
+                        float yPulseTime = 0;
+                        if (_isLogging_RR_Errors) {
+
+                           yPulseTime = 500;
+
+                        } else {
+
+                           // show previous time
+
+                           final int numPulseTimes = yData_PulseTime.size();
+
+                           if (numPulseTimes > 0) {
+                              yPulseTime = yData_PulseTime.get(numPulseTimes - 1);
+                           }
+                        }
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(yPulseTime);
+                     }
+                  }
+               }
+            }
+
+            // set variable xy data after the arrays are filled up
+            chartDataModel.setVariableXYData(
+                  xData_PulseTime.toArray(),
+                  yData_PulseTime.toArray(),
+                  timeSerie_WithRRIndex);
+         }
+
+         break;
+
+      case DEVICE_BPM_ONLY:
+
+         if (isAvailable_PulseSerie) {
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
          }
          break;
 
-      case RR_INTERVALS__2ND_DEVICE_BPM:
+      case RR_AVERAGE___2ND_DEVICE_BPM:
 
-         if (isPulseSerie && isPulseTimeSerie) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseTimeSerie, pulseSerie }, chartType);
+         if (isAvailable_PulseSerie && isAvailable_AvgBpmFromRRIntervals) {
+
+            yDataPulse = createChartDataSerie(new float[][]
+
+            {
+                  avgBpmFromRRIntervals,
+                  pulseSerie
+            },
+                  chartType);
          }
          break;
 
-      case DEVICE_BPM__2ND__RR_INTERVALS:
+      case DEVICE_BPM___2ND_RR_AVERAGE:
       default:
 
-         if (isPulseSerie && isPulseTimeSerie) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, pulseTimeSerie }, chartType);
+         if (isAvailable_PulseSerie && isAvailable_AvgBpmFromRRIntervals) {
+
+            yDataPulse = createChartDataSerie(new float[][]
+
+            {
+                  pulseSerie,
+                  avgBpmFromRRIntervals
+            },
+                  chartType);
          }
       }
 
       // when user selection could not be applied, try to use the remaining possibilities
       if (yDataPulse == null) {
 
-         if (isPulseSerie) {
+         if (isAvailable_PulseSerie) {
 
             yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
 
-         } else if (isPulseTimeSerie) {
+         } else if (isAvailable_AvgBpmFromRRIntervals) {
 
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+            yDataPulse = createChartDataSerieNoZero(avgBpmFromRRIntervals, chartType);
          }
       }
 

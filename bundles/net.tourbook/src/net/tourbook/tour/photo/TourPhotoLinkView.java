@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,7 +53,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
@@ -170,7 +169,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private ActionFilterTourWithoutSavedPhotos _actionFilterTourWithoutSavedPhotos;
    private ActionFilterTourWithPhotos         _actionFilterTourWithPhotos;
    private ActionFilterOneHistoryTour         _actionFilterOneHistory;
-   private ActionModifyColumns                _actionModifyColumns;
    private ActionSavePhotosInTour             _actionSavePhotoInTour;
 
    private final PeriodFormatter              _durationFormatter;
@@ -180,7 +178,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _nf_1_1.setMinimumFractionDigits(1);
       _nf_1_1.setMaximumFractionDigits(1);
 
-      _durationFormatter = new PeriodFormatterBuilder()//
+      _durationFormatter = new PeriodFormatterBuilder()
             .appendYears()
             .appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
             .appendMonths()
@@ -653,7 +651,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _actionFilterOneHistory = new ActionFilterOneHistoryTour(this);
       _actionFilterTourWithoutSavedPhotos = new ActionFilterTourWithoutSavedPhotos(this);
       _actionFilterTourWithPhotos = new ActionFilterTourWithPhotos(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionSavePhotoInTour = new ActionSavePhotosInTour(this);
    }
 
@@ -730,7 +727,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .margins(2, 2)
             .applyTo(container);
@@ -765,7 +762,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
           * combo: camera
           */
          _comboCamera = new Combo(container, SWT.READ_ONLY);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.FILL)
 //					.hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
                .applyTo(_comboCamera);
@@ -948,7 +945,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             iconPicDirView.setText(UI.EMPTY_STRING);
 
             final Link linkImport = new Link(container, SWT.NONE);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -1343,14 +1340,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private void fillToolbar() {
 
       /*
-       * fill view menu
-       */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
-
-      /*
        * fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
@@ -1433,7 +1422,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
          final PhotoSelection photoSelection = (PhotoSelection) selection;
 
-         final Command command = _commandService.getCommand(ActionHandlerSyncPhotoWithTour.COMMAND_ID);
+         final Command command = _commandService.getCommand(ActionHandler_SyncPhotoWithTour.COMMAND_ID);
          final State state = command.getState(RegistryToggleState.STATE_ID);
          final boolean isSync = (Boolean) state.getValue();
 

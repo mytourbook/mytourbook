@@ -76,7 +76,7 @@ public class TileImageLoader implements Runnable {
    }
 
    /**
-    * Get tile tile image from offline file, url or tile painter
+    * Get tile image from offline file, url or tile painter
     */
    private void getTileImage(final Tile tile) {
 

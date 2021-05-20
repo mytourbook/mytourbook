@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,6 +75,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -101,8 +103,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -193,7 +193,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Button               _btnSavePerson;
    private Button               _btnCancel;
 
-   private TabFolder            _tabFolderPerson;
+   private CTabFolder           _tabFolderPerson;
    private Text                 _txtFirstName;
    private Text                 _txtLastName;
    private Combo                _cboSportComputer;
@@ -668,24 +668,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    private void createUI_30_Person_Folder(final Composite parent) {
 
-      _tabFolderPerson = new TabFolder(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      _tabFolderPerson = new CTabFolder(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(_tabFolderPerson);
       {
          // tab: person
-         final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
+         final CTabItem tabItemDetails = new CTabItem(_tabFolderPerson, SWT.NONE);
          tabItemDetails.setText(Messages.Pref_People_Tab_Person);
          tabItemDetails.setControl(createUI_50_Tab_Person(_tabFolderPerson));
 
          // tab: hr zone
-         final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
+         final CTabItem tabItemHRZone = new CTabItem(_tabFolderPerson, SWT.NONE);
          tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
          tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
 
          // tab: data transfer
-         final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
+         final CTabItem tabItemDataTransfer = new CTabItem(_tabFolderPerson, SWT.NONE);
          tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
          tabItemDataTransfer.setControl(createUI_90_Tab_DataTransfer(_tabFolderPerson));
       }
@@ -1810,7 +1810,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final String transferPath = _rawDataPathEditor.getStringValue().trim();
 
-         if (!StringUtils.isNullOrEmpty(transferPath) && Util.isDirectory(transferPath) == false) {
+         if (StringUtils.hasContent(transferPath) && Util.isDirectory(transferPath) == false) {
 
             setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 

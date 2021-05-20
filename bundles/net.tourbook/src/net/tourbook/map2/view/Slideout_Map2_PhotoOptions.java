@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,14 +19,15 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -48,7 +49,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
+public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final String   MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -64,7 +65,7 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
    final static IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
    private IDialogSettings       _state;
 
-   private Action                _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
    private ActionOpenPrefDialog  _actionPrefDialog;
 
    private Map2View              _map2View;
@@ -99,18 +100,9 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
 
    private void createActions() {
 
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault_Dark));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-
-      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPageMap2Appearance.ID)
-            .setDarkMode(true)
+      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPage_Map2_Appearance.ID)
             .closeThisTooltip(this)
             .setShell(_parent.getShell());
    }
@@ -263,7 +255,8 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
       }
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
 

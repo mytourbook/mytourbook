@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,7 +91,8 @@ public class ExportGpxTester {
       _tourExporter.setIsExportWithBarometer(true);
       _tourExporter.setIsCamouflageSpeed(true);
       _tourExporter.setCamouflageSpeed(15 / 3.6f); // 15km/h
-      _tour.setBodyWeight(77.7f);
+      _tour.setBodyWeight(77.7f); //77.7kg
+      _tour.setCalories(1282000); //1282 kcal / 1282000 calories
 
       executeTest(controlTourFileName);
    }

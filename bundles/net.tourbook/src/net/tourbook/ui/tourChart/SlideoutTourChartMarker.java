@@ -18,6 +18,8 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
@@ -25,7 +27,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -52,14 +53,17 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final String     GRAPH_LABEL_ALTITUDE      = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String     GRAPH_LABEL_TIME          = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String     GRAPH_LABEL_DISTANCE      = net.tourbook.common.Messages.Graph_Label_Distance;
-   private static final String     GRAPH_LABEL_ELEVATIONGAIN = net.tourbook.common.Messages.Graph_Label_ElevationGain;
+   private static final String     APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_ForegroundColor_Dark_Tooltip;
+   private static final String     APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_ForegroundColor_Light_Tooltip;
 
-   private final IPreferenceStore  _prefStore                = TourbookPlugin.getPrefStore();
+   private static final String     GRAPH_LABEL_ALTITUDE                     = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String     GRAPH_LABEL_TIME                         = net.tourbook.common.Messages.Graph_Label_Time;
+   private static final String     GRAPH_LABEL_DISTANCE                     = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String     GRAPH_LABEL_ELEVATIONGAIN                = net.tourbook.common.Messages.Graph_Label_ElevationGain;
+
+   private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
 
    private SelectionAdapter        _defaultSelectionAdapter;
    private MouseWheelListener      _defaultMouseWheelListener;
@@ -100,9 +104,9 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       };
    }
 
-   private PixelConverter _pc;
+   private PixelConverter        _pc;
 
-   private Action         _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    /*
     * UI controls
@@ -130,9 +134,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
    private Combo                 _comboLabelTempPosition;
    private Combo                 _comboTooltipPosition;
 
-   private ColorSelectorExtended _colorDefaultMarker;
-   private ColorSelectorExtended _colorDeviceMarker;
-   private ColorSelectorExtended _colorHiddenMarker;
+   private ColorSelectorExtended _colorDefaultMarker_Light;
+   private ColorSelectorExtended _colorDefaultMarker_Dark;
+   private ColorSelectorExtended _colorDeviceMarker_Light;
+   private ColorSelectorExtended _colorDeviceMarker_Dark;
+   private ColorSelectorExtended _colorHiddenMarker_Light;
+   private ColorSelectorExtended _colorHiddenMarker_Dark;
 
    private Label                 _lblLabelOffset;
    private Label                 _lblMarkerPointSize;
@@ -158,19 +165,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -440,7 +435,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
             .applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
-            .spacing(_pc.convertWidthInCharsToPixels(4), 0)
+            .spacing(_pc.convertWidthInCharsToPixels(2), 0)
             .applyTo(container);
       {
          createUI_92_Sizes(container);
@@ -524,12 +519,16 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
    private void createUI_94_Colors(final Composite parent) {
 
+      final GridDataFactory colorLayout = GridDataFactory.swtDefaults()
+            .grab(false, true)
+            .align(SWT.BEGINNING, SWT.BEGINNING);
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.FILL, SWT.BEGINNING)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          /*
@@ -543,14 +542,19 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
 
-            // Color selector
-            _colorDefaultMarker = new ColorSelectorExtended(container);
-            _colorDefaultMarker.addOpenListener(this);
-            _colorDefaultMarker.addListener(_defaultPropertyChangeListener);
-            GridDataFactory.swtDefaults()
-                  .grab(false, true)
-                  .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_colorDefaultMarker.getButton());
+            // Color selector: light
+            _colorDefaultMarker_Light = new ColorSelectorExtended(container);
+            _colorDefaultMarker_Light.addOpenListener(this);
+            _colorDefaultMarker_Light.addListener(_defaultPropertyChangeListener);
+            _colorDefaultMarker_Light.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
+            colorLayout.applyTo(_colorDefaultMarker_Light.getButton());
+
+            // Color selector: dark
+            _colorDefaultMarker_Dark = new ColorSelectorExtended(container);
+            _colorDefaultMarker_Dark.addOpenListener(this);
+            _colorDefaultMarker_Dark.addListener(_defaultPropertyChangeListener);
+            _colorDefaultMarker_Dark.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
+            colorLayout.applyTo(_colorDefaultMarker_Dark.getButton());
          }
 
          /*
@@ -565,14 +569,19 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
 
-            // Color selector
-            _colorDeviceMarker = new ColorSelectorExtended(container);
-            _colorDeviceMarker.addOpenListener(this);
-            _colorDeviceMarker.addListener(_defaultPropertyChangeListener);
-            GridDataFactory.swtDefaults()
-                  .grab(false, true)
-                  .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_colorDeviceMarker.getButton());
+            // Color selector: light
+            _colorDeviceMarker_Light = new ColorSelectorExtended(container);
+            _colorDeviceMarker_Light.addOpenListener(this);
+            _colorDeviceMarker_Light.addListener(_defaultPropertyChangeListener);
+            _colorDeviceMarker_Light.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
+            colorLayout.applyTo(_colorDeviceMarker_Light.getButton());
+
+            // Color selector: light
+            _colorDeviceMarker_Dark = new ColorSelectorExtended(container);
+            _colorDeviceMarker_Dark.addOpenListener(this);
+            _colorDeviceMarker_Dark.addListener(_defaultPropertyChangeListener);
+            _colorDeviceMarker_Dark.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
+            colorLayout.applyTo(_colorDeviceMarker_Dark.getButton());
          }
 
          /*
@@ -587,14 +596,19 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
 
-            // Color selector
-            _colorHiddenMarker = new ColorSelectorExtended(container);
-            _colorHiddenMarker.addOpenListener(this);
-            _colorHiddenMarker.addListener(_defaultPropertyChangeListener);
-            GridDataFactory.swtDefaults()
-                  .grab(false, true)
-                  .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_colorHiddenMarker.getButton());
+            // Color selector: light
+            _colorHiddenMarker_Light = new ColorSelectorExtended(container);
+            _colorHiddenMarker_Light.addOpenListener(this);
+            _colorHiddenMarker_Light.addListener(_defaultPropertyChangeListener);
+            _colorHiddenMarker_Light.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
+            colorLayout.applyTo(_colorHiddenMarker_Light.getButton());
+
+            // Color selector: light
+            _colorHiddenMarker_Dark = new ColorSelectorExtended(container);
+            _colorHiddenMarker_Dark.addOpenListener(this);
+            _colorHiddenMarker_Dark.addListener(_defaultPropertyChangeListener);
+            _colorHiddenMarker_Dark.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
+            colorLayout.applyTo(_colorHiddenMarker_Dark.getButton());
          }
       }
    }
@@ -648,89 +662,101 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
    private void onChangeUI() {
 
-      final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+// SET_FORMATTING_OFF
 
-      final boolean isDrawMarkerWithDefaultColor = _chkDrawMarkerWithDefaultColor.getSelection();
-      final boolean isShowAbsoluteValues = _chkShowAbsoluteValues.getSelection();
-      final boolean isShowHiddenMarker = _chkShowHiddenMarker.getSelection();
-      final boolean isShowLabelTempPos = _chkShowLabelTempPosition.getSelection();
-      final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
-      final boolean isShowMarkerPoint = _chkShowMarkerPoint.getSelection();
-      final boolean isShowMarkerTooltip = _chkShowMarkerTooltip.getSelection();
-      final boolean isShowOnlyWithDescription = _chkShowOnlyWithDescription.getSelection();
-      final boolean isShowTooltipData_Elevation = _chkTooltipData_Elevation.getSelection();
-      final boolean isShowTooltipData_Distance = _chkTooltipData_Distance.getSelection();
-      final boolean isShowTooltipData_Duration = _chkTooltipData_Duration.getSelection();
-      final boolean isShowTooltipData_ElevationGainDifference = _chkTooltipData_ElevationGainDifference.getSelection();
-      final boolean isShowTooltipData_DistanceDifference = _chkTooltipData_DistanceDifference.getSelection();
-      final boolean isShowTooltipData_DurationDifference = _chkTooltipData_DurationDifference.getSelection();
+      final boolean isDrawMarkerWithDefaultColor               = _chkDrawMarkerWithDefaultColor.getSelection();
+      final boolean isShowAbsoluteValues                       = _chkShowAbsoluteValues.getSelection();
+      final boolean isShowHiddenMarker                         = _chkShowHiddenMarker.getSelection();
+      final boolean isShowLabelTempPos                         = _chkShowLabelTempPosition.getSelection();
+      final boolean isShowMarkerLabel                          = _chkShowMarkerLabel.getSelection();
+      final boolean isShowMarkerPoint                          = _chkShowMarkerPoint.getSelection();
+      final boolean isShowMarkerTooltip                        = _chkShowMarkerTooltip.getSelection();
+      final boolean isShowOnlyWithDescription                  = _chkShowOnlyWithDescription.getSelection();
+      final boolean isShowTooltipData_Elevation                = _chkTooltipData_Elevation.getSelection();
+      final boolean isShowTooltipData_Distance                 = _chkTooltipData_Distance.getSelection();
+      final boolean isShowTooltipData_Duration                 = _chkTooltipData_Duration.getSelection();
+      final boolean isShowTooltipData_ElevationGainDifference  = _chkTooltipData_ElevationGainDifference.getSelection();
+      final boolean isShowTooltipData_DistanceDifference       = _chkTooltipData_DistanceDifference.getSelection();
+      final boolean isShowTooltipData_DurationDifference       = _chkTooltipData_DurationDifference.getSelection();
 
-      final int hoverSize = _spinHoverSize.getSelection();
-      final int labelOffset = _spinLabelOffset.getSelection();
-      final int markerPointSize = _spinMarkerPointSize.getSelection();
-      final int tempPosition = _comboLabelTempPosition.getSelectionIndex();
-      final int ttPosition = _comboTooltipPosition.getSelectionIndex();
+      final int hoverSize           = _spinHoverSize.getSelection();
+      final int labelOffset         = _spinLabelOffset.getSelection();
+      final int markerPointSize     = _spinMarkerPointSize.getSelection();
+      final int tempPosition        = _comboLabelTempPosition.getSelectionIndex();
+      final int ttPosition          = _comboTooltipPosition.getSelectionIndex();
 
-      final RGB defaultColor = _colorDefaultMarker.getColorValue();
-      final RGB deviceColor = _colorDeviceMarker.getColorValue();
-      final RGB hiddenColor = _colorHiddenMarker.getColorValue();
+      final RGB defaultColor_Light  = _colorDefaultMarker_Light.getColorValue();
+      final RGB defaultColor_Dark   = _colorDefaultMarker_Dark.getColorValue();
+      final RGB deviceColor_Light   = _colorDeviceMarker_Light.getColorValue();
+      final RGB deviceColor_Dark    = _colorDeviceMarker_Dark.getColorValue();
+      final RGB hiddenColor_Light   = _colorHiddenMarker_Light.getColorValue();
+      final RGB hiddenColor_Dark    = _colorHiddenMarker_Dark.getColorValue();
 
       /*
        * Update pref store
        */
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE, hoverSize);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET, labelOffset);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION, tempPosition);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, markerPointSize);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION, ttPosition);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE,             hoverSize);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET,           labelOffset);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION,    tempPosition);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE,             markerPointSize);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION,       ttPosition);
 
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, isDrawMarkerWithDefaultColor);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES, isShowAbsoluteValues);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, isShowHiddenMarker);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION, isShowLabelTempPos);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, isShowMarkerPoint);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION, isShowTooltipData_Elevation);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE, isShowTooltipData_Distance);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION, isShowTooltipData_Duration);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE,
-            isShowTooltipData_ElevationGainDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR,               isDrawMarkerWithDefaultColor);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES,                  isShowAbsoluteValues);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER,                    isShowHiddenMarker);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION,              isShowLabelTempPos);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL,                     isShowMarkerLabel);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT,                     isShowMarkerPoint);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP,                   isShowMarkerTooltip);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION,           isShowTooltipData_Elevation);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE,            isShowTooltipData_Distance);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION,            isShowTooltipData_Duration);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE, isShowTooltipData_ElevationGainDifference);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE, isShowTooltipData_DistanceDifference);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE, isShowTooltipData_DurationDifference);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION, isShowOnlyWithDescription);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION,            isShowOnlyWithDescription);
 
-      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, defaultColor);
-      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE, deviceColor);
-      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN, hiddenColor);
+      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,       defaultColor_Light);
+      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK,  defaultColor_Dark);
+      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,        deviceColor_Light);
+      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK,   deviceColor_Dark);
+      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,        hiddenColor_Light);
+      PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK,   hiddenColor_Dark);
 
       /*
        * Update chart config
        */
-      tcc.isDrawMarkerWithDefaultColor = isDrawMarkerWithDefaultColor;
-      tcc.isShowAbsoluteValues = isShowAbsoluteValues;
-      tcc.isShowHiddenMarker = isShowHiddenMarker;
-      tcc.isShowLabelTempPos = isShowLabelTempPos;
-      tcc.isShowMarkerLabel = isShowMarkerLabel;
-      tcc.isShowMarkerPoint = isShowMarkerPoint;
-      tcc.isShowMarkerTooltip = isShowMarkerTooltip;
-      tcc.isShowTooltipData_Elevation = isShowTooltipData_Elevation;
-      tcc.isShowTooltipData_Distance = isShowTooltipData_Distance;
-      tcc.isShowTooltipData_Duration = isShowTooltipData_Duration;
-      tcc.isShowTooltipData_ElevationGainDifference = isShowTooltipData_ElevationGainDifference;
-      tcc.isShowTooltipData_DistanceDifference = isShowTooltipData_DistanceDifference;
-      tcc.isShowTooltipData_DurationDifference = isShowTooltipData_DurationDifference;
-      tcc.isShowOnlyWithDescription = isShowOnlyWithDescription;
+      final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
-      tcc.markerHoverSize = hoverSize;
-      tcc.markerLabelOffset = labelOffset;
-      tcc.markerLabelTempPos = tempPosition;
-      tcc.markerPointSize = markerPointSize;
-      tcc.markerTooltipPosition = ttPosition;
+      tcc.isDrawMarkerWithDefaultColor                = isDrawMarkerWithDefaultColor;
+      tcc.isShowAbsoluteValues                        = isShowAbsoluteValues;
+      tcc.isShowHiddenMarker                          = isShowHiddenMarker;
+      tcc.isShowLabelTempPos                          = isShowLabelTempPos;
+      tcc.isShowMarkerLabel                           = isShowMarkerLabel;
+      tcc.isShowMarkerPoint                           = isShowMarkerPoint;
+      tcc.isShowMarkerTooltip                         = isShowMarkerTooltip;
+      tcc.isShowTooltipData_Elevation                 = isShowTooltipData_Elevation;
+      tcc.isShowTooltipData_Distance                  = isShowTooltipData_Distance;
+      tcc.isShowTooltipData_Duration                  = isShowTooltipData_Duration;
+      tcc.isShowTooltipData_ElevationGainDifference   = isShowTooltipData_ElevationGainDifference;
+      tcc.isShowTooltipData_DistanceDifference        = isShowTooltipData_DistanceDifference;
+      tcc.isShowTooltipData_DurationDifference        = isShowTooltipData_DurationDifference;
+      tcc.isShowOnlyWithDescription                   = isShowOnlyWithDescription;
 
-      tcc.markerColorDefault = defaultColor;
-      tcc.markerColorDevice = deviceColor;
-      tcc.markerColorHidden = hiddenColor;
+      tcc.markerHoverSize           = hoverSize;
+      tcc.markerLabelOffset         = labelOffset;
+      tcc.markerLabelTempPos        = tempPosition;
+      tcc.markerPointSize           = markerPointSize;
+      tcc.markerTooltipPosition     = ttPosition;
+
+      tcc.markerColorDefault_Light  = defaultColor_Light;
+      tcc.markerColorDefault_Dark   = defaultColor_Dark;
+      tcc.markerColorDevice_Light   = deviceColor_Light;
+      tcc.markerColorDevice_Dark    = deviceColor_Dark;
+      tcc.markerColorHidden_Light   = hiddenColor_Light;
+      tcc.markerColorHidden_Dark    = hiddenColor_Dark;
+
+// SET_FORMATTING_ON
 
       // update chart with new settings
       _tourChart.updateUI_MarkerLayer();
@@ -741,7 +767,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       /*
        * Update UI with defaults from pref store
@@ -771,9 +798,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       _spinMarkerPointSize.setSelection(     _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
       _spinLabelOffset.setSelection(         _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET));
 
-      _colorDefaultMarker.setColorValue(  PreferenceConverter.getColor(_prefStore,          ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
-      _colorDeviceMarker.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
-      _colorHiddenMarker.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+      _colorDefaultMarker_Light.setColorValue(  PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
+      _colorDefaultMarker_Dark.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK));
+      _colorDeviceMarker_Light.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
+      _colorDeviceMarker_Dark.setColorValue(    PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK));
+      _colorHiddenMarker_Light.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+      _colorHiddenMarker_Dark.setColorValue(    PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK));
 
 // SET_FORMATTING_ON
 
@@ -788,32 +818,39 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
             ? ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION
             : tcc.markerTooltipPosition;
 
-      _chkDrawMarkerWithDefaultColor.setSelection(tcc.isDrawMarkerWithDefaultColor);
-      _chkShowAbsoluteValues.setSelection(tcc.isShowAbsoluteValues);
+// SET_FORMATTING_OFF
 
-      _chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
-      _chkShowLabelTempPosition.setSelection(tcc.isShowLabelTempPos);
-      _chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
-      _chkShowMarkerPoint.setSelection(tcc.isShowMarkerPoint);
-      _chkShowMarkerTooltip.setSelection(tcc.isShowMarkerTooltip);
-      _chkTooltipData_Elevation.setSelection(tcc.isShowTooltipData_Elevation);
-      _chkTooltipData_Distance.setSelection(tcc.isShowTooltipData_Distance);
-      _chkTooltipData_Duration.setSelection(tcc.isShowTooltipData_Duration);
-      _chkTooltipData_ElevationGainDifference.setSelection(tcc.isShowTooltipData_ElevationGainDifference);
-      _chkTooltipData_DistanceDifference.setSelection(tcc.isShowTooltipData_DistanceDifference);
-      _chkTooltipData_DurationDifference.setSelection(tcc.isShowTooltipData_DurationDifference);
-      _chkShowOnlyWithDescription.setSelection(tcc.isShowOnlyWithDescription);
+      _chkDrawMarkerWithDefaultColor.setSelection(          tcc.isDrawMarkerWithDefaultColor);
+      _chkShowAbsoluteValues.setSelection(                  tcc.isShowAbsoluteValues);
 
-      _comboLabelTempPosition.select(tcc.markerLabelTempPos);
-      _comboTooltipPosition.select(markerTooltipPosition);
+      _chkShowHiddenMarker.setSelection(                    tcc.isShowHiddenMarker);
+      _chkShowLabelTempPosition.setSelection(               tcc.isShowLabelTempPos);
+      _chkShowMarkerLabel.setSelection(                     tcc.isShowMarkerLabel);
+      _chkShowMarkerPoint.setSelection(                     tcc.isShowMarkerPoint);
+      _chkShowMarkerTooltip.setSelection(                   tcc.isShowMarkerTooltip);
+      _chkTooltipData_Elevation.setSelection(               tcc.isShowTooltipData_Elevation);
+      _chkTooltipData_Distance.setSelection(                tcc.isShowTooltipData_Distance);
+      _chkTooltipData_Duration.setSelection(                tcc.isShowTooltipData_Duration);
+      _chkTooltipData_ElevationGainDifference.setSelection( tcc.isShowTooltipData_ElevationGainDifference);
+      _chkTooltipData_DistanceDifference.setSelection(      tcc.isShowTooltipData_DistanceDifference);
+      _chkTooltipData_DurationDifference.setSelection(      tcc.isShowTooltipData_DurationDifference);
+      _chkShowOnlyWithDescription.setSelection(             tcc.isShowOnlyWithDescription);
 
-      _colorDefaultMarker.setColorValue(tcc.markerColorDefault);
-      _colorDeviceMarker.setColorValue(tcc.markerColorDevice);
-      _colorHiddenMarker.setColorValue(tcc.markerColorHidden);
+      _comboLabelTempPosition.select(  tcc.markerLabelTempPos);
+      _comboTooltipPosition.select(    markerTooltipPosition);
 
-      _spinHoverSize.setSelection(tcc.markerHoverSize);
-      _spinLabelOffset.setSelection(tcc.markerLabelOffset);
-      _spinMarkerPointSize.setSelection(tcc.markerPointSize);
+      _colorDefaultMarker_Light.setColorValue(              tcc.markerColorDefault_Light);
+      _colorDefaultMarker_Dark.setColorValue(               tcc.markerColorDefault_Dark);
+      _colorDeviceMarker_Light.setColorValue(               tcc.markerColorDevice_Light);
+      _colorDeviceMarker_Dark.setColorValue(                tcc.markerColorDevice_Dark);
+      _colorHiddenMarker_Light.setColorValue(               tcc.markerColorHidden_Light);
+      _colorHiddenMarker_Dark.setColorValue(                tcc.markerColorHidden_Dark);
+
+      _spinHoverSize.setSelection(        tcc.markerHoverSize);
+      _spinLabelOffset.setSelection(      tcc.markerLabelOffset);
+      _spinMarkerPointSize.setSelection(  tcc.markerPointSize);
+
+// SET_FORMATTING_ON
    }
 
 }

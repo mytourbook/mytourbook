@@ -25,8 +25,17 @@ public class Messages extends NLS {
    public static String        App_Action_New_WithConfirm;
    public static String        App_Action_Remove_NoConfirm;
    public static String        App_Action_Rename_WithConfirm;
+   public static String        App_Action_RestoreDefault;
+   public static String        App_Action_RestoreDefault_Tooltip;
 
    public static String        App_Error_NotSupportedValueFormatter;
+
+   public static String        App_Theme_BackgroundColor_Light_Tooltip;
+   public static String        App_Theme_BackgroundColor_Dark_Tooltip;
+   public static String        App_Theme_ForegroundColor_Light_Tooltip;
+   public static String        App_Theme_ForegroundColor_Dark_Tooltip;
+   public static String        App_Theme_ValueFor_Light_Tooltip;
+   public static String        App_Theme_ValueFor_Dark_Tooltip;
 
    public static String        Action_App_CustomizeColumnsAndProfiles;
    public static String        Action_App_SizeAllColumnsToFit;
@@ -164,41 +173,6 @@ public class Messages extends NLS {
    public static String        Graph_Pref_color_statistic_distance;
    public static String        Graph_Pref_color_statistic_time;
    public static String        Graph_Pref_ColorText;
-
-   public static String        Image___Empty16;
-
-   public static String        Image__App_Close;
-   public static String        Image__App_Close_Themed;
-   public static String        Image__App_No;
-   public static String        Image__App_Yes;
-   public static String        Image__BookOpen_Themed;
-   public static String        Image__ColumnCategory;
-   public static String        Image__CustomizeProfilesColumns;
-   public static String        Image__MapProvider_Custom;
-   public static String        Image__MapProvider_Custom_Hill;
-   public static String        Image__MapProvider_Internal;
-   public static String        Image__MapProvider_Profile;
-   public static String        Image__MapProvider_Profile_Hill;
-   public static String        Image__MapProvider_Transparent;
-   public static String        Image__MapProvider_Transparent_Hill;
-   public static String        Image__options;
-   public static String        Image__Options_Dark;
-   public static String        Image__Pin_Themed;
-   public static String        Image__TourOptions;
-   public static String        Image__TourOptions_Disabled;
-   public static String        Image__weather_sunny;
-   public static String        Image__weather_cloudy;
-   public static String        Image__weather_clouds;
-   public static String        Image__weather_lightning;
-   public static String        Image__weather_rain;
-   public static String        Image__weather_snow;
-   public static String        Image__Weather_ScatteredShowers;
-   public static String        Image__Weather_Severe;
-
-   public static String        Image_Action_PhotoFilter;
-   public static String        Image_Action_PhotoFilter_Disabled;
-   public static String        Image_Action_PhotoFilterNoPhotos;
-   public static String        Image_Action_PhotoFilterWithPhotos;
 
    public static String        Map3_Color_ProfileName_Default;
    public static String        Map3_Color_ProfileName_New;

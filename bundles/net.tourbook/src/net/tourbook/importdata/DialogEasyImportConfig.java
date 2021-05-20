@@ -20,13 +20,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -45,7 +50,6 @@ import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -59,16 +63,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -76,6 +75,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -85,8 +86,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -94,7 +93,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -117,8 +115,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -131,7 +127,7 @@ import org.joda.time.PeriodType;
 /**
  * Dialog to configure the device import.
  */
-public class DialogEasyImportConfig extends TitleAreaDialog {
+public class DialogEasyImportConfig extends TitleAreaDialog implements IActionResetToDefault {
 
    public static final String           ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
@@ -173,7 +169,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private SelectionAdapter             _speedTourTypeListener;
    //
    private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
-   private Action                       _actionRestoreDefaults;
+   private ActionResetToDefaults        _actionRestoreDefaults;
    private ActionSpeedTourType_Add      _actionTTSpeed_Add;
    private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
    private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
@@ -278,6 +274,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ComboViewerCadence[] _comboTT_Cadence;
    //
    private Image                _imageFileSystem;
+   private Image                _imageAppOptions;
    //
    private Label                _lblIC_FileSystemImage;
    private Label                _lblIC_ConfigName;
@@ -315,7 +312,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
    private Spinner[]            _spinnerTT_Speed_AvgSpeed;
    //
-   private TabFolder            _tabFolderEasy;
+   private CTabFolder           _tabFolderEasy;
    //
    private Text                 _txtIC_DeviceFiles;
    private Text                 _txtIC_ConfigName;
@@ -384,7 +381,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          super(null, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
       }
 
       @Override
@@ -403,8 +400,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Disabled));
       }
 
       @Override
@@ -460,8 +457,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort_Disabled));
       }
 
       @Override
@@ -609,26 +606,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__options).createImage());
+      _imageAppOptions = CommonActivator.getThemedImageDescriptor(CommonImages.App_Options).createImage();
+      setDefaultImage(_imageAppOptions);
 
       cloneEasyConfig(easyConfig);
    }
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-               // tour type images can have been changed
+            // tour type images can have been changed
 
-               _ilViewer.refresh(true);
-               update_UI_From_Model_IL();
-            }
+            _ilViewer.refresh(true);
+            update_UI_From_Model_IL();
          }
       };
 
@@ -741,19 +736,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             Messages.action_tourType_modify_tourTypes,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetDashboardToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -784,12 +767,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
        */
       final MenuManager menuMgr = new MenuManager();
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-            fillTourTypeMenu(menuMgr);
-         }
-      });
+      menuMgr.addMenuListener(this::fillTourTypeMenu);
       final Menu ttContextMenu = menuMgr.createContextMenu(_linkTT_One_TourType);
       _linkTT_One_TourType.setMenu(ttContextMenu);
    }
@@ -800,29 +778,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      TabItem tabDashboard;
+      CTabItem tabDashboard;
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
-         _tabFolderEasy = new TabFolder(container, SWT.NONE);
+         _tabFolderEasy = new CTabFolder(container, SWT.NONE);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolderEasy);
          {
             // tab: config
-            final TabItem tabConfig = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabConfig = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabConfig.setText(Messages.Dialog_ImportConfig_Tab_Configuration);
             tabConfig.setControl(createUI_200_ImportActions(_tabFolderEasy));
 
             // tab: launcher
-            final TabItem tabLauncher = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabLauncher = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabLauncher.setText(Messages.Dialog_ImportConfig_Tab_Launcher);
             tabLauncher.setControl(createUI_500_IL_ImportLauncher(_tabFolderEasy));
 
             // tab: dashboard
-            tabDashboard = new TabItem(_tabFolderEasy, SWT.NONE);
+            tabDashboard = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabDashboard.setText(Messages.Dialog_ImportConfig_Tab_Dashboard);
             tabDashboard.setControl(createUI_900_Dashboard(_tabFolderEasy));
          }
@@ -920,19 +898,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _icViewer.setUseHashlookup(true);
       _icViewer.setContentProvider(new ICContentProvider());
 
-      _icViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onIC_SelectIC(event.getSelection());
-         }
-      });
+      _icViewer.addSelectionChangedListener(selectionChangedEvent -> onIC_SelectIC(selectionChangedEvent.getSelection()));
 
-      _icViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onIC_DblClick();
-         }
-      });
+      _icViewer.addDoubleClickListener(doubleClickEvent -> onIC_DblClick());
 
       createUI_213_IC_ContextMenu();
       createUI_214_IC_DragDrop();
@@ -1301,12 +1269,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI_254_IC_DeviceFileFolder(final Composite parent) {
 
-      final ModifyListener deviceTypeListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onSelectDevice();
-         }
-      };
+      final ModifyListener deviceTypeListener = modifyEvent -> onSelectDevice();
 
       final Composite importContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(importContainer);
@@ -1334,7 +1297,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              * File System image
              */
             _lblIC_FileSystemImage = new Label(importContainer, SWT.NONE);
-            _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+            _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
             _lblIC_FileSystemImage.setImage(_imageFileSystem);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
@@ -1594,13 +1557,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
        * critical for performance that these methods be as efficient as possible.
        */
-      final Listener paintListener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      final Listener paintListener = event -> {
 
-            if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-               onPaintViewer(event);
-            }
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+            onPaintViewer(event);
          }
       };
       table.addListener(SWT.MeasureItem, paintListener);
@@ -1618,19 +1578,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _ilViewer.setUseHashlookup(true);
       _ilViewer.setContentProvider(new ILContentProvider());
 
-      _ilViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_IL(event.getSelection());
-         }
-      });
+      _ilViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_IL(selectionChangedEvent.getSelection()));
 
-      _ilViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onIL_DblClick();
-         }
-      });
+      _ilViewer.addDoubleClickListener(doubleClickEvent -> onIL_DblClick());
 
       createUI_513_IL_ContextMenu();
       createUI_514_IL_DragDrop();
@@ -1817,12 +1767,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
          final MenuManager menuMgr = new MenuManager();
          menuMgr.setRemoveAllWhenShown(true);
-         menuMgr.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(final IMenuManager menuMgr) {
-               fillTourTypeOneMenu(menuMgr);
-            }
-         });
+         menuMgr.addMenuListener(this::fillTourTypeOneMenu);
          final Menu ttContextMenu = menuMgr.createContextMenu(_btnIL_NewOne);
          _btnIL_NewOne.setMenu(ttContextMenu);
 
@@ -2195,12 +2140,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              */
             final MenuManager menuMgr = new MenuManager();
             menuMgr.setRemoveAllWhenShown(true);
-            menuMgr.addMenuListener(new IMenuListener() {
-               @Override
-               public void menuAboutToShow(final IMenuManager menuMgr) {
-                  fillSpeedTourTypeMenu(menuMgr, linkTourType);
-               }
-            });
+            menuMgr.addMenuListener(menuManager -> fillSpeedTourTypeMenu(menuManager, linkTourType));
             final Menu ttContextMenu = menuMgr.createContextMenu(linkTourType);
             linkTourType.setMenu(ttContextMenu);
 
@@ -2380,13 +2320,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             _spinnerIL_TemperatureAdjustmentDuration.setMinimum(0);
             _spinnerIL_TemperatureAdjustmentDuration.setMaximum(60 * 60 * 24); // 1 day
             _spinnerIL_TemperatureAdjustmentDuration.setPageIncrement(60); // 1 minute
-            _spinnerIL_TemperatureAdjustmentDuration.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  updateUI_TemperatureAdjustmentDuration();
-                  onIL_Modified();
-               }
+            _spinnerIL_TemperatureAdjustmentDuration.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               updateUI_TemperatureAdjustmentDuration();
+               onIL_Modified();
             });
             _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -3228,6 +3165,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _configImageHash.clear();
 
       Util.disposeResource(_imageFileSystem);
+      Util.disposeResource(_imageAppOptions);
    }
 
    /**
@@ -3279,7 +3217,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
       final boolean isAdjustTemperature = isILSelected && _chkIL_AdjustTemperature.getSelection();
       final boolean isRetrieveWeatherData = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            !StringUtils.isNullOrEmpty(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+            StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
 
       boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
@@ -3551,13 +3489,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 //      FONT_BOLD = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-      parent.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDispose());
 
       /*
        * IC listener
@@ -3570,12 +3502,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          }
       };
 
-      _icModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onIC_Modified();
-         }
-      };
+      _icModifyListener = modifyEvent -> onIC_Modified();
 
       /*
        * Path listener
@@ -3586,12 +3513,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             onIC_Folder_FocusLost(e);
          }
       };
-      _ic_FolderModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onIC_Folder_Modified(e);
-            onIC_Modified();
-         }
+      _ic_FolderModifyListener = modifyEvent -> {
+         onIC_Folder_Modified(modifyEvent);
+         onIC_Modified();
       };
       _ic_FolderKeyListener = new KeyAdapter() {
          @Override
@@ -3603,12 +3527,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /*
        * IL listener
        */
-      _ilModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onIL_Modified();
-         }
-      };
+      _ilModifyListener = modifyEvent -> onIL_Modified();
 
       _ilSelectionListener = new SelectionAdapter() {
          @Override
@@ -3626,23 +3545,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             doLiveUpdate();
          }
       };
-      _liveUpdateMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            doLiveUpdate();
-         }
+      _liveUpdateMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         doLiveUpdate();
       };
 
       /*
        * Default mouse listener
        */
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-         }
-      };
+      _defaultMouseWheelListener = UI::adjustSpinnerValueOnMouseScroll;
 
       _speedTourTypeListener = new SelectionAdapter() {
          @Override
@@ -3663,16 +3574,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          }
       };
 
-      _defaultModify_MouseWheelListener = new MouseWheelListener() {
+      _defaultModify_MouseWheelListener = mouseEvent -> {
 
-         @Override
-         public void mouseScrolled(final MouseEvent e) {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-            UI.adjustSpinnerValueOnMouseScroll(e);
-
-            onIL_Modified();
-            enable_IL_Controls();
-         }
+         onIL_Modified();
+         enable_IL_Controls();
       };
 
    }
@@ -4111,7 +4018,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
             selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell(),
                   filterOSPath.replace(fileSystem.getId(), UI.EMPTY_STRING));
-            if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+            if (StringUtils.hasContent(selectedFolder)) {
                _comboIC_DeviceFolder.setText(selectedFolder);
             }
          } catch (final Exception e) {
@@ -4196,7 +4103,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       //We update the file system icon
       Util.disposeResource(_imageFileSystem);
       if (isDeviceLocal) {
-         _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+         _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
       } else if (NIO.isTourBookFileSystem(_comboIC_DeviceType.getText())) {
          final ImageDescriptor fileSystemImageDescriptor = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText())
                .getFileSystemImageDescriptor();
@@ -4312,7 +4219,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _ilViewer.getTable().redraw();
    }
 
-   private void resetDashboardToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _chkDash_LiveUpdate.setSelection(EasyConfig.LIVE_UPDATE_DEFAULT);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,8 @@ import java.text.DateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.time.TimeTools;
@@ -39,7 +39,9 @@ public class CiclotourTextDataReader extends TourbookDevice {
    private static final String FILE_HEADER_EN = "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:"; //$NON-NLS-1$
    private static final String FILE_HEADER_DE = "Zeit:	Strecke:	H�he:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";          //$NON-NLS-1$
 
-   public CiclotourTextDataReader() {}
+   public CiclotourTextDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -139,8 +141,9 @@ public class CiclotourTextDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       // immediately bail out if the file format is not correct.
       if (!validateRawData(importFilePath)) {

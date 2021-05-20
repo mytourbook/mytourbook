@@ -22,6 +22,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.HoveredValuePointData;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
@@ -33,16 +35,15 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -222,11 +223,12 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private class ActionOpenTooltipMenu extends Action {
 
-      public ActionOpenTooltipMenu(final ValuePoint_ToolTip_MenuManager tooltipMenuManager) {
-         super(null, Action.AS_PUSH_BUTTON);
+      public ActionOpenTooltipMenu() {
+
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__tour_options));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
       }
 
       @Override
@@ -311,33 +313,30 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * create a new chart configuration when the preferences has changed
-             */
-            if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)
-            //
-            ) {
-               _isToolTipVisible = (Boolean) event.getNewValue();
+         /*
+          * create a new chart configuration when the preferences has changed
+          */
+         if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)
+         //
+         ) {
+            _isToolTipVisible = (Boolean) propertyChangeEvent.getNewValue();
 
-               if (_isToolTipVisible) {
-                  show(new Point(_devXMouse, _devYMouse));
-               } else {
-                  hide();
-               }
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-
-               // dispose old colors
-               _colorCache.dispose();
-
-               reopen();
+            if (_isToolTipVisible) {
+               show(new Point(_devXMouse, _devYMouse));
+            } else {
+               hide();
             }
+
+         } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+            // dispose old colors
+            _colorCache.dispose();
+
+            reopen();
          }
       };
 
@@ -348,7 +347,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _ttMenuMgr = new ValuePoint_ToolTip_MenuManager(this, state);
 
-      _actionOpenTooltipMenu = new ActionOpenTooltipMenu(_ttMenuMgr);
+      _actionOpenTooltipMenu = new ActionOpenTooltipMenu();
    }
 
    @Override
@@ -410,12 +409,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _shellContainer.setForeground(_fgColor);
       _shellContainer.setBackground(_bgColor);
-      _shellContainer.addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent e) {
-            onPaintShellContainer(e);
-         }
-      });
+      _shellContainer.addPaintListener(this::onPaintShellContainer);
 //      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
 
@@ -1655,11 +1649,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          final long pace = (long) _tourData.getPaceSerieSeconds()[valueIndex];
 
          _lblPace.setText(String.format(Messages.Tooltip_ValuePoint_Format_Pace,
-
                pace / 60,
-               pace % 60)
-
-               .toString());
+               pace % 60));
       }
 
       if (_isVisible_And_Available_Power) {
@@ -1672,11 +1663,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
                TourChart.PULSE_GRAPH_DEFAULT);
 
-         // @FJBDev: Do NOT optimize these if statements, this way it is better readable for me !
+         // @FJBDev: Do NOT optimize the following if statements, this way it is better readable for me !
 
          if (_isAvailable_Pulse_BpmFromDevice) {
 
-            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS) {
+            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE) {
 
                _lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
             }
@@ -1685,9 +1676,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          if (_isAvailable_Pulse_RRIntervals) {
 
-            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY || pulseGraph == PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM) {
+            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+                  || pulseGraph == PulseGraph.RR_AVERAGE___2ND_DEVICE_BPM
+                  || pulseGraph == PulseGraph.RR_AVERAGE_ONLY) {
 
-               _lblPulse.setText(_nf1.format(_tourData.getPulse_RRIntervals()[valueIndex]));
+               _lblPulse.setText(_nf1.format(_tourData.getPulse_AvgBpmFromRRIntervals()[valueIndex]));
             }
          }
       }
@@ -1717,12 +1710,18 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
-         _lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + timeSerie[valueIndex]));
+         _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + timeSerie[valueIndex]) % 86400));
       }
 
       if (_isVisible_And_Available_TimeSlice) {
-         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
-         _lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
+
+         /*
+          * Show the same time slice value which is also selected in the tour editor where time
+          * slices are starting with 1, otherwise it could be confusing
+          */
+
+         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex + 1));
+         _lblDataSerieMax.setText(Integer.toString(timeSerie.length));
       }
 
       if (_isVisible_And_Available_TourCompareResult) {

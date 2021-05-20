@@ -15,26 +15,28 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionPhotoGalleryType extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionPhotoGalleryType(final PhotoGallery photoGallery) {
+   public ActionPhotoGalleryType(final PhotoGallery photoGallery) {
 
-		super(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail, AS_PUSH_BUTTON);
+      super(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail, AS_PUSH_BUTTON);
 
-		_photoGallery = photoGallery;
+      _photoGallery = photoGallery;
 
-		setToolTipText(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail));
-	}
+      setToolTipText(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip);
+      setImageDescriptor(PhotoActivator.getImageDescriptor(PhotoImages.PhotoGallery_Thumbnail));
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionPhotoGalleryType();
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionPhotoGalleryType();
+   }
 }

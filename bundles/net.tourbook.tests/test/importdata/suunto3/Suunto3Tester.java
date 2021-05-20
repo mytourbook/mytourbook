@@ -59,7 +59,7 @@ class Suunto3Tester {
       final String filePath = IMPORT_FILE_PATH + "597F0A5112001700-2016-08-27T15_45_41-0"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+		deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -74,7 +74,7 @@ class Suunto3Tester {
       final String filePath = IMPORT_FILE_PATH + "F783095113000500-2015-05-31T09_51_13-0"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+		deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

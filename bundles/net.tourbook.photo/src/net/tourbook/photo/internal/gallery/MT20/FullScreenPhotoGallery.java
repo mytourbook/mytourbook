@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,645 +60,647 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
-	private static final int		GALLERY_DEFAULT_HEIGHT					= 150;
-	private static final int		GALLERY_MIN_IMAGE_SIZE					= 40;
-	private static final int		GALLERY_MAX_IMAGE_SIZE					= 1000;
+   private static final int      GALLERY_DEFAULT_HEIGHT                 = 150;
+   private static final int      GALLERY_MIN_IMAGE_SIZE                 = 40;
+   private static final int      GALLERY_MAX_IMAGE_SIZE                 = 1000;
 
-	private static final String		STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT	= "STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT"; //$NON-NLS-1$
+   private static final String   STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT = "STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT"; //$NON-NLS-1$
 
-	private ControlAnimation		_photoGalleryAnimation;
+   private ControlAnimation      _photoGalleryAnimation;
 
-	private IDialogSettings			_state;
+   private IDialogSettings       _state;
 
-	private AllControlsListener		_allControlsListener;
+   private AllControlsListener   _allControlsListener;
 
-	private GalleryMT20				_sourceGallery;
-	private PhotoGallery			_photoGallery;
-	private FullScreenImageViewer	_fullScreenImageViewer;
+   private GalleryMT20           _sourceGallery;
+   private PhotoGallery          _photoGallery;
+   private FullScreenImageViewer _fullScreenImageViewer;
 
-	private int						_displayedPhotosHash;
-	private int						_displayedItemIndex;
+   private int                   _displayedPhotosHash;
+   private int                   _displayedItemIndex;
 
-	private boolean					_isLinkPhotoDisplayed;
+   private boolean               _isLinkPhotoDisplayed;
 
-	private ToolBarManager			_galleryToolbarManager;
+   private ToolBarManager        _galleryToolbarManager;
 
-	/*
-	 * UI controls
-	 */
-	private Shell					_fullScreenShell;
-	private Shell					_galleryShell;
+   /*
+    * UI controls
+    */
+   private Shell     _fullScreenShell;
+   private Shell     _galleryShell;
 
-	private ToolBar					_galleryToolbarControl;
-	private Spinner					_spinnerResizeImage;
+   private ToolBar   _galleryToolbarControl;
+   private Spinner   _spinnerResizeImage;
 
-	private Control					_galleryContainer;
-	private Composite				_containerFooter;
+   private Control   _galleryContainer;
+   private Composite _containerFooter;
 
-	/**
-	 * This listener is added to ALL widgets within the tooltip shell.
-	 */
-	private class AllControlsListener implements Listener {
-		public void handleEvent(final Event event) {
-			onAllControlsEvent(event);
-		}
+   /**
+    * This listener is added to ALL widgets within the tooltip shell.
+    */
+   private class AllControlsListener implements Listener {
 
-	}
+      @Override
+      public void handleEvent(final Event event) {
+         onAllControlsEvent(event);
+      }
+   }
 
-	public class ControlAnimation implements Runnable {
+   public class ControlAnimation implements Runnable {
 
-		/**
-		 * how long each tick is when fading in/out (in ms)
-		 */
-//		private static final int	FADE_TIME_INTERVAL		= UI.IS_OSX ? 10 : 10;
-		private final int			FADE_TIME_INTERVAL	= UI.IS_OSX ? 10 : 10;
+      /**
+       * Number of steps when fading in
+       */
+      private static final int FADE_IN_STEPS      = 20;
 
-		/**
-		 * Number of steps when fading in
-		 */
-		private static final int	FADE_IN_STEPS		= 20;
+      /**
+       * Number of steps when fading out
+       */
+      private static final int FADE_OUT_STEPS     = 10;
 
-		/**
-		 * Number of steps when fading out
-		 */
-		private static final int	FADE_OUT_STEPS		= 10;
+      private static final int ALPHA_OPAQUE       = 0xff;
 
-		private static final int	ALPHA_OPAQUE		= 0xff;
+      /**
+       * how long each tick is when fading in/out (in ms)
+       */
+//      private static final int   FADE_TIME_INTERVAL      = UI.IS_OSX ? 10 : 10;
+      private final int        FADE_TIME_INTERVAL = UI.IS_OSX ? 10 : 10;
 
-		private Display				_display;
-		private Shell				_shell;
+      private Display          _display;
+      private Shell            _shell;
 
-		private boolean				_isFadeIn;
-		private boolean				_isFadeOut;
+      private boolean          _isFadeIn;
+      private boolean          _isFadeOut;
 
-		private int					_fadeAlpha;
+      private int              _fadeAlpha;
 
-		public ControlAnimation(final Shell shell, final Control control) {
+      public ControlAnimation(final Shell shell, final Control control) {
 
-			_shell = shell;
-			_display = shell.getDisplay();
-		}
+         _shell = shell;
+         _display = shell.getDisplay();
+      }
 
-		public void fadeIn() {
+      public void fadeIn() {
 
-			if (_isFadeIn) {
-				// fade in is already started
-				return;
-			}
+         if (_isFadeIn) {
+            // fade in is already started
+            return;
+         }
 
-			if (_isFadeOut) {
+         if (_isFadeOut) {
 
-				// stop fade out and start with current alpha
+            // stop fade out and start with current alpha
 
-				_fadeAlpha = _shell.getAlpha();
-			} else {
-				_fadeAlpha = 0;
-			}
+            _fadeAlpha = _shell.getAlpha();
+         } else {
+            _fadeAlpha = 0;
+         }
 
-			_isFadeIn = true;
-			_isFadeOut = false;
+         _isFadeIn = true;
+         _isFadeOut = false;
 
-			run();
-		}
+         run();
+      }
 
-		public void fadeOut() {
+      public void fadeOut() {
 
-			if (_isFadeOut) {
-				// fade out is already started
-				return;
-			}
+         if (_isFadeOut) {
+            // fade out is already started
+            return;
+         }
 
-			_fadeAlpha = _shell.getAlpha();
+         _fadeAlpha = _shell.getAlpha();
 
-			_isFadeIn = false;
-			_isFadeOut = true;
+         _isFadeIn = false;
+         _isFadeOut = true;
 
-			run();
-		}
+         run();
+      }
 
-		@Override
-		public void run() {
+      @Override
+      public void run() {
 
-			if (_shell == null || _shell.isDisposed()) {
-				return;
-			}
+         if (_shell == null || _shell.isDisposed()) {
+            return;
+         }
 
-			final boolean isVisible = _shell.isVisible();
+         final boolean isVisible = _shell.isVisible();
 
-			if (_isFadeIn) {
+         if (_isFadeIn) {
 
-				final int fadeInStep = ALPHA_OPAQUE / FADE_IN_STEPS;
+            final int fadeInStep = ALPHA_OPAQUE / FADE_IN_STEPS;
 
-				int newAlpha = _fadeAlpha + fadeInStep;
-				if (newAlpha > ALPHA_OPAQUE) {
-					newAlpha = ALPHA_OPAQUE;
-				}
+            int newAlpha = _fadeAlpha + fadeInStep;
+            if (newAlpha > ALPHA_OPAQUE) {
+               newAlpha = ALPHA_OPAQUE;
+            }
 
-				// set alpha before shell is displayed
-				_shell.setAlpha(newAlpha);
+            // set alpha before shell is displayed
+            _shell.setAlpha(newAlpha);
 
-				if (isVisible == false) {
-					_shell.setVisible(true);
-					_shell.setActive();
-				}
+            if (isVisible == false) {
+               _shell.setVisible(true);
+               _shell.setActive();
+            }
 
-				final int currentAlpha = _shell.getAlpha();
-				if (currentAlpha != newAlpha) {
+            final int currentAlpha = _shell.getAlpha();
+            if (currentAlpha != newAlpha) {
 
-					// platform do not support alpha (e.g. Ubuntu 12.04 in my test system)
+               // platform do not support alpha (e.g. Ubuntu 12.04 in my test system)
 
-					_shell.setAlpha(ALPHA_OPAQUE);
-					_isFadeIn = false;
+               _shell.setAlpha(ALPHA_OPAQUE);
+               _isFadeIn = false;
 
-				} else {
+            } else {
 
-					_fadeAlpha = currentAlpha;
+               _fadeAlpha = currentAlpha;
 
-					if (currentAlpha == ALPHA_OPAQUE) {
+               if (currentAlpha == ALPHA_OPAQUE) {
 
-						// reached end of fade in
-						_isFadeIn = false;
+                  // reached end of fade in
+                  _isFadeIn = false;
 
-					} else {
+               } else {
 
-						// start timer for a neww fade in
-						_display.timerExec(FADE_TIME_INTERVAL, this);
-					}
-				}
+                  // start timer for a neww fade in
+                  _display.timerExec(FADE_TIME_INTERVAL, this);
+               }
+            }
 
-			} else if (_isFadeOut) {
+         } else if (_isFadeOut) {
 
-				if (isVisible == false) {
-					_isFadeOut = false;
-					return;
-				}
+            if (isVisible == false) {
+               _isFadeOut = false;
+               return;
+            }
 
-				final int fadeOutStep = ALPHA_OPAQUE / FADE_OUT_STEPS;
+            final int fadeOutStep = ALPHA_OPAQUE / FADE_OUT_STEPS;
 
-				int newAlpha = _fadeAlpha - fadeOutStep;
-				if (newAlpha < 0) {
-					newAlpha = 0;
-				}
+            int newAlpha = _fadeAlpha - fadeOutStep;
+            if (newAlpha < 0) {
+               newAlpha = 0;
+            }
 
-				_shell.setAlpha(newAlpha);
+            _shell.setAlpha(newAlpha);
 
-				final int currentAlpha = _shell.getAlpha();
-				if (currentAlpha != newAlpha) {
+            final int currentAlpha = _shell.getAlpha();
+            if (currentAlpha != newAlpha) {
 
-					// platform do not support alpha (e.g. Ubuntu 12.04 in my test system)
+               // platform do not support alpha (e.g. Ubuntu 12.04 in my test system)
 
-					_shell.setAlpha(0);
+               _shell.setAlpha(0);
 
-					_shell.setVisible(false);
-					_isFadeOut = false;
+               _shell.setVisible(false);
+               _isFadeOut = false;
 
-				} else {
+            } else {
 
-					_fadeAlpha = currentAlpha;
+               _fadeAlpha = currentAlpha;
 
-					if (currentAlpha == 0) {
+               if (currentAlpha == 0) {
 
-						// reached end of fade in
+                  // reached end of fade in
 
-						_shell.setVisible(false);
-						_isFadeOut = false;
+                  _shell.setVisible(false);
+                  _isFadeOut = false;
 
-					} else {
+               } else {
 
-						// start timer for a neww fade out
-						_display.timerExec(FADE_TIME_INTERVAL, this);
-					}
-				}
-			}
-		}
-	}
+                  // start timer for a neww fade out
+                  _display.timerExec(FADE_TIME_INTERVAL, this);
+               }
+            }
+         }
+      }
+   }
 
-	public FullScreenPhotoGallery(	final Shell fullScreenShell,
-									final GalleryMT20 sourceGallery,
-									final FullScreenImageViewer fullScreenImageViewer,
-									final IDialogSettings state) {
+   public FullScreenPhotoGallery(final Shell fullScreenShell,
+                                 final GalleryMT20 sourceGallery,
+                                 final FullScreenImageViewer fullScreenImageViewer,
+                                 final IDialogSettings state) {
 
-		_fullScreenShell = fullScreenShell;
-		_sourceGallery = sourceGallery;
-		_fullScreenImageViewer = fullScreenImageViewer;
-		_state = state;
+      _fullScreenShell = fullScreenShell;
+      _sourceGallery = sourceGallery;
+      _fullScreenImageViewer = fullScreenImageViewer;
+      _state = state;
 
-		createUI();
+      createUI();
 
-		_photoGalleryAnimation = new ControlAnimation(_galleryShell, _photoGallery.getGallery());
+      _photoGalleryAnimation = new ControlAnimation(_galleryShell, _photoGallery.getGallery());
 
-		_allControlsListener = new AllControlsListener();
-		addListenerToAllControls(_galleryShell);
+      _allControlsListener = new AllControlsListener();
+      addListenerToAllControls(_galleryShell);
 
-		addFullScreenListener();
-	}
+      addFullScreenListener();
+   }
 
-	private void addFullScreenListener() {
+   private void addFullScreenListener() {
 
-		_fullScreenShell.addDisposeListener(new DisposeListener() {
+      _fullScreenShell.addDisposeListener(new DisposeListener() {
 
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-	}
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
+   }
 
-	/**
-	 * ########################### Recursive #########################################<br>
-	 * <p>
-	 * Add listener to all controls
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void addListenerToAllControls(final Control control) {
+   /**
+    * ########################### Recursive #########################################<br>
+    * <p>
+    * Add listener to all controls
+    * <p>
+    * ########################### Recursive #########################################<br>
+    *
+    * @param control
+    */
+   private void addListenerToAllControls(final Control control) {
 
-		control.addListener(SWT.KeyDown, _allControlsListener);
+      control.addListener(SWT.KeyDown, _allControlsListener);
 
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				addListenerToAllControls(child);
-			}
-		}
-	}
+      if (control instanceof Composite) {
+         final Control[] children = ((Composite) control).getChildren();
+         for (final Control child : children) {
+            addListenerToAllControls(child);
+         }
+      }
+   }
 
-	private void addShellListener() {
+   private void addShellListener() {
 
-		_galleryShell.addControlListener(new ControlListener() {
+      _galleryShell.addControlListener(new ControlListener() {
 
-			@Override
-			public void controlMoved(final ControlEvent e) {}
+         @Override
+         public void controlMoved(final ControlEvent e) {}
 
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResize(e);
-			}
-		});
+         @Override
+         public void controlResized(final ControlEvent e) {
+            onResize(e);
+         }
+      });
 
-		_galleryShell.addShellListener(new ShellListener() {
+      _galleryShell.addShellListener(new ShellListener() {
 
-			@Override
-			public void shellActivated(final ShellEvent e) {}
+         @Override
+         public void shellActivated(final ShellEvent e) {}
 
-			@Override
-			public void shellClosed(final ShellEvent e) {}
+         @Override
+         public void shellClosed(final ShellEvent e) {}
 
-			@Override
-			public void shellDeactivated(final ShellEvent e) {
-				hideGallery();
-			}
+         @Override
+         public void shellDeactivated(final ShellEvent e) {
+            hideGallery();
+         }
 
-			@Override
-			public void shellDeiconified(final ShellEvent e) {}
+         @Override
+         public void shellDeiconified(final ShellEvent e) {}
 
-			@Override
-			public void shellIconified(final ShellEvent e) {
-				hideGallery();
-			}
-		});
-	}
+         @Override
+         public void shellIconified(final ShellEvent e) {
+            hideGallery();
+         }
+      });
+   }
 
-	private void createUI() {
+   private void createUI() {
 
-		_galleryShell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
+      _galleryShell = new Shell(SWT.NO_TRIM | SWT.ON_TOP);
 
-		final Rectangle fsShellSize = _fullScreenShell.getBounds();
+      final Rectangle fsShellSize = _fullScreenShell.getBounds();
 
-		_galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_DEFAULT_HEIGHT);
-//		_galleryShell.setLayout(new FillLayout());
-		GridLayoutFactory.fillDefaults().spacing(0, 10).applyTo(_galleryShell);
-//		_galleryShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+      _galleryShell.setBounds(fsShellSize.x, fsShellSize.y, fsShellSize.width, GALLERY_DEFAULT_HEIGHT);
+//      _galleryShell.setLayout(new FillLayout());
+      GridLayoutFactory.fillDefaults().spacing(0, 10).applyTo(_galleryShell);
+//      _galleryShell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
-		addShellListener();
+      addShellListener();
 
-		createUI_10_Gallery(_galleryShell);
-	}
+      createUI_10_Gallery(_galleryShell);
+   }
 
-	private void createUI_10_Gallery(final Shell parent) {
+   private void createUI_10_Gallery(final Shell parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		{
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      {
 
-			_photoGallery = new PhotoGallery(_state);
+         _photoGallery = new PhotoGallery(_state);
 
-			_photoGallery.hideActionSorting();
-			_photoGallery.hideActionFiltering();
-			_photoGallery.setShowCustomActionBar();
+         _photoGallery.hideActionSorting();
+         _photoGallery.hideActionFiltering();
+         _photoGallery.setShowCustomActionBar();
 
-			_photoGallery.createPhotoGallery(container, SWT.H_SCROLL, this);
+         _photoGallery.createPhotoGallery(container, SWT.H_SCROLL, this);
 
-			/**
-			 * Prevent to open pref dialog, when it's opened it would close this tooltip and the
-			 * pref dialog is hidden -->> APP IS FREEZING !!!
-			 */
-			_photoGallery.setShowOtherShellActions(false);
+         /**
+          * Prevent to open pref dialog, when it's opened it would close this tooltip and the
+          * pref dialog is hidden -->> APP IS FREEZING !!!
+          */
+         _photoGallery.setShowOtherShellActions(false);
 
-			createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+         createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
 
-			createUI_30_Footer(container);
-		}
+         createUI_30_Footer(container);
+      }
 
-		fillActionBar();
+      fillActionBar();
 
-		/*
-		 * set fullscreen image viewer in the photo gallery to the fullscreen image viewer in the
-		 * source gallery, this is a bit a a hack
-		 */
-		_photoGallery.setFullScreenImageViewer(_sourceGallery.getFullScreenImageViewer());
+      /*
+       * set fullscreen image viewer in the photo gallery to the fullscreen image viewer in the
+       * source gallery, this is a bit a a hack
+       */
+      _photoGallery.setFullScreenImageViewer(_sourceGallery.getFullScreenImageViewer());
 
-		_galleryContainer = _photoGallery.getGalleryContainer();
-	}
+      _galleryContainer = _photoGallery.getGalleryContainer();
+   }
 
-	private void createUI_20_ActionBar(final Composite parent) {
+   private void createUI_20_ActionBar(final Composite parent) {
 
-		GridLayoutFactory.fillDefaults().applyTo(parent);
+      GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			/*
-			 * create gallery toolbar
-			 */
-			_galleryToolbarControl = new ToolBar(container, SWT.FLAT);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.FILL)
-					.grab(true, false)
-					.applyTo(_galleryToolbarControl);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         /*
+          * create gallery toolbar
+          */
+         _galleryToolbarControl = new ToolBar(container, SWT.FLAT);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.END, SWT.FILL)
+               .grab(true, false)
+               .applyTo(_galleryToolbarControl);
 
-			/*
-			 * spinner: resize image
-			 */
-			_spinnerResizeImage = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.applyTo(_spinnerResizeImage);
-			_spinnerResizeImage.setMinimum(GALLERY_MIN_IMAGE_SIZE);
-			_spinnerResizeImage.setMaximum(GALLERY_MAX_IMAGE_SIZE);
-			_spinnerResizeImage.setToolTipText(UI.IS_OSX
-					? Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX
-					: Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip);
+         /*
+          * spinner: resize image
+          */
+         _spinnerResizeImage = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .applyTo(_spinnerResizeImage);
+         _spinnerResizeImage.setMinimum(GALLERY_MIN_IMAGE_SIZE);
+         _spinnerResizeImage.setMaximum(GALLERY_MAX_IMAGE_SIZE);
+         _spinnerResizeImage.setToolTipText(UI.IS_OSX
+               ? Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX
+               : Messages.FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip);
 
-			_spinnerResizeImage.addSelectionListener(new SelectionAdapter() {
+         _spinnerResizeImage.addSelectionListener(new SelectionAdapter() {
 
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectResizeImage();
-				}
-			});
-			_spinnerResizeImage.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					Util.adjustSpinnerValueOnMouseScroll(event);
-					onSelectResizeImage();
-				}
-			});
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectResizeImage();
+            }
+         });
+         _spinnerResizeImage.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               Util.adjustSpinnerValueOnMouseScroll(event);
+               onSelectResizeImage();
+            }
+         });
 
-		}
-	}
+      }
+   }
 
-	private void createUI_30_Footer(final Composite parent) {
+   private void createUI_30_Footer(final Composite parent) {
 
-		_containerFooter = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerFooter);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(1)
-				.spacing(0, 0)
-				.extendedMargins(0, 0, 5, 0)
-				.applyTo(_containerFooter);
-//		_containerFooter.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-//			final Label label = new Label(_containerFooter, SWT.NONE);
-//			GridDataFactory.fillDefaults().applyTo(label);
-//			label.setText("Madlkfjasljdfasjdflasf");
-		}
+      _containerFooter = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerFooter);
+      GridLayoutFactory.fillDefaults()//
+            .numColumns(1)
+            .spacing(0, 0)
+            .extendedMargins(0, 0, 5, 0)
+            .applyTo(_containerFooter);
+//      _containerFooter.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+//         final Label label = new Label(_containerFooter, SWT.NONE);
+//         GridDataFactory.fillDefaults().applyTo(label);
+//         label.setText("Madlkfjasljdfasjdflasf");
+      }
 
-	}
+   }
 
-	private void fillActionBar() {
+   private void fillActionBar() {
 
-		/*
-		 * fill gallery toolbar
-		 */
-		_galleryToolbarManager = new ToolBarManager(_galleryToolbarControl);
+      /*
+       * fill gallery toolbar
+       */
+      _galleryToolbarManager = new ToolBarManager(_galleryToolbarControl);
 
-		// must be called after the custom action bar is created
-		_photoGallery.createActionBar();
+      // must be called after the custom action bar is created
+      _photoGallery.createActionBar();
 
-		_galleryToolbarManager.update(false);
-	}
+      _galleryToolbarManager.update(false);
+   }
 
-	@Override
-	public IStatusLineManager getStatusLineManager() {
-		return null;
-	}
+   @Override
+   public IStatusLineManager getStatusLineManager() {
+      return null;
+   }
 
-	@Override
-	public IToolBarManager getToolBarManager() {
-		return _galleryToolbarManager;
-	}
+   @Override
+   public IToolBarManager getToolBarManager() {
+      return _galleryToolbarManager;
+   }
 
-	private void hideGallery() {
+   private void hideGallery() {
 
-		if (_galleryShell == null || _galleryShell.isVisible() == false) {
-			return;
-		}
+      if (_galleryShell == null || _galleryShell.isVisible() == false) {
+         return;
+      }
 
-		_photoGallery.stopLoadingImages();
+      _photoGallery.stopLoadingImages();
 
-		_photoGalleryAnimation.fadeOut();
+      _photoGalleryAnimation.fadeOut();
 
-		_fullScreenImageViewer.activate();
-	}
+      _fullScreenImageViewer.activate();
+   }
 
-	private void onAllControlsEvent(final Event event) {
+   private void onAllControlsEvent(final Event event) {
 
-		final int keyCode = event.keyCode;
+      final int keyCode = event.keyCode;
 
-		if (keyCode == SWT.ESC) {
+      if (keyCode == SWT.ESC) {
 
-			// hide full screen gallery
-			hideGallery();
+         // hide full screen gallery
+         hideGallery();
 
-		} else {
+      } else {
 
-			final char keyCharacterShowPhotoGallery = Messages.FullScreenImageViewer_KeyCharacter_ShowPhotoGallery
-					.charAt(0);
+         final char keyCharacterShowPhotoGallery = Messages.FullScreenImageViewer_KeyCharacter_ShowPhotoGallery
+               .charAt(0);
 
-			if (event.character == keyCharacterShowPhotoGallery) {
+         if (event.character == keyCharacterShowPhotoGallery) {
 
-				// hide with the same key as opening full screen gallery
-				hideGallery();
-			}
-		}
-	}
+            // hide with the same key as opening full screen gallery
+            hideGallery();
+         }
+      }
+   }
 
-	private void onDispose() {
+   private void onDispose() {
 
-		if (_galleryShell != null) {
+      if (_galleryShell != null) {
 
-			saveState();
+         saveState();
 
-			_galleryShell.close();
-		}
-	}
+         _galleryShell.close();
+      }
+   }
 
-	private void onResize(final ControlEvent e) {
+   private void onResize(final ControlEvent e) {
 
-//		final Point shellSize = _galleryShell.getSize();
-//		final Point gallerySize = _photoGallery.getGallery().getSize();
+//      final Point shellSize = _galleryShell.getSize();
+//      final Point gallerySize = _photoGallery.getGallery().getSize();
 //
-//		final int trimX = shellSize.y - gallerySize.y;
+//      final int trimX = shellSize.y - gallerySize.y;
 //
-//		System.out.println(UI.timeStampNano()
-//				+ " onResize()\ttrim: "
-//				+ trimX
-//				+ "  shell: "
-//				+ shellSize.y
-//				+ "  gallery: "
-//				+ gallerySize.y);
-	}
+//      System.out.println(UI.timeStampNano()
+//            + " onResize()\ttrim: "
+//            + trimX
+//            + "  shell: "
+//            + shellSize.y
+//            + "  gallery: "
+//            + gallerySize.y);
+   }
 
-	private void onSelectResizeImage() {
+   private void onSelectResizeImage() {
 
-		setGallerySize(_spinnerResizeImage.getSelection());
-	}
+      setGallerySize(_spinnerResizeImage.getSelection());
+   }
 
-	@Override
-	public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
+   @Override
+   public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
 
-	void restoreState() {
+   void restoreState() {
 
-		final int imageSize = Util.getStateInt(_state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_DEFAULT_HEIGHT);
-		_spinnerResizeImage.setSelection(imageSize);
+      final int imageSize = Util.getStateInt(_state, STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, GALLERY_DEFAULT_HEIGHT);
+      _spinnerResizeImage.setSelection(imageSize);
 
-		updateColors(true);
+      updateColors(true);
 
-		_photoGallery.restoreState();
-	}
+      _photoGallery.restoreState();
+   }
 
-	void saveState() {
+   void saveState() {
 
-		_state.put(STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, _spinnerResizeImage.getSelection());
+      _state.put(STATE_FULL_SCREEN_PHOTO_GALLERY_HEIGHT, _spinnerResizeImage.getSelection());
 
-		_photoGallery.saveState();
-	}
+      _photoGallery.saveState();
+   }
 
-	/**
-	 * Set shell size from gallery size.
-	 * 
-	 * @param imageSize
-	 */
-	private void setGallerySize(final int imageSize) {
+   /**
+    * Set shell size from gallery size.
+    *
+    * @param imageSize
+    */
+   private void setGallerySize(final int imageSize) {
 
-		final Point shellSize = _galleryShell.getSize();
-		final Point gallerySize = _photoGallery.getGallery().getSize();
+      final Point shellSize = _galleryShell.getSize();
+      final Point gallerySize = _photoGallery.getGallery().getSize();
 
-		final int trimX = shellSize.y - gallerySize.y;
+      final int trimX = shellSize.y - gallerySize.y;
 
-		_galleryShell.setSize(shellSize.x, trimX + imageSize);
-	}
+      _galleryShell.setSize(shellSize.x, trimX + imageSize);
+   }
 
-	@Override
-	public void setSelection(final PhotoSelection photoSelection) {
+   @Override
+   public void setSelection(final PhotoSelection photoSelection) {
 
-		_isLinkPhotoDisplayed = photoSelection.isLinkPhotoDisplayed;
+      _isLinkPhotoDisplayed = photoSelection.isLinkPhotoDisplayed;
 
-		_fullScreenImageViewer.showImage(photoSelection);
-	}
+      _fullScreenImageViewer.showImage(photoSelection);
+   }
 
-	boolean showImages(final int mouseY, final int displayedItemIndex) {
+   boolean showImages(final int mouseY, final int displayedItemIndex) {
 
-		if (mouseY == 0) {
+      if (mouseY == 0) {
 
-			// show gallery
+         // show gallery
 
-			_displayedItemIndex = displayedItemIndex;
+         _displayedItemIndex = displayedItemIndex;
 
-			showImages_10_InGallery();
+         showImages_10_InGallery();
 
-			return true;
+         return true;
 
-		} else {
+      } else {
 
-			// hide gallery
+         // hide gallery
 
-			hideGallery();
+         hideGallery();
 
-			return false;
-		}
-	}
+         return false;
+      }
+   }
 
-	private void showImages_10_InGallery() {
+   private void showImages_10_InGallery() {
 
-		final IPhotoProvider photoProvider = _sourceGallery.getPhotoProvider();
-		final Photo[] photoWrapper = photoProvider.getSortedAndFilteredPhotos();
+      final IPhotoProvider photoProvider = _sourceGallery.getPhotoProvider();
+      final Photo[] photoWrapper = photoProvider.getSortedAndFilteredPhotos();
 
-		final int photosHash = photoWrapper.hashCode();
-		final String galleryPositionKey = photosHash + "_FullScreenPhotoGallery";//$NON-NLS-1$
+      final int photosHash = photoWrapper.hashCode();
+      final String galleryPositionKey = photosHash + "_FullScreenPhotoGallery";//$NON-NLS-1$
 
-		/**
-		 * !!! gallery shell must be visible before any gallery methods are called, otherwise the
-		 * gallery is hidden and not fully initialized !!!!
-		 */
+      /**
+       * !!! gallery shell must be visible before any gallery methods are called, otherwise the
+       * gallery is hidden and not fully initialized !!!!
+       */
 
-		final boolean isShellVisible = _galleryShell.isVisible();
-		if (isShellVisible == false) {
-			_photoGalleryAnimation.fadeIn();
-		}
+      final boolean isShellVisible = _galleryShell.isVisible();
+      if (isShellVisible == false) {
+         _photoGalleryAnimation.fadeIn();
+      }
 
-		/**
-		 * check if new images should be displayed, this check is VERY IMPORTANT otherwise this can
-		 * be a performance hog
-		 */
-		if (_displayedPhotosHash != photosHash) {
+      /**
+       * check if new images should be displayed, this check is VERY IMPORTANT otherwise this can
+       * be a performance hog
+       */
+      if (_displayedPhotosHash != photosHash) {
 
-			_displayedPhotosHash = photosHash;
+         _displayedPhotosHash = photosHash;
 
-			final Control gallery = _photoGallery.getGallery();
+         final Control gallery = _photoGallery.getGallery();
 
-			final Point gallerySize = gallery.getSize();
+         final Point gallerySize = gallery.getSize();
 
-			if (gallerySize.x == 0) {
+         if (gallerySize.x == 0) {
 
-				/**
-				 * setting size is a bit tricky, I found no other way
-				 */
+            /**
+             * setting size is a bit tricky, I found no other way
+             */
 
-				// height must be set with the layout
-				final GridData gd = (GridData) _galleryContainer.getLayoutData();
-				gd.heightHint = _spinnerResizeImage.getSelection();
+            // height must be set with the layout
+            final GridData gd = (GridData) _galleryContainer.getLayoutData();
+            gd.heightHint = _spinnerResizeImage.getSelection();
 
-				// with must be set from the shell size
-				gd.widthHint = _galleryShell.getSize().x;
+            // with must be set from the shell size
+            gd.widthHint = _galleryShell.getSize().x;
 
-				_galleryShell.pack(true);
-			}
+            _galleryShell.pack(true);
+         }
 
-			_photoGallery.showImages(photoWrapper, galleryPositionKey, _isLinkPhotoDisplayed);
-		}
+         _photoGallery.showImages(photoWrapper, galleryPositionKey, _isLinkPhotoDisplayed);
+      }
 
-		// show photo in the gallery which is displayed in the full screen viewer
-		_photoGallery.selectItem(_displayedItemIndex, galleryPositionKey);
-	}
+      // show photo in the gallery which is displayed in the full screen viewer
+      _photoGallery.selectItem(_displayedItemIndex, galleryPositionKey);
+   }
 
-	private void updateColors(final boolean isRestore) {
+   private void updateColors(final boolean isRestore) {
 
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+      final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+      final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
-		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
+      final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
-		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
+      _photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
 
-		_containerFooter.setBackground(bgColor);
-	}
+      _containerFooter.setBackground(bgColor);
+   }
 
 }

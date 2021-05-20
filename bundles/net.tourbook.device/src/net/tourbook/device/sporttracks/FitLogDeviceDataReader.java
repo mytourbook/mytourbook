@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.sporttracks;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -45,8 +45,9 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 
    private static final IPreferenceStore _prefStore              = TourbookPlugin.getDefault().getPreferenceStore();
 
-   // plugin constructor
-   public FitLogDeviceDataReader() {}
+   public FitLogDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -81,8 +82,9 @@ public class FitLogDeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       final boolean isFitLogExFile = isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true) ||
             isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);
@@ -97,7 +99,8 @@ public class FitLogDeviceDataReader extends TourbookDevice {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
-            isFitLogExFile);
+            isFitLogExFile,
+            isReimport);
 
       try {
 
@@ -116,12 +119,7 @@ public class FitLogDeviceDataReader extends TourbookDevice {
          final Display display = Display.getDefault();
 
          if (saxHandler.isNewTag()) {
-            display.syncExec(new Runnable() {
-               @Override
-               public void run() {
-                  TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
-               }
-            });
+            display.syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
          }
 
          if (saxHandler.isNewTourType()) {
@@ -129,14 +127,8 @@ public class FitLogDeviceDataReader extends TourbookDevice {
             TourDatabase.clearTourTypes();
             TourManager.getInstance().clearTourDataCache();
 
-            display.syncExec(new Runnable() {
-               @Override
-               public void run() {
-                  // fire modify event
-                  _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
-               }
-            });
-
+            // fire modify event
+            display.syncExec(() -> _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
          }
       }
 

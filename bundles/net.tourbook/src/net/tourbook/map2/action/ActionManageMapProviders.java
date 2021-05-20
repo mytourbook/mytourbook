@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,8 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 
@@ -30,27 +31,15 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ActionManageMapProviders extends Action {
 
-   private Map2View             _map2View;
-
-   private AnimatedToolTipShell _openedTooltip;
+   private Map2View _map2View;
 
    public ActionManageMapProviders(final Map2View map2View) {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__options));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
 
       _map2View = map2View;
-   }
-
-   /**
-    * This tooltip will be closed when the pref dialog is opened.
-    *
-    * @param openedTooltip
-    */
-   public void closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
-
-      _openedTooltip = openedTooltip;
    }
 
    @Override
@@ -59,7 +48,7 @@ public class ActionManageMapProviders extends Action {
       // set the currently displayed map provider so that this mp will be selected in the pref page
       final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-      prefStore.setValue(//
+      prefStore.setValue(
             IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER,
             _map2View.getMap().getMapProvider().getId());
 

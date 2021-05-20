@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.application;
 
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
@@ -329,7 +330,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _actionPreferences = ActionFactory.PREFERENCES.create(window);
       _actionPreferences.setText(Messages.App_Action_open_preferences);
-      _actionPreferences.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
+      _actionPreferences.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
       register(_actionPreferences);
 
       _actionOtherViews = new ActionOtherViews(window);

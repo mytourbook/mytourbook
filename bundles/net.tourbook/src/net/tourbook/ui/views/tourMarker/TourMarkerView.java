@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,7 +49,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -92,7 +91,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -123,7 +121,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private ActionOpenMarkerDialog   _actionEditTourMarkers;
    private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
-   private ActionModifyColumns      _actionModifyColumns;
 
    private PixelConverter           _pc;
 
@@ -284,11 +281,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
                _markerViewer.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _markerViewer.getTable().redraw();
             }
          }
       };
@@ -442,7 +434,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
    }
 
    private void createMenuManager() {
@@ -516,8 +507,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
       table.setHeaderVisible(true);
-//      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-      table.setLinesVisible(false);
+      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
       table.addKeyListener(new KeyListener() {
 
@@ -1088,15 +1078,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void fillToolbar() {
 
-      final IActionBars actionBars = getViewSite().getActionBars();
+//      final IActionBars actionBars = getViewSite().getActionBars();
 
       /*
        * Fill view menu
        */
-      final IMenuManager menuMgr = actionBars.getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = actionBars.getMenuManager();
+//
+//      menuMgr.add(new Separator());
 
       /*
        * Fill view toolbar

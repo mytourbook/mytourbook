@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -47,8 +48,8 @@ public class ActionDeleteMarkerDialog extends Action {
       _tourProvider = tourProvider;
 
       setText(Messages.App_Action_DeleteTourMarker);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       setEnabled(false);
    }
