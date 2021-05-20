@@ -116,7 +116,6 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TableViewerTourInfoToolTip;
@@ -348,7 +347,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionJoinTours                _actionJoinTours;
    private ActionMergeIntoMenu            _actionMergeIntoTour;
    private ActionMergeTour                _actionMergeTour;
-   private ActionModifyColumns            _actionModifyColumns;
    private ActionOpenTour                 _actionOpenTour;
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
@@ -1032,7 +1030,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionJoinTours = new ActionJoinTours(this);
       _actionMergeIntoTour = new ActionMergeIntoMenu(this);
       _actionMergeTour = new ActionMergeTour(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
       _actionOpenTourLogView = new ActionOpenTourLogView();
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
@@ -3802,8 +3799,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       menuMgr.add(_actionRemoveToursWhenClosed);
       menuMgr.add(_actionEditImportPreferences);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
    }
 
    private void fireSelectedTour() {

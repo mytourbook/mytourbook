@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -31,7 +30,7 @@ public class ActionTourPhotos extends Action {
 
       super(Messages.Tour_Action_TourPhotos, AS_CHECK_BOX);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.PhotoPhotos)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoPhotos));
 
       _tourChart = tourChart;
    }

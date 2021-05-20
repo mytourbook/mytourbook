@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -34,7 +33,7 @@ public class ActionXAxisTime extends Action {
       _tourChart = tourChart;
 
       setToolTipText(Messages.Tour_Action_show_time_on_x_axis_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.XAxis_ShowTime)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.XAxis_ShowTime));
 
       setChecked(tourChart.getTourChartConfig().isShowTimeOnXAxis);
    }

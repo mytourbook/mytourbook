@@ -54,7 +54,6 @@ import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
@@ -97,6 +96,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -151,7 +151,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private ActionRemoveComparedTourSaveStatus _actionRemoveComparedTourSaveStatus;
    private ActionCheckTours                   _actionCheckTours;
    private ActionUncheckTours                 _actionUncheckTours;
-   private ActionModifyColumns                _actionModifyColumns;
    private ActionCollapseAll                  _actionCollapseAll;
 
    private ActionEditQuick                    _actionEditQuick;
@@ -463,7 +462,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       _actionEditTour = new ActionEditTour(this);
       _actionOpenTour = new ActionOpenTour(this);
 
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionCollapseAll = new ActionCollapseAll(this);
    }
 
@@ -1218,8 +1216,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       /*
        * fill view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
    }
 
    @Override
@@ -1674,14 +1671,19 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
       } else if (element instanceof TVICompareResultComparedTour) {
 
-         // show the saved tours in a different color
+         // show the saved tours with a different color
 
          if (((TVICompareResultComparedTour) (element)).isSaved()) {
-            cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+
+            final Color fgColor = UI.isDarkTheme()
+                  ? Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY)
+                  : Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+
+            cell.setForeground(fgColor);
+
          } else {
-            // show the text with tour color
-            cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TOUR));
-//            cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+
+            // display text with default color
          }
       }
    }

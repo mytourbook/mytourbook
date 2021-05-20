@@ -16,7 +16,6 @@
 package net.tourbook.photo;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ThemeUtil;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -223,7 +222,7 @@ public class PhotoUI {
     */
    public static void setThemedIcon(final UIElement uiElement, final String imageName) {
 
-      uiElement.setIcon(PhotoActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
+      uiElement.setIcon(PhotoActivator.getThemedImageDescriptor(imageName));
    }
 
    public static void setupThemedImages() {

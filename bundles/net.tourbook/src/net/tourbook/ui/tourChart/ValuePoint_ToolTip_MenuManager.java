@@ -135,7 +135,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
          super(Messages.Tooltip_ValuePoint_Action_CloseContextMenu);
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -150,7 +150,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
          setText(Messages.Action_ToolTip_Hide);
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -213,8 +213,10 @@ public class ValuePoint_ToolTip_MenuManager {
    private class ActionSetDefaults extends Action {
 
       public ActionSetDefaults() {
+
          setText(Messages.Action_ToolTip_SetDefaults);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo));
       }
 
       @Override
@@ -251,10 +253,11 @@ public class ValuePoint_ToolTip_MenuManager {
          _graphId = graphId;
 
          if (graphImageName != null) {
-            _graphImage = TourbookPlugin.getImageDescriptor(graphImageName);
+            _graphImage = TourbookPlugin.getThemedImageDescriptor(graphImageName);
          }
+
          if (graphImageNameDisabled != null) {
-            _graphImageDisabled = TourbookPlugin.getImageDescriptor(graphImageNameDisabled);
+            _graphImageDisabled = TourbookPlugin.getThemedImageDescriptor(graphImageNameDisabled);
          }
       }
 
@@ -345,31 +348,31 @@ public class ValuePoint_ToolTip_MenuManager {
 
    private void createGraphActions() {
 
-      _actionValue_Header = new ActionValueItem(//
+      _actionValue_Header = new ActionValueItem(
             -1,
             Messages.Tooltip_ValuePoint_Action_Value_Header,
             null,
             null);
 
-      _actionValue_TimeSlices = new ActionValueItem(//
+      _actionValue_TimeSlices = new ActionValueItem(
             VALUE_ID_TIME_SLICES,
             Messages.Tooltip_ValuePoint_Action_Value_TimeSlices,
             null,
             null);
 
-      _actionValue_ChartZoomFactor = new ActionValueItem(//
+      _actionValue_ChartZoomFactor = new ActionValueItem(
             VALUE_ID_CHART_ZOOM_FACTOR,
             Messages.Tooltip_ValuePoint_Action_Value_ChartZoomFactor,
             null,
             null);
 
-      _actionValue_TimeDuration = new ActionValueItem(//
+      _actionValue_TimeDuration = new ActionValueItem(
             VALUE_ID_TIME_DURATION,
             Messages.Tooltip_ValuePoint_Action_Value_TimeDuration,
             null,
             null);
 
-      _actionValue_TimeOfDay = new ActionValueItem(//
+      _actionValue_TimeOfDay = new ActionValueItem(
             VALUE_ID_TIME_OF_DAY,
             Messages.Tooltip_ValuePoint_Action_Value_TimeOfDay,
             null,

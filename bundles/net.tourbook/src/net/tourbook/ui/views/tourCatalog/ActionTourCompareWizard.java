@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,20 +34,21 @@ import org.eclipse.ui.WorkbenchException;
 
 public class ActionTourCompareWizard extends Action {
 
-   private final IReferenceTourProvider fRefTourProvider;
+   private final IReferenceTourProvider _refTourProvider;
 
    public ActionTourCompareWizard(final IReferenceTourProvider refTourProvider) {
 
-      fRefTourProvider = refTourProvider;
+      _refTourProvider = refTourProvider;
 
       setText(Messages.action_tourCatalog_open_compare_wizard);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourCatalog_CompareWizard));
+
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCatalog_CompareWizard));
    }
 
    @Override
    public void run() {
 
-      final WizardTourComparer wizard = new WizardTourComparer(fRefTourProvider);
+      final WizardTourComparer wizard = new WizardTourComparer(_refTourProvider);
 
       final WizardDialog dialog = new PositionedWizardDialog(Display.getCurrent().getActiveShell(),
             wizard,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,12 @@ import org.eclipse.swt.graphics.GC;
 
 public interface ILineSelectionPainter {
 
-	/**
-	 * Draw selected line graphs.
-	 * 
-	 * @param gc
-	 * @param allGraphDrawingData
-	 * @param isFocusActive
-	 */
-	void drawSelectedLines(GC gc, ArrayList<GraphDrawingData> allGraphDrawingData, boolean isFocusActive);
+   /**
+    * Draw selected line graphs, this is used for selected tour segments.
+    *
+    * @param gc
+    * @param allGraphDrawingData
+    * @param isFocusActive
+    */
+   void drawSelectedLines(GC gc, ArrayList<GraphDrawingData> allGraphDrawingData, boolean isFocusActive);
 }

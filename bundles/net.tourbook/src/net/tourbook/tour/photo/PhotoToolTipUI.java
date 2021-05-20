@@ -127,7 +127,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_ToolTip);
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -143,7 +143,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Pin_Blue));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Pin));
       }
 
       @Override
