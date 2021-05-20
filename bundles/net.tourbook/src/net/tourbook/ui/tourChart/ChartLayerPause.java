@@ -200,6 +200,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    @Override
    public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
       //Nothing to do
+      System.out.println("TOTO");
    }
 
    public void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
