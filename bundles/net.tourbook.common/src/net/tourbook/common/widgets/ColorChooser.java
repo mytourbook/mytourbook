@@ -298,7 +298,7 @@ public class ColorChooser extends Composite {
 
       _tabFolder = new CTabFolder(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_tabFolder);
-      _tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      _tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
       // hexagon
       final CTabItem hexagonTab = new CTabItem(_tabFolder, SWT.NONE);

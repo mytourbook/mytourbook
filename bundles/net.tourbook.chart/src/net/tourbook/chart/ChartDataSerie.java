@@ -141,7 +141,7 @@ public abstract class ChartDataSerie {
    public RGB getDefaultRGB() {
 
       /*
-       * when default color is not set, return an ugly color to see in the ui that something is
+       * When default color is not set, return an ugly color to see in the ui that something is
        * wrong
        */
       if (_defaultRGB == null) {

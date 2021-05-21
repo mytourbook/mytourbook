@@ -470,7 +470,7 @@ public class Map extends Canvas {
    private boolean     _isScaleVisible;
 
    private final Color _transparentColor;
-   private final Color _defaultBackgroundColor;
+   private Color       _defaultBackgroundColor;
 
    /*
     * POI image
@@ -637,9 +637,6 @@ public class Map extends Canvas {
       _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
 
       _transparentColor = new Color(MAP_TRANSPARENT_RGB);
-      _defaultBackgroundColor = UI.isDarkTheme()
-            ? ThemeUtil.getDarkestBackgroundColor()
-            : new Color(MAP_DEFAULT_BACKGROUND_RGB);
 
       SYS_COLOR_BLACK = _display.getSystemColor(SWT.COLOR_BLACK);
       SYS_COLOR_DARK_GRAY = _display.getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -653,6 +650,15 @@ public class Map extends Canvas {
       _tourBreadcrumb = new MapTourBreadcrumb();
 
       paint_Overlay_0_SetupThread();
+
+      parent.getDisplay().asyncExec(() -> {
+
+         // must be run async because dark theme colors could not yet be initialized
+
+         _defaultBackgroundColor = UI.IS_DARK_THEME
+               ? ThemeUtil.getDarkestBackgroundColor()
+               : new Color(MAP_DEFAULT_BACKGROUND_RGB);
+      });
    }
 
    /**
