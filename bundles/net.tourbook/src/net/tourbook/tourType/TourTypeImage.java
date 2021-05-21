@@ -73,14 +73,14 @@ public class TourTypeImage {
 // SET_FORMATTING_OFF
 
       g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-      g2d.setRenderingHint(RenderingHints.KEY_DITHERING,             RenderingHints.VALUE_DITHER_ENABLE);
-      g2d.setRenderingHint(RenderingHints.KEY_RENDERING,             RenderingHints.VALUE_RENDER_QUALITY);
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,          RenderingHints.VALUE_ANTIALIAS_ON);
-      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST,     100);
-      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,   RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,       RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,        RenderingHints.VALUE_STROKE_PURE);
+//      g2d.setRenderingHint(RenderingHints.KEY_DITHERING,             RenderingHints.VALUE_DITHER_ENABLE);
+//      g2d.setRenderingHint(RenderingHints.KEY_RENDERING,             RenderingHints.VALUE_RENDER_QUALITY);
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST,     100);
+//      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,   RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+//      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,       RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+//      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,        RenderingHints.VALUE_STROKE_PURE);
 
 // SET_FORMATTING_ON
 
@@ -100,7 +100,8 @@ public class TourTypeImage {
 
             final GC gc = new GC(existingImageSWT);
             {
-               // cleanup old image
+               // cleanup old image -> this do not change the alpha data
+               // a workaround may be to use AWT to draw the image
                gc.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
                gc.fillRectangle(existingImageSWT.getBounds());
 
@@ -431,36 +432,37 @@ public class TourTypeImage {
    /**
     * @param typeId
     * @param imageCacheKey
-    * @param isDisposeOldImage
+    * @param isDisposeCachedImage
     * @return
     */
-   public static Image getTourTypeImage(final long typeId, final String imageCacheKey, final boolean isDisposeOldImage) {
+   public static Image getTourTypeImage(final long typeId, final String imageCacheKey, final boolean isDisposeCachedImage) {
 
-      final Image existingImage = _imageCache.get(imageCacheKey);
+      final Image cachedImage = _imageCache.get(imageCacheKey);
 
       // check if image is available
-      if (existingImage != null && existingImage.isDisposed() == false) {
+      if (cachedImage != null && cachedImage.isDisposed() == false) {
 
          // check if the image is dirty
          if (_dirtyImages.containsKey(imageCacheKey) == false) {
 
-            // image is available and not dirty
-            return existingImage;
+            // image is available and not dirty -> return valid image
+
+            return cachedImage;
 
          } else {
 
             // image is available and dirty
 
-            if (isDisposeOldImage) {
+            if (isDisposeCachedImage) {
 
-               existingImage.dispose();
+               cachedImage.dispose();
             }
          }
       }
 
       // create image for the tour type
 
-      if (existingImage == null || existingImage.isDisposed()) {
+      if (cachedImage == null || cachedImage.isDisposed()) {
 
          return createTourTypeImage(typeId, imageCacheKey, null);
 
@@ -468,7 +470,7 @@ public class TourTypeImage {
 
          // old tour type image is available and not disposed but needs to be updated
 
-         return createTourTypeImage(typeId, imageCacheKey, existingImage);
+         return createTourTypeImage(typeId, imageCacheKey, cachedImage);
       }
    }
 
@@ -497,8 +499,8 @@ public class TourTypeImage {
     */
    public static ImageDescriptor getTourTypeImageDescriptor(final long tourTypeId) {
 
-      final String keyColorId = createImageCacheKey(tourTypeId);
-      final ImageDescriptor existingDescriptor = _imageCacheDescriptor.get(keyColorId);
+      final String imageCacheKey = createImageCacheKey(tourTypeId);
+      final ImageDescriptor existingDescriptor = _imageCacheDescriptor.get(imageCacheKey);
 
       if (existingDescriptor != null) {
          return existingDescriptor;
@@ -507,7 +509,7 @@ public class TourTypeImage {
       final Image tourTypeImage = getTourTypeImage(tourTypeId);
       final ImageDescriptor newImageDesc = ImageDescriptor.createFromImage(tourTypeImage);
 
-      _imageCacheDescriptor.put(keyColorId, newImageDesc);
+      _imageCacheDescriptor.put(imageCacheKey, newImageDesc);
 
       return newImageDesc;
    }

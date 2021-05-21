@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,22 +24,22 @@ import org.eclipse.jface.action.Action;
 
 public class ActionReloadFailedMapImages extends Action {
 
-	private Map2View	_mapView;
+   private Map2View _mapView;
 
-	public ActionReloadFailedMapImages(final Map2View mapView) {
+   public ActionReloadFailedMapImages(final Map2View mapView) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_mapView = mapView;
+      _mapView = mapView;
 
-		setText(Messages.map_action_reload_map);
+      setText(Messages.map_action_reload_map);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Refresh));
+   }
 
-	@Override
-	public void run() {
-		_mapView.actionReloadFailedMapImages();
-	}
+   @Override
+   public void run() {
+      _mapView.actionReloadFailedMapImages();
+   }
 
 }

@@ -1693,7 +1693,7 @@ public class Map2View extends ViewPart implements
          gc.fillRectangle(imageBounds);
 
          if (isDataAvailable) {
-            TourMapPainter.drawMap2Legend(gc, imageBounds, mapColorProvider, true);
+            TourMapPainter.drawMap2_Legend(gc, imageBounds, mapColorProvider, true, false);
          } else {
             // draws only a transparent image to hide the legend
          }

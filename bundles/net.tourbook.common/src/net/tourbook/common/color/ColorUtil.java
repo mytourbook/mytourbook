@@ -23,6 +23,17 @@ import org.eclipse.swt.graphics.RGB;
 public class ColorUtil {
 
    /**
+    * Converts SWT color into AWT color
+    *
+    * @param swtColor
+    * @return
+    */
+   public static Color convertSWTColor_into_AWTColor(final org.eclipse.swt.graphics.Color swtColor) {
+
+      return new Color(swtColor.getRed(), swtColor.getGreen(), swtColor.getBlue());
+   }
+
+   /**
     * @param color
     * @param alpha
     *           0xff is opaque, 0 is transparent

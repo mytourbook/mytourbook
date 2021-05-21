@@ -44,7 +44,6 @@ public class GraphColorPainter {
    private String                       _recreateColorId;
    private String                       _recreateColorDefinitionId;
 
-
    /**
     * @param colorTree
     */
@@ -144,10 +143,11 @@ public class GraphColorPainter {
                   final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
                   colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-                  TourMapPainter.drawMap2Legend(
+                  TourMapPainter.drawMap2_Legend(
                         gc,
                         imageBounds,
                         colorProvider,
+                        false,
                         false);
 
                } else {
@@ -216,7 +216,6 @@ public class GraphColorPainter {
 
          final int imageSize = _itemHeight - 2;
          final int imageSpacing = GRAPH_COLOR_SPACING;
-         final int imageOffsetX = imageSize + imageSpacing;
 
          final int imageWidth = (horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing);
          final int imageHeight = imageSize;
@@ -226,11 +225,10 @@ public class GraphColorPainter {
                imageWidth,
                imageHeight);
 
-
          final Rectangle drawableBounds = new Rectangle(
-               imageOffsetX,
                0,
-               imageWidth - imageOffsetX,
+               0,
+               imageWidth,
                imageHeight);
 
          final GC gc = new GC(colorImage);
@@ -245,10 +243,11 @@ public class GraphColorPainter {
                final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
                colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-               TourMapPainter.drawMap2Legend(
+               TourMapPainter.drawMap2_Legend(
                      gc,
                      drawableBounds,
                      colorProvider,
+                     false,
                      false);
 
             } else {

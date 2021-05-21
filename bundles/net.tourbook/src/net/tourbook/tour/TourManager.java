@@ -47,6 +47,7 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -3568,6 +3569,8 @@ public class TourManager {
 
       computeValueClipping(tourData);
 
+      final RGB defaultRGB = ThemeUtil.getDefaultForegroundColor_Table().getRGB();
+
       /*
        * Distance
        */
@@ -3578,7 +3581,7 @@ public class TourManager {
          xDataDist.setLabel(Messages.tour_editor_label_distance);
          xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
          xDataDist.setValueDivisor(1000);
-         xDataDist.setDefaultRGB(new RGB(0, 0, 0));
+         xDataDist.setDefaultRGB(defaultRGB);
 
          // do not show average values but show the other values with 3 digits
          xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
@@ -3590,7 +3593,7 @@ public class TourManager {
       final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
-      xDataTime.setDefaultRGB(new RGB(0, 0, 0));
+      xDataTime.setDefaultRGB(defaultRGB);
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -338,17 +338,9 @@ public class ConconiView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-
-      final RGB rgbPrefDark = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-
-      final RGB rgbPrefBright = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
       final double[][] powerSerie = new double[validDataLength][];
       final double[][] pulseSerie = new double[validDataLength][];
@@ -508,7 +500,8 @@ public class ConconiView extends ViewPart {
       _conconiDataForSelectedTour = createConconiData(powerSerie[lastTourIndex], pulseSerie[lastTourIndex]);
 
       if (_chkExtendedScaling.getSelection()) {
-         xDataPower.setScalingFactors(//
+
+         xDataPower.setScalingFactors(
                (double) _spinFactor.getSelection() / 10,
                maxXValue + ADJUST_MAX_POWER_VALUE);
       }
@@ -1026,6 +1019,7 @@ public class ConconiView extends ViewPart {
    }
 
    private void updateChart_12(final ArrayList<Long> tourIds) {
+
       updateChart_22(TourManager.getInstance().getTourData(tourIds));
    }
 
@@ -1130,8 +1124,14 @@ public class ConconiView extends ViewPart {
       _scaleDeflection.setEnabled(true);
       _scaleDeflection.setMaximum(maxDeflection > 0 ? lastXIndex : 0);
 
-      // ensure that too much scale ticks are displayed
-      final int pageIncrement = maxDeflection < 20 ? 1 : maxDeflection < 100 ? 5 : maxDeflection < 1000 ? 50 : 100;
+      // ensure that not too much scale ticks are displayed
+      final int pageIncrement = maxDeflection < 20
+            ? 1
+            : maxDeflection < 100
+                  ? 5
+                  : maxDeflection < 1000
+                        ? 50
+                        : 100;
 
       _scaleDeflection.setPageIncrement(pageIncrement);
 
