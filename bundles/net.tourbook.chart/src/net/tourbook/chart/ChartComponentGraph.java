@@ -298,7 +298,6 @@ public class ChartComponentGraph extends Canvas {
    private Cursor                     _cursorDragged;
    private Cursor                     _cursorDragXSlider_ModeZoom;
    private Cursor                     _cursorDragXSlider_ModeSlider;
-   private Cursor                     _cursorHoverXSlider;
    private Cursor                     _cursorModeZoom;
    private Cursor                     _cursorModeZoomMove;
    private Cursor                     _cursorModeSlider;
@@ -481,26 +480,29 @@ public class ChartComponentGraph extends Canvas {
 
       _pc = new PixelConverter(_chart);
 
-      _cursorResizeLeftRight = new Cursor(display, SWT.CURSOR_SIZEWE);
-      _cursorResizeTopDown = new Cursor(display, SWT.CURSOR_SIZENS);
-      _cursorDragged = new Cursor(display, SWT.CURSOR_SIZEALL);
-      _cursorArrow = new Cursor(display, SWT.CURSOR_ARROW);
+// SET_FORMATTING_OFF
 
-      _cursorModeSlider = createCursorFromImage(ChartImages.CursorMode_Slider);
-      _cursorModeZoom = createCursorFromImage(ChartImages.CursorMode_Zoom);
-      _cursorModeZoomMove = createCursorFromImage(ChartImages.CursorMode_ZoomMove);
-      _cursorDragXSlider_ModeZoom = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
-      _cursorHoverXSlider = createCursorFromImage(ChartImages.Cursor_Hover_XSlider);
+      _cursorResizeLeftRight           = new Cursor(display, SWT.CURSOR_SIZEWE);
+      _cursorResizeTopDown             = new Cursor(display, SWT.CURSOR_SIZENS);
+      _cursorDragged                   = new Cursor(display, SWT.CURSOR_SIZEALL);
+      _cursorArrow                     = new Cursor(display, SWT.CURSOR_ARROW);
 
-      _cursorMove1x = createCursorFromImage(ChartImages.Cursor_Move1x);
-      _cursorMove2x = createCursorFromImage(ChartImages.Cursor_Move2x);
-      _cursorMove3x = createCursorFromImage(ChartImages.Cursor_Move3x);
-      _cursorMove4x = createCursorFromImage(ChartImages.Cursor_Move4x);
-      _cursorMove5x = createCursorFromImage(ChartImages.Cursor_Move5x);
+      _cursorModeSlider                = createCursorFromImage(ChartImages.CursorMode_Slider);
+      _cursorModeZoom                  = createCursorFromImage(ChartImages.CursorMode_Zoom);
+      _cursorModeZoomMove              = createCursorFromImage(ChartImages.CursorMode_Slider_Move);
+      _cursorDragXSlider_ModeZoom      = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider    = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
 
-      _cursorXSliderLeft = createCursorFromImage(ChartImages.Cursor_X_Slider_Left);
-      _cursorXSliderRight = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
+      _cursorMove1x                    = createCursorFromImage(ChartImages.Cursor_Move1x);
+      _cursorMove2x                    = createCursorFromImage(ChartImages.Cursor_Move2x);
+      _cursorMove3x                    = createCursorFromImage(ChartImages.Cursor_Move3x);
+      _cursorMove4x                    = createCursorFromImage(ChartImages.Cursor_Move4x);
+      _cursorMove5x                    = createCursorFromImage(ChartImages.Cursor_Move5x);
+
+      _cursorXSliderLeft               = createCursorFromImage(ChartImages.Cursor_X_Slider_Left);
+      _cursorXSliderRight              = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
+
+// SET_FORMATTING_ON
 
       _gridColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
       _gridColorMajor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -1008,7 +1010,7 @@ public class ChartComponentGraph extends Canvas {
    private Cursor createCursorFromImage(final String imageName) {
 
       Image cursorImage = null;
-      final ImageDescriptor imageDescriptor = ChartActivator.getImageDescriptor(imageName);
+      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName);
 
       if (imageDescriptor == null) {
 
@@ -7141,30 +7143,34 @@ public class ChartComponentGraph extends Canvas {
    private void onDispose() {
 
       // dispose resources
-      _cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
-      _cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
-      _cursorDragged = Util.disposeResource(_cursorDragged);
-      _cursorArrow = Util.disposeResource(_cursorArrow);
-      _cursorModeSlider = Util.disposeResource(_cursorModeSlider);
-      _cursorModeZoom = Util.disposeResource(_cursorModeZoom);
-      _cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
-      _cursorDragXSlider_ModeZoom = Util.disposeResource(_cursorDragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider = Util.disposeResource(_cursorDragXSlider_ModeSlider);
-      _cursorHoverXSlider = Util.disposeResource(_cursorHoverXSlider);
 
-      _cursorMove1x = Util.disposeResource(_cursorMove1x);
-      _cursorMove2x = Util.disposeResource(_cursorMove2x);
-      _cursorMove3x = Util.disposeResource(_cursorMove3x);
-      _cursorMove4x = Util.disposeResource(_cursorMove4x);
-      _cursorMove5x = Util.disposeResource(_cursorMove5x);
+// SET_FORMATTING_OFF
 
-      _cursorXSliderLeft = Util.disposeResource(_cursorXSliderLeft);
-      _cursorXSliderRight = Util.disposeResource(_cursorXSliderRight);
+      _cursorResizeLeftRight           = Util.disposeResource(_cursorResizeLeftRight);
+      _cursorResizeTopDown             = Util.disposeResource(_cursorResizeTopDown);
+      _cursorDragged                   = Util.disposeResource(_cursorDragged);
+      _cursorArrow                     = Util.disposeResource(_cursorArrow);
+      _cursorModeSlider                = Util.disposeResource(_cursorModeSlider);
+      _cursorModeZoom                  = Util.disposeResource(_cursorModeZoom);
+      _cursorModeZoomMove              = Util.disposeResource(_cursorModeZoomMove);
+      _cursorDragXSlider_ModeZoom      = Util.disposeResource(_cursorDragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider    = Util.disposeResource(_cursorDragXSlider_ModeSlider);
 
-      _chartImage_20_Chart = Util.disposeResource(_chartImage_20_Chart);
-      _chartImage_10_Graphs = Util.disposeResource(_chartImage_10_Graphs);
-      _chartImage_40_Overlay = Util.disposeResource(_chartImage_40_Overlay);
-      _chartImage_30_Custom = Util.disposeResource(_chartImage_30_Custom);
+      _cursorMove1x                    = Util.disposeResource(_cursorMove1x);
+      _cursorMove2x                    = Util.disposeResource(_cursorMove2x);
+      _cursorMove3x                    = Util.disposeResource(_cursorMove3x);
+      _cursorMove4x                    = Util.disposeResource(_cursorMove4x);
+      _cursorMove5x                    = Util.disposeResource(_cursorMove5x);
+
+      _cursorXSliderLeft               = Util.disposeResource(_cursorXSliderLeft);
+      _cursorXSliderRight              = Util.disposeResource(_cursorXSliderRight);
+
+      _chartImage_20_Chart             = Util.disposeResource(_chartImage_20_Chart);
+      _chartImage_10_Graphs            = Util.disposeResource(_chartImage_10_Graphs);
+      _chartImage_40_Overlay           = Util.disposeResource(_chartImage_40_Overlay);
+      _chartImage_30_Custom            = Util.disposeResource(_chartImage_30_Custom);
+
+// SET_FORMATTING_ON
 
       _colorCache.dispose();
    }

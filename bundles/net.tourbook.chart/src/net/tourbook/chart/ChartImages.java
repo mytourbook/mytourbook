@@ -25,9 +25,8 @@ public class ChartImages {
    public static final String Arrow_Right                   = "arrow-right.gif";
    public static final String Arrow_Right_Disabled          = "arrow-right-disabled.gif";
 
-   public static final String Cursor_DragXSlider_ModeSlider = "Cursor-DragXSlider-ModeSlider.png";
-   public static final String Cursor_DragXSlider_ModeZoom   = "Cursor-DragXSlider-ModeZoom.png";
-   public static final String Cursor_Hover_XSlider          = "Cursor-Hover-XSlider.png";
+   public static final String Cursor_DragXSlider_ModeSlider = "cursor-drag-x-slider-mode-slider.png";
+   public static final String Cursor_DragXSlider_ModeZoom   = "cursor-drag-x-slider-mode-zoom.png";
    public static final String Cursor_Move1x                 = "cursor-move-x-slider-1x.png";
    public static final String Cursor_Move2x                 = "cursor-move-x-slider-2x.png";
    public static final String Cursor_Move3x                 = "cursor-move-x-slider-3x.png";
@@ -37,8 +36,8 @@ public class ChartImages {
    public static final String Cursor_X_Slider_Right         = "cursor-x-slider-right.png";
 
    public static final String CursorMode_Slider             = "cursor-mode-slider.png";
+   public static final String CursorMode_Slider_Move        = "cursor-mode-slider-move.png";
    public static final String CursorMode_Zoom               = "cursor-mode-zoom.png";
-   public static final String CursorMode_ZoomMove           = "cursor-mode-slider-move.png";
 
    public static final String MouseMode                     = "mouse-mode.png";
 

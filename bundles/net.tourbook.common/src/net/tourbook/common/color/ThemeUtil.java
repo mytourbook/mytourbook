@@ -89,6 +89,9 @@ public class ThemeUtil {
    private static Color        _defaultForegroundColor_Combo;
    private static Color        _defaultBackgroundColor_Combo;
 
+   private static Color        _defaultForegroundColor_Shell;
+   private static Color        _defaultBackgroundColor_Shell;
+
    /**
     * These are all Eclipse themes when using W10:
     *
@@ -159,6 +162,10 @@ public class ThemeUtil {
       return _defaultBackgroundColor_Combo;
    }
 
+   public static Color getDefaultBackgroundColor_Shell() {
+      return _defaultBackgroundColor_Shell;
+   }
+
    /**
     * @return Returns the table default background color for light or dark theme
     */
@@ -175,6 +182,10 @@ public class ThemeUtil {
 
    public static Color getDefaultForegroundColor_Combo() {
       return _defaultForegroundColor_Combo;
+   }
+
+   public static Color getDefaultForegroundColor_Shell() {
+      return _defaultForegroundColor_Shell;
    }
 
    /**
@@ -327,6 +338,9 @@ public class ThemeUtil {
 //         System.out.println((System.currentTimeMillis() + " table.getBackground()      2 " + table.getBackground()));
 //         System.out.println((System.currentTimeMillis() + " shell.getForeground()      2 " + shell.getForeground()));
 //         System.out.println((System.currentTimeMillis() + " table.getForeground()      2 " + table.getForeground()));
+
+         _defaultForegroundColor_Shell = shell.getForeground();
+         _defaultBackgroundColor_Shell = shell.getBackground();
 
          _defaultForegroundColor_Combo = combo.getForeground();
          _defaultBackgroundColor_Combo = combo.getBackground();

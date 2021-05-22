@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -23,8 +25,6 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -131,16 +131,9 @@ public class ChartComponentAxis extends Canvas {
          public void mouseHover(final MouseEvent e) {}
       });
 
-      addControlListener(new ControlListener() {
-
-         @Override
-         public void controlMoved(final ControlEvent e) {}
-
-         @Override
-         public void controlResized(final ControlEvent e) {
-            _clientArea = getClientArea();
-         }
-      });
+      addControlListener(controlResizedAdapter(controlEvent -> {
+         _clientArea = getClientArea();
+      }));
 
       addListener(SWT.MouseWheel, this::onMouseWheel);
    }
@@ -273,8 +266,8 @@ public class ChartComponentAxis extends Canvas {
          final String zoomText = getZoomText(moveRatio * 100);
          final int textHeight = gc.textExtent(zoomText).y;
 
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-         gc.drawText(zoomText, //
+         gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         gc.drawText(zoomText,
                1,
                devYMarker - textHeight + 2,
                true);
@@ -300,8 +293,8 @@ public class ChartComponentAxis extends Canvas {
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
 
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-         gc.drawText(zoomText, //
+         gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         gc.drawText(zoomText,
                devAxisWidth - textWidth - 0,
                devYMarker - textHeight + 2,
                true);
@@ -392,7 +385,7 @@ public class ChartComponentAxis extends Canvas {
             final int xPos = labelExtend.y / 2;
             final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
-            final Color fgColor = new Color(_display, yData.getDefaultRGB());
+            final Color fgColor = new Color(yData.getDefaultRGB());
             gc.setForeground(fgColor);
 
             final Transform tr = new Transform(_display);
@@ -406,13 +399,12 @@ public class ChartComponentAxis extends Canvas {
                gc.setTransform(null);
             }
             tr.dispose();
-            fgColor.dispose();
          }
 
          /*
           * Draw y units
           */
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+         gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
 
          int devY;
 
@@ -426,7 +418,6 @@ public class ChartComponentAxis extends Canvas {
             } else {
                devY = devYTop + (int) devYUnit;
             }
-
 
             final String valueLabel = yUnit.valueLabel;
 

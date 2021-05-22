@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMarker;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.PhotoActivator;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -30,8 +30,9 @@ public class ActionMarkerFilterWithNoGPS extends Action {
       super(null, AS_CHECK_BOX);
 
       setToolTipText(Messages.Action_MarkerFilter_WithoutGPS_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MarkerFilter_WithoutGPS));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MarkerFilter_WithoutGPS_Disabled));
+
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_NoGPS));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_NoGPS_Disabled));
 
       _tourMarkerAllView = tourMarkerAllView;
    }
