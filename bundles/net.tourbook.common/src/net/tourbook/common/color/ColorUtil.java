@@ -48,6 +48,17 @@ public class ColorUtil {
       return graphColor;
    }
 
+   /**
+    * @param rgb
+    * @return Returns an integer value from a {@link RGB}
+    */
+   public static int getColorValue(final RGB rgb) {
+
+      return ((rgb.blue & 0xFF) << 0)
+            | ((rgb.green & 0xFF) << 8)
+            | ((rgb.red & 0xFF) << 16);
+   }
+
    public static RGB getComplimentColor(final RGB color) {
 
       // get compliment color
@@ -144,6 +155,21 @@ public class ColorUtil {
    public static RGB getContrastRGB(final RGB rgb) {
 
       return getContrastRGB(rgb.red, rgb.green, rgb.blue);
+   }
+
+   /**
+    * Splits an integer color values in it's reg, green, blue components.
+    *
+    * @param rgbValue
+    * @return Returns a {@link RGB} from an integer color value
+    */
+   public static RGB getRGB(final int rgbValue) {
+
+      final byte red = (byte) ((rgbValue & 0xFF) >> 0);
+      final byte green = (byte) ((rgbValue & 0xFF00) >> 8);
+      final byte blue = (byte) ((rgbValue & 0xFF0000) >> 16);
+
+      return new RGB(red, green, blue);
    }
 
    /**

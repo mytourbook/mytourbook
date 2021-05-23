@@ -106,8 +106,9 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 43;
+   private static final int TOURBOOK_DB_VERSION = 44;
 
+//   private static final int TOURBOOK_DB_VERSION = 44; // 21.?
 //   private static final int TOURBOOK_DB_VERSION = 43; // 21.3
 //   private static final int TOURBOOK_DB_VERSION = 42; // 20.11.1
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
@@ -3983,32 +3984,42 @@ public class TourDatabase {
       /*
        * CREATE TABLE TourType
        */
-      //                                             //$NON-NLS-1$
 
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TYPE + "   (                                      \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TYPE + "   (                                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
       //
+
             + SQL.CreateField_EntityId(ENTITY_ID_TYPE, true)
-            //
-            + "   name                 VARCHAR(" + TourType.DB_LENGTH_NAME + "),                \n" //$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + "   colorBrightRed       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorBrightGreen     SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorBrightBlue      SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorDarkRed         SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorDarkGreen       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorDarkBlue        SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorLineRed         SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorLineGreen       SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   colorLineBlue        SMALLINT NOT NULL,                                       \n" //$NON-NLS-1$
+
+            + "   name                 VARCHAR(" + TourType.DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   colorBrightRed       SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+            + "   colorBrightGreen     SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+            + "   colorBrightBlue      SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+
+            + "   colorDarkRed         SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+            + "   colorDarkGreen       SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+            + "   colorDarkBlue        SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+
+            + "   colorLineRed         SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+            + "   colorLineGreen       SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
+            + "   colorLineBlue        SMALLINT NOT NULL,                                       " + NL //$NON-NLS-1$
 
             // version 19 start
-            //
-            + "   colorTextRed         SMALLINT DEFAULT 0,                                      \n" //$NON-NLS-1$
-            + "   colorTextGreen       SMALLINT DEFAULT 0,                                      \n" //$NON-NLS-1$
-            + "   colorTextBlue        SMALLINT DEFAULT 0                                       \n" //$NON-NLS-1$
-            //
+
+            + "   colorTextRed         SMALLINT DEFAULT 0,                                      " + NL //$NON-NLS-1$
+            + "   colorTextGreen       SMALLINT DEFAULT 0,                                      " + NL //$NON-NLS-1$
+            + "   colorTextBlue        SMALLINT DEFAULT 0                                       " + NL //$NON-NLS-1$
+
             // version 19 end ---------
-            //
+
+            // version 44 start
+
+            + "   colorLine_Dark       INTEGER DEFAULT 0,                                       " + NL //$NON-NLS-1$
+            + "   colorText_Dark       INTEGER DEFAULT 0,                                       " + NL //$NON-NLS-1$
+
+            // version 44 end ---------
+
             + ")"); //$NON-NLS-1$
    }
 
@@ -5174,6 +5185,11 @@ public class TourDatabase {
          // 42 -> 43    21.3
          if (currentDbVersion == 42) {
             currentDbVersion = _dbDesignVersion_New = updateDb_042_To_043(conn, splashManager);
+         }
+
+         // 43 -> 44    21.?
+         if (currentDbVersion == 43) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_043_To_044(conn, splashManager);
          }
 
          // update db design version number
@@ -7893,7 +7909,14 @@ public class TourDatabase {
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   // 40 -> 41    20.8
+   /**
+    * 40 -> 41 ... 20.8
+    *
+    * @param conn
+    * @param splashManager
+    * @return
+    * @throws SQLException
+    */
    private int updateDb_040_To_041(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 41;
@@ -8146,6 +8169,41 @@ public class TourDatabase {
             em.close();
          }
       });
+   }
+
+   /**
+    * 43 -> 44 ... 21.?
+    *
+    * @param conn
+    * @param splashManager
+    * @return
+    * @throws SQLException
+    */
+   private int updateDb_043_To_044(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 44;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+//         // version 44 start
+//
+//         + "   colorLine_Dark       INTEGER DEFAULT 0,    " + NL //$NON-NLS-1$
+//         + "   colorText_Dark       INTEGER DEFAULT 0,    " + NL //$NON-NLS-1$
+//
+//         // version 44 end ---------
+
+         // Add new columns
+         SQL.AddCol_Int(stmt, TABLE_TOUR_TYPE, "colorLine_Dark", DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Int(stmt, TABLE_TOUR_TYPE, "colorText_Dark", DEFAULT_0); //$NON-NLS-1$
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

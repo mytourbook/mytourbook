@@ -319,9 +319,12 @@ public class StatisticServices {
        * Color index 1...n+1: tour type colors
        */
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+
       for (final TourType tourType : tourTypes) {
+
          rgbBright.add(tourType.getRGBBright());
          rgbDark.add(tourType.getRGBDark());
+
          rgbLine.add(tourType.getRGBLine());
          rgbText.add(tourType.getRGBText());
       }

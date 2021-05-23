@@ -22,6 +22,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.swt.graphics.RGB;
@@ -76,23 +77,13 @@ public class TourType implements Comparable<Object> {
    private short            colorLineRed;
    private short            colorLineGreen;
    private short            colorLineBlue;
-   @Transient
-   private short            colorLineRed_Dark;
-   @Transient
-   private short            colorLineGreen_Dark;
-   @Transient
-   private short            colorLineBlue_Dark;
    //
    private short            colorTextRed;
    private short            colorTextGreen;
    private short            colorTextBlue;
-
-   @Transient
-   private short            colorTextRed_Dark;
-   @Transient
-   private short            colorTextGreen_Dark;
-   @Transient
-   private short            colorTextBlue_Dark;
+   //
+   private int              colorLine_Dark;
+   private int              colorText_Dark;
 
    /**
     * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
@@ -155,6 +146,14 @@ public class TourType implements Comparable<Object> {
       }
 
       return true;
+   }
+
+   public int getColorLine_Dark() {
+      return colorLine_Dark;
+   }
+
+   public int getColorText_Dark() {
+      return colorText_Dark;
    }
 
    public long getCreateId() {
@@ -233,9 +232,7 @@ public class TourType implements Comparable<Object> {
       colorLineGreen = (short) rgbLine_Light.green;
       colorLineBlue = (short) rgbLine_Light.blue;
 
-      colorLineRed_Dark = (short) rgbLine_Dark.red;
-      colorLineGreen_Dark = (short) rgbLine_Dark.green;
-      colorLineBlue_Dark = (short) rgbLine_Dark.blue;
+      colorLine_Dark = ColorUtil.getColorValue(rgbLine_Dark);
    }
 
    /**
@@ -270,9 +267,7 @@ public class TourType implements Comparable<Object> {
       colorTextGreen = (short) rgbText_Light.green;
       colorTextBlue = (short) rgbText_Light.blue;
 
-      colorTextRed_Dark = (short) rgbText_Dark.red;
-      colorTextGreen_Dark = (short) rgbText_Dark.green;
-      colorTextBlue_Dark = (short) rgbText_Dark.blue;
+      colorText_Dark = ColorUtil.getColorValue(rgbText_Dark);
    }
 
    public void setName(final String name) {
