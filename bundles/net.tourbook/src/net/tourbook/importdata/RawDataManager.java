@@ -825,7 +825,7 @@ public class RawDataManager {
 
       final long start = System.currentTimeMillis();
 
-      if (actionModifyTourValues_10_Confirm(tourValueTypes, true) == false) {
+      if (!actionModifyTourValues_10_Confirm(tourValueTypes, true)) {
          return;
       }
 
@@ -2441,6 +2441,7 @@ public class RawDataManager {
       final File currentTourImportFile = actionReimportTour_20_GetImportFile(tourData, skipToursWithFileNotFound, reImportStatus);
 
       if (reimportedFile[0] != null && reimportedFile[0].equals(currentTourImportFile)
+      //TODO FB convert to local variable so that its not shared ?
             && _newlyImportedTours.size() > 0) {
 
          // this case occurs when a file contains multiple tours
