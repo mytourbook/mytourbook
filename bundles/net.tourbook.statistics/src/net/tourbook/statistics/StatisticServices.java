@@ -213,7 +213,7 @@ public class StatisticServices {
 
    /**
     * Set default colors for the y-axis, the color is defined in
-    * {@link GraphColorManager#PREF_COLOR_LINE}
+    * {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}
     *
     * @param yData
     * @param graphName
@@ -227,7 +227,7 @@ public class StatisticServices {
       // put the color into the chart data
       yData.setDefaultRGB(PreferenceConverter.getColor(//
             commonPrefStore,
-            defaultColorName + GraphColorManager.PREF_COLOR_LINE));
+            defaultColorName + GraphColorManager.PREF_COLOR_LINE_LIGHT));
    }
 
    /**
@@ -300,19 +300,19 @@ public class StatisticServices {
 
          rgbBright.add(PreferenceConverter.getColor(
                commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_BRIGHT));
+               defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT));
 
          rgbDark.add(PreferenceConverter.getColor(
                commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_DARK));
+               defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_DARK));
 
          rgbLine.add(PreferenceConverter.getColor(
                commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_LINE));
+               defaultColorName + GraphColorManager.PREF_COLOR_LINE_LIGHT));
 
          rgbText.add(PreferenceConverter.getColor(
                commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_TEXT));
+               defaultColorName + GraphColorManager.PREF_COLOR_TEXT_LIGHT));
       }
 
       /*

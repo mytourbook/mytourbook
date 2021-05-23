@@ -155,8 +155,9 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 
             newTourType.setColorBright(l);
             newTourType.setColorDark(n);
-            newTourType.setColorLine(d);
-            newTourType.setColorText(d);
+
+            newTourType.setColorLine(d, d);
+            newTourType.setColorText(d, d);
 
             // add new entity to db
             final TourType savedTourType = TourDatabase.saveEntity(

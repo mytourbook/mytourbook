@@ -396,7 +396,7 @@ public class ChartComponentGraph extends Canvas {
    private Color                      _backgroundColor;
 
    /**
-    * Default background color
+    * Default foreground color
     */
    private Color                      _foregroundColor;
 
@@ -5791,9 +5791,6 @@ public class ChartComponentGraph extends Canvas {
             final ChartDataYSerie yData = ySlider.getYData();
 
             final Color colorLine = new Color(yData.getRgbLine()[0]);
-            final Color colorBright = new Color(yData.getRgbBright()[0]);
-            final Color colorDark = new Color(yData.getRgbDark()[0]);
-            final Color colorText = new Color(yData.getRgbText()[0]);
 
             final GraphDrawingData drawingData = ySlider.getDrawingData();
             final int devYBottom = drawingData.getDevYBottom();
@@ -5843,19 +5840,15 @@ public class ChartComponentGraph extends Canvas {
             final int labelY = devYLabelPos - labelHeight;
 
             // draw label background
-            gcGraph.setForeground(colorBright);
-            gcGraph.setBackground(colorDark);
-//            gcGraph.setAlpha(0xb0);
-            gcGraph.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
+            gcGraph.setBackground(_backgroundColor);
+            gcGraph.fillRectangle(labelX, labelY, labelWidth, labelHeight);
 
             // draw label border
-//            gcGraph.setAlpha(0xa0);
             gcGraph.setForeground(colorLine);
             gcGraph.drawRectangle(labelX, labelY, labelWidth, labelHeight);
-//            gcGraph.setAlpha(0xff);
 
             // draw label text
-            gcGraph.setForeground(colorText);
+            gcGraph.setForeground(_foregroundColor);
             gcGraph.drawString(label, labelX + 3, labelY - 0, true);
 
             // draw slider line
@@ -8993,13 +8986,11 @@ public class ChartComponentGraph extends Canvas {
 
    private void setupColors() {
 
-      final boolean isDarkTheme = UI.isDarkTheme();
-
-      _foregroundColor = isDarkTheme
+      _foregroundColor = UI.IS_DARK_THEME
             ? ThemeUtil.getDarkestForegroundColor()
             : _chart.getForeground();
 
-      _backgroundColor = isDarkTheme
+      _backgroundColor = UI.IS_DARK_THEME
             ? ThemeUtil.getDarkestBackgroundColor()
             : _chart.getBackgroundColor();
    }

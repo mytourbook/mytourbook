@@ -310,7 +310,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                false);
       }
 
-      colorDefinition.setColorNames(graphColors);
+      colorDefinition.setColorItems(graphColors);
    }
 
    private Composite createUI(final Composite parent) {
@@ -724,7 +724,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
     */
    private void defineColumn_30_ColorDefinition(final TreeColumnLayout treeLayout, final Tree tree) {
 
-      final int numHorizontalImages = 4;
+      final int numHorizontalImages = 6;
       final int trailingOffset = 10;
 
       final int itemHeight = tree.getItemHeight();
@@ -1127,22 +1127,22 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       // update model
       _selectedGraphColor.setRGB(newRGB);
 
-      final TourTypeColorDefinition selectedColorDefinition = (TourTypeColorDefinition) _selectedGraphColor
-            .getColorDefinition();
+      final TourTypeColorDefinition selectedColorDef = (TourTypeColorDefinition) _selectedGraphColor.getColorDefinition();
 
       /*
        * update tour type in the db
        */
-      final TourType oldTourType = selectedColorDefinition.getTourType();
+      final TourType oldTourType = selectedColorDef.getTourType();
 
-      oldTourType.setColorBright(selectedColorDefinition.getGradientBright_New());
-      oldTourType.setColorDark(selectedColorDefinition.getGradientDark_New());
-      oldTourType.setColorLine(selectedColorDefinition.getLineColor_New());
-      oldTourType.setColorText(selectedColorDefinition.getTextColor_New());
+      oldTourType.setColorBright(selectedColorDef.getGradientBright_New());
+      oldTourType.setColorDark(selectedColorDef.getGradientDark_New());
+
+      oldTourType.setColorLine(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
+      oldTourType.setColorText(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
 
       final TourType savedTourType = saveTourType(oldTourType);
 
-      selectedColorDefinition.setTourType(savedTourType);
+      selectedColorDef.setTourType(savedTourType);
 
       // replace tour type with new one
       _dbTourTypes.remove(oldTourType);
@@ -1155,7 +1155,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       // invalidate old color/image from the graph and color definition to force the recreation
       _graphColorPainter.invalidateResources(
             _selectedGraphColor.getColorId(),
-            selectedColorDefinition.getColorDefinitionId());
+            selectedColorDef.getColorDefinitionId());
 
       // update UI
       TourTypeImage.setTourTypeImagesDirty();
@@ -1164,7 +1164,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
        * update the tree viewer, the color images will be recreated in the label provider
        */
       _tourTypeViewer.update(_selectedGraphColor, null);
-      _tourTypeViewer.update(selectedColorDefinition, null);
+      _tourTypeViewer.update(selectedColorDef, null);
 
       // without a repaint the color def image is not updated
       _tourTypeViewer.getTree().redraw();
@@ -1264,15 +1264,16 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       /*
        * Create a dummy definition to get the default colors
        */
-      final TourTypeColorDefinition dummyColorDefinition = new TourTypeColorDefinition(
+      final TourTypeColorDefinition dummyColorDef = new TourTypeColorDefinition(
             newTourType,
             UI.EMPTY_STRING,
             UI.EMPTY_STRING);
 
-      newTourType.setColorBright(dummyColorDefinition.getGradientBright_Default());
-      newTourType.setColorDark(dummyColorDefinition.getGradientDark_Default());
-      newTourType.setColorLine(dummyColorDefinition.getLineColor_Default());
-      newTourType.setColorText(dummyColorDefinition.getTextColor_Default());
+      newTourType.setColorBright(dummyColorDef.getGradientBright_Default());
+      newTourType.setColorDark(dummyColorDef.getGradientDark_Default());
+
+      newTourType.setColorLine(dummyColorDef.getLineColor_Default_Light(), dummyColorDef.getLineColor_Default_Dark());
+      newTourType.setColorText(dummyColorDef.getTextColor_Default_Light(), dummyColorDef.getTextColor_Default_Dark());
 
       // add new entity to db
       final TourType savedTourType = saveTourType(newTourType);

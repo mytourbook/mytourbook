@@ -166,7 +166,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       @Override
       public Object[] getElements(final Object inputElement) {
          if (inputElement instanceof PrefPageAppearanceColors) {
-            return GraphColorManager.getInstance().getGraphColorDefinitions();
+            return GraphColorManager.getAllColorDefinitions();
          }
          return null;
       }
@@ -222,28 +222,35 @@ public class PrefPageAppearanceColors extends PreferencePage implements
     */
    private void createColorDefinitions() {
 
-      final String[][] colorNames = GraphColorManager.colorNames;
-      final ColorDefinition[] graphColorDefinitions = GraphColorManager.getInstance().getGraphColorDefinitions();
+      final String[][] allColorNames = GraphColorManager.colorNames;
+      final ColorDefinition[] allGraphColorDefinitions = GraphColorManager.getAllColorDefinitions();
 
-      for (final ColorDefinition colorDefinition : graphColorDefinitions) {
+      for (final ColorDefinition colorDefinition : allGraphColorDefinitions) {
 
-         final ArrayList<GraphColorItem> graphColors = new ArrayList<>();
+         final ArrayList<GraphColorItem> allGraphColorItems = new ArrayList<>();
 
          final boolean isMapColorAvailable = colorDefinition.getMap2Color_Active() != null;
 
-         for (final String[] colorName : colorNames) {
+         for (final String[] colorName : allColorNames) {
 
-            if (colorName[0] == GraphColorManager.PREF_COLOR_MAPPING) {
+            final String colorNameID = colorName[0];
+            final String visibleColorName = colorName[1];
+
+            if (colorNameID == GraphColorManager.PREF_COLOR_MAPPING) {
+
                if (isMapColorAvailable) {
+
                   // create map color
-                  graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], true));
+                  allGraphColorItems.add(new GraphColorItem(colorDefinition, colorNameID, visibleColorName, true));
                }
+
             } else {
-               graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], false));
+
+               allGraphColorItems.add(new GraphColorItem(colorDefinition, colorNameID, visibleColorName, false));
             }
          }
 
-         colorDefinition.setColorNames(graphColors.toArray(new GraphColorItem[graphColors.size()]));
+         colorDefinition.setColorItems(allGraphColorItems.toArray(new GraphColorItem[allGraphColorItems.size()]));
       }
    }
 
@@ -501,8 +508,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
     */
    private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
 
-      final int numHorizontalImages = 5;
-      final int trailingOffset = 10;
+      final int numHorizontalImages = 7;
+      final int trailingOffset = 2;
 
       final int itemHeight = tree.getItemHeight();
       final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING) * numHorizontalImages
@@ -721,15 +728,19 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    @Override
    protected void performDefaults() {
 
-      final ColorDefinition[] graphColorDefinitions = GraphColorManager.getInstance().getGraphColorDefinitions();
+      final ColorDefinition[] graphColorDefinitions = GraphColorManager.getAllColorDefinitions();
 
       // update current colors
       for (final ColorDefinition graphDefinition : graphColorDefinitions) {
 
          graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Default());
          graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Default());
-         graphDefinition.setLineColor_New(graphDefinition.getLineColor_Default());
-         graphDefinition.setTextColor_New(graphDefinition.getTextColor_Default());
+
+         graphDefinition.setLineColor_New_Light(graphDefinition.getLineColor_Default_Light());
+         graphDefinition.setLineColor_New_Dark(graphDefinition.getLineColor_Default_Dark());
+
+         graphDefinition.setTextColor_New_Light(graphDefinition.getTextColor_Default_Light());
+         graphDefinition.setTextColor_New_Dark(graphDefinition.getTextColor_Default_Dark());
 
          final Map2ColorProfile defaultLegendColor = graphDefinition.getMap2Color_Default();
          if (defaultLegendColor != null) {
@@ -765,12 +776,16 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    private void resetColors() {
 
-      for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
+      for (final ColorDefinition graphDefinition : GraphColorManager.getAllColorDefinitions()) {
 
          graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Active());
          graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Active());
-         graphDefinition.setLineColor_New(graphDefinition.getLineColor_Active());
-         graphDefinition.setTextColor_New(graphDefinition.getTextColor_Active());
+
+         graphDefinition.setLineColor_New_Light(graphDefinition.getLineColor_Active_Light());
+         graphDefinition.setLineColor_New_Dark(graphDefinition.getLineColor_Active_Dark());
+
+         graphDefinition.setTextColor_New_Light(graphDefinition.getTextColor_Active_Light());
+         graphDefinition.setTextColor_New_Dark(graphDefinition.getTextColor_Active_Dark());
 
          graphDefinition.setMap2Color_New(graphDefinition.getMap2Color_Active());
       }

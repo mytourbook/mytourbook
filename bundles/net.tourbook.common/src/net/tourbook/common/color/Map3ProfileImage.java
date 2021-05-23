@@ -133,13 +133,9 @@ public class Map3ProfileImage extends ProfileImage implements Cloneable {
             transform.setElements(1, 0, 0, 1, dx, dy);
          }
 
-         final Color fgColor = ColorUtil.getContrastColor(display, red & 0xFF, green & 0xFF, blue & 0xFF);
-         {
-            gc.setTransform(transform);
-            gc.setForeground(fgColor);
-            gc.drawText(net.tourbook.common.UI.EMPTY_STRING + elev, 0, 0, true);
-         }
-         fgColor.dispose();
+         gc.setTransform(transform);
+         gc.setForeground(ColorUtil.getContrastColor(red & 0xFF, green & 0xFF, blue & 0xFF));
+         gc.drawText(net.tourbook.common.UI.EMPTY_STRING + elev, 0, 0, true);
       }
       transform.dispose();
 
