@@ -405,9 +405,9 @@
          name="%preference_page_tour_type_root"
       />
          <page
-            name="%preference_page_tour_types"
-            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
-            class="net.tourbook.preferences.PrefPageTourTypes"
+            name        ="%Pref_Page_TourType_Colors"
+            id          ="net.tourbook.preferences.PrefPageTourTypeDefinition"
+            class       ="net.tourbook.preferences.PrefPageTourTypes"
             category    ="net.tourbook.preferences.PrefPageTourTypeFilter"
          />
 

@@ -140,30 +140,99 @@ public class GraphColorManager {
       MAP_COLOR_ELEVATION = new Map2ColorProfile(
 
             new ColorValue[] {
-                  new ColorValue(10, 0xEC, 0x20, 0x20),
-                  new ColorValue(50, 255, 85, 13),
-                  new ColorValue(100, 255, 255, 0),
-                  new ColorValue(150, 0, 170, 9),
-                  new ColorValue(190, 23, 163, 255) },
+                  new ColorValue(10, 210, 53, 0),
+                  new ColorValue(50, 255, 64, 0),
+                  new ColorValue(100, 255, 255, 4),
+                  new ColorValue(150, 0, 191, 255),
+                  new ColorValue(190, 0, 99, 132)
+            },
 
             MapColorProfile.BRIGHTNESS_DIMMING,
-            38,
+            0,
+            MapColorProfile.BRIGHTNESS_DEFAULT,
+            5);
+
+      MAP_COLOR_PULSE = new Map2ColorProfile(
+
+            new ColorValue[] {
+
+                  new ColorValue(10, 0, 203, 0),
+                  new ColorValue(50, 57, 255, 0),
+                  new ColorValue(100, 255, 230, 51),
+                  new ColorValue(150, 255, 108, 0),
+                  new ColorValue(190, 255, 0, 0)
+            },
+
+            MapColorProfile.BRIGHTNESS_DIMMING,
+            12,
             MapColorProfile.BRIGHTNESS_LIGHTNING,
-            39);
+            52,
+
+            // overwrite min/max values
+            true,
+            100,
+            true,
+            150);
+
+      MAP_COLOR_SPEED = new Map2ColorProfile(
+
+            new ColorValue[] {
+
+                  new ColorValue(10, 255, 255, 255),
+                  new ColorValue(50, 242, 255, 0),
+                  new ColorValue(100, 174, 225, 0),
+                  new ColorValue(150, 0, 128, 255),
+                  new ColorValue(190, 0, 98, 196)
+            },
+
+            MapColorProfile.BRIGHTNESS_DEFAULT,
+            8,
+            MapColorProfile.BRIGHTNESS_DIMMING,
+            48,
+
+            // overwrite min/max values
+            true,
+            0,
+            true,
+            50);
+
+      MAP_COLOR_PACE = new Map2ColorProfile(
+
+            new ColorValue[] {
+
+                  new ColorValue(10, 255, 0, 0),
+                  new ColorValue(50, 255, 255, 0),
+                  new ColorValue(100, 0, 169, 0),
+                  new ColorValue(150, 0, 255, 255),
+                  new ColorValue(190, 0, 0, 255)
+            },
+
+            MapColorProfile.BRIGHTNESS_DIMMING,
+            17,
+            MapColorProfile.BRIGHTNESS_DIMMING,
+            8,
+
+            // overwrite min/max values
+            false,
+            4,
+            true,
+            6);
 
       MAP_COLOR_GRADIENT = new Map2ColorProfile(
 
             new ColorValue[] {
-                  new ColorValue(10, 0, 0, 255),
-                  new ColorValue(50, 0, 255, 255),
-                  new ColorValue(100, 0, 237, 0),
-                  new ColorValue(150, 255, 255, 0),
-                  new ColorValue(190, 255, 0, 0) },
+
+                  new ColorValue(10, 0, 111, 0),
+                  new ColorValue(50, 0, 255, 0),
+                  new ColorValue(100, 255, 255, 255),
+                  new ColorValue(150, 255, 57, 0),
+                  new ColorValue(190, 183, 41, 0)
+            },
 
             MapColorProfile.BRIGHTNESS_DIMMING,
-            23,
+            19,
             MapColorProfile.BRIGHTNESS_DIMMING,
-            10,
+            12,
 
             // overwrite min/max values
             true,
@@ -171,56 +240,16 @@ public class GraphColorManager {
             true,
             10);
 
-      MAP_COLOR_PACE = new Map2ColorProfile(
-
-            new ColorValue[] {
-                  new ColorValue(10, 255, 0, 0),
-                  new ColorValue(50, 255, 255, 0),
-                  new ColorValue(100, 0, 169, 0),
-                  new ColorValue(150, 0, 255, 255),
-                  new ColorValue(190, 0, 0, 255) },
-
-            MapColorProfile.BRIGHTNESS_DIMMING,
-            17,
-            MapColorProfile.BRIGHTNESS_DIMMING,
-            8);
-
-      MAP_COLOR_PULSE = new Map2ColorProfile(
-
-            new ColorValue[] {
-                  new ColorValue(10, 0, 203, 0),
-                  new ColorValue(50, 57, 255, 0),
-                  new ColorValue(100, 255, 255, 0),
-                  new ColorValue(150, 255, 0, 0),
-                  new ColorValue(190, 255, 0, 247) },
-
-            MapColorProfile.BRIGHTNESS_DIMMING,
-            11,
-            MapColorProfile.BRIGHTNESS_DIMMING,
-            10);
-
-      MAP_COLOR_SPEED = new Map2ColorProfile(
-
-            new ColorValue[] {
-                  new ColorValue(10, 0, 0, 255),
-                  new ColorValue(50, 0, 255, 255),
-                  new ColorValue(100, 0, 169, 0),
-                  new ColorValue(150, 255, 255, 0),
-                  new ColorValue(190, 255, 0, 0) },
-
-            MapColorProfile.BRIGHTNESS_DIMMING,
-            17,
-            MapColorProfile.BRIGHTNESS_DIMMING,
-            8);
-
       MAP_COLOR_RUN_DYN_STEP_LENGTH = new Map2ColorProfile(
 
             new ColorValue[] {
+
                   new ColorValue(10, 140, 0, 255),
-                  new ColorValue(50, 215, 65, 0),
+                  new ColorValue(50, 215, 0, 134),
                   new ColorValue(100, 255, 77, 0),
-                  new ColorValue(150, 255, 115, 55),
-                  new ColorValue(190, 255, 236, 0) },
+                  new ColorValue(150, 255, 160, 55),
+                  new ColorValue(190, 255, 236, 0)
+            },
 
             MapColorProfile.BRIGHTNESS_DIMMING,
             20,
@@ -318,10 +347,12 @@ public class GraphColorManager {
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTIMETER,
             Messages.Graph_Label_Altimeter,
-            new RGB(255, 255, 255),
-            new RGB(255, 180, 0),
-            new RGB(249, 174, 0),
-            new RGB(144, 103, 0),
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0xff, 0xb4, 0x0),
+            new RGB(0xf9, 0xae, 0x0),
+            new RGB(0xf9, 0xae, 0x0),
+            new RGB(0x90, 0x67, 0x0),
+            new RGB(0x0, 0xce, 0x9f),
             null));
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_CADENCE,

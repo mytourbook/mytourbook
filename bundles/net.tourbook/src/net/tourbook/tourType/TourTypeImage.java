@@ -407,9 +407,9 @@ public class TourTypeImage {
 
       } else {
 
-         final RGB rgbBright = colorTourType.getRGBBright();
-         final RGB rgbDark = colorTourType.getRGBDark();
-         final RGB rgbLine = colorTourType.getRGBLine();
+         final RGB rgbBright = colorTourType.getRGB_Gradient_Bright();
+         final RGB rgbDark = colorTourType.getRGB_Gradient_Dark();
+         final RGB rgbLine = colorTourType.getRGB_Line_Light();
 
          drawingColors.colorBright = new java.awt.Color(rgbBright.red, rgbBright.green, rgbBright.blue);
          drawingColors.colorDark = new java.awt.Color(rgbDark.red, rgbDark.green, rgbDark.blue);

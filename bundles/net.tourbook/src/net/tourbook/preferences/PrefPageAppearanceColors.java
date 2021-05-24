@@ -22,6 +22,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.ColorValue;
@@ -35,7 +36,6 @@ import net.tourbook.common.color.MapUnits;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -107,8 +107,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          Messages.Pref_ChartColors_unit_high,
          Messages.Pref_ChartColors_unit_max);
 
-   private final IPreferenceStore    _prefStore             = TourbookPlugin.getDefault().getPreferenceStore();
-   private final IPreferenceStore    _commonPrefStore       = CommonActivator.getPrefStore();
+   private final IPreferenceStore    _prefStore             = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore    _prefStore_Common      = CommonActivator.getPrefStore();
 
    TreeViewer                        _colorViewer;
 
@@ -117,6 +117,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    private ColorDefinition           _expandedItem;
    private boolean                   _isNavigationKeyPressed;
+   private boolean                   _isInTreeExpand;
 
    private IGradientColorProvider    _legendImageColorProvider;
    private DialogMap2ColorEditor     _dialogMappingColor;
@@ -293,19 +294,19 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    private void createUI_10_ColorViewer(final Composite parent) {
 
       /*
-       * create tree layout
+       * Create tree layout
        */
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(400, 100)
+            .hint(400, 650)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
       layoutContainer.setLayout(treeLayout);
 
       /*
-       * create viewer
+       * Create viewer
        */
       final Tree tree = new Tree(layoutContainer,
             SWT.H_SCROLL
@@ -341,6 +342,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       });
 
       _colorViewer.addSelectionChangedListener(selectionChangedEvent -> {
+
+         if (_isInTreeExpand) {
+
+            // prevent: !MESSAGE Ignored reentrant call while viewer is busy. This is only logged once per viewer instance, but similar calls will still be ignored.
+
+            return;
+         }
 
          final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
 
@@ -420,15 +428,18 @@ public class PrefPageAppearanceColors extends PreferencePage implements
                final ColorDefinition treeItem = (ColorDefinition) element;
 
                if (_expandedItem != null) {
-                  _colorViewer.collapseToLevel(_expandedItem, 1);
+
+                  _isInTreeExpand = true;
+                  {
+                     _colorViewer.collapseToLevel(_expandedItem, 1);
+                  }
+                  _isInTreeExpand = false;
                }
 
-               Display.getCurrent().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     _colorViewer.expandToLevel(treeItem, 1);
-                     _expandedItem = treeItem;
-                  }
+               _colorViewer.getTree().getDisplay().asyncExec(() -> {
+
+                  _colorViewer.expandToLevel(treeItem, 1);
+                  _expandedItem = treeItem;
                });
             }
          }
@@ -597,7 +608,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    @Override
    public void init(final IWorkbench workbench) {
-      setPreferenceStore(_commonPrefStore);
+      setPreferenceStore(_prefStore_Common);
    }
 
    /**
@@ -623,6 +634,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       final RGB oldValue = (RGB) event.getOldValue();
       final RGB newValue = (RGB) event.getNewValue();
 
+      ColorDefinition colorDefinition = null;
+
       if (!oldValue.equals(newValue) && _selectedColor != null) {
 
          // color has changed
@@ -630,12 +643,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          // update the data model
          _selectedColor.setRGB(newValue);
 
-         final ColorDefinition colorDefinition = _selectedColor.getColorDefinition();
+         colorDefinition = _selectedColor.getColorDefinition();
 
          /*
           * dispose the old color/image from the graph
           */
-         _graphColorPainter.invalidateResources(//
+         _graphColorPainter.invalidateResources(
                _selectedColor.getColorId(),
                colorDefinition.getColorDefinitionId());
 
@@ -646,9 +659,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          _colorViewer.update(colorDefinition, null);
 
          _isColorChanged = true;
+      }
 
-         // log changes that it is easier to adjust the defaults, this case will propaly happen not very often
-         System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
+      // log changes that it is easier to adjust the defaults, this case will propably happen not very often
+      if (colorDefinition != null) {
+
+         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
                + ("\t: " + colorDefinition)); //$NON-NLS-1$
       }
    }
@@ -804,9 +820,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       MapColorProvider.updateMap2Colors();
 
       // force to change the status
-      TourbookPlugin.getDefault()
-            .getPreferenceStore()
-            .setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+      _prefStore.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
    }
 
    private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition,
@@ -818,7 +832,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       /*
        * dispose old color and image for the graph
        */
-      _graphColorPainter.invalidateResources(//
+      _graphColorPainter.invalidateResources(
             _selectedColor.getColorId(),
             selectedColorDefinition.getColorDefinitionId());
 

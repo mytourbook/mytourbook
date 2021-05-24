@@ -52,7 +52,10 @@ public class ColorValue implements Cloneable {
 
    @Override
    public String toString() {
-      return "ColorValue(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+
+      final int valueText = Math.round(value);
+
+      return "new ColorValue(" + valueText + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
    }
 
 }

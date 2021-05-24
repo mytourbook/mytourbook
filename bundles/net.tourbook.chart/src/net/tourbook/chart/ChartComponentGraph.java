@@ -2507,7 +2507,7 @@ public class ChartComponentGraph extends Canvas {
 
       final int devYTop = drawingData.getDevYTop() - labelHeight;
 
-      final Color colorText = new Color(yData.getDefaultRGB());
+      final Color colorText = new Color(yData.getRgbText()[0]);
       gcGraph.setForeground(colorText);
       gcGraph.drawString(graphTitle, 0, devYTop, true);
    }

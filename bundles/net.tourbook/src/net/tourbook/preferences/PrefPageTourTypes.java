@@ -82,7 +82,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -240,6 +239,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
          return label;
       }
 
+      initUI(parent);
+
       final Composite ui = createUI(parent);
 
       fillUI();
@@ -269,10 +270,14 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                   tourType,
                   colorName,
                   tourType.getName(),
-                  tourType.getRGBBright(),
-                  tourType.getRGBDark(),
-                  tourType.getRGBLine(),
-                  tourType.getRGBText());
+                  tourType.getRGB_Gradient_Bright(),
+                  tourType.getRGB_Gradient_Dark(),
+                  tourType.getRGB_Line_Light(),
+                  tourType.getRGB_Line_Dark(),
+                  tourType.getRGB_Text_Light(),
+                  tourType.getRGB_Text_Dark()
+
+            );
 
             _colorDefinitions.add(colorDefinition);
 
@@ -346,7 +351,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 100)
+            .hint(400, 600)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -499,9 +504,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
              * Color selector
              */
             _colorSelector = new ColorSelector(container);
-            _colorSelector.getButton().setLayoutData(new GridData());
-            _colorSelector.setEnabled(false);
-            _colorSelector.addListener(this::onModifyGraphColor);
+            _colorSelector.addListener(this::onTourType_Modify);
             setButtonLayoutData(_colorSelector.getButton());
          }
          {
@@ -716,7 +719,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnWeightData(2, true));
+      treeLayout.setColumnData(tc, new ColumnWeightData(3, true));
    }
 
    /**
@@ -1097,6 +1100,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
    }
 
+   private void initUI(final Composite parent) {
+
+   }
+
    @Override
    public boolean okToLeave() {
 
@@ -1106,70 +1113,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       }
 
       return super.okToLeave();
-   }
-
-   /**
-    * This is called when the color in the color selector is modified
-    *
-    * @param event
-    */
-   private void onModifyGraphColor(final PropertyChangeEvent event) {
-
-      final RGB oldRGB = (RGB) event.getOldValue();
-      final RGB newRGB = (RGB) event.getNewValue();
-
-      if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
-         return;
-      }
-
-      // color has changed
-
-      // update model
-      _selectedGraphColor.setRGB(newRGB);
-
-      final TourTypeColorDefinition selectedColorDef = (TourTypeColorDefinition) _selectedGraphColor.getColorDefinition();
-
-      /*
-       * update tour type in the db
-       */
-      final TourType oldTourType = selectedColorDef.getTourType();
-
-      oldTourType.setColorBright(selectedColorDef.getGradientBright_New());
-      oldTourType.setColorDark(selectedColorDef.getGradientDark_New());
-
-      oldTourType.setColorLine(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
-      oldTourType.setColorText(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
-
-      final TourType savedTourType = saveTourType(oldTourType);
-
-      selectedColorDef.setTourType(savedTourType);
-
-      // replace tour type with new one
-      _dbTourTypes.remove(oldTourType);
-      _dbTourTypes.add(savedTourType);
-      Collections.sort(_dbTourTypes);
-
-      /*
-       * Update UI
-       */
-      // invalidate old color/image from the graph and color definition to force the recreation
-      _graphColorPainter.invalidateResources(
-            _selectedGraphColor.getColorId(),
-            selectedColorDef.getColorDefinitionId());
-
-      // update UI
-      TourTypeImage.setTourTypeImagesDirty();
-
-      /*
-       * update the tree viewer, the color images will be recreated in the label provider
-       */
-      _tourTypeViewer.update(_selectedGraphColor, null);
-      _tourTypeViewer.update(selectedColorDef, null);
-
-      // without a repaint the color def image is not updated
-      _tourTypeViewer.getTree().redraw();
-
-      _isModified = true;
    }
 
    /**
@@ -1374,6 +1317,70 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       });
 
       setFocusToViewer();
+   }
+
+   /**
+    * This is called when the color in the color selector is modified
+    *
+    * @param event
+    */
+   private void onTourType_Modify(final PropertyChangeEvent event) {
+
+      final RGB oldRGB = (RGB) event.getOldValue();
+      final RGB newRGB = (RGB) event.getNewValue();
+
+      if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
+         return;
+      }
+
+      // color has changed
+
+      // update model
+      _selectedGraphColor.setRGB(newRGB);
+
+      final TourTypeColorDefinition selectedColorDef = (TourTypeColorDefinition) _selectedGraphColor.getColorDefinition();
+
+      /*
+       * update tour type in the db
+       */
+      final TourType oldTourType = selectedColorDef.getTourType();
+
+      oldTourType.setColorBright(selectedColorDef.getGradientBright_New());
+      oldTourType.setColorDark(selectedColorDef.getGradientDark_New());
+
+      oldTourType.setColorLine(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
+      oldTourType.setColorText(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
+
+      final TourType savedTourType = saveTourType(oldTourType);
+
+      selectedColorDef.setTourType(savedTourType);
+
+      // replace tour type with new one
+      _dbTourTypes.remove(oldTourType);
+      _dbTourTypes.add(savedTourType);
+      Collections.sort(_dbTourTypes);
+
+      /*
+       * Update UI
+       */
+      // invalidate old color/image from the graph and color definition to force the recreation
+      _graphColorPainter.invalidateResources(
+            _selectedGraphColor.getColorId(),
+            selectedColorDef.getColorDefinitionId());
+
+      // update UI
+      TourTypeImage.setTourTypeImagesDirty();
+
+      /*
+       * update the tree viewer, the color images will be recreated in the label provider
+       */
+      _tourTypeViewer.update(_selectedGraphColor, null);
+      _tourTypeViewer.update(selectedColorDef, null);
+
+      // without a repaint the color def image is not updated
+      _tourTypeViewer.getTree().redraw();
+
+      _isModified = true;
    }
 
    private void onTourType_Rename() {

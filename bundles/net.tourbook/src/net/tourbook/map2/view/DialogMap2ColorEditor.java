@@ -36,8 +36,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -69,7 +68,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private final IGradientColorProvider _colorProvider;
    private Map2ColorProfile             _mapColorWorkingCopy;
 
-   private final SelectionAdapter       _defaultSelectionAdapter;
+   private SelectionListener            _defaultSelectionAdapter;
 
    private ColorDefinition              _colorDefinition;
 
@@ -109,16 +108,6 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private ColorSelector _colorSelectorLow;
    private ColorSelector _colorSelectorMin;
 
-   {
-      _defaultSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            updateModelFromUI();
-            doLiveUpdate();
-         }
-      };
-   }
-
    public DialogMap2ColorEditor(final Shell parentShell,
                                 final IGradientColorProvider colorProvider,
                                 final IMap2ColorUpdater mapColorUpdater) {
@@ -136,6 +125,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    public boolean close() {
 
       saveState();
+      logColorValues();
 
       return super.close();
    }
@@ -185,15 +175,17 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
+      final Composite uiContainer = (Composite) super.createDialogArea(parent);
 
-      createUI(dlgAreaContainer);
+      initUI();
+
+      createUI(uiContainer);
 
       restoreState();
 
       enableControls();
 
-      return dlgAreaContainer;
+      return uiContainer;
    }
 
    /**
@@ -523,7 +515,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
          _chkLiveUpdate.setText(Messages.LegendColor_Dialog_Check_LiveUpdate);
          _chkLiveUpdate.setToolTipText(Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip);
          _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               enableControls();
+            enableControls();
          }));
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
 
@@ -533,7 +525,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
          _btnApply = new Button(container, SWT.NONE);
          _btnApply.setText(Messages.App_Action_Apply);
          _btnApply.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               _mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
+            _mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
          }));
          setButtonLayoutData(_btnApply);
       }
@@ -585,6 +577,20 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
       // keep window size and position
       return _state;
+   }
+
+   private void initUI() {
+
+      _defaultSelectionAdapter = widgetSelectedAdapter(selectionEvent -> {
+         updateModelFromUI();
+         doLiveUpdate();
+      });
+   }
+
+   private void logColorValues() {
+
+      // log changes that it is easier to adjust the defaults, this case will propably happen not very often
+      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]") + _mapColorWorkingCopy); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    private void onSelectColor(final ColorSelector colorSelector, final int valueColorIndex) {
@@ -642,21 +648,21 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
       // update color selector
 
-      final ColorValue[] colorValues = _mapColorWorkingCopy.getColorValues();
+      final ColorValue[] allColorValues = _mapColorWorkingCopy.getColorValues();
 
-      ColorValue colorValue = colorValues[4];
+      ColorValue colorValue = allColorValues[4];
       _colorSelectorMax.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[3];
+      colorValue = allColorValues[3];
       _colorSelectorHigh.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[2];
+      colorValue = allColorValues[2];
       _colorSelectorMid.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[1];
+      colorValue = allColorValues[1];
       _colorSelectorLow.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[0];
+      colorValue = allColorValues[0];
       _colorSelectorMin.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
       _mapColorWorkingCopy.setMinBrightness(_cboMinBrightness.getSelectionIndex());

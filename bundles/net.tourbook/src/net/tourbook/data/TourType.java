@@ -22,6 +22,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.database.TourDatabase;
 
@@ -167,22 +168,42 @@ public class TourType implements Comparable<Object> {
       return name;
    }
 
-   public RGB getRGBBright() {
-
+   public RGB getRGB_Gradient_Bright() {
       return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
    }
 
-   public RGB getRGBDark() {
-
+   public RGB getRGB_Gradient_Dark() {
       return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
    }
 
-   public RGB getRGBLine() {
+   public RGB getRGB_Line_Dark() {
+      return ColorUtil.createRGB(colorLine_Dark);
+   }
+
+   public RGB getRGB_Line_Light() {
       return new RGB(colorLineRed, colorLineGreen, colorLineBlue);
    }
 
-   public RGB getRGBText() {
+   public RGB getRGB_Line_Themed() {
+
+      return UI.IS_DARK_THEME
+            ? getRGB_Line_Dark()
+            : getRGB_Line_Light();
+   }
+
+   public RGB getRGB_Text_Dark() {
+      return ColorUtil.createRGB(colorText_Dark);
+   }
+
+   public RGB getRGB_Text_Light() {
       return new RGB(colorTextRed, colorTextGreen, colorTextBlue);
+   }
+
+   public RGB getRGB_Text_Themed() {
+
+      return UI.IS_DARK_THEME
+            ? getRGB_Text_Dark()
+            : getRGB_Text_Light();
    }
 
    /**

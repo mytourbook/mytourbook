@@ -33,6 +33,21 @@ public class ColorUtil {
    }
 
    /**
+    * Splits an integer color values in it's red, green and blue components.
+    *
+    * @param rgbValue
+    * @return Returns a {@link RGB} from an integer color value
+    */
+   public static RGB createRGB(final int rgbValue) {
+
+      final int red = (rgbValue & 0xFF0000) >>> 16;
+      final int green = (rgbValue & 0xFF00) >>> 8;
+      final int blue = (rgbValue & 0xFF) >>> 0;
+
+      return new RGB(red, green, blue);
+   }
+
+   /**
     * @param color
     * @param alpha
     *           0xff is opaque, 0 is transparent
@@ -40,7 +55,7 @@ public class ColorUtil {
     */
    public static int getARGB(final RGB color, final int alpha) {
 
-      final int graphColor = ((color.blue & 0xFF) << 0) //
+      final int graphColor = ((color.blue & 0xFF) << 0)
             | ((color.green & 0xFF) << 8)
             | ((color.red & 0xFF) << 16)
             | ((alpha) << 24);
@@ -155,21 +170,6 @@ public class ColorUtil {
    public static RGB getContrastRGB(final RGB rgb) {
 
       return getContrastRGB(rgb.red, rgb.green, rgb.blue);
-   }
-
-   /**
-    * Splits an integer color values in it's reg, green, blue components.
-    *
-    * @param rgbValue
-    * @return Returns a {@link RGB} from an integer color value
-    */
-   public static RGB getRGB(final int rgbValue) {
-
-      final byte red = (byte) ((rgbValue & 0xFF) >> 0);
-      final byte green = (byte) ((rgbValue & 0xFF00) >> 8);
-      final byte blue = (byte) ((rgbValue & 0xFF0000) >> 16);
-
-      return new RGB(red, green, blue);
    }
 
    /**

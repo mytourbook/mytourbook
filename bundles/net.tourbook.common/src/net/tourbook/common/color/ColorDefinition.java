@@ -107,17 +107,14 @@ public class ColorDefinition {
     * @param colorDefinitionId
     *           Unique id
     * @param visibleName
-    *           visible name
     * @param defaultGradientBright
-    *           default bright gradient color
     * @param defaultGradientDark
-    *           default dark gradient color
     * @param defaultLineColor_Light
-    *           default line color
+    * @param defaultLineColor_Dark
     * @param defaultTextColor_Light
-    *           default text color
+    * @param defaultTextColor_Dark
     * @param defaultMapColorProfile
-    *           Map color configuration or <code>null</code> when not available.
+    *           Map color configuration or <code>null</code> when not available
     */
    protected ColorDefinition(final String colorDefinitionId,
                              final String visibleName,
@@ -451,7 +448,7 @@ public class ColorDefinition {
 
       return "\nColorDefinition   \n" //$NON-NLS-1$
 
-            + "_colorDefinitionId         =" + _colorDefinitionId       + NL //$NON-NLS-1$
+            + "_colorDefinitionId = " + _colorDefinitionId       + NL //$NON-NLS-1$
 //            + "_visibleName               =" + _visibleName             + NL //$NON-NLS-1$ //$NON-NLS-2$
 //            + "_graphPrefNamePrefix         =" + _graphPrefNamePrefix       + NL //$NON-NLS-1$ //$NON-NLS-2$
 //            + "_graphColorItems            =" + Arrays.toString(_graphColorItems) + NL //$NON-NLS-1$ //$NON-NLS-2$
