@@ -17,7 +17,6 @@ package net.tourbook.common.color;
 
 import java.awt.Color;
 
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.RGB;
 
 public class ColorUtil {
@@ -64,13 +63,13 @@ public class ColorUtil {
             (int) (blue * darker));
    }
 
-   public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final int rgbValue) {
+   public static org.eclipse.swt.graphics.Color getContrastColor(final int rgbValue) {
 
       final byte blue = (byte) ((rgbValue & 0xFF0000) >> 16);
       final byte green = (byte) ((rgbValue & 0xFF00) >> 8);
       final byte red = (byte) ((rgbValue & 0xFF) >> 0);
 
-      return getContrastColor(device, red & 0xFF, green & 0xFF, blue & 0xFF);
+      return getContrastColor(red & 0xFF, green & 0xFF, blue & 0xFF);
    }
 
    /**
@@ -81,23 +80,22 @@ public class ColorUtil {
     * @param blue
     * @return Returns white or black that contrasts with the background color.
     */
-   public static org.eclipse.swt.graphics.Color getContrastColor(final Device display,
-                                                                 final int red,
+   public static org.eclipse.swt.graphics.Color getContrastColor(final int red,
                                                                  final int green,
                                                                  final int blue) {
 
       final int yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
 
       if (yiq >= 128) {
-         return new org.eclipse.swt.graphics.Color(display, 0, 0, 0);
+         return new org.eclipse.swt.graphics.Color(0, 0, 0);
       } else {
-         return new org.eclipse.swt.graphics.Color(display, 0xff, 0xff, 0xff);
+         return new org.eclipse.swt.graphics.Color(0xff, 0xff, 0xff);
       }
    }
 
-   public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final RGB rgb) {
+   public static org.eclipse.swt.graphics.Color getContrastColor(final RGB rgb) {
 
-      return getContrastColor(device, rgb.red, rgb.green, rgb.blue);
+      return getContrastColor(rgb.red, rgb.green, rgb.blue);
    }
 
    /**

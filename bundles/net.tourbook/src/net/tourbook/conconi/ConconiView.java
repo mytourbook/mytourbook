@@ -338,9 +338,9 @@ public class ConconiView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE_LIGHT);
+      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       final double[][] powerSerie = new double[validDataLength][];
       final double[][] pulseSerie = new double[validDataLength][];

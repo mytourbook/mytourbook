@@ -806,8 +806,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
-      _photoOverlayBGColorLink = new Color(colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor_Active());
-      _photoOverlayBGColorTour = new Color(colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor_Active());
+      _photoOverlayBGColorLink = new Color(colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor_Active_Themed());
+      _photoOverlayBGColorTour = new Color(colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor_Active_Themed());
 
       _imagePhoto = TourbookPlugin.getThemedImageDescriptor(Images.PhotoPhotos);
       _imagePhotoTooltip = TourbookPlugin.getThemedImageDescriptor(Images.PhotoImage);

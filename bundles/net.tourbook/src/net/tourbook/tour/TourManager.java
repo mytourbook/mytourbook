@@ -1486,11 +1486,11 @@ public class TourManager {
     * @param graphName
     * @param colorProfileName
     *           Can be any of <br>
-    *           {@link GraphColorManager#PREF_COLOR_BRIGHT},<br>
-    *           {@link GraphColorManager#PREF_COLOR_DARK}<br>
-    *           {@link GraphColorManager#PREF_COLOR_LINE}<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_BRIGHT},<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_DARK}<br>
+    *           {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}<br>
     *           {@link GraphColorManager#PREF_COLOR_MAPPING}<br>
-    *           {@link GraphColorManager#PREF_COLOR_TEXT}.
+    *           {@link GraphColorManager#PREF_COLOR_TEXT_LIGHT}.
     * @return
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
@@ -2771,10 +2771,18 @@ public class TourManager {
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
-      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final String prefColorLine = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final String prefColorText = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorLine);
+      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorText);
+      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

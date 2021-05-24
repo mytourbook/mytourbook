@@ -410,9 +410,9 @@ public class HeartRateVariabilityView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE_LIGHT);
+      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       final double[][] rr0Series = new double[validDataLength][];
       final float[][] rr1Series = new float[validDataLength][];

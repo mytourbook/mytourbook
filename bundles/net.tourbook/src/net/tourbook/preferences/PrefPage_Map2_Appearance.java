@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -349,11 +350,12 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
          int lineCount = Util.countCharacter(infoText, '\n');
 
          _pageSimple = new StyledText(_pageBookPaintMethod, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageSimple);
          _pageSimple.setText(infoText);
-         _pageSimple.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+         _pageSimple.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         _pageSimple.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
          _pageSimple.setLineBullet(0, lineCount + 1, bullet);
          _pageSimple.setLineWrapIndent(0, lineCount + 1, 10);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageSimple);
 
          /*
           * complex painting method
@@ -362,11 +364,12 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
          lineCount = Util.countCharacter(infoText, '\n');
 
          _pageComplex = new StyledText(_pageBookPaintMethod, SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageComplex);
          _pageComplex.setText(infoText);
-         _pageComplex.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+         _pageComplex.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         _pageComplex.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
          _pageComplex.setLineBullet(0, lineCount + 1, bullet);
          _pageComplex.setLineWrapIndent(0, lineCount + 1, 10);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageComplex);
       }
 
       // set group margin after the fields are created
