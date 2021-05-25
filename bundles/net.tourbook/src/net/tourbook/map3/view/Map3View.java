@@ -1106,15 +1106,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          }
       });
 
-//		_mapContainer.addControlListener(new ControlAdapter() {
-//
-//			@Override
-//			public void controlResized(final ControlEvent e) {
-//				Map3Manager.getTourLegendLayer().resizeLegendImage();
-//			}
-//
-//		});
-
       parent.layout();
    }
 
@@ -1625,9 +1616,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tonAWTMouseClick");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
       final boolean isRightClick = SwingUtilities.isRightMouseButton(mouseEvent);
       if (isRightClick) {
 
@@ -2077,14 +2065,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    }
 
    public void setTourInfo(final ITrackPath hoveredTrackPath, final Integer hoveredPositionIndex) {
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]")
-//				+ ("\thoveredPositionIndex: " + hoveredPositionIndex)
-//				+ ("\t_currentHoveredTrackPosition: " + _currentHoveredTrackPosition)
-//				+ ("\thoveredTrackPath: " + hoveredTrackPath)
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
       if (hoveredTrackPath == null) {
 

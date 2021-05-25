@@ -47,6 +47,7 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -1485,11 +1486,11 @@ public class TourManager {
     * @param graphName
     * @param colorProfileName
     *           Can be any of <br>
-    *           {@link GraphColorManager#PREF_COLOR_BRIGHT},<br>
-    *           {@link GraphColorManager#PREF_COLOR_DARK}<br>
-    *           {@link GraphColorManager#PREF_COLOR_LINE}<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_BRIGHT},<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_DARK}<br>
+    *           {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}<br>
     *           {@link GraphColorManager#PREF_COLOR_MAPPING}<br>
-    *           {@link GraphColorManager#PREF_COLOR_TEXT}.
+    *           {@link GraphColorManager#PREF_COLOR_TEXT_LIGHT}.
     * @return
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
@@ -2770,10 +2771,18 @@ public class TourManager {
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
-      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final String prefColorLine = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final String prefColorText = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorLine);
+      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorText);
+      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3568,6 +3577,8 @@ public class TourManager {
 
       computeValueClipping(tourData);
 
+      final RGB defaultRGB = ThemeUtil.getDefaultForegroundColor_Table().getRGB();
+
       /*
        * Distance
        */
@@ -3578,7 +3589,7 @@ public class TourManager {
          xDataDist.setLabel(Messages.tour_editor_label_distance);
          xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
          xDataDist.setValueDivisor(1000);
-         xDataDist.setDefaultRGB(new RGB(0, 0, 0));
+         xDataDist.setDefaultRGB(defaultRGB);
 
          // do not show average values but show the other values with 3 digits
          xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
@@ -3590,7 +3601,7 @@ public class TourManager {
       final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
-      xDataTime.setDefaultRGB(new RGB(0, 0, 0));
+      xDataTime.setDefaultRGB(defaultRGB);
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*

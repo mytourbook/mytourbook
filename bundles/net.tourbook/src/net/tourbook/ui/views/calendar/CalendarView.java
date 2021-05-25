@@ -94,7 +94,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private boolean                 _stateIsLinked;
    private boolean                 _stateIsShowTourInfo;
 
-   ColorDefinition[]               _allColorDefinition             = GraphColorManager.getInstance().getGraphColorDefinitions();
+   ColorDefinition[]               _allColorDefinition             = GraphColorManager.getAllColorDefinitions();
 
    private ISelectionListener      _selectionListener;
    private IPartListener2          _partListener;

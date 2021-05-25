@@ -163,10 +163,6 @@ public class Images {
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
-   public static final String MarkerFilter_WithGPS                       = "marker-filter-with-gps.png";                          //$NON-NLS-1$
-   public static final String MarkerFilter_WithGPS_Disabled              = "marker-filter-with-gps-disabled.png";                 //$NON-NLS-1$
-   public static final String MarkerFilter_WithoutGPS                    = "marker-filter-without-gps.png";                       //$NON-NLS-1$
-   public static final String MarkerFilter_WithoutGPS_Disabled           = "marker-filter-without-gps-disabled.png";              //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.png";                                     //$NON-NLS-1$
    public static final String MyTourbook16                               = "tourbook16.png";                                      //$NON-NLS-1$
    public static final String POI_Anchor                                 = "anchor.png";                                          //$NON-NLS-1$

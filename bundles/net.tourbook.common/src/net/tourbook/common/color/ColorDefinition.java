@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,8 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class ColorDefinition {
 
+   private static final char      NL               = UI.NEW_LINE;
+
    private final IPreferenceStore _commonPrefStore = CommonActivator.getPrefStore();
 
    private String                 _colorDefinitionId;
@@ -39,10 +41,6 @@ public class ColorDefinition {
     */
    private GraphColorItem[]       _graphColorItems;
 
-   private RGB                    _lineColor_Active;
-   private RGB                    _lineColor_Default;
-   private RGB                    _lineColor_New;
-
    private RGB                    _gradientBright_Active;
    private RGB                    _gradientBright_Default;
    private RGB                    _gradientBright_New;
@@ -51,9 +49,19 @@ public class ColorDefinition {
    private RGB                    _gradientDark_Default;
    private RGB                    _gradientDark_New;
 
-   private RGB                    _textColor_Active;
-   private RGB                    _textColor_Default;
-   private RGB                    _textColor_New;
+   private RGB                    _lineColor_Active_Light;
+   private RGB                    _lineColor_Active_Dark;
+   private RGB                    _lineColor_Default_Light;
+   private RGB                    _lineColor_Default_Dark;
+   private RGB                    _lineColor_New_Light;
+   private RGB                    _lineColor_New_Dark;
+
+   private RGB                    _textColor_Active_Light;
+   private RGB                    _textColor_Active_Dark;
+   private RGB                    _textColor_Default_Light;
+   private RGB                    _textColor_Default_Dark;
+   private RGB                    _textColor_New_Light;
+   private RGB                    _textColor_New_Dark;
 
    /*
     * One color definition contains different profiles which are used depending on the current
@@ -62,6 +70,36 @@ public class ColorDefinition {
    private Map2ColorProfile _map2ColorProfile_Active;
    private Map2ColorProfile _map2ColorProfile_Default;
    private Map2ColorProfile _map2ColorProfile_New;
+
+   protected ColorDefinition(final String colorDefinitionId,
+                             final String visibleName,
+
+                             final RGB defaultGradientBright,
+                             final RGB defaultGradientDark,
+
+                             final RGB defaultLineColor_Light,
+                             final RGB defaultTextColor_Light,
+
+                             final Map2ColorProfile defaultMapColorProfile) {
+
+      this(
+
+            colorDefinitionId,
+            visibleName,
+
+            defaultGradientBright,
+            defaultGradientDark,
+
+            defaultLineColor_Light,
+            defaultLineColor_Light,
+
+            defaultTextColor_Light,
+            defaultTextColor_Light,
+
+            defaultMapColorProfile
+
+      );
+   }
 
    /**
     * Sets the color for the default, current and changes
@@ -74,19 +112,25 @@ public class ColorDefinition {
     *           default bright gradient color
     * @param defaultGradientDark
     *           default dark gradient color
-    * @param defaultLineColor
+    * @param defaultLineColor_Light
     *           default line color
-    * @param defaultTextColor
+    * @param defaultTextColor_Light
     *           default text color
     * @param defaultMapColorProfile
     *           Map color configuration or <code>null</code> when not available.
     */
    protected ColorDefinition(final String colorDefinitionId,
                              final String visibleName,
+
                              final RGB defaultGradientBright,
                              final RGB defaultGradientDark,
-                             final RGB defaultLineColor,
-                             final RGB defaultTextColor,
+
+                             final RGB defaultLineColor_Light,
+                             final RGB defaultLineColor_Dark,
+
+                             final RGB defaultTextColor_Light,
+                             final RGB defaultTextColor_Dark,
+
                              final Map2ColorProfile defaultMapColorProfile) {
 
       _colorDefinitionId = colorDefinitionId;
@@ -94,17 +138,21 @@ public class ColorDefinition {
 
       _gradientBright_Default = defaultGradientBright;
       _gradientDark_Default = defaultGradientDark;
-      _lineColor_Default = defaultLineColor;
-      _textColor_Default = defaultTextColor;
+
+      _lineColor_Default_Light = defaultLineColor_Light;
+      _lineColor_Default_Dark = defaultLineColor_Dark;
+
+      _textColor_Default_Light = defaultTextColor_Light;
+      _textColor_Default_Dark = defaultTextColor_Dark;
 
       _map2ColorProfile_Default = defaultMapColorProfile;
 
       _graphPrefNamePrefix = ICommonPreferences.GRAPH_COLORS + _colorDefinitionId + UI.SYMBOL_DOT;
 
       /*
-       * set gradient bright from pref store or default
+       * Set gradient bright from pref store or default
        */
-      final String prefColorGradientBright = getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT);
+      final String prefColorGradientBright = getGraphPrefName(GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       if (_commonPrefStore.contains(prefColorGradientBright)) {
          _gradientBright_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientBright);
@@ -114,9 +162,9 @@ public class ColorDefinition {
       _gradientBright_New = _gradientBright_Active;
 
       /*
-       * gradient dark
+       * Gradient dark
        */
-      final String prefColorGradientDark = getGraphPrefName(GraphColorManager.PREF_COLOR_DARK);
+      final String prefColorGradientDark = getGraphPrefName(GraphColorManager.PREF_COLOR_GRADIENT_DARK);
 
       if (_commonPrefStore.contains(prefColorGradientDark)) {
          _gradientDark_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientDark);
@@ -126,28 +174,44 @@ public class ColorDefinition {
       _gradientDark_New = _gradientDark_Active;
 
       /*
-       * line color
+       * Line color
        */
-      final String prefColorLine = getGraphPrefName(GraphColorManager.PREF_COLOR_LINE);
+      final String prefColorLine_Light = getGraphPrefName(GraphColorManager.PREF_COLOR_LINE_LIGHT);
+      final String prefColorLine_Dark = getGraphPrefName(GraphColorManager.PREF_COLOR_LINE_DARK);
 
-      if (_commonPrefStore.contains(prefColorLine)) {
-         _lineColor_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorLine);
+      if (_commonPrefStore.contains(prefColorLine_Light)) {
+         _lineColor_Active_Light = PreferenceConverter.getColor(_commonPrefStore, prefColorLine_Light);
       } else {
-         _lineColor_Active = _lineColor_Default;
+         _lineColor_Active_Light = _lineColor_Default_Light;
       }
-      _lineColor_New = _lineColor_Active;
+      if (_commonPrefStore.contains(prefColorLine_Dark)) {
+         _lineColor_Active_Dark = PreferenceConverter.getColor(_commonPrefStore, prefColorLine_Dark);
+      } else {
+         _lineColor_Active_Dark = _lineColor_Default_Dark;
+      }
+
+      _lineColor_New_Light = _lineColor_Active_Light;
+      _lineColor_New_Dark = _lineColor_Active_Dark;
 
       /*
-       * text color
+       * Text color
        */
-      final String prefColorText = getGraphPrefName(GraphColorManager.PREF_COLOR_TEXT);
+      final String prefColorText_Light = getGraphPrefName(GraphColorManager.PREF_COLOR_TEXT_LIGHT);
+      final String prefColorText_Dark = getGraphPrefName(GraphColorManager.PREF_COLOR_TEXT_DARK);
 
-      if (_commonPrefStore.contains(prefColorText)) {
-         _textColor_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorText);
+      if (_commonPrefStore.contains(prefColorText_Light)) {
+         _textColor_Active_Light = PreferenceConverter.getColor(_commonPrefStore, prefColorText_Light);
       } else {
-         _textColor_Active = _textColor_Default;
+         _textColor_Active_Light = _textColor_Default_Light;
       }
-      _textColor_New = _textColor_Active;
+      if (_commonPrefStore.contains(prefColorText_Dark)) {
+         _textColor_Active_Dark = PreferenceConverter.getColor(_commonPrefStore, prefColorText_Dark);
+      } else {
+         _textColor_Active_Dark = _textColor_Default_Dark;
+      }
+
+      _textColor_New_Light = _textColor_Active_Light;
+      _textColor_New_Dark = _textColor_Active_Dark;
    }
 
    @Override
@@ -214,16 +278,33 @@ public class ColorDefinition {
       return graphPrefName;
    }
 
-   public RGB getLineColor_Active() {
-      return _lineColor_Active;
+   public RGB getLineColor_Active_Dark() {
+      return _lineColor_Active_Dark;
    }
 
-   public RGB getLineColor_Default() {
-      return _lineColor_Default;
+   public RGB getLineColor_Active_Light() {
+      return _lineColor_Active_Light;
    }
 
-   public RGB getLineColor_New() {
-      return _lineColor_New;
+   public RGB getLineColor_Active_Themed() {
+
+      return UI.IS_DARK_THEME ? _lineColor_Active_Dark : _lineColor_Active_Light;
+   }
+
+   public RGB getLineColor_Default_Dark() {
+      return _lineColor_Default_Dark;
+   }
+
+   public RGB getLineColor_Default_Light() {
+      return _lineColor_Default_Light;
+   }
+
+   public RGB getLineColor_New_Dark() {
+      return _lineColor_New_Dark;
+   }
+
+   public RGB getLineColor_New_Light() {
+      return _lineColor_New_Light;
    }
 
    public Map2ColorProfile getMap2Color_Active() {
@@ -238,16 +319,33 @@ public class ColorDefinition {
       return _map2ColorProfile_New;
    }
 
-   public RGB getTextColor_Active() {
-      return _textColor_Active;
+   public RGB getTextColor_Active_Dark() {
+      return _textColor_Active_Dark;
    }
 
-   public RGB getTextColor_Default() {
-      return _textColor_Default;
+   public RGB getTextColor_Active_Light() {
+      return _textColor_Active_Light;
    }
 
-   public RGB getTextColor_New() {
-      return _textColor_New;
+   public RGB getTextColor_Active_Themed() {
+
+      return UI.IS_DARK_THEME ? _textColor_Active_Dark : _textColor_Active_Light;
+   }
+
+   public RGB getTextColor_Default_Dark() {
+      return _textColor_Default_Dark;
+   }
+
+   public RGB getTextColor_Default_Light() {
+      return _textColor_Default_Light;
+   }
+
+   public RGB getTextColor_New_Dark() {
+      return _textColor_New_Dark;
+   }
+
+   public RGB getTextColor_New_Light() {
+      return _textColor_New_Light;
    }
 
    public String getVisibleName() {
@@ -264,7 +362,7 @@ public class ColorDefinition {
 
    private String logRGB(final RGB rgb) {
 
-//		new RGB(0x5B, 0x5B, 0x5B),
+//      new RGB(0x5B, 0x5B, 0x5B),
 
       if (rgb == null) {
          return "null"; //$NON-NLS-1$
@@ -278,11 +376,11 @@ public class ColorDefinition {
    }
 
    /**
-    * Set color names for this color definition, the color names are children in the tree.
+    * Set color items for this color definition, the color items are children in the tree.
     *
     * @param children
     */
-   public void setColorNames(final GraphColorItem[] children) {
+   public void setColorItems(final GraphColorItem[] children) {
       _graphColorItems = children;
    }
 
@@ -302,12 +400,20 @@ public class ColorDefinition {
       _gradientDark_New = newGradientDark;
    }
 
-   public void setLineColor_Active(final RGB lineColor) {
-      _lineColor_Active = lineColor;
+   public void setLineColor_Active_Dark(final RGB lineColor) {
+      _lineColor_Active_Dark = lineColor;
    }
 
-   public void setLineColor_New(final RGB newLineColor) {
-      _lineColor_New = newLineColor;
+   public void setLineColor_Active_Light(final RGB lineColor) {
+      _lineColor_Active_Light = lineColor;
+   }
+
+   public void setLineColor_New_Dark(final RGB newLineColor) {
+      _lineColor_New_Dark = newLineColor;
+   }
+
+   public void setLineColor_New_Light(final RGB newLineColor) {
+      _lineColor_New_Light = newLineColor;
    }
 
    public void setMap2Color_Active(final Map2ColorProfile mapColor) {
@@ -318,12 +424,20 @@ public class ColorDefinition {
       _map2ColorProfile_New = newMapColor;
    }
 
-   public void setTextColor_Active(final RGB textColor) {
-      _textColor_Active = textColor;
+   public void setTextColor_Active_Dark(final RGB textColor) {
+      _textColor_Active_Dark = textColor;
    }
 
-   public void setTextColor_New(final RGB _textColorNew) {
-      _textColor_New = _textColorNew;
+   public void setTextColor_Active_Light(final RGB textColor) {
+      _textColor_Active_Light = textColor;
+   }
+
+   public void setTextColor_New_Dark(final RGB textColorNew) {
+      _textColor_New_Dark = textColorNew;
+   }
+
+   public void setTextColor_New_Light(final RGB textColorNew) {
+      _textColor_New_Light = textColorNew;
    }
 
    public void setVisibleName(final String visibleName) {
@@ -335,38 +449,42 @@ public class ColorDefinition {
 
 // SET_FORMATTING_OFF
 
-		return "\nColorDefinition	\n" //$NON-NLS-1$
+      return "\nColorDefinition   \n" //$NON-NLS-1$
 
-				+ "_colorDefinitionId			=" + _colorDefinitionId 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_visibleName					=" + _visibleName 				+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_graphPrefNamePrefix			=" + _graphPrefNamePrefix 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_graphColorItems				=" + Arrays.toString(_graphColorItems) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_colorDefinitionId         =" + _colorDefinitionId       + NL //$NON-NLS-1$
+//            + "_visibleName               =" + _visibleName             + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_graphPrefNamePrefix         =" + _graphPrefNamePrefix       + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_graphColorItems            =" + Arrays.toString(_graphColorItems) + NL //$NON-NLS-1$ //$NON-NLS-2$
 //
-//				+ "_lineColor_Active				=" + _lineColor_Active 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_lineColor_New					=" + _lineColor_New 				+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_lineColor_Active            =" + _lineColor_Active          + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_lineColor_New               =" + _lineColor_New             + NL //$NON-NLS-1$ //$NON-NLS-2$
 //
-//				+ "_gradientBright_Active		=" + _gradientBright_Active 	+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_gradientBright_New			=" + _gradientBright_New 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_gradientBright_Active      =" + _gradientBright_Active    + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_gradientBright_New         =" + _gradientBright_New       + NL //$NON-NLS-1$ //$NON-NLS-2$
 //
-//				+ "_gradientDark_Active			=" + _gradientDark_Active 		+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_gradientDark_New				=" + _gradientDark_New 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_gradientDark_Active         =" + _gradientDark_Active       + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_gradientDark_New            =" + _gradientDark_New          + NL //$NON-NLS-1$ //$NON-NLS-2$
 //
-//				+ "_textColor_Active				=" + _textColor_Active 			+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_textColor_New					=" + _textColor_New 				+ "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_textColor_Active            =" + _textColor_Active          + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_textColor_New               =" + _textColor_New             + NL //$NON-NLS-1$ //$NON-NLS-2$
 //
-//				+ "_map2ColorProfile_Active	=" + _map2ColorProfile_Active + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_map2ColorProfile_New		=" + _map2ColorProfile_New 	+ "\n" //$NON-NLS-1$
+//            + "_map2ColorProfile_Active   =" + _map2ColorProfile_Active + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "_map2ColorProfile_New      =" + _map2ColorProfile_New    + NL //$NON-NLS-1$
 
-				// Java code
+            // Java code
 
-				+ logRGB(_gradientBright_New)	+ "\n"	// _gradientBright_Default		= "  //$NON-NLS-1$
-				+ logRGB(_gradientDark_New)	+ "\n"	// _gradientDark_Default		= "  //$NON-NLS-1$
-				+ logRGB(_lineColor_New) 		+ "\n"	// _lineColor_Default			= "  //$NON-NLS-1$
-				+ logRGB(_textColor_New) 		+ "\n"	// _textColor_Default			= "  //$NON-NLS-1$
+            + logRGB(_gradientBright_New)    + NL
+            + logRGB(_gradientDark_New)      + NL
 
-//				+ "_map2ColorProfile_Default	= " + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "]"; //$NON-NLS-1$
-		;
+            + logRGB(_lineColor_New_Light)   + NL
+            + logRGB(_lineColor_New_Dark)    + NL
+
+            + logRGB(_textColor_New_Light)   + NL
+            + logRGB(_textColor_New_Dark)    + NL
+
+//            + "_map2ColorProfile_Default   = " + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "]"; //$NON-NLS-1$
+      ;
 // SET_FORMATTING_ON
    }
 }

@@ -928,14 +928,14 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             getRgbVertices(),
             isDrawUnits);
 
-      _profileImage = TourMapPainter.createMapLegendImage(//
+      _profileImage = TourMapPainter.createMap3_LegendImage(
             _dialogColorProvider,
             ColorProviderConfig.MAP3_PROFILE,
             imageWidth,
             imageHeight,
             true,
             true,
-            true);
+            false);
 
       _canvasProfileImage.setImage(_profileImage);
    }

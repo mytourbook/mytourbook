@@ -1144,10 +1144,14 @@ public class TourChartAnalyzerView extends ViewPart {
 
          /*
           * Update foreground color, otherwise the label is not displayed with the value color
-          * because it is overwritten by the dark theme
+          * because it will be overwritten by the dark theme
           */
-         graphInfo.labelValueLabel.setForeground(graphInfo.valueForegroundColor);
-         graphInfo.labelValueUnit.setForeground(graphInfo.valueForegroundColor);
+         if (graphInfo.labelValueLabel != null) {
+            graphInfo.labelValueLabel.setForeground(graphInfo.valueForegroundColor);
+         }
+         if (graphInfo.labelValueUnit != null) {
+            graphInfo.labelValueUnit.setForeground(graphInfo.valueForegroundColor);
+         }
 
          final Label lblLeft = graphInfo.labelLeft;
          final Label lblRight = graphInfo.labelRight;

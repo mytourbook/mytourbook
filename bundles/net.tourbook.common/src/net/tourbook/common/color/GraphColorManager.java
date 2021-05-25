@@ -48,74 +48,84 @@ import org.w3c.dom.Element;
  */
 public class GraphColorManager {
 
-   public static final String            PREF_GRAPH_ALTIMETER                    = "altimeter";                  //$NON-NLS-1$
-   public static final String            PREF_GRAPH_ALTITUDE                     = "altitude";                   //$NON-NLS-1$
-   public static final String            PREF_GRAPH_CADENCE                      = "cadence";                    //$NON-NLS-1$
-   public static final String            PREF_GRAPH_GEAR                         = "gear";                       //$NON-NLS-1$
-   public static final String            PREF_GRAPH_DISTANCE                     = "distance";                   //$NON-NLS-1$
-   public static final String            PREF_GRAPH_HEARTBEAT                    = "heartbeat";                  //$NON-NLS-1$
-   public static final String            PREF_GRAPH_HISTORY                      = "History";                    //$NON-NLS-1$
-   public static final String            PREF_GRAPH_GRADIENT                     = "gradient";                   //$NON-NLS-1$
-   public static final String            PREF_GRAPH_PACE                         = "pace";                       //$NON-NLS-1$
-   public static final String            PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
-   public static final String            PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TEMPTERATURE                 = "tempterature";               //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TOUR                         = "tour";                       //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                //$NON-NLS-1$
-   public static final String            PREF_GRAPH_RUN_DYN_STANCE_TIME          = "RunDyn_StanceTime";          //$NON-NLS-1$
-   public static final String            PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED = "RunDyn_StanceTime_Balanced"; //$NON-NLS-1$
-   public static final String            PREF_GRAPH_RUN_DYN_STEP_LENGTH          = "RunDyn_StepLength";          //$NON-NLS-1$
-   public static final String            PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION = "RunDyn_VerticalOscillation"; //$NON-NLS-1$
-   public static final String            PREF_GRAPH_RUN_DYN_VERTICAL_RATIO       = "RunDyn_VerticalRatio";       //$NON-NLS-1$
-   public static final String            PREF_GRAPH_SWIM_STROKES                 = "Swim_Strokes";               //$NON-NLS-1$
-   public static final String            PREF_GRAPH_SWIM_SWOLF                   = "Swim_Swolf";                 //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TRAINING_EFFECT_AEROB        = "Training_Effect_Aerob";      //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TRAINING_EFFECT_ANAEROB      = "Training_Effect_Anaerob";    //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TRAINING_PERFORMANCE         = "Training_Performance";       //$NON-NLS-1$
-   public static final String            PREF_GRAPH_BODYFAT                      = "BodyFat";                    //$NON-NLS-1$
-   public static final String            PREF_GRAPH_BODYWEIGHT                   = "BodyWeight";                 //$NON-NLS-1$
+   public static final String  PREF_GRAPH_ALTIMETER                    = "altimeter";                  //$NON-NLS-1$
+   public static final String  PREF_GRAPH_ALTITUDE                     = "altitude";                   //$NON-NLS-1$
+   public static final String  PREF_GRAPH_CADENCE                      = "cadence";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_GEAR                         = "gear";                       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_DISTANCE                     = "distance";                   //$NON-NLS-1$
+   public static final String  PREF_GRAPH_HEARTBEAT                    = "heartbeat";                  //$NON-NLS-1$
+   public static final String  PREF_GRAPH_HISTORY                      = "History";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_GRADIENT                     = "gradient";                   //$NON-NLS-1$
+   public static final String  PREF_GRAPH_PACE                         = "pace";                       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TEMPTERATURE                 = "tempterature";               //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TOUR                         = "tour";                       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME          = "RunDyn_StanceTime";          //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED = "RunDyn_StanceTime_Balanced"; //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_STEP_LENGTH          = "RunDyn_StepLength";          //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION = "RunDyn_VerticalOscillation"; //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_VERTICAL_RATIO       = "RunDyn_VerticalRatio";       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SWIM_STROKES                 = "Swim_Strokes";               //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SWIM_SWOLF                   = "Swim_Swolf";                 //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TRAINING_EFFECT_AEROB        = "Training_Effect_Aerob";      //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TRAINING_EFFECT_ANAEROB      = "Training_Effect_Anaerob";    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TRAINING_PERFORMANCE         = "Training_Performance";       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_BODYFAT                      = "BodyFat";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_BODYWEIGHT                   = "BodyWeight";                 //$NON-NLS-1$
 
-   public static final String            PREF_COLOR_BRIGHT                       = "bright";                     //$NON-NLS-1$
-   public static final String            PREF_COLOR_DARK                         = "dark";                       //$NON-NLS-1$
-   public static final String            PREF_COLOR_LINE                         = "line";                       //$NON-NLS-1$
-   public static final String            PREF_COLOR_TEXT                         = "text";                       //$NON-NLS-1$
-   public static final String            PREF_COLOR_MAPPING                      = "mapping";                    //$NON-NLS-1$
+   public static final String  PREF_COLOR_GRADIENT_BRIGHT              = "bright";                     //$NON-NLS-1$
+   public static final String  PREF_COLOR_GRADIENT_DARK                = "dark";                       //$NON-NLS-1$
+   public static final String  PREF_COLOR_LINE_LIGHT                   = "line";                       //$NON-NLS-1$
+   public static final String  PREF_COLOR_LINE_DARK                    = "line-dark";                  //$NON-NLS-1$
+   public static final String  PREF_COLOR_TEXT_LIGHT                   = "text";                       //$NON-NLS-1$
+   public static final String  PREF_COLOR_TEXT_DARK                    = "text-dark";                  //$NON-NLS-1$
+   public static final String  PREF_COLOR_MAPPING                      = "mapping";                    //$NON-NLS-1$
 
-   private static final String           MEMENTO_LEGEND_COLOR_FILE               = "legendcolor.xml";            //$NON-NLS-1$
-   private static final String           MEMENTO_ROOT                            = "legendcolorlist";            //$NON-NLS-1$
+   private static final String MEMENTO_LEGEND_COLOR_FILE               = "legendcolor.xml";            //$NON-NLS-1$
+   private static final String MEMENTO_ROOT                            = "legendcolorlist";            //$NON-NLS-1$
 
-   private static final String           MEMENTO_CHILD_LEGEND_COLOR              = "legendcolor";                //$NON-NLS-1$
-   private static final String           TAG_LEGEND_COLOR_PREF_NAME              = "prefname";                   //$NON-NLS-1$
+   private static final String MEMENTO_CHILD_LEGEND_COLOR              = "legendcolor";                //$NON-NLS-1$
+   private static final String TAG_LEGEND_COLOR_PREF_NAME              = "prefname";                   //$NON-NLS-1$
 
-   private static final String           MEMENTO_CHILD_VALUE_COLOR               = "valuecolor";                 //$NON-NLS-1$
-   private static final String           TAG_VALUE_COLOR_VALUE                   = "value";                      //$NON-NLS-1$
-   private static final String           TAG_VALUE_COLOR_RED                     = "red";                        //$NON-NLS-1$
-   private static final String           TAG_VALUE_COLOR_GREEN                   = "green";                      //$NON-NLS-1$
-   private static final String           TAG_VALUE_COLOR_BLUE                    = "blue";                       //$NON-NLS-1$
+   private static final String MEMENTO_CHILD_VALUE_COLOR               = "valuecolor";                 //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_VALUE                   = "value";                      //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_RED                     = "red";                        //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_GREEN                   = "green";                      //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_BLUE                    = "blue";                       //$NON-NLS-1$
 
-   static final String                   MEMENTO_CHILD_BRIGHTNESS                = "brightness";                 //$NON-NLS-1$
-   static final String                   TAG_BRIGHTNESS_MIN                      = "min";                        //$NON-NLS-1$
-   static final String                   TAG_BRIGHTNESS_MIN_FACTOR               = "minFactor";                  //$NON-NLS-1$
-   static final String                   TAG_BRIGHTNESS_MAX                      = "max";                        //$NON-NLS-1$
-   static final String                   TAG_BRIGHTNESS_MAX_FACTOR               = "maxFactor";                  //$NON-NLS-1$
+   static final String         MEMENTO_CHILD_BRIGHTNESS                = "brightness";                 //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MIN                      = "min";                        //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MIN_FACTOR               = "minFactor";                  //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MAX                      = "max";                        //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MAX_FACTOR               = "maxFactor";                  //$NON-NLS-1$
 
-   static final String                   MEMENTO_CHILD_MIN_MAX_VALUE             = "minmaxValue";                //$NON-NLS-1$
-   static final String                   TAG_IS_MIN_VALUE_OVERWRITE              = "isMinOverwrite";             //$NON-NLS-1$
-   static final String                   TAG_MIN_VALUE_OVERWRITE                 = "minValueOverwrite";          //$NON-NLS-1$
-   static final String                   TAG_IS_MAX_VALUE_OVERWRITE              = "isMaxOverwrite";             //$NON-NLS-1$
-   static final String                   TAG_MAX_VALUE_OVERWRITE                 = "maxValueOverwrite";          //$NON-NLS-1$
+   static final String         MEMENTO_CHILD_MIN_MAX_VALUE             = "minmaxValue";                //$NON-NLS-1$
+   static final String         TAG_IS_MIN_VALUE_OVERWRITE              = "isMinOverwrite";             //$NON-NLS-1$
+   static final String         TAG_MIN_VALUE_OVERWRITE                 = "minValueOverwrite";          //$NON-NLS-1$
+   static final String         TAG_IS_MAX_VALUE_OVERWRITE              = "isMaxOverwrite";             //$NON-NLS-1$
+   static final String         TAG_MAX_VALUE_OVERWRITE                 = "maxValueOverwrite";          //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
 
    public static String[][]              colorNames                              = new String[][] {
 
-         { PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
-         { PREF_COLOR_DARK, Messages.Graph_Pref_color_gradient_dark },
-         { PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
-         { PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
-         { PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }
+         { PREF_COLOR_GRADIENT_BRIGHT,    Messages.Graph_Pref_color_gradient_bright },
+         { PREF_COLOR_GRADIENT_DARK,      Messages.Graph_Pref_color_gradient_dark   },
+
+         { PREF_COLOR_LINE_LIGHT,         Messages.Graph_Pref_ColorLine_Theme_Light },
+         { PREF_COLOR_LINE_DARK,          Messages.Graph_Pref_ColorLine_Theme_Dark  },
+         { PREF_COLOR_TEXT_LIGHT,         Messages.Graph_Pref_ColorText_Theme_Light },
+         { PREF_COLOR_TEXT_DARK,          Messages.Graph_Pref_ColorText_Theme_Dark  },
+
+         { PREF_COLOR_MAPPING,            Messages.Graph_Pref_color_mapping         }
    };
 
-   private static final Map2ColorProfile MAP_COLOR_ALTITUDE;
+// SET_FORMATTING_ON
+
+   private static final Map2ColorProfile MAP_COLOR_ELEVATION;
    private static final Map2ColorProfile MAP_COLOR_GRADIENT;
    private static final Map2ColorProfile MAP_COLOR_PACE;
    private static final Map2ColorProfile MAP_COLOR_PULSE;
@@ -127,7 +137,7 @@ public class GraphColorManager {
     */
    static {
 
-      MAP_COLOR_ALTITUDE = new Map2ColorProfile(
+      MAP_COLOR_ELEVATION = new Map2ColorProfile(
 
             new ColorValue[] {
                   new ColorValue(10, 0xEC, 0x20, 0x20),
@@ -227,189 +237,59 @@ public class GraphColorManager {
 
    private static GraphColorManager _instance;
 
-   private ColorDefinition[]        _graphColorDefinitions;
+   private static ColorDefinition[] _allGraphColorDefinitions;
 
    public GraphColorManager() {}
 
-   public static GraphColorManager getInstance() {
-
-      if (_instance == null) {
-         _instance = new GraphColorManager();
-      }
-
-      return _instance;
-   }
-
-   private static XMLMemento getXMLMementoRoot() {
-
-      Document document;
-      try {
-         document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-         final Element element = document.createElement(MEMENTO_ROOT);
-         element.setAttribute("version", "1"); //$NON-NLS-1$ //$NON-NLS-2$
-         document.appendChild(element);
-
-         return new XMLMemento(document, element);
-
-      } catch (final ParserConfigurationException e) {
-         throw new Error(e.getMessage());
-      }
-   }
-
-   public static void saveColors() {
-
-      // save all graph colors, in the pref store and the map color in a xml file.
-      saveColors_GraphColors_InPrefStore();
-      saveColors_MapColors_InXml();
-
-      // update active colors
-      for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
-
-         // graph color
-         graphDefinition.setGradientBright_Active(graphDefinition.getGradientBright_New());
-         graphDefinition.setGradientDark_Active(graphDefinition.getGradientDark_New());
-         graphDefinition.setLineColor_Active(graphDefinition.getLineColor_New());
-         graphDefinition.setTextColor_Active(graphDefinition.getTextColor_New());
-
-         // 2D map color
-         graphDefinition.setMap2Color_Active(graphDefinition.getMap2Color_New());
-      }
-   }
-
-   private static void saveColors_GraphColors_InPrefStore() {
-
-      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-
-      for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
-
-         PreferenceConverter.setValue(
-               commonPrefStore,
-               graphDefinition.getGraphPrefName(PREF_COLOR_BRIGHT),
-               graphDefinition.getGradientBright_New());
-
-         PreferenceConverter.setValue(
-               commonPrefStore,
-               graphDefinition.getGraphPrefName(PREF_COLOR_DARK),
-               graphDefinition.getGradientDark_New());
-
-         PreferenceConverter.setValue(
-               commonPrefStore,
-               graphDefinition.getGraphPrefName(PREF_COLOR_LINE),
-               graphDefinition.getLineColor_New());
-
-         PreferenceConverter.setValue(
-               commonPrefStore,
-               graphDefinition.getGraphPrefName(PREF_COLOR_TEXT),
-               graphDefinition.getTextColor_New());
-      }
-   }
-
-   /**
-    * Write the map color data into a xml file.
-    */
-   private static void saveColors_MapColors_InXml() {
-
-      BufferedWriter writer = null;
-
-      try {
-
-         final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
-         final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
-
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
-
-         final XMLMemento xmlMemento = getXMLMementoRoot();
-
-         for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
-
-            final Map2ColorProfile mapColor = graphDefinition.getMap2Color_New();
-
-            // map color can be null when it's not defined
-            if (mapColor == null) {
-               continue;
-            }
-
-            final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
-            mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getColorDefinitionId());
-
-            for (final ColorValue valueColor : mapColor.getColorValues()) {
-
-               final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
-
-               mementoValueColor.putFloat(TAG_VALUE_COLOR_VALUE, valueColor.value);
-               mementoValueColor.putInteger(TAG_VALUE_COLOR_RED, valueColor.red);
-               mementoValueColor.putInteger(TAG_VALUE_COLOR_GREEN, valueColor.green);
-               mementoValueColor.putInteger(TAG_VALUE_COLOR_BLUE, valueColor.blue);
-            }
-
-            final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
-            mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, mapColor.getMinBrightness());
-            mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, mapColor.getMinBrightnessFactor());
-            mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, mapColor.getMaxBrightness());
-            mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, mapColor.getMaxBrightnessFactor());
-
-            final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
-            mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, mapColor.isMinValueOverwrite() ? 1 : 0);
-            mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.getMinValueOverwrite());
-            mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, mapColor.isMaxValueOverwrite() ? 1 : 0);
-            mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.getMaxValueOverwrite());
-         }
-
-         xmlMemento.save(writer);
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      } finally {
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
-      }
-   }
-
    /**
     * Create graph default colors
-    * 
+    *
     * @return
     */
-   private List<ColorDefinition> createDefaultColors() {
+   private static List<ColorDefinition> createDefaultColors() {
 
       final List<ColorDefinition> allColorDef = new ArrayList<>();
 
-      allColorDef.add(new ColorDefinition(
-            PREF_GRAPH_ALTITUDE, //             colorDefinitionId
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTITUDE, // colorDefinitionId
+
             Messages.Graph_Label_Altitude, //   visibleName
+
             new RGB(255, 255, 255), //          defaultGradientBright
             new RGB(0, 255, 0), //              defaultGradientDark
+
             new RGB(45, 188, 45), //            defaultLineColor
             new RGB(44, 134, 33), //            defaultTextColor
-            MAP_COLOR_ALTITUDE)); //            defaultMapColorProfile
+
+            MAP_COLOR_ELEVATION)); //           defaultMapColorProfile
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_HEARTBEAT,
             Messages.Graph_Label_Heartbeat,
-            new RGB(255, 255, 255),
-            new RGB(253, 0, 0),
-            new RGB(253, 0, 0),
-            new RGB(183, 0, 0),
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0xfd, 0x0, 0x0),
+            new RGB(0xfd, 0x0, 0x0),
+            new RGB(0xff, 0x3e, 0x3e),
+            new RGB(0xb7, 0x0, 0x0),
+            new RGB(0xb7, 0x0, 0x0),
             MAP_COLOR_PULSE));
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_SPEED,
             Messages.Graph_Label_Speed,
-            new RGB(255, 255, 255),
-            new RGB(0, 135, 211),
-            new RGB(0, 132, 210),
-            new RGB(0, 106, 167),
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x0, 0x87, 0xd3),
+            new RGB(0x0, 0x84, 0xd2),
+            new RGB(0x0, 0x9f, 0xff),
+            new RGB(0x6a, 0xc8, 0xff),
+            new RGB(0xff, 0x80, 0x40),
             MAP_COLOR_SPEED));
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_PACE,
             Messages.Graph_Label_Pace,
-            new RGB(255, 255, 255),
-            new RGB(0x9C, 0x2F, 0xFF),
-            new RGB(0x9C, 0x2F, 0xFF),
-            new RGB(88, 26, 142),
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x9c, 0x2f, 0xff),
+            new RGB(0x9c, 0x2f, 0xff),
+            new RGB(0xb1, 0x5b, 0xff),
+            new RGB(0x58, 0x1a, 0x8e),
+            new RGB(0x9d, 0x54, 0xe0),
             MAP_COLOR_PACE));
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_POWER,
@@ -519,11 +399,16 @@ public class GraphColorManager {
             null));
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_SWIM_SWOLF,
+
             Messages.Graph_Label_Prefix_Swimming + uiSpacing + Messages.Graph_Label_Swim_Swolf,
+
             new RGB(0xff, 0xff, 0xff),
             new RGB(0x86, 0x57, 0xe7),
             new RGB(0x4a, 0x1a, 0xb0),
+            new RGB(0x4a, 0x1a, 0xb0),
             new RGB(0x28, 0xe, 0x61),
+            new RGB(0x75, 0x40, 0xe3),
+
             null));
 
       /*
@@ -619,80 +504,51 @@ public class GraphColorManager {
       return allColorDef;
    }
 
-   public ColorDefinition getColorDefinition(final MapGraphId graphId) {
+   public static ColorDefinition[] getAllColorDefinitions() {
 
-      switch (graphId) {
-
-      case Altitude:
-         return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
-
-      case Gradient:
-         return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
-
-      case Pace:
-         return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
-
-      case Pulse:
-         return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
-
-      case Speed:
-         return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
-
-      case RunDyn_StepLength:
-         return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
-
-      default:
-         break;
-      }
-
-      return null;
-   }
-
-   /**
-    * @param preferenceName
-    *           preference name PREF_GRAPH_...
-    * @return Returns the {@link ColorDefinition} for the preference name
-    */
-   public ColorDefinition getGraphColorDefinition(final String preferenceName) {
-
-      final ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
-
-      for (final ColorDefinition colorDefinition : colorDefinitions) {
-         if (colorDefinition.getColorDefinitionId().equals(preferenceName)) {
-            return colorDefinition;
-         }
-      }
-
-      return null;
-   }
-
-   public ColorDefinition[] getGraphColorDefinitions() {
-
-      if (_graphColorDefinitions != null) {
-         return _graphColorDefinitions;
+      if (_allGraphColorDefinitions != null) {
+         return _allGraphColorDefinitions;
       }
 
       final List<ColorDefinition> allColorDef = createDefaultColors();
 
-      // sort list by name
-//		Collections.sort(list, new Comparator<ColorDefinition>() {
-//			public int compare(ColorDefinition def1, ColorDefinition def2) {
-//				return def1.getVisibleName().compareTo(def2.getVisibleName());
-//			}
-//		});
-
-      _graphColorDefinitions = allColorDef.toArray(new ColorDefinition[allColorDef.size()]);
+      _allGraphColorDefinitions = allColorDef.toArray(new ColorDefinition[allColorDef.size()]);
 
       readXmlMapColors();
       setMapColors();
 
-      return _graphColorDefinitions;
+      return _allGraphColorDefinitions;
+   }
+
+   public static GraphColorManager getInstance() {
+
+      if (_instance == null) {
+         _instance = new GraphColorManager();
+      }
+
+      return _instance;
+   }
+
+   private static XMLMemento getXMLMementoRoot() {
+
+      Document document;
+      try {
+         document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+         final Element element = document.createElement(MEMENTO_ROOT);
+         element.setAttribute("version", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+         document.appendChild(element);
+
+         return new XMLMemento(document, element);
+
+      } catch (final ParserConfigurationException e) {
+         throw new Error(e.getMessage());
+      }
    }
 
    /**
     * Read legend data from a xml file
     */
-   private void readXmlMapColors() {
+   private static void readXmlMapColors() {
 
       final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
       final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
@@ -800,7 +656,7 @@ public class GraphColorManager {
             /*
              * update color definition with the read data
              */
-            for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
+            for (final ColorDefinition colorDefinition : _allGraphColorDefinitions) {
 
                if (colorDefinition.getColorDefinitionId().equals(prefName)) {
 
@@ -817,12 +673,138 @@ public class GraphColorManager {
       }
    }
 
+   public static void saveColors() {
+
+      // save all graph colors, in the pref store and the map color in a xml file.
+      saveColors_GraphColors_InPrefStore();
+      saveColors_MapColors_InXml();
+
+      // update active colors
+      for (final ColorDefinition graphDefinition : getAllColorDefinitions()) {
+
+         // graph color
+         graphDefinition.setGradientBright_Active(graphDefinition.getGradientBright_New());
+         graphDefinition.setGradientDark_Active(graphDefinition.getGradientDark_New());
+
+         graphDefinition.setLineColor_Active_Light(graphDefinition.getLineColor_New_Light());
+         graphDefinition.setLineColor_Active_Dark(graphDefinition.getLineColor_New_Dark());
+
+         graphDefinition.setTextColor_Active_Light(graphDefinition.getTextColor_New_Light());
+         graphDefinition.setTextColor_Active_Dark(graphDefinition.getTextColor_New_Dark());
+
+         // 2D map color
+         graphDefinition.setMap2Color_Active(graphDefinition.getMap2Color_New());
+      }
+   }
+
+   private static void saveColors_GraphColors_InPrefStore() {
+
+      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+
+      for (final ColorDefinition colorDefinition : getAllColorDefinitions()) {
+
+         PreferenceConverter.setValue(
+               commonPrefStore,
+               colorDefinition.getGraphPrefName(PREF_COLOR_GRADIENT_BRIGHT),
+               colorDefinition.getGradientBright_New());
+
+         PreferenceConverter.setValue(
+               commonPrefStore,
+               colorDefinition.getGraphPrefName(PREF_COLOR_GRADIENT_DARK),
+               colorDefinition.getGradientDark_New());
+
+         PreferenceConverter.setValue(
+               commonPrefStore,
+               colorDefinition.getGraphPrefName(PREF_COLOR_LINE_LIGHT),
+               colorDefinition.getLineColor_New_Light());
+         PreferenceConverter.setValue(
+               commonPrefStore,
+               colorDefinition.getGraphPrefName(PREF_COLOR_LINE_DARK),
+               colorDefinition.getLineColor_New_Dark());
+
+         PreferenceConverter.setValue(
+               commonPrefStore,
+               colorDefinition.getGraphPrefName(PREF_COLOR_TEXT_LIGHT),
+               colorDefinition.getTextColor_New_Light());
+         PreferenceConverter.setValue(
+               commonPrefStore,
+               colorDefinition.getGraphPrefName(PREF_COLOR_TEXT_DARK),
+               colorDefinition.getTextColor_New_Dark());
+      }
+   }
+
+   /**
+    * Write the map color data into a xml file.
+    */
+   private static void saveColors_MapColors_InXml() {
+
+      BufferedWriter writer = null;
+
+      try {
+
+         final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
+         final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
+
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+
+         final XMLMemento xmlMemento = getXMLMementoRoot();
+
+         for (final ColorDefinition graphDefinition : getAllColorDefinitions()) {
+
+            final Map2ColorProfile mapColor = graphDefinition.getMap2Color_New();
+
+            // map color can be null when it's not defined
+            if (mapColor == null) {
+               continue;
+            }
+
+            final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
+            mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getColorDefinitionId());
+
+            for (final ColorValue valueColor : mapColor.getColorValues()) {
+
+               final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
+
+               mementoValueColor.putFloat(TAG_VALUE_COLOR_VALUE, valueColor.value);
+               mementoValueColor.putInteger(TAG_VALUE_COLOR_RED, valueColor.red);
+               mementoValueColor.putInteger(TAG_VALUE_COLOR_GREEN, valueColor.green);
+               mementoValueColor.putInteger(TAG_VALUE_COLOR_BLUE, valueColor.blue);
+            }
+
+            final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
+            mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, mapColor.getMinBrightness());
+            mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, mapColor.getMinBrightnessFactor());
+            mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, mapColor.getMaxBrightness());
+            mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, mapColor.getMaxBrightnessFactor());
+
+            final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
+            mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, mapColor.isMinValueOverwrite() ? 1 : 0);
+            mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.getMinValueOverwrite());
+            mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, mapColor.isMaxValueOverwrite() ? 1 : 0);
+            mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.getMaxValueOverwrite());
+         }
+
+         xmlMemento.save(writer);
+
+      } catch (final IOException e) {
+         e.printStackTrace();
+      } finally {
+         if (writer != null) {
+            try {
+               writer.close();
+            } catch (final IOException e) {
+               e.printStackTrace();
+            }
+         }
+      }
+   }
+
    /**
     * set legend colors when available
     */
-   private void setMapColors() {
+   private static void setMapColors() {
 
-      for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
+      for (final ColorDefinition colorDefinition : _allGraphColorDefinitions) {
 
          // set legend color
          if (colorDefinition.getMap2Color_Active() == null) {
@@ -840,5 +822,52 @@ public class GraphColorManager {
          final Map2ColorProfile mapColor = colorDefinition.getMap2Color_Active();
          colorDefinition.setMap2Color_New(mapColor);
       }
+   }
+
+   public ColorDefinition getColorDefinition(final MapGraphId graphId) {
+
+      switch (graphId) {
+
+      case Altitude:
+         return getGraphColorDefinition(PREF_GRAPH_ALTITUDE);
+
+      case Gradient:
+         return getGraphColorDefinition(PREF_GRAPH_GRADIENT);
+
+      case Pace:
+         return getGraphColorDefinition(PREF_GRAPH_PACE);
+
+      case Pulse:
+         return getGraphColorDefinition(PREF_GRAPH_HEARTBEAT);
+
+      case Speed:
+         return getGraphColorDefinition(PREF_GRAPH_SPEED);
+
+      case RunDyn_StepLength:
+         return getGraphColorDefinition(PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+
+      default:
+         break;
+      }
+
+      return null;
+   }
+
+   /**
+    * @param preferenceName
+    *           preference name PREF_GRAPH_...
+    * @return Returns the {@link ColorDefinition} for the preference name
+    */
+   public ColorDefinition getGraphColorDefinition(final String preferenceName) {
+
+      final ColorDefinition[] colorDefinitions = getAllColorDefinitions();
+
+      for (final ColorDefinition colorDefinition : colorDefinitions) {
+         if (colorDefinition.getColorDefinitionId().equals(preferenceName)) {
+            return colorDefinition;
+         }
+      }
+
+      return null;
    }
 }
