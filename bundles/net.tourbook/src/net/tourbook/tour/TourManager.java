@@ -502,37 +502,15 @@ public class TourManager {
 
       final long tourId1 = tourData1.getTourId().longValue();
       final long tourId2 = tourData2.getTourId().longValue();
+      final String message = NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
+            tourData2.toStringWithHash(),
+            tourData1.toStringWithHash());
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         final String message = UI.EMPTY_STRING
-               + "ERROR: " //                                                                                              //$NON-NLS-1$
-               + "The internal structure of the application is out of synch." //                                           //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "You can solve the problem by:" //                                                                        //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "- restarting the application" //                                                                         //$NON-NLS-1$
-               + UI.NEW_LINE
-               + "- close the tour editor in all perspectives" //                                                          //$NON-NLS-1$
-               + UI.NEW_LINE
-               + "- save/revert tour and select another tour" //                                                           //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + UI.NEW_LINE
-               + "The tour editor contains the selected tour, but the data are different." //                              //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "Tour in Editor:" //                                                                                      //$NON-NLS-1$
-               + tourData2.toStringWithHash()
-               + UI.NEW_LINE
-               + "Selected Tour:" //                                                                                       //$NON-NLS-1$
-               + tourData1.toStringWithHash()
-               + UI.NEW_LINE2
-               + UI.NEW_LINE
-               + "You should also inform the author of the application how this error occured. " //                        //$NON-NLS-1$
-               + "However it isn't very easy to find out, what actions are exactly done, before this error occured. " //   //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "These actions must be reproducable otherwise the bug cannot be identified."; //                          //$NON-NLS-1$
-
-         MessageDialog.openError(Display.getDefault().getActiveShell(), "Error: Out of Synch", message); //                //$NON-NLS-1$
+         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+               Messages.TourManager_Dialog_OutOfSyncError_Title,
+               message);
 
          throw new MyTourbookException(message);
       }
@@ -5338,8 +5316,8 @@ public class TourManager {
       if (_tourDataEditorInstance.isDirty()) {
 
          MessageDialog.openError(Display.getCurrent().getActiveShell(),
-               Messages.TourManager_Dialog_OutofSyncError_Title,
-               NLS.bind(Messages.TourManager_Dialog_OutofSyncError_Message,
+               Messages.TourManager_Dialog_OutOfSyncError_Title,
+               NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
                      tourDataForEditor.toStringWithHash(),
                      tourDataInEditor.toStringWithHash()));
 

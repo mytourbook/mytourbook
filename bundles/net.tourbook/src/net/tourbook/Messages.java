@@ -2507,9 +2507,10 @@ public class Messages extends NLS {
 
    public static String Tour_Log_Action_Clear_Tooltip;
 
-   public static String TourManager_Dialog_OutofSyncError_Message;
-   public static String TourManager_Dialog_OutofSyncError_Title;
+   public static String TourManager_Dialog_OutOfSyncError_Message;
+   public static String TourManager_Dialog_OutOfSyncError_Title;
 
+   public static String Tour_Marker_Column_Description_ShortCut;
    public static String Tour_Marker_Column_Description_Tooltip;
    public static String Tour_Marker_Column_horizontal_offset;
    public static String Tour_Marker_Column_horizontal_offset_tooltip;
