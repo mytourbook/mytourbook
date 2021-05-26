@@ -508,7 +508,7 @@ public class TourManager {
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                Messages.TourManager_Dialog_OutOfSyncError_Title,
                message);
 
