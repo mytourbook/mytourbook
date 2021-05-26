@@ -141,7 +141,7 @@ public abstract class ChartDataSerie {
    public RGB getDefaultRGB() {
 
       /*
-       * when default color is not set, return an ugly color to see in the ui that something is
+       * When default color is not set, return an ugly color to see in the ui that something is
        * wrong
        */
       if (_defaultRGB == null) {
@@ -265,8 +265,8 @@ public abstract class ChartDataSerie {
       _rgbLine = rgbLine;
    }
 
-   public void setRgbText(final RGB _rgbText[]) {
-      this._rgbText = _rgbText;
+   public void setRgbText(final RGB rgbText[]) {
+      _rgbText = rgbText;
    }
 
    /**
@@ -288,10 +288,10 @@ public abstract class ChartDataSerie {
    public void setVisibleMinValue(final double minValue) {
 
 // debug: check Nan
-//		if (minValue != minValue) {
-//			int a = 0;
-//			a++;
-//		}
+//    if (minValue != minValue) {
+//       int a = 0;
+//       a++;
+//    }
 
       _visibleMinValue = minValue;
    }

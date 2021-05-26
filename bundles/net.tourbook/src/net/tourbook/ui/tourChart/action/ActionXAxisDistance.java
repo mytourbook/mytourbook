@@ -19,7 +19,6 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -67,7 +66,7 @@ public class ActionXAxisDistance extends Action {
          disabledImageName = Images.XAxis_ShowDistance_Disabled;
       }
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageName));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImageName));
    }
 }

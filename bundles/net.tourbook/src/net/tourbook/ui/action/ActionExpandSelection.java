@@ -18,7 +18,6 @@ package net.tourbook.ui.action;
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITreeViewer;
 
 import org.eclipse.jface.action.Action;
@@ -43,8 +42,8 @@ public class ActionExpandSelection extends Action {
       setText(Messages.app_action_expand_selection_tooltip);
       setToolTipText(Messages.app_action_expand_selection_tooltip);
 
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_ExpandAll)));
-      setDisabledImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_ExpandAll_Disabled)));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_ExpandAll));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_ExpandAll_Disabled));
    }
 
    /**

@@ -82,7 +82,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          super(Messages.Action_Tag_AutoOpenCancel);
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

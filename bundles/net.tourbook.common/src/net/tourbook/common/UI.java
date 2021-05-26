@@ -16,6 +16,7 @@
 package net.tourbook.common;
 
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.nio.charset.Charset;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -235,10 +235,20 @@ public class UI {
          '|', };
 
 // SET_FORMATTING_OFF
+
    public static final boolean   IS_LINUX    = "gtk".equals(SWT.getPlatform());                                                                  //$NON-NLS-1$
    public static final boolean   IS_OSX      = "carbon".equals(SWT.getPlatform())   || "cocoa".equals(SWT.getPlatform());                        //$NON-NLS-1$ //$NON-NLS-2$
    public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
+
 // SET_FORMATTING_ON
+
+   /**
+    * Is <code>true</code> when the dark theme in the UI is selected
+    */
+   public static boolean IS_DARK_THEME;
+
+   // this is the old field before using IS_DARK_THEME
+   private static boolean      _isDarkThemeSelected;
 
    /**
     * On Linux an async selection event is fired since e4
@@ -514,7 +524,6 @@ public class UI {
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
    private static FontMetrics          _fontMetrics;
-   private static boolean              _isDarkThemeSelected;
 
 // SET_FORMATTING_OFF
 
@@ -574,6 +583,8 @@ public class UI {
    public static final Font    AWT_FONT_ARIAL_BOLD_12    = Font.decode("Arial-bold-12");  //$NON-NLS-1$
    public static final Font    AWT_FONT_ARIAL_BOLD_24    = Font.decode("Arial-bold-24");  //$NON-NLS-1$
 
+   public static Font          AWT_DIALOG_FONT;
+
 // SET_FORMATTING_OFF
 
    private static final Random   RANDOM_GENERATOR                       = new Random();
@@ -610,6 +621,7 @@ public class UI {
       updateUnits();
 
       setupUI_FontMetrics();
+      setupUI_AWTFonts();
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
@@ -2239,7 +2251,10 @@ public class UI {
    }
 
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
+
       _isDarkThemeSelected = isDarkThemeSelected;
+
+      IS_DARK_THEME = isDarkThemeSelected;
    }
 
    /**
@@ -2251,7 +2266,7 @@ public class UI {
     */
    public static void setThemedIcon(final UIElement uiElement, final String imageName) {
 
-      uiElement.setIcon(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
+      uiElement.setIcon(CommonActivator.getThemedImageDescriptor(imageName));
    }
 
    public static void setupThemedImages() {
@@ -2264,6 +2279,28 @@ public class UI {
       IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,   CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
 
 // SET_FORMATTING_ON
+   }
+
+   private static void setupUI_AWTFonts() {
+
+      if (IS_WIN) {
+
+         final Font winFont = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font");
+
+         if (winFont != null) {
+            AWT_DIALOG_FONT = winFont;
+         }
+
+      } else if (IS_OSX) {
+
+      } else if (IS_LINUX) {
+
+      }
+
+      if (AWT_DIALOG_FONT == null) {
+
+         AWT_DIALOG_FONT = AWT_FONT_ARIAL_12;
+      }
    }
 
    private static boolean setupUI_FontMetrics() {

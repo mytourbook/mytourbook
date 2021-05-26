@@ -29,7 +29,7 @@ public class ActionMouseMode extends Action {
 
       setToolTipText(Messages.Action_mouse_mode_tooltip);
 
-      setImageDescriptor(Activator.getThemedImageDescriptor(ChartImages.MouseMode));
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseMode));
    }
 
    @Override

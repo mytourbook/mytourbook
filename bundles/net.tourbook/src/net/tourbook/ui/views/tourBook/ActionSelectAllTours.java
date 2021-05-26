@@ -32,7 +32,9 @@ public class ActionSelectAllTours extends Action {
       _tourViewer = tourViewer;
 
       setText(Messages.action_tourbook_select_year_month_tours);
+
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_SelectAll));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_SelectAll_Disabled));
    }
 
    @Override

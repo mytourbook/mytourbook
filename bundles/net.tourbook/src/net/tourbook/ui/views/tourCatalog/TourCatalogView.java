@@ -55,7 +55,6 @@ import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -171,7 +170,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    private ActionCollapseOthers      _actionCollapseOthers;
    private ActionExpandSelection     _actionExpandSelection;
    private ActionRefreshView         _actionRefreshView;
-   private ActionModifyColumns       _actionModifyColumns;
    private ActionEditQuick           _actionEditQuick;
    private ActionEditTour            _actionEditTour;
    private ActionSetTourTypeMenu     _actionSetTourType;
@@ -524,7 +522,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       _actionTourCompareWizard = new ActionTourCompareWizard(this);
       _actionLinkTour = new ActionLinkTour(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
 
       _actionCollapseOthers = new ActionCollapseOthers(this);
       _actionExpandSelection = new ActionExpandSelection(this);
@@ -1103,9 +1100,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       /*
        * fill view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-      menuMgr.add(_actionModifyColumns);
    }
 
    void fireSelection(final ISelection selection) {

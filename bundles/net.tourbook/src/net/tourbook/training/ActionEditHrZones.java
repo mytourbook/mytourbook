@@ -18,7 +18,6 @@ package net.tourbook.training;
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.color.ThemeUtil;
 
 import org.eclipse.jface.action.Action;
 
@@ -32,7 +31,7 @@ public class ActionEditHrZones extends Action {
 
       setToolTipText(Messages.Training_Action_EditHrZones_Tooltip);
 
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
 
       _trainingView = trainingView;
    }

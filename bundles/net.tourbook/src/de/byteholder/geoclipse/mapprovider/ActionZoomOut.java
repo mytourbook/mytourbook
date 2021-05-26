@@ -19,7 +19,6 @@ import de.byteholder.geoclipse.Messages;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 
 import org.eclipse.jface.action.Action;
 
@@ -35,8 +34,8 @@ public class ActionZoomOut extends Action {
 
       setToolTipText(Messages.Map_Action_ZoomOut_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_Out)));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_Out_Disabled)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out_Disabled));
    }
 
    @Override

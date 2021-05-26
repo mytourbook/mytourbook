@@ -28,8 +28,8 @@ public class ActionZoomFitGraph extends Action {
       setText(Messages.Action_zoom_fit_to_graph);
       setToolTipText(Messages.Action_zoom_fit_to_graph_tooltip);
 
-      setImageDescriptor(Activator.getThemedImageDescriptor(ChartImages.Zoom_FitToWindow));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_FitToWindow_Disabled));
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_FitToWindow));
+      setDisabledImageDescriptor(ChartActivator.getImageDescriptor(ChartImages.Zoom_FitToWindow_Disabled));
    }
 
    @Override

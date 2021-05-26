@@ -1707,7 +1707,7 @@ public class Messages extends NLS {
    public static String Pref_TourTypes_Button_add;
    public static String Pref_TourTypes_Button_delete;
    public static String Pref_TourTypes_Button_rename;
-   public static String Pref_TourTypes_Dialog_Restart_Message;
+   public static String Pref_TourTypes_Dialog_Restart_Message_2;
    public static String Pref_TourTypes_Dialog_Restart_Title;
    public static String Pref_TourTypes_Dlg_delete_tour_type_msg;
    public static String Pref_TourTypes_Dlg_delete_tour_type_title;
@@ -2182,6 +2182,7 @@ public class Messages extends NLS {
    public static String Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip;
    public static String Slideout_TourMarkerFilter_Label_GeoFilterArea;
    public static String Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
+   public static String Slideout_TourMarkerFilter_Label_Title;
 
    public static String Slideout_TourTagFilter_Action_AddProfile_Tooltip;
    public static String Slideout_TourTagFilter_Action_CheckAllTags_Tooltip;
@@ -2508,6 +2509,9 @@ public class Messages extends NLS {
    public static String Tour_Info_Label_AllFields_Tooltip;
 
    public static String Tour_Log_Action_Clear_Tooltip;
+
+   public static String TourManager_Dialog_OutOfSyncError_Message;
+   public static String TourManager_Dialog_OutOfSyncError_Title;
 
    public static String Tour_Marker_Column_Description_ShortCut;
    public static String Tour_Marker_Column_Description_Tooltip;

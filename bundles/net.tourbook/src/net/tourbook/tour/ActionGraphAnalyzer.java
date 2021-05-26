@@ -19,7 +19,6 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.TourChartAnalyzerView;
 
@@ -36,7 +35,7 @@ public class ActionGraphAnalyzer extends Action {
       super(null, AS_PUSH_BUTTON);
 
       setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourAnalyzer)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourAnalyzer));
 
       _chart = chart;
    }

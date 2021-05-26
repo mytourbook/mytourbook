@@ -47,6 +47,7 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -501,37 +502,15 @@ public class TourManager {
 
       final long tourId1 = tourData1.getTourId().longValue();
       final long tourId2 = tourData2.getTourId().longValue();
+      final String message = NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
+            tourData2.toStringWithHash(),
+            tourData1.toStringWithHash());
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         final String message = UI.EMPTY_STRING
-               + "ERROR: " //                                                                                              //$NON-NLS-1$
-               + "The internal structure of the application is out of synch." //                                           //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "You can solve the problem by:" //                                                                        //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "- restarting the application" //                                                                         //$NON-NLS-1$
-               + UI.NEW_LINE
-               + "- close the tour editor in all perspectives" //                                                          //$NON-NLS-1$
-               + UI.NEW_LINE
-               + "- save/revert tour and select another tour" //                                                           //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + UI.NEW_LINE
-               + "The tour editor contains the selected tour, but the data are different." //                              //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "Tour in Editor:" //                                                                                      //$NON-NLS-1$
-               + tourData2.toStringWithHash()
-               + UI.NEW_LINE
-               + "Selected Tour:" //                                                                                       //$NON-NLS-1$
-               + tourData1.toStringWithHash()
-               + UI.NEW_LINE2
-               + UI.NEW_LINE
-               + "You should also inform the author of the application how this error occured. " //                        //$NON-NLS-1$
-               + "However it isn't very easy to find out, what actions are exactly done, before this error occured. " //   //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "These actions must be reproducable otherwise the bug cannot be identified."; //                          //$NON-NLS-1$
-
-         MessageDialog.openError(Display.getDefault().getActiveShell(), "Error: Out of Synch", message); //                //$NON-NLS-1$
+         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+               Messages.TourManager_Dialog_OutOfSyncError_Title,
+               message);
 
          throw new MyTourbookException(message);
       }
@@ -1485,11 +1464,11 @@ public class TourManager {
     * @param graphName
     * @param colorProfileName
     *           Can be any of <br>
-    *           {@link GraphColorManager#PREF_COLOR_BRIGHT},<br>
-    *           {@link GraphColorManager#PREF_COLOR_DARK}<br>
-    *           {@link GraphColorManager#PREF_COLOR_LINE}<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_BRIGHT},<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_DARK}<br>
+    *           {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}<br>
     *           {@link GraphColorManager#PREF_COLOR_MAPPING}<br>
-    *           {@link GraphColorManager#PREF_COLOR_TEXT}.
+    *           {@link GraphColorManager#PREF_COLOR_TEXT_LIGHT}.
     * @return
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
@@ -2770,10 +2749,18 @@ public class TourManager {
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
-      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final String prefColorLine = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final String prefColorText = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorLine);
+      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorText);
+      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3568,6 +3555,8 @@ public class TourManager {
 
       computeValueClipping(tourData);
 
+      final RGB defaultRGB = ThemeUtil.getDefaultForegroundColor_Table().getRGB();
+
       /*
        * Distance
        */
@@ -3578,7 +3567,7 @@ public class TourManager {
          xDataDist.setLabel(Messages.tour_editor_label_distance);
          xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
          xDataDist.setValueDivisor(1000);
-         xDataDist.setDefaultRGB(new RGB(0, 0, 0));
+         xDataDist.setDefaultRGB(defaultRGB);
 
          // do not show average values but show the other values with 3 digits
          xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
@@ -3590,7 +3579,7 @@ public class TourManager {
       final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
-      xDataTime.setDefaultRGB(new RGB(0, 0, 0));
+      xDataTime.setDefaultRGB(defaultRGB);
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*
@@ -5326,25 +5315,11 @@ public class TourManager {
        */
       if (_tourDataEditorInstance.isDirty()) {
 
-         final String error = "ERROR: " //                                             //$NON-NLS-1$
-               + "The internal structure of the application is out of synch.\n"//               //$NON-NLS-1$
-               + "\n" //                                                         //$NON-NLS-1$
-               + "You can solve the problem by:\n"//                                    //$NON-NLS-1$
-               + "\n"//                                                         //$NON-NLS-1$
-               + "Save or revert the tour in the tour editor and select another tour\n"//         //$NON-NLS-1$
-               + "\n\n" //                                                         //$NON-NLS-1$
-               + "The tour editor contains the selected tour, but the data are different.\n" //   //$NON-NLS-1$
-               + "\n" //                                                         //$NON-NLS-1$
-               + ("Tour in Editor:" + tourDataForEditor.toStringWithHash() + "\n") //            //$NON-NLS-1$ //$NON-NLS-2$
-               + ("Selected Tour: " + tourDataInEditor.toStringWithHash() + "\n") //            //$NON-NLS-1$ //$NON-NLS-2$
-               + "\n\n" //                                                         //$NON-NLS-1$
-               + "You should also inform the author of the application how this error occured." //   //$NON-NLS-1$
-               + " However it isn't very easy to find out, what actions are exactly done," //      //$NON-NLS-1$
-               + " before this error occured. \n" //                                    //$NON-NLS-1$
-               + "\n" //                                                         //$NON-NLS-1$
-               + "These actions must be reproducable otherwise the bug cannot be identified."; //   //$NON-NLS-1$
-
-         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", error); //$NON-NLS-1$
+         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+               Messages.TourManager_Dialog_OutOfSyncError_Title,
+               NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
+                     tourDataForEditor.toStringWithHash(),
+                     tourDataInEditor.toStringWithHash()));
 
       } else {
 

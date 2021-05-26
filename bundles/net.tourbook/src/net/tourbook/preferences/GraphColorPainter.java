@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tree;
 
 public class GraphColorPainter {
 
@@ -49,7 +50,10 @@ public class GraphColorPainter {
    GraphColorPainter(final IColorTreeViewer colorTreeViewer) {
 
       _colorTreeViewer = colorTreeViewer;
-      _itemHeight = _colorTreeViewer.getTreeViewer().getTree().getItemHeight();
+
+      final Tree tree = _colorTreeViewer.getTreeViewer().getTree();
+
+      _itemHeight = tree.getItemHeight();
    }
 
    void disposeAllResources() {
@@ -59,9 +63,6 @@ public class GraphColorPainter {
       }
       _imageCache.clear();
 
-      for (final Color color : _colorCache.values()) {
-         color.dispose();
-      }
       _colorCache.clear();
    }
 
@@ -142,17 +143,18 @@ public class GraphColorPainter {
                   final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
                   colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-                  TourMapPainter.drawMap2Legend(
+                  TourMapPainter.drawMap2_Legend(
                         gc,
                         imageBounds,
                         colorProvider,
+                        false,
                         false);
 
                } else {
 
                   // draw graph color
 
-                  final Color graphColor = getGraphColor(display, graphColorItem);
+                  final Color graphColor = getGraphColor(graphColorItem);
 
                   // draw border
 //                  gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
@@ -183,7 +185,8 @@ public class GraphColorPainter {
 
    Image drawGraphColorImage(final GraphColorItem graphColorItem,
                              final int horizontalImages,
-                             final boolean isRecreateTourTypeImages) {
+                             final boolean isRecreateTourTypeImages,
+                             final Color backgroundColor) {
 
       final Display display = Display.getCurrent();
 
@@ -202,10 +205,7 @@ public class GraphColorPainter {
             image.dispose();
          }
 
-         final Color color = _colorCache.remove(colorId);
-         if (color != null && !color.isDisposed()) {
-            color.dispose();
-         }
+         _colorCache.remove(colorId);
       }
 
       Image colorImage = _imageCache.get(colorId);
@@ -216,7 +216,6 @@ public class GraphColorPainter {
 
          final int imageSize = _itemHeight - 2;
          final int imageSpacing = GRAPH_COLOR_SPACING;
-         final int imageOffsetX = imageSize + imageSpacing;
 
          final int imageWidth = (horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing);
          final int imageHeight = imageSize;
@@ -227,9 +226,9 @@ public class GraphColorPainter {
                imageHeight);
 
          final Rectangle drawableBounds = new Rectangle(
-               imageOffsetX,
                0,
-               imageWidth - imageOffsetX,
+               0,
+               imageWidth,
                imageHeight);
 
          final GC gc = new GC(colorImage);
@@ -244,17 +243,23 @@ public class GraphColorPainter {
                final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
                colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-               TourMapPainter.drawMap2Legend(
+               TourMapPainter.drawMap2_Legend(
                      gc,
                      drawableBounds,
                      colorProvider,
+                     false,
                      false);
 
             } else {
 
                // draw graph color image
 
-               final Color graphColor = getGraphColor(display, graphColorItem);
+               // fill with default background color that the dark theme
+               // do not show a white rectangle before the graph color
+               gc.setBackground(backgroundColor);
+               gc.fillRectangle(colorImage.getBounds());
+
+               final Color graphColor = getGraphColor(graphColorItem);
 
                // draw border
 //               gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
@@ -288,14 +293,16 @@ public class GraphColorPainter {
     * @param graphColor
     * @return return the {@link Color} for the graph
     */
-   private Color getGraphColor(final Display display, final GraphColorItem graphColor) {
+   private Color getGraphColor(final GraphColorItem graphColor) {
 
       final String colorId = graphColor.getColorId();
 
       Color imageColor = _colorCache.get(colorId);
 
       if (imageColor == null) {
-         imageColor = new Color(display, graphColor.getRGB());
+
+         imageColor = new Color(graphColor.getRGB());
+
          _colorCache.put(colorId, imageColor);
       }
 

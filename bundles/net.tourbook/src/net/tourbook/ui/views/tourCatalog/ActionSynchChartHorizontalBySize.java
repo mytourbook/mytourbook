@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,22 +24,22 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchChartHorizontalBySize extends Action {
 
-   private ISynchedChart synchChart;
+   private ISynchedChart _synchChart;
 
-   public ActionSynchChartHorizontalBySize(final ISynchedChart resultView) {
+   public ActionSynchChartHorizontalBySize(final ISynchedChart syncChart) {
 
       super(null, AS_CHECK_BOX);
 
-      this.synchChart = resultView;
+      _synchChart = syncChart;
 
       setToolTipText(Messages.tourCatalog_view_action_synch_charts_bySize_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncGraph_BySize));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncGraph_BySize_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize_Disabled));
    }
 
    @Override
    public void run() {
-      synchChart.synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SIZE);
+      _synchChart.synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SIZE);
    }
 }

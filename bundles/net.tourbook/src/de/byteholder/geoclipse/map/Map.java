@@ -77,6 +77,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorUtil;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
@@ -469,7 +470,7 @@ public class Map extends Canvas {
    private boolean     _isScaleVisible;
 
    private final Color _transparentColor;
-   private final Color _defaultBackgroundColor;
+   private Color       _defaultBackgroundColor;
 
    /*
     * POI image
@@ -635,8 +636,7 @@ public class Map extends Canvas {
       _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
       _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
 
-      _transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
-      _defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
+      _transparentColor = new Color(MAP_TRANSPARENT_RGB);
 
       SYS_COLOR_BLACK = _display.getSystemColor(SWT.COLOR_BLACK);
       SYS_COLOR_DARK_GRAY = _display.getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -650,6 +650,15 @@ public class Map extends Canvas {
       _tourBreadcrumb = new MapTourBreadcrumb();
 
       paint_Overlay_0_SetupThread();
+
+      parent.getDisplay().asyncExec(() -> {
+
+         // must be run async because dark theme colors could not yet be initialized
+
+         _defaultBackgroundColor = UI.IS_DARK_THEME
+               ? ThemeUtil.getDarkestBackgroundColor()
+               : new Color(MAP_DEFAULT_BACKGROUND_RGB);
+      });
    }
 
    /**
@@ -1048,7 +1057,24 @@ public class Map extends Canvas {
       final int width = Math.max(1, clientArea.width);
       final int height = Math.max(1, clientArea.height);
 
-      return new Image(display, width, height);
+      final Image mapImage = new Image(display, width, height);
+
+      if (UI.isDarkTheme()) {
+
+         /*
+          * It looks ugly when in the dark theme the default map background is white which occure
+          * before the map tile images are painted
+          */
+
+         final GC gc = new GC(mapImage);
+         {
+            gc.setBackground(ThemeUtil.getDarkestBackgroundColor());
+            gc.fillRectangle(clientArea);
+         }
+         gc.dispose();
+      }
+
+      return mapImage;
    }
 
    public void deleteFailedImageFiles() {
@@ -2455,9 +2481,6 @@ public class Map extends Canvas {
       disposeResource(_cursorSearchTour);
       disposeResource(_cursorSearchTour_Scroll);
 
-      disposeResource(_defaultBackgroundColor);
-      disposeResource(_transparentColor);
-
       // dispose resources in the overlay plugins
       for (final MapPainter overlay : _overlays) {
          overlay.dispose();
@@ -3577,7 +3600,7 @@ public class Map extends Canvas {
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.setForeground(SYS_COLOR_WHITE);
 
-      gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+      gc.setBackground(SYS_COLOR_YELLOW);
       gc.setAlpha(0x30);
       gc.fillRectangle(dev_X1 + 1, dev_Y1 + 1, dev_Width - 2, dev_Height - 2);
       gc.setAlpha(0xff);
