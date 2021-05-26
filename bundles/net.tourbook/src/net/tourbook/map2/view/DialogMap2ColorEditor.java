@@ -26,6 +26,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapColorProfile;
 import net.tourbook.map2.Messages;
+import net.tourbook.preferences.PrefPageAppearanceColors;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -589,8 +590,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
    private void logColorValues() {
 
-      // log changes that it is easier to adjust the defaults, this case will propably happen not very often
-      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]") + _mapColorWorkingCopy); //$NON-NLS-1$ //$NON-NLS-2$
+      if (PrefPageAppearanceColors.isLogging_ColorValues()) {
+
+         // log changes that it is easier to adjust the default values
+         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]") + _mapColorWorkingCopy); //$NON-NLS-1$ //$NON-NLS-2$
+      }
    }
 
    private void onSelectColor(final ColorSelector colorSelector, final int valueColorIndex) {

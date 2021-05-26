@@ -79,17 +79,4 @@ public abstract class MapColorProfile {
       this.minBrightnessFactor = minBrightnessFactor;
    }
 
-   public String toString_dis() {
-
-      return String.format("\n" //$NON-NLS-1$
-            + "MapColorProfile\n" //$NON-NLS-1$
-            + "   minBrightness         =%s\n" //$NON-NLS-1$
-            + "   minBrightnessFactor   =%s\n" //$NON-NLS-1$
-            + "   maxBrightness         =%s\n" //$NON-NLS-1$
-            + "   maxBrightnessFactor   =%s\n", //$NON-NLS-1$
-            minBrightness,
-            minBrightnessFactor,
-            maxBrightness,
-            maxBrightnessFactor);
-   }
 }

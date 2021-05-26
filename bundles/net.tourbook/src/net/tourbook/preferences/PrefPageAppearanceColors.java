@@ -33,9 +33,11 @@ import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
+import net.tourbook.common.util.Util;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -78,7 +80,17 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       IColorTreeViewer,
       IMap2ColorUpdater {
 
-   public static final String ID = "net.tourbook.preferences.PrefPageChartColors"; //$NON-NLS-1$
+   public static final String  ID                         = "net.tourbook.preferences.PrefPageChartColors";        //$NON-NLS-1$
+
+   private static final String SYS_PROP__LOG_COLOR_VALUES = "logColorValues";                                      //$NON-NLS-1$
+   private static boolean      _isLogging_ColorValues     = System.getProperty(SYS_PROP__LOG_COLOR_VALUES) != null;
+
+   static {
+
+      if (_isLogging_ColorValues) {
+         Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_COLOR_VALUES, "Color values are logged"); //$NON-NLS-1$
+      }
+   }
 
    /*
     * Legend is created with dummy values 0...200.
@@ -87,6 +99,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    private static final int          LEGEND_MAX_VALUE       = 200;
 
    private static ColorValue[]       _legendImageColors     = new ColorValue[] {
+
          new ColorValue(10, 255, 0, 0),
          new ColorValue(50, 100, 100, 0),
          new ColorValue(100, 0, 255, 0),
@@ -94,6 +107,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          new ColorValue(190, 0, 0, 255) };
 
    private static final List<Float>  _legendImageUnitValues = Arrays.asList(
+
          10f,
          50f,
          100f,
@@ -101,6 +115,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          190f);
 
    private static final List<String> _legendImageUnitLabels = Arrays.asList(
+
          Messages.Pref_ChartColors_unit_min,
          Messages.Pref_ChartColors_unit_low,
          Messages.Pref_ChartColors_unit_mid,
@@ -110,7 +125,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    private final IPreferenceStore    _prefStore             = TourbookPlugin.getPrefStore();
    private final IPreferenceStore    _prefStore_Common      = CommonActivator.getPrefStore();
 
-   TreeViewer                        _colorViewer;
+   private TreeViewer                _colorViewer;
 
    private GraphColorItem            _selectedColor;
    private boolean                   _isColorChanged;
@@ -208,6 +223,10 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       mapUnits.legendMaxValue = LEGEND_MAX_VALUE;
 
       return colorProvider;
+   }
+
+   public static boolean isLogging_ColorValues() {
+      return _isLogging_ColorValues;
    }
 
    @Override
@@ -661,8 +680,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          _isColorChanged = true;
       }
 
-      // log changes that it is easier to adjust the defaults, this case will propably happen not very often
-      if (colorDefinition != null) {
+      // log changes that it is easier to adjust the default values
+      if (colorDefinition != null && _isLogging_ColorValues) {
 
          System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
                + ("\t: " + colorDefinition)); //$NON-NLS-1$

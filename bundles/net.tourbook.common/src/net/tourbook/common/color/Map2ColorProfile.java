@@ -243,20 +243,6 @@ public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 
       sb.append("   );");
 
-//      this.minBrightness          = minBrightness;
-//      this.minBrightnessFactor    = minBrightnessFactor;
-//      this.maxBrightness          = maxBrightness;
-//      this.maxBrightnessFactor    = maxBrightnessFactor;
-
-//      public static final int      BRIGHTNESS_DEFAULT        = 0;
-//      public static final int      BRIGHTNESS_DIMMING        = 1;
-//      public static final int      BRIGHTNESS_LIGHTNING      = 2;
-
-//      this.isMinValueOverwrite    = isMinOverwrite;
-//      this.minValueOverwrite      = minOverwrite;
-//      this.isMaxValueOverwrite    = isMaxOverwrite;
-//      this.maxValueOverwrite      = maxOverwrite;
-
       return sb.toString();
    }
 

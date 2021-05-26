@@ -4131,8 +4131,8 @@ public class TourManager {
       ChartDataYSerie yDataGears = null;
       if (gearSerie != null) {
 
-         final float[][] chartGearSerie = new float[][] //
-         {
+         final float[][] chartGearSerie = new float[][] {
+
                // gear ratio
                gearSerie[0],
 

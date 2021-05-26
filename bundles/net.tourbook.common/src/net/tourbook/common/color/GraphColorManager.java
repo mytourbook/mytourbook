@@ -116,8 +116,9 @@ public class GraphColorManager {
          { PREF_COLOR_GRADIENT_DARK,      Messages.Graph_Pref_color_gradient_dark   },
 
          { PREF_COLOR_LINE_LIGHT,         Messages.Graph_Pref_ColorLine_Theme_Light },
-         { PREF_COLOR_LINE_DARK,          Messages.Graph_Pref_ColorLine_Theme_Dark  },
          { PREF_COLOR_TEXT_LIGHT,         Messages.Graph_Pref_ColorText_Theme_Light },
+
+         { PREF_COLOR_LINE_DARK,          Messages.Graph_Pref_ColorLine_Theme_Dark  },
          { PREF_COLOR_TEXT_DARK,          Messages.Graph_Pref_ColorText_Theme_Dark  },
 
          { PREF_COLOR_MAPPING,            Messages.Graph_Pref_color_mapping         }

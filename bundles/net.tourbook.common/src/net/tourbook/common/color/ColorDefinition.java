@@ -357,9 +357,17 @@ public class ColorDefinition {
       return result;
    }
 
+   /**
+    * Log RGB values as Java code:
+    * <p>
+    * <code>
+    *  new RGB(0x5B, 0x5B, 0x5B),
+    * </code>
+    *
+    * @param rgb
+    * @return
+    */
    private String logRGB(final RGB rgb) {
-
-//      new RGB(0x5B, 0x5B, 0x5B),
 
       if (rgb == null) {
          return "null"; //$NON-NLS-1$
@@ -446,29 +454,9 @@ public class ColorDefinition {
 
 // SET_FORMATTING_OFF
 
-      return "\nColorDefinition   \n" //$NON-NLS-1$
+      return "\nColorDefinition"             + NL + NL //$NON-NLS-1$
 
-            + "_colorDefinitionId = " + _colorDefinitionId       + NL //$NON-NLS-1$
-//            + "_visibleName               =" + _visibleName             + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_graphPrefNamePrefix         =" + _graphPrefNamePrefix       + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_graphColorItems            =" + Arrays.toString(_graphColorItems) + NL //$NON-NLS-1$ //$NON-NLS-2$
-//
-//            + "_lineColor_Active            =" + _lineColor_Active          + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_lineColor_New               =" + _lineColor_New             + NL //$NON-NLS-1$ //$NON-NLS-2$
-//
-//            + "_gradientBright_Active      =" + _gradientBright_Active    + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_gradientBright_New         =" + _gradientBright_New       + NL //$NON-NLS-1$ //$NON-NLS-2$
-//
-//            + "_gradientDark_Active         =" + _gradientDark_Active       + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_gradientDark_New            =" + _gradientDark_New          + NL //$NON-NLS-1$ //$NON-NLS-2$
-//
-//            + "_textColor_Active            =" + _textColor_Active          + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_textColor_New               =" + _textColor_New             + NL //$NON-NLS-1$ //$NON-NLS-2$
-//
-//            + "_map2ColorProfile_Active   =" + _map2ColorProfile_Active + NL //$NON-NLS-1$ //$NON-NLS-2$
-//            + "_map2ColorProfile_New      =" + _map2ColorProfile_New    + NL //$NON-NLS-1$
-
-            // Java code
+            + "_colorDefinitionId = " + _colorDefinitionId  + NL + NL //$NON-NLS-1$
 
             + logRGB(_gradientBright_New)    + NL
             + logRGB(_gradientDark_New)      + NL
@@ -479,8 +467,6 @@ public class ColorDefinition {
             + logRGB(_textColor_New_Light)   + NL
             + logRGB(_textColor_New_Dark)    + NL
 
-//            + "_map2ColorProfile_Default   = " + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//            + "]"; //$NON-NLS-1$
       ;
 // SET_FORMATTING_ON
    }

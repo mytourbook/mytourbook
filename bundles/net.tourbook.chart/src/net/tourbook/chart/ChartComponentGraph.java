@@ -310,9 +310,6 @@ public class ChartComponentGraph extends Canvas {
    private Cursor                     _cursorXSliderLeft;
    private Cursor                     _cursorXSliderRight;
 
-   private Color                      _gridColor;
-   private Color                      _gridColorMajor;
-
    /**
     * Contains a {@link ChartTitleSegment} when a tour title area is hovered, otherwise
     * <code>null</code> .
@@ -503,9 +500,6 @@ public class ChartComponentGraph extends Canvas {
       _cursorXSliderRight              = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
 
 // SET_FORMATTING_ON
-
-      _gridColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
-      _gridColorMajor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
       _chartComponents = (ChartComponents) parent;
 
@@ -2112,8 +2106,7 @@ public class ChartComponentGraph extends Canvas {
       final String unitLabel = graphDrawingData.getXData().getUnitLabel();
       final int devUnitLabelWidth = gcChart.textExtent(unitLabel).x;
 
-      gcChart.setForeground(_foregroundColor);
-      gcGraph.setForeground(_gridColor);
+      gcChart.setForeground(Chart.FOREGROUND_COLOR_UNITS);
 
       final int xUnitSize = xUnits.size();
       int devNextXUnitTick = Integer.MIN_VALUE;
@@ -2310,7 +2303,6 @@ public class ChartComponentGraph extends Canvas {
             if (xUnit.isMajorValue) {
 
                gcGraph.setLineStyle(SWT.LINE_SOLID);
-               gcGraph.setForeground(_gridColorMajor);
 
             } else {
 
@@ -2322,8 +2314,9 @@ public class ChartComponentGraph extends Canvas {
 //               gcGraph.setLineWidth(0);
 
                gcGraph.setLineDash(DOT_DASHES);
-               gcGraph.setForeground(_gridColor);
             }
+
+            gcGraph.setForeground(Chart.FOREGROUND_COLOR_GRID);
             gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, graphDrawingData.devGraphHeight);
 
          }
@@ -2342,7 +2335,9 @@ public class ChartComponentGraph extends Canvas {
    private void drawAsync_220_HGrid(final GC gcGraph, final GraphDrawingData drawingData) {
 
       if (_chart.isShowHorizontalGridLines == false) {
+
          // h-grid is not visible
+
          return;
       }
 
@@ -2385,11 +2380,11 @@ public class ChartComponentGraph extends Canvas {
 
             if (yUnit.isMajorValue) {
                gcGraph.setLineStyle(SWT.LINE_SOLID);
-               gcGraph.setForeground(_gridColorMajor);
             } else {
                gcGraph.setLineDash(DOT_DASHES);
-               gcGraph.setForeground(_gridColor);
             }
+
+            gcGraph.setForeground(Chart.FOREGROUND_COLOR_GRID);
             gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
          }
 
@@ -3844,8 +3839,8 @@ public class ChartComponentGraph extends Canvas {
       final int barHeight2 = barHeight / 2;
 
       // get the colors
-      final RGB[] rgbDark = yData.getRgbDark();
-      final RGB[] rgbBright = yData.getRgbBright();
+      final RGB[] rgbDark = yData.getRgbText();
+      final RGB[] rgbBright = yData.getRgbLine();
 
       final Color colorBgDark = new Color(rgbDark[0]);
       final Color colorBgBright = new Color(rgbBright[0]);
@@ -5611,9 +5606,6 @@ public class ChartComponentGraph extends Canvas {
       final boolean isGraphOverlapped = _chartDrawingData.chartDataModel.isGraphOverlapped();
 
       final int devSliderLinePos = (int) (slider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
-
-//      final int grayColorIndex = 60;
-//      final Color colorTxt = new Color(grayColorIndex, grayColorIndex, grayColorIndex);
 
       int graphNo = 0;
 

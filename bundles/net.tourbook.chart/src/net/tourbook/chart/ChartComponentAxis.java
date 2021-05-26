@@ -404,7 +404,7 @@ public class ChartComponentAxis extends Canvas {
          /*
           * Draw y units
           */
-         gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         gc.setForeground(Chart.FOREGROUND_COLOR_UNITS);
 
          int devY;
 
