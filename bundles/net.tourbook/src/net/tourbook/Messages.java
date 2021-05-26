@@ -1937,9 +1937,11 @@ public class Messages extends NLS {
    public static String Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String Slideout_Map25TrackOptions_Label_Name;
    public static String Slideout_Map25TrackOptions_Label_OutlineColor;
+   public static String Slideout_Map25TrackOptions_Label_OutlineColor_Tooltip;
    public static String Slideout_Map25TrackOptions_Label_OutlineWidth;
    public static String Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
    public static String Slideout_Map25TrackOptions_Label_DirectionArrows;
+   public static String Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;
 
    public static String Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
@@ -2030,6 +2032,7 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
    public static String Slideout_Map_Options_Label_SliderLocation_Size;
    public static String Slideout_Map_Options_Label_SliderPath_Color;
+   public static String Slideout_Map_Options_Label_SliderPath_Color_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
 
