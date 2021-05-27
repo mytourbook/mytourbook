@@ -28,7 +28,7 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class ColorDefinition {
 
-   private static final char      NL               = UI.NEW_LINE;
+   private static final String    NL               = UI.NEW_LINE1;
 
    private final IPreferenceStore _commonPrefStore = CommonActivator.getPrefStore();
 
@@ -454,7 +454,7 @@ public class ColorDefinition {
 
 // SET_FORMATTING_OFF
 
-      return "\nColorDefinition"             + NL + NL //$NON-NLS-1$
+      return NL + NL
 
             + "_colorDefinitionId = " + _colorDefinitionId  + NL + NL //$NON-NLS-1$
 

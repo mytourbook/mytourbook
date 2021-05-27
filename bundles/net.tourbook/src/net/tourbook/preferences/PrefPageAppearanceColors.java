@@ -81,6 +81,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    public static final String ID = "net.tourbook.preferences.PrefPageChartColors"; //$NON-NLS-1$
 
+   private static final char  NL = UI.NEW_LINE;
+
    /*
     * Legend is created with dummy values 0...200.
     */
@@ -172,6 +174,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       @Override
       public Object[] getChildren(final Object parentElement) {
+
          if (parentElement instanceof ColorDefinition) {
             final ColorDefinition graphDefinition = (ColorDefinition) parentElement;
             return graphDefinition.getGraphColorItems();
@@ -181,6 +184,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       @Override
       public Object[] getElements(final Object inputElement) {
+
          if (inputElement instanceof PrefPageAppearanceColors) {
             return GraphColorManager.getAllColorDefinitions();
          }
@@ -194,6 +198,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       @Override
       public boolean hasChildren(final Object element) {
+
          if (element instanceof ColorDefinition) {
             return true;
          }
@@ -630,6 +635,48 @@ public class PrefPageAppearanceColors extends PreferencePage implements
             this);
    }
 
+   private void logAllColorValues() {
+
+      final StringBuilder sb = new StringBuilder();
+
+      final ColorDefinition[] allGraphColorDefinitions = GraphColorManager.getAllColorDefinitions();
+
+      // log color definition
+      for (final ColorDefinition colorDefinition : allGraphColorDefinitions) {
+         sb.append(colorDefinition.toString());
+      }
+
+      // log map2 colors
+      for (final ColorDefinition colorDefinition : allGraphColorDefinitions) {
+
+         final Map2ColorProfile map2Color_New = colorDefinition.getMap2Color_New();
+         if (map2Color_New != null) {
+            sb.append(map2Color_New);
+         }
+      }
+
+      System.out.println(NL + NL
+
+            + UI.timeStampNano()
+
+            + " [" + getClass().getSimpleName() + "] ()" + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + sb.toString()
+
+      );
+
+   }
+
+   @Override
+   public boolean okToLeave() {
+
+      if (_isLogging_ColorValues) {
+         logAllColorValues();
+      }
+
+      return super.okToLeave();
+   }
+
    /**
     * is called when the color in the color selector has changed
     *
@@ -668,10 +715,16 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       }
 
       // log changes that it is easier to adjust the default values
-      if (colorDefinition != null && _isLogging_ColorValues) {
+      if (_selectedColor != null && _isLogging_ColorValues) {
 
-         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("\t: " + colorDefinition)); //$NON-NLS-1$
+         System.out.println(NL + NL
+
+               + UI.timeStampNano()
+
+               + " [" + getClass().getSimpleName() + "] ()" //$NON-NLS-1$ //$NON-NLS-2$
+               + _selectedColor.getColorDefinition()
+
+         );
       }
    }
 

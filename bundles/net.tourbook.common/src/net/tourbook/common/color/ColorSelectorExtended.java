@@ -224,6 +224,7 @@ public class ColorSelectorExtended extends EventManager {
       colorDialog.setRGBs(_allCustomRGBs);
 
       final RGB newColor = colorDialog.open();
+
       _allCustomRGBs = colorDialog.getRGBs();
 
       if (newColor != null) {

@@ -593,7 +593,12 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
       if (PrefPageAppearanceColors.isLogging_ColorValues()) {
 
          // log changes that it is easier to adjust the default values
-         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]") + _mapColorWorkingCopy); //$NON-NLS-1$ //$NON-NLS-2$
+         System.out.println(UI.NEW_LINE + UI.NEW_LINE
+
+               + UI.timeStampNano()
+
+               + " [" + getClass().getSimpleName() + "]"
+               + _mapColorWorkingCopy);
       }
    }
 
