@@ -219,6 +219,9 @@ public class TourChartAnalyzerView extends ViewPart {
             // dispose old colors
             _colorCache.dispose();
 
+            // force a redraw
+            _valueIndexLeftLast = -1;
+
             updateInfo(_chartInfo, false);
          }
       };

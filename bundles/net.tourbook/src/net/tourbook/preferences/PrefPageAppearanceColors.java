@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +27,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.ColorValue;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
@@ -39,13 +42,12 @@ import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -61,11 +63,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -80,25 +79,15 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       IColorTreeViewer,
       IMap2ColorUpdater {
 
-   public static final String  ID                         = "net.tourbook.preferences.PrefPageChartColors";        //$NON-NLS-1$
-
-   private static final String SYS_PROP__LOG_COLOR_VALUES = "logColorValues";                                      //$NON-NLS-1$
-   private static boolean      _isLogging_ColorValues     = System.getProperty(SYS_PROP__LOG_COLOR_VALUES) != null;
-
-   static {
-
-      if (_isLogging_ColorValues) {
-         Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_COLOR_VALUES, "Color values are logged"); //$NON-NLS-1$
-      }
-   }
+   public static final String ID = "net.tourbook.preferences.PrefPageChartColors"; //$NON-NLS-1$
 
    /*
     * Legend is created with dummy values 0...200.
     */
-   private static final int          LEGEND_MIN_VALUE       = 0;
-   private static final int          LEGEND_MAX_VALUE       = 200;
+   private static final int          LEGEND_MIN_VALUE           = 0;
+   private static final int          LEGEND_MAX_VALUE           = 200;
 
-   private static ColorValue[]       _legendImageColors     = new ColorValue[] {
+   private static ColorValue[]       _legendImageColors         = new ColorValue[] {
 
          new ColorValue(10, 255, 0, 0),
          new ColorValue(50, 100, 100, 0),
@@ -106,7 +95,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          new ColorValue(150, 0, 100, 100),
          new ColorValue(190, 0, 0, 255) };
 
-   private static final List<Float>  _legendImageUnitValues = Arrays.asList(
+   private static final List<Float>  _legendImageUnitValues     = Arrays.asList(
 
          10f,
          50f,
@@ -114,7 +103,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          150f,
          190f);
 
-   private static final List<String> _legendImageUnitLabels = Arrays.asList(
+   private static final List<String> _legendImageUnitLabels     = Arrays.asList(
 
          Messages.Pref_ChartColors_unit_min,
          Messages.Pref_ChartColors_unit_low,
@@ -122,29 +111,40 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          Messages.Pref_ChartColors_unit_high,
          Messages.Pref_ChartColors_unit_max);
 
-   private final IPreferenceStore    _prefStore             = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore    _prefStore_Common      = CommonActivator.getPrefStore();
+   private static final String       SYS_PROP__LOG_COLOR_VALUES = "logColorValues";                                      //$NON-NLS-1$
+   private static boolean            _isLogging_ColorValues     = System.getProperty(SYS_PROP__LOG_COLOR_VALUES) != null;
+   static {
 
-   private TreeViewer                _colorViewer;
+      if (_isLogging_ColorValues) {
+         Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_COLOR_VALUES, "Color values are logged"); //$NON-NLS-1$
+      }
+   }
 
-   private GraphColorItem            _selectedColor;
-   private boolean                   _isColorChanged;
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private ColorDefinition           _expandedItem;
-   private boolean                   _isNavigationKeyPressed;
-   private boolean                   _isInTreeExpand;
+   private static final IDialogSettings  _state            = CommonActivator.getState(ID);
 
-   private IGradientColorProvider    _legendImageColorProvider;
-   private DialogMap2ColorEditor     _dialogMappingColor;
-   private GraphColorPainter         _graphColorPainter;
+   private TreeViewer                    _colorViewer;
+   private GraphColorItem                _selectedColor;
+   private boolean                       _isColorChanged;
+
+   private ColorDefinition               _expandedItem;
+   private boolean                       _isNavigationKeyPressed;
+   private boolean                       _isInTreeExpand;
+
+   private IGradientColorProvider        _legendImageColorProvider;
+   private DialogMap2ColorEditor         _dialogMappingColor;
+
+   private GraphColorPainter             _graphColorPainter;
 
    /*
     * UI controls
     */
-   private Button        _btnLegend;
-   private Button        _chkLiveUpdate;
+   private Button                _btnLegend;
+   private Button                _chkLiveUpdate;
 
-   private ColorSelector _colorSelector;
+   private ColorSelectorExtended _colorSelector;
 
    /**
     * the color content provider has the following structure<br>
@@ -406,7 +406,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
          } else if (selection instanceof GraphColorItem) {
 
-            onSelectColorInColorViewer();
+            onSelect_ColorIn_ColorViewer();
 
             // run async that the UI do display the selected color in the color button
             _colorViewer.getTree().getDisplay().asyncExec(() -> {
@@ -417,7 +417,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
                   // legend color is selected
 
-                  onSelectMappingColor();
+                  onSelect_MappingColor();
 
                } else {
 
@@ -480,32 +480,25 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          /*
           * button: color selector:
           */
-         _colorSelector = new ColorSelector(container);
-         _colorSelector.getButton().setLayoutData(new GridData());
+         _colorSelector = new ColorSelectorExtended(container);
          _colorSelector.setEnabled(false);
-         setButtonLayoutData(_colorSelector.getButton());
-         _colorSelector.addListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               onSelectColorInColorSelector(event);
-               doLiveUpdate();
-            }
+         _colorSelector.addListener(propertyChangeEvent -> {
+            onSelect_ColorIn_ColorSelector(propertyChangeEvent);
+            doLiveUpdate();
          });
+         setButtonLayoutData(_colorSelector.getButton());
 
          /*
           * button: mapping color
           */
          _btnLegend = new Button(container, SWT.NONE);
          _btnLegend.setText(Messages.Pref_ChartColors_btn_legend);
+         _btnLegend.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            onSelect_MappingColor();
+            doLiveUpdate();
+         }));
          setButtonLayoutData(_btnLegend);
 
-         _btnLegend.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectMappingColor();
-               doLiveUpdate();
-            }
-         });
          _btnLegend.setEnabled(false);
       }
    }
@@ -520,16 +513,10 @@ public class PrefPageAppearanceColors extends PreferencePage implements
           * Checkbox: live update
           */
          _chkLiveUpdate = new Button(container, SWT.CHECK);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
          _chkLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
          _chkLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
-         _chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               doLiveUpdate();
-            }
-         });
+         _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> doLiveUpdate()));
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
       }
    }
 
@@ -648,7 +635,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
     *
     * @param event
     */
-   private void onSelectColorInColorSelector(final PropertyChangeEvent event) {
+   private void onSelect_ColorIn_ColorSelector(final PropertyChangeEvent event) {
 
       final RGB oldValue = (RGB) event.getOldValue();
       final RGB newValue = (RGB) event.getNewValue();
@@ -691,7 +678,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    /**
     * is called when the color in the color viewer was selected
     */
-   private void onSelectColorInColorViewer() {
+   private void onSelect_ColorIn_ColorViewer() {
 
       final IStructuredSelection selection = (IStructuredSelection) _colorViewer.getSelection();
 
@@ -732,7 +719,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    /**
     * modify the colors of the legend
     */
-   private void onSelectMappingColor() {
+   private void onSelect_MappingColor() {
 
       final ColorDefinition selectedColorDefinition = _selectedColor.getColorDefinition();
 
@@ -771,11 +758,11 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Default());
          graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Default());
 
-         graphDefinition.setLineColor_New_Light(graphDefinition.getLineColor_Default_Light());
-         graphDefinition.setLineColor_New_Dark(graphDefinition.getLineColor_Default_Dark());
+         graphDefinition.setLineColor_New_LightTheme(graphDefinition.getLineColor_Default_Light());
+         graphDefinition.setLineColor_New_DarkTheme(graphDefinition.getLineColor_Default_Dark());
 
-         graphDefinition.setTextColor_New_Light(graphDefinition.getTextColor_Default_Light());
-         graphDefinition.setTextColor_New_Dark(graphDefinition.getTextColor_Default_Dark());
+         graphDefinition.setTextColor_New_LightTheme(graphDefinition.getTextColor_Default_Light());
+         graphDefinition.setTextColor_New_DarkTheme(graphDefinition.getTextColor_Default_Dark());
 
          final Map2ColorProfile defaultLegendColor = graphDefinition.getMap2Color_Default();
          if (defaultLegendColor != null) {
@@ -816,11 +803,11 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Active());
          graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Active());
 
-         graphDefinition.setLineColor_New_Light(graphDefinition.getLineColor_Active_Light());
-         graphDefinition.setLineColor_New_Dark(graphDefinition.getLineColor_Active_Dark());
+         graphDefinition.setLineColor_New_LightTheme(graphDefinition.getLineColor_Active_Light());
+         graphDefinition.setLineColor_New_DarkTheme(graphDefinition.getLineColor_Active_Dark());
 
-         graphDefinition.setTextColor_New_Light(graphDefinition.getTextColor_Active_Light());
-         graphDefinition.setTextColor_New_Dark(graphDefinition.getTextColor_Active_Dark());
+         graphDefinition.setTextColor_New_LightTheme(graphDefinition.getTextColor_Active_Light());
+         graphDefinition.setTextColor_New_DarkTheme(graphDefinition.getTextColor_Active_Dark());
 
          graphDefinition.setMap2Color_New(graphDefinition.getMap2Color_Active());
       }
@@ -830,6 +817,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       // live update
       _chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
+
+      _colorSelector.restoreCustomColors(_state);
    }
 
    private void updateAndSaveColors() {
@@ -837,6 +826,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       GraphColorManager.saveColors();
 
       MapColorProvider.updateMap2Colors();
+
+      _colorSelector.saveCustomColors(_state);
 
       // force to change the status
       _prefStore.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());

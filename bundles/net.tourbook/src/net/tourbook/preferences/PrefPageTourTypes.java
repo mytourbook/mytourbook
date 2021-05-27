@@ -28,8 +28,10 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColorProvider;
@@ -50,12 +52,12 @@ import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
 import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -97,10 +99,13 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
+   private static final String                ID                     = "net.tourbook.preferences.PrefPageTourTypes";               //$NON-NLS-1$
+
    private static final String                COLOR_UNIQUE_ID_PREFIX = "crId";                                                     //$NON-NLS-1$
 
    private static final String[]              SORT_PROPERTY          = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
 
+   private static final IDialogSettings       _state                 = CommonActivator.getState(ID);
    private final IPreferenceStore             _prefStore             = TourbookPlugin.getPrefStore();
 
    private GraphColorPainter                  _graphColorPainter;
@@ -126,21 +131,21 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
-   private TreeViewer    _tourTypeViewer;
+   private TreeViewer            _tourTypeViewer;
 
-   private Button        _btnAdd;
-   private Button        _btnDelete;
-   private Button        _btnRename;
+   private Button                _btnAdd;
+   private Button                _btnDelete;
+   private Button                _btnRename;
 
-   private ColorSelector _colorSelector;
+   private ColorSelectorExtended _colorSelector;
 
-   private Combo         _comboFillColor1;
-   private Combo         _comboFillColor2;
-   private Combo         _comboFillLayout;
-   private Combo         _comboBorderColor;
-   private Combo         _comboBorderLayout;
+   private Combo                 _comboFillColor1;
+   private Combo                 _comboFillColor2;
+   private Combo                 _comboFillLayout;
+   private Combo                 _comboBorderColor;
+   private Combo                 _comboBorderLayout;
 
-   private Spinner       _spinnerBorder;
+   private Spinner               _spinnerBorder;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -503,7 +508,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             /*
              * Color selector
              */
-            _colorSelector = new ColorSelector(container);
+            _colorSelector = new ColorSelectorExtended(container);
             _colorSelector.addListener(this::onTourType_Modify);
             setButtonLayoutData(_colorSelector.getButton());
          }
@@ -952,6 +957,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
          TourTypeManager.saveState();
 
          TourManager.getInstance().clearTourDataCache();
+
+         _colorSelector.saveCustomColors(_state);
 
          // fire modify event
          _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
@@ -1485,6 +1492,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       _comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor1));
       _comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor2));
       _comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(imageConfig.imageLayout));
+
+      _colorSelector.restoreCustomColors(_state);
 
       enableLayoutControls();
    }

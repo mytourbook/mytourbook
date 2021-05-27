@@ -718,11 +718,11 @@ public class GraphColorManager {
          graphDefinition.setGradientBright_Active(graphDefinition.getGradientBright_New());
          graphDefinition.setGradientDark_Active(graphDefinition.getGradientDark_New());
 
-         graphDefinition.setLineColor_Active_Light(graphDefinition.getLineColor_New_Light());
-         graphDefinition.setLineColor_Active_Dark(graphDefinition.getLineColor_New_Dark());
+         graphDefinition.setLineColor_Active_LightTheme(graphDefinition.getLineColor_New_Light());
+         graphDefinition.setLineColor_Active_DarkTheme(graphDefinition.getLineColor_New_Dark());
 
-         graphDefinition.setTextColor_Active_Light(graphDefinition.getTextColor_New_Light());
-         graphDefinition.setTextColor_Active_Dark(graphDefinition.getTextColor_New_Dark());
+         graphDefinition.setTextColor_Active_LightTheme(graphDefinition.getTextColor_New_Light());
+         graphDefinition.setTextColor_Active_DarkTheme(graphDefinition.getTextColor_New_Dark());
 
          // 2D map color
          graphDefinition.setMap2Color_Active(graphDefinition.getMap2Color_New());

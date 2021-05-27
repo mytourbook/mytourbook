@@ -421,7 +421,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_GraphBackground(_parent, toolbar, TourChart.this);
+         return new SlideoutGraphBackground(_parent, toolbar, TourChart.this);
       }
 
       @Override
