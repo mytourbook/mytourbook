@@ -17,6 +17,7 @@ package net.tourbook.chart;
 
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.form.ViewForm;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.util.ITourToolTipProvider;
@@ -71,6 +72,9 @@ public class Chart extends ViewForm {
    private static final int                          MouseExit                        = 50;
    private static final int                          KeyDown                          = 110;
    private static final int                          ChartResized                     = 999;
+
+   public static Color                               FOREGROUND_COLOR_GRID;
+   public static Color                               FOREGROUND_COLOR_UNITS;
 
    private final ListenerList<IBarSelectionListener> _barSelectionListeners           = new ListenerList<>();
    private final ListenerList<IBarSelectionListener> _barDoubleClickListeners         = new ListenerList<>();
@@ -185,7 +189,7 @@ public class Chart extends ViewForm {
          setBorderVisible(true);
       }
 
-      //		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      setupColors();
 
       final GridLayout gl = new GridLayout(1, false);
       gl.marginWidth = 0;
@@ -1263,6 +1267,22 @@ public class Chart extends ViewForm {
 
       // set tour info icon into the left axis
       getToolTipControl().setTourToolTipProvider(tourToolTip);
+   }
+
+   private void setupColors() {
+
+      // color must be set lately otherwise the dark theme could not be initialized
+
+//    final int grayColor = 111;
+//    gcGraph.setForeground(new Color(grayColor, grayColor, grayColor));
+
+      FOREGROUND_COLOR_GRID = UI.IS_DARK_THEME
+            ? new Color(99, 99, 99)
+            : new Color(222, 222, 222);
+
+      FOREGROUND_COLOR_UNITS = UI.IS_DARK_THEME
+            ? new Color(155, 155, 155)
+            : new Color(133, 133, 133);
    }
 
    public void setValuePointToolTipProvider(final IPinned_ToolTip valuePointToolTip) {
