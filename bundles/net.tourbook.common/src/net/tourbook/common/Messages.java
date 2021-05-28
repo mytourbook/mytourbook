@@ -260,7 +260,7 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_Pressure_Atmosphere_Millibar;
    public static String        Pref_System_Option_SmallLength_Inch;
    public static String        Pref_System_Option_SmallLength_Millimeter;
-   public static String        Pref_System_Option_Temperature_Celcius;
+   public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
 
    public static String        Weather_Clounds_Clouds;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,7 +94,7 @@ public class MeasurementSystem_Manager {
             Unit_Height_Body.METER,
             Unit_Pace.MINUTES_PER_KILOMETER,
             Unit_Pressure_Atmosphere.MILLIBAR,
-            Unit_Temperature.CELCIUS,
+            Unit_Temperature.CELSIUS,
             Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Imperial,
@@ -118,7 +118,7 @@ public class MeasurementSystem_Manager {
             Unit_Height_Body.METER,
             Unit_Pace.MINUTES_PER_KILOMETER,
             Unit_Pressure_Atmosphere.MILLIBAR,
-            Unit_Temperature.CELCIUS,
+            Unit_Temperature.CELSIUS,
             Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other1,
@@ -130,7 +130,7 @@ public class MeasurementSystem_Manager {
             Unit_Height_Body.METER,
             Unit_Pace.MINUTES_PER_KILOMETER,
             Unit_Pressure_Atmosphere.MILLIBAR,
-            Unit_Temperature.CELCIUS,
+            Unit_Temperature.CELSIUS,
             Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other2,
@@ -142,7 +142,7 @@ public class MeasurementSystem_Manager {
             Unit_Height_Body.METER,
             Unit_Pace.MINUTES_PER_KILOMETER,
             Unit_Pressure_Atmosphere.MILLIBAR,
-            Unit_Temperature.CELCIUS,
+            Unit_Temperature.CELSIUS,
             Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other3,
@@ -154,7 +154,7 @@ public class MeasurementSystem_Manager {
             Unit_Height_Body.METER,
             Unit_Pace.MINUTES_PER_KILOMETER,
             Unit_Pressure_Atmosphere.MILLIBAR,
-            Unit_Temperature.CELCIUS,
+            Unit_Temperature.CELSIUS,
             Unit_Weight.KILOGRAM));
 
       // overwrite default values with saved values
@@ -163,56 +163,56 @@ public class MeasurementSystem_Manager {
 
 // SET_FORMATTING_OFF
 
-   private static final System_Distance                        _allSystem_Distances[] = {
+   private static final System_Distance[]                        _allSystem_Distances = {
 
          new System_Distance(Unit_Distance.KILOMETER,          Messages.Pref_System_Option_Distance_Kilometer),
          new System_Distance(Unit_Distance.MILE,               Messages.Pref_System_Option_Distance_Mile),
          new System_Distance(Unit_Distance.NAUTIC_MILE,        Messages.Pref_System_Option_Distance_NauticMile),
    };
 
-   private static final System_Elevation                       _allSystem_Elevations[] = {
+   private static final System_Elevation[]                       _allSystem_Elevations = {
 
          new System_Elevation(Unit_Elevation.METER,            Messages.Pref_System_Option_Elevation_Meter),
          new System_Elevation(Unit_Elevation.FOOT,             Messages.Pref_System_Option_Elevation_Foot),
    };
 
-   private static final System_Height                          _allSystem_Heights[] = {
+   private static final System_Height[]                          _allSystem_Heights = {
 
          new System_Height(Unit_Height_Body.METER,             Messages.Pref_System_Option_Height_Meter),
          new System_Height(Unit_Height_Body.INCH,              Messages.Pref_System_Option_Height_Inch),
    };
 
-   private static final System_Length                          _allSystem_Lengths[] = {
+   private static final System_Length[]                          _allSystem_Lengths = {
 
          new System_Length(Unit_Length.METER,                  Messages.Pref_System_Option_Length_Meter),
          new System_Length(Unit_Length.YARD,                   Messages.Pref_System_Option_Length_Yard),
    };
 
-   private static final System_LengthSmall                     _allSystem_Length_Small[] = {
+   private static final System_LengthSmall[]                     _allSystem_Length_Small = {
 
          new System_LengthSmall(Unit_Length_Small.MILLIMETER,  Messages.Pref_System_Option_SmallLength_Millimeter),
          new System_LengthSmall(Unit_Length_Small.INCH,        Messages.Pref_System_Option_SmallLength_Inch),
    };
 
-   private static final System_Pace                            _allSystem_Pace[] = {
+   private static final System_Pace []                           _allSystem_Pace = {
 
          new System_Pace(Unit_Pace.MINUTES_PER_KILOMETER,      Messages.Pref_System_Option_Pace_MinutesPerKilometer),
          new System_Pace(Unit_Pace.MINUTES_PER_MILE,           Messages.Pref_System_Option_Pace_MinutesPerMile),
    };
 
-   private static final System_Pressure_Atmosphere             _allSystem_Pressure_Atmosphere[] = {
+   private static final System_Pressure_Atmosphere[]             _allSystem_Pressure_Atmosphere = {
 
          new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.MILLIBAR,          Messages.Pref_System_Option_Pressure_Atmosphere_Millibar),
          new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.INCH_OF_MERCURY,   Messages.Pref_System_Option_Pressure_Atmosphere_InchOfMercury),
    };
 
-   private static final System_Temperature                     _allSystem_Temperatures[] = {
+   private static final System_Temperature[]                     _allSystem_Temperatures = {
 
-         new System_Temperature(Unit_Temperature.CELCIUS,      Messages.Pref_System_Option_Temperature_Celcius),
+         new System_Temperature(Unit_Temperature.CELSIUS,      Messages.Pref_System_Option_Temperature_Celsius),
          new System_Temperature(Unit_Temperature.FAHRENHEIT,   Messages.Pref_System_Option_Temperature_Fahrenheit),
    };
 
-   private static final System_Weight                          _allSystem_Weights[] = {
+   private static final System_Weight[]                          _allSystem_Weights = {
 
          new System_Weight(Unit_Weight.KILOGRAM,               Messages.Pref_System_Option_BodyWeight_Kilogram),
          new System_Weight(Unit_Weight.POUND,                  Messages.Pref_System_Option_BodyWeight_Pound),
@@ -541,7 +541,7 @@ public class MeasurementSystem_Manager {
          final Unit_Length_Small          length_Small         = (Unit_Length_Small)         Util.getXmlEnum(xmlProfile, ATTR_LENGTH_SMALL,           Unit_Length_Small.MILLIMETER);
          final Unit_Pace                  pace                 = (Unit_Pace)                 Util.getXmlEnum(xmlProfile, ATTR_PACE,                   Unit_Pace.MINUTES_PER_KILOMETER);
          final Unit_Pressure_Atmosphere   pressure_Atmospheric = (Unit_Pressure_Atmosphere)  Util.getXmlEnum(xmlProfile, ATTR_PRESSURE_ATMOSPHERE,    Unit_Pressure_Atmosphere.MILLIBAR);
-         final Unit_Temperature           temperature          = (Unit_Temperature)          Util.getXmlEnum(xmlProfile, ATTR_TEMPERATURE,            Unit_Temperature.CELCIUS);
+         final Unit_Temperature           temperature          = (Unit_Temperature)          Util.getXmlEnum(xmlProfile, ATTR_TEMPERATURE,            Unit_Temperature.CELSIUS);
          final Unit_Weight                weight               = (Unit_Weight)               Util.getXmlEnum(xmlProfile, ATTR_WEIGHT,                 Unit_Weight.KILOGRAM);
 
 // SET_FORMATTING_ON
