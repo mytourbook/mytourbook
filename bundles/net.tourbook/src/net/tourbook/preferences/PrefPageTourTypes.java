@@ -277,10 +277,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                   tourType.getName(),
                   tourType.getRGB_Gradient_Bright(),
                   tourType.getRGB_Gradient_Dark(),
-                  tourType.getRGB_Line_Light(),
-                  tourType.getRGB_Line_Dark(),
-                  tourType.getRGB_Text_Light(),
-                  tourType.getRGB_Text_Dark()
+                  tourType.getRGB_Line_LightTheme(),
+                  tourType.getRGB_Line_DarkTheme(),
+                  tourType.getRGB_Text_LightTheme(),
+                  tourType.getRGB_Text_DarkTheme()
 
             );
 
@@ -1219,11 +1219,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             UI.EMPTY_STRING,
             UI.EMPTY_STRING);
 
-      newTourType.setColorBright(dummyColorDef.getGradientBright_Default());
-      newTourType.setColorDark(dummyColorDef.getGradientDark_Default());
+      newTourType.setColor_Gradient_Bright(dummyColorDef.getGradientBright_Default());
+      newTourType.setColor_Gradient_Dark(dummyColorDef.getGradientDark_Default());
 
-      newTourType.setColorLine(dummyColorDef.getLineColor_Default_Light(), dummyColorDef.getLineColor_Default_Dark());
-      newTourType.setColorText(dummyColorDef.getTextColor_Default_Light(), dummyColorDef.getTextColor_Default_Dark());
+      newTourType.setColor_Line(dummyColorDef.getLineColor_Default_Light(), dummyColorDef.getLineColor_Default_Dark());
+      newTourType.setColor_Text(dummyColorDef.getTextColor_Default_Light(), dummyColorDef.getTextColor_Default_Dark());
 
       // add new entity to db
       final TourType savedTourType = saveTourType(newTourType);
@@ -1352,11 +1352,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
        */
       final TourType oldTourType = selectedColorDef.getTourType();
 
-      oldTourType.setColorBright(selectedColorDef.getGradientBright_New());
-      oldTourType.setColorDark(selectedColorDef.getGradientDark_New());
+      oldTourType.setColor_Gradient_Bright(selectedColorDef.getGradientBright_New());
+      oldTourType.setColor_Gradient_Dark(selectedColorDef.getGradientDark_New());
 
-      oldTourType.setColorLine(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
-      oldTourType.setColorText(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
+      oldTourType.setColor_Line(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
+      oldTourType.setColor_Text(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
 
       final TourType savedTourType = saveTourType(oldTourType);
 

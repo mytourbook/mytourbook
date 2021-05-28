@@ -66,25 +66,15 @@ public class TourType implements Comparable<Object> {
 
    @Basic(optional = false)
    private String           name;
-   //
-   private short            colorBrightRed;
-   private short            colorBrightGreen;
-   private short            colorBrightBlue;
-   //
-   private short            colorDarkRed;
-   private short            colorDarkGreen;
-   private short            colorDarkBlue;
-   //
-   private short            colorLineRed;
-   private short            colorLineGreen;
-   private short            colorLineBlue;
-   //
-   private short            colorTextRed;
-   private short            colorTextGreen;
-   private short            colorTextBlue;
-   //
-   private int              colorLine_Dark;
-   private int              colorText_Dark;
+
+   private int              color_Gradient_Bright;
+   private int              color_Gradient_Dark;
+
+   private int              color_Line_LightTheme;
+   private int              color_Line_DarkTheme;
+
+   private int              color_Text_LightTheme;
+   private int              color_Text_DarkTheme;
 
    /**
     * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
@@ -150,11 +140,11 @@ public class TourType implements Comparable<Object> {
    }
 
    public int getColorLine_Dark() {
-      return colorLine_Dark;
+      return color_Line_DarkTheme;
    }
 
    public int getColorText_Dark() {
-      return colorText_Dark;
+      return color_Text_DarkTheme;
    }
 
    public long getCreateId() {
@@ -169,41 +159,41 @@ public class TourType implements Comparable<Object> {
    }
 
    public RGB getRGB_Gradient_Bright() {
-      return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
+      return ColorUtil.createRGB(color_Gradient_Bright);
    }
 
    public RGB getRGB_Gradient_Dark() {
-      return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
+      return ColorUtil.createRGB(color_Gradient_Dark);
    }
 
-   public RGB getRGB_Line_Dark() {
-      return ColorUtil.createRGB(colorLine_Dark);
+   public RGB getRGB_Line_DarkTheme() {
+      return ColorUtil.createRGB(color_Line_DarkTheme);
    }
 
-   public RGB getRGB_Line_Light() {
-      return new RGB(colorLineRed, colorLineGreen, colorLineBlue);
+   public RGB getRGB_Line_LightTheme() {
+      return ColorUtil.createRGB(color_Line_LightTheme);
    }
 
    public RGB getRGB_Line_Themed() {
 
       return UI.IS_DARK_THEME
-            ? getRGB_Line_Dark()
-            : getRGB_Line_Light();
+            ? getRGB_Line_DarkTheme()
+            : getRGB_Line_LightTheme();
    }
 
-   public RGB getRGB_Text_Dark() {
-      return ColorUtil.createRGB(colorText_Dark);
+   public RGB getRGB_Text_DarkTheme() {
+      return ColorUtil.createRGB(color_Text_DarkTheme);
    }
 
-   public RGB getRGB_Text_Light() {
-      return new RGB(colorTextRed, colorTextGreen, colorTextBlue);
+   public RGB getRGB_Text_LightTheme() {
+      return ColorUtil.createRGB(color_Text_LightTheme);
    }
 
    public RGB getRGB_Text_Themed() {
 
       return UI.IS_DARK_THEME
-            ? getRGB_Text_Dark()
-            : getRGB_Text_Light();
+            ? getRGB_Text_DarkTheme()
+            : getRGB_Text_LightTheme();
    }
 
    /**
@@ -228,11 +218,9 @@ public class TourType implements Comparable<Object> {
     *
     * @param rgbBright
     */
-   public void setColorBright(final RGB rgbBright) {
+   public void setColor_Gradient_Bright(final RGB rgbBright) {
 
-      colorBrightRed = (short) rgbBright.red;
-      colorBrightGreen = (short) rgbBright.green;
-      colorBrightBlue = (short) rgbBright.blue;
+      color_Gradient_Bright = ColorUtil.getColorValue(rgbBright);
    }
 
    /**
@@ -240,55 +228,47 @@ public class TourType implements Comparable<Object> {
     *
     * @param rgbDark
     */
-   public void setColorDark(final RGB rgbDark) {
+   public void setColor_Gradient_Dark(final RGB rgbDark) {
 
-      colorDarkRed = (short) rgbDark.red;
-      colorDarkGreen = (short) rgbDark.green;
-      colorDarkBlue = (short) rgbDark.blue;
+      color_Gradient_Dark = ColorUtil.getColorValue(rgbDark);
    }
 
-   public void setColorLine(final RGB rgbLine_Light, final RGB rgbLine_Dark) {
+   public void setColor_Line(final RGB rgbLine_Light, final RGB rgbLine_Dark) {
 
-      colorLineRed = (short) rgbLine_Light.red;
-      colorLineGreen = (short) rgbLine_Light.green;
-      colorLineBlue = (short) rgbLine_Light.blue;
+      color_Line_LightTheme = ColorUtil.getColorValue(rgbLine_Light);
+      color_Line_DarkTheme = ColorUtil.getColorValue(rgbLine_Dark);
+   }
 
-      colorLine_Dark = ColorUtil.getColorValue(rgbLine_Dark);
+   public void setColor_Text(final RGB rgbText_Light, final RGB rgbText_Dark) {
+
+      color_Text_LightTheme = ColorUtil.getColorValue(rgbText_Light);
+      color_Text_DarkTheme = ColorUtil.getColorValue(rgbText_Dark);
    }
 
    /**
-    * @param bright
+    * @param gradient_Bright
     *           Gradient bright color
-    * @param dark
+    * @param gradient_Dark
     *           Gradient dark color
-    * @param line_Light
-    * @param line_Dark
-    * @param text_Light
-    * @param text_Dark
+    * @param line_LightTheme
+    * @param line_DarkTheme
+    * @param text_LightTheme
+    * @param text_DarkTheme
     */
-   public void setColors(final RGB bright,
-                         final RGB dark,
+   public void setColors(final RGB gradient_Bright,
+                         final RGB gradient_Dark,
 
-                         final RGB line_Light,
-                         final RGB line_Dark,
+                         final RGB line_LightTheme,
+                         final RGB line_DarkTheme,
 
-                         final RGB text_Light,
-                         final RGB text_Dark) {
+                         final RGB text_LightTheme,
+                         final RGB text_DarkTheme) {
 
-      setColorBright(bright);
-      setColorDark(dark);
+      setColor_Gradient_Bright(gradient_Bright);
+      setColor_Gradient_Dark(gradient_Dark);
 
-      setColorLine(line_Light, line_Dark);
-      setColorText(text_Light, text_Dark);
-   }
-
-   public void setColorText(final RGB rgbText_Light, final RGB rgbText_Dark) {
-
-      colorTextRed = (short) rgbText_Light.red;
-      colorTextGreen = (short) rgbText_Light.green;
-      colorTextBlue = (short) rgbText_Light.blue;
-
-      colorText_Dark = ColorUtil.getColorValue(rgbText_Dark);
+      setColor_Line(line_LightTheme, line_DarkTheme);
+      setColor_Text(text_LightTheme, text_DarkTheme);
    }
 
    public void setName(final String name) {
