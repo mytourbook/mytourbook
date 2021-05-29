@@ -756,9 +756,6 @@ public class Messages extends NLS {
    public static String        compute_tourValueSpeed_label_description_Hints;
    public static String        compute_tourValueSpeed_label_speedTimeSlice;
 
-   public static String        Database_Confirm_update;
-   public static String        Database_Confirm_update_title;
-
    public static String        Database_Monitor_CreateDatabase;
    public static String        Database_Monitor_db_service_task;
    public static String        Database_Monitor_persistent_service_task;
@@ -2381,8 +2378,12 @@ public class Messages extends NLS {
    public static String Tour_Data_Text_EntireTour;
    public static String Tour_Data_Text_ImportFileLocation;
 
+   public static String Tour_Database_Action_CloseApp;
+   public static String Tour_Database_Action_UpdateDatabase;
    public static String Tour_Database_CannotConnectToDerbyServer_Message;
    public static String Tour_Database_CannotConnectToDerbyServer_Title;
+   public static String Tour_Database_Dialog_ConfirmUpdate_Message;
+   public static String Tour_Database_Dialog_ConfirmUpdate_Title;
    public static String Tour_Database_Dialog_ValidateFields_Message;
    public static String Tour_Database_Dialog_ValidateFields_Title;
    public static String Tour_Database_load_all_tours;

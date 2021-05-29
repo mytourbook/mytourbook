@@ -88,7 +88,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -4953,23 +4952,27 @@ public class TourDatabase {
        * Confirm update
        */
 
-      // define buttons with default to NO
-      final String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
+      // define buttons with default to "Close App"
+      final String[] buttons = new String[] {
+            Messages.Tour_Database_Action_UpdateDatabase,
+            Messages.Tour_Database_Action_CloseApp };
+
+      final String dialogMessage = NLS.bind(Messages.Tour_Database_Dialog_ConfirmUpdate_Message,
+            new Object[] {
+                  currentDbVersion,
+                  TOURBOOK_DB_VERSION,
+                  _databasePath });
 
       if ((new MessageDialog(
             splashManager.getShell(),
-            Messages.Database_Confirm_update_title,
+            Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
             null,
-            NLS.bind(Messages.Database_Confirm_update,
-                  new Object[] {
-                        currentDbVersion,
-                        TOURBOOK_DB_VERSION,
-                        _databasePath }),
+            dialogMessage,
             MessageDialog.QUESTION,
             buttons,
             1).open()) != Window.OK) {
 
-         // the user want no update -> close application
+         // the user will not update -> close application
          PlatformUI.getWorkbench().close();
 
          return false;
@@ -4984,7 +4987,7 @@ public class TourDatabase {
 //
 //       if ((new MessageDialog(
 //             Display.getDefault().getActiveShell(),
-//             Messages.Database_Confirm_update_title,
+//             Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
 //             null,
 //             NLS.bind(Messages.Database_Confirm_Update20, _databasePath),
 //             MessageDialog.QUESTION,
@@ -5610,7 +5613,7 @@ public class TourDatabase {
 //
 //       MessageDialog.openInformation(
 //          Display.getDefault().getActiveShell(),
-//          Messages.Database_Confirm_update_title,
+//          Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
 //          Messages.Tour_Database_Update_TourWeek_Info);
       }
 
@@ -8274,14 +8277,21 @@ public class TourDatabase {
          // update new fields with old values
          execUpdate(stmt,
 
-               "UPDATE " + TABLE_TOUR_TYPE + NL //$NON-NLS-1$
+            "UPDATE " + TABLE_TOUR_TYPE + NL //$NON-NLS-1$
 
-                     + "SET" + NL //$NON-NLS-1$
+            + "SET" + NL //$NON-NLS-1$
 
-                     + " COLOR_GRADIENT_BRIGHT  = (COLORBRIGHTRED * 65536) + (COLORBRIGHTGREEN * 256) + COLORBRIGHTBLUE,"  + NL  //$NON-NLS-1$
-                     + " COLOR_GRADIENT_DARK    = (COLORDARKRED   * 65536) + (COLORDARKGREEN   * 256) + COLORDARKBLUE,"    + NL  //$NON-NLS-1$
-                     + " COLOR_LINE_LIGHTTHEME  = (COLORLINERED   * 65536) + (COLORLINEGREEN   * 256) + COLORLINEBLUE,"    + NL  //$NON-NLS-1$
-                     + " COLOR_TEXT_LIGHTTHEME  = (COLORTEXTRED   * 65536) + (COLORTEXTGREEN   * 256) + COLORTEXTBLUE");         //$NON-NLS-1$
+            + " COLOR_GRADIENT_BRIGHT  = (COLORBRIGHTRED * 65536) + (COLORBRIGHTGREEN * 256) + COLORBRIGHTBLUE,"  + NL  //$NON-NLS-1$
+            + " COLOR_GRADIENT_DARK    = (COLORDARKRED   * 65536) + (COLORDARKGREEN   * 256) + COLORDARKBLUE,"    + NL  //$NON-NLS-1$
+
+            + " COLOR_LINE_LIGHTTHEME  = (COLORLINERED   * 65536) + (COLORLINEGREEN   * 256) + COLORLINEBLUE,"    + NL  //$NON-NLS-1$
+            + " COLOR_TEXT_LIGHTTHEME  = (COLORTEXTRED   * 65536) + (COLORTEXTGREEN   * 256) + COLORTEXTBLUE,"    + NL  //$NON-NLS-1$
+
+            // set defaults for the dark theme that it is not displayed with black color
+            + " COLOR_LINE_DARKTHEME   = (COLORLINERED   * 65536) + (COLORLINEGREEN   * 256) + COLORLINEBLUE,"    + NL  //$NON-NLS-1$
+            + " COLOR_TEXT_DARKTHEME   = (COLORTEXTRED   * 65536) + (COLORTEXTGREEN   * 256) + COLORTEXTBLUE"     + NL  //$NON-NLS-1$
+
+         );
 
          // drop old fields
          SQL.Cleanup_DropColumn(stmt, TABLE_TOUR_TYPE, "colorBrightRed");                    //$NON-NLS-1$
