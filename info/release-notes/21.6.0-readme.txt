@@ -9,10 +9,6 @@ TODO's
 
                - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                  mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-* Tour modification (Frederic) 
-               - Use multi-threading (ThreadPoolExecutor)
-
   
 New
 ===
