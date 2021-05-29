@@ -7459,29 +7459,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
          }
 
-      } else if (selection instanceof SelectionTourMarker) {
-
-         final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
-
-         final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-         final int numberOfTourMarkers = tourMarker.size();
-
-         int leftSliderValueIndex = 0;
-         int rightSliderValueIndex = 0;
-
-         if (numberOfTourMarkers == 1) {
-
-            leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-            rightSliderValueIndex = leftSliderValueIndex;
-
-         } else if (numberOfTourMarkers > 1) {
-
-            leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-            rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
-         }
-
-         selectTimeSlice_InViewer(leftSliderValueIndex, rightSliderValueIndex);
-
       } else if (selection instanceof StructuredSelection) {
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();

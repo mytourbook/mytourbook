@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views;
+
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 
 import java.util.ArrayList;
 
@@ -50,7 +52,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -140,12 +141,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
       final IWorkbenchPage page = getSite().getPage();
 
-      _partContainer.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent event) {
-            onResizeUI();
-         }
-      });
+      _partContainer.addControlListener(controlResizedAdapter(controlEvent -> onResizeUI()));
 
       _postSelectionListener = new ISelectionListener() {
          @Override
@@ -214,19 +210,19 @@ public class TourChartAnalyzerView extends ViewPart {
 
    private void addPrefListeners() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = event -> {
 
-            final String property = event.getProperty();
+         final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
-               // dispose old colors
-               _colorCache.dispose();
+            // dispose old colors
+            _colorCache.dispose();
 
-               updateInfo(_chartInfo, false);
-            }
+            // force a redraw
+            _valueIndexLeftLast = -1;
+
+            updateInfo(_chartInfo, false);
          }
       };
 

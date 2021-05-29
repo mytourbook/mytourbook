@@ -498,8 +498,8 @@ public class HeartRateVariabilityView extends ViewPart {
       yDataRR1.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
       yDataRR1.setDefaultRGB(rgbPrefLine);
       yDataRR1.setRgbLine(rgbLine);
-      yDataRR1.setRgbDark(rgbDark);
-      yDataRR1.setRgbBright(rgbBright);
+      yDataRR1.setRgbGradient_Dark(rgbDark);
+      yDataRR1.setRgbGradient_Bright(rgbBright);
 
       yDataRR1.forceYAxisMinValue(yDataRR1.getOriginalMinValue() - ADJUST_PULSE_VALUE);
       yDataRR1.forceYAxisMaxValue(yDataRR1.getOriginalMaxValue() + ADJUST_PULSE_VALUE);

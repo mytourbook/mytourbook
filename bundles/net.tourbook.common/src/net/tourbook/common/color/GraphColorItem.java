@@ -106,19 +106,19 @@ public class GraphColorItem {
 
       if (GraphColorManager.PREF_COLOR_LINE_LIGHT.equals(_colorPrefName)) {
 
-         _colorDefinition.setLineColor_New_Light(rgb);
+         _colorDefinition.setLineColor_New_LightTheme(rgb);
 
       } else if (GraphColorManager.PREF_COLOR_LINE_DARK.equals(_colorPrefName)) {
 
-         _colorDefinition.setLineColor_New_Dark(rgb);
+         _colorDefinition.setLineColor_New_DarkTheme(rgb);
 
       } else if (GraphColorManager.PREF_COLOR_TEXT_LIGHT.equals(_colorPrefName)) {
 
-         _colorDefinition.setTextColor_New_Light(rgb);
+         _colorDefinition.setTextColor_New_LightTheme(rgb);
 
       } else if (GraphColorManager.PREF_COLOR_TEXT_DARK.equals(_colorPrefName)) {
 
-         _colorDefinition.setTextColor_New_Dark(rgb);
+         _colorDefinition.setTextColor_New_DarkTheme(rgb);
 
       } else if (GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT.equals(_colorPrefName)) {
 

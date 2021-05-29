@@ -344,25 +344,25 @@ public class RawDataManager {
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
          float avgTemperature = oldTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
+         if (!UI.UNIT_IS_TEMPERATURE_CELSIUS) {
             avgTemperature = avgTemperature
                   * UI.UNIT_FAHRENHEIT_MULTI
                   + UI.UNIT_FAHRENHEIT_ADD;
          }
          previousData.add(
-               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
-                     ? UI.SYMBOL_TEMPERATURE_CELCIUS
+               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
+                     ? UI.SYMBOL_TEMPERATURE_CELSIUS
                      : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
 
          avgTemperature = newTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
+         if (!UI.UNIT_IS_TEMPERATURE_CELSIUS) {
             avgTemperature = avgTemperature
                   * UI.UNIT_FAHRENHEIT_MULTI
                   + UI.UNIT_FAHRENHEIT_ADD;
          }
          newData.add(
-               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
-                     ? UI.SYMBOL_TEMPERATURE_CELCIUS
+               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
+                     ? UI.SYMBOL_TEMPERATURE_CELSIUS
                      : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
       }
       if (tourValueType == TourValueType.TOUR_MARKER ||

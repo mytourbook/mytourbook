@@ -27,7 +27,6 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,6 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -96,8 +94,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -256,6 +252,7 @@ public class TourManager {
    };
 
    private static final IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore                 _prefStore_Common                 = CommonActivator.getPrefStore();
 
    private static TourManager                            _instance;
 
@@ -364,34 +361,25 @@ public class TourManager {
 
       createAvgCallbacks();
 
-      _prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefStore.addPropertyChangeListener(propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
+         if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
 
-               clearTourDataCache();
+            clearTourDataCache();
 
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
+            // fire modify event
+            Display.getDefault().asyncExec(() -> fireEvent(TourEventId.UPDATE_UI));
 
-                     // fire modify event
-                     fireEvent(TourEventId.UPDATE_UI);
-                  }
-               });
+         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            /*
+             * multiple tours can have the wrong person for hr zones
+             */
 
-               /*
-                * multiple tours can have the wrong person for hr zones
-                */
-
-               _joined_TourData = null;
-               _allLoaded_TourData = null;
-            }
+            _joined_TourData = null;
+            _allLoaded_TourData = null;
          }
       });
    }
@@ -508,7 +496,7 @@ public class TourManager {
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                Messages.TourManager_Dialog_OutOfSyncError_Title,
                message);
 
@@ -600,17 +588,14 @@ public class TourManager {
 
       final boolean[] retValue = { false };
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            for (final TourData tourData : tourDataList) {
+         for (final TourData tourData : tourDataList) {
 
-               final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
+            final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
 
-               if (isComputed) {
-                  retValue[0] = true;
-               }
+            if (isComputed) {
+               retValue[0] = true;
             }
          }
       });
@@ -778,12 +763,10 @@ public class TourManager {
       loadTourData(tourIds, allMultipleTours, false);
 
       // sort tours by start date/time
-      Collections.sort(allMultipleTours, new Comparator<TourData>() {
-         @Override
-         public int compare(final TourData t1, final TourData t2) {
-            return t1.getTourStartTimeMS() < t2.getTourStartTimeMS() ? -1 : 1;
-         }
-      });
+      Collections.sort(
+            allMultipleTours,
+            (tourData1, tourData2) -> tourData1.getTourStartTimeMS() < tourData2.getTourStartTimeMS()
+                  ? -1 : 1);
 
       int numTimeSlices = 0;
       int numSwimTimeSlices = 0;
@@ -1473,12 +1456,11 @@ public class TourManager {
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
 
+      // get COLOR from common pref store
+
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
-      // get COLOR from common pref store
-      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-
-      final RGB color = PreferenceConverter.getColor(commonPrefStore, prefGraphName + colorProfileName);
+      final RGB color = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + colorProfileName);
 
       return color;
    }
@@ -1993,31 +1975,28 @@ public class TourManager {
        * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
        * returns null in none UI threads
        */
-      Display.getDefault().syncExec(new Runnable() {
+      Display.getDefault().syncExec(() -> {
 
-         @Override
-         public void run() {
+         try {
 
-            try {
+            final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-               final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
 
-               final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+            final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
-               final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+            if (viewPart instanceof TourDataEditorView) {
 
-               if (viewPart instanceof TourDataEditorView) {
+               tourDataEditorView[0] = (TourDataEditorView) viewPart;
 
-                  tourDataEditorView[0] = (TourDataEditorView) viewPart;
+               if (isActive) {
 
-                  if (isActive) {
+                  page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-                     page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+               } else if (page.isPartVisible(viewPart) == false || isActive) {
 
-                  } else if (page.isPartVisible(viewPart) == false || isActive) {
-
-                     page.bringToTop(viewPart);
-                  }
+                  page.bringToTop(viewPart);
+               }
 
 // HINT: this does not restore the part when it's in a fast view
 //
@@ -2026,11 +2005,10 @@ public class TourManager {
 //         page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //         page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
 
-               }
-
-            } catch (final PartInitException e) {
-               StatusUtil.log(e);
             }
+
+         } catch (final PartInitException e) {
+            StatusUtil.log(e);
          }
       });
 
@@ -2746,8 +2724,7 @@ public class TourManager {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
-      // get COLOR from common pref store
-      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+      // get colors from common pref store
 
       final String prefColorLine = UI.IS_DARK_THEME
             ? GraphColorManager.PREF_COLOR_LINE_DARK
@@ -2757,10 +2734,10 @@ public class TourManager {
             ? GraphColorManager.PREF_COLOR_TEXT_DARK
             : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
 
-      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorLine);
-      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + prefColorText);
-      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
-      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final RGB rgbGradient_Dark = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbGradient_Bright = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
+      final RGB rgbTextColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorText);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2770,12 +2747,12 @@ public class TourManager {
        * <p>
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        */
-      yData.setDefaultRGB(prefLineColor);
+      yData.setDefaultRGB(rgbLineColor);
 
-      yData.setRgbLine(new RGB[] { prefLineColor });
-      yData.setRgbText(new RGB[] { prefTextColor });
-      yData.setRgbDark(new RGB[] { prefDarkColor });
-      yData.setRgbBright(new RGB[] { prefBrightColor });
+      yData.setRgbGradient_Dark(new RGB[] { rgbGradient_Dark });
+      yData.setRgbGradient_Bright(new RGB[] { rgbGradient_Bright });
+      yData.setRgbLine(new RGB[] { rgbLineColor });
+      yData.setRgbText(new RGB[] { rgbTextColor });
    }
 
    public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
@@ -3546,6 +3523,16 @@ public class TourManager {
          return chartDataModel;
       }
 
+      final String prefColorName_Distance = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_DISTANCE + UI.SYMBOL_DOT;
+      final String prefColorName_Time = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
+
+      final String prefColorTextThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      final RGB rgbText_Distance = PreferenceConverter.getColor(_prefStore_Common, prefColorName_Distance + prefColorTextThemed);
+      final RGB rgbText_Time = PreferenceConverter.getColor(_prefStore_Common, prefColorName_Time + prefColorTextThemed);
+
       if (hasPropertyChanged) {
          tourData.clearComputedSeries();
       }
@@ -3554,8 +3541,6 @@ public class TourManager {
       tourData.computeAltimeterGradientSerie();
 
       computeValueClipping(tourData);
-
-      final RGB defaultRGB = ThemeUtil.getDefaultForegroundColor_Table().getRGB();
 
       /*
        * Distance
@@ -3567,7 +3552,7 @@ public class TourManager {
          xDataDist.setLabel(Messages.tour_editor_label_distance);
          xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
          xDataDist.setValueDivisor(1000);
-         xDataDist.setDefaultRGB(defaultRGB);
+         xDataDist.setRgbText(new RGB[] { rgbText_Distance });
 
          // do not show average values but show the other values with 3 digits
          xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
@@ -3579,7 +3564,7 @@ public class TourManager {
       final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
-      xDataTime.setDefaultRGB(defaultRGB);
+      xDataTime.setRgbText(new RGB[] { rgbText_Time });
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*
@@ -3665,7 +3650,7 @@ public class TourManager {
       // HR zones can be displayed when they are available
       final boolean canShowBackground_HrZones = tcc.canShowBackground_HrZones = tourData.getNumberOfHrZones() > 0;
 
-      // swim style can be displayed when they are availabel
+      // swim style can be displayed when they are available
       final boolean canShowBackground_SwimStyle = tcc.canShowBackground_SwimStyle = tourData.swim_Time != null;
 
       final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
@@ -4125,8 +4110,8 @@ public class TourManager {
       ChartDataYSerie yDataGears = null;
       if (gearSerie != null) {
 
-         final float[][] chartGearSerie = new float[][] //
-         {
+         final float[][] chartGearSerie = new float[][] {
+
                // gear ratio
                gearSerie[0],
 

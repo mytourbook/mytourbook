@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,16 +60,20 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
     * @param visibleName
     * @param defaultGradientBright
     * @param defaultGradientDark
-    * @param defaultLineColor
-    * @param defaultTextColor
+    * @param defaultLineColor_Light
+    * @param defaultTextColor_Light
+    * @param rgb2
+    * @param rgb
     */
    public TourTypeColorDefinition(final TourType tourType,
                                   final String colorDefinitionId,
                                   final String visibleName,
                                   final RGB defaultGradientBright,
                                   final RGB defaultGradientDark,
-                                  final RGB defaultLineColor,
-                                  final RGB defaultTextColor) {
+                                  final RGB defaultLineColor_Light,
+                                  final RGB defaultLineColor_Dark,
+                                  final RGB defaultTextColor_Light,
+                                  final RGB defaultTextColor_Dark) {
 
       super(colorDefinitionId,
             visibleName,
@@ -77,8 +81,11 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
             defaultGradientBright,
             defaultGradientDark,
 
-            defaultLineColor,
-            defaultTextColor,
+            defaultLineColor_Light,
+            defaultLineColor_Dark,
+
+            defaultTextColor_Light,
+            defaultTextColor_Dark,
 
             null);
 
