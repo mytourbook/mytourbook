@@ -417,7 +417,8 @@ public class TourLayer extends Layer {
          final LineStyle style = LineStyle.builder()
                .strokeWidth(trackConfig.outlineWidth)
                .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
-               .cap(Cap.BUTT)
+               //.cap(Cap.BUTT)
+               .cap(Paint.Cap.ROUND)
                // this is not yet working
                // .isOutline(true)
                .build();
