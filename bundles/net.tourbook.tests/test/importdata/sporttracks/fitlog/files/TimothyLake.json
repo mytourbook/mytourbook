@@ -170,27 +170,53 @@
     "validForSave" : true
   } ],
   "tourType" : {
+    "colorLine_Dark" : 15243444,
+    "colorText_Dark" : 6428465,
     "createId" : 1,
     "name" : "Running",
-    "rgbbright" : {
+    "rgb_Gradient_Bright" : {
       "blue" : 255,
       "green" : 255,
       "hsb" : [ 0.0, 0.0, 1.0 ],
       "red" : 255
     },
-    "rgbdark" : {
+    "rgb_Gradient_Dark" : {
       "blue" : 199,
       "green" : 167,
       "hsb" : [ 338.18182, 0.34509802, 1.0 ],
       "red" : 255
     },
-    "rgbline" : {
+    "rgb_Line_DarkTheme" : {
       "blue" : 180,
       "green" : 152,
       "hsb" : [ 339.0, 0.34482756, 0.9098039 ],
       "red" : 232
     },
-    "rgbtext" : {
+    "rgb_Line_LightTheme" : {
+      "blue" : 180,
+      "green" : 152,
+      "hsb" : [ 339.0, 0.34482756, 0.9098039 ],
+      "red" : 232
+    },
+    "rgb_Line_Themed" : {
+      "blue" : 180,
+      "green" : 152,
+      "hsb" : [ 339.0, 0.34482756, 0.9098039 ],
+      "red" : 232
+    },
+    "rgb_Text_DarkTheme" : {
+      "blue" : 49,
+      "green" : 23,
+      "hsb" : [ 339.2, 0.7653061, 0.38431373 ],
+      "red" : 98
+    },
+    "rgb_Text_LightTheme" : {
+      "blue" : 49,
+      "green" : 23,
+      "hsb" : [ 339.2, 0.7653061, 0.38431373 ],
+      "red" : 98
+    },
+    "rgb_Text_Themed" : {
       "blue" : 49,
       "green" : 23,
       "hsb" : [ 339.2, 0.7653061, 0.38431373 ],
