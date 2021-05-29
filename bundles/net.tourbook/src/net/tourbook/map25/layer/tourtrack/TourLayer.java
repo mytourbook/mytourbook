@@ -393,7 +393,7 @@ public class TourLayer extends Layer {
          _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
          _bitmapArrow = _markertoolkit.drawTrackArrow(40,
-               ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
+               ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));
 
          _tex = new TextureItem(_bitmapArrow);
 
