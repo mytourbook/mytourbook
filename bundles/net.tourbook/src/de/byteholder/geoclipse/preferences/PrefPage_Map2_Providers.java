@@ -3072,6 +3072,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void saveState() {
 
+      if (_columnManager == null) {
+
+         // this happened when another pref page had an error and this pref page was selected
+
+         return;
+      }
+
       _state.put(STATE_SORT_COLUMN_ID, _mpComparator.__sortColumnId);
       _state.put(STATE_SORT_COLUMN_DIRECTION, _mpComparator.__sortDirection);
 

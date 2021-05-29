@@ -693,11 +693,11 @@ public class FitLogSAXHandler extends DefaultHandler {
                Long.toString(newTourType.getTypeId()),
                newTourType.getName());
 
-         newTourType.setColorBright(newColorDef.getGradientBright_Default());
-         newTourType.setColorDark(newColorDef.getGradientDark_Default());
+         newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
+         newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
 
-         newTourType.setColorLine(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
-         newTourType.setColorText(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
+         newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
+         newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
 
          // save new entity
          newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);

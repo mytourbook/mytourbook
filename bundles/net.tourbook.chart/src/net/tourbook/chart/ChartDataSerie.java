@@ -237,7 +237,7 @@ public abstract class ChartDataSerie {
    }
 
    /**
-    * This value is also used to draw the axis text for the data serie
+    * This value is sometimes used to draw the axis text for the data serie
     *
     * @param color
     */
@@ -253,11 +253,11 @@ public abstract class ChartDataSerie {
       _label = label;
    }
 
-   public void setRgbBright(final RGB[] rgbBright) {
+   public void setRgbGradient_Bright(final RGB[] rgbBright) {
       _rgbBright = rgbBright;
    }
 
-   public void setRgbDark(final RGB[] rgbDark) {
+   public void setRgbGradient_Dark(final RGB[] rgbDark) {
       _rgbDark = rgbDark;
    }
 

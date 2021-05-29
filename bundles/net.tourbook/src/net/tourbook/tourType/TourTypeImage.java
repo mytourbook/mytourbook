@@ -317,6 +317,11 @@ public class TourTypeImage {
 
       if (isCircle) {
 
+//         // draw debug border
+//         g2d.setStroke(new BasicStroke(1));
+//         g2d.setColor(Color.GRAY);
+//         g2d.drawRect(0, 0, imageSize - 1, imageSize - 1);
+
          g2d.setStroke(new BasicStroke(borderWidth));
          g2d.setColor(color1);
 
@@ -327,9 +332,10 @@ public class TourTypeImage {
          final float ovalPos = (borderWidth / 2f) + 0.5f;
          final int ovalPosInt = (int) ovalPos;
          final float ovalSize = imageSize - ovalPosInt - borderWidth / 2f;
-         final int ovalSizeInt = (int) ovalSize;
+         final int ovalSizeInt = (int) ovalSize - 2;
 
-         g2d.drawOval(//
+
+         g2d.drawOval(
                ovalPosInt,
                ovalPosInt,
                ovalSizeInt,
@@ -407,9 +413,9 @@ public class TourTypeImage {
 
       } else {
 
-         final RGB rgbBright = colorTourType.getRGBBright();
-         final RGB rgbDark = colorTourType.getRGBDark();
-         final RGB rgbLine = colorTourType.getRGBLine();
+         final RGB rgbBright = colorTourType.getRGB_Gradient_Bright();
+         final RGB rgbDark = colorTourType.getRGB_Gradient_Dark();
+         final RGB rgbLine = colorTourType.getRGB_Line_Themed();
 
          drawingColors.colorBright = new java.awt.Color(rgbBright.red, rgbBright.green, rgbBright.blue);
          drawingColors.colorDark = new java.awt.Color(rgbDark.red, rgbDark.green, rgbDark.blue);

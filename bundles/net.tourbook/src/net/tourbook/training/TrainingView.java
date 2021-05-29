@@ -1344,8 +1344,8 @@ public class TrainingView extends ViewPart {
 
       yData.setColorIndex(new int[][] { colorIndex });
       yData.setRgbLine(rgbLine);
-      yData.setRgbBright(rgbBright);
-      yData.setRgbDark(rgbDark);
+      yData.setRgbGradient_Bright(rgbBright);
+      yData.setRgbGradient_Dark(rgbDark);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
       chartDataModel.addYData(yData);

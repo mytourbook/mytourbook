@@ -20,6 +20,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.graphics.Color;
@@ -79,7 +80,9 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
       final double scaleX = drawingData.getScaleX();
       final double scaleY = drawingData.getScaleY();
-      final Color colorDefault = new Color(new RGB(0x60, 0x60, 0x60));
+      final Color colorDefault = UI.IS_DARK_THEME
+            ? new Color(new RGB(0xa0, 0xa0, 0xa0))
+            : new Color(new RGB(0x60, 0x60, 0x60));
       final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(2);
       /*
        * Draw pause point and label

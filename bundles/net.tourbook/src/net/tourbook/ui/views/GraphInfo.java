@@ -73,7 +73,7 @@ class GraphInfo {
 
       this.chartData = chartData;
 
-      valueForegroundColor = _tourChartAnalyzerView.getColor(chartData.getDefaultRGB());
+      valueForegroundColor = _tourChartAnalyzerView.getColor(chartData.getRgbText()[0]);
    }
 
    void createUI_Info_10_Left() {
