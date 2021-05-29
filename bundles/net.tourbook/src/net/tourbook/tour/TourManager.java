@@ -27,7 +27,6 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,8 +94,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -364,34 +361,25 @@ public class TourManager {
 
       createAvgCallbacks();
 
-      _prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefStore.addPropertyChangeListener(propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
+         if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
 
-               clearTourDataCache();
+            clearTourDataCache();
 
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
+            // fire modify event
+            Display.getDefault().asyncExec(() -> fireEvent(TourEventId.UPDATE_UI));
 
-                     // fire modify event
-                     fireEvent(TourEventId.UPDATE_UI);
-                  }
-               });
+         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            /*
+             * multiple tours can have the wrong person for hr zones
+             */
 
-               /*
-                * multiple tours can have the wrong person for hr zones
-                */
-
-               _joined_TourData = null;
-               _allLoaded_TourData = null;
-            }
+            _joined_TourData = null;
+            _allLoaded_TourData = null;
          }
       });
    }
@@ -508,7 +496,7 @@ public class TourManager {
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                Messages.TourManager_Dialog_OutOfSyncError_Title,
                message);
 
@@ -600,17 +588,14 @@ public class TourManager {
 
       final boolean[] retValue = { false };
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            for (final TourData tourData : tourDataList) {
+         for (final TourData tourData : tourDataList) {
 
-               final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
+            final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
 
-               if (isComputed) {
-                  retValue[0] = true;
-               }
+            if (isComputed) {
+               retValue[0] = true;
             }
          }
       });
@@ -778,12 +763,10 @@ public class TourManager {
       loadTourData(tourIds, allMultipleTours, false);
 
       // sort tours by start date/time
-      Collections.sort(allMultipleTours, new Comparator<TourData>() {
-         @Override
-         public int compare(final TourData t1, final TourData t2) {
-            return t1.getTourStartTimeMS() < t2.getTourStartTimeMS() ? -1 : 1;
-         }
-      });
+      Collections.sort(
+            allMultipleTours,
+            (tourData1, tourData2) -> tourData1.getTourStartTimeMS() < tourData2.getTourStartTimeMS()
+                  ? -1 : 1);
 
       int numTimeSlices = 0;
       int numSwimTimeSlices = 0;
@@ -1992,31 +1975,28 @@ public class TourManager {
        * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
        * returns null in none UI threads
        */
-      Display.getDefault().syncExec(new Runnable() {
+      Display.getDefault().syncExec(() -> {
 
-         @Override
-         public void run() {
+         try {
 
-            try {
+            final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-               final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
 
-               final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+            final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
-               final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+            if (viewPart instanceof TourDataEditorView) {
 
-               if (viewPart instanceof TourDataEditorView) {
+               tourDataEditorView[0] = (TourDataEditorView) viewPart;
 
-                  tourDataEditorView[0] = (TourDataEditorView) viewPart;
+               if (isActive) {
 
-                  if (isActive) {
+                  page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-                     page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+               } else if (page.isPartVisible(viewPart) == false || isActive) {
 
-                  } else if (page.isPartVisible(viewPart) == false || isActive) {
-
-                     page.bringToTop(viewPart);
-                  }
+                  page.bringToTop(viewPart);
+               }
 
 // HINT: this does not restore the part when it's in a fast view
 //
@@ -2025,11 +2005,10 @@ public class TourManager {
 //         page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //         page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
 
-               }
-
-            } catch (final PartInitException e) {
-               StatusUtil.log(e);
             }
+
+         } catch (final PartInitException e) {
+            StatusUtil.log(e);
          }
       });
 
@@ -3671,7 +3650,7 @@ public class TourManager {
       // HR zones can be displayed when they are available
       final boolean canShowBackground_HrZones = tcc.canShowBackground_HrZones = tourData.getNumberOfHrZones() > 0;
 
-      // swim style can be displayed when they are availabel
+      // swim style can be displayed when they are available
       final boolean canShowBackground_SwimStyle = tcc.canShowBackground_SwimStyle = tourData.swim_Time != null;
 
       final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);

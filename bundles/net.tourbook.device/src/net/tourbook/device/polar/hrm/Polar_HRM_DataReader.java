@@ -1133,7 +1133,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * Lap Dist     Manually given lap distance in meters / yards, units are depending on
     * 				US/Euro unit selection
     * Power        Momentary power value in Watts
-    * Temperature	Momentary temperature value in Celcius / Fahrenheit, units are depending
+    * Temperature	Momentary temperature value in Celsius / Fahrenheit, units are depending
     * 				on US/Euro unit selection
     * PhaseLap     Internal phase/lap information used for interval calculation
     * AirPr        Air pressure value from AXN products
@@ -1269,7 +1269,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
              * Lap Dist     Manually given lap distance in meters / yards, units are depending on
              * 				US/Euro unit selection
              * Power        Momentary power value in Watts
-             * Temperature	Momentary temperature value in Celcius / Fahrenheit, units are depending
+             * Temperature	Momentary temperature value in Celsius / Fahrenheit, units are depending
              * 				on US/Euro unit selection
              * PhaseLap     Internal phase/lap information used for interval calculation
              * AirPr        Air pressure value from AXN products

@@ -66,7 +66,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -196,7 +195,7 @@ public class UI {
    public static final String       SYMBOL_QUESTION_MARK               = "?";        //$NON-NLS-1$
    public static final char         SYMBOL_SEMICOLON                   = ';';
    public static final String       SYMBOL_STAR                        = "*";        //$NON-NLS-1$
-   public static final String       SYMBOL_TEMPERATURE_CELCIUS         = "\u00b0C";  //$NON-NLS-1$
+   public static final String       SYMBOL_TEMPERATURE_CELSIUS         = "\u00b0C";  //$NON-NLS-1$
    public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT      = "\u00b0F";  //$NON-NLS-1$
    public static final String       SYMBOL_UNDERSCORE                  = "_";        //$NON-NLS-1$
    public static final String       SYMBOL_WIND_WITH_SPACE             = "W ";       //$NON-NLS-1$
@@ -328,7 +327,7 @@ public class UI {
    /**
     * Imperial system for temperature
     * <p>
-    * (Celcius * 9/5) + 32 = Fahrenheit
+    * (Celsius * 9/5) + 32 = Fahrenheit
     */
    public static final float   UNIT_FAHRENHEIT_MULTI          = 1.8f;
    public static final float   UNIT_FAHRENHEIT_ADD            = 32;
@@ -401,22 +400,22 @@ public class UI {
    public static boolean       UNIT_IS_PRESSURE_MERCURY;
 
    /**
-    * Temperature could be celcius (metric) or fahrenheit
+    * Temperature could be celsius (metric) or fahrenheit
     */
-   public static boolean       UNIT_IS_TEMPERATURE_CELCIUS;
+   public static boolean       UNIT_IS_TEMPERATURE_CELSIUS;
 
    /**
-    * Temperature could be celcius (metric) or fahrenheit
+    * Temperature could be celsius (metric) or fahrenheit
     */
    public static boolean       UNIT_IS_TEMPERATURE_FAHRENHEIT;
 
    /**
-    * Weight could be kilogramm (metric) or pound
+    * Weight could be kilogram (metric) or pound
     */
-   public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
+   public static boolean       UNIT_IS_WEIGHT_KILOGRAM;
 
    /**
-    * Weight could be kilogramm (metric) or pound
+    * Weight could be kilogram (metric) or pound
     */
    public static boolean       UNIT_IS_WEIGHT_POUND;
 
@@ -603,7 +602,7 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-   public final static ImageRegistry IMAGE_REGISTRY;
+   public static final ImageRegistry IMAGE_REGISTRY;
 
    public static final int           DECORATOR_HORIZONTAL_INDENT = 2;
 
@@ -863,7 +862,7 @@ public class UI {
     */
    public static float convertBodyWeightFromMetric(final float bodyWeight) {
 
-      if (UNIT_IS_WEIGHT_KILOGRAMM) {
+      if (UNIT_IS_WEIGHT_KILOGRAM) {
          return bodyWeight;
       }
 
@@ -877,7 +876,7 @@ public class UI {
     */
    public static float convertBodyWeightToMetric(final float weight) {
 
-      if (UNIT_IS_WEIGHT_KILOGRAMM) {
+      if (UNIT_IS_WEIGHT_KILOGRAM) {
          return weight;
       }
 
@@ -939,7 +938,7 @@ public class UI {
     */
    public static float convertPrecipitation_FromMetric(final float precipitation) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_TEMPERATURE_CELSIUS) {
          return precipitation;
       }
 
@@ -991,7 +990,7 @@ public class UI {
     */
    public static float convertTemperatureFromMetric(final float temperature) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_TEMPERATURE_CELSIUS) {
          return temperature;
       }
 
@@ -1005,7 +1004,7 @@ public class UI {
     */
    public static float convertTemperatureToMetric(final float temperature) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_TEMPERATURE_CELSIUS) {
          return temperature;
       }
 
@@ -1043,7 +1042,7 @@ public class UI {
       final Color white = display.getSystemColor(SWT.COLOR_WHITE);
       final Color black = display.getSystemColor(SWT.COLOR_BLACK);
 
-      final PaletteData palette = new PaletteData(new RGB[] { white.getRGB(), black.getRGB() });
+      final PaletteData palette = new PaletteData(white.getRGB(), black.getRGB());
 
       final ImageData sourceData = new ImageData(16, 16, 1, palette);
       sourceData.transparentPixel = 0;
@@ -2679,7 +2678,7 @@ public class UI {
       /*
        * Temperature
        */
-      UNIT_IS_TEMPERATURE_CELCIUS         = false;
+      UNIT_IS_TEMPERATURE_CELSIUS         = false;
       UNIT_IS_TEMPERATURE_FAHRENHEIT      = false;
 
       if (activeSystem.getTemperature() == Unit_Temperature.FAHRENHEIT) {
@@ -2696,7 +2695,7 @@ public class UI {
 
          // default is the metric measure system
 
-         UNIT_IS_TEMPERATURE_CELCIUS      = true;
+         UNIT_IS_TEMPERATURE_CELSIUS      = true;
 
          UNIT_LABEL_TEMPERATURE           = UNIT_TEMPERATURE_C;
          UNIT_VALUE_TEMPERATURE           = 1;
@@ -2705,7 +2704,7 @@ public class UI {
       /*
        * Weight
        */
-      UNIT_IS_WEIGHT_KILOGRAMM            = false;
+      UNIT_IS_WEIGHT_KILOGRAM            = false;
       UNIT_IS_WEIGHT_POUND                = false;
 
       if (activeSystem.getWeight() == Unit_Weight.POUND) {
@@ -2721,7 +2720,7 @@ public class UI {
 
          // default is the metric measure system
 
-         UNIT_IS_WEIGHT_KILOGRAMM         = true;
+         UNIT_IS_WEIGHT_KILOGRAM         = true;
 
          UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_KG;
          UNIT_VALUE_WEIGHT                = 1;
@@ -2733,16 +2732,13 @@ public class UI {
 
    public static VerifyListener verifyFilenameInput() {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
+      return verifyEvent -> {
 
-            // check invalid chars
-            for (final char invalidChar : INVALID_FILENAME_CHARS) {
-               if (invalidChar == e.character) {
-                  e.doit = false;
-                  return;
-               }
+         // check invalid chars
+         for (final char invalidChar : INVALID_FILENAME_CHARS) {
+            if (invalidChar == verifyEvent.character) {
+               verifyEvent.doit = false;
+               return;
             }
          }
       };
@@ -2750,16 +2746,13 @@ public class UI {
 
    public static VerifyListener verifyFilePathInput() {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
+      return verifyEvent -> {
 
-            // check invalid chars
-            for (final char invalidChar : INVALID_FILEPATH_CHARS) {
-               if (invalidChar == e.character) {
-                  e.doit = false;
-                  return;
-               }
+         // check invalid chars
+         for (final char invalidChar : INVALID_FILEPATH_CHARS) {
+            if (invalidChar == verifyEvent.character) {
+               verifyEvent.doit = false;
+               return;
             }
          }
       };
@@ -2800,42 +2793,36 @@ public class UI {
 
    public static VerifyListener verifyListenerInteger(final boolean canBeNegative) {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
+      return verifyEvent -> {
 
-            // check backspace and del key
-            if (e.character == SWT.BS || e.character == SWT.DEL) {
-               return;
-            }
+         // check backspace and del key
+         if (verifyEvent.character == SWT.BS || verifyEvent.character == SWT.DEL) {
+            return;
+         }
 
-            // check '-' key
-            if (canBeNegative && e.character == '-') {
-               return;
-            }
+         // check '-' key
+         if (canBeNegative && verifyEvent.character == '-') {
+            return;
+         }
 
-            try {
-               Integer.parseInt(e.text);
-            } catch (final NumberFormatException ex) {
-               e.doit = false;
-            }
+         try {
+            Integer.parseInt(verifyEvent.text);
+         } catch (final NumberFormatException ex) {
+            verifyEvent.doit = false;
          }
       };
    }
 
    public static VerifyListener verifyListenerTypeLong() {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
-            if (e.text.equals(EMPTY_STRING)) {
-               return;
-            }
-            try {
-               Long.parseLong(e.text);
-            } catch (final NumberFormatException e1) {
-               e.doit = false;
-            }
+      return verifyEvent -> {
+         if (verifyEvent.text.equals(EMPTY_STRING)) {
+            return;
+         }
+         try {
+            Long.parseLong(verifyEvent.text);
+         } catch (final NumberFormatException e1) {
+            verifyEvent.doit = false;
          }
       };
    }
