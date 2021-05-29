@@ -317,6 +317,11 @@ public class TourTypeImage {
 
       if (isCircle) {
 
+//         // draw debug border
+//         g2d.setStroke(new BasicStroke(1));
+//         g2d.setColor(Color.GRAY);
+//         g2d.drawRect(0, 0, imageSize - 1, imageSize - 1);
+
          g2d.setStroke(new BasicStroke(borderWidth));
          g2d.setColor(color1);
 
@@ -327,9 +332,10 @@ public class TourTypeImage {
          final float ovalPos = (borderWidth / 2f) + 0.5f;
          final int ovalPosInt = (int) ovalPos;
          final float ovalSize = imageSize - ovalPosInt - borderWidth / 2f;
-         final int ovalSizeInt = (int) ovalSize;
+         final int ovalSizeInt = (int) ovalSize - 2;
 
-         g2d.drawOval(//
+
+         g2d.drawOval(
                ovalPosInt,
                ovalPosInt,
                ovalSizeInt,

@@ -379,10 +379,18 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
 
    private void restoreState() {
 
+      final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+
+      if (tcc == null) {
+
+         // this happened when a tour was not displayed in the tour chart
+
+         return;
+      }
+
       _spinnerGraphTransparencyFilling_Light.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
       _spinnerGraphTransparencyFilling_Dark.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK));
 
-      final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
       // graph background
       select_GraphBgSource(tcc.graphBackground_Source);
