@@ -57,9 +57,10 @@ Improvements
   - Extending the zoom levels capacity from 20 to 23
 
 * 2.5D Map (Thomas):
-  - Upgrading VTM lib to 0.15 321
+  - Upgrading VTM lib to 0.15 321 and further to 0.16 349
   - Size of photothumbnails can be changed via slideout 326
   - Show direction arrows on the tourpath, controlled via slideout 339
+  - Tourtrack and Sliderpath have round ends like in map2 349
 
 * 3D Map & Tour Chart Preferences (Frederic)
  - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0

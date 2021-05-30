@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 
-import org.oscim.backend.canvas.Paint.Cap;
+//import org.oscim.backend.canvas.Paint.Cap;
+import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -379,8 +380,8 @@ public class SliderPath_Layer extends Layer {
 
 				.strokeWidth(trackConfig.sliderPath_LineWidth)
 				.color(ColorUtil.getARGB(trackConfig.sliderPath_Color, trackConfig.sliderPath_Opacity * 0xff / 100))
-				.cap(Cap.BUTT)
-
+            //.cap(Cap.BUTT)
+            .cap(Paint.Cap.ROUND)
 				// this is not yet working
 				// .isOutline(true)
 
