@@ -89,6 +89,9 @@ Bugfix
 * Map25 Mapprovider (Thomas)
   - Map was not displayed correctly at the very first start of Mytourbook 343
 
+* Statistic Values View (Frederic)
+  - Fixed a bug where the elevation gain value was incorrect
+
 Translation    
 ===========
 
