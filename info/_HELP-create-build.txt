@@ -15,7 +15,7 @@ Setup to run gradle:
                 C:\BIN\gradle\gradle-6.9\bin;
                 C:\BIN\maven\bin\;
 
-This is the installed gradle wrapper in the build folder:
+Setup the graddle wrapper in the build folder:
 
    gradle wrapper --gradle-version 6.9
 
