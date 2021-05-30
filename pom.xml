@@ -67,6 +67,13 @@
          <url>https://download.eclipse.org/releases/2021-03</url>
       </repository>   
 
+      <repository>
+         <id>eclipse.nattable.2.0</id>                                  <layout>p2</layout>
+         <url>http://download.eclipse.org/nattable/releases/2.0.0/repository</url>
+      </repository>   
+
+
+
       <!-- Repo for Chromium is/was not supported in Eclipse
       
       <repository>
