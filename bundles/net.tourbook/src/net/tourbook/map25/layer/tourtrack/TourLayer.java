@@ -393,7 +393,7 @@ public class TourLayer extends Layer {
          _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
          _bitmapArrow = _markertoolkit.drawTrackArrow(40,
-               ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
+               ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));
 
          _tex = new TextureItem(_bitmapArrow);
 
@@ -417,7 +417,8 @@ public class TourLayer extends Layer {
          final LineStyle style = LineStyle.builder()
                .strokeWidth(trackConfig.outlineWidth)
                .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
-               .cap(Cap.BUTT)
+               //.cap(Cap.BUTT)
+               .cap(Paint.Cap.ROUND)
                // this is not yet working
                // .isOutline(true)
                .build();
