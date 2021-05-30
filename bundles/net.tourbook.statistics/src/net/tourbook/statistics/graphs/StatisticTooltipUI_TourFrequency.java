@@ -76,7 +76,7 @@ public class StatisticTooltipUI_TourFrequency {
    private static IValueFormatter        _valueFormatter_Time_HH           = new ValueFormatter_Time_HH();
    private static IValueFormatter        _valueFormatter_Time_HHMM         = new ValueFormatter_Time_HHMM();
 
-   private final int                     _columnSpacing                    = 10;
+   private static final int              _columnSpacing                    = 10;
 
    /*
     * Tooltip context
