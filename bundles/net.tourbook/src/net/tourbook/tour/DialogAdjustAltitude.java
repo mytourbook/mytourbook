@@ -52,7 +52,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -748,16 +747,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          }
       });
 
-      spinner.addFocusListener(new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {}
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            onChangeAltitude();
-         }
-      });
+      spinner.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onChangeAltitude()));
 
       return spinner;
    }
@@ -1720,9 +1710,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                   maxIndex,
                   maxIndex));
 
-      _tourChart.getDisplay().timerExec(100, () -> {
-         updateTourChart();
-      });
+      _tourChart.getDisplay().timerExec(100, this::updateTourChart);
    }
 
    private void onMouseDown(final ChartMouseEvent mouseEvent) {
@@ -2093,9 +2081,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       if (isAdjustmentType_SRTM_SPline()) {
 
-         Display.getCurrent().asyncExec(() -> {
-            onModify_SRTMSelection();
-         });
+         Display.getCurrent().asyncExec(this::onModify_SRTMSelection);
       }
    }
 
