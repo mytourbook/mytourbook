@@ -42,7 +42,7 @@ public class DownloadSRTM3 {
     * Prefix used to identify redirects to URS for the purpose of adding authentication headers. For
     * test, this should be: https://uat.urs.earthdata.nasa.gov for test
     */
-   private static final String           HTTP_URS_EARTHDATA_NASA_GOV = "https://urs.earthdata.nasa.gov";
+   private static final String           HTTP_URS_EARTHDATA_NASA_GOV = "https://urs.earthdata.nasa.gov"; //$NON-NLS-1$
 
    /**
     * SRTM example file
@@ -114,7 +114,7 @@ public class DownloadSRTM3 {
          final URL url = new URL(resourceUrl);
          final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-         connection.setRequestMethod("GET");
+         connection.setRequestMethod("GET"); //$NON-NLS-1$
          connection.setInstanceFollowRedirects(false);
          connection.setUseCaches(false);
          connection.setDoInput(true);
@@ -124,12 +124,12 @@ public class DownloadSRTM3 {
           */
          if (resourceUrl.startsWith(HTTP_URS_EARTHDATA_NASA_GOV)) {
 
-            final byte[] authorizationData = (username + ":" + password).getBytes();
+            final byte[] authorizationData = (username + ":" + password).getBytes(); //$NON-NLS-1$
 
             connection.setDoOutput(true);
             connection.setRequestProperty(
-                  "Authorization",
-                  "Basic " + Base64.getEncoder().encodeToString(authorizationData));
+                  "Authorization", //$NON-NLS-1$
+                  "Basic " + Base64.getEncoder().encodeToString(authorizationData)); //$NON-NLS-1$
          }
 
          /*
@@ -155,21 +155,21 @@ public class DownloadSRTM3 {
 
             final String message = connection.getResponseMessage();
 
-            throw new Exception("Response from server - " + status + ": " + message);
+            throw new Exception("Response from server - " + status + ": " + message); //$NON-NLS-1$ //$NON-NLS-2$
          }
 
          /*
           * Get the redirection location and continue. This should really
           * have a null check, just in case.
           */
-         resourceUrl = connection.getHeaderField("Location");
+         resourceUrl = connection.getHeaderField("Location"); //$NON-NLS-1$
 
          // log just a few redirects in case it is not working any more
          if (_numRedirectedLogs < MAX_REDIRECTED_LOGS) {
 
             _numRedirectedLogs++;
 
-            System.out.println(this.getClass().getCanonicalName() + " - Redirecting to: " + resourceUrl);
+            System.out.println(this.getClass().getCanonicalName() + " - Redirecting to: " + resourceUrl); //$NON-NLS-1$
          }
       }
 
@@ -177,7 +177,7 @@ public class DownloadSRTM3 {
        * If we get here, we exceeded our redirect limit. This is most likely
        * a configuration problem somewhere in the remote server.
        */
-      throw new Exception(String.format("Redirection limit %d exceeded", MAX_REDIRECTED_LOGS));
+      throw new Exception(String.format("Redirection limit %d exceeded", MAX_REDIRECTED_LOGS)); //$NON-NLS-1$
    }
 
 }

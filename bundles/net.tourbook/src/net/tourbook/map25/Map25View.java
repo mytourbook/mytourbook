@@ -53,6 +53,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
+import net.tourbook.map2.Messages;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionShowPhotos;
@@ -1335,7 +1336,7 @@ public class Map25View extends ViewPart implements
             allPhotos.addAll(tourPhotoLink.linkPhotos);
          }
 
-         Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size());
+         Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size()); //$NON-NLS-1$
 
       } else {
 
@@ -1591,7 +1592,7 @@ public class Map25View extends ViewPart implements
       // hillshading layer
       final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
       final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 100);
-      Map25App.debugPrint(" Map25View: ** restore_state opacy: " + layerHillshadingOpacity);
+      Map25App.debugPrint(" Map25View: ** restore_state opacy: " + layerHillshadingOpacity); //$NON-NLS-1$
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
