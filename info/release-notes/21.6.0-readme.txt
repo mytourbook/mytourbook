@@ -9,10 +9,6 @@ TODO's
 
                - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                  mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-* Tour modification (Frederic) 
-               - Use multi-threading (ThreadPoolExecutor)
-
   
 New
 ===
@@ -93,6 +89,9 @@ Bugfix
 * Map25 Mapprovider (Thomas)
   - Map was not displayed correctly at the very first start of Mytourbook 343
 
+* Statistic Values View (Frederic)
+  - Fixed a bug where the elevation gain value was incorrect
+
 Translation    
 ===========
 
@@ -107,4 +106,4 @@ System
 ======
 
 * Eclipse 2021-?
-* FIT SDK 21.53
+* FIT SDK 21.54
