@@ -1,5 +1,5 @@
 /******************************************************  *************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -241,7 +241,7 @@ public class StatisticTooltipUI_CategorizedData {
       _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
       _isTourTypeImageAvailable = _tourTypeId >= 0;
 
-      initUI(parent);
+      initUI();
 
       createActions();
       createUI(parent);
@@ -705,7 +705,7 @@ public class StatisticTooltipUI_CategorizedData {
 
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
    }
 
@@ -761,9 +761,6 @@ public class StatisticTooltipUI_CategorizedData {
       final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
       final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
 
-      final float elevationUp_WithMeasurement            = elevationUp / UI.UNIT_VALUE_ELEVATION;
-      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / UI.UNIT_VALUE_ELEVATION;
-
       final String deviceTime_Elapsed_Percentage_Text    = deviceTime_Elapsed_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Elapsed_Percentage);
       final String deviceTime_Recorded_Percentage_Text   = deviceTime_Recorded_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Recorded_Percentage);
       final String deviceTime_Paused_Percentage_Text     = deviceTime_Paused_Percentage   == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Paused_Percentage);
@@ -803,8 +800,8 @@ public class StatisticTooltipUI_CategorizedData {
       _lblDistance                           .setText(distance                      == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
       _lblDistance_Unit                      .setText(distance                      == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-      _lblElevationUp                        .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
-      _lblElevationUp_Unit                   .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+      _lblElevationUp                        .setText(elevationUp_Summary   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary));
+      _lblElevationUp_Unit                   .setText(elevationUp_Summary   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
       _lblNumberOfTours                      .setText(Integer.toString((int) (numTours + 0.5)));
 
@@ -825,8 +822,8 @@ public class StatisticTooltipUI_CategorizedData {
          _lblDistance_Summary                .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance_Summary / 1000.0));
          _lblDistance_Summary_Unit           .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-         _lblElevationUp_Summary             .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary_WithMeasurement));
-         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+         _lblElevationUp_Summary             .setText(elevationUp_Summary == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary));
+         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
          _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
       }
