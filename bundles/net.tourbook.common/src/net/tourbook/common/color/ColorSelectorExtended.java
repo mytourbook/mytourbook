@@ -327,13 +327,16 @@ public class ColorSelectorExtended extends EventManager {
 
    private void saveCustomColors_Colors(final XMLMemento xmlMemento) {
 
-      for (final RGB customRGB : getCustomColors()) {
+      if (_allCustomRGBs != null) {
 
-         final IMemento xmlCustomColor = xmlMemento.createChild(TAG_CUSTOM_COLOR);
+         for (final RGB customRGB : _allCustomRGBs) {
 
-         xmlCustomColor.putInteger(ATTR_RED, customRGB.red);
-         xmlCustomColor.putInteger(ATTR_GREEN, customRGB.green);
-         xmlCustomColor.putInteger(ATTR_BLUE, customRGB.blue);
+            final IMemento xmlCustomColor = xmlMemento.createChild(TAG_CUSTOM_COLOR);
+
+            xmlCustomColor.putInteger(ATTR_RED, customRGB.red);
+            xmlCustomColor.putInteger(ATTR_GREEN, customRGB.green);
+            xmlCustomColor.putInteger(ATTR_BLUE, customRGB.blue);
+         }
       }
    }
 
