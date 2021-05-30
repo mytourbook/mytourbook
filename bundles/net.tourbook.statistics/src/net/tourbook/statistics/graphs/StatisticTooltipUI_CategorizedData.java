@@ -755,7 +755,7 @@ public class StatisticTooltipUI_CategorizedData {
 
       final float distance_Summary                       = computeSummary(_tourData_Common.distance_High_Resorted,      _valueIndex);
       final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
-      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex) ;
+      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex);
 
       final float distance_Percentage                    = distance_Summary    == 0 ? 0 : distance    / distance_Summary      * 100;
       final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
@@ -797,11 +797,11 @@ public class StatisticTooltipUI_CategorizedData {
       _lblComputedTime_Break                 .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
       _lblComputedTime_Break_Unit            .setText(computedTime_Break_UnitText);
 
-      _lblDistance                           .setText(distance                      == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
-      _lblDistance_Unit                      .setText(distance                      == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+      _lblDistance                           .setText(distance       == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary  (distance / 1000.0));
+      _lblDistance_Unit                      .setText(distance       == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-      _lblElevationUp                        .setText(elevationUp_Summary   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary));
-      _lblElevationUp_Unit                   .setText(elevationUp_Summary   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+      _lblElevationUp                        .setText(elevationUp    == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp));
+      _lblElevationUp_Unit                   .setText(elevationUp    == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
       _lblNumberOfTours                      .setText(Integer.toString((int) (numTours + 0.5)));
 
@@ -819,11 +819,11 @@ public class StatisticTooltipUI_CategorizedData {
          _lblComputedTime_Break_Summary      .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break_Summary));
          _lblComputedTime_Break_Summary_Unit .setText(computedTime_Break_Summary_UnitText);
 
-         _lblDistance_Summary                .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance_Summary / 1000.0));
-         _lblDistance_Summary_Unit           .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+         _lblDistance_Summary                .setText(distance_Summary     == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary  (distance_Summary / 1000.0));
+         _lblDistance_Summary_Unit           .setText(distance_Summary     == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-         _lblElevationUp_Summary             .setText(elevationUp_Summary == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary));
-         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+         _lblElevationUp_Summary             .setText(elevationUp_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp_Summary));
+         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
          _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
       }
