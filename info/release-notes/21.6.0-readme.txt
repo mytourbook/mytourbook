@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* SRTM         - Change color of SRTM line in tour chart, in dark mode it's almost not visible
+
 * Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                  Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
