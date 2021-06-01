@@ -60,6 +60,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -108,7 +109,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
    private SelectionListener       _fieldSelectionListener_DateTime;
 
    {
-      _defaultModifyListener = modifyEvent -> onProfile_Modify();
+      _defaultModifyListener = this::onProfile_Modify;
 
       _fieldSelectionListener_DateTime = SelectionListener.widgetSelectedAdapter(
             this::onField_Select_DateTime);
@@ -1548,9 +1549,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
    }
 
-   private void onField_Select_DateTime(final SelectionEvent event) {
+   private void onField_Select_DateTime(final SelectionEvent selectionEvent) {
 
-      final DateTime dateTime = (DateTime) (event.widget);
+      //TODO FB here ?
+      if (UI.isLinuxAsyncEvent(selectionEvent.widget)) {
+         System.out.println("adf");
+      }
+      final DateTime dateTime = (DateTime) (selectionEvent.widget);
 
       final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
       final int fieldNo = (int) dateTime.getData(FIELD_NO);
@@ -1813,8 +1818,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _profileViewer.getTable().setFocus();
    }
 
-   private void onProfile_Modify() {
+   private void onProfile_Modify(final ModifyEvent modifyEvent) {
 
+      //TODO FB here ?
+      if (UI.isLinuxAsyncEvent(modifyEvent.widget)) {
+         System.out.println("adf");
+      }
       if (_selectedProfile == null) {
          return;
       }
