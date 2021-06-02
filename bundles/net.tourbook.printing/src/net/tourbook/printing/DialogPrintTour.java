@@ -165,8 +165,7 @@ public class DialogPrintTour extends TitleAreaDialog {
                   | SWT.CLOSE
                   | SWT.MIN
 //				| SWT.MAX
-                  | SWT.RESIZE
-                  | SWT.NONE;
+                  | SWT.RESIZE;
 
       // make dialog resizable
       setShellStyle(shellStyle);
@@ -593,6 +592,7 @@ public class DialogPrintTour extends TitleAreaDialog {
             printJob.join();
          } catch (final InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
          }
       }
    }
