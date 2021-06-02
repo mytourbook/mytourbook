@@ -1151,8 +1151,7 @@ public class Chart extends ViewForm {
 
       updateMouseModeUIState();
 
-      final Point devMouse = this.toControl(getDisplay().getCursorLocation());
-      _chartComponents.getChartComponentGraph().setCursorStyle(devMouse.y);
+      _chartComponents.getChartComponentGraph().setCursorStyle();
 
    }
 
