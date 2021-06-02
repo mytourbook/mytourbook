@@ -67,7 +67,6 @@ public class Images {
    public static final String App_SequenceNumber_Disabled                = "app-sequence-number-disabled.png";                    //$NON-NLS-1$
    public static final String App_Sort                                   = "app-sort.png";                                        //$NON-NLS-1$
    public static final String App_Sort_Disabled                          = "app-sort-disabled.png";                               //$NON-NLS-1$
-   public static final String App_Synced                                 = "synced.gif";                                          //$NON-NLS-1$
    public static final String App_Today                                  = "today.png";                                           //$NON-NLS-1$
    public static final String App_Trash                                  = "trash.png";                                           //$NON-NLS-1$
    public static final String App_Trash_Disabled                         = "trash-disabled.png";                                  //$NON-NLS-1$
