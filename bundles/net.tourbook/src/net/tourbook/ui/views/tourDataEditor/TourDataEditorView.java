@@ -6000,7 +6000,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   tourDataModified = true;
                }
 
-               if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
+               if (newTemperatureValue != Float.MIN_VALUE && _serieTemperature != null) {
+
                   if (isTemperatureValueOffset) {
 
                      //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
