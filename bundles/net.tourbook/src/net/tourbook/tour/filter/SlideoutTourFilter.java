@@ -55,15 +55,13 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -380,12 +378,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                UI.addSashColorHandler(sash);
 
                // save sash width
-               sash.addMouseListener(new MouseAdapter() {
-                  @Override
-                  public void mouseUp(final MouseEvent e) {
-                     _state.put(STATE_SASH_WIDTH, _containerProfiles.getSize().x);
-                  }
-               });
+               sash.addMouseListener(MouseListener.mouseUpAdapter(
+                     mouseEvent -> _state.put(STATE_SASH_WIDTH, _containerProfiles.getSize().x)));
             }
 
             // right part
@@ -690,12 +684,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                //				.grab(true, true)
                .applyTo(_filterScrolled_Content);
          _filterScrolled_Container.setContent(_filterScrolled_Content);
-         _filterScrolled_Container.addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(final ControlEvent e) {
-               onResizeFilterContent();
-            }
-         });
+         _filterScrolled_Container.addControlListener(ControlListener.controlResizedAdapter(
+               controlEvent -> onResizeFilterContent()));
 
          GridLayoutFactory
                .fillDefaults()//

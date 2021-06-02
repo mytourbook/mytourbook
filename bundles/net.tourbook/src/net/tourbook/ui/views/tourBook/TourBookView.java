@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourBook;
 import gnu.trove.list.array.TIntArrayList;
 
 import java.io.File;
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +101,6 @@ import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -117,7 +115,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -190,7 +187,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -205,7 +201,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -1096,18 +1091,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void addSelectionListener() {
 
       // this view part is a selection listener
-      _postSelectionListener = new ISelectionListener() {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-            // prevent to listen to a selection which is originated by this year chart
-            if (part == TourBookView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         // prevent to listen to a selection which is originated by this year chart
+         if (workbenchPart == TourBookView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
 
       // register selection listener in the page
@@ -1116,31 +1107,28 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void addTourEventListener() {
 
-      _tourPropertyListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourPropertyListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == TourBookView.this) {
-               return;
-            }
+         if (workbenchPart == TourBookView.this) {
+            return;
+         }
 
-            if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
+         if (tourEventId == TourEventId.TOUR_CHANGED || tourEventId == TourEventId.UPDATE_UI) {
 
-               /*
-                * it is possible when a tour type was modified, the tour can be hidden or visible in
-                * the viewer because of the tour type filter
-                */
-               reloadViewer();
+            /*
+             * it is possible when a tour type was modified, the tour can be hidden or visible in
+             * the viewer because of the tour type filter
+             */
+            reloadViewer();
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
+            onSelectionChanged((ISelection) eventData);
 
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
-                  || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
-               reloadViewer();
-            }
+            reloadViewer();
          }
       };
       TourManager.getInstance().addTourEventListener(_tourPropertyListener);
@@ -1211,14 +1199,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _viewerMenuManager_Tree = new MenuManager();
       _viewerMenuManager_Tree.setRemoveAllWhenShown(true);
-      _viewerMenuManager_Tree.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
+      _viewerMenuManager_Tree.addMenuListener(menuManager -> {
 
-            _tourInfoToolTip_Tree.hideToolTip();
+         _tourInfoToolTip_Tree.hideToolTip();
 
-            fillContextMenu(manager, true);
-         }
+         fillContextMenu(menuManager, true);
       });
    }
 
@@ -1328,14 +1313,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_Body_SelectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
       // use a RowSelectionModel that will perform row selections and is able to identify a row via unique ID
-      final IRowIdAccessor<TVITourBookTour> rowIdAccessor = new IRowIdAccessor<>() {
-
-         @Override
-         public Serializable getRowId(final TVITourBookTour rowObject) {
-            return rowObject.tourId;
-         }
-
-      };
+      final IRowIdAccessor<TVITourBookTour> rowIdAccessor = rowObject -> rowObject.tourId;
       _natTable_Body_SelectionLayer.setSelectionModel(new RowSelectionModel<>(
             _natTable_Body_SelectionLayer,
             _natTable_DataProvider,
@@ -1420,13 +1398,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final UiBindingRegistry uiBindingRegistry = _tourViewer_NatTable.getUiBindingRegistry();
 
       // add mouse double click listener
-      final IMouseAction mouseDoubleClickAction = new IMouseAction() {
-
-         @Override
-         public void run(final NatTable natTable, final MouseEvent event) {
-            TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
-         }
-      };
+      final IMouseAction mouseDoubleClickAction = (natTable, mouseEvent) -> TourManager.getInstance().tourDoubleClickAction(TourBookView.this,
+            _tourDoubleClickState);
       uiBindingRegistry.registerDoubleClickBinding(MouseEventMatcher.bodyLeftClick(SWT.NONE), mouseDoubleClickAction);
 
       // setup selection listener for the nattable
@@ -1541,12 +1514,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_Tree.setComparer(new ItemComparer_Tree());
       _tourViewer_Tree.setUseHashlookup(true);
 
-      _tourViewer_Tree.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_TreeItem(event);
-         }
-      });
+      _tourViewer_Tree.addSelectionChangedListener(this::onSelect_TreeItem);
 
       _tourViewer_Tree.addDoubleClickListener(doubleClickEvent -> {
 
@@ -2763,46 +2731,45 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       if (_isLayoutNatTable) {
 
          setupTourViewerContent();
+         return;
+      }
 
-      } else {
+      _selectedYear = -1;
+      _selectedYearSub = -1;
+      TVITourBookTour selectedTourItem = null;
 
-         _selectedYear = -1;
-         _selectedYearSub = -1;
-         TVITourBookTour selectedTourItem = null;
+      final ISelection oldSelection = _tourViewer_Tree.getSelection();
+      if (oldSelection != null) {
 
-         final ISelection oldSelection = _tourViewer_Tree.getSelection();
-         if (oldSelection != null) {
+         final Object selection = ((IStructuredSelection) oldSelection).getFirstElement();
+         if (selection instanceof TVITourBookTour) {
 
-            final Object selection = ((IStructuredSelection) oldSelection).getFirstElement();
-            if (selection instanceof TVITourBookTour) {
+            selectedTourItem = (TVITourBookTour) selection;
 
-               selectedTourItem = (TVITourBookTour) selection;
+            _selectedYear = selectedTourItem.tourYear;
 
-               _selectedYear = selectedTourItem.tourYear;
-
-               if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
-                  _selectedYearSub = selectedTourItem.colWeekNo;
-               } else {
-                  _selectedYearSub = selectedTourItem.tourMonth;
-               }
+            if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
+               _selectedYearSub = selectedTourItem.colWeekNo;
+            } else {
+               _selectedYearSub = selectedTourItem.tourMonth;
             }
          }
+      }
 
-         reloadViewer();
-         reselectTourViewer();
+      reloadViewer();
+      reselectTourViewer();
 
-         final IStructuredSelection newSelection = (IStructuredSelection) _tourViewer_Tree.getSelection();
-         if (newSelection != null) {
+      final IStructuredSelection newSelection = (IStructuredSelection) _tourViewer_Tree.getSelection();
+      if (newSelection != null) {
 
-            final Object selection = newSelection.getFirstElement();
-            if (selection instanceof TVITourBookTour) {
+         final Object selection = newSelection.getFirstElement();
+         if (selection instanceof TVITourBookTour) {
 
-               selectedTourItem = (TVITourBookTour) selection;
+            selectedTourItem = (TVITourBookTour) selection;
 
-               _tourViewer_Tree.collapseAll();
-               _tourViewer_Tree.expandToLevel(selectedTourItem, 0);
-               _tourViewer_Tree.setSelection(new StructuredSelection(selectedTourItem), false);
-            }
+            _tourViewer_Tree.collapseAll();
+            _tourViewer_Tree.expandToLevel(selectedTourItem, 0);
+            _tourViewer_Tree.setSelection(new StructuredSelection(selectedTourItem), false);
          }
       }
    }
@@ -2827,11 +2794,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void reselectTourViewer_NatTable() {
 
-      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
+      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions ->
 
-         // don't check reload that a tour selection is fired
-         selectTours_NatTable(allRowPositions, true, true, false);
-      });
+      // don't check reload that a tour selection is fired
+      selectTours_NatTable(allRowPositions, true, true, false));
    }
 
    private void reselectTourViewer_Tree() {
@@ -2987,15 +2953,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       // restore frozen columns
       final String frozenColumnId = _columnManager_NatTable.getActiveProfile().getFrozenColumnId();
-      if (frozenColumnId != null) {
+      if (frozenColumnId == null) {
+         return;
+      }
 
-         for (final ColumnDefinition colDef : _columnManager_NatTable.getVisibleAndSortedColumns()) {
+      for (final ColumnDefinition colDef : _columnManager_NatTable.getVisibleAndSortedColumns()) {
 
-            if (frozenColumnId.equals(colDef.getColumnId())) {
+         if (frozenColumnId.equals(colDef.getColumnId())) {
 
-               _columnManager_NatTable.action_FreezeColumn(colDef);
-               break;
-            }
+            _columnManager_NatTable.action_FreezeColumn(colDef);
+            break;
          }
       }
    }
@@ -3143,7 +3110,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3161,13 +3128,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 

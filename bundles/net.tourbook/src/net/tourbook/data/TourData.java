@@ -5095,7 +5095,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (serieData.powerSerie != null) {
 
-         if (isPowerSerieFromDevice & isDataSerieWithContent(serieData.powerSerie)) {
+         if (isPowerSerieFromDevice && isDataSerieWithContent(serieData.powerSerie)) {
             serieData.powerSerie20 = convertDataSeries_ToFloat(serieData.powerSerie, 0);
          }
 

@@ -30,7 +30,6 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -67,7 +66,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
@@ -92,7 +90,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -281,32 +278,29 @@ public class TrainingView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * set a new chart configuration when the preferences has changed
-             */
-            if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         /*
+          * set a new chart configuration when the preferences has changed
+          */
+         if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+               || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               onModifyPerson();
+            onModifyPerson();
 
-            } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-            //
-            ) {
+         } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+         //
+         ) {
 
-               setChartProperties();
+            setChartProperties();
 
-               // grid has changed, update chart
-               updateUI_30_HrZonesFromModel();
-            }
+            // grid has changed, update chart
+            updateUI_30_HrZonesFromModel();
          }
       };
 
@@ -318,54 +312,47 @@ public class TrainingView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-            if (part == TrainingView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (workbenchPart == TrainingView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         if (workbenchPart == TrainingView.this) {
+            return;
+         }
 
-            if (part == TrainingView.this) {
-               return;
+         if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
+         } else if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+
+            if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+               updateUI_20(modifiedTours.get(0));
             }
+         } else if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-            if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+            if (_tourData != null) {
 
-               clearView();
+               _tourData.clearComputedSeries();
 
-            } else if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-                  updateUI_20(modifiedTours.get(0));
-               }
-            } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-
-               if (_tourData != null) {
-
-                  _tourData.clearComputedSeries();
-
-                  updateUI_20(_tourData);
-               }
+               updateUI_20(_tourData);
             }
          }
       };
@@ -600,11 +587,7 @@ public class TrainingView extends ViewPart {
             gc.drawImage(_hrZoneImage, 0, 0);
          });
 
-         _canvasHrZoneImage.addControlListener(controlResizedAdapter(controlEvent -> {
-
-            updateUI_44_HrZoneImage();
-
-         }));
+         _canvasHrZoneImage.addControlListener(controlResizedAdapter(controlEvent -> updateUI_44_HrZoneImage()));
 
          _canvasHrZoneImage.addDisposeListener(disposeEvent -> {
 
@@ -625,12 +608,9 @@ public class TrainingView extends ViewPart {
 
       setChartProperties();
 
-      _chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
-         @Override
-         public void selectionChanged(final int serieIndex, final int valueIndex) {
+      _chartHrTime.addBarSelectionListener((serieIndex, valueIndex) -> {
 
 //               _postSelectionProvider.setSelection(selection);
-         }
       });
    }
 
@@ -746,7 +726,6 @@ public class TrainingView extends ViewPart {
       for (int zoneIndex = hrZoneSize - 1; zoneIndex >= 0; zoneIndex--) {
 
          final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
-         final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(hrZone.getColor());
          _hrZoneColorsBright[zoneIndex] = new Color(hrZone.getColorBright());
          _hrZoneColorsDark[zoneIndex] = new Color(hrZone.getColorDark());
 
@@ -797,9 +776,7 @@ public class TrainingView extends ViewPart {
       }
 
       // must be run async otherwise it is overwritten when using the dark theme
-      parent.getDisplay().asyncExec(() -> {
-         updateUI_HrZoneColors();
-      });
+      parent.getDisplay().asyncExec(this::updateUI_HrZoneColors);
    }
 
    @Override
@@ -1056,26 +1033,23 @@ public class TrainingView extends ViewPart {
    private void showTourFromTourProvider() {
 
       // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_pageBook.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_pageBook.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_tourData != null) {
-               return;
-            }
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_tourData != null) {
+            return;
+         }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.size() > 0) {
-               updateUI_20(selectedTours.get(0));
-            }
+         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         if (selectedTours != null && selectedTours.size() > 0) {
+            updateUI_20(selectedTours.get(0));
          }
       });
    }
@@ -1464,8 +1438,7 @@ public class TrainingView extends ViewPart {
          _lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          _lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI
-               .format_hh_mm((long) (zoneTime + 30))
-               .toString());
+               .format_hh_mm((long) (zoneTime + 30)));
          _lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          _lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
