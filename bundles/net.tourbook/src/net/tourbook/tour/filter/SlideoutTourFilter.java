@@ -241,7 +241,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
                0, // default index
 
-               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_DeleteProperty,
                Messages.App_Action_Cancel);
 
          dialog = dialog.withStyleOnTop();
