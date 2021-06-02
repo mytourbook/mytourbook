@@ -60,8 +60,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -692,22 +691,19 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void createUI_80_Option_TCX_ActivitiesCourses(final Composite parent) {
 
-      final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableFields();
-            setFileName();
-         }
-      };
+      final SelectionListener defaultSelectionListener = SelectionListener.widgetSelectedAdapter(
+            selectionEvent -> {
+               enableFields();
+               setFileName();
+            });
 
-      final SelectionAdapter nameSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            updateUI_CourseName();
-            enableFields();
-            setFileName();
-         }
-      };
+      final SelectionListener nameSelectionListener = SelectionListener.widgetSelectedAdapter(
+            selectionEvent -> {
+
+               updateUI_CourseName();
+               enableFields();
+               setFileName();
+            });
 
       final ModifyListener nameModifyListener = modifyEvent -> validateFields();
 
