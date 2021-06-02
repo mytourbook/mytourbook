@@ -43,6 +43,7 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileLis
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -50,7 +51,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -67,7 +67,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
@@ -76,20 +75,20 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    /**
     * The ID of the view as specified by the extension.
     */
-   public static final String      ID                              = "net.tourbook.views.calendar.CalendarView";                //$NON-NLS-1$
+   public static final String      ID                              = "net.tourbook.views.calendar.CalendarView";  //$NON-NLS-1$
 
-   private static final String     STATE_IS_LINKED                 = "STATE_IS_LINKED";                                         //$NON-NLS-1$
-   private static final String     STATE_IS_SHOW_TOUR_INFO         = "STATE_IS_SHOW_TOUR_INFO";                                 //$NON-NLS-1$
-   static final String             STATE_TOUR_TOOLTIP_DELAY        = "STATE_TOUR_TOOLTIP_DELAY";                                //$NON-NLS-1$
+   private static final String     STATE_IS_LINKED                 = "STATE_IS_LINKED";                           //$NON-NLS-1$
+   private static final String     STATE_IS_SHOW_TOUR_INFO         = "STATE_IS_SHOW_TOUR_INFO";                   //$NON-NLS-1$
+   static final String             STATE_TOUR_TOOLTIP_DELAY        = "STATE_TOUR_TOOLTIP_DELAY";                  //$NON-NLS-1$
 
-   private static final String     STATE_FIRST_DISPLAYED_EPOCH_DAY = "STATE_FIRST_DISPLAYED_EPOCH_DAY";                         //$NON-NLS-1$
-   private static final String     STATE_SELECTED_TOURS            = "STATE_SELECTED_TOURS";                                    //$NON-NLS-1$
+   private static final String     STATE_FIRST_DISPLAYED_EPOCH_DAY = "STATE_FIRST_DISPLAYED_EPOCH_DAY";           //$NON-NLS-1$
+   private static final String     STATE_SELECTED_TOURS            = "STATE_SELECTED_TOURS";                      //$NON-NLS-1$
 
-   static final int                DEFAULT_TOUR_TOOLTIP_DELAY      = 100;                                                       // ms
+   static final int                DEFAULT_TOUR_TOOLTIP_DELAY      = 100;                                         // ms
 
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView");               //$NON-NLS-1$
+   private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView"); //$NON-NLS-1$
 
    private boolean                 _stateIsLinked;
    private boolean                 _stateIsShowTourInfo;
@@ -179,39 +178,31 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
+      _prefChangeListener = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+               || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
+               || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
-                  || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
-                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
+            refreshCalendar();
 
-               refreshCalendar();
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+            _calendarGraph.updateTourTypeColors();
 
-               _calendarGraph.updateTourTypeColors();
-
-               refreshCalendar();
-            }
+            refreshCalendar();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-
-               refreshCalendar();
-            }
+            refreshCalendar();
          }
       };
 
@@ -223,19 +214,15 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    // create and register our selection listener
    private void addSelectionListener() {
 
-      _selectionListener = new ISelectionListener() {
+      _selectionListener = (workbenchPart, selection) -> {
 
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-            // prevent to listen to a selection which is originated by this year chart
-            if (part == CalendarView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
-
+         // prevent to listen to a selection which is originated by this year chart
+         if (workbenchPart == CalendarView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
+
       };
 
       // register selection listener in the page
@@ -244,34 +231,31 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (CalendarView.this == part) {
-               // skip own events
-               return;
-            }
+         if (CalendarView.this == workbenchPart) {
+            // skip own events
+            return;
+         }
 
-            if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
-               /*
-                * it is possible when a tour type was modified, the tour can be hidden or visible in
-                * the viewer because of the tour type filter
-                */
-               refreshCalendar();
+         if (tourEventId == TourEventId.TOUR_CHANGED || tourEventId == TourEventId.UPDATE_UI) {
+            /*
+             * it is possible when a tour type was modified, the tour can be hidden or visible in
+             * the viewer because of the tour type filter
+             */
+            refreshCalendar();
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION //
-                  || eventId == TourEventId.SLIDER_POSITION_CHANGED)
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION //
+               || tourEventId == TourEventId.SLIDER_POSITION_CHANGED)
 
-                  && eventData instanceof ISelection) {
+               && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
+            onSelectionChanged((ISelection) eventData);
 
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
-                  || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
-               refreshCalendar();
-            }
+            refreshCalendar();
          }
       };
 
@@ -327,7 +311,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          /*
           * Link with other views
           */
-         _actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
+         _actionSetLinked = new Action(null, IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
                _calendarGraph.setLinked(_stateIsLinked);
@@ -583,7 +567,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          final Long newTourId = ((SelectionTourId) selection).getTourId();
          final Long oldTourId = _calendarGraph.getSelectedTourId();
 
-         if (newTourId != oldTourId) {
+         if (newTourId.equals(oldTourId) == false) {
 
             _stateIsLinked = _actionSetLinked.isChecked();
 
@@ -633,12 +617,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       if (null != _calendarGraph) {
 
-         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-            @Override
-            public void run() {
-               _calendarGraph.refreshCalendar();
-            }
-         });
+         BusyIndicator.showWhile(Display.getCurrent(), () -> _calendarGraph.refreshCalendar());
       }
    }
 
@@ -663,7 +642,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          _calendarGraph.setFirstDay(LocalDate.ofEpochDay(epochDay));
       }
 
-      final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, Long.valueOf(-1));
+      final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, -1);
       _calendarGraph.setSelectionTourId(selectedTourId);
 
       // tooltip
@@ -697,12 +676,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       // run async that the calling UI (slideout) is updated immediately
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            _calendarGraph.updateUI_Layout(true);
-         }
-      });
+      Display.getDefault().asyncExec(() -> _calendarGraph.updateUI_Layout(true));
    }
 
    void updateUI_ProfileName(final CalendarProfile selectedProfile, final String modifiedProfileName) {
@@ -739,7 +713,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       /*
        * Get title text
        */
-      String titleText = UI.EMPTY_STRING;
+      String titleText;
       GC gc = new GC(_lblTitle);
       {
          final int availableWidth = _lblTitle.getSize().x;
