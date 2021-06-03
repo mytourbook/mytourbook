@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,28 +18,194 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.ui.tourChart.SlideoutTourChartPauses;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourChartPauses extends Action {
+public class ActionTourChartPauses extends ContributionItem implements IOpeningDialog {
 
-   private TourChart _tourChart;
+   private String                _dialogId = getClass().getCanonicalName();
 
-   public ActionTourChartPauses(final TourChart tourChart) {
+   private TourChart             _tourChart;
 
-      super(null, AS_CHECK_BOX);
+   private ToolBar               _toolBar;
+   private ToolItem              _actionToolItem;
 
-      setToolTipText(Messages.Tour_Action_ShowTourPauses_Tooltip);
+   private SlideoutTourChartPauses _slideoutTourChartPause;
+
+   /*
+    * UI controls
+    */
+   private Control _parent;
+
+   private Image   _imageEnabled;
+   private Image   _imageDisabled;
+
+   public ActionTourChartPauses(final TourChart tourChart, final Control parent) {
 
       _tourChart = tourChart;
+      _parent = parent;
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled));
+      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourPauses).createImage();
+      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled).createImage();
    }
 
    @Override
-   public void run() {
-      _tourChart.actionShowTourPauses(isChecked());
+   public void fill(final ToolBar toolbar, final int index) {
+
+      if (_actionToolItem == null && toolbar != null) {
+
+         toolbar.addDisposeListener(disposeEvent -> {
+            _actionToolItem.dispose();
+            _actionToolItem = null;
+         });
+
+         _toolBar = toolbar;
+
+         _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
+         _actionToolItem.setImage(_imageEnabled);
+         _actionToolItem.setDisabledImage(_imageDisabled);
+         _actionToolItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAction();
+            }
+         });
+
+         toolbar.addMouseMoveListener(mouseEvent -> {
+
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+
+            onMouseMove(hoveredItem);
+         });
+
+         _slideoutTourChartPause = new SlideoutTourChartPauses(_parent, _toolBar, _tourChart);
+
+         updateUI();
+      }
+   }
+
+   @Override
+   public String getDialogId() {
+      return _dialogId;
+   }
+
+   @Override
+   public void hideDialog() {
+      _slideoutTourChartPause.hideNow();
+   }
+
+   private void onAction() {
+
+      updateUI();
+
+      final boolean isTourInfoVisible = _actionToolItem.getSelection();
+
+      if (isTourInfoVisible) {
+
+         final Rectangle itemBounds = _actionToolItem.getBounds();
+
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
+
+         openSlideout(itemBounds, false);
+
+      } else {
+
+         _slideoutTourChartPause.close();
+      }
+
+      _tourChart.actionShowTourInfo(isTourInfoVisible);
+   }
+
+   private void onMouseMove(final ToolItem item) {
+
+      // ignore other items
+      if (item != _actionToolItem) {
+         return;
+      }
+
+      if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
+
+         // marker is not displayed
+
+         return;
+      }
+
+      final boolean isToolItemHovered = item == _actionToolItem;
+
+      Rectangle itemBounds = null;
+
+      if (isToolItemHovered) {
+
+         itemBounds = item.getBounds();
+
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
+      }
+
+      openSlideout(itemBounds, true);
+   }
+
+   private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+
+      // ensure other dialogs are closed
+      _tourChart.closeOpenedDialogs(this);
+
+      _slideoutTourChartPause.open(itemBounds, isOpenDelayed);
+   }
+
+   public void setEnabled(final boolean isEnabled) {
+
+      _actionToolItem.setEnabled(isEnabled);
+
+      if (isEnabled && _actionToolItem.getSelection() == false) {
+
+         // show default icon
+         _actionToolItem.setImage(_imageEnabled);
+      }
+   }
+
+   public void setSelected(final boolean isSelected) {
+
+      if (_actionToolItem == null) {
+         // this happened
+         return;
+      }
+
+      _actionToolItem.setSelection(isSelected);
+
+      updateUI();
+   }
+
+   private void updateUI() {
+
+      if (_actionToolItem.getSelection()) {
+
+         // hide tooltip because the tour info options slideout is displayed
+
+         _actionToolItem.setToolTipText(UI.EMPTY_STRING);
+
+      } else {
+
+         _actionToolItem.setToolTipText(Messages.Tour_Action_ShowTourPauses_Tooltip);
+      }
    }
 }
