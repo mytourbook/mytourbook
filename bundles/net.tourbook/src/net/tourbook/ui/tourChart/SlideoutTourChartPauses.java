@@ -19,11 +19,9 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
-import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -33,18 +31,13 @@ import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -52,27 +45,14 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final String     APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
-   private static final String     APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
-
-   private IPropertyChangeListener _defaultChangePropertyListener;
-   private SelectionListener       _defaultSelectionListener;
-   private MouseWheelListener      _defaultMouseWheelListener;
+   private SelectionListener      _defaultSelectionListener;
 
    {
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = mouseEvent -> {
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         onChangeUI();
-      };
-
-      _defaultChangePropertyListener = propertyChangeEvent -> onChangeUI();
    }
-
-   private PixelConverter        _pc;
 
    private ActionOpenPrefDialog  _actionPrefDialog;
    private ActionResetToDefaults _actionRestoreDefaults;
@@ -80,23 +60,13 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    /*
     * UI controls
     */
-   private TourChart             _tourChart;
+   private TourChart _tourChart;
 
-   private Button                _chkShowInfoTitle;
-   private Button                _chkShowInfoTooltip;
-   private Button                _chkShowInfoTourSeparator;
-   private Button                _chkSegmentAlternateColor;
-
-   private Label                 _lblTooltipDelay;
-
-   private Spinner               _spinnerTooltipDelay;
-
-   private ColorSelectorExtended _colorSegmentAlternateColor_Dark;
-   private ColorSelectorExtended _colorSegmentAlternateColor_Light;
+   private Button    _chkShowInfoTitle;
 
    public SlideoutTourChartPauses(final Control ownerControl,
-                                final ToolBar toolBar,
-                                final TourChart tourChart) {
+                                  final ToolBar toolBar,
+                                  final TourChart tourChart) {
 
       super(ownerControl, toolBar);
 
@@ -221,19 +191,10 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
    private void enableControls() {
 
-      final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
-      final boolean isShowSegmentAlternateColor = _chkSegmentAlternateColor.getSelection();
-
-      _lblTooltipDelay.setEnabled(isShowInfoTooltip);
-      _spinnerTooltipDelay.setEnabled(isShowInfoTooltip);
-
-      _colorSegmentAlternateColor_Light.setEnabled(isShowSegmentAlternateColor);
-      _colorSegmentAlternateColor_Dark.setEnabled(isShowSegmentAlternateColor);
    }
 
    private void initUI(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
    }
 
    private void onChangeUI() {
@@ -253,17 +214,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
        * Update UI with defaults from pref store
        */
       _chkShowInfoTitle.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE));
-      _chkShowInfoTooltip.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE));
-      _chkShowInfoTourSeparator.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE));
-
-      _spinnerTooltipDelay.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY));
-
-      // segment alternate color
-      _chkSegmentAlternateColor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-      _colorSegmentAlternateColor_Light.setColorValue(
-            PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
-      _colorSegmentAlternateColor_Dark.setColorValue(
-            PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK));
 
       onChangeUI();
    }
@@ -273,51 +223,16 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
       _chkShowInfoTitle.setSelection(tcc.isShowInfoTitle);
-      _chkShowInfoTooltip.setSelection(tcc.isShowInfoTooltip);
-      _chkShowInfoTourSeparator.setSelection(tcc.isShowInfoTourSeparator);
-
-      _spinnerTooltipDelay.setSelection(tcc.tourInfoTooltipDelay);
-
-      // segment alternate color
-      _chkSegmentAlternateColor.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-      _colorSegmentAlternateColor_Light.setColorValue(
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
-      _colorSegmentAlternateColor_Dark.setColorValue(
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK));
    }
 
    private void saveState() {
 
       final boolean isShowInfoTitle = _chkShowInfoTitle.getSelection();
-      final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
-      final boolean isShowInfoTourSeparator = _chkShowInfoTourSeparator.getSelection();
-      final int tooltipDelay = _spinnerTooltipDelay.getSelection();
 
       /*
        * Update pref store
        */
       _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE, isShowInfoTitle);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE, isShowInfoTooltip);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, isShowInfoTourSeparator);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, tooltipDelay);
-
-      // segment alternate color
-      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, _chkSegmentAlternateColor.getSelection());
-      PreferenceConverter.setValue(_prefStore,
-            ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
-            _colorSegmentAlternateColor_Light.getColorValue());
-      PreferenceConverter.setValue(_prefStore,
-            ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK,
-            _colorSegmentAlternateColor_Dark.getColorValue());
-
-      /*
-       * Update chart config
-       */
-      final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
-      tcc.isShowInfoTitle = isShowInfoTitle;
-      tcc.isShowInfoTooltip = isShowInfoTooltip;
-      tcc.isShowInfoTourSeparator = isShowInfoTourSeparator;
-      tcc.tourInfoTooltipDelay = tooltipDelay;
    }
 
 }
