@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class ActionCreateRefTour extends Action {
    public ActionCreateRefTour(final TourChart tourChart) {
 
       setText(Messages.tourCatalog_view_action_create_reference_tour);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourCatalog_RefTour_New));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCatalog_RefTour_New));
 
       _tourChart = tourChart;
    }

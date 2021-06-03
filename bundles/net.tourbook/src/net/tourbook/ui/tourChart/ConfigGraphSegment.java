@@ -49,7 +49,7 @@ public class ConfigGraphSegment {
 	 */
 	public ConfigGraphSegment(final String graphColorName) {
 
-		segmentLineRGB = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT);
+		segmentLineRGB = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT_LIGHT);
 	}
 
 }

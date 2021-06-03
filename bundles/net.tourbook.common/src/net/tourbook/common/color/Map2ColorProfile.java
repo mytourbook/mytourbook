@@ -1,20 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.color;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 /**
@@ -22,130 +23,227 @@ import net.tourbook.common.util.StatusUtil;
  */
 public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 
-	protected boolean		isMinValueOverwrite	= false;
-	protected boolean		isMaxValueOverwrite	= false;
-	protected int			minValueOverwrite;
-	protected int			maxValueOverwrite;
+   private static final char NL          = UI.NEW_LINE;
 
-	private ColorValue[]	colorValues			= new ColorValue[] {
-			new ColorValue(10, 255, 0, 0),
-			new ColorValue(50, 100, 100, 0),
-			new ColorValue(100, 0, 255, 0),
-			new ColorValue(150, 0, 100, 100),
-			new ColorValue(190, 0, 0, 255)		};
+   protected boolean         isMinValueOverwrite;
+   protected boolean         isMaxValueOverwrite;
 
-	public Map2ColorProfile() {}
+   protected int             minValueOverwrite;
+   protected int             maxValueOverwrite;
 
-	/**
-	 * @param valueColors
-	 * @param minBrightness
-	 * @param minBrightnessFactor
-	 * @param maxBrightness
-	 * @param maxBrightnessFactor
-	 */
-	public Map2ColorProfile(final ColorValue[] valueColors,
-							final int minBrightness,
-							final int minBrightnessFactor,
-							final int maxBrightness,
-							final int maxBrightnessFactor) {
+   private ColorValue[]      colorValues = new ColorValue[] {
 
-		this.colorValues = valueColors;
+         new ColorValue(10, 255, 0, 0),
+         new ColorValue(50, 100, 100, 0),
+         new ColorValue(100, 0, 255, 0),
+         new ColorValue(150, 0, 100, 100),
+         new ColorValue(190, 0, 0, 255)
 
-		this.minBrightness = minBrightness;
-		this.minBrightnessFactor = minBrightnessFactor;
-		this.maxBrightness = maxBrightness;
-		this.maxBrightnessFactor = maxBrightnessFactor;
-	}
+   };
 
-	/**
-	 * @param valueColors
-	 * @param minBrightness
-	 * @param minBrightnessFactor
-	 * @param maxBrightness
-	 * @param maxBrightnessFactor
-	 * @param isMinOverwrite
-	 * @param minOverwrite
-	 * @param isMaxOverwrite
-	 * @param maxOverwrite
-	 */
-	public Map2ColorProfile(final ColorValue[] valueColors,
-							final int minBrightness,
-							final int minBrightnessFactor,
-							final int maxBrightness,
-							final int maxBrightnessFactor,
-							final boolean isMinOverwrite,
-							final int minOverwrite,
-							final boolean isMaxOverwrite,
-							final int maxOverwrite) {
+   public Map2ColorProfile() {}
 
-		this(valueColors, minBrightness, minBrightnessFactor, maxBrightness, maxBrightnessFactor);
+   /**
+    * @param valueColors
+    * @param minBrightness
+    * @param minBrightnessFactor
+    * @param maxBrightness
+    * @param maxBrightnessFactor
+    */
+   public Map2ColorProfile(final ColorValue[] valueColors,
 
-		this.isMinValueOverwrite = isMinOverwrite;
-		this.minValueOverwrite = minOverwrite;
-		this.isMaxValueOverwrite = isMaxOverwrite;
-		this.maxValueOverwrite = maxOverwrite;
-	}
+                           final int minBrightness,
+                           final int minBrightnessFactor,
+                           final int maxBrightness,
+                           final int maxBrightnessFactor) {
 
-	@Override
-	public Map2ColorProfile clone() {
+      this.colorValues = valueColors;
 
-		Map2ColorProfile clonedObject = null;
+      this.minBrightness = minBrightness;
+      this.minBrightnessFactor = minBrightnessFactor;
+      this.maxBrightness = maxBrightness;
+      this.maxBrightnessFactor = maxBrightnessFactor;
+   }
 
-		try {
+   /**
+    * @param valueColors
+    * @param minBrightness
+    * @param minBrightnessFactor
+    * @param maxBrightness
+    * @param maxBrightnessFactor
+    * @param isMinOverwrite
+    * @param minOverwrite
+    * @param isMaxOverwrite
+    * @param maxOverwrite
+    */
+   public Map2ColorProfile(final ColorValue[] valueColors,
 
-			clonedObject = (Map2ColorProfile) super.clone();
+                           final int minBrightness,
+                           final int minBrightnessFactor,
+                           final int maxBrightness,
+                           final int maxBrightnessFactor,
 
-			clonedObject.colorValues = new ColorValue[colorValues.length];
+                           final boolean isMinOverwrite,
+                           final int minOverwrite,
+                           final boolean isMaxOverwrite,
+                           final int maxOverwrite) {
 
-			for (int colorIndex = 0; colorIndex < colorValues.length; colorIndex++) {
-				clonedObject.colorValues[colorIndex] = colorValues[colorIndex].clone();
-			}
+      this(valueColors, minBrightness, minBrightnessFactor, maxBrightness, maxBrightnessFactor);
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+      this.isMinValueOverwrite = isMinOverwrite;
+      this.minValueOverwrite = minOverwrite;
+      this.isMaxValueOverwrite = isMaxOverwrite;
+      this.maxValueOverwrite = maxOverwrite;
+   }
 
-		return clonedObject;
-	}
+   @Override
+   public Map2ColorProfile clone() {
 
-	public ColorValue[] getColorValues() {
-		return colorValues;
-	}
+      Map2ColorProfile clonedObject = null;
 
-	public int getMaxValueOverwrite() {
-		return maxValueOverwrite;
-	}
+      try {
 
-	public int getMinValueOverwrite() {
-		return minValueOverwrite;
-	}
+         clonedObject = (Map2ColorProfile) super.clone();
 
-	public boolean isMaxValueOverwrite() {
-		return isMaxValueOverwrite;
-	}
+         clonedObject.colorValues = new ColorValue[colorValues.length];
 
-	public boolean isMinValueOverwrite() {
-		return isMinValueOverwrite;
-	}
+         for (int colorIndex = 0; colorIndex < colorValues.length; colorIndex++) {
+            clonedObject.colorValues[colorIndex] = colorValues[colorIndex].clone();
+         }
 
-	public void setColorValues(final ColorValue[] colorValues) {
-		this.colorValues = colorValues;
-	}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-	public void setIsMaxValueOverwrite(final boolean isMaxValueOverwrite) {
-		this.isMaxValueOverwrite = isMaxValueOverwrite;
-	}
+      return clonedObject;
+   }
 
-	public void setIsMinValueOverwrite(final boolean isMinValueOverwrite) {
-		this.isMinValueOverwrite = isMinValueOverwrite;
-	}
+   private String getBrightnessText(final int brightnessValue) {
 
-	public void setMaxValueOverwrite(final int overwriteMaxValue) {
-		this.maxValueOverwrite = overwriteMaxValue;
-	}
+//    public static final int      BRIGHTNESS_DEFAULT        = 0;
+//    public static final int      BRIGHTNESS_DIMMING        = 1;
+//    public static final int      BRIGHTNESS_LIGHTNING      = 2;
 
-	public void setMinValueOverwrite(final int overwriteMinValue) {
-		this.minValueOverwrite = overwriteMinValue;
-	}
+      if (brightnessValue == 1) {
+         return "MapColorProfile.BRIGHTNESS_DIMMING"; //$NON-NLS-1$
+      } else if (brightnessValue == 2) {
+         return "MapColorProfile.BRIGHTNESS_LIGHTNING"; //$NON-NLS-1$
+      } else {
+         return "MapColorProfile.BRIGHTNESS_DEFAULT"; //$NON-NLS-1$
+      }
+   }
+
+   public ColorValue[] getColorValues() {
+      return colorValues;
+   }
+
+   public int getMaxValueOverwrite() {
+      return maxValueOverwrite;
+   }
+
+   public int getMinValueOverwrite() {
+      return minValueOverwrite;
+   }
+
+   public boolean isMaxValueOverwrite() {
+      return isMaxValueOverwrite;
+   }
+
+   public boolean isMinValueOverwrite() {
+      return isMinValueOverwrite;
+   }
+
+   public void setColorValues(final ColorValue[] colorValues) {
+      this.colorValues = colorValues;
+   }
+
+   public void setIsMaxValueOverwrite(final boolean isMaxValueOverwrite) {
+      this.isMaxValueOverwrite = isMaxValueOverwrite;
+   }
+
+   public void setIsMinValueOverwrite(final boolean isMinValueOverwrite) {
+      this.isMinValueOverwrite = isMinValueOverwrite;
+   }
+
+   public void setMaxValueOverwrite(final int overwriteMaxValue) {
+      this.maxValueOverwrite = overwriteMaxValue;
+   }
+
+   public void setMinValueOverwrite(final int overwriteMinValue) {
+      this.minValueOverwrite = overwriteMinValue;
+   }
+
+   @Override
+   public String toString() {
+
+//      new Map2ColorProfile(
+//
+//            new ColorValue[] {
+//
+//                  new ColorValue(10, 0, 0, 255),
+//                  new ColorValue(50, 0, 255, 255),
+//                  new ColorValue(100, 0, 237, 0),
+//                  new ColorValue(150, 255, 255, 0),
+//                  new ColorValue(190, 255, 0, 0)
+//
+//            },
+//
+//            MapColorProfile.BRIGHTNESS_DIMMING,
+//            23,
+//            MapColorProfile.BRIGHTNESS_DIMMING,
+//            10,
+//
+//            // overwrite min/max values
+//            true,
+//            -10,
+//            true,
+//            10
+//            )
+
+      final int numColorValues = colorValues.length;
+
+      final String minBrightness_Text = getBrightnessText(minBrightness);
+      final String maxBrightness_Text = getBrightnessText(maxBrightness);
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append(NL);
+      sb.append(NL);
+
+      sb.append("new Map2ColorProfile(" + NL); //$NON-NLS-1$
+      sb.append(NL);
+      sb.append("   new ColorValue[] {" + NL); //$NON-NLS-1$
+      sb.append(NL);
+
+      for (int valueIndex = 0; valueIndex < numColorValues; valueIndex++) {
+         final ColorValue colorValue = colorValues[valueIndex];
+         final String komma = valueIndex < numColorValues - 1 ? "," : ""; //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("      " + colorValue + komma + NL); //$NON-NLS-1$
+      }
+      sb.append("   }," + NL); //$NON-NLS-1$
+
+      sb.append(NL);
+
+      sb.append("   " + minBrightness_Text + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("   " + minBrightnessFactor + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("   " + maxBrightness_Text + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("   " + maxBrightnessFactor + "" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+
+      if (isMinValueOverwrite || isMaxValueOverwrite) {
+         sb.append("   " + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(NL);
+
+         sb.append("   // overwrite min/max values" + NL); //$NON-NLS-1$
+
+         sb.append("   " + isMinValueOverwrite + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("   " + minValueOverwrite + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("   " + isMaxValueOverwrite + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("   " + maxValueOverwrite + NL); //$NON-NLS-1$
+      }
+
+      sb.append("   );"); //$NON-NLS-1$
+
+      return sb.toString();
+   }
 
 }

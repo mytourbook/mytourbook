@@ -67,7 +67,6 @@ public class Images {
    public static final String App_SequenceNumber_Disabled                = "app-sequence-number-disabled.png";                    //$NON-NLS-1$
    public static final String App_Sort                                   = "app-sort.png";                                        //$NON-NLS-1$
    public static final String App_Sort_Disabled                          = "app-sort-disabled.png";                               //$NON-NLS-1$
-   public static final String App_Synced                                 = "synced.gif";                                          //$NON-NLS-1$
    public static final String App_Today                                  = "today.png";                                           //$NON-NLS-1$
    public static final String App_Trash                                  = "trash.png";                                           //$NON-NLS-1$
    public static final String App_Trash_Disabled                         = "trash-disabled.png";                                  //$NON-NLS-1$
@@ -163,10 +162,6 @@ public class Images {
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
-   public static final String MarkerFilter_WithGPS                       = "marker-filter-with-gps.png";                          //$NON-NLS-1$
-   public static final String MarkerFilter_WithGPS_Disabled              = "marker-filter-with-gps-disabled.png";                 //$NON-NLS-1$
-   public static final String MarkerFilter_WithoutGPS                    = "marker-filter-without-gps.png";                       //$NON-NLS-1$
-   public static final String MarkerFilter_WithoutGPS_Disabled           = "marker-filter-without-gps-disabled.png";              //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.png";                                     //$NON-NLS-1$
    public static final String MyTourbook16                               = "tourbook16.png";                                      //$NON-NLS-1$
    public static final String POI_Anchor                                 = "anchor.png";                                          //$NON-NLS-1$

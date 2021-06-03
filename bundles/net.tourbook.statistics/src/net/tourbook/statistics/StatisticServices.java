@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,13 +23,13 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -40,7 +40,9 @@ public class StatisticServices {
    /**
     * Offset for tour types in the color index
     */
-   public static int TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
+   public static int                     TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
+
+   private static final IPreferenceStore _prefStore_Common            = CommonActivator.getPrefStore();
 
    /**
     * @param serieIndex
@@ -213,21 +215,19 @@ public class StatisticServices {
 
    /**
     * Set default colors for the y-axis, the color is defined in
-    * {@link GraphColorManager#PREF_COLOR_LINE}
+    * {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}
     *
     * @param yData
     * @param graphName
     */
    public static void setDefaultColors(final ChartDataYSerie yData, final String graphName) {
 
-      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-
       final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
       // put the color into the chart data
-      yData.setDefaultRGB(PreferenceConverter.getColor(//
-            commonPrefStore,
-            defaultColorName + GraphColorManager.PREF_COLOR_LINE));
+      yData.setDefaultRGB(PreferenceConverter.getColor(
+            _prefStore_Common,
+            defaultColorName + GraphColorManager.PREF_COLOR_LINE_LIGHT));
    }
 
    /**
@@ -281,8 +281,8 @@ public class StatisticServices {
                                         final String graphName,
                                         final TourTypeFilter tourTypeFilter) {
 
-      final ArrayList<RGB> rgbBright = new ArrayList<>();
-      final ArrayList<RGB> rgbDark = new ArrayList<>();
+      final ArrayList<RGB> rgbGradient_Bright = new ArrayList<>();
+      final ArrayList<RGB> rgbGradient_Dark = new ArrayList<>();
       final ArrayList<RGB> rgbLine = new ArrayList<>();
       final ArrayList<RGB> rgbText = new ArrayList<>();
 
@@ -293,42 +293,42 @@ public class StatisticServices {
       if (tourTypeFilter.showUndefinedTourTypes()) {
 
          /*
-          * color index 0: default color
+          * Color index 0: default color
           */
-         final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
          final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
-         rgbBright.add(PreferenceConverter.getColor(
-               commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_BRIGHT));
+         final String prefColorLineThemed = UI.IS_DARK_THEME
+               ? GraphColorManager.PREF_COLOR_LINE_DARK
+               : GraphColorManager.PREF_COLOR_LINE_LIGHT;
 
-         rgbDark.add(PreferenceConverter.getColor(
-               commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_DARK));
+         final String prefColorTextThemed = UI.IS_DARK_THEME
+               ? GraphColorManager.PREF_COLOR_TEXT_DARK
+               : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
 
-         rgbLine.add(PreferenceConverter.getColor(
-               commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_LINE));
+         rgbGradient_Bright.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT));
+         rgbGradient_Dark.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_DARK));
 
-         rgbText.add(PreferenceConverter.getColor(
-               commonPrefStore,
-               defaultColorName + GraphColorManager.PREF_COLOR_TEXT));
+         rgbLine.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorLineThemed));
+         rgbText.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorTextThemed));
       }
 
       /*
        * Color index 1...n+1: tour type colors
        */
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+
       for (final TourType tourType : tourTypes) {
-         rgbBright.add(tourType.getRGBBright());
-         rgbDark.add(tourType.getRGBDark());
-         rgbLine.add(tourType.getRGBLine());
-         rgbText.add(tourType.getRGBText());
+
+         rgbGradient_Bright.add(tourType.getRGB_Gradient_Bright());
+         rgbGradient_Dark.add(tourType.getRGB_Gradient_Dark());
+
+         rgbLine.add(tourType.getRGB_Line_Themed());
+         rgbText.add(tourType.getRGB_Text_Themed());
       }
 
       // put the colors into the chart data
-      yData.setRgbBright(rgbBright.toArray(new RGB[rgbBright.size()]));
-      yData.setRgbDark(rgbDark.toArray(new RGB[rgbDark.size()]));
+      yData.setRgbGradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
+      yData.setRgbGradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
       yData.setRgbLine(rgbLine.toArray(new RGB[rgbLine.size()]));
       yData.setRgbText(rgbText.toArray(new RGB[rgbText.size()]));
 
@@ -371,7 +371,7 @@ public class StatisticServices {
     */
    public static void updateChartProperties(final Chart chart, final String prefGridPrefix) {
 
-      UI.updateChartProperties(chart, prefGridPrefix);
+      net.tourbook.ui.UI.updateChartProperties(chart, prefGridPrefix);
 
       /*
        * These settings are currently static, a UI to modify it is not yet implemented.

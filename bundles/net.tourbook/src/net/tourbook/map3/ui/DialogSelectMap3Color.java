@@ -767,7 +767,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
                rgbVertices,
                false);
 
-         image = TourMapPainter.createMapLegendImage(//
+         image = TourMapPainter.createMap3_LegendImage(
                colorProvider,
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,

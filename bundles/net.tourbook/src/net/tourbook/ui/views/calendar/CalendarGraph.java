@@ -3659,10 +3659,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       for (final TourType tourType : tourTypes) {
 
-         _rgbBright.add(tourType.getRGBBright());
-         _rgbDark.add(tourType.getRGBDark());
-         _rgbLine.add(tourType.getRGBLine());
-         _rgbText.add(tourType.getRGBText());
+         _rgbBright.add(tourType.getRGB_Gradient_Bright());
+         _rgbDark.add(tourType.getRGB_Gradient_Dark());
+         _rgbLine.add(tourType.getRGB_Line_LightTheme());
+         _rgbText.add(tourType.getRGB_Text_LightTheme());
       }
    }
 

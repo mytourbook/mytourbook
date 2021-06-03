@@ -24,7 +24,6 @@ import java.util.List;
 public class Workouts {
    public String        error;
    public List<Payload> payload;
-//   public Metadata      metadata;
 
    public Workouts() {
       payload = new ArrayList<>();

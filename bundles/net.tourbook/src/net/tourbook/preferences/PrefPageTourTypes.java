@@ -15,11 +15,11 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -28,8 +28,10 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColorProvider;
@@ -50,12 +52,12 @@ import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
 import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -77,16 +79,11 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -102,10 +99,13 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
+   private static final String                ID                     = "net.tourbook.preferences.PrefPageTourTypes";               //$NON-NLS-1$
+
    private static final String                COLOR_UNIQUE_ID_PREFIX = "crId";                                                     //$NON-NLS-1$
 
    private static final String[]              SORT_PROPERTY          = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
 
+   private static final IDialogSettings       _state                 = CommonActivator.getState(ID);
    private final IPreferenceStore             _prefStore             = TourbookPlugin.getPrefStore();
 
    private GraphColorPainter                  _graphColorPainter;
@@ -131,21 +131,21 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
-   private TreeViewer    _tourTypeViewer;
+   private TreeViewer            _tourTypeViewer;
 
-   private Button        _btnAdd;
-   private Button        _btnDelete;
-   private Button        _btnRename;
+   private Button                _btnAdd;
+   private Button                _btnDelete;
+   private Button                _btnRename;
 
-   private ColorSelector _colorSelector;
+   private ColorSelectorExtended _colorSelector;
 
-   private Combo         _comboFillColor1;
-   private Combo         _comboFillColor2;
-   private Combo         _comboFillLayout;
-   private Combo         _comboBorderColor;
-   private Combo         _comboBorderLayout;
+   private Combo                 _comboFillColor1;
+   private Combo                 _comboFillColor2;
+   private Combo                 _comboFillLayout;
+   private Combo                 _comboBorderColor;
+   private Combo                 _comboBorderLayout;
 
-   private Spinner       _spinnerBorder;
+   private Spinner               _spinnerBorder;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -244,6 +244,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
          return label;
       }
 
+      initUI(parent);
+
       final Composite ui = createUI(parent);
 
       fillUI();
@@ -273,10 +275,14 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                   tourType,
                   colorName,
                   tourType.getName(),
-                  tourType.getRGBBright(),
-                  tourType.getRGBDark(),
-                  tourType.getRGBLine(),
-                  tourType.getRGBText());
+                  tourType.getRGB_Gradient_Bright(),
+                  tourType.getRGB_Gradient_Dark(),
+                  tourType.getRGB_Line_LightTheme(),
+                  tourType.getRGB_Line_DarkTheme(),
+                  tourType.getRGB_Text_LightTheme(),
+                  tourType.getRGB_Text_DarkTheme()
+
+            );
 
             _colorDefinitions.add(colorDefinition);
 
@@ -314,7 +320,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                false);
       }
 
-      colorDefinition.setColorNames(graphColors);
+      colorDefinition.setColorItems(graphColors);
    }
 
    private Composite createUI(final Composite parent) {
@@ -350,7 +356,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 100)
+            .hint(400, 600)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -380,70 +386,80 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
       _tourTypeViewer.setUseHashlookup(true);
 
-      _tourTypeViewer.getTree().addKeyListener(new KeyListener() {
+      _tourTypeViewer.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
 
-         @Override
-         public void keyPressed(final KeyEvent keyEvent) {
+         _isNavigationKeyPressed = false;
 
-            if (keyEvent.keyCode == SWT.ARROW_UP || keyEvent.keyCode == SWT.ARROW_DOWN) {
-               _isNavigationKeyPressed = true;
-            } else {
-               _isNavigationKeyPressed = false;
+         switch (keyEvent.keyCode) {
+
+         case SWT.ARROW_UP:
+         case SWT.ARROW_DOWN:
+            _isNavigationKeyPressed = true;
+            break;
+
+         case SWT.DEL:
+
+            if (_btnDelete.isEnabled()) {
+               onTourType_Delete();
             }
-         }
 
-         @Override
-         public void keyReleased(final KeyEvent keyEvent) {}
-      });
+            break;
+
+         case SWT.F2:
+
+            if (_btnRename.isEnabled()) {
+               onTourType_Rename();
+            }
+
+            break;
+         }
+      }));
 
       _tourTypeViewer.addSelectionChangedListener(selectionChangedEvent -> {
 
          final Object selection = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
 
-         // don't expand when navigation key is pressed
+         final boolean isNavigationKeyPressed = _isNavigationKeyPressed;
+
          if (_isNavigationKeyPressed) {
+
+            // don't expand when navigation key is pressed
 
             _isNavigationKeyPressed = false;
 
-            return;
-         }
+         } else {
 
-         if (selection instanceof ColorDefinition) {
+            // expand/collapse tree item
 
-            // expand/collapse current item
-            final ColorDefinition treeItem = (ColorDefinition) selection;
+            if (selection instanceof ColorDefinition) {
 
-            if (_tourTypeViewer.getExpandedState(treeItem)) {
+               // expand/collapse current item
+               final ColorDefinition treeItem = (ColorDefinition) selection;
 
-               // item is expanded -> collapse
+               if (_tourTypeViewer.getExpandedState(treeItem)) {
 
-               _tourTypeViewer.collapseToLevel(treeItem, 1);
+                  // item is expanded -> collapse
 
-            } else {
+                  _tourTypeViewer.collapseToLevel(treeItem, 1);
 
-               // item is collapsed -> expand
+               } else {
 
-               if (_expandedItem != null) {
-                  _tourTypeViewer.collapseToLevel(_expandedItem, 1);
+                  // item is collapsed -> expand
+
+                  if (_expandedItem != null) {
+                     _tourTypeViewer.collapseToLevel(_expandedItem, 1);
+                  }
+                  _tourTypeViewer.expandToLevel(treeItem, 1);
+                  _expandedItem = treeItem;
+
+                  // expanding the triangle, the layout is correctly done but not with double click
+                  layoutContainer.layout(true, true);
                }
-               _tourTypeViewer.expandToLevel(treeItem, 1);
-               _expandedItem = treeItem;
-
-               // expanding the triangle, the layout is correctly done but not with double click
-               layoutContainer.layout(true, true);
             }
-
-         } else if (selection instanceof GraphColorItem) {
-
-            onSelectColorInColorViewer();
-
-            // run async that the UI do display the selected color in the color button
-            display.asyncExec(() -> {
-
-               // open color selection dialog
-               _colorSelector.open();
-            });
          }
+
+         onSelectColorInColorViewer(isNavigationKeyPressed);
+         enableActions();
       });
 
       _tourTypeViewer.addTreeListener(new ITreeViewerListener() {
@@ -488,63 +504,47 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         /*
-          * Color selector
-          */
          {
-            _colorSelector = new ColorSelector(container);
-            _colorSelector.getButton().setLayoutData(new GridData());
-            _colorSelector.setEnabled(false);
-            _colorSelector.addListener(this::onChangeGraphColor);
+            /*
+             * Color selector
+             */
+            _colorSelector = new ColorSelectorExtended(container);
+            _colorSelector.addListener(this::onTourType_Modify);
             setButtonLayoutData(_colorSelector.getButton());
          }
-
-         /*
-          * Add
-          */
          {
+            /*
+             * Add
+             */
             _btnAdd = new Button(container, SWT.NONE);
             _btnAdd.setText(Messages.Pref_TourTypes_Button_add);
-            _btnAdd.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAddTourType();
-                  enableActions();
-               }
-            });
+            _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               onTourType_Add();
+               enableActions();
+            }));
             setButtonLayoutData(_btnAdd);
          }
-
-         /*
-          * Rename
-          */
          {
+            /*
+             * Rename
+             */
             _btnRename = new Button(container, SWT.NONE);
             _btnRename.setText(Messages.Pref_TourTypes_Button_rename);
-            _btnRename.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onRenameTourType();
-               }
-            });
+            _btnRename.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               onTourType_Rename();
+            }));
             setButtonLayoutData(_btnRename);
          }
-
-         /*
-          * Delete
-          */
          {
-// 2009-01-02 disabled because the tour data cache was cleared
-// button: delete
+            /*
+             * Delete
+             */
             _btnDelete = new Button(container, SWT.NONE);
             _btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
-            _btnDelete.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onDeleteTourType();
-                  enableActions();
-               }
-            });
+            _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               onTourType_Delete();
+               enableActions();
+            }));
             setButtonLayoutData(_btnDelete);
          }
       }
@@ -724,7 +724,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnWeightData(2, true));
+      treeLayout.setColumnData(tc, new ColumnWeightData(3, true));
    }
 
    /**
@@ -732,13 +732,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
     */
    private void defineColumn_30_ColorDefinition(final TreeColumnLayout treeLayout, final Tree tree) {
 
-      final int numberOfHorizontalImages = 4;
+      final int numHorizontalImages = 6;
       final int trailingOffset = 10;
 
       final int itemHeight = tree.getItemHeight();
       final int oneColorWidth = itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING;
 
-      final int colorImageWidth = (oneColorWidth * numberOfHorizontalImages) + trailingOffset;
+      final int colorImageWidth = (oneColorWidth * numHorizontalImages) + trailingOffset;
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
       final TreeColumn tc = tvc.getColumn();
@@ -754,7 +754,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
                final Image image = _graphColorPainter.drawColorDefinitionImage(
                      (ColorDefinition) element,
-                     numberOfHorizontalImages,
+                     numHorizontalImages,
                      _isRecreateTourTypeImages,
                      backgroundColor);
 
@@ -764,7 +764,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
                final Image image = _graphColorPainter.drawGraphColorImage(
                      (GraphColorItem) element,
-                     numberOfHorizontalImages,
+                     numHorizontalImages,
                      _isRecreateTourTypeImages,
                      backgroundColor);
 
@@ -892,24 +892,24 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    private void enableActions() {
 
       final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
-      final int selectedItemsSize = selectedItems.size();
-      final Object firstSelectedColorDefinition = selectedItems.getFirstElement();
+      final Object firstSelectedItem = selectedItems.getFirstElement();
+      final int numSelectedItems = selectedItems.size();
 
-      boolean isSelected = false;
+      boolean canDeleteColor = false;
       boolean isGraphSelected = false;
 
-      if (firstSelectedColorDefinition instanceof GraphColorItem) {
+      if (firstSelectedItem instanceof GraphColorItem) {
 
          isGraphSelected = true;
-         isSelected = true;
+         canDeleteColor = true;
 
-      } else if (firstSelectedColorDefinition instanceof TourTypeColorDefinition) {
+      } else if (firstSelectedItem instanceof TourTypeColorDefinition) {
 
-         isSelected = true;
+         canDeleteColor = true;
       }
 
-      _btnDelete.setEnabled(isSelected);
-      _btnRename.setEnabled(selectedItemsSize == 1);
+      _btnDelete.setEnabled(canDeleteColor);
+      _btnRename.setEnabled(numSelectedItems == 1);
 
       _colorSelector.setEnabled(isGraphSelected);
    }
@@ -958,6 +958,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
          TourManager.getInstance().clearTourDataCache();
 
+         _colorSelector.saveCustomColors(_state);
+
          // fire modify event
          _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 
@@ -966,7 +968,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             _isLayoutModified = false;
 
             // show restart info
-            final MessageDialog messageDialog = new MessageDialog(this.getShell(),
+            final MessageDialog messageDialog = new MessageDialog(
+                  getShell(),
                   Messages.Pref_TourTypes_Dialog_Restart_Title,
                   null,
                   Messages.Pref_TourTypes_Dialog_Restart_Message_2,
@@ -975,7 +978,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                   1);
 
             if (messageDialog.open() == Window.OK) {
-               Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+               getShell().getDisplay().asyncExec(() -> PlatformUI.getWorkbench().restart());
             }
          }
       }
@@ -1014,27 +1017,25 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
     */
    private List<TourTypeColorDefinition> getSelectedColorDefinitions() {
 
-      final List<TourTypeColorDefinition> selectedColorDefinitions = new ArrayList<>();
+      final List<TourTypeColorDefinition> allSelectedColorDefinitions = new ArrayList<>();
 
-      final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
+      final StructuredSelection allSelectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
 
-      final Iterator<?> selectedItemsIterator = selectedItems.iterator();
-      while (selectedItemsIterator.hasNext()) {
+      for (final Object selectedItem : allSelectedItems) {
 
-         final Object selectedItem = selectedItemsIterator.next();
          if (selectedItem instanceof GraphColorItem) {
 
             final GraphColorItem graphColor = (GraphColorItem) selectedItem;
 
-            selectedColorDefinitions.add((TourTypeColorDefinition) graphColor.getColorDefinition());
+            allSelectedColorDefinitions.add((TourTypeColorDefinition) graphColor.getColorDefinition());
 
          } else if (selectedItem instanceof TourTypeColorDefinition) {
 
-            selectedColorDefinitions.add((TourTypeColorDefinition) selectedItem);
+            allSelectedColorDefinitions.add((TourTypeColorDefinition) selectedItem);
          }
       }
 
-      return selectedColorDefinitions;
+      return allSelectedColorDefinitions;
    }
 
    private TourTypeBorder getSelectedTourTypeBorderLayout() {
@@ -1106,6 +1107,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
    }
 
+   private void initUI(final Composite parent) {
+
+   }
+
    @Override
    public boolean okToLeave() {
 
@@ -1117,11 +1122,80 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       return super.okToLeave();
    }
 
-   private void onAddTourType() {
+   /**
+    * Is called when a color in the color viewer is selected.
+    *
+    * @param isNavigationKeyPressed
+    */
+   private void onSelectColorInColorViewer(final boolean isNavigationKeyPressed) {
+
+      _selectedGraphColor = null;
+
+      final Object firstElement = _tourTypeViewer.getStructuredSelection().getFirstElement();
+
+      if (firstElement instanceof GraphColorItem) {
+
+         final GraphColorItem graphColor = (GraphColorItem) firstElement;
+
+         _selectedGraphColor = graphColor;
+
+         _colorSelector.setColorValue(graphColor.getRGB());
+
+         if (isNavigationKeyPressed == false) {
+
+            // open color dialog only when not navigated with the keyboard
+
+            /*
+             * Run async that the UI do display the selected color in the color button when the
+             * color dialog is opened
+             */
+            _tourTypeViewer.getTree().getDisplay().asyncExec(() -> {
+
+               // open color selection dialog
+
+               _colorSelector.open();
+            });
+         }
+      }
+
+      setFocusToViewer();
+   }
+
+   private void onSelectImageLayout() {
+
+      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+
+      imageConfig.imageColor1 = getSelectedTourTypeColor(_comboFillColor1);
+      imageConfig.imageColor2 = getSelectedTourTypeColor(_comboFillColor2);
+      imageConfig.imageLayout = getSelectedTourTypeLayout();
+
+      imageConfig.borderColor = getSelectedTourTypeColor(_comboBorderColor);
+      imageConfig.borderLayout = getSelectedTourTypeBorderLayout();
+      imageConfig.borderWidth = _spinnerBorder.getSelection();
+
+      // set tour type images dirty
+      TourTypeImage.setTourTypeImagesDirty();
+
+      _isRecreateTourTypeImages = true;
+      {
+         _tourTypeViewer.refresh(true);
+
+         // do a redraw in the tree viewer, the color images will be recreated in the label provider
+         _tourTypeViewer.getTree().redraw();
+      }
+      _isRecreateTourTypeImages = false;
+
+      _isModified = true;
+      _isLayoutModified = true;
+
+      enableLayoutControls();
+   }
+
+   private void onTourType_Add() {
 
       // ask for the tour type name
       final InputDialog inputDialog = new InputDialog(
-            this.getShell(),
+            getShell(),
             Messages.Pref_TourTypes_Dlg_new_tour_type_title,
             Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
             UI.EMPTY_STRING,
@@ -1140,15 +1214,16 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       /*
        * Create a dummy definition to get the default colors
        */
-      final TourTypeColorDefinition dummyColorDefinition = new TourTypeColorDefinition(
+      final TourTypeColorDefinition dummyColorDef = new TourTypeColorDefinition(
             newTourType,
             UI.EMPTY_STRING,
             UI.EMPTY_STRING);
 
-      newTourType.setColorBright(dummyColorDefinition.getGradientBright_Default());
-      newTourType.setColorDark(dummyColorDefinition.getGradientDark_Default());
-      newTourType.setColorLine(dummyColorDefinition.getLineColor_Default());
-      newTourType.setColorText(dummyColorDefinition.getTextColor_Default());
+      newTourType.setColor_Gradient_Bright(dummyColorDef.getGradientBright_Default());
+      newTourType.setColor_Gradient_Dark(dummyColorDef.getGradientDark_Default());
+
+      newTourType.setColor_Line(dummyColorDef.getLineColor_Default_Light(), dummyColorDef.getLineColor_Default_Dark());
+      newTourType.setColor_Text(dummyColorDef.getTextColor_Default_Light(), dummyColorDef.getTextColor_Default_Dark());
 
       // add new entity to db
       final TourType savedTourType = saveTourType(newTourType);
@@ -1192,85 +1267,25 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       }
    }
 
-   /**
-    * Is called when the color in the color selector has changed
-    *
-    * @param event
-    */
-   private void onChangeGraphColor(final PropertyChangeEvent event) {
-
-      final RGB oldRGB = (RGB) event.getOldValue();
-      final RGB newRGB = (RGB) event.getNewValue();
-
-      if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
-         return;
-      }
-
-      // color has changed
-
-      // update model
-      _selectedGraphColor.setRGB(newRGB);
-
-      final TourTypeColorDefinition selectedColorDefinition = (TourTypeColorDefinition) _selectedGraphColor
-            .getColorDefinition();
-
-      /*
-       * update tour type in the db
-       */
-      final TourType oldTourType = selectedColorDefinition.getTourType();
-
-      oldTourType.setColorBright(selectedColorDefinition.getGradientBright_New());
-      oldTourType.setColorDark(selectedColorDefinition.getGradientDark_New());
-      oldTourType.setColorLine(selectedColorDefinition.getLineColor_New());
-      oldTourType.setColorText(selectedColorDefinition.getTextColor_New());
-
-      final TourType savedTourType = saveTourType(oldTourType);
-
-      selectedColorDefinition.setTourType(savedTourType);
-
-      // replace tour type with new one
-      _dbTourTypes.remove(oldTourType);
-      _dbTourTypes.add(savedTourType);
-      Collections.sort(_dbTourTypes);
-
-      /*
-       * Update UI
-       */
-      // invalidate old color/image from the graph and color definition to force the recreation
-      _graphColorPainter.invalidateResources(
-            _selectedGraphColor.getColorId(),
-            selectedColorDefinition.getColorDefinitionId());
-
-      // update UI
-      TourTypeImage.setTourTypeImagesDirty();
-
-      /*
-       * update the tree viewer, the color images will be recreated in the label provider
-       */
-      _tourTypeViewer.update(_selectedGraphColor, null);
-      _tourTypeViewer.update(selectedColorDefinition, null);
-
-      // without a repaint the color def image is not updated
-      _tourTypeViewer.getTree().redraw();
-
-      _isModified = true;
-   }
-
-   private void onDeleteTourType() {
+   private void onTourType_Delete() {
 
       final List<TourTypeColorDefinition> allSelectedColorDefinitions = getSelectedColorDefinitions();
-      final List<TourType> selectedTourTypes = new ArrayList<>();
+      final List<TourType> allSelectedTourTypes = new ArrayList<>();
 
-      allSelectedColorDefinitions.stream().forEach(colorDefinition -> selectedTourTypes.add(colorDefinition.getTourType()));
+      allSelectedColorDefinitions.stream()
+            .forEach(colorDefinition -> allSelectedTourTypes.add(colorDefinition.getTourType()));
 
       final List<String> allTourTypeNames = new ArrayList<>();
-      selectedTourTypes.stream().forEach(tourType -> allTourTypeNames.add(tourType.getName()));
 
-      final String allTourTypeNamesJoined = StringUtils.join(allTourTypeNames.stream().toArray(String[]::new), UI.COMMA_SPACE);
+      allSelectedTourTypes.stream()
+            .forEach(tourType -> allTourTypeNames.add(tourType.getName()));
+
+      final String allTourTypeNamesJoined = StringUtils
+            .join(allTourTypeNames.stream().toArray(String[]::new), UI.COMMA_SPACE);
 
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
-            this.getShell(),
+            getShell(),
             Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
             null,
             NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, allTourTypeNamesJoined),
@@ -1284,7 +1299,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
          return;
       }
 
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+      BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 
          for (final TourTypeColorDefinition selectedColorDefinition : allSelectedColorDefinitions) {
 
@@ -1295,11 +1310,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
                // update model
                _dbTourTypes.remove(selectedTourType);
-
                _colorDefinitions.remove(selectedColorDefinition);
 
                // update UI
                _tourTypeViewer.remove(selectedColorDefinition);
+
+// a tour type image cannot be deleted otherwise an image dispose exception can occur
+//             TourTypeImage.deleteTourTypeImage(selectedTourType.getTypeId());
 
                _isModified = true;
             }
@@ -1309,7 +1326,71 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       setFocusToViewer();
    }
 
-   private void onRenameTourType() {
+   /**
+    * This is called when the color in the color selector is modified
+    *
+    * @param event
+    */
+   private void onTourType_Modify(final PropertyChangeEvent event) {
+
+      final RGB oldRGB = (RGB) event.getOldValue();
+      final RGB newRGB = (RGB) event.getNewValue();
+
+      if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
+         return;
+      }
+
+      // color has changed
+
+      // update model
+      _selectedGraphColor.setRGB(newRGB);
+
+      final TourTypeColorDefinition selectedColorDef = (TourTypeColorDefinition) _selectedGraphColor.getColorDefinition();
+
+      /*
+       * update tour type in the db
+       */
+      final TourType oldTourType = selectedColorDef.getTourType();
+
+      oldTourType.setColor_Gradient_Bright(selectedColorDef.getGradientBright_New());
+      oldTourType.setColor_Gradient_Dark(selectedColorDef.getGradientDark_New());
+
+      oldTourType.setColor_Line(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
+      oldTourType.setColor_Text(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
+
+      final TourType savedTourType = saveTourType(oldTourType);
+
+      selectedColorDef.setTourType(savedTourType);
+
+      // replace tour type with new one
+      _dbTourTypes.remove(oldTourType);
+      _dbTourTypes.add(savedTourType);
+      Collections.sort(_dbTourTypes);
+
+      /*
+       * Update UI
+       */
+      // invalidate old color/image from the graph and color definition to force the recreation
+      _graphColorPainter.invalidateResources(
+            _selectedGraphColor.getColorId(),
+            selectedColorDef.getColorDefinitionId());
+
+      // update UI
+      TourTypeImage.setTourTypeImagesDirty();
+
+      /*
+       * update the tree viewer, the color images will be recreated in the label provider
+       */
+      _tourTypeViewer.update(_selectedGraphColor, null);
+      _tourTypeViewer.update(selectedColorDef, null);
+
+      // without a repaint the color def image is not updated
+      _tourTypeViewer.getTree().redraw();
+
+      _isModified = true;
+   }
+
+   private void onTourType_Rename() {
 
       final TourTypeColorDefinition selectedColorDefinition = getFirstSelectedColorDefinition();
       if (selectedColorDefinition == null) {
@@ -1357,63 +1438,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       }
 
       setFocusToViewer();
-   }
-
-   /**
-    * Is called when a color in the color viewer is selected.
-    */
-   private void onSelectColorInColorViewer() {
-
-      _selectedGraphColor = null;
-
-      final IStructuredSelection selection = (IStructuredSelection) _tourTypeViewer.getSelection();
-      final Object firstElement = selection.getFirstElement();
-
-      if (firstElement instanceof GraphColorItem) {
-
-         final GraphColorItem graphColor = (GraphColorItem) firstElement;
-
-         _selectedGraphColor = graphColor;
-
-         _colorSelector.setColorValue(graphColor.getRGB());
-         _colorSelector.setEnabled(true);
-
-      } else {
-
-         _colorSelector.setEnabled(false);
-      }
-
-      setFocusToViewer();
-   }
-
-   private void onSelectImageLayout() {
-
-      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
-
-      imageConfig.imageColor1 = getSelectedTourTypeColor(_comboFillColor1);
-      imageConfig.imageColor2 = getSelectedTourTypeColor(_comboFillColor2);
-      imageConfig.imageLayout = getSelectedTourTypeLayout();
-
-      imageConfig.borderColor = getSelectedTourTypeColor(_comboBorderColor);
-      imageConfig.borderLayout = getSelectedTourTypeBorderLayout();
-      imageConfig.borderWidth = _spinnerBorder.getSelection();
-
-      // set tour type images dirty
-      TourTypeImage.setTourTypeImagesDirty();
-
-      _isRecreateTourTypeImages = true;
-      {
-         _tourTypeViewer.refresh(true);
-
-         // do a redraw in the tree viewer, the color images will be recreated in the label provider
-         _tourTypeViewer.getTree().redraw();
-      }
-      _isRecreateTourTypeImages = false;
-
-      _isModified = true;
-      _isLayoutModified = true;
-
-      enableLayoutControls();
    }
 
    @Override
@@ -1468,6 +1492,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       _comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor1));
       _comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor2));
       _comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(imageConfig.imageLayout));
+
+      _colorSelector.restoreCustomColors(_state);
 
       enableLayoutControls();
    }

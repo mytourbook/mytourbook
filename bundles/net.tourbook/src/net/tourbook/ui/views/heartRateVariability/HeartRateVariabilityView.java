@@ -410,9 +410,9 @@ public class HeartRateVariabilityView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE_LIGHT);
+      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
 
       final double[][] rr0Series = new double[validDataLength][];
       final float[][] rr1Series = new float[validDataLength][];
@@ -498,8 +498,8 @@ public class HeartRateVariabilityView extends ViewPart {
       yDataRR1.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
       yDataRR1.setDefaultRGB(rgbPrefLine);
       yDataRR1.setRgbLine(rgbLine);
-      yDataRR1.setRgbDark(rgbDark);
-      yDataRR1.setRgbBright(rgbBright);
+      yDataRR1.setRgbGradient_Dark(rgbDark);
+      yDataRR1.setRgbGradient_Bright(rgbBright);
 
       yDataRR1.forceYAxisMinValue(yDataRR1.getOriginalMinValue() - ADJUST_PULSE_VALUE);
       yDataRR1.forceYAxisMaxValue(yDataRR1.getOriginalMaxValue() + ADJUST_PULSE_VALUE);
