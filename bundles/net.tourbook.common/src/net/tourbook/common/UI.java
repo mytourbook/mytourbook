@@ -755,21 +755,10 @@ public class UI {
     */
    public static void addSashColorHandler(final Sash sash) {
 
-      sash.addMouseTrackListener(new MouseTrackListener() {
-
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-         }
-
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
+      sash.addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(mouseEvent -> sash.setBackground(Display.getCurrent().getSystemColor(
+            SWT.COLOR_WIDGET_DARK_SHADOW))));
+      sash.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> sash.setBackground(Display.getCurrent().getSystemColor(
+            SWT.COLOR_WIDGET_BACKGROUND))));
 
       sash.addSelectionListener(new SelectionAdapter() {
          @Override
