@@ -45,8 +45,6 @@ import org.json.JSONObject;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-   private static final String               JSON_GZ                      = ".json.gz";
-
    private HashMap<TourData, List<TimeData>> _processedActivities         = new HashMap<>();
 
    private HashMap<String, String>           _childrenActivitiesToProcess = new HashMap<>();
@@ -106,7 +104,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
                FilenameUtils.getBaseName(filePath)) +
                UI.DASH +
                String.valueOf(++currentFileNumber) +
-               JSON_GZ;
+               ".json.gz"; //$NON-NLS-1$
 
          final Map.Entry<String, String> childEntry = getChildActivity(parentFileName);
 
@@ -352,7 +350,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
                   FilenameUtils.getBaseName(filePath)) +
                   UI.DASH +
                   String.valueOf(fileNumber - 1) +
-                  JSON_GZ;
+                  ".json.gz"; //$NON-NLS-1$
 
             if (key.getImportFileName().contains(parentFileName)) {
                parentEntry = entry;
@@ -361,7 +359,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
 
          if (parentEntry == null) {
-            _childrenActivitiesToProcess.putIfAbsent(filePath, jsonFileContent);
+            if (!_childrenActivitiesToProcess.containsKey(filePath)) {
+               _childrenActivitiesToProcess.put(filePath, jsonFileContent);
+            }
          } else {
             activity = suuntoJsonProcessor.ImportActivity(
                   jsonFileContent,
@@ -451,8 +451,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-
-      if (!fileName.toLowerCase().endsWith(JSON_GZ)) {
+      if (!fileName.toLowerCase().endsWith(".json.gz")) { //$NON-NLS-1$
          return false;
       }
 
