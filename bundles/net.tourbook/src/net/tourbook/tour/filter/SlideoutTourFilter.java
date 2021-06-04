@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.DateFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
@@ -109,8 +111,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
    {
       _defaultModifyListener = this::onProfile_Modify;
 
-      _fieldSelectionListener_DateTime = SelectionListener.widgetSelectedAdapter(
-            this::onField_Select_DateTime);
+      _fieldSelectionListener_DateTime = widgetSelectedAdapter(this::onField_Select_DateTime);
 
       _keepOpenListener = new FocusListener() {
 
@@ -522,7 +523,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             final Button button = new Button(container, SWT.PUSH);
             button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
             button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
-            button.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            button.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onProfile_Add()));
 
             // set button default width
@@ -535,7 +536,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             _btnCopyProfile = new Button(container, SWT.PUSH);
             _btnCopyProfile.setText(Messages.Slideout_TourFilter_Action_CopyProfile);
             _btnCopyProfile.setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
-            _btnCopyProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _btnCopyProfile.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onProfile_Copy()));
 
             // set button default width
@@ -548,7 +549,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             _btnDeleteProfile = new Button(container, SWT.PUSH);
             _btnDeleteProfile.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
             _btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
-            _btnDeleteProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _btnDeleteProfile.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onProfile_Delete()));
 
             // set button default width
@@ -660,12 +661,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       /*
        * Field listener
        */
-      final SelectionListener fieldListener = SelectionListener.widgetSelectedAdapter(
+      final SelectionListener fieldListener = widgetSelectedAdapter(
             selectionEvent -> onProperty_SelectField(selectionEvent.widget));
-      final SelectionListener operatorListener = SelectionListener.widgetSelectedAdapter(
+      final SelectionListener operatorListener = widgetSelectedAdapter(
             selectionEvent -> onProperty_SelectOperator(selectionEvent.widget));
 
-      final SelectionListener enabledListener = SelectionListener.widgetSelectedAdapter(
+      final SelectionListener enabledListener = widgetSelectedAdapter(
             selectionEvent -> onProperty_SelectEnabled(selectionEvent.widget));
 
       {
@@ -1007,7 +1008,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             _btnAddProperty.setText(Messages.Slideout_TourFilter_Action_AddProperty);
             _btnAddProperty.setToolTipText(Messages.Slideout_TourFilter_Action_AddProperty_Tooltip);
 
-            _btnAddProperty.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _btnAddProperty.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onProperty_Add()));
 
             // set button default width
@@ -1021,7 +1022,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             _btnActivateAll_Yes.setText(Messages.Slideout_TourFilter_Action_ActivateAll);
             _btnActivateAll_Yes.setToolTipText(Messages.Slideout_TourFilter_Action_ActivateAll_Tooltip);
 
-            _btnActivateAll_Yes.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _btnActivateAll_Yes.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onProperty_ActivateAll(true)));
 
             // set button default width
@@ -1035,7 +1036,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             _btnActivateAll_No.setText(Messages.Slideout_TourFilter_Action_DeactivateAll);
             _btnActivateAll_No.setToolTipText(Messages.Slideout_TourFilter_Action_DeactivateAll_Tooltip);
 
-            _btnActivateAll_No.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _btnActivateAll_No.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onProperty_ActivateAll(false)));
 
             // set button default width
@@ -1048,7 +1049,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
             _chkLiveUpdate.setToolTipText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate_Tooltip);
-            _chkLiveUpdate.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> doLiveUpdate()));
 
             GridDataFactory
@@ -1063,7 +1064,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
              */
             _btnApply = new Button(container, SWT.PUSH);
             _btnApply.setText(Messages.Slideout_TourFilter_Action_Apply);
-            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            _btnApply.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> doApply()));
 
             // set button default width
@@ -1158,7 +1159,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             onField_Select_Number_Float(mouseEvent.widget);
          });
 
-         spinner.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+         spinner.addSelectionListener(widgetSelectedAdapter(
                selectionEvent -> onField_Select_Number_Float(selectionEvent.widget)));
 
          if (fieldNo == 1) {
@@ -1222,7 +1223,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             onField_Select_Number_Integer(mouseEvent.widget);
          });
 
-         spinner.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+         spinner.addSelectionListener(widgetSelectedAdapter(
                selectionEvent -> onField_Select_Number_Integer(selectionEvent.widget)));
 
          if (fieldNo == 1) {
@@ -1271,7 +1272,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          onField_Select_SeasonDay(mouseEvent.widget);
       });
 
-      spinnerDay.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+      spinnerDay.addSelectionListener(widgetSelectedAdapter(
             selectionEvent -> onField_Select_SeasonDay(selectionEvent.widget)));
 
       // ensure that this field is not empty
@@ -1304,7 +1305,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
       comboMonth.addFocusListener(_keepOpenListener);
 
-      comboMonth.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+      comboMonth.addSelectionListener(widgetSelectedAdapter(
             selectionEvent -> onField_Select_SeasonMonth(selectionEvent.widget)));
 
       comboMonth.addMouseWheelListener(mouseEvent -> onField_Select_SeasonMonth(mouseEvent.widget));
@@ -1347,7 +1348,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          final Link link = new Link(parent, SWT.NONE);
          link.setText(Messages.Slideout_TourFilter_Link_TextSearchHint);
          link.setToolTipText(Messages.Slideout_TourFilter_Link_TextSearchHint_Tooltip);
-         link.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+         link.addSelectionListener(widgetSelectedAdapter(
                selectionEvent -> Util.showView(SearchView.ID, true)));
       }
 
