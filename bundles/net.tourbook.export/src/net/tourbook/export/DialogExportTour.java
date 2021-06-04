@@ -691,13 +691,13 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void createUI_80_Option_TCX_ActivitiesCourses(final Composite parent) {
 
-      final SelectionListener defaultSelectionListener = SelectionListener.widgetSelectedAdapter(
+      final SelectionListener defaultSelectionListener = widgetSelectedAdapter(
             selectionEvent -> {
                enableFields();
                setFileName();
             });
 
-      final SelectionListener nameSelectionListener = SelectionListener.widgetSelectedAdapter(
+      final SelectionListener nameSelectionListener = widgetSelectedAdapter(
             selectionEvent -> {
 
                updateUI_CourseName();
