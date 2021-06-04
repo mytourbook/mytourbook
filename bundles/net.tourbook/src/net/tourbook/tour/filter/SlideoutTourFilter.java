@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseUpAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.DateFormatSymbols;
@@ -57,13 +60,10 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -379,7 +379,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                UI.addSashColorHandler(sash);
 
                // save sash width
-               sash.addMouseListener(MouseListener.mouseUpAdapter(
+               sash.addMouseListener(mouseUpAdapter(
                      mouseEvent -> _state.put(STATE_SASH_WIDTH, _containerProfiles.getSize().x)));
             }
 
@@ -503,7 +503,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          _txtProfileName.selectAll();
       });
 
-      _profileViewer.getTable().addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
+      _profileViewer.getTable().addKeyListener(keyPressedAdapter(keyEvent -> {
          if (keyEvent.keyCode == SWT.DEL) {
             onProfile_Delete();
          }
@@ -685,7 +685,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                //				.grab(true, true)
                .applyTo(_filterScrolled_Content);
          _filterScrolled_Container.setContent(_filterScrolled_Content);
-         _filterScrolled_Container.addControlListener(ControlListener.controlResizedAdapter(
+         _filterScrolled_Container.addControlListener(controlResizedAdapter(
                controlEvent -> onResizeFilterContent()));
 
          GridLayoutFactory
