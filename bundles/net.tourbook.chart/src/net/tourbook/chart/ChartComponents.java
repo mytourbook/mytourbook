@@ -26,7 +26,8 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -236,7 +237,7 @@ public class ChartComponents extends Composite {
       setLayout(gl);
 
       // left: create left axis canvas
-      componentAxisLeft = new ChartComponentAxis(parent, this);
+      componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
       gd = new GridData(SWT.NONE, SWT.FILL, false, true);
       gd.widthHint = _yAxisWidthLeft;
       componentAxisLeft.setLayoutData(gd);
@@ -247,7 +248,7 @@ public class ChartComponents extends Composite {
       componentGraph.setLayoutData(gd);
 
       // right: create right axis canvas
-      componentAxisRight = new ChartComponentAxis(parent, this);
+      componentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
       gd = new GridData(SWT.NONE, SWT.FILL, false, true);
       gd.widthHint = _yAxisWidthRight;
       componentAxisRight.setLayoutData(gd);
@@ -263,7 +264,12 @@ public class ChartComponents extends Composite {
    private void addListener() {
 
       // this is the only resize listener for the whole chart
-      addControlListener(ControlListener.controlResizedAdapter(controlEvent -> onResize()));
+      addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent event) {
+            onResize();
+         }
+      });
    }
 
    /**
@@ -1714,7 +1720,7 @@ public class ChartComponents extends Composite {
          graphMaxValue = Math.min(24 * 3600, ((((int) yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
 
          // adjust to the whole hour
-         graphMinValue = Math.max(0, (((int) yData.getVisibleMinValue() / 3600) * 3600));
+         graphMinValue = Math.max(0, ((((int) yData.getVisibleMinValue() / 3600) * 3600)));
 
          graphUnit = (graphMaxValue - graphMinValue) / unitCounter;
          graphUnit = (long) Util.roundTimeValue(graphUnit, unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H);
@@ -2317,25 +2323,30 @@ public class ChartComponents extends Composite {
           * delay the change event when the key down was pressed several times
           */
          final Display display = Display.getCurrent();
-         display.asyncExec(() -> display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
-
-            final int __runnableKeyDownCounter = _keyDownCounter[0];
-
+         display.asyncExec(new Runnable() {
             @Override
             public void run() {
-               if (__runnableKeyDownCounter == _keyDownCounter[0]
-                     && __runnableKeyDownCounter != _lastKeyDownCounter[0]) {
+               display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
 
-                  /*
-                   * prevent redoing it, this happened when the selectNext/Previous
-                   * Method took a long time when the chart was drawn
-                   */
-                  _lastKeyDownCounter[0] = __runnableKeyDownCounter;
+                  final int __runnableKeyDownCounter = _keyDownCounter[0];
 
-                  _chart.fireBarSelectionEvent(0, selectedIndex[0]);
-               }
+                  @Override
+                  public void run() {
+                     if (__runnableKeyDownCounter == _keyDownCounter[0]
+                           && __runnableKeyDownCounter != _lastKeyDownCounter[0]) {
+
+                        /*
+                         * prevent redoing it, this happened when the selectNext/Previous
+                         * Method took a long time when the chart was drawn
+                         */
+                        _lastKeyDownCounter[0] = __runnableKeyDownCounter;
+
+                        _chart.fireBarSelectionEvent(0, selectedIndex[0]);
+                     }
+                  }
+               });
             }
-         }));
+         });
       }
    }
 
