@@ -125,11 +125,11 @@ public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 //    public static final int      BRIGHTNESS_LIGHTNING      = 2;
 
       if (brightnessValue == 1) {
-         return "MapColorProfile.BRIGHTNESS_DIMMING";
+         return "MapColorProfile.BRIGHTNESS_DIMMING"; //$NON-NLS-1$
       } else if (brightnessValue == 2) {
-         return "MapColorProfile.BRIGHTNESS_LIGHTNING";
+         return "MapColorProfile.BRIGHTNESS_LIGHTNING"; //$NON-NLS-1$
       } else {
-         return "MapColorProfile.BRIGHTNESS_DEFAULT";
+         return "MapColorProfile.BRIGHTNESS_DEFAULT"; //$NON-NLS-1$
       }
    }
 
@@ -210,38 +210,38 @@ public class Map2ColorProfile extends MapColorProfile implements Cloneable {
       sb.append(NL);
       sb.append(NL);
 
-      sb.append("new Map2ColorProfile(" + NL);
+      sb.append("new Map2ColorProfile(" + NL); //$NON-NLS-1$
       sb.append(NL);
-      sb.append("   new ColorValue[] {" + NL);
+      sb.append("   new ColorValue[] {" + NL); //$NON-NLS-1$
       sb.append(NL);
 
       for (int valueIndex = 0; valueIndex < numColorValues; valueIndex++) {
          final ColorValue colorValue = colorValues[valueIndex];
-         final String komma = valueIndex < numColorValues - 1 ? "," : "";
-         sb.append("      " + colorValue + komma + NL);
+         final String komma = valueIndex < numColorValues - 1 ? "," : ""; //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("      " + colorValue + komma + NL); //$NON-NLS-1$
       }
-      sb.append("   }," + NL);
+      sb.append("   }," + NL); //$NON-NLS-1$
 
       sb.append(NL);
 
-      sb.append("   " + minBrightness_Text + "," + NL);
-      sb.append("   " + minBrightnessFactor + "," + NL);
-      sb.append("   " + maxBrightness_Text + "," + NL);
-      sb.append("   " + maxBrightnessFactor + "" + NL);
+      sb.append("   " + minBrightness_Text + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("   " + minBrightnessFactor + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("   " + maxBrightness_Text + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("   " + maxBrightnessFactor + "" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
       if (isMinValueOverwrite || isMaxValueOverwrite) {
-         sb.append("   " + "," + NL);
+         sb.append("   " + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
          sb.append(NL);
 
-         sb.append("   // overwrite min/max values" + NL);
+         sb.append("   // overwrite min/max values" + NL); //$NON-NLS-1$
 
-         sb.append("   " + isMinValueOverwrite + "," + NL);
-         sb.append("   " + minValueOverwrite + "," + NL);
-         sb.append("   " + isMaxValueOverwrite + "," + NL);
-         sb.append("   " + maxValueOverwrite + NL);
+         sb.append("   " + isMinValueOverwrite + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("   " + minValueOverwrite + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("   " + isMaxValueOverwrite + "," + NL); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("   " + maxValueOverwrite + NL); //$NON-NLS-1$
       }
 
-      sb.append("   );");
+      sb.append("   );"); //$NON-NLS-1$
 
       return sb.toString();
    }

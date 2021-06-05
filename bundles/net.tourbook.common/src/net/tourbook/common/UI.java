@@ -2284,7 +2284,7 @@ public class UI {
 
       if (IS_WIN) {
 
-         final Font winFont = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font");
+         final Font winFont = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font"); //$NON-NLS-1$
 
          if (winFont != null) {
             AWT_DIALOG_FONT = winFont;

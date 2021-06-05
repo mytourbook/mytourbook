@@ -51,11 +51,6 @@ public class Messages extends NLS {
    public static String        profileViewer_column_label_shadowValue_tooltip;
 
    public static String        prefPage_srtm_btn_adjust_columns;
-   public static String        prefPage_srtm_button_testConnection;
-   public static String        prefPage_srtm_checkHTTPConnection_message;
-   public static String        prefPage_srtm_checkHTTPConnection_title;
-   public static String        prefPage_srtm_checkHTTPConnectionFAILED_message;
-   public static String        prefPage_srtm_checkHTTPConnectionOK_message;
    public static String        prefPage_srtm_chk_use_default_location;
    public static String        prefPage_srtm_confirm_defaults_message;
    public static String        prefPage_srtm_confirm_defaults_title;
@@ -65,17 +60,12 @@ public class Messages extends NLS {
    public static String        prefPage_srtm_dlg_delete_profile_title;
    public static String        prefPage_srtm_editor_data_filepath;
    public static String        prefPage_srtm_group_label_data_location;
-   public static String        prefPage_srtm_group_label_srtm3;
    public static String        prefPage_srtm_msg_invalid_data_path;
-   public static String        prefPage_srtm_msg_invalidSrtm3FtpUrl;
-   public static String        prefPage_srtm_msg_invalidSrtm3HttpUrl;
    public static String        prefPage_srtm_profile_add;
    public static String        prefPage_srtm_profile_duplicate;
    public static String        prefPage_srtm_profile_edit;
    public static String        prefPage_srtm_profile_option_apply_when_selected;
    public static String        prefPage_srtm_profile_remove;
-   public static String        prefPage_srtm_radio_srtm3FtpUrl;
-   public static String        prefPage_srtm_radio_srtm3HttpUrl;
    public static String        prefPage_srtm_resolution_title;
    public static String        prefPage_srtm_resolution_very_fine;
    public static String        prefPage_srtm_resolution_fine;
@@ -83,9 +73,6 @@ public class Messages extends NLS {
    public static String        prefPage_srtm_resolution_very_rough;
    public static String        prefPage_srtm_shadow_text;
    public static String        prefPage_srtm_shadow_value_text;
-
-   public static String        srtm_transfer_error_message;
-   public static String        srtm_transfer_error_title;
 
    public static String        dialog_adjust_srtm_colors_button_add;
    public static String        dialog_adjust_srtm_colors_button_add_multiple;
@@ -112,7 +99,6 @@ public class Messages extends NLS {
    public static String        error_message_timeoutWhenConnectingToServer;
 
    public static String        job_name_downloadMonitor;
-   public static String        job_name_ftpDownload;
    public static String        job_name_httpDownload;
 
    public static String        Log_SRTM_DownloadingResource;
@@ -130,7 +116,6 @@ public class Messages extends NLS {
    public static String        PrefPage_SRTMData_Info_EmptyPassword;
    public static String        PrefPage_SRTMData_Label_AccountValidation_NO;
    public static String        PrefPage_SRTMData_Label_AccountValidation_YES;
-   public static String        PrefPage_SRTMData_Label_CredentialValidation;
    public static String        PrefPage_SRTMData_Label_Password;
    public static String        PrefPage_SRTMData_Label_Username;
    public static String        PrefPage_SRTMData_Link_AccountInfo;

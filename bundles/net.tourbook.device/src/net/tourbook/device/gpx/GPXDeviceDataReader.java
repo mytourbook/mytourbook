@@ -205,7 +205,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
          //
          ;
 
-         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString()));
+         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString())); //$NON-NLS-1$
 
          TourLogManager.logEx(e);
 

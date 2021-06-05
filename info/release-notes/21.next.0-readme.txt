@@ -6,19 +6,13 @@ TODO's
 
 * Tour Chart   - Select color for 2nd graph line instead of compliment color
                - Set default graphs in the graph slideout, sorting still needs the pref page
- 
+
 * Tour Search  - Test Edge browser if the tour selection in the result list is working with the mouse
                - Implement workaround: Select tour with an action in the context menu
-               
+
 * Compare Tours by Elevation
                - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
 
-* UI Theme     Provide a UI to select the UI theme
-               https://www.eclipse.org/eclipse/news/4.18/platform.php#system-theme
-               -cssTheme org.eclipse.e4.ui.css.theme.e4_classic
-               -cssTheme org.eclipse.e4.ui.css.theme.e4_default
-               -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
-  
 * Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                  Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
@@ -26,7 +20,7 @@ TODO's
                  mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
 
 * Tour modification (Frederic) 
-	         - Use multi-threading (ThreadPoolExecutor)
+               - Use multi-threading (ThreadPoolExecutor)
 
 Issues
 ======
@@ -37,77 +31,24 @@ Issues
 New
 ===
 
-* Tour Book View (Frederic)
- - Added the ability to delete values, for any given tour, such as elevation, time, gear, cadence...etc
-
-* Tour values deletion/re-import (Frederic)
- - Added a confirmation dialog that will always be displayed to the user when re-importing or deleting tour values for the whole database
- - Locking by default the UI controls to modify tour values on more than 1 tour at a time
- - Separated calories in its own category
+*
 
 
 Improvements
 ============
 
-* Tour Chart 
-  - Displaying the night sections with a grey color for a more intuitive chart and better readability (Frederic)
-  - More options to show R-R values together with other pules graphs (R-R average, device value)
-
-* 2D Map (Frederic)
-  - Extending the zoom levels capacity from 20 to 23
-
-* 2.5D Map (Thomas):
-  - Upgrading VTM lib to 0.15 321
-  - Size of photothumbnails can be changed via slideout 326
-  - Show direction arrows on the tourpath, controlled via slideout 339
-
-* 3D Map & Tour Chart Preferences (Frederic)
- - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0
-
+* 
 
 Changes  
 =======
 
-* SRTM Download
-  - The download of SRTM data files is still free but it requires that a user is authenticated. Username and password can be entered in the SRTM data preferences page which also contains information how to request a SRTM server account 
-
-* Fitlog/FitlogEx import (Frederic)
-  - When re-importing tours, the complete list of tour types and tags are not re-imported anymore
+* 
     
 
 Bugfix
 ======
 
-* Tour Chart
-  - R-R values were not visible within tour breaks
-
-* Tour Chart Value Tooltip 
-  - Fixed a bug when importing tours (FIT, Suunto SML, Suunto XML, Garmin TCX) where in some cases, the tour start components were erroneous (the Time of Day value in the Value Point Tooltip was wrong). Now this data is adjusted with the tour's time zone.
-
-* Tour Import View (Frederic)
-  - The kcal column was displaying values in calories units instead of kcalories
-
-* Chart Tooltip (Frederic)
-  - Displaying the hour from 0 when a new day starts
-
-* Chart Create Tourmarker (Thomas)
-  - Same wording as on other places. "create marker" -> "create tour marker" 331
-
-* Compress Database
-  - Fixed SQL exception when the tour database size is too large to fit into an integer value
-
-* Fitlog/FitlogEx import (Frederic)
-  - Fixed an issue where in some cases the imported tour time zone could be wrong
-
-* FIT File: Pause Re-Import (Frederic)
-  - In some scenarii, the pause import could be erroneous and lead to negative paused time values
-
-* Tour Type Preference page (Frederic)
-  - Fixed a bug in the tour type viewer when selecting several tour types and only the first one was deleted.
-  - Disabling the "Rename" button when more than 1 tour type is selected
-
-* Map25 Mapprovider (Thomas)
-  - map25 was not displayed correctly at the very first start of Mytourbook 343
+* 
 
 Translation    
 ===========

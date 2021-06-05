@@ -57,10 +57,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -71,11 +68,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -327,31 +322,28 @@ public class DialogExportTour extends TitleAreaDialog {
 
       shell.setText(Messages.dialog_export_shell_text);
 
-      shell.addListener(SWT.Resize, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      shell.addListener(SWT.Resize, event -> {
 
-            // allow resizing the width but not the height
+         // allow resizing the width but not the height
 
-            if (_shellDefaultSize == null) {
-               _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            }
+         if (_shellDefaultSize == null) {
+            _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+         }
 
-            final Point shellSize = shell.getSize();
+         final Point shellSize = shell.getSize();
 
-            /*
-             * this is not working, the shell is flickering when the shell size is below min size
-             * and I found no way to prevent a resize :-(
-             */
+         /*
+          * this is not working, the shell is flickering when the shell size is below min size
+          * and I found no way to prevent a resize :-(
+          */
 //				if (shellSize.x < _shellDefaultSize.x) {
 //					event.doit = false;
 //				}
 
-            shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
-            shellSize.y = _shellDefaultSize.y;
+         shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+         shellSize.y = _shellDefaultSize.y;
 
-            shell.setSize(shellSize);
-         }
+         shell.setSize(shellSize);
       });
    }
 
@@ -665,12 +657,7 @@ public class DialogExportTour extends TitleAreaDialog {
          _spinnerCamouflageSpeed.setPageIncrement(10);
          _spinnerCamouflageSpeed.setMinimum(1);
          _spinnerCamouflageSpeed.setMaximum(1000);
-         _spinnerCamouflageSpeed.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-            }
-         });
+         _spinnerCamouflageSpeed.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
 
          // label: unit
          _lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
@@ -738,12 +725,7 @@ public class DialogExportTour extends TitleAreaDialog {
          }
       };
 
-      final ModifyListener nameModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            validateFields();
-         }
-      };
+      final ModifyListener nameModifyListener = modifyEvent -> validateFields();
 
       // container
       final Composite container = new Composite(parent, SWT.NONE);
@@ -847,12 +829,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
       Label label;
 
-      final ModifyListener filePathModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            validateFields();
-         }
-      };
+      final ModifyListener filePathModifyListener = modifyEvent -> validateFields();
 
       /*
        * group: filename

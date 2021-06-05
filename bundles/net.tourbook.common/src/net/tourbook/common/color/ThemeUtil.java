@@ -37,7 +37,7 @@ public class ThemeUtil {
    /**
     * Currently only .png files are supported for themed images !!!
     */
-   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";
+   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";  //$NON-NLS-1$
 
    /**
     * All images for the dark theme should have this postfix before the file extension
@@ -284,19 +284,19 @@ public class ThemeUtil {
          final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
          final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
 
-         display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
-         display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
-         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
-         display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
-         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
-         display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);             //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);          //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);  //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);                                         //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
