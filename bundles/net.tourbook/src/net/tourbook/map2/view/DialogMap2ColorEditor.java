@@ -597,7 +597,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
                + UI.timeStampNano()
 
-               + " [" + getClass().getSimpleName() + "]"
+               + " [" + getClass().getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
                + _mapColorWorkingCopy);
       }
    }

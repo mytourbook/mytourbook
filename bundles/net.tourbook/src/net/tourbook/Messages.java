@@ -1254,8 +1254,6 @@ public class Messages extends NLS {
    public static String        Map25_Provider_MyTileServer_Description;
    public static String        Map25_Provider_MyTileServer_Name;
    public static String        Map25_Provider_OpenAndoMap_Description;
-   public static String        Map25_Provider_OpenScienceMap_Description;
-   public static String        Map25_Provider_OpenScienceMap_Name;
 
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;
@@ -1337,7 +1335,6 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
-   public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Title;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
    public static String        Pref_Appearance_Group_Theme;

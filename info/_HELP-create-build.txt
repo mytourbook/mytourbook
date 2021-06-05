@@ -8,12 +8,24 @@
 * Run "gradlew" in "C:\DAT\MT\mytourbook\build\build.net.tourbook" this will run the default task
 
 
+Setup to run gradle:
+
+   JAVA_HOME   =C:\Program Files\AdoptOpenJDK\jdk-11.0.11.9-hotspot\
+   Path        =C:\Program Files\AdoptOpenJDK\jdk-11.0.11.9-hotspot\bin;
+                C:\BIN\gradle\gradle-6.9\bin;
+                C:\BIN\maven\bin\;
+
+Setup the graddle wrapper in the build folder:
+
+   gradle wrapper --gradle-version 6.9
+
+
 #################
  Build VTM Plugin
 #################
 
    Setup Gradle environment
-   - Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\WolfgangSchramm\.gradle\gradle.properties
+   - Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\Wolfgang\.gradle\gradle.properties
    
 
    Build plugin

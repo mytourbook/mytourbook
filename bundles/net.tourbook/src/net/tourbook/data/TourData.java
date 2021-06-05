@@ -125,6 +125,7 @@ import org.hibernate.annotations.Cascade;
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
    private static final char           NL                                = UI.NEW_LINE;
+   private static final String         INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
 
    public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
    public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
@@ -8118,7 +8119,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             final int numRR = rrIndex_Next - rrIndex_Current;
             if (numRR > 4) {
-               sb.append(numRR + " ∑  ");
+               sb.append(numRR + INTERVAL_SUMMARY_UNIT);
             }
 
             for (int rrIndex = rrIndex_Current; rrIndex < rrIndex_Next; rrIndex++) {
@@ -8144,7 +8145,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          } else if (rrIndex_Next < 0) {
 
-            sb.append("Next: " + rrIndex_Next);
+            // translation is currently diabled because I cannot remember when this case occur
+            sb.append("Next: " + rrIndex_Next); //$NON-NLS-1$
 
          }
 
