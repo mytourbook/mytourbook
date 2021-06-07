@@ -493,7 +493,6 @@ public class StravaUploader extends TourbookCloudUploader {
          TourLogManager.logTitle(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
 
          runnable.schedule();
-         //new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
          runnable.addJobChangeListener(new JobChangeAdapter() {
             @Override
