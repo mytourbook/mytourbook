@@ -37,7 +37,7 @@ public class ThemeUtil {
    /**
     * Currently only .png files are supported for themed images !!!
     */
-   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";
+   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";  //$NON-NLS-1$
 
    /**
     * All images for the dark theme should have this postfix before the file extension
@@ -88,6 +88,9 @@ public class ThemeUtil {
 
    private static Color        _defaultForegroundColor_Combo;
    private static Color        _defaultBackgroundColor_Combo;
+
+   private static Color        _defaultForegroundColor_Shell;
+   private static Color        _defaultBackgroundColor_Shell;
 
    /**
     * These are all Eclipse themes when using W10:
@@ -159,6 +162,10 @@ public class ThemeUtil {
       return _defaultBackgroundColor_Combo;
    }
 
+   public static Color getDefaultBackgroundColor_Shell() {
+      return _defaultBackgroundColor_Shell;
+   }
+
    /**
     * @return Returns the table default background color for light or dark theme
     */
@@ -175,6 +182,10 @@ public class ThemeUtil {
 
    public static Color getDefaultForegroundColor_Combo() {
       return _defaultForegroundColor_Combo;
+   }
+
+   public static Color getDefaultForegroundColor_Shell() {
+      return _defaultForegroundColor_Shell;
    }
 
    /**
@@ -273,19 +284,19 @@ public class ThemeUtil {
          final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
          final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
 
-         display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
-         display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
-         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
-         display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
-         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
-         display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
-         display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);             //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);          //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);  //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);                                         //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);                                         //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -327,6 +338,9 @@ public class ThemeUtil {
 //         System.out.println((System.currentTimeMillis() + " table.getBackground()      2 " + table.getBackground()));
 //         System.out.println((System.currentTimeMillis() + " shell.getForeground()      2 " + shell.getForeground()));
 //         System.out.println((System.currentTimeMillis() + " table.getForeground()      2 " + table.getForeground()));
+
+         _defaultForegroundColor_Shell = shell.getForeground();
+         _defaultBackgroundColor_Shell = shell.getBackground();
 
          _defaultForegroundColor_Combo = combo.getForeground();
          _defaultBackgroundColor_Combo = combo.getBackground();

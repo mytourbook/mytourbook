@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,19 +62,29 @@ public class GraphColorItem {
 
    public RGB getRGB() {
 
-      if (GraphColorManager.PREF_COLOR_LINE.equals(_colorPrefName)) {
+      if (GraphColorManager.PREF_COLOR_LINE_LIGHT.equals(_colorPrefName)) {
 
-         return _colorDefinition.getLineColor_New();
+         return _colorDefinition.getLineColor_New_Light();
 
-      } else if (GraphColorManager.PREF_COLOR_TEXT.equals(_colorPrefName)) {
+      } else if (GraphColorManager.PREF_COLOR_LINE_DARK.equals(_colorPrefName)) {
 
-         return _colorDefinition.getTextColor_New();
+         return _colorDefinition.getLineColor_New_Dark();
 
-      } else if (GraphColorManager.PREF_COLOR_BRIGHT.equals(_colorPrefName)) {
+      } else if (GraphColorManager.PREF_COLOR_TEXT_LIGHT.equals(_colorPrefName)) {
+
+         return _colorDefinition.getTextColor_New_Light();
+
+      } else if (GraphColorManager.PREF_COLOR_TEXT_DARK.equals(_colorPrefName)) {
+
+         return _colorDefinition.getTextColor_New_Dark();
+
+      } else if (GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT.equals(_colorPrefName)) {
 
          return _colorDefinition.getGradientBright_New();
 
       } else {
+
+         // use as default color
 
          return _colorDefinition.getGradientDark_New();
       }
@@ -94,19 +104,29 @@ public class GraphColorItem {
 
    public void setRGB(final RGB rgb) {
 
-      if (GraphColorManager.PREF_COLOR_LINE.equals(_colorPrefName)) {
+      if (GraphColorManager.PREF_COLOR_LINE_LIGHT.equals(_colorPrefName)) {
 
-         _colorDefinition.setLineColor_New(rgb);
+         _colorDefinition.setLineColor_New_LightTheme(rgb);
 
-      } else if (GraphColorManager.PREF_COLOR_TEXT.equals(_colorPrefName)) {
+      } else if (GraphColorManager.PREF_COLOR_LINE_DARK.equals(_colorPrefName)) {
 
-         _colorDefinition.setTextColor_New(rgb);
+         _colorDefinition.setLineColor_New_DarkTheme(rgb);
 
-      } else if (GraphColorManager.PREF_COLOR_BRIGHT.equals(_colorPrefName)) {
+      } else if (GraphColorManager.PREF_COLOR_TEXT_LIGHT.equals(_colorPrefName)) {
+
+         _colorDefinition.setTextColor_New_LightTheme(rgb);
+
+      } else if (GraphColorManager.PREF_COLOR_TEXT_DARK.equals(_colorPrefName)) {
+
+         _colorDefinition.setTextColor_New_DarkTheme(rgb);
+
+      } else if (GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT.equals(_colorPrefName)) {
 
          _colorDefinition.setGradientBright_New(rgb);
 
       } else {
+
+         // use as default color
 
          _colorDefinition.setGradientDark_New(rgb);
       }
@@ -114,11 +134,12 @@ public class GraphColorItem {
 
    @Override
    public String toString() {
+
       return "GraphColorItem [" //$NON-NLS-1$
 
-            + ("_visibleName=" + _visibleName + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_colorId=" + _colorId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_colorPrefName=" + _colorPrefName) //$NON-NLS-1$
+            + "_visibleName=" + _visibleName + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "_colorId=" + _colorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "_colorPrefName=" + _colorPrefName //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

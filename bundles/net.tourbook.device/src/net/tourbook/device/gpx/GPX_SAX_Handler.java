@@ -1203,10 +1203,15 @@ public class GPX_SAX_Handler extends DefaultHandler {
                newTourType.getName());
 
          newTourType.setColors(
+
                newColor.getGradientBright_Default(),
                newColor.getGradientDark_Default(),
-               newColor.getLineColor_Default(),
-               newColor.getTextColor_Default());
+
+               newColor.getLineColor_Default_Light(),
+               newColor.getLineColor_Default_Dark(),
+
+               newColor.getTextColor_Default_Light(),
+               newColor.getTextColor_Default_Dark());
 
          tempTourTypes.add(newTourType);
 

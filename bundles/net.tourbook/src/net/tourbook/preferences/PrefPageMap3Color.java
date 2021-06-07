@@ -1167,7 +1167,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
          colorProvider.configureColorProvider(ColorProviderConfig.MAP3_PROFILE, imageWidth, rgbVertices, false);
 
-         image = TourMapPainter.createMapLegendImage(//
+         image = TourMapPainter.createMap3_LegendImage(
                colorProvider,
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,

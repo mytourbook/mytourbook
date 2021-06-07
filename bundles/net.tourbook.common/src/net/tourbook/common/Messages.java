@@ -168,11 +168,13 @@ public class Messages extends NLS {
 
    public static String        Graph_Pref_color_gradient_bright;
    public static String        Graph_Pref_color_gradient_dark;
-   public static String        Graph_Pref_color_line;
    public static String        Graph_Pref_color_mapping;
    public static String        Graph_Pref_color_statistic_distance;
    public static String        Graph_Pref_color_statistic_time;
-   public static String        Graph_Pref_ColorText;
+   public static String        Graph_Pref_ColorLine_Theme_Dark;
+   public static String        Graph_Pref_ColorLine_Theme_Light;
+   public static String        Graph_Pref_ColorText_Theme_Dark;
+   public static String        Graph_Pref_ColorText_Theme_Light;
 
    public static String        Map3_Color_ProfileName_Default;
    public static String        Map3_Color_ProfileName_New;
@@ -258,7 +260,7 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_Pressure_Atmosphere_Millibar;
    public static String        Pref_System_Option_SmallLength_Inch;
    public static String        Pref_System_Option_SmallLength_Millimeter;
-   public static String        Pref_System_Option_Temperature_Celcius;
+   public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
 
    public static String        Weather_Clounds_Clouds;

@@ -320,7 +320,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
 
          if (!_isPhotoShowScaled) {
-            debugPrint(" ??????????? PhotoToolkit getPhotoImage: returned unscaled image");
+            debugPrint(" ??????????? PhotoToolkit getPhotoImage: returned unscaled image"); //$NON-NLS-1$
             return photoImage;
          }
 

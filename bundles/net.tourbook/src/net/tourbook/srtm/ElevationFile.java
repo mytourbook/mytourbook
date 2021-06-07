@@ -201,7 +201,7 @@ public class ElevationFile {
          _shortBuffer = _fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, _fileChannel.size()).asShortBuffer();
 
       } catch (final Exception e) {
-         System.out.println(this.getClass().getCanonicalName() + " - " + e.getMessage());
+         System.out.println(this.getClass().getCanonicalName() + " - " + e.getMessage()); //$NON-NLS-1$
          throw (e);
       }
 

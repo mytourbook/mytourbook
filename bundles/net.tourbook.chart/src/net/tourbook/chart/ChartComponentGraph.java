@@ -298,7 +298,6 @@ public class ChartComponentGraph extends Canvas {
    private Cursor                     _cursorDragged;
    private Cursor                     _cursorDragXSlider_ModeZoom;
    private Cursor                     _cursorDragXSlider_ModeSlider;
-   private Cursor                     _cursorHoverXSlider;
    private Cursor                     _cursorModeZoom;
    private Cursor                     _cursorModeZoomMove;
    private Cursor                     _cursorModeSlider;
@@ -310,9 +309,6 @@ public class ChartComponentGraph extends Canvas {
    private Cursor                     _cursorResizeTopDown;
    private Cursor                     _cursorXSliderLeft;
    private Cursor                     _cursorXSliderRight;
-
-   private Color                      _gridColor;
-   private Color                      _gridColorMajor;
 
    /**
     * Contains a {@link ChartTitleSegment} when a tour title area is hovered, otherwise
@@ -397,7 +393,7 @@ public class ChartComponentGraph extends Canvas {
    private Color                      _backgroundColor;
 
    /**
-    * Default background color
+    * Default foreground color
     */
    private Color                      _foregroundColor;
 
@@ -481,29 +477,29 @@ public class ChartComponentGraph extends Canvas {
 
       _pc = new PixelConverter(_chart);
 
-      _cursorResizeLeftRight = new Cursor(display, SWT.CURSOR_SIZEWE);
-      _cursorResizeTopDown = new Cursor(display, SWT.CURSOR_SIZENS);
-      _cursorDragged = new Cursor(display, SWT.CURSOR_SIZEALL);
-      _cursorArrow = new Cursor(display, SWT.CURSOR_ARROW);
+// SET_FORMATTING_OFF
 
-      _cursorModeSlider = createCursorFromImage(ChartImages.CursorMode_Slider);
-      _cursorModeZoom = createCursorFromImage(ChartImages.CursorMode_Zoom);
-      _cursorModeZoomMove = createCursorFromImage(ChartImages.CursorMode_ZoomMove);
-      _cursorDragXSlider_ModeZoom = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
-      _cursorHoverXSlider = createCursorFromImage(ChartImages.Cursor_Hover_XSlider);
+      _cursorResizeLeftRight           = new Cursor(display, SWT.CURSOR_SIZEWE);
+      _cursorResizeTopDown             = new Cursor(display, SWT.CURSOR_SIZENS);
+      _cursorDragged                   = new Cursor(display, SWT.CURSOR_SIZEALL);
+      _cursorArrow                     = new Cursor(display, SWT.CURSOR_ARROW);
 
-      _cursorMove1x = createCursorFromImage(ChartImages.Cursor_Move1x);
-      _cursorMove2x = createCursorFromImage(ChartImages.Cursor_Move2x);
-      _cursorMove3x = createCursorFromImage(ChartImages.Cursor_Move3x);
-      _cursorMove4x = createCursorFromImage(ChartImages.Cursor_Move4x);
-      _cursorMove5x = createCursorFromImage(ChartImages.Cursor_Move5x);
+      _cursorModeSlider                = createCursorFromImage(ChartImages.CursorMode_Slider);
+      _cursorModeZoom                  = createCursorFromImage(ChartImages.CursorMode_Zoom);
+      _cursorModeZoomMove              = createCursorFromImage(ChartImages.CursorMode_Slider_Move);
+      _cursorDragXSlider_ModeZoom      = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider    = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
 
-      _cursorXSliderLeft = createCursorFromImage(ChartImages.Cursor_X_Slider_Left);
-      _cursorXSliderRight = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
+      _cursorMove1x                    = createCursorFromImage(ChartImages.Cursor_Move1x);
+      _cursorMove2x                    = createCursorFromImage(ChartImages.Cursor_Move2x);
+      _cursorMove3x                    = createCursorFromImage(ChartImages.Cursor_Move3x);
+      _cursorMove4x                    = createCursorFromImage(ChartImages.Cursor_Move4x);
+      _cursorMove5x                    = createCursorFromImage(ChartImages.Cursor_Move5x);
 
-      _gridColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
-      _gridColorMajor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+      _cursorXSliderLeft               = createCursorFromImage(ChartImages.Cursor_X_Slider_Left);
+      _cursorXSliderRight              = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
+
+// SET_FORMATTING_ON
 
       _chartComponents = (ChartComponents) parent;
 
@@ -1008,7 +1004,7 @@ public class ChartComponentGraph extends Canvas {
    private Cursor createCursorFromImage(final String imageName) {
 
       Image cursorImage = null;
-      final ImageDescriptor imageDescriptor = ChartActivator.getImageDescriptor(imageName);
+      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName);
 
       if (imageDescriptor == null) {
 
@@ -2110,8 +2106,7 @@ public class ChartComponentGraph extends Canvas {
       final String unitLabel = graphDrawingData.getXData().getUnitLabel();
       final int devUnitLabelWidth = gcChart.textExtent(unitLabel).x;
 
-      gcChart.setForeground(_foregroundColor);
-      gcGraph.setForeground(_gridColor);
+      gcChart.setForeground(Chart.FOREGROUND_COLOR_UNITS);
 
       final int xUnitSize = xUnits.size();
       int devNextXUnitTick = Integer.MIN_VALUE;
@@ -2308,7 +2303,6 @@ public class ChartComponentGraph extends Canvas {
             if (xUnit.isMajorValue) {
 
                gcGraph.setLineStyle(SWT.LINE_SOLID);
-               gcGraph.setForeground(_gridColorMajor);
 
             } else {
 
@@ -2320,8 +2314,9 @@ public class ChartComponentGraph extends Canvas {
 //               gcGraph.setLineWidth(0);
 
                gcGraph.setLineDash(DOT_DASHES);
-               gcGraph.setForeground(_gridColor);
             }
+
+            gcGraph.setForeground(Chart.FOREGROUND_COLOR_GRID);
             gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, graphDrawingData.devGraphHeight);
 
          }
@@ -2340,7 +2335,9 @@ public class ChartComponentGraph extends Canvas {
    private void drawAsync_220_HGrid(final GC gcGraph, final GraphDrawingData drawingData) {
 
       if (_chart.isShowHorizontalGridLines == false) {
+
          // h-grid is not visible
+
          return;
       }
 
@@ -2383,11 +2380,11 @@ public class ChartComponentGraph extends Canvas {
 
             if (yUnit.isMajorValue) {
                gcGraph.setLineStyle(SWT.LINE_SOLID);
-               gcGraph.setForeground(_gridColorMajor);
             } else {
                gcGraph.setLineDash(DOT_DASHES);
-               gcGraph.setForeground(_gridColor);
             }
+
+            gcGraph.setForeground(Chart.FOREGROUND_COLOR_GRID);
             gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
          }
 
@@ -2505,7 +2502,7 @@ public class ChartComponentGraph extends Canvas {
 
       final int devYTop = drawingData.getDevYTop() - labelHeight;
 
-      final Color colorText = new Color(yData.getDefaultRGB());
+      final Color colorText = new Color(yData.getRgbText()[0]);
       gcGraph.setForeground(colorText);
       gcGraph.drawString(graphTitle, 0, devYTop, true);
    }
@@ -3200,7 +3197,9 @@ public class ChartComponentGraph extends Canvas {
       if (path2 != null) {
 
          // this color is not yet user defined
-         final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
+         final RGB complimentColor = UI.IS_DARK_THEME
+               ? new RGB(255, 118, 255)
+               : ColorUtil.getComplimentColor(rgbFg);
          final Color path2Color = new Color(complimentColor);
 
          gc.setForeground(path2Color);
@@ -3842,8 +3841,8 @@ public class ChartComponentGraph extends Canvas {
       final int barHeight2 = barHeight / 2;
 
       // get the colors
-      final RGB[] rgbDark = yData.getRgbDark();
-      final RGB[] rgbBright = yData.getRgbBright();
+      final RGB[] rgbDark = yData.getRgbText();
+      final RGB[] rgbBright = yData.getRgbLine();
 
       final Color colorBgDark = new Color(rgbDark[0]);
       final Color colorBgBright = new Color(rgbBright[0]);
@@ -5610,9 +5609,6 @@ public class ChartComponentGraph extends Canvas {
 
       final int devSliderLinePos = (int) (slider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
 
-//      final int grayColorIndex = 60;
-//      final Color colorTxt = new Color(grayColorIndex, grayColorIndex, grayColorIndex);
-
       int graphNo = 0;
 
       final ArrayList<ChartXSliderLabel> labelList = slider.getLabelList();
@@ -5789,9 +5785,6 @@ public class ChartComponentGraph extends Canvas {
             final ChartDataYSerie yData = ySlider.getYData();
 
             final Color colorLine = new Color(yData.getRgbLine()[0]);
-            final Color colorBright = new Color(yData.getRgbBright()[0]);
-            final Color colorDark = new Color(yData.getRgbDark()[0]);
-            final Color colorText = new Color(yData.getRgbText()[0]);
 
             final GraphDrawingData drawingData = ySlider.getDrawingData();
             final int devYBottom = drawingData.getDevYBottom();
@@ -5841,19 +5834,15 @@ public class ChartComponentGraph extends Canvas {
             final int labelY = devYLabelPos - labelHeight;
 
             // draw label background
-            gcGraph.setForeground(colorBright);
-            gcGraph.setBackground(colorDark);
-//            gcGraph.setAlpha(0xb0);
-            gcGraph.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
+            gcGraph.setBackground(_backgroundColor);
+            gcGraph.fillRectangle(labelX, labelY, labelWidth, labelHeight);
 
             // draw label border
-//            gcGraph.setAlpha(0xa0);
             gcGraph.setForeground(colorLine);
             gcGraph.drawRectangle(labelX, labelY, labelWidth, labelHeight);
-//            gcGraph.setAlpha(0xff);
 
             // draw label text
-            gcGraph.setForeground(colorText);
+            gcGraph.setForeground(_foregroundColor);
             gcGraph.drawString(label, labelX + 3, labelY - 0, true);
 
             // draw slider line
@@ -7141,30 +7130,34 @@ public class ChartComponentGraph extends Canvas {
    private void onDispose() {
 
       // dispose resources
-      _cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
-      _cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
-      _cursorDragged = Util.disposeResource(_cursorDragged);
-      _cursorArrow = Util.disposeResource(_cursorArrow);
-      _cursorModeSlider = Util.disposeResource(_cursorModeSlider);
-      _cursorModeZoom = Util.disposeResource(_cursorModeZoom);
-      _cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
-      _cursorDragXSlider_ModeZoom = Util.disposeResource(_cursorDragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider = Util.disposeResource(_cursorDragXSlider_ModeSlider);
-      _cursorHoverXSlider = Util.disposeResource(_cursorHoverXSlider);
 
-      _cursorMove1x = Util.disposeResource(_cursorMove1x);
-      _cursorMove2x = Util.disposeResource(_cursorMove2x);
-      _cursorMove3x = Util.disposeResource(_cursorMove3x);
-      _cursorMove4x = Util.disposeResource(_cursorMove4x);
-      _cursorMove5x = Util.disposeResource(_cursorMove5x);
+// SET_FORMATTING_OFF
 
-      _cursorXSliderLeft = Util.disposeResource(_cursorXSliderLeft);
-      _cursorXSliderRight = Util.disposeResource(_cursorXSliderRight);
+      _cursorResizeLeftRight           = Util.disposeResource(_cursorResizeLeftRight);
+      _cursorResizeTopDown             = Util.disposeResource(_cursorResizeTopDown);
+      _cursorDragged                   = Util.disposeResource(_cursorDragged);
+      _cursorArrow                     = Util.disposeResource(_cursorArrow);
+      _cursorModeSlider                = Util.disposeResource(_cursorModeSlider);
+      _cursorModeZoom                  = Util.disposeResource(_cursorModeZoom);
+      _cursorModeZoomMove              = Util.disposeResource(_cursorModeZoomMove);
+      _cursorDragXSlider_ModeZoom      = Util.disposeResource(_cursorDragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider    = Util.disposeResource(_cursorDragXSlider_ModeSlider);
 
-      _chartImage_20_Chart = Util.disposeResource(_chartImage_20_Chart);
-      _chartImage_10_Graphs = Util.disposeResource(_chartImage_10_Graphs);
-      _chartImage_40_Overlay = Util.disposeResource(_chartImage_40_Overlay);
-      _chartImage_30_Custom = Util.disposeResource(_chartImage_30_Custom);
+      _cursorMove1x                    = Util.disposeResource(_cursorMove1x);
+      _cursorMove2x                    = Util.disposeResource(_cursorMove2x);
+      _cursorMove3x                    = Util.disposeResource(_cursorMove3x);
+      _cursorMove4x                    = Util.disposeResource(_cursorMove4x);
+      _cursorMove5x                    = Util.disposeResource(_cursorMove5x);
+
+      _cursorXSliderLeft               = Util.disposeResource(_cursorXSliderLeft);
+      _cursorXSliderRight              = Util.disposeResource(_cursorXSliderRight);
+
+      _chartImage_20_Chart             = Util.disposeResource(_chartImage_20_Chart);
+      _chartImage_10_Graphs            = Util.disposeResource(_chartImage_10_Graphs);
+      _chartImage_40_Overlay           = Util.disposeResource(_chartImage_40_Overlay);
+      _chartImage_30_Custom            = Util.disposeResource(_chartImage_30_Custom);
+
+// SET_FORMATTING_ON
 
       _colorCache.dispose();
    }
@@ -8987,13 +8980,11 @@ public class ChartComponentGraph extends Canvas {
 
    private void setupColors() {
 
-      final boolean isDarkTheme = UI.isDarkTheme();
-
-      _foregroundColor = isDarkTheme
+      _foregroundColor = UI.IS_DARK_THEME
             ? ThemeUtil.getDarkestForegroundColor()
             : _chart.getForeground();
 
-      _backgroundColor = isDarkTheme
+      _backgroundColor = UI.IS_DARK_THEME
             ? ThemeUtil.getDarkestBackgroundColor()
             : _chart.getBackgroundColor();
    }

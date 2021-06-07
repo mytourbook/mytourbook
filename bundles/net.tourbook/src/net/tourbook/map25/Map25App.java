@@ -822,7 +822,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    @Override
    public boolean onItemLongPress(final int index, final MarkerInterface mi) {
       final MarkerItem markerItem = (MarkerItem) mi;
-      System.out.println("Marker tap " + markerItem.getTitle());
+      System.out.println("Marker tap " + markerItem.getTitle()); //$NON-NLS-1$
       System.out.println(
             (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") // //$NON-NLS-1$ //$NON-NLS-2$
                   + ("\tonItemLongPress (Tourmarker)") //$NON-NLS-1$

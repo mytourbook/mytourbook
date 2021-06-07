@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
@@ -314,8 +313,8 @@ public class TourFilterManager {
    private static final Bundle            _bundle           = TourbookPlugin.getDefault().getBundle();
    private static final IPath             _stateLocation    = Platform.getStateLocation(_bundle);
 
-   private final static IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
-   private final static IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+   private static final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
 
    private static IPropertyChangeListener _prefChangeListener_Common;
 
@@ -324,16 +323,13 @@ public class TourFilterManager {
       // load unit very early
       updateUnits();
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               updateUnits();
-            }
+            updateUnits();
          }
       };
 
@@ -880,8 +876,8 @@ public class TourFilterManager {
 
          final Integer int1 = filterProperty.intValue1;
          final Integer int2 = filterProperty.intValue2;
-         final Double double1 = truncateValue(fieldConfig, filterProperty.doubleValue1);
-         final Double double2 = truncateValue(fieldConfig, filterProperty.doubleValue2);
+         final Double double1 = truncateValue(filterProperty.doubleValue1);
+         final Double double2 = truncateValue(filterProperty.doubleValue2);
 
          final String text1 = filterProperty.textValue1;
          final String text2 = filterProperty.textValue2;
@@ -972,7 +968,7 @@ public class TourFilterManager {
             break;
 
          case TOUR_MANUAL_TOUR:
-            getSQL_ManualTour(sqlWhere, sqlParameters, fieldOperator);
+            getSQL_ManualTour(sqlWhere, fieldOperator);
             break;
 
          case WEATHER_TEMPERATURE:
@@ -1290,10 +1286,10 @@ public class TourFilterManager {
       switch (fieldOperator) {
 
       case IS_EMPTY:
-         getSQL_Empty(sqlWhere, sqlParameters, sqlField, true);
+         getSQL_Empty(sqlWhere, sqlField, true);
          break;
       case IS_NOT_EMPTY:
-         getSQL_Empty(sqlWhere, sqlParameters, sqlField, false);
+         getSQL_Empty(sqlWhere, sqlField, false);
          break;
 
       }
@@ -1325,7 +1321,6 @@ public class TourFilterManager {
    }
 
    private static void getSQL_Empty(final StringBuilder sqlWhere,
-                                    final ArrayList<Object> sqlParameters,
                                     final String sqlField,
                                     final boolean isOp) {
 
@@ -1428,7 +1423,6 @@ public class TourFilterManager {
    }
 
    private static void getSQL_ManualTour(final StringBuilder sqlWhere,
-                                         final ArrayList<Object> sqlParameters,
                                          final TourFilterFieldOperator fieldOperator) {
 
       final String sqlField = TOUR_DATA_MANUAL_TOUR;
@@ -1465,60 +1459,61 @@ public class TourFilterManager {
 
       final File xmlFile = getXmlFile();
 
-      if (xmlFile.exists()) {
+      if (!xmlFile.exists()) {
+         return;
+      }
 
-         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
+      try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
 
-            final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
-            for (final IMemento mementoChild : xmlRoot.getChildren()) {
+         final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+         for (final IMemento mementoChild : xmlRoot.getChildren()) {
 
-               final XMLMemento xmlProfile = (XMLMemento) mementoChild;
-               if (TAG_PROFILE.equals(xmlProfile.getType())) {
+            final XMLMemento xmlProfile = (XMLMemento) mementoChild;
+            if (TAG_PROFILE.equals(xmlProfile.getType())) {
 
-                  final TourFilterProfile tourFilterProfile = new TourFilterProfile();
+               final TourFilterProfile tourFilterProfile = new TourFilterProfile();
 
-                  tourFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+               tourFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
 
-                  _filterProfiles.add(tourFilterProfile);
+               _filterProfiles.add(tourFilterProfile);
 
-                  // set selected profile
-                  if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
-                     _selectedProfile = tourFilterProfile;
-                  }
+               // set selected profile
+               if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
+                  _selectedProfile = tourFilterProfile;
+               }
 
-                  // loop: all properties
-                  for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
+               // loop: all properties
+               for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
 
-                     final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
+                  final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
 
-                     final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
-                           xmlProperty,
-                           ATTR_FIELD_ID,
-                           TourFilterFieldId.TIME_TOUR_DATE);
+                  final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
+                        xmlProperty,
+                        ATTR_FIELD_ID,
+                        TourFilterFieldId.TIME_TOUR_DATE);
 
-                     final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
-                           xmlProperty,
-                           ATTR_FIELD_OPERATOR,
-                           TourFilterFieldOperator.EQUALS);
+                  final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
+                        xmlProperty,
+                        ATTR_FIELD_OPERATOR,
+                        TourFilterFieldOperator.EQUALS);
 
-                     final TourFilterFieldConfig fieldConfig = getFieldConfig(fieldId);
+                  final TourFilterFieldConfig fieldConfig = getFieldConfig(fieldId);
 
-                     final TourFilterProperty filterProperty = new TourFilterProperty();
+                  final TourFilterProperty filterProperty = new TourFilterProperty();
 
-                     filterProperty.fieldConfig = fieldConfig;
-                     filterProperty.fieldOperator = fieldOperator;
-                     filterProperty.isEnabled = Util.getXmlBoolean(xmlProperty, ATTR_IS_ENABLED, true);
+                  filterProperty.fieldConfig = fieldConfig;
+                  filterProperty.fieldOperator = fieldOperator;
+                  filterProperty.isEnabled = Util.getXmlBoolean(xmlProperty, ATTR_IS_ENABLED, true);
 
-                     readFilterProfile_10_PropertyDetail(xmlProperty, filterProperty);
+                  readFilterProfile_10_PropertyDetail(xmlProperty, filterProperty);
 
-                     tourFilterProfile.filterProperties.add(filterProperty);
-                  }
+                  tourFilterProfile.filterProperties.add(filterProperty);
                }
             }
-
-         } catch (final Exception e) {
-            StatusUtil.log(e);
          }
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
       }
    }
 
@@ -1769,7 +1764,7 @@ public class TourFilterManager {
       _actionTourFilter = actionTourFilterAdv;
    }
 
-   private static double truncateValue(final TourFilterFieldConfig fieldConfig, final double doubleValue) {
+   private static double truncateValue(final double doubleValue) {
 
       final int decimals = 5;
 
@@ -1784,7 +1779,7 @@ public class TourFilterManager {
       // set label km or mi
       getFieldConfig(TourFilterFieldId.MOTION_DISTANCE).unitLabel(UI.UNIT_LABEL_DISTANCE);
 
-      // set label celcius or fahrenheit
+      // set label celsius or fahrenheit
       getFieldConfig(TourFilterFieldId.WEATHER_TEMPERATURE).unitLabel(UI.UNIT_LABEL_TEMPERATURE);
 
       // set km or mi
