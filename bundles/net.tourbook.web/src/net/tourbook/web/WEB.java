@@ -160,6 +160,13 @@ public class WEB {
    public static final int              STATE_BODY_FONT_SIZE_MIN                 = 1;
    public static final int              STATE_BODY_FONT_SIZE_MAX                 = 100;
 
+   /*
+    * Tags which are replaced in the css file to support the dark mode
+    */
+   public static final String CSS_TAG__BODY__COLOR                        = "$BODY_COLOR$";                         //$NON-NLS-1$
+   public static final String CSS_TAG__BODY__BACKGROUND_COLOR             = "$BODY_BACKGROUND_COLOR$";              //$NON-NLS-1$
+   public static final String CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR = "$ACTION_CONTAINER__BACKGROUND_COLOR$"; //$NON-NLS-1$
+
    /**
     * Converts Java newline into HTML newline.
     *
