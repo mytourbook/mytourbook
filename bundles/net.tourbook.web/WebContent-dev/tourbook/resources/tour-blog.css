@@ -10,6 +10,8 @@ body
    color:                  #$BODY_COLOR$;
    background-color:       #$BODY_BACKGROUND_COLOR$;
    margin:                 5px;
+
+   $BODY_SCROLLBAR$
 }
 
 p,td,ul 
@@ -78,6 +80,16 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
    margin-top:             2px;
    margin-bottom:          2px;
    font-weight:            normal;
+}
+
+a:LINK
+{
+   color:                  #$A_LINK__COLOR$;
+}
+
+a:VISITED 
+{
+   color:                  #$A_VISITED__COLOR$;
 }
 
 a.label-text:LINK,

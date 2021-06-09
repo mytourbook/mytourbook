@@ -56,25 +56,25 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourLogView extends ViewPart {
 
-   public static final String  ID                               = "net.tourbook.tour.TourLogView";                 //$NON-NLS-1$
+   public static final String  ID                               = "net.tourbook.tour.TourLogView";        //$NON-NLS-1$
 
    private static final char   NL                               = UI.NEW_LINE;
 
-   private static final String STATE_COPY                       = "COPY";                                          //$NON-NLS-1$
-   private static final String STATE_DELETE                     = "DELETE";                                        //$NON-NLS-1$
-   private static final String STATE_ERROR                      = "ERROR";                                         //$NON-NLS-1$
-   private static final String STATE_EXCEPTION                  = "EXCEPTION";                                     //$NON-NLS-1$
-   private static final String STATE_INFO                       = "INFO";                                          //$NON-NLS-1$
-   private static final String STATE_OK                         = "OK";                                            //$NON-NLS-1$
-   private static final String STATE_SAVE                       = "SAVE";                                          //$NON-NLS-1$
+   private static final String STATE_COPY                       = "COPY";                                 //$NON-NLS-1$
+   private static final String STATE_DELETE                     = "DELETE";                               //$NON-NLS-1$
+   private static final String STATE_ERROR                      = "ERROR";                                //$NON-NLS-1$
+   private static final String STATE_EXCEPTION                  = "EXCEPTION";                            //$NON-NLS-1$
+   private static final String STATE_INFO                       = "INFO";                                 //$NON-NLS-1$
+   private static final String STATE_OK                         = "OK";                                   //$NON-NLS-1$
+   private static final String STATE_SAVE                       = "SAVE";                                 //$NON-NLS-1$
 
-   public static final String  CSS_LOG_INFO                     = "info";                                          //$NON-NLS-1$
-   private static final String CSS_LOG_ITEM                     = "logItem";                                       //$NON-NLS-1$
-   private static final String CSS_LOG_SUB_ITEM                 = "subItem";                                       //$NON-NLS-1$
-   public static final String  CSS_LOG_TITLE                    = "title";                                         //$NON-NLS-1$
+   public static final String  CSS_LOG_INFO                     = "info";                                 //$NON-NLS-1$
+   private static final String CSS_LOG_ITEM                     = "logItem";                              //$NON-NLS-1$
+   private static final String CSS_LOG_SUB_ITEM                 = "subItem";                              //$NON-NLS-1$
+   public static final String  CSS_LOG_TITLE                    = "title";                                //$NON-NLS-1$
 
-   private static final String DOM_ID_LOG                       = "logs";                                          //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                           //$NON-NLS-1$
+   private static final String DOM_ID_LOG                       = "logs";                                 //$NON-NLS-1$
+   private static final String WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                  //$NON-NLS-1$
 
    private IPartListener2      _partListener;
 
@@ -320,22 +320,24 @@ public class TourLogView extends ViewPart {
    private String createHTML() {
 
       final String html = UI.EMPTY_STRING
+
             + "<!DOCTYPE html>" + NL // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>" + NL //$NON-NLS-1$
-            + "<head>" + NL + createHTML_10_Head() + NL + "</head>" + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "<body>" + NL + createHTML_20_Body() + NL + "</body>" + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "</html>"; //$NON-NLS-1$
+            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>" + NL //    //$NON-NLS-1$
+            + "<head>" + NL + createHTML_10_Head() + NL + "</head>" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "<body>" + NL + createHTML_20_Body() + NL + "</body>" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "</html>" //                                                                      //$NON-NLS-1$
+      ;
 
       return html;
    }
 
    private String createHTML_10_Head() {
 
-      final String html = UI.EMPTY_STRING//
-            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //$NON-NLS-1$
-            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //$NON-NLS-1$
-            + _cssFromFile
-            + NL;
+      final String html = UI.EMPTY_STRING
+
+            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //      //$NON-NLS-1$
+            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //                    //$NON-NLS-1$
+            + _cssFromFile + NL;
 
       return html;
    }
@@ -501,10 +503,13 @@ public class TourLogView extends ViewPart {
          final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
          final String css = Util.readContentFromFile(webFile.getAbsolutePath());
 
-         _cssFromFile = UI.EMPTY_STRING//
-               + "<style>" + NL //$NON-NLS-1$
+         _cssFromFile = UI.EMPTY_STRING
+
+               + "<style>" + NL //              //$NON-NLS-1$
+               + WEB.createCSS_Scrollbar()
                + css
-               + "</style>" + NL; //$NON-NLS-1$
+               + "</style>" + NL //             //$NON-NLS-1$
+         ;
 
       } catch (IOException | URISyntaxException e) {
          TourLogManager.logEx(e);

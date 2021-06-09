@@ -44,9 +44,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Web tools.
+ * Web tools
  */
 public class WEB {
+
+   private static final char NL       = UI.NEW_LINE;
 
    /**
     * This is the <b>MAIN</b> switch to run Dojo in the dev or release folder. In debug mode the
@@ -57,7 +59,7 @@ public class WEB {
     * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
     * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
     */
-   static boolean IS_DEBUG = false;
+   static boolean            IS_DEBUG = false;
 
    /*
     * It is very complicated to support testing for language translators, therefore it is currently
@@ -165,7 +167,21 @@ public class WEB {
     */
    public static final String CSS_TAG__BODY__COLOR                        = "$BODY_COLOR$";                         //$NON-NLS-1$
    public static final String CSS_TAG__BODY__BACKGROUND_COLOR             = "$BODY_BACKGROUND_COLOR$";              //$NON-NLS-1$
+   public static final String CSS_TAG__A_LINK__COLOR                      = "$A_LINK__COLOR$";                      //$NON-NLS-1$
+   public static final String CSS_TAG__A_VISITED__COLOR                   = "$A_VISITED__COLOR$";                   //$NON-NLS-1$
    public static final String CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR = "$ACTION_CONTAINER__BACKGROUND_COLOR$"; //$NON-NLS-1$
+
+   public static final String CSS_TAG__BODY_SCROLLBAR                     = "$BODY_SCROLLBAR$";                     //$NON-NLS-1$
+   public static final String CSS_CONTENT__BODY_SCROLLBAR__DARK           = UI.EMPTY_STRING
+
+         + "   scrollbar-face-color:         #4d4d4d;" + NL
+         + "   scrollbar-shadow-color:       #4d4d4d;" + NL                                                         //$NON-NLS-1$
+         + "   scrollbar-track-color:        #292929;" + NL                                                         //$NON-NLS-1$
+         + "   scrollbar-highlight-color:    #8f8;" + NL                                                            //$NON-NLS-1$
+         + "   scrollbar-arrow-color:        #888;" + NL                                                            //$NON-NLS-1$
+         + "   scrollbar-3dlight-color:      #000;" + NL                                                            //$NON-NLS-1$
+         + "   scrollbar-darkshadow-color:   #000;" + NL                                                            //$NON-NLS-1$
+   ;
 
    /**
     * Converts Java newline into HTML newline.
@@ -187,6 +203,24 @@ public class WEB {
    public static String convertJS_LineBreaks(final String text) {
 
       return text.replaceAll("\\r\\n|\\r|\\n", "\\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
+    * Create scrollbar CSS for the dark mode
+    */
+   public static String createCSS_Scrollbar() {
+
+      final String darkThemeScrollbar = UI.EMPTY_STRING
+
+            + "body" + NL
+            + "{" + NL //                                //$NON-NLS-1$
+            + CSS_CONTENT__BODY_SCROLLBAR__DARK
+            + "}" + NL //                               //$NON-NLS-1$
+      ;
+
+      return UI.IS_DARK_THEME
+            ? darkThemeScrollbar
+            : UI.EMPTY_STRING;
    }
 
    /**

@@ -338,11 +338,21 @@ public class TourBlogView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
-      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__COLOR,                        UI.IS_DARK_THEME ? "ddd" : "333");     //$NON-NLS-1$ //$NON-NLS-2$
-      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__BACKGROUND_COLOR,             UI.IS_DARK_THEME ? "333" : "fff");     //$NON-NLS-1$ //$NON-NLS-2$
-      htmlCss = htmlCss.replace(WEB.CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR, UI.IS_DARK_THEME ? "444" : "f8f8f8");  //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__COLOR,                        UI.IS_DARK_THEME ? "ddd" : "333");        //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__BACKGROUND_COLOR,             UI.IS_DARK_THEME ? "333" : "fff");        //$NON-NLS-1$ //$NON-NLS-2$
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__A_LINK__COLOR,                      UI.IS_DARK_THEME ? "D6FF6F" : "3B9529");  //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__A_VISITED__COLOR,                   UI.IS_DARK_THEME ? "7E9543" : "DE559D");  //$NON-NLS-1$ //$NON-NLS-2$
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR, UI.IS_DARK_THEME ? "444" : "f8f8f8");     //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_ON
+
+      if (UI.IS_DARK_THEME) {
+
+         // show dark scrollbar
+         htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY_SCROLLBAR, WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK);
+      }
 
       final String html = UI.EMPTY_STRING
 
