@@ -94,7 +94,7 @@ Bugfix
 Translation    
 ===========
 
-- Czech 20.11 (Lukas)
+- NOT YET TRANSLATED - Czech 20.11 (Lukas)
 - Dutch (Maarten)
 - French (Frederic)
 - German

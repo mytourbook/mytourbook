@@ -27,7 +27,7 @@ public class CommonImages {
    public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
    public static final String App_CollapseAll              = "collapseall.png";                           //$NON-NLS-1$
    public static final String App_CollapseAll_Disabled     = "collapseall-disabled.png";                  //$NON-NLS-1$
-   public static final String App_EmptyIcon_Placeholder    = "_empty16.png"; //$NON-NLS-1$
+   public static final String App_EmptyIcon_Placeholder    = "_empty16.png";                              //$NON-NLS-1$
    public static final String App_ExpandAll                = "expandall.png";                             //$NON-NLS-1$
    public static final String App_ExpandAll_Disabled       = "expandall-disabled.png";                    //$NON-NLS-1$
    public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$

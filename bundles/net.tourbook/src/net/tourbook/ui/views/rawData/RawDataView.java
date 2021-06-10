@@ -201,11 +201,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 // SET_FORMATTING_OFF
 
-   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String   COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 
 // SET_FORMATTING_ON
 
    public static final String ID = "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+
+   private static final char  NL = UI.NEW_LINE;
 
    // db state
    private static final String           IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";               //$NON-NLS-1$
@@ -1075,14 +1077,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
             final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
 
-            bgImage = (CSS_IMPORT_BACKGROUND + "\n")// //$NON-NLS-1$
-                  + "{\n" //$NON-NLS-1$
-                  + ("   background:            url('data:image/svg+xml;base64," + base64Encoded + "');\n") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ("   background-repeat:      no-repeat;\n") //$NON-NLS-1$
-                  + ("   background-size:       contain;\n") //$NON-NLS-1$
-                  + ("   background-position:    center center;\n") //$NON-NLS-1$
-                  + ("   opacity:            " + (float) opacity / 100 + ";\n") //$NON-NLS-1$ //$NON-NLS-2$
-                  + "}\n"; //$NON-NLS-1$
+            bgImage = CSS_IMPORT_BACKGROUND + NL
+
+                  + "{" + NL //                                                           //$NON-NLS-1$
+                  + "   background:             url('data:image/svg+xml;base64," + base64Encoded + "');" + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   background-repeat:      no-repeat;" + NL //                       //$NON-NLS-1$
+                  + "   background-size:        contain;" + NL //                         //$NON-NLS-1$
+                  + "   background-position:    center center;" + NL //                   //$NON-NLS-1$
+                  + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+                  + "}" + NL; //                                                          //$NON-NLS-1$
 
          } catch (IOException | URISyntaxException e) {
             TourLogManager.logEx(e);
@@ -1100,30 +1103,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          animation = UI.EMPTY_STRING//
 
-               + ("body\n") //$NON-NLS-1$
-               + ("{\n") //$NON-NLS-1$
-               + ("   animation:               fadeinBody;\n") //$NON-NLS-1$
-               + ("   animation-duration:         " + _nf1.format(animationDuration / 10.0) + "s;\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   animation-timing-function:   ease;\n") //$NON-NLS-1$
-               + ("}\n") //$NON-NLS-1$
+               + "body" + NL //                                         //$NON-NLS-1$
+               + "{" + NL //                                            //$NON-NLS-1$
+               + "   animation:                    fadeinBody;" + NL // //$NON-NLS-1$
+               + "   animation-duration:           " + _nf1.format(animationDuration / 10.0) + "s;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+               + "   animation-timing-function:    ease;" + NL //       //$NON-NLS-1$
+               + "}" + NL //                                            //$NON-NLS-1$
 
-               + ("@keyframes fadeinBody                                    \n") //$NON-NLS-1$
-               + ("{                                                   \n") //$NON-NLS-1$
+               + "@keyframes fadeinBody" + NL //                        //$NON-NLS-1$
+               + "{" + NL //                                            //$NON-NLS-1$
 
-               + ("   from                                             \n") //$NON-NLS-1$
-               + ("   {                                                \n") //$NON-NLS-1$
-               + ("      opacity:            0;                           \n") //$NON-NLS-1$
-               + ("      background-color:      ButtonFace;                     \n") //$NON-NLS-1$
-               + ("      transform:            rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);   \n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               + ("   }                                                \n") //$NON-NLS-1$
-//                        transform:            rotateX(-80deg) rotateY(-80deg);
-//                        transform-origin:       50% 200%;
+               + "   from" + NL //                                      //$NON-NLS-1$
+               + "   {" + NL //                                         //$NON-NLS-1$
+               + "      opacity:             0;" + NL //                //$NON-NLS-1$
+               + "      background-color:    ButtonFace;" + NL //       //$NON-NLS-1$
+               + "      transform:           rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);   " + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "   }" + NL //                                         //$NON-NLS-1$
 
-               + ("   to                                                \n") //$NON-NLS-1$
-               + ("   {                                                \n") //$NON-NLS-1$
-               + ("      opacity:            1;                           \n") //$NON-NLS-1$
-               + ("   }                                                \n") //$NON-NLS-1$
-               + ("}                                                   \n"); //$NON-NLS-1$
+               + "   to" + NL //                                        //$NON-NLS-1$
+               + "   {" + NL //                                         //$NON-NLS-1$
+               + "      opacity:             1;" + NL //                //$NON-NLS-1$
+               + "   }" + NL //                                         //$NON-NLS-1$
+               + "}" + NL; //                                           //$NON-NLS-1$
       }
 
       /*
@@ -1131,35 +1132,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        */
       final String tileSize = UI.EMPTY_STRING
             //
-            + (CSS_IMPORT_TILE + "\n") //$NON-NLS-1$
-            + ("{\n") //$NON-NLS-1$
-            + ("   min-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   max-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   min-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   max-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("}\n"); //$NON-NLS-1$
+            + CSS_IMPORT_TILE + NL
+
+            + "{" + NL //                                      //$NON-NLS-1$
+            + "   min-height: " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   max-height: " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   min-width:  " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   max-width:  " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "}" + NL; //                                     //$NON-NLS-1$
 
       /*
        * State tooltip
        */
       final String stateTooltip = UI.EMPTY_STRING
-            //
-            + (".stateTooltip\n") //$NON-NLS-1$
-            + ("{\n") //$NON-NLS-1$
-            + ("   width:" + easyConfig.stateToolTipWidth + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("}\n"); //$NON-NLS-1$
+
+            + ".stateTooltip" + NL //                          //$NON-NLS-1$
+            + "{" + NL //                                      //$NON-NLS-1$
+            + "   width:" + easyConfig.stateToolTipWidth + "px;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+            + "}" + NL; //                                     //$NON-NLS-1$
 
       /*
        * CSS
        */
-      final String customCSS = UI.EMPTY_STRING //
+      final String customCSS = UI.EMPTY_STRING
 
-            + "<style>\n" // //$NON-NLS-1$
+            + "<style>" + NL //     //$NON-NLS-1$
+            + WEB.createCSS_Scrollbar()
             + animation
             + bgImage
             + tileSize
             + stateTooltip
-            + "</style>\n"; //$NON-NLS-1$
+            + "</style>" + NL; //   //$NON-NLS-1$
 
       return customCSS;
    }
@@ -1175,25 +1178,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //      prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
 //      the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
 
-      final String html = UI.EMPTY_STRING //
-            + "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
-            + ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + "</html>"; //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING
+
+            + "<!DOCTYPE html>" + NL //   // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>" + NL //    //$NON-NLS-1$
+            + "<head>" + NL + createHTML_10_Head() + NL + "</head>" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "<body>" + NL + createHTML_20_Body() + NL + "</body>" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "</html>"; //                                                                     //$NON-NLS-1$
 
       return html;
    }
 
    private String createHTML_10_Head() {
 
-      final String html = UI.EMPTY_STRING//
-            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
-            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING
+
+            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //   //$NON-NLS-1$
+            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //                 //$NON-NLS-1$
             + _cssFonts
             + _cssFromFile
             + createCSS_Custom()
-            + "\n"; //$NON-NLS-1$
+            + "" + NL; // //$NON-NLS-1$
 
       return html;
    }
@@ -1202,16 +1207,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final StringBuilder sb = new StringBuilder();
 
-      sb.append("<div class='import-container'>\n"); //$NON-NLS-1$
+      sb.append("<div class='import-container'>" + NL); //$NON-NLS-1$
       {
          /*
           * Very tricky: When a parent has an opacity, a child cannot modify it. Therefore the
           * different divs with position relative/absolute. It took me some time to find/implement
           * this tricky but simple solution.
           */
-         sb.append("<div class='import-background'></div>\n"); //$NON-NLS-1$
+         sb.append("<div class='import-background'></div>" + NL); //$NON-NLS-1$
 
-         sb.append("<div class='import-content'>\n"); //$NON-NLS-1$
+         sb.append("<div class='import-content'>" + NL); //$NON-NLS-1$
          {
             /*
              * Device Import
@@ -1222,15 +1227,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             /*
              * Get Tours
              */
-            sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$
-            sb.append("</div>\n"); //$NON-NLS-1$
+            sb.append("<div class='get-tours-title title'>" + NL); //$NON-NLS-1$
+            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + NL);
+            sb.append("</div>" + NL); //$NON-NLS-1$
 
             createHTML_90_SimpleImport(sb);
          }
-         sb.append("</div>\n"); //$NON-NLS-1$
+         sb.append("</div>" + NL); //$NON-NLS-1$
       }
-      sb.append("</div>\n"); //$NON-NLS-1$
+      sb.append("</div>" + NL); //$NON-NLS-1$
 
       return sb.toString();
    }
@@ -1239,35 +1244,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
 
-      final String html = UI.EMPTY_STRING //
+      final String html = UI.EMPTY_STRING
 
-            + "<div class='auto-import-header'>\n" //$NON-NLS-1$
-            + ("   <table border=0><tbody><tr>\n") //$NON-NLS-1$
+            + "<div class='auto-import-header'>" + NL //          //$NON-NLS-1$
+            + "   <table border=0><tbody><tr>" + NL //            //$NON-NLS-1$
 
             // device state on/off
-            + ("      <td>\n") //$NON-NLS-1$
-            + ("         <div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_DeviceState_OnOff() + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ("      </td>\n") //$NON-NLS-1$
+            + "      <td>" + NL //                                //$NON-NLS-1$
+            + "         <div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_DeviceState_OnOff() + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "      </td>" + NL //                               //$NON-NLS-1$
 
             // title
-            + ("      <td><span class='title'>" + Messages.Import_Data_HTML_EasyImport + "</span></td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + "      <td><span class='title'>" + Messages.Import_Data_HTML_EasyImport + "</span></td>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
             // state icon
-            + ("      <td>\n") //$NON-NLS-1$
-            + ("         <div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:25px;' class='" + watchClass + "'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + (createHTML_54_DeviceState())
-            + ("         </div>\n") //$NON-NLS-1$
-            + ("      </td>\n") //$NON-NLS-1$
+            + "      <td>" + NL //                                //$NON-NLS-1$
+            + "         <div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:25px;' class='" + watchClass + "'>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + createHTML_54_DeviceState()
+            + "         </div>" + NL //                           //$NON-NLS-1$
+            + "      </td>" + NL //                               //$NON-NLS-1$
 
             // selected config
-            + ("      <td>") //$NON-NLS-1$
-            + ("         <div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + (createHTML_60_SelectImportConfig())
-            + ("         </div>") //$NON-NLS-1$
-            + ("      </td>") //$NON-NLS-1$
+            + "      <td>" //$NON-NLS-1$
+            + "         <div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + createHTML_60_SelectImportConfig()
+            + "         </div>" //                                //$NON-NLS-1$
+            + "      </td>" //                                    //$NON-NLS-1$
 
-            + "   </tr></tbody></table>\n" // //$NON-NLS-1$
-            + "</div>\n"; //$NON-NLS-1$
+            + "   </tr></tbody></table>" + NL //                  //$NON-NLS-1$
+            + "</div>" + NL; //                                   //$NON-NLS-1$
 
       sb.append(html);
    }
@@ -1292,14 +1297,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String html = UI.EMPTY_STRING//
 
-            + "<a class='onOffIcon dash-action'" // //$NON-NLS-1$
-            + ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + ">" //$NON-NLS-1$
+            + "<a class='onOffIcon dash-action'" //                  //$NON-NLS-1$
+            + "title='" + tooltip + "'" //                           //$NON-NLS-1$ //$NON-NLS-2$
+            + " href='" + hrefAction + "'" //                        //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" //                                                 //$NON-NLS-1$
 
-            + ("<div class='stateIcon' " + onOffImage + "></div>") //$NON-NLS-1$ //$NON-NLS-2$
+            + "<div class='stateIcon' " + onOffImage + "></div>" //  //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "</a>"; //$NON-NLS-1$
+            + "</a>"; //                                             //$NON-NLS-1$
 
       return html;
    }
@@ -1322,18 +1327,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Disabled);
          final String htmlTooltip = Messages.Import_Data_HTML_WatchingIsOff;
 
-         html = "\n"// //$NON-NLS-1$
+         html = "" + NL //                                                 //$NON-NLS-1$
 
-               + "<a class='importState dash-action'" // //$NON-NLS-1$
-               + (" href='" + HTTP_DUMMY + "'") //$NON-NLS-1$ //$NON-NLS-2$
-               + ">" //$NON-NLS-1$
+               + "<a class='importState dash-action'" //                   //$NON-NLS-1$
+               + " href='" + HTTP_DUMMY + "'" //                           //$NON-NLS-1$ //$NON-NLS-2$
+               + ">" //                                                    //$NON-NLS-1$
 
-               + ("<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   <div class='stateIconValue'></div>\n") //$NON-NLS-1$
-               + ("</div>\n") //$NON-NLS-1$
-               + ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+               + "<div class='stateIcon' " + stateImage + ">" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + "   <div class='stateIconValue'></div>" + NL //           //$NON-NLS-1$
+               + "</div>" + NL //                                          //$NON-NLS-1$
+               + "<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "</a>\n"; //$NON-NLS-1$
+               + "</a>" + NL; //                                           //$NON-NLS-1$
 
       } else if (isWatchAnything && _isDeviceStateValid) {
 
@@ -1354,18 +1359,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                ? Messages.Import_Data_HTML_AcquireDeviceInfo
                : Messages.Import_Data_HTML_NothingIsWatched;
 
-         html = "\n"// //$NON-NLS-1$
+         html = "" + NL //                                                 //$NON-NLS-1$
 
-               + "<a class='importState dash-action'" // //$NON-NLS-1$
-               + (" href='" + hrefSetupAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-               + ">\n" //$NON-NLS-1$
+               + "<a class='importState dash-action'" //                   //$NON-NLS-1$
+               + " href='" + hrefSetupAction + "'" //                      //$NON-NLS-1$ //$NON-NLS-2$
+               + ">" + NL //                                               //$NON-NLS-1$
 
-               + ("<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   <div class='stateIconValue'></div>\n") //$NON-NLS-1$
-               + ("</div>\n") //$NON-NLS-1$
-               + ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+               + "<div class='stateIcon' " + stateImage + ">" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + "   <div class='stateIconValue'></div>" + NL //           //$NON-NLS-1$
+               + "</div>" + NL //                                          //$NON-NLS-1$
+               + "<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "</a>\n"; //$NON-NLS-1$
+               + "</a>" + NL; //                                           //$NON-NLS-1$
       }
 
       return html;
@@ -1531,7 +1536,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                : Messages.Import_Data_HTML_WatchingOn;
 
          // show red image when off
-         final String imageUrl = isWatchingOff //
+         final String imageUrl = isWatchingOff
                ? _imageUrl_Device_TurnOff
                : _imageUrl_Device_TurnOn;
 
@@ -1572,18 +1577,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             ? "style='overflow-y: scroll;'" //$NON-NLS-1$
             : UI.EMPTY_STRING;
 
-      final String html = "\n"// //$NON-NLS-1$
+      final String html = "" + NL //                                       //$NON-NLS-1$
 
-            + "<a class='importState dash-action'" // //$NON-NLS-1$
-            + (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + ">" //$NON-NLS-1$
+            + "<a class='importState dash-action'" //                      //$NON-NLS-1$
+            + " href='" + hrefAction + "'" //                              //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" //                                                       //$NON-NLS-1$
 
-            + ("   <div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("      <div class='stateIconValue'>" + stateIconValue + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   </div>\n") //$NON-NLS-1$
-            + ("   <div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='stateIcon' " + stateImage + ">" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+            + "      <div class='stateIconValue'>" + stateIconValue + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+            + "   </div>" + NL //                                          //$NON-NLS-1$
+            + "   <div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-            + "</a>\n"; //$NON-NLS-1$
+            + "</a>" + NL; //                                              //$NON-NLS-1$
 
       return html;
    }
@@ -1778,27 +1783,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             : DOM_CLASS_DEVICE_OFF;
 
       sb.append("<table border=0" //$NON-NLS-1$
-            + (" id='" + DOM_ID_IMPORT_TILES + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" style='margin-top:5px;'") //$NON-NLS-1$
-            + (" class='" + watchClass + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + "><tbody>\n"); //$NON-NLS-1$
+            + " id='" + DOM_ID_IMPORT_TILES + "'" //$NON-NLS-1$ //$NON-NLS-2$
+            + " style='margin-top:5px;'" //$NON-NLS-1$
+            + " class='" + watchClass + "'" //$NON-NLS-1$ //$NON-NLS-2$
+            + "><tbody>" + NL); //$NON-NLS-1$
 
       for (final ImportLauncher importLauncher : allImportLauncher) {
 
          if (importLauncher.isShowInDashboard) {
 
             if (tileIndex % numHorizontalTiles == 0) {
-               sb.append("<tr>\n"); //$NON-NLS-1$
+               sb.append("<tr>" + NL); //$NON-NLS-1$
                isTrOpen = true;
             }
 
             // enforce equal column width
-            sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
             sb.append(createHTML_82_Easy_Tile(importLauncher));
-            sb.append("</td>\n"); //$NON-NLS-1$
+            sb.append("</td>" + NL); //$NON-NLS-1$
 
             if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
-               sb.append("</tr>\n"); //$NON-NLS-1$
+               sb.append("</tr>" + NL); //$NON-NLS-1$
                isTrOpen = false;
             }
 
@@ -1807,10 +1812,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       if (isTrOpen) {
-         sb.append("</tr>\n"); //$NON-NLS-1$
+         sb.append("</tr>" + NL); //$NON-NLS-1$
       }
 
-      sb.append("</tbody></table>\n"); //$NON-NLS-1$
+      sb.append("</tbody></table>" + NL); //$NON-NLS-1$
    }
 
    private String createHTML_82_Easy_Tile(final ImportLauncher importTile) {
@@ -1842,10 +1847,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String html = UI.EMPTY_STRING
 
-            + ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ("   <div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   <div class='import-tile-config'>" + htmlConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("</a>\n") //$NON-NLS-1$
+            + "<a href='" + href + "' title='" + tooltip + "' class='import-tile'>" + NL //  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='import-tile-image'>" + htmlImage + "</div>" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+            + "   <div class='import-tile-config'>" + htmlConfig + "</div>" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
+            + "</a>" + NL //                                                                 //$NON-NLS-1$
       ;
 
       return html;
@@ -1871,7 +1876,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          for (final SpeedTourType speedTT : speedTourTypes) {
 
             if (isSpeedAdded) {
-               ttText.append(UI.NEW_LINE);
+               ttText.append(NL);
             }
 
             final long tourTypeId = speedTT.tourTypeId;
@@ -1945,7 +1950,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // adjust temperature
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          if (importLauncher.isAdjustTemperature) {
 
@@ -1967,7 +1972,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // retrieve weather data
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          sb.append(importLauncher.isRetrieveWeatherData
                ? Messages.Import_Data_HTML_RetrieveWeatherData_Yes
@@ -1976,7 +1981,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // save tour
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          sb.append(importLauncher.isSaveTour
                ? Messages.Import_Data_HTML_SaveTour_Yes
@@ -1985,7 +1990,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // delete device files
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          sb.append(getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles
                ? Messages.Import_Data_HTML_DeleteDeviceFiles_Yes
@@ -2068,8 +2073,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void createHTML_90_SimpleImport(final StringBuilder sb) {
 
-      sb.append("<div class='get-tours-items'>\n"); //$NON-NLS-1$
-      sb.append("   <table><tbody><tr>\n"); //$NON-NLS-1$
+      sb.append("<div class='get-tours-items'>" + NL); //$NON-NLS-1$
+      sb.append("   <table><tbody><tr>" + NL); //$NON-NLS-1$
       {
          createHTML_92_TileAction(
                sb,
@@ -2109,8 +2114,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                (HTTP_DUMMY + HREF_ACTION_OLD_UI),
                null);
       }
-      sb.append("   </tr></tbody></table>\n"); // //$NON-NLS-1$
-      sb.append("</div>\n"); //$NON-NLS-1$
+      sb.append("   </tr></tbody></table>" + NL); // //$NON-NLS-1$
+      sb.append("</div>" + NL); //$NON-NLS-1$
 
    }
 
@@ -2126,8 +2131,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          htmlImage = "style='" // //$NON-NLS-1$
 
-               + ("background-image:   url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
-               //
+               + "background-image:   url(" + imageUrl + ");" + NL //$NON-NLS-1$ //$NON-NLS-2$
+
                + "'"; //$NON-NLS-1$
       }
 
@@ -2136,10 +2141,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final String html = UI.EMPTY_STRING
 
             + HTML_TD
-            + ("<a href='" + href + "' title='" + validTooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ("   <div class='import-tile-image action-button' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   <div class='import-tile-config'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("</a>\n") //$NON-NLS-1$
+            + "<a href='" + href + "' title='" + validTooltip + "' class='import-tile'>" + NL //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='import-tile-image action-button' " + htmlImage + "></div>" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "   <div class='import-tile-config'>" + name + "</div>" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + "</a>" + NL //                                                                       //$NON-NLS-1$
             + HTML_TD_END;
 
       sb.append(html);
@@ -2254,18 +2259,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final byte[] data = Files.readAllBytes(path);
          final String base64Encoded = Base64.getEncoder().encodeToString(data);
 
-         _cssFonts = "<style>\n" // //$NON-NLS-1$
+         _cssFonts = "<style>" + NL //                               //$NON-NLS-1$
 
-               + ("@font-face\n") //$NON-NLS-1$
-               + ("{\n") //$NON-NLS-1$
-//               + ("   font-family:   'NothingYouCouldDo';\n") //$NON-NLS-1$
-               + ("   font-family:   'Nunito-Bold';\n") //$NON-NLS-1$
-               + ("   font-weight:   700;\n") //$NON-NLS-1$
-               + ("   font-style:      bold;\n") //$NON-NLS-1$
-               + ("   src:         url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("}\n") //$NON-NLS-1$
+               + "@font-face" + NL //                                //$NON-NLS-1$
+               + "{" + NL //                                         //$NON-NLS-1$
+               + "   font-family:   'Nunito-Bold';" + NL //          //$NON-NLS-1$
+               + "   font-weight:   700;" + NL //                    //$NON-NLS-1$
+               + "   font-style:      bold;" + NL //                 //$NON-NLS-1$
+               + "   src:         url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');" //$NON-NLS-1$ //$NON-NLS-2$
+               + "}" + NL //                                         //$NON-NLS-1$
 
-               + "</style>\n"; //$NON-NLS-1$
+               + "</style>" + NL //                                  //$NON-NLS-1$
+         ;
 
          /*
           * Webpage css
@@ -2283,11 +2288,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             css3 = Util.readContentFromFile(webFile.getAbsolutePath());
          }
 
-         _cssFromFile = UI.EMPTY_STRING//
-               + "<style>\n" //$NON-NLS-1$
+         _cssFromFile = UI.EMPTY_STRING
+
+               + "<style>" + NL //        //$NON-NLS-1$
                + css
                + css3
-               + "</style>\n"; //$NON-NLS-1$
+               + "</style>" + NL //      //$NON-NLS-1$
+         ;
 
          /*
           * Image urls
@@ -5780,7 +5787,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isBrowserAvailable = _browser != null;
 
       // set dashboard page
-      _dashboard_PageBook.showPage(isBrowserAvailable//
+      _dashboard_PageBook.showPage(isBrowserAvailable
             ? _dashboardPage_WithBrowser
             : _dashboardPage_NoBrowser);
 
@@ -5825,13 +5832,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
       jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
 
-      final String js = "\n" //$NON-NLS-1$
+      final String js = UI.EMPTY_STRING + NL //                                                                //$NON-NLS-1$
 
-            + ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + "var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";" + NL //                                         //$NON-NLS-1$ //$NON-NLS-2$
+            + "document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-            + ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + "var htmlDeviceState =\"" + jsDeviceState + "\";" + NL //                                        //$NON-NLS-1$ //$NON-NLS-2$
+            + "document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
       ;
 
       final boolean isSuccess = _browser.execute(js);
@@ -5874,10 +5881,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          _isShowWatcherAnimation = false;
 
-         final String js = UI.EMPTY_STRING//
-               + ("document.getElementById(\"" + DOM_ID_IMPORT_TILES + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               + ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               + ("document.getElementById(\"" + DOM_ID_IMPORT_CONFIG + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         final String js = UI.EMPTY_STRING
+
+               + "document.getElementById(\"" + DOM_ID_IMPORT_TILES + "\").className ='" + domClassState + "';" + NL //    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").className ='" + domClassState + "';" + NL //    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "document.getElementById(\"" + DOM_ID_IMPORT_CONFIG + "\").className ='" + domClassState + "';" + NL //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          ;
 
          _browser.execute(js);
