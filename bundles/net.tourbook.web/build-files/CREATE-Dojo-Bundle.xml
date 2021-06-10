@@ -100,7 +100,10 @@
    	
       <gzip src="${path-dojoBuildRelease}/dojo/dojo.js"                    destfile="${path-WebContent-Rel}/dojo/dojo.js.jgz"/>
       <gzip src="${path-dojoBuildRelease}/tourbook/search/SearchApp.js"    destfile="${WebContentRelTourbook}/search/SearchApp.js.jgz"/>
+   	
+   	<!-- The dark theme has to manipulate the css file
       <gzip src="${path-dojoBuildRelease}/tourbook/search/search.css"      destfile="${WebContentRelTourbook}/search/search.css.jgz"/>
+   	-->
 
    </target>
 

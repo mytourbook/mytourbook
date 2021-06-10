@@ -50,6 +50,8 @@ import net.tourbook.common.util.Util;
  */
 public class WebContentServer {
 
+   private static final char    NL                       = UI.NEW_LINE;
+
    private static final boolean IS_DEBUG_PORT            = false;
    private static final int     NUMBER_OF_SERVER_THREADS = 1;
 
@@ -120,28 +122,28 @@ public class WebContentServer {
 //
 // This font is disabled because it is not easy to read it.
 //
-//		/*
-//		 * Set css font to the same as the whole app.
-//		 */
-//		final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
+//      /*
+//       * Set css font to the same as the whole app.
+//       */
+//      final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
 //
-//		final float fontHeight = dlgFont.getHeight() * 1.0f;
-//		final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
+//      final float fontHeight = dlgFont.getHeight() * 1.0f;
+//      final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
 //
-//		final String cssFont = ""//
-//				+ "<style>															\n"
-//				+ "body																\n"
-//				+ "{																\n"
-//				+ ("	font-family:	" + dlgFont.getName() + ", sans-serif;		\n")
-//				+ ("	font-size:		" + fontSize + "pt;							\n")
+//      final String cssFont = ""//
+//            + "<style>                                             " + NL
+//            + "body                                                " + NL
+//            + "{                                                " + NL
+//            + ("   font-family:   " + dlgFont.getName() + ", sans-serif;      " + NL )
+//            + ("   font-size:      " + fontSize + "pt;                     " + NL )
 //
-//				/*
-//				 * IE do not set the font weight correctly, 599 is too light compared the external
-//				 * IE, 600 is heavier than the external IE, 400 is by definition the default.
-//				 */
-//				+ "		font-weight:	400;										\n"
-//				+ "}																\n"
-//				+ "</STYLE>															\n";
+//            /*
+//             * IE do not set the font weight correctly, 599 is too light compared the external
+//             * IE, 600 is heavier than the external IE, 400 is by definition the default.
+//             */
+//            + "      font-weight:   400;                              " + NL
+//            + "}                                                " + NL
+//            + "</STYLE>                                             " + NL ;
 
       // Steps when switching between DEBUG and RELEASE build:
       // =====================================================
@@ -149,23 +151,27 @@ public class WebContentServer {
       // - Run ant file Create-Dojo-Bundle.xml when RELEASE build is enabled.
       // - Restart app.
 
-      final String dojoSearch = WEB.IS_DEBUG //
+      final String dojoSearch = WEB.IS_DEBUG
 
             ? UI.EMPTY_STRING
 
                   // DEBUG build
-                  + "	<link rel='stylesheet' href='search.css'>					\n" //$NON-NLS-1$
-                  + "	<script src='/dojo/dojo.js'></script>						\n" //$NON-NLS-1$
+                  + "   <link rel='stylesheet' href='search.css'>" + NL //                   //$NON-NLS-1$
+                  + "   <script src='/dojo/dojo.js'></script>" + NL //                       //$NON-NLS-1$
 
             : UI.EMPTY_STRING
 
                   // RELEASE build
-                  + "	<link rel='stylesheet' href='search.css.jgz'>				\n" //$NON-NLS-1$
-                  + "	<script src='/dojo/dojo.js.jgz'></script>					\n" //$NON-NLS-1$
-                  + "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
+
+                  // use css without compression to support the dark theme
+                  + "   <link rel='stylesheet' href='search.css'>" + NL //                   //$NON-NLS-1$
+//                + "   <link rel='stylesheet' href='search.css.jgz'>" + NL //               //$NON-NLS-1$
+
+                  + "   <script src='/dojo/dojo.js.jgz'></script>" + NL //                   //$NON-NLS-1$
+                  + "   <script src='/tourbook/search/SearchApp.js.jgz'></script>" + NL //   //$NON-NLS-1$
       ;
 
-//		dojoSearch += cssFont;
+//      dojoSearch += cssFont;
 
       /*
        * Get valid locale, invalid locale will cause errors of not supported Dojo files.
@@ -241,6 +247,7 @@ public class WebContentServer {
          final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
 
          final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
+         final boolean isSearchCssRequest = requestUriPath.contains("search.css");
 
          boolean isDojoRequest = false;
 
@@ -250,7 +257,7 @@ public class WebContentServer {
                      || requestUriPath.startsWith(DOJO_DGRID)
                      || requestUriPath.startsWith(DOJO_DSTORE)
                      || requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
-         //
+
          ) {
             isDojoRequest = true;
             requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
@@ -332,7 +339,7 @@ public class WebContentServer {
                final File file = new File(requestedOSPath).getCanonicalFile();
 
                if (LOG_URL) {
-//						log.append("\t-->\t" + file.toString());
+//                  log.append("\t-->\t" + file.toString());
                }
 
                if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
@@ -380,7 +387,7 @@ public class WebContentServer {
 
       try {
 
-         final String response = "403 (Forbidden)\n";//$NON-NLS-1$
+         final String response = "403 (Forbidden)" + NL;//$NON-NLS-1$
          httpExchange.sendResponseHeaders(403, response.length());
 
          os = httpExchange.getResponseBody();
@@ -401,7 +408,7 @@ public class WebContentServer {
 
       try {
 
-         final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);//$NON-NLS-1$
+         final String response = String.format("%s\n404 (Not Found)" + NL, requestUriPath);//$NON-NLS-1$
          httpExchange.sendResponseHeaders(404, response.length());
 
          os = httpExchange.getResponseBody();
@@ -484,19 +491,19 @@ public class WebContentServer {
 
          if (LOG_XHR) {
 
-//				reqBody = httpExchange.getRequestBody();
+//            reqBody = httpExchange.getRequestBody();
 //
-//				final StringBuilder sb = new StringBuilder();
-//				final byte[] buffer = new byte[0x10000];
+//            final StringBuilder sb = new StringBuilder();
+//            final byte[] buffer = new byte[0x10000];
 //
-//				while (reqBody.read(buffer) != -1) {
-//					sb.append(buffer);
-//				}
+//            while (reqBody.read(buffer) != -1) {
+//               sb.append(buffer);
+//            }
 //
-//				// log content
-//				log.append("\nXHR-\n");
-//				log.append(sb.toString());
-//				log.append("\n-XHR\n");
+//            // log content
+//            log.append("\nXHR-" + NL );
+//            log.append(sb.toString());
+//            log.append("\n-XHR" + NL );
          }
 
          final String xhrKey = requestUriPath;
@@ -516,10 +523,10 @@ public class WebContentServer {
 
    private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
 
-      log.append("\n");//$NON-NLS-1$
+      log.append(NL);
 
       for (final Entry<String, List<String>> entry : headerEntries) {
-         log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));//$NON-NLS-1$
+         log.append(String.format("%-20s %s" + NL, entry.getKey(), entry.getValue()));//$NON-NLS-1$
       }
    }
 
