@@ -204,16 +204,13 @@ public class DialogReimportTours extends TitleAreaDialog {
          selectedTourIds[i] = (Long) selectedItems[i];
       }
 
-      RawDataManager rawDataManager = null;
       final boolean isReimportConcurrent = skipToursWithFileNotFound;
+      final RawDataManager rawDataManager = isReimportConcurrent
+            ? new RawDataManager()
+            : RawDataManager.getInstance();
       if (isReimportConcurrent) {
 
-         rawDataManager = new RawDataManager();
          initializeThreadPoolExecutor();
-      } else {
-
-         // Sequential re-import
-         rawDataManager = RawDataManager.getInstance();
       }
       rawDataManager.setImportId();
       rawDataManager.setImportCanceled(false);
@@ -253,183 +250,88 @@ public class DialogReimportTours extends TitleAreaDialog {
                   continue;
                }
 
-               RawDataManager.getInstance().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+               if (isReimportConcurrent) {
 
-               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() && isUserAsked_ToCancelReImport[0] == false
-                     && skipToursWithFileNotFound == false) {
+                  try {
 
-                  // user has canceled the re-import -> ask if the whole re-import should be canceled
+                     _dbUpdateQueue.put(tourId);
 
-                  final boolean[] isCancelReimport = { false };
+                  } catch (final InterruptedException e) {
 
-                  display.syncExec(() -> {
+                     StatusUtil.log(e);
+                     Thread.currentThread().interrupt();
+                  }
 
-                     if (MessageDialog.openQuestion(display.getActiveShell(),
-                           Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                           Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+                  final Runnable executorTask = () -> {
 
-                        isCancelReimport[0] = true;
+                     // get last added item
+                     Long queueItem_TourId;
+                     queueItem_TourId = _dbUpdateQueue.poll();
 
-                     } else {
-
-                        isUserAsked_ToCancelReImport[0] = true;
+                     if (queueItem_TourId == null) {
+                        return;
                      }
-                  });
 
-                  if (isCancelReimport[0]) {
-                     break;
+                     rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+
+                  };
+
+                  _dbUpdateExecutor.submit(executorTask);
+
+               } else {
+
+                  RawDataManager.getInstance().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+
+                  if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() && isUserAsked_ToCancelReImport[0] == false
+                        && skipToursWithFileNotFound == false) {
+
+                     // user has canceled the re-import -> ask if the whole re-import should be canceled
+
+                     final boolean[] isCancelReimport = { false };
+
+                     display.syncExec(() -> {
+
+                        if (MessageDialog.openQuestion(display.getActiveShell(),
+                              Messages.Import_Data_Dialog_IsCancelReImport_Title,
+                              Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+
+                           isCancelReimport[0] = true;
+
+                        } else {
+
+                           isUserAsked_ToCancelReImport[0] = true;
+                        }
+                     });
+
+                     if (isCancelReimport[0]) {
+                        break;
+                     }
                   }
                }
             }
+            if (isReimportConcurrent) {
 
-            if (reImportStatus.isReImported()) {
+               // All tasks have been submitted, we can begin the shutdown of our executor
+               //(preventing new tasks from being submitted)
+               System.out.println("Starting shutdown...");
+               _dbUpdateExecutor.shutdown();
+               long toto = 0;
+               while (!_dbUpdateExecutor.isTerminated()) {
 
-               RawDataManager.getInstance().updateTourData_InImportView_FromDb(monitor);
+                  final long currentActiveCount = _dbUpdateExecutor.getCompletedTaskCount();
 
-               // reselect tours, run in UI thread
-               display.asyncExec(tourViewer::reloadViewer);
-            }
-         }
-      };
+                  if (currentActiveCount > toto) {
 
-      try {
-         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
-      } catch (final Exception e) {
-         TourLogManager.logEx(e);
-         Thread.currentThread().interrupt();
-      } finally {
+                     System.out.println(currentActiveCount);
+                     final long difference = currentActiveCount - toto;
+                     monitor.worked((int) difference);
+                     monitor.subTask(NLS.bind(
+                           Messages.Import_Data_Dialog_Reimport_SubTask,
+                           new Object[] { reimported = (int) difference, numberOfTours }));
 
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(//
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_REIMPORT_END, time));
+                     toto = currentActiveCount;
 
-      }
-   }
-
-   /**
-    * @param tourValueTypes
-    *           A list of tour values to be re-imported
-    * @param tourViewer
-    *           Tour viewer containing the selected tours to be re-imported.
-    * @param skipToursWithFileNotFound
-    *           Indicates whether to re-import or not a tour for which the file is not found
-    */
-   private void actionReimportSelectedTours_Concurrent(final List<TourValueType> tourValueTypes,
-                                                       final ITourViewer3 tourViewer,
-                                                       final boolean skipToursWithFileNotFound) {
-
-      final long start = System.currentTimeMillis();
-
-      if (!RawDataManager.getInstance().actionModifyTourValues_10_Confirm(tourValueTypes, true)) {
-         return;
-      }
-
-      // get selected tour IDs
-      final Object[] selectedItems = RawDataManager.getInstance().getTourViewerSelectedTourIds(tourViewer);
-
-      if (selectedItems == null || selectedItems.length == 0) {
-
-         MessageDialog.openInformation(Display.getDefault().getActiveShell(),
-               Messages.Dialog_ReimportTours_Dialog_Title,
-               Messages.Dialog_ModifyTours_Dialog_ToursAreNotSelected);
-
-         return;
-      }
-
-      /*
-       * convert selection to array
-       */
-      final Long[] selectedTourIds = new Long[selectedItems.length];
-      for (int i = 0; i < selectedItems.length; i++) {
-         selectedTourIds[i] = (Long) selectedItems[i];
-      }
-
-      final RawDataManager rawDataManager = new RawDataManager();
-      rawDataManager.setImportId();
-      rawDataManager.setImportCanceled(false);
-
-      initializeThreadPoolExecutor();
-
-      final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
-
-         Display display = Display.getDefault();
-
-         @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-            final ReImportStatus reImportStatus = new ReImportStatus();
-            final boolean[] isUserAsked_ToCancelReImport = { false };
-
-            final File[] reimportedFile = new File[1];
-            //TODO FB to rename to reimport, did I mix it up with the delete task ?
-            int deleted = 0;
-            final int numberOfTours = selectedTourIds.length;
-
-            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numberOfTours);
-
-            // loop: all selected tours in the viewer
-            for (final Long tourId : selectedTourIds) {
-
-               if (monitor.isCanceled()) {
-                  // stop re-importing but process re-imported tours
-                  break;
-               }
-
-               final TourData oldTourData = TourManager.getTour(tourId);
-
-               if (oldTourData == null) {
-                  continue;
-               }
-
-               try {
-
-                  _dbUpdateQueue.put(tourId);
-
-               } catch (final InterruptedException e) {
-
-                  StatusUtil.log(e);
-                  Thread.currentThread().interrupt();
-               }
-
-               final Runnable executorTask = () -> {
-
-                  // get last added item
-                  Long queueItem_TourId;
-                  queueItem_TourId = _dbUpdateQueue.poll();
-
-                  if (queueItem_TourId == null) {
-                     return;
                   }
-
-                  new RawDataManager().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
-
-               };
-
-               _dbUpdateExecutor.submit(executorTask);
-
-            }
-
-            // All tasks have been submitted, we can begin the shutdown of our executor
-            //(preventing new tasks from being submitted)
-            System.out.println("Starting shutdown...");
-            _dbUpdateExecutor.shutdown();
-            long toto = 0;
-            while (!_dbUpdateExecutor.isTerminated()) {
-
-               final long currentActiveCount = _dbUpdateExecutor.getCompletedTaskCount();
-
-               if (currentActiveCount > toto) {
-
-                  System.out.println(currentActiveCount);
-                  final long difference = currentActiveCount - toto;
-                  monitor.worked((int) difference);
-                  monitor.subTask(NLS.bind(
-                        Messages.Import_Data_Dialog_Reimport_SubTask,
-                        new Object[] { deleted = (int) difference, numberOfTours }));
-
-                  toto = currentActiveCount;
-
                }
             }
 
