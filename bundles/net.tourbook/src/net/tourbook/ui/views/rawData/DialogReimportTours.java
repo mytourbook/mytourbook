@@ -173,8 +173,8 @@ public class DialogReimportTours extends TitleAreaDialog {
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void actionReimportSelectedTours_Concurrent(final List<TourValueType> tourValueTypes,
-                                           final ITourViewer3 tourViewer,
-                                           final boolean skipToursWithFileNotFound) {
+                                                       final ITourViewer3 tourViewer,
+                                                       final boolean skipToursWithFileNotFound) {
 
       final long start = System.currentTimeMillis();
 
@@ -817,16 +817,18 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } else {
 
-         // re-import SELECTED tours
+         doReimport_SelectedTours(tourValueTypes, skipToursWithFileNotFound);
+      }
+   }
 
-         if (skipToursWithFileNotFound) {
-            // async reimport
-            actionReimportSelectedTours_Concurrent(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
-         } else {
-            //normal reimport
-            RawDataManager.getInstance().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
-         }
+   private void doReimport_SelectedTours(final List<TourValueType> tourValueTypes, final boolean skipToursWithFileNotFound) {
 
+      if (skipToursWithFileNotFound) {
+         // Concurrent re-import
+         actionReimportSelectedTours_Concurrent(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
+      } else {
+         // Sequential rei-mport
+         RawDataManager.getInstance().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
       }
    }
 
