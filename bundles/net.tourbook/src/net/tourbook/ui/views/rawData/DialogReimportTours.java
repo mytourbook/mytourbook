@@ -20,15 +20,21 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import de.byteholder.geoclipse.map.UI;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeTourValues;
@@ -38,15 +44,20 @@ import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -105,37 +116,42 @@ public class DialogReimportTours extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Composite _parent;
+   private Composite                _parent;
 
-   private Button    _btnDeselectAll;
-   private Button    _btnUnlockAllToursSelection;
-   private Button    _btnUnlockBetweenDatesSelection;
+   private Button                   _btnDeselectAll;
+   private Button                   _btnUnlockAllToursSelection;
+   private Button                   _btnUnlockBetweenDatesSelection;
 
-   private Button    _chkData_AllTimeSlices;
-   private Button    _chkData_Cadence;
-   private Button    _chkData_Calories;
-   private Button    _chkData_Elevation;
-   private Button    _chkData_EntireTour;
-   private Button    _chkData_Gear;
-   private Button    _chkData_ImportFileLocation;
-   private Button    _chkData_PowerAndPulse;
-   private Button    _chkData_PowerAndSpeed;
-   private Button    _chkData_RunningDynamics;
-   private Button    _chkSkip_Tours_With_ImportFile_NotFound;
-   private Button    _chkData_Swimming;
-   private Button    _chkData_Temperature;
-   private Button    _chkData_Training;
-   private Button    _chkData_TourMarkers;
-   private Button    _chkData_TourTimerPauses;
+   private Button                   _chkData_AllTimeSlices;
+   private Button                   _chkData_Cadence;
+   private Button                   _chkData_Calories;
+   private Button                   _chkData_Elevation;
+   private Button                   _chkData_EntireTour;
+   private Button                   _chkData_Gear;
+   private Button                   _chkData_ImportFileLocation;
+   private Button                   _chkData_PowerAndPulse;
+   private Button                   _chkData_PowerAndSpeed;
+   private Button                   _chkData_RunningDynamics;
+   private Button                   _chkSkip_Tours_With_ImportFile_NotFound;
+   private Button                   _chkData_Swimming;
+   private Button                   _chkData_Temperature;
+   private Button                   _chkData_Training;
+   private Button                   _chkData_TourMarkers;
+   private Button                   _chkData_TourTimerPauses;
 
-   private Button    _rdoReimport_Tours_All;
-   private Button    _rdoReimport_Tours_BetweenDates;
-   private Button    _rdoReimport_Tours_Selected;
+   private Button                   _rdoReimport_Tours_All;
+   private Button                   _rdoReimport_Tours_BetweenDates;
+   private Button                   _rdoReimport_Tours_Selected;
 
-   private DateTime  _dtTourDate_From;
-   private DateTime  _dtTourDate_Until;
+   private DateTime                 _dtTourDate_From;
+   private DateTime                 _dtTourDate_Until;
 
-   private Group     _groupTours;
+   private Group                    _groupTours;
+
+   private ThreadPoolExecutor       _dbUpdateExecutor;
+   private ArrayBlockingQueue<Long> _dbUpdateQueue;
+
+   private ThreadFactory            _threadFactory;
 
    /**
     * @param parentShell
@@ -146,6 +162,156 @@ public class DialogReimportTours extends TitleAreaDialog {
       super(parentShell);
 
       _tourViewer = tourViewer;
+   }
+
+   /**
+    * @param tourValueTypes
+    *           A list of tour values to be re-imported
+    * @param tourViewer
+    *           Tour viewer containing the selected tours to be re-imported.
+    * @param skipToursWithFileNotFound
+    *           Indicates whether to re-import or not a tour for which the file is not found
+    */
+   private void actionReimportSelectedTours_Concurrent(final List<TourValueType> tourValueTypes,
+                                           final ITourViewer3 tourViewer,
+                                           final boolean skipToursWithFileNotFound) {
+
+      final long start = System.currentTimeMillis();
+
+      if (!RawDataManager.getInstance().actionModifyTourValues_10_Confirm(tourValueTypes, true)) {
+         return;
+      }
+
+      // get selected tour IDs
+      final Object[] selectedItems = RawDataManager.getInstance().getTourViewerSelectedTourIds(tourViewer);
+
+      if (selectedItems == null || selectedItems.length == 0) {
+
+         MessageDialog.openInformation(Display.getDefault().getActiveShell(),
+               Messages.Dialog_ReimportTours_Dialog_Title,
+               Messages.Dialog_ModifyTours_Dialog_ToursAreNotSelected);
+
+         return;
+      }
+
+      /*
+       * convert selection to array
+       */
+      final Long[] selectedTourIds = new Long[selectedItems.length];
+      for (int i = 0; i < selectedItems.length; i++) {
+         selectedTourIds[i] = (Long) selectedItems[i];
+      }
+
+      final RawDataManager rawDataManager = new RawDataManager();
+      rawDataManager.setImportId();
+      rawDataManager.setImportCanceled(false);
+
+      initializeThreadPoolExecutor();
+
+      final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
+
+         Display display = Display.getDefault();
+
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            final ReImportStatus reImportStatus = new ReImportStatus();
+            final boolean[] isUserAsked_ToCancelReImport = { false };
+
+            final File[] reimportedFile = new File[1];
+            //TODO FB to rename to reimport, did I mix it up with the delete task ?
+            int deleted = 0;
+            final int numberOfTours = selectedTourIds.length;
+
+            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numberOfTours);
+
+            // loop: all selected tours in the viewer
+            for (final Long tourId : selectedTourIds) {
+
+               if (monitor.isCanceled()) {
+                  // stop re-importing but process re-imported tours
+                  break;
+               }
+
+               final TourData oldTourData = TourManager.getTour(tourId);
+
+               if (oldTourData == null) {
+                  continue;
+               }
+
+               try {
+
+                  _dbUpdateQueue.put(tourId);
+
+               } catch (final InterruptedException e) {
+
+                  StatusUtil.log(e);
+                  Thread.currentThread().interrupt();
+               }
+
+               final Runnable executorTask = () -> {
+
+                  // get last added item
+                  Long queueItem_TourId;
+                  queueItem_TourId = _dbUpdateQueue.poll();
+
+                  if (queueItem_TourId == null) {
+                     return;
+                  }
+
+                  new RawDataManager().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+
+               };
+
+               _dbUpdateExecutor.submit(executorTask);
+
+            }
+
+            // All tasks have been submitted, we can begin the shutdown of our executor
+            //(preventing new tasks from being submitted)
+            System.out.println("Starting shutdown...");
+            _dbUpdateExecutor.shutdown();
+            long toto = 0;
+            while (!_dbUpdateExecutor.isTerminated()) {
+
+               final long currentActiveCount = _dbUpdateExecutor.getCompletedTaskCount();
+
+               if (currentActiveCount > toto) {
+
+                  System.out.println(currentActiveCount);
+                  final long difference = currentActiveCount - toto;
+                  monitor.worked((int) difference);
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { deleted = (int) difference, numberOfTours }));
+
+                  toto = currentActiveCount;
+
+               }
+            }
+
+            if (reImportStatus.isReImported()) {
+
+               rawDataManager.updateTourData_InImportView_FromDb(monitor);
+
+               // reselect tours, run in UI thread
+               display.asyncExec(tourViewer::reloadViewer);
+            }
+         }
+      };
+
+      try {
+         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
+      } catch (final Exception e) {
+         TourLogManager.logEx(e);
+         Thread.currentThread().interrupt();
+      } finally {
+
+         final double time = (System.currentTimeMillis() - start) / 1000.0;
+         TourLogManager.addLog(//
+               TourLogState.DEFAULT,
+               String.format(RawDataManager.LOG_REIMPORT_END, time));
+      }
    }
 
    @Override
@@ -655,7 +821,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          if (skipToursWithFileNotFound) {
             // async reimport
-            new RawDataManager().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
+            actionReimportSelectedTours_Concurrent(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
          } else {
             //normal reimport
             RawDataManager.getInstance().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
@@ -739,6 +905,30 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       //Helpful during development
 //    return null;
+   }
+
+   private void initializeThreadPoolExecutor() {
+
+      if (_threadFactory == null) {
+
+         _threadFactory = runnable -> {
+
+            //TODO FB
+            final Thread thread = new Thread(runnable, "Modifying tours");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         };
+      }
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, _threadFactory);
+      _dbUpdateExecutor.prestartAllCoreThreads();
+
+      if (_dbUpdateQueue == null) {
+         _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+      }
    }
 
    private void initUI() {

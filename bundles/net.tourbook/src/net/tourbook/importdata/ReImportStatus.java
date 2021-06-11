@@ -30,4 +30,8 @@ public class ReImportStatus {
    boolean isCanceled_Auto_ImportFilePathIsEmpty;
 
    boolean isCanceled_Auto_TheFileLocationDialog;
+
+   public boolean isReImported() {
+      return isReImported;
+   }
 }
