@@ -23,6 +23,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
@@ -76,8 +77,6 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
-   //TODO FB do not use concurrency when the checkbox skip files.... is not checked
-   //add a message under the checkbox
    private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
    private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
 
@@ -223,7 +222,6 @@ public class DialogReimportTours extends TitleAreaDialog {
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
             final ReImportStatus reImportStatus = new ReImportStatus();
-            final boolean[] isUserAsked_ToCancelReImport = { false };
 
             final File[] reimportedFile = new File[1];
             int reimported = 0;
@@ -259,6 +257,11 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final Runnable executorTask = () -> {
 
+                     if (monitor.isCanceled()) {
+                        System.out.println("DOINGNOTHING");
+                        return;
+                     }
+
                      // get last added item
                      Long queueItem_TourId;
                      queueItem_TourId = _dbUpdateQueue.poll();
@@ -284,36 +287,13 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   RawDataManager.getInstance().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
 
-                  if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() &&
-                        isUserAsked_ToCancelReImport[0] == false &&
-                        skipToursWithFileNotFound == false) {
-
-                     // user has canceled the re-import -> ask if the whole re-import should be canceled
-
-                     final boolean[] isCancelReimport = { false };
-
-                     display.syncExec(() -> {
-
-                        if (MessageDialog.openQuestion(display.getActiveShell(),
-                              Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                              Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
-
-                           isCancelReimport[0] = true;
-
-                        } else {
-
-                           isUserAsked_ToCancelReImport[0] = true;
-                        }
-                     });
-
-                     if (isCancelReimport[0]) {
-                        break;
-                     }
+                  if (handleFileLocationDialog_UserCancellation(reImportStatus, skipToursWithFileNotFound)) {
+                     break;
                   }
                }
             }
 
-            if (isReimportConcurrent) {
+            if (isReimportConcurrent && !monitor.isCanceled()) {
 
                // All tasks have been submitted, we can begin the shutdown of our executor
                //(preventing new tasks from being submitted)
@@ -323,6 +303,13 @@ public class DialogReimportTours extends TitleAreaDialog {
                while (!_dbUpdateExecutor.isTerminated()) {
 
                   final long newCompletedTaskCount = _dbUpdateExecutor.getCompletedTaskCount();
+
+                  if (monitor.isCanceled()) {
+                     final Collection<? super Long> list = new ArrayList<>();
+                     _dbUpdateQueue.drainTo(list);
+                     System.out.println(list.size());
+                     break;
+                  }
 
                   if (newCompletedTaskCount > completedTaskCount) {
 
@@ -953,27 +940,57 @@ public class DialogReimportTours extends TitleAreaDialog {
 //    return null;
    }
 
+   public boolean handleFileLocationDialog_UserCancellation(final ReImportStatus reImportStatus,
+                                                            final boolean skipToursWithFileNotFound) {
+
+      final boolean[] isUserAsked_ToCancelReImport = { false };
+
+      if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() &&
+            isUserAsked_ToCancelReImport[0] == false &&
+            skipToursWithFileNotFound == false) {
+
+         // user has canceled the re-import -> ask if the whole re-import should be canceled
+
+         final boolean[] isCancelReimport = { false };
+
+         final Display display = Display.getDefault();
+
+         display.syncExec(() -> {
+
+            if (MessageDialog.openQuestion(display.getActiveShell(),
+                  Messages.Import_Data_Dialog_IsCancelReImport_Title,
+                  Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+
+               isCancelReimport[0] = true;
+
+            } else {
+
+               isUserAsked_ToCancelReImport[0] = true;
+            }
+         });
+
+         return isCancelReimport[0];
+      }
+
+      return false;
+   }
+
    private void initializeThreadPoolExecutor() {
 
-      if (_threadFactory == null) {
+      _threadFactory = runnable -> {
 
-         _threadFactory = runnable -> {
+         final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
 
-            final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         };
-      }
+         return thread;
+      };
 
       _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, _threadFactory);
       _dbUpdateExecutor.prestartAllCoreThreads();
 
-      if (_dbUpdateQueue == null) {
-         _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
-      }
+      _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    }
 
    private void initUI() {
