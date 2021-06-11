@@ -49,6 +49,7 @@ public class Images {
    public static final String App_Edit                                   = "quick-edit.png";                                      //$NON-NLS-1$
    public static final String App_Edit_Disabled                          = "quick-edit-disabled.png";                             //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder                  = "icon-placeholder.gif";                                //$NON-NLS-1$
+   public static final String App_Hide                                   = "app-hide.png";                                        //$NON-NLS-1$
    public static final String App_OK                                     = "16px-Crystal_Clear_action_apply.png";                 //$NON-NLS-1$
    public static final String App_Paste                                  = "paste_edit.png";                                      //$NON-NLS-1$
    public static final String App_Placeholder16                          = "placeholder16.png";                                   //$NON-NLS-1$
@@ -65,6 +66,7 @@ public class Images {
    public static final String App_RemoveAll_Disabled                     = "remove-all-disabled.png";                             //$NON-NLS-1$
    public static final String App_SequenceNumber                         = "app-sequence-number.png";                             //$NON-NLS-1$
    public static final String App_SequenceNumber_Disabled                = "app-sequence-number-disabled.png";                    //$NON-NLS-1$
+   public static final String App_Show                                   = "app-show.png";                                        //$NON-NLS-1$
    public static final String App_Sort                                   = "app-sort.png";                                        //$NON-NLS-1$
    public static final String App_Sort_Disabled                          = "app-sort-disabled.png";                               //$NON-NLS-1$
    public static final String App_Today                                  = "today.png";                                           //$NON-NLS-1$
@@ -93,7 +95,6 @@ public class Images {
    public static final String EditRow_Disabled                           = "edit-row-disabled.png";                               //$NON-NLS-1$
    public static final String EditTour                                   = "tour-editor.png";                                     //$NON-NLS-1$
    public static final String EditTour_Disabled                          = "write_obj_disabled.gif";                              //$NON-NLS-1$
-   public static final String Eye                                        = "eye.png";                                             //$NON-NLS-1$
    public static final String GeoParts                                   = "geo-parts.png";                                       //$NON-NLS-1$
    public static final String GeoParts_Disabled                          = "geo-parts-disabled.png";                              //$NON-NLS-1$
    public static final String Graph                                      = "graph.png";                                           //$NON-NLS-1$

@@ -7,9 +7,11 @@ html
 body 
 {
    font-size:              $BODY_FONT_SIZE$px;
-   color:                  #404040;
-   background-color:       #fff;
+   color:                  #$BODY_COLOR$;
+   background-color:       #$BODY_BACKGROUND_COLOR$;
    margin:                 5px;
+
+   $BODY_SCROLLBAR$
 }
 
 p,td,ul 
@@ -60,7 +62,6 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 
    font-size:              150%;
    font-weight:            bold;
-   color:                  #333;   
 }
 
 .blog-item
@@ -81,12 +82,21 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
    font-weight:            normal;
 }
 
+a:LINK
+{
+   color:                  #$A_LINK__COLOR$;
+}
+
+a:VISITED 
+{
+   color:                  #$A_VISITED__COLOR$;
+}
+
 a.label-text:LINK,
 a.label-text:VISITED 
 {
    display:                block;
    width:                  auto;               /* enforce width to the right border */
-   color:                  #333;   
    text-decoration:        none;
 }
 
@@ -105,12 +115,11 @@ a.label-text:VISITED
 }
 .action-hover-container:HOVER 
 {
-   background-color:       #f8f8f8;
+   background-color:       #$ACTION_CONTAINER__BACKGROUND_COLOR$;
 }
 .action-hover-container .action-container a:HOVER 
 { 
    border:                 1px solid #aaa;
-   border-radius:          3px;
 }
 
 .action-container 
@@ -118,7 +127,6 @@ a.label-text:VISITED
    opacity:                0;
    filter:                 alpha(opacity=0);
 
-   background-color:       #f8f8f8;
    position:               absolute;
    right:                  5px;               /* blog margin*/
    z-index:                10;
@@ -136,8 +144,7 @@ a.action:VISITED
    background-repeat:      no-repeat;
    background-position:    center;
 
-   border:                 1px solid #f8f8f8;
-   border-radius:          3px;
+   border:                 1px solid #$ACTION_CONTAINER__BACKGROUND_COLOR$;
 
    cursor:                 pointer; 
 }
