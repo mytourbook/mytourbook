@@ -313,8 +313,8 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                // All tasks have been submitted, we can begin the shutdown of our executor
                //(preventing new tasks from being submitted)
-               System.out.println("Starting shutdown...");
                _dbUpdateExecutor.shutdown();
+               //TODO FB need toto?
                long toto = 0;
                while (!_dbUpdateExecutor.isTerminated()) {
 
@@ -949,8 +949,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          _threadFactory = runnable -> {
 
-            //TODO FB
-            final Thread thread = new Thread(runnable, "Modifying tours");//$NON-NLS-1$
+            final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
 
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.setDaemon(true);
