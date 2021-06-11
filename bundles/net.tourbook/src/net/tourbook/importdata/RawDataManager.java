@@ -1922,15 +1922,15 @@ public class RawDataManager {
       return _importState_ImportYear;
    }
 
-   public ArrayList<String> getInvalidFilesList() {
+   public List<String> getInvalidFilesList() {
       return _invalidFilesList;
    }
 
-   public ArrayList<TourTag> getTempTourTags() {
+   public List<TourTag> getTempTourTags() {
       return _tempTourTags;
    }
 
-   public ArrayList<TourType> getTempTourTypes() {
+   public List<TourType> getTempTourTypes() {
       return _tempTourTypes;
    }
 
@@ -2363,9 +2363,9 @@ public class RawDataManager {
 
       final File currentTourImportFile = actionReimportTour_20_GetImportFile(tourData, skipToursWithFileNotFound, reImportStatus);
 
-      if (reimportedFile[0] != null && reimportedFile[0].equals(currentTourImportFile)
-      //TODO FB convert to local variable so that its not shared ?
-            && _newlyImportedTours.size() > 0) {
+      if (reimportedFile[0] != null &&
+            reimportedFile[0].equals(currentTourImportFile) &&
+            _newlyImportedTours.size() > 0) {
 
          // this case occurs when a file contains multiple tours
 
@@ -2434,14 +2434,12 @@ public class RawDataManager {
 
       final HashSet<?> oldFileNames = (HashSet<?>) _importedFileNames.clone();
 
-      for (final TourData tourData : removedTours) {
-
+      Arrays.asList(removedTours).forEach(tourData -> {
          final Long key = tourData.getTourId();
-
          if (_toursInImportView.containsKey(key)) {
             _toursInImportView.remove(key);
          }
-      }
+      });
 
       /*
        * Check if all tours from a file are removed, when yes, remove file path that the file can
@@ -2449,31 +2447,33 @@ public class RawDataManager {
        * because it's not yet saved which tours are removed from a file and which are not.
        */
       for (final Object item : oldFileNames) {
-         if (item instanceof String) {
 
-            final String oldFilePath = (String) item;
-            boolean isNeeded = false;
+         if (!(item instanceof String)) {
+            continue;
+         }
 
-            for (final TourData tourData : _toursInImportView.values()) {
+         final String oldFilePath = (String) item;
+         boolean isNeeded = false;
 
-               final String tourFilePathName = tourData.getImportFilePathName();
+         for (final TourData tourData : _toursInImportView.values()) {
 
-               if (tourFilePathName != null && tourFilePathName.equals(oldFilePath)) {
-                  isNeeded = true;
-                  break;
-               }
+            final String tourFilePathName = tourData.getImportFilePathName();
+
+            if (tourFilePathName != null && tourFilePathName.equals(oldFilePath)) {
+               isNeeded = true;
+               break;
             }
+         }
 
-            if (isNeeded == false) {
+         if (isNeeded == false) {
 
-               // file path is not needed any more
-               _importedFileNames.remove(oldFilePath);
-            }
+            // file path is not needed any more
+            _importedFileNames.remove(oldFilePath);
          }
       }
    }
 
-   public ImportRunState runImport(final ArrayList<OSFile> importFiles,
+   public ImportRunState runImport(final List<OSFile> importFiles,
                                    final boolean isEasyImport,
                                    final String fileGlobPattern) {
 
@@ -2873,5 +2873,4 @@ public class RawDataManager {
          }
       }
    }
-
 }
