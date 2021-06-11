@@ -34,4 +34,8 @@ public class ReImportStatus {
    public boolean isReImported() {
       return isReImported;
    }
+
+   public boolean isCanceled_ByUser_TheFileLocationDialog() {
+      return isCanceled_ByUser_TheFileLocationDialog;
+   }
 }
