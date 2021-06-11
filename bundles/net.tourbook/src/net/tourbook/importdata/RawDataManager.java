@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -1892,14 +1893,14 @@ public class RawDataManager {
       return _devicesBySortPriority;
    }
 
-   public HashSet<String> getImportedFiles() {
+   public Set<String> getImportedFiles() {
       return _importedFileNames;
    }
 
    /**
     * @return Returns an {@link ArrayList} containing the imported tours.
     */
-   public ArrayList<TourData> getImportedTourList() {
+   public List<TourData> getImportedTourList() {
 
       final Collection<TourData> importedToursCollection = _toursInImportView.values();
       final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
@@ -2859,7 +2860,7 @@ public class RawDataManager {
     *
     * @param modifiedTours
     */
-   public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
+   public void updateTourDataModel(final List<TourData> modifiedTours) {
 
       for (final TourData tourData : modifiedTours) {
          if (tourData != null) {

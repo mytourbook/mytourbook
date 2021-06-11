@@ -996,7 +996,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
                // save imported file names
-               final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
+               final Set<String> importedFiles = _rawDataMgr.getImportedFiles();
                _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
                if (!RawDataManager.isReimportingActive() &&
@@ -4800,7 +4800,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             runEasyImport_006_RetrieveWeatherData(importLauncher, importedTours);
          }
 
-         ArrayList<TourData> importedAndSavedTours;
+         List<TourData> importedAndSavedTours;
 
          /*
           * 99. Save imported tours
@@ -5029,7 +5029,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     *           are not touched, this feature is used to move device files to the backup folder.
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
-                                                  final ArrayList<TourData> allTourData,
+                                                  final List<TourData> allTourData,
                                                   final List<String> invalidFiles,
                                                   final boolean isEasyImport) {
 
@@ -5186,7 +5186,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isRemoveToursWhenClosed) {
          stateImportedFiles = new String[] {};
       } else {
-         final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
+         final Set<String> importedFiles = _rawDataMgr.getImportedFiles();
          stateImportedFiles = importedFiles.toArray(new String[importedFiles.size()]);
       }
       _state.put(STATE_IMPORTED_FILENAMES, stateImportedFiles);
