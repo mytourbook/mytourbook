@@ -25,9 +25,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -205,15 +209,14 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
 
       final boolean isReimportConcurrent = skipToursWithFileNotFound;
-      final RawDataManager rawDataManager = isReimportConcurrent
-            ? new RawDataManager()
-            : RawDataManager.getInstance();
       if (isReimportConcurrent) {
 
          initializeThreadPoolExecutor();
+      } else {
+
+         RawDataManager.getInstance().setImportId();
+         RawDataManager.getInstance().setImportCanceled(false);
       }
-      rawDataManager.setImportId();
-      rawDataManager.setImportCanceled(false);
 
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
@@ -238,11 +241,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                   // stop re-importing but process re-imported tours
                   break;
                }
-
-               monitor.worked(1);
-               monitor.subTask(NLS.bind(
-                     Messages.Import_Data_Dialog_Reimport_SubTask,
-                     new Object[] { ++reimported, numberOfTours }));
 
                final TourData oldTourData = TourManager.getTour(tourId);
 
@@ -272,18 +270,26 @@ public class DialogReimportTours extends TitleAreaDialog {
                         return;
                      }
 
+                     final RawDataManager rawDataManager = new RawDataManager();
+                     rawDataManager.setImportId();
+                     rawDataManager.setImportCanceled(false);
                      rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
-
                   };
 
                   _dbUpdateExecutor.submit(executorTask);
 
                } else {
 
+                  monitor.worked(1);
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { ++reimported, numberOfTours }));
+
                   RawDataManager.getInstance().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
 
-                  if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() && isUserAsked_ToCancelReImport[0] == false
-                        && skipToursWithFileNotFound == false) {
+                  if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() &&
+                        isUserAsked_ToCancelReImport[0] == false &&
+                        skipToursWithFileNotFound == false) {
 
                      // user has canceled the re-import -> ask if the whole re-import should be canceled
 
@@ -309,35 +315,57 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
                }
             }
+
             if (isReimportConcurrent) {
 
                // All tasks have been submitted, we can begin the shutdown of our executor
                //(preventing new tasks from being submitted)
-               _dbUpdateExecutor.shutdown();
-               //TODO FB need toto?
-               long toto = 0;
-               while (!_dbUpdateExecutor.isTerminated()) {
-
-                  final long currentActiveCount = _dbUpdateExecutor.getCompletedTaskCount();
-
-                  if (currentActiveCount > toto) {
-
-                     System.out.println(currentActiveCount);
-                     final long difference = currentActiveCount - toto;
-                     monitor.worked((int) difference);
+               //   _dbUpdateExecutor.shutdown();
+               final long completedTaskCount = 0;
+               final List<Callable<Object>> todo = new ArrayList<>((int) _dbUpdateExecutor.getTaskCount());
+               final List<Future<Object>> answers = _dbUpdateExecutor.invokeAll(todo);
+               int toto = 0;
+               for (final Future<?> future : answers) {
+                  try {
+                     future.get();
+                     monitor.worked(1);
                      monitor.subTask(NLS.bind(
                            Messages.Import_Data_Dialog_Reimport_SubTask,
-                           new Object[] { reimported = (int) difference, numberOfTours }));
-
-                     toto = currentActiveCount;
-
+                           new Object[] { ++toto, numberOfTours }));
+                  } catch (final InterruptedException e) {
+                     // TODO Auto-generated catch block
+                     e.printStackTrace();
+                  } catch (final ExecutionException e) {
+                     // TODO Auto-generated catch block
+                     e.printStackTrace();
                   }
                }
+
+               _dbUpdateExecutor.shutdown();
+               try {
+                  _dbUpdateExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+               } catch (final InterruptedException e) {}
+
+//               while (!_dbUpdateExecutor.()) {
+//
+//                  final long newCompletedTaskCount = _dbUpdateExecutor.getCompletedTaskCount();
+//
+//                  if (newCompletedTaskCount > completedTaskCount) {
+//
+//                     final long difference = newCompletedTaskCount - completedTaskCount;
+//                     monitor.worked((int) difference);
+//                     monitor.subTask(NLS.bind(
+//                           Messages.Import_Data_Dialog_Reimport_SubTask,
+//                           new Object[] { newCompletedTaskCount, numberOfTours }));
+//
+//                     completedTaskCount = newCompletedTaskCount;
+//                  }
+//               }
             }
 
             if (reImportStatus.isReImported()) {
 
-               rawDataManager.updateTourData_InImportView_FromDb(monitor);
+               RawDataManager.getInstance().updateTourData_InImportView_FromDb(monitor);
 
                // reselect tours, run in UI thread
                display.asyncExec(tourViewer::reloadViewer);
