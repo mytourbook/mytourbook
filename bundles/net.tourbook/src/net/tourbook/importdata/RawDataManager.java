@@ -184,12 +184,12 @@ public class RawDataManager {
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private final Map<Long, TourData>       _toursInImportView                  = new HashMap<>();
+   private final Map<Long, TourData> _toursInImportView          = new HashMap<>();
 
    /**
     * Contains tours which are imported from the last file name.
     */
-   private final Map<Long, TourData>       _newlyImportedTours                 = new HashMap<>();
+   private final Map<Long, TourData> _newlyImportedTours         = new HashMap<>();
 
    private String                    _lastImportedFileName;
 
@@ -221,6 +221,7 @@ public class RawDataManager {
    //
    private final ArrayList<TourType>       _tempTourTypes                      = new ArrayList<>();
    private final ArrayList<TourTag>        _tempTourTags                       = new ArrayList<>();
+
    /**
     * This is a wrapper to keep the {@link #isBackupImportFile} state.
     */
@@ -932,8 +933,6 @@ public class RawDataManager {
 
       }
    }
-
-
 
    /**
     * @param tourData
@@ -2318,7 +2317,6 @@ public class RawDataManager {
 
       return newFile.getAbsolutePath();
    }
-
 
    /**
     * Re-imports a tour and specifically the data specified.
