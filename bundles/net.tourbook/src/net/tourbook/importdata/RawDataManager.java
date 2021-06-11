@@ -91,9 +91,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
-   //TODO FB
-   //why can't it find tours in the files when it can when not using concurrency
-   //do not use concurrency when the checkbox skip files.... is not checked
 
 // SET_FORMATTING_OFF
 

@@ -75,6 +75,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
+   //TODO FB do not use concurrency when the checkbox skip files.... is not checked
+   //add a message under the checkbox
    private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
    private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
 
@@ -163,6 +165,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       _tourViewer = tourViewer;
    }
+
    /**
     * @param tourValueTypes
     *           A list of tour values to be re-imported
@@ -172,8 +175,8 @@ public class DialogReimportTours extends TitleAreaDialog {
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void actionReimportSelectedTours(final List<TourValueType> tourValueTypes,
-                                           final ITourViewer3 tourViewer,
-                                           final boolean skipToursWithFileNotFound) {
+                                            final ITourViewer3 tourViewer,
+                                            final boolean skipToursWithFileNotFound) {
 
       final long start = System.currentTimeMillis();
 
