@@ -4821,7 +4821,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            final ArrayList<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
+            final List<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
 
             runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
@@ -5030,7 +5030,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
                                                   final ArrayList<TourData> allTourData,
-                                                  final ArrayList<String> invalidFiles,
+                                                  final List<String> invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always then tour files are deleted
@@ -5832,7 +5832,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
       jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
 
-      final String js = UI.EMPTY_STRING + NL //                                                                //$NON-NLS-1$
+      final String js = UI.EMPTY_STRING + NL //
 
             + "var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";" + NL //                                         //$NON-NLS-1$ //$NON-NLS-2$
             + "document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;" + NL // //$NON-NLS-1$ //$NON-NLS-2$

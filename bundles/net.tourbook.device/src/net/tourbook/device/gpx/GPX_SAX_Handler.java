@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -1155,7 +1156,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       final Set<TourTag> tourTags = new HashSet<>();
 
       final Collection<TourTag> dbTags = TourDatabase.getAllTourTags().values();
-      final ArrayList<TourTag> tempTags = RawDataManager.getInstance().getTempTourTags();
+      final List<TourTag> tempTags = RawDataManager.getInstance().getTempTourTags();
 
       for (final String tagName : _allImportedTagNames) {
 
@@ -1185,7 +1186,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       TourType tourType = TourDatabase.findTourType(_tourTypeName, TourDatabase.getAllTourTypes());
 
-      final ArrayList<TourType> tempTourTypes = RawDataManager.getInstance().getTempTourTypes();
+      final List<TourType> tempTourTypes = RawDataManager.getInstance().getTempTourTypes();
 
       if (tourType == null) {
          tourType = TourDatabase.findTourType(_tourTypeName, tempTourTypes);
