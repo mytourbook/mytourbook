@@ -25,13 +25,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -75,6 +71,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
@@ -320,47 +317,24 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                // All tasks have been submitted, we can begin the shutdown of our executor
                //(preventing new tasks from being submitted)
-               //   _dbUpdateExecutor.shutdown();
-               final long completedTaskCount = 0;
-               final List<Callable<Object>> todo = new ArrayList<>((int) _dbUpdateExecutor.getTaskCount());
-               final List<Future<Object>> answers = _dbUpdateExecutor.invokeAll(todo);
-               int toto = 0;
-               for (final Future<?> future : answers) {
-                  try {
-                     future.get();
-                     monitor.worked(1);
+               _dbUpdateExecutor.shutdown();
+
+               long completedTaskCount = 0;
+               while (!_dbUpdateExecutor.isTerminated()) {
+
+                  final long newCompletedTaskCount = _dbUpdateExecutor.getCompletedTaskCount();
+
+                  if (newCompletedTaskCount > completedTaskCount) {
+
+                     final long difference = newCompletedTaskCount - completedTaskCount;
+                     monitor.worked((int) difference);
                      monitor.subTask(NLS.bind(
                            Messages.Import_Data_Dialog_Reimport_SubTask,
-                           new Object[] { ++toto, numberOfTours }));
-                  } catch (final InterruptedException e) {
-                     // TODO Auto-generated catch block
-                     e.printStackTrace();
-                  } catch (final ExecutionException e) {
-                     // TODO Auto-generated catch block
-                     e.printStackTrace();
+                           new Object[] { newCompletedTaskCount, numberOfTours }));
+
+                     completedTaskCount = newCompletedTaskCount;
                   }
                }
-
-               _dbUpdateExecutor.shutdown();
-               try {
-                  _dbUpdateExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-               } catch (final InterruptedException e) {}
-
-//               while (!_dbUpdateExecutor.()) {
-//
-//                  final long newCompletedTaskCount = _dbUpdateExecutor.getCompletedTaskCount();
-//
-//                  if (newCompletedTaskCount > completedTaskCount) {
-//
-//                     final long difference = newCompletedTaskCount - completedTaskCount;
-//                     monitor.worked((int) difference);
-//                     monitor.subTask(NLS.bind(
-//                           Messages.Import_Data_Dialog_Reimport_SubTask,
-//                           new Object[] { newCompletedTaskCount, numberOfTours }));
-//
-//                     completedTaskCount = newCompletedTaskCount;
-//                  }
-//               }
             }
 
             if (reImportStatus.isReImported()) {
@@ -464,6 +438,14 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkSkip_Tours_With_ImportFile_NotFound = new Button(container, SWT.CHECK);
             _chkSkip_Tours_With_ImportFile_NotFound.setText(Messages.Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound);
             GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(_chkSkip_Tours_With_ImportFile_NotFound);
+
+            /*
+             * Label informing the user that if the checkbox is not selected, it
+             * will take significantly more time
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Dialog_ReimportTours_Label_DegradedPerformance);
+            GridDataFactory.fillDefaults().applyTo(label);
          }
       }
    }

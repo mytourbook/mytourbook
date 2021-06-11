@@ -402,6 +402,7 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
    public static String        Dialog_ReimportTours_Dialog_Message;
    public static String        Dialog_ReimportTours_Dialog_Title;
+   public static String        Dialog_ReimportTours_Label_DegradedPerformance;
    public static String        Dialog_ReimportTours_Group_Tours;
    public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
    public static String        Dialog_ReimportTours_Group_Data;
