@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -58,10 +59,9 @@ import net.tourbook.tour.TourLogState;
 
 import org.apache.http.HttpHeaders;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -429,10 +429,10 @@ public class StravaUploader extends TourbookCloudUploader {
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
 
-      final Job runnable = new Job("") {
+      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
          @Override
-         public IStatus run(final IProgressMonitor monitor) {
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
             monitor.beginTask(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
                   numberOfTours,
@@ -441,7 +441,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             if (!getValidTokens()) {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
-               return Status.CANCEL_STATUS;
+               return;
             }
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
@@ -476,8 +476,6 @@ public class StravaUploader extends TourbookCloudUploader {
             monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
-
-            return Status.OK_STATUS;
          }
 
       };
@@ -488,9 +486,8 @@ public class StravaUploader extends TourbookCloudUploader {
          TourLogManager.showLogView();
          TourLogManager.logTitle(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
 
-         runnable.schedule();
-         //new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
-         runnable.join();
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+
          TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
          MessageDialog.openInformation(
@@ -498,7 +495,7 @@ public class StravaUploader extends TourbookCloudUploader {
                Messages.Dialog_UploadToursToStrava_Title,
                NLS.bind(Messages.Dialog_UploadToursToStrava_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
-      } catch (final Exception e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
          Thread.currentThread().interrupt();
       }
