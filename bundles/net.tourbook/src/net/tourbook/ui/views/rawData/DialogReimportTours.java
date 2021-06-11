@@ -653,7 +653,14 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          // re-import SELECTED tours
 
-         RawDataManager.getInstance().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
+         if (skipToursWithFileNotFound) {
+            // async reimport
+            new RawDataManager().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
+         } else {
+            //normal reimport
+            RawDataManager.getInstance().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
+         }
+
       }
    }
 
