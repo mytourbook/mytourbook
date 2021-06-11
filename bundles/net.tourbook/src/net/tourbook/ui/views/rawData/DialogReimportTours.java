@@ -204,8 +204,19 @@ public class DialogReimportTours extends TitleAreaDialog {
          selectedTourIds[i] = (Long) selectedItems[i];
       }
 
-      RawDataManager.getInstance().setImportId();
-      RawDataManager.getInstance().setImportCanceled(false);
+      RawDataManager rawDataManager = null;
+      final boolean isReimportConcurrent = skipToursWithFileNotFound;
+      if (isReimportConcurrent) {
+
+         rawDataManager = new RawDataManager();
+         initializeThreadPoolExecutor();
+      } else {
+
+         // Sequential re-import
+         rawDataManager = RawDataManager.getInstance();
+      }
+      rawDataManager.setImportId();
+      rawDataManager.setImportCanceled(false);
 
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
@@ -218,7 +229,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             final boolean[] isUserAsked_ToCancelReImport = { false };
 
             final File[] reimportedFile = new File[1];
-            int deleted = 0;
+            int reimported = 0;
             final int numberOfTours = selectedTourIds.length;
 
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numberOfTours);
@@ -234,7 +245,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                monitor.worked(1);
                monitor.subTask(NLS.bind(
                      Messages.Import_Data_Dialog_Reimport_SubTask,
-                     new Object[] { ++deleted, numberOfTours }));
+                     new Object[] { ++reimported, numberOfTours }));
 
                final TourData oldTourData = TourManager.getTour(tourId);
 
@@ -949,17 +960,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } else {
 
-         doReimport_SelectedTours(tourValueTypes, skipToursWithFileNotFound);
-      }
-   }
-
-   private void doReimport_SelectedTours(final List<TourValueType> tourValueTypes, final boolean skipToursWithFileNotFound) {
-
-      if (skipToursWithFileNotFound) {
-         // Concurrent re-import
-         actionReimportSelectedTours_Concurrent(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
-      } else {
-         // Sequential rei-mport
          actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
       }
    }
