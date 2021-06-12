@@ -98,7 +98,7 @@ public class SearchView extends ViewPart implements ISearchView {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == SearchView.this) {
-					SearchMgr.setSearchView(null);
+					SearchManager.setSearchView(null);
 				}
 			}
 
@@ -115,7 +115,7 @@ public class SearchView extends ViewPart implements ISearchView {
 			public void partOpened(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == SearchView.this) {
-					SearchMgr.setSearchView(SearchView.this);
+					SearchManager.setSearchView(SearchView.this);
 				}
 			}
 
@@ -237,7 +237,7 @@ public class SearchView extends ViewPart implements ISearchView {
 		_browser.addLocationListener(new LocationAdapter() {
 			@Override
 			public void changing(final LocationEvent event) {
-				SearchMgr.onBrowserLocation(event);
+				SearchManager.onBrowserLocation(event);
 			}
 		});
 
@@ -256,13 +256,13 @@ public class SearchView extends ViewPart implements ISearchView {
 
 			linkExternalBrowser.setText(NLS.bind(
 					Messages.Search_View_Link_ExternalBrowser,
-					SearchMgr.SEARCH_URL,
-					SearchMgr.SEARCH_URL));
+					SearchManager.SEARCH_URL,
+					SearchManager.SEARCH_URL));
 
 			linkExternalBrowser.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					WEB.openUrl(SearchMgr.SEARCH_URL);
+					WEB.openUrl(SearchManager.SEARCH_URL);
 				}
 			});
 
@@ -286,13 +286,13 @@ public class SearchView extends ViewPart implements ISearchView {
 
 			linkLinuxBrowser.setText(NLS.bind(
 					Messages.Search_View_Link_LinuxBrowser,
-					SearchMgr.SEARCH_URL,
-					SearchMgr.SEARCH_URL));
+					SearchManager.SEARCH_URL,
+					SearchManager.SEARCH_URL));
 
 			linkLinuxBrowser.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					WEB.openUrl(SearchMgr.SEARCH_URL);
+					WEB.openUrl(SearchManager.SEARCH_URL);
 				}
 			});
 
@@ -419,7 +419,7 @@ public class SearchView extends ViewPart implements ISearchView {
 			_isWinInternalLoaded = true;
 
 			// show search page
-			_browser.setUrl(SearchMgr.SEARCH_URL);
+			_browser.setUrl(SearchManager.SEARCH_URL);
 		}
 	}
 }
