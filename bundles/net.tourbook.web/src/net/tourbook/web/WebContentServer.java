@@ -467,10 +467,11 @@ public class WebContentServer {
 
             // replaces values in search.css file
 
-            // for debugging
-            _cssReplacementValues.clear();
-            _cssReplacementValues = null;
-            setupCssReplacements();
+//            // for debugging - START
+//            _cssReplacementValues.clear();
+//            _cssReplacementValues = null;
+//            setupCssReplacements();
+//            // for debugging - END
 
             replacingOutputStream = new ReplacingOutputStream(outputStream, _cssReplacementValues);
 
@@ -596,6 +597,7 @@ public class WebContentServer {
 
 // SET_FORMATTING_OFF
 
+      _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");           //$NON-NLS-1$
       _cssReplacementValues.put("BODY__COLOR",                             ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
       _cssReplacementValues.put("BODY__BACKGROUND_COLOR",                  ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
       _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.IS_DARK_THEME                                //$NON-NLS-1$
@@ -609,7 +611,8 @@ public class WebContentServer {
       _cssReplacementValues.put("DRGID_SELECTED__BACKGROUND_COLOR",        UI.IS_DARK_THEME ? "555" : "ddd");        //$NON-NLS-1$
       _cssReplacementValues.put("DRGID_SELECTED_HOVER__BACKGROUND_COLOR",  UI.IS_DARK_THEME ? "666" : "ccc");        //$NON-NLS-1$
 
-      _cssReplacementValues.put("DIJIT_BUTTON_HOVER",                      UI.IS_DARK_THEME ? "666" : "ddd");        //$NON-NLS-1$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__COLOR",               UI.IS_DARK_THEME ? "ddd" : "666");        //$NON-NLS-1$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__BACKGROUND_COLOR",    UI.IS_DARK_THEME ? "666" : "ddd");        //$NON-NLS-1$
 
       _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");     //$NON-NLS-1$
       _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");        //$NON-NLS-1$

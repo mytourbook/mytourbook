@@ -1,8 +1,13 @@
 
 body
 {
-   color:                  #$BODY__COLOR$;
-   background-color:       #$BODY__BACKGROUND_COLOR$;
+   /* Hide theme background images */
+   background:             none     !important;
+   
+   color:                  #$BODY__COLOR$             !important;
+   background-color:       #$BODY__BACKGROUND_COLOR$  !important;
+   
+   $BODY__SCROLLBAR$
 }
 
 table
@@ -16,8 +21,7 @@ table
 a
 {
    text-decoration:        none;
-   xfont-weight:           bold;
-   color:                  #24b;
+   color:                  #$A__COLOR$;
 }
 
 /*
@@ -58,21 +62,77 @@ a
    width:                  30em;               
 }
 
+.dijitButtonNode
+{
+   background:             none              !important;
+}
+
+.dijitDialog .dijitButtonNode
+{
+   border:                 1px solid gray    !important;
+}
+
+.dijitButtonHover .dijitButtonNode 
+{
+   color:                  #$DIJIT_BUTTON_HOVER__COLOR$                 !important;
+   background-color:       #$DIJIT_BUTTON_HOVER__BACKGROUND_COLOR$      !important;
+}
+
 /*
    Overwrite dijit dialog
 */
 .mtDialog .dijitDialog
 {
    line-height:            80%;
+   color:                  #$BODY__COLOR$;
 }
 
-.mtDialog .dijitTitlePaneTitle                  /* group for widgets */
+.dijitDialogPaneContent,
+.dijitTitlePaneContentOuter,
+.dijitTitlePaneTitle
 {
-   background-image:       none;                /* hide gray */
-   border:                 1px solid #fff;      /* overwrite (hide) border */      
-   border-bottom:          1px solid #bfbfbf;   /* set border only at the bottom */
+   background-color:       #$BODY__BACKGROUND_COLOR$ !important;
+}
+
+.dijitDialogPaneContent 
+{
+   border-top:             0px   !important;
+}
+.dijitDialogTitleBar
+{
+   background:             #$BODY__BACKGROUND_COLOR$ !important;
+}
+
+.dijitTitlePaneTitle
+{
+   margin-left:            0px !important;
+}
+
+.mtDialog .dijitTitlePaneTitle                              /* this is a group of widgets */
+{
+   background-image:       none;                            /* hide gray */
+   border:                 0px !important;                  /* overwrite (hide) border */      
+   border-bottom:          1px solid #bfbfbf !important;    /* set border only at the bottom */
    padding-left:           0;
    margin-left:            -5px;
+}
+
+/* Background color for the search view when search dialog is opened */
+.dijitDialogUnderlayWrapper
+{
+   xbackground-color:       rgba(0, 0, 0, 0.3) !important;
+}
+
+.dijitTooltipContainer
+{
+   color:                  #$BODY__COLOR$             !important;
+   background:             #$BODY__BACKGROUND_COLOR$  !important;
+}
+
+.dijitMenu 
+{
+   border:                 1px solid black;
+   background-color:       #$BODY__BACKGROUND_COLOR$ !important;
 }
 
 /*
@@ -80,12 +140,12 @@ a
    
    Overwrite dojo css by setting the custom class after the dojo class in the <body> tag.
 */
-.search .dijitButton
+.searchBar .dijitButton
 {
    margin:                 0;   
 }
 
-.search .dijitButton .dijitButtonNode {
+.searchBar .dijitButton .dijitButtonNode {
     
    font-size:              1.2em;
                            
@@ -98,33 +158,31 @@ a
    box-shadow:             none;
 }
 
-.search .dijitButtonHover .dijitButtonNode {
-   background-color:       #ddd;
-}
-
 /*
    Overwrite dijit for the search text field.
 */
-.search .dijitTextBox
+.searchBar .dijitTextBox
 {
+   color:                  #$BODY__COLOR$;
+   
    background-image:       none;               /* hide gradient */
-   border-color:           #f4f4f4;
-   background-color:       #f4f4f4;
+   border-color:           #$BODY__BACKGROUND_COLOR$;
+   background-color:       #$BODY__BACKGROUND_COLOR$;
 }
 
-.search .dijitTextBoxFocused
+.searchBar .dijitTextBoxFocused
 {
    border-color:           #ddd;   
 }
 
-.search .dijitTextBoxHover
+.searchBar .dijitTextBoxHover
 {
    background-image:       none;                /* hide default gradient image */                  
    border-width:           1px;   
    border-color:           #bbb;
 }
 
-.search .dijitInputField 
+.searchBar .dijitInputField 
 {
    padding:                2px;
 }
@@ -144,7 +202,7 @@ a
 #domSearchInputContainer
 {
    padding:                0px;   
-   background-color:       #f4f4f4;
+   background-color:       #$DOM_SEARCH_INPUT_CONTAINER$;
    overflow:               hidden;
 }
 
@@ -158,7 +216,7 @@ a
 */
 #domAppStatus
 {
-   color:                  #666;
+   color:                  #$DOM_APP_STATUS$;
    text-align:             right;
    white-space:            nowrap;
 }
@@ -242,7 +300,6 @@ a
 .item-container .action-container a:HOVER 
 { 
    border:                 1px solid #aaa;
-   border-radius:          3px;
 }
 
 /*
@@ -253,7 +310,6 @@ a
    opacity:                0;
    filter:                 alpha(opacity=0);
                            
-   xbackground-color:      #0ff;
    position:               absolute;
    right:                  2px;               
    z-index:                10;
@@ -272,7 +328,6 @@ a.action:VISITED
    background-repeat:      no-repeat;
    background-position:    center;
                            
-   border-radius:          3px;
    border:                 1px solid rgba(0, 0, 0, 0.0);   /* hide border with transparent color */
                            
    cursor:                 pointer; 

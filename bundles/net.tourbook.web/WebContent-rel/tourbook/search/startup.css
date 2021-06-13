@@ -25,10 +25,9 @@ html, body
    left:                0;
    width:               100%;
    height:              100%;
-   background-color:    #fff;
+   font-size:           2em;
    
    color:               #aaa;
-   font-size:           2em;
 }
 
 #domLoading div

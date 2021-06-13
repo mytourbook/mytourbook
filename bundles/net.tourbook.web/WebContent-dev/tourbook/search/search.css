@@ -21,8 +21,7 @@ table
 a
 {
    text-decoration:        none;
-   xfont-weight:           bold;
-   color:                  #24b;
+   color:                  #$A__COLOR$;
 }
 
 /*
@@ -65,13 +64,18 @@ a
 
 .dijitButtonNode
 {
-   background:             none     !important;
+   background:             none              !important;
 }
 
-.dijitButtonHover .dijitButtonNode
+.dijitDialog .dijitButtonNode
 {
-   color:                  #ddd    !important;
-   background-color:       #666    !important;
+   border:                 1px solid gray    !important;
+}
+
+.dijitButtonHover .dijitButtonNode 
+{
+   color:                  #$DIJIT_BUTTON_HOVER__COLOR$                 !important;
+   background-color:       #$DIJIT_BUTTON_HOVER__BACKGROUND_COLOR$      !important;
 }
 
 /*
@@ -90,6 +94,10 @@ a
    background-color:       #$BODY__BACKGROUND_COLOR$ !important;
 }
 
+.dijitDialogPaneContent 
+{
+   border-top:             0px   !important;
+}
 .dijitDialogTitleBar
 {
    background:             #$BODY__BACKGROUND_COLOR$ !important;
@@ -121,6 +129,12 @@ a
    background:             #$BODY__BACKGROUND_COLOR$  !important;
 }
 
+.dijitMenu 
+{
+   border:                 1px solid black;
+   background-color:       #$BODY__BACKGROUND_COLOR$ !important;
+}
+
 /*
    Dijit Button
    
@@ -142,10 +156,6 @@ a
    background-image:       none;
                            
    box-shadow:             none;
-}
-
-.searchBar .dijitButtonHover .dijitButtonNode {
-   background-color:       #$DIJIT_BUTTON_HOVER$;
 }
 
 /*
