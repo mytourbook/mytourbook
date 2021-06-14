@@ -83,7 +83,7 @@ public class TourLogView extends ViewPart {
    private boolean             _isNewUI;
    private boolean             _isBrowserCompleted;
 
-   private String              _cssFromFile;
+   private String              _tourLogCSS;
    private String              _noBrowserLog                    = UI.EMPTY_STRING;
 
    private String              _imageUrl_StateCopy              = getIconUrl(Images.State_Copy);
@@ -337,7 +337,7 @@ public class TourLogView extends ViewPart {
 
             + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //      //$NON-NLS-1$
             + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //                    //$NON-NLS-1$
-            + _cssFromFile + NL;
+            + _tourLogCSS + NL;
 
       return html;
    }
@@ -501,13 +501,13 @@ public class TourLogView extends ViewPart {
       try {
 
          final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
-         final String css = Util.readContentFromFile(webFile.getAbsolutePath());
+         final String cssFromFile = Util.readContentFromFile(webFile.getAbsolutePath());
 
-         _cssFromFile = UI.EMPTY_STRING
+         _tourLogCSS = UI.EMPTY_STRING
 
                + "<style>" + NL //              //$NON-NLS-1$
                + WEB.createCSS_Scrollbar()
-               + css
+               + cssFromFile
                + "</style>" + NL //             //$NON-NLS-1$
          ;
 
