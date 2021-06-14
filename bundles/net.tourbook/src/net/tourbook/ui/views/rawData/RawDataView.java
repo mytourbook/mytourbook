@@ -4932,7 +4932,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.subLog_Error(String.format(
+            TourLogManager.subLog_Info(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -5832,7 +5832,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
       jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
 
-      final String js = UI.EMPTY_STRING + NL //                                                                //$NON-NLS-1$
+      final String js = UI.EMPTY_STRING + NL //
 
             + "var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";" + NL //                                         //$NON-NLS-1$ //$NON-NLS-2$
             + "document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
