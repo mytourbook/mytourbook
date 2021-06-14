@@ -247,10 +247,7 @@ public class UI {
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean IS_DARK_THEME;
-
-   // this is the old field before using IS_DARK_THEME
-   private static boolean      _isDarkThemeSelected;
+   public static boolean       IS_DARK_THEME;
 
    /**
     * On Linux an async selection event is fired since e4
@@ -1623,7 +1620,7 @@ public class UI {
     * @return <code>true</code> when a dark theme is selected in the UI
     */
    public static boolean isDarkTheme() {
-      return _isDarkThemeSelected;
+      return IS_DARK_THEME;
    }
 
    public static boolean isLinuxAsyncEvent(final Widget widget) {
@@ -2255,8 +2252,6 @@ public class UI {
    }
 
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
-
-      _isDarkThemeSelected = isDarkThemeSelected;
 
       IS_DARK_THEME = isDarkThemeSelected;
    }

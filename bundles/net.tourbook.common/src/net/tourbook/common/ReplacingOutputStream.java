@@ -1,5 +1,6 @@
 /**
- * Source: http://stackoverflow.com/questions/1624830/java-search-replace-in-a-stream<br>
+ * Source: http://stackoverflow.com/questions/1624830/java-search-replace-in-a-stream<p>
+ *
  * Date: 2015-01-28
  */
 package net.tourbook.common;
@@ -15,80 +16,88 @@ import java.util.Map;
  */
 public class ReplacingOutputStream extends OutputStream {
 
-	private static final int			DOLLAR_SIGN		= "$".codePointAt(0);		//$NON-NLS-1$
-	private static final int			BACKSLASH		= "\\".codePointAt(0);		//$NON-NLS-1$
+   private static final int          DOLLAR_SIGN      = "$".codePointAt(0);  //$NON-NLS-1$
+   private static final int          BACKSLASH        = "\\".codePointAt(0); //$NON-NLS-1$
 
-	private final OutputStream			delegate;
-	private final Map<String, Object>	replacementValues;
+   private final OutputStream        _outputStream;
+   private final Map<String, Object> _replacementValues;
 
-	private int							previous		= Integer.MIN_VALUE;
-	private boolean						_isReplacing	= false;
+   private int                       _previousValue   = Integer.MIN_VALUE;
+   private boolean                   _isReplacing     = false;
 
-	private ArrayList<Integer>			replacement		= new ArrayList<Integer>();
+   private ArrayList<Integer>        _allReplacements = new ArrayList<>();
 
-	public ReplacingOutputStream(final OutputStream delegate, final Map<String, Object> replacementValues) {
+   public ReplacingOutputStream(final OutputStream delegate, final Map<String, Object> replacementValues) {
 
-		this.delegate = delegate;
-		this.replacementValues = replacementValues;
-	}
+      _outputStream = delegate;
+      _replacementValues = replacementValues;
+   }
 
-	private void doReplacement() throws IOException {
+   private void doReplacement() throws IOException {
 
-		final StringBuilder sb = new StringBuilder();
-		for (final Integer intval : replacement) {
-			final char[] chars = Character.toChars(intval);
-			sb.append(chars);
-		}
+      final StringBuilder sb = new StringBuilder();
 
-		replacement.clear();
+      for (final Integer intvalue : _allReplacements) {
+         final char[] chars = Character.toChars(intvalue);
+         sb.append(chars);
+      }
 
-		final String oldValue = sb.toString();
-		final Object replaceValue = replacementValues.get(oldValue);
+      _allReplacements.clear();
 
-		if (replaceValue == null) {
-			throw new RuntimeException("Could not find replacement variable for value '" + oldValue + "'."); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+      final String oldValue = sb.toString();
+      final Object replaceValue = _replacementValues.get(oldValue);
 
-		if (replaceValue instanceof byte[]) {
+      if (replaceValue == null) {
+         throw new RuntimeException("Could not find replacement variable for value '" + oldValue + "'."); //$NON-NLS-1$ //$NON-NLS-2$
+      }
 
-			final byte[] newValue = (byte[]) replaceValue;
+      if (replaceValue instanceof byte[]) {
 
-			delegate.write(newValue);
+         final byte[] newValue = (byte[]) replaceValue;
 
-		} else {
+         _outputStream.write(newValue);
 
-			final String newValue = replaceValue.toString();
+      } else {
 
-			for (int i = 0; i < newValue.length(); ++i) {
+         final String newValue = replaceValue.toString();
 
-				final int value = newValue.codePointAt(i);
+         for (int i = 0; i < newValue.length(); ++i) {
 
-				delegate.write(value);
-			}
-		}
-	}
+            final int value = newValue.codePointAt(i);
 
-	public @Override void write(final int b) throws IOException {
+            _outputStream.write(value);
+         }
+      }
+   }
 
-		if (b == DOLLAR_SIGN && previous != BACKSLASH) {
+   public @Override void write(final int byteValue) throws IOException {
 
-			if (_isReplacing) {
-				doReplacement();
-				_isReplacing = false;
-			} else {
-				_isReplacing = true;
-			}
+      if (byteValue == DOLLAR_SIGN && _previousValue != BACKSLASH) {
 
-		} else {
+         if (_isReplacing) {
 
-			if (_isReplacing) {
-				replacement.add(b);
-			} else {
-				delegate.write(b);
-			}
-		}
+            doReplacement();
 
-		previous = b;
+            _isReplacing = false;
 
-	}
+         } else {
+
+            _isReplacing = true;
+         }
+
+      } else {
+
+         if (_isReplacing) {
+
+            _allReplacements.add(byteValue);
+
+         } else {
+
+            _outputStream.write(byteValue);
+         }
+      }
+
+      _previousValue = byteValue;
+
+   }
 }

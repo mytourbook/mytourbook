@@ -87,7 +87,7 @@ public class MessageManager implements IMessageManager {
 
    private Hashtable<Control, ControlDecorator> decorators                    = new Hashtable<>();
    private boolean                              autoUpdate                    = true;
-   private Form                                 scrolledForm;
+   private Form                                 form;
 
    private IMessagePrefixProvider               prefixProvider                = DEFAULT_PREFIX_PROVIDER;
 
@@ -100,7 +100,7 @@ public class MessageManager implements IMessageManager {
       private String              prefix;
 
       ControlDecorator(final Control control) {
-         this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
+         this.decoration = new ControlDecoration(control, decorationPosition, form.getBody());
       }
 
       void addAll(final ArrayList<IMessage> target) {
@@ -183,7 +183,7 @@ public class MessageManager implements IMessageManager {
       void updatePosition() {
          final Control control = decoration.getControl();
          decoration.dispose();
-         this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
+         this.decoration = new ControlDecoration(control, decorationPosition, form.getBody());
          update();
       }
 
@@ -299,11 +299,17 @@ public class MessageManager implements IMessageManager {
    /**
     * Creates a new instance of the message manager that will work with the provided form.
     *
-    * @param scrolledForm
+    * @param form
     *           the form to control
     */
-   public MessageManager(final Form scrolledForm) {
-      this.scrolledForm = scrolledForm;
+   public MessageManager(final Form form) {
+
+      this.form = form;
+
+      /**
+       * It's difficult to set a message color for a dark theme because it's hardcoded in
+       * org.eclipse.ui.internal.forms.widgets.FormHeading.MessageRegion.updateForeground()
+       */
    }
 
    public static String createDetails(final IMessage[] messages) {
@@ -650,13 +656,13 @@ public class MessageManager implements IMessageManager {
 
       pruneControlDecorators();
 
-      final Composite head = scrolledForm.getHead();
+      final Composite head = form.getHead();
       if (head.isDisposed()) {
          return;
       }
 
       if (head.getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
-         scrolledForm.setMessage(null, IMessageProvider.NONE);
+         form.setMessage(null, IMessageProvider.NONE);
          return;
       }
 
@@ -669,7 +675,7 @@ public class MessageManager implements IMessageManager {
          // a single message
          final IMessage message = peers.get(0);
          messageText = message.getMessage();
-         scrolledForm.setMessage(messageText, maxType, array);
+         form.setMessage(messageText, maxType, array);
       } else {
          // show a summary message for the message
          // and list of errors for the details
@@ -678,7 +684,7 @@ public class MessageManager implements IMessageManager {
          } else {
             messageText = SINGLE_MESSAGE_SUMMARY_KEYS[maxType];
          }
-         scrolledForm.setMessage(messageText, maxType, array);
+         form.setMessage(messageText, maxType, array);
       }
    }
 

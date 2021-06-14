@@ -34,15 +34,21 @@ import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
 
+   public static final String  DEFAULT_BACKGROUND_LIGHT_THEME = "fff";   //$NON-NLS-1$
+   public static final String  DEFAULT_FOREGROUND_LIGHT_THEME = "333";   //$NON-NLS-1$
+
+   public static final String  DEFAULT_FOREGROUND_DARK_THEME  = "ddd";   //$NON-NLS-1$
+   public static final String  DEFAULT_BACKGROUND_DARK_THEME  = "333";   //$NON-NLS-1$
+
    /**
     * Currently only .png files are supported for themed images !!!
     */
-   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";  //$NON-NLS-1$
+   private static final String IMAGE_NAME_EXTENSION_PNG       = ".png";  //$NON-NLS-1$
 
    /**
     * All images for the dark theme should have this postfix before the file extension
     */
-   private static final String DARK_THEME_POSTFIX       = "-dark"; //$NON-NLS-1$
+   public static final String  DARK_THEME_POSTFIX             = "-dark"; //$NON-NLS-1$
 
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
@@ -200,6 +206,20 @@ public class ThemeUtil {
     */
    public static Color getDefaultForegroundColor_TableHeader() {
       return _defaultForegroundColor_TableHeader;
+   }
+
+   public static String getThemedCss_DefaultBackground() {
+
+      return UI.IS_DARK_THEME
+            ? ThemeUtil.DEFAULT_BACKGROUND_DARK_THEME
+            : ThemeUtil.DEFAULT_BACKGROUND_LIGHT_THEME;
+   }
+
+   public static String getThemedCss_DefaultForeground() {
+
+      return UI.IS_DARK_THEME
+            ? ThemeUtil.DEFAULT_FOREGROUND_DARK_THEME
+            : ThemeUtil.DEFAULT_FOREGROUND_LIGHT_THEME;
    }
 
    /**
