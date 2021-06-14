@@ -104,12 +104,12 @@ public class TourLogView extends ViewPart {
    private Composite _page_WithBrowser;
    private Text      _txtNoBrowser;
 
-   public class ActionReset extends Action {
+   private class ActionReset extends Action {
 
       public ActionReset() {
 
          setText(Messages.Tour_Log_Action_Clear_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RemoveAll));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
       }
 
       @Override

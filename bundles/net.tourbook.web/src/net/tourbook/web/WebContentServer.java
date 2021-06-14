@@ -465,7 +465,7 @@ public class WebContentServer {
 
          } else if (file.getName().equals(SEARCH_CSS)) {
 
-            // replaces values in search.css file
+            // replace values in search.css file
 
 //            // for debugging - START
 //            _cssReplacementValues.clear();
