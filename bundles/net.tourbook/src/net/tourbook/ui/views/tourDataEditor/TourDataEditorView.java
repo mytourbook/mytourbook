@@ -7811,8 +7811,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          /*
           * saveTour will check the tour editor dirty state, but when the tour is saved the dirty
-          * flag
-          * can be set before to prevent an out of sync error
+          * flag can be set before to prevent an out of sync error
           */
          _isTourDirty = false;
 
@@ -7869,7 +7868,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // notify all views
          TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData), TourDataEditorView.this);
       }
-      _isSavingInProgress = false;
+
+      /*
+       * Linux needs async, otherwise the tour is modified again when pressing Ctrl+S
+       */
+      _parent.getDisplay().asyncExec(() -> {
+         _isSavingInProgress = false;
+      });
 
       getDataSeriesFromTourData();
 
@@ -8132,8 +8137,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       showDefaultTitle();
 
-      /*
-       * this is not an eclipse editor part but the property change must be fired to hide the "*"
+      /**
+       * This is not an eclipse editor part but the property change must be fired to hide the "*"
        * marker in the part name
        */
       firePropertyChange(PROP_DIRTY);
