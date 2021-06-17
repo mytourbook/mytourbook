@@ -4184,13 +4184,13 @@
      inkscape:window-y="51"
      inkscape:window-x="136"
      inkscape:window-height="1185"
-     inkscape:window-width="1599"
+     inkscape:window-width="1713"
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="319.09373"
-     inkscape:cx="281.21874"
-     inkscape:zoom="16.000001"
+     inkscape:cy="339.25656"
+     inkscape:cx="299.92375"
+     inkscape:zoom="22.627418"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -4223,6 +4223,22 @@
      id="layer1"
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
+    <path
+       id="rect8923"
+       style="fill:#abdd27;fill-opacity:1;stroke-linecap:round"
+       d="m 305,346 v 13 h 16 v -13 z"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar-dark.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="rect6662"
+       style="fill:#abdd27;fill-opacity:1;stroke-linecap:round"
+       d="m 305,322 v 12 h 16 v -12 z"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       sodipodi:nodetypes="ccccc" />
     <path
        style="fill:#86ae1b;fill-opacity:1;stroke:#808080;stroke-width:0.999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999999, 0.99999899999999997;stroke-dashoffset:0;stroke-opacity:1"
        d="m 510.49998,139 v 15"
@@ -8222,15 +8238,23 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
        inkscape:connector-curvature="0"
        id="path5651-4"
-       d="m 288,328 h 4 v 3 h -4 z"
+       d="m 289,328 h 5 v 4 h -5 z"
        style="fill:#abdd27;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
        inkscape:connector-curvature="0"
+       id="path5651-4-1"
+       d="m 315,329 h 4 v 3 h -4 z"
+       style="fill:#465b0b;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
+       inkscape:connector-curvature="0"
        id="path5651-4-8"
-       d="m 280,320 h 15 v 2 h -15 z"
+       d="m 280.00001,320 h 16 v 2 h -16 z"
        style="fill:#abdd27;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -8238,7 +8262,7 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
        inkscape:connector-curvature="0"
        id="path5651-4-8-8"
-       d="m 280,334 h 15 v 1 h -15 z"
+       d="m 280.00001,334 h 16 v 1 h -16 z"
        style="fill:#abdd27;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -8246,15 +8270,15 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
        inkscape:connector-curvature="0"
        id="path5651-4-8-8-3"
-       d="m 280,319 h 15 v 1 h -15 z"
-       style="fill:#828282;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 280.00001,319 h 16 v 1 h -16 z"
+       style="fill:#627f14;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar-dark.png"
        inkscape:connector-curvature="0"
        id="path5651-4-8-8-2"
-       d="m 280,359 h 15 v 1 h -15 z"
+       d="m 280.00001,359 h 16 v 1 h -16 z"
        style="fill:#abdd27;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -11627,8 +11651,16 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar-dark.png"
        inkscape:connector-curvature="0"
        id="path5651-4-4"
-       d="m 288,353 h 4 v 3 h -4 z"
+       d="m 288,352 h 5 v 4 h -5 z"
        style="fill:#abdd27;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar-dark.png"
+       inkscape:connector-curvature="0"
+       id="path5651-4-4-8"
+       d="m 315,354 h 4 v 3 h -4 z"
+       style="fill:#465b0b;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <rect
        transform="scale(1,-1)"
        inkscape:export-ydpi="96"
@@ -15388,7 +15420,43 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar-dark.png"
        inkscape:connector-curvature="0"
        id="path5651-4-8-2"
-       d="m 280,345 h 15 v 2 h -15 z"
+       d="m 280,344 h 16 v 2 h -16 z"
        style="fill:#abdd27;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
+       y="319"
+       x="305"
+       height="15.999999"
+       width="15.999995"
+       id="rect4471-81-5-8-1-8-4-3-2-3-0"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
+       inkscape:connector-curvature="0"
+       id="path5651-4-8-7-2"
+       d="m 304.99985,319.00031 h 15 v 1 h -15 z"
+       style="fill:none;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar-dark.png"
+       y="344"
+       x="304.99985"
+       height="15.999999"
+       width="15.999995"
+       id="rect4471-81-5-8-1-8-4-3-2-3-1-8"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\calendar.png"
+       inkscape:connector-curvature="0"
+       id="path5651-4-8-8-3-0"
+       d="m 305,321 h 16 v 1 h -16 z"
+       style="fill:#627f14;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>
