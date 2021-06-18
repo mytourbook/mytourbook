@@ -20,6 +20,45 @@
   <defs
      id="defs2987">
     <linearGradient
+       id="linearGradient31394">
+      <stop
+         style="stop-color:#8c8c8c;stop-opacity:1"
+         offset="0"
+         id="stop31386" />
+      <stop
+         style="stop-color:#8c8c8c;stop-opacity:1"
+         offset="0.37604249"
+         id="stop33171" />
+      <stop
+         style="stop-color:#ff2e2b;stop-opacity:1"
+         offset="0.37604249"
+         id="stop40365" />
+      <stop
+         id="stop31392"
+         offset="1"
+         style="stop-color:#ff2e2b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient10887">
+      <stop
+         style="stop-color:#6e0202;stop-opacity:1"
+         offset="0"
+         id="stop10883" />
+      <stop
+         style="stop-color:#6e0202;stop-opacity:1"
+         offset="0.55555558"
+         id="stop11403" />
+      <stop
+         style="stop-color:#353535;stop-opacity:1"
+         offset="0.55555558"
+         id="stop20934" />
+      <stop
+         style="stop-color:#353535;stop-opacity:1"
+         offset="1"
+         id="stop10885" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient5090"
        inkscape:swatch="solid">
       <stop
@@ -78,21 +117,21 @@
     <linearGradient
        id="gear-fill">
       <stop
-         style="stop-color:#646464;stop-opacity:1;"
+         id="stop21721"
          offset="0"
-         id="stop21719" />
+         style="stop-color:#646464;stop-opacity:1" />
       <stop
-         id="stop21729"
-         offset="0.48101267"
-         style="stop-color:#646464;stop-opacity:1;" />
-      <stop
-         style="stop-color:#e71010;stop-opacity:1;"
-         offset="0.48101267"
+         style="stop-color:#646464;stop-opacity:1"
+         offset="0.47786543"
          id="stop21731" />
       <stop
-         id="stop21721"
+         id="stop21729"
+         offset="0.47786543"
+         style="stop-color:#f70000;stop-opacity:1" />
+      <stop
+         style="stop-color:#f70000;stop-opacity:1"
          offset="1"
-         style="stop-color:#f70000;stop-opacity:1;" />
+         id="stop21719" />
     </linearGradient>
     <linearGradient
        id="4513">
@@ -4085,22 +4124,12 @@
        xlink:href="#linearGradient5006"
        inkscape:collect="always" />
     <linearGradient
-       gradientUnits="userSpaceOnUse"
-       y2="38.353222"
-       x2="306.875"
-       y1="51.830963"
-       x1="306.875"
-       id="linearGradient5004-2"
-       xlink:href="#gear"
-       inkscape:collect="always"
-       gradientTransform="matrix(1.0367427,0,0,1.0426636,9.418133,-1.8206185)" />
-    <linearGradient
        gradientTransform="matrix(1.0367427,0,0,1.0426636,9.418164,19.032653)"
        gradientUnits="userSpaceOnUse"
        y2="15.651138"
        x2="287.95493"
-       y1="34.350098"
-       x1="287.95493"
+       y1="29.700228"
+       x1="287.99994"
        id="linearGradient25462"
        xlink:href="#gear-fill"
        inkscape:collect="always" />
@@ -4138,19 +4167,28 @@
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient12722"
-       id="linearGradient12709"
+       id="linearGradient2863"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0666681,0,0,1.0666668,0.799505,43.427061)"
+       gradientTransform="matrix(1.0666681,0,0,1.0666668,0.799505,73.427061)"
        x1="288.00009"
        y1="29.599627"
        x2="288.00009"
        y2="14.599628" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient12722"
-       id="linearGradient2863"
+       xlink:href="#linearGradient10887"
+       id="linearGradient10889"
+       x1="314"
+       y1="33"
+       x2="314"
+       y2="51"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient31394"
+       id="linearGradient35987"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0666681,0,0,1.0666668,0.799505,73.427061)"
+       gradientTransform="matrix(1.0666681,0,0,1.0666668,0.799505,43.427061)"
        x1="288.00009"
        y1="29.599627"
        x2="288.00009"
@@ -4174,7 +4212,7 @@
      inkscape:bbox-nodes="true"
      inkscape:bbox-paths="true"
      inkscape:snap-bbox="true"
-     inkscape:snap-global="true"
+     inkscape:snap-global="false"
      showguides="true"
      inkscape:snap-nodes="true"
      inkscape:snap-to-guides="false"
@@ -4188,9 +4226,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="346.39392"
-     inkscape:cx="303.96751"
-     inkscape:zoom="5.6568545"
+     inkscape:cy="88.476736"
+     inkscape:cx="264.01599"
+     inkscape:zoom="5.6568543"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -4222,7 +4260,8 @@
   <g
      id="layer1"
      inkscape:groupmode="layer"
-     inkscape:label="Layer 1">
+     inkscape:label="Layer 1"
+     style="display:inline">
     <path
        id="rect8923"
        style="fill:#abdd27;fill-opacity:1;stroke-linecap:round"
@@ -4240,14 +4279,14 @@
        inkscape:export-ydpi="96"
        sodipodi:nodetypes="ccccc" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#808080;stroke-width:0.999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999999, 0.99999899999999997;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#808080;stroke-width:0.999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999999, 0.999999;stroke-dashoffset:0;stroke-opacity:1"
        d="m 510.49998,139 v 15"
        id="path3158-7-2-2-6"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#808080;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#808080;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 507.5,139 v 7"
        id="path3158-7-2-2"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments.png"
@@ -6162,7 +6201,7 @@
        d="M 295.77572,49.895109 288.00016,34.255156 280.2246,49.895109"
        style="fill:#ff6d01;fill-opacity:1;stroke:#723000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:url(#linearGradient25462);fill-opacity:1;stroke:url(#linearGradient5004-2);stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#linearGradient25462);fill-opacity:1;stroke:url(#linearGradient10889);stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 315.77571,49.895109 -7.77556,-15.639953 -7.77556,15.639953"
        id="path6328-0-1"
        inkscape:connector-curvature="0"
@@ -10426,7 +10465,7 @@
        x="161.25"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
-         y="641.50281"
+         y="606.11218"
          x="161.25"
          id="tspan1811"
          sodipodi:role="line" /></text>
@@ -10436,7 +10475,7 @@
        x="159.125"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
-         y="641.37781"
+         y="605.98718"
          x="159.125"
          id="tspan1815"
          sodipodi:role="line" /></text>
@@ -10801,7 +10840,7 @@
          x="266.44431"
          id="tspan2373"
          sodipodi:role="line"
-         style="stroke-width:0.999997;fill:#999999;fill-opacity:1">2</tspan></text>
+         style="fill:#999999;fill-opacity:1;stroke-width:0.999997">2</tspan></text>
     <rect
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#435800;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.13865;stroke-miterlimit:4;stroke-dasharray:none;marker:none;enable-background:accumulate"
        id="rect3899-5-2-3-7-7"
@@ -11357,7 +11396,7 @@
        inkscape:connector-curvature="0"
        id="path3780-8-5-5-4-4"
        d="m 355.27315,65.00743 -2.27206,-5.03864 -2.31587,5.02151"
-       style="display:inline;fill:#ff4020;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="display:inline;fill:#ff5330;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="ccc"
        inkscape:export-ydpi="96"
@@ -11439,7 +11478,7 @@
        d="M 440.77573,74.891232 432.99931,59.25307 425.22286,74.891232"
        style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:url(#linearGradient12709);fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#linearGradient35987);fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 316,75.000002 -8,-16.000001 -8,16.000001"
        id="path6328-0-1-9"
        inkscape:connector-curvature="0"
@@ -15245,21 +15284,21 @@
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999997, 0.99999700000000002;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999997, 0.999997;stroke-dashoffset:0;stroke-opacity:1"
        d="M 510.48386,163.99997 V 177"
        id="path3158-7-2-2-6-6"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 507.487,163.99997 v 7"
        id="path3158-7-2-2-3"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 498.49639,163.99997 v 13"
        id="path3158-7-5"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-dark.png"
@@ -15277,14 +15316,14 @@
        inkscape:export-ydpi="96.000092"
        transform="scale(1,-1)" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 495.4995,163.99997 v 13"
        id="path3158-2"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#86ae1b;fill-opacity:1;stroke:#cccccc;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 503.49118,163.99997 v 13"
        id="path3158-7-2-4"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-dark.png"
@@ -15300,21 +15339,21 @@
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 510.48386,188.99997 v 15"
        id="path3158-7-2-2-6-6-3"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-disabled-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 507.487,188.99997 v 7"
        id="path3158-7-2-2-3-8"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-disabled-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 498.49639,188.99997 v 13"
        id="path3158-7-5-2"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-disabled-dark.png"
@@ -15332,14 +15371,14 @@
        inkscape:export-ydpi="96.000092"
        transform="scale(1,-1)" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 495.4995,188.99997 v 13"
        id="path3158-2-2"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-disabled-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.99999800000000005;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#656565;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999998, 0.999998;stroke-dashoffset:0;stroke-opacity:1"
        d="m 503.49118,188.99997 v 13"
        id="path3158-7-2-4-0"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-disabled-dark.png"
@@ -15378,7 +15417,7 @@
        transform="scale(1,-1)" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24.6407px;line-height:46.2015px;font-family:'Liberation Mono';-inkscape-font-specification:'Liberation Mono Bold';letter-spacing:0px;word-spacing:0px;fill:#656565;fill-opacity:1;stroke:none;stroke-width:1;"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24.6407px;line-height:46.2015px;font-family:'Liberation Mono';-inkscape-font-specification:'Liberation Mono Bold';letter-spacing:0px;word-spacing:0px;fill:#656565;fill-opacity:1;stroke:none;stroke-width:1"
        x="280.94983"
        y="284.03653"
        id="text11384-5-1"
@@ -15390,7 +15429,7 @@
          id="tspan11382-9-0"
          x="280.94983"
          y="284.03653"
-         style="fill:#656565;fill-opacity:1;stroke-width:1;">A</tspan></text>
+         style="fill:#656565;fill-opacity:1;stroke-width:1">A</tspan></text>
     <path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
@@ -15584,5 +15623,32 @@
        id="path5651-4-8-8-3-0-1"
        d="m 330,321 h 16 v 1 h -16 z"
        style="fill:#346054;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path3774-1-5-4-32"
+       d="m 360.2625,49.801899 -2.35254,-4.973045 m -9.77343,-0.02815 -2.38919,5.0058"
+       style="display:inline;fill:#8cd020;fill-opacity:1;stroke:#4a6d11;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path3778-4-7-8-68"
+       d="m 350.45266,39.797983 -2.33721,5.040365 m 9.83116,0.01558 -2.30312,-5.04955"
+       style="display:inline;fill:#ffa32d;fill-opacity:1;stroke:#7e4800;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
+       sodipodi:nodetypes="ccc"
+       inkscape:connector-curvature="0"
+       id="path3780-8-5-5-8"
+       d="m 355.6523,39.848526 -2.66268,-4.741764 -2.59712,4.787134"
+       style="display:inline;fill:#ff5330;fill-opacity:1;stroke:#8d1300;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>
