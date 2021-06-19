@@ -682,43 +682,37 @@ public class TileImageCache {
                                     final ImageData loadedImageData,
                                     final Image tileOfflineImage) {
 
-      final MP mp = tile.getMP();
+      final Image tileImage = tileOfflineImage != null
+            ? tileOfflineImage
+            : new Image(_display, loadedImageData);
 
+      putIntoImageCache(tileKey, tileImage);
+
+      final MP mp = tile.getMP();
       final int dimmingAlphaValue = mp.getDimLevel();
+
       if (dimmingAlphaValue == 0xFF) {
 
          // tile image is not dimmed
 
-         final Image tileImage = tileOfflineImage != null ? //
-               tileOfflineImage
-               : new Image(_display, loadedImageData);
-
-         putIntoImageCache(tileKey, tileImage);
-
-         return tileImage;
-
       } else {
 
          // tile image is dimmed
-
-         final Image tileImage = tileOfflineImage != null ? //
-               tileOfflineImage
-               : new Image(_display, loadedImageData);
-
-         final Rectangle imageBounds = tileImage.getBounds();
-
-         final Image dimmedImage = new Image(_display, imageBounds);
 
          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          //
          // run in the UI thread
          //
          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         _display.syncExec(() -> {
+         _display.asyncExec(() -> {
 
             if (tileImage == null || tileImage.isDisposed()) {
                return;
             }
+
+            // create dimmed image
+            final Rectangle imageBounds = tileImage.getBounds();
+            final Image dimmedImage = new Image(_display, imageBounds);
 
             final GC gcTileImage = new GC(dimmedImage);
             final Color dimColor = new Color(_display, mp.getDimColor());
@@ -736,12 +730,13 @@ public class TileImageCache {
             gcTileImage.dispose();
 
             tileImage.dispose();
+
+            putIntoImageCache(tileKey, dimmedImage);
          });
 
-         putIntoImageCache(tileKey, dimmedImage);
-
-         return dimmedImage;
       }
+
+      return tileImage;
    }
 
 }
