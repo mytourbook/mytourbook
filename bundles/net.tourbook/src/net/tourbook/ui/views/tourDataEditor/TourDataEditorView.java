@@ -3181,6 +3181,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       display.asyncExec(() -> {
 
+         if (_pageBook.isDisposed()) {
+            return;
+         }
+
          _foregroundColor_Default = parent.getForeground(); // Color {170, 170, 170, 255}    with dark mode
          _backgroundColor_Default = parent.getBackground(); // Color {47, 47, 47, 255}       with dark mode
 
