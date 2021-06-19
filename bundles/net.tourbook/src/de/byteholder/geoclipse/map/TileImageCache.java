@@ -714,27 +714,28 @@ public class TileImageCache {
          // run in the UI thread
          //
          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         _display.syncExec(new Runnable() {
-            @Override
-            public void run() {
+         _display.syncExec(() -> {
 
-               final GC gcTileImage = new GC(dimmedImage);
-               final Color dimColor = new Color(_display, mp.getDimColor());
-               {
-                  gcTileImage.setBackground(dimColor);
-                  gcTileImage.fillRectangle(imageBounds);
-
-                  gcTileImage.setAlpha(dimmingAlphaValue);
-                  {
-                     gcTileImage.drawImage(tileImage, 0, 0);
-                  }
-                  gcTileImage.setAlpha(0xff);
-               }
-               dimColor.dispose();
-               gcTileImage.dispose();
-
-               tileImage.dispose();
+            if (tileImage == null || tileImage.isDisposed()) {
+               return;
             }
+
+            final GC gcTileImage = new GC(dimmedImage);
+            final Color dimColor = new Color(_display, mp.getDimColor());
+            {
+               gcTileImage.setBackground(dimColor);
+               gcTileImage.fillRectangle(imageBounds);
+
+               gcTileImage.setAlpha(dimmingAlphaValue);
+               {
+                  gcTileImage.drawImage(tileImage, 0, 0);
+               }
+               gcTileImage.setAlpha(0xff);
+            }
+            dimColor.dispose();
+            gcTileImage.dispose();
+
+            tileImage.dispose();
          });
 
          putIntoImageCache(tileKey, dimmedImage);
