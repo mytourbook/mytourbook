@@ -6,10 +6,10 @@ New
 * Dark Theme
 
   - The UI theme can be selected in the preference
-  - Lots and lots of color and symbol adjustments to make the dark theme
-    look really good now, but it's not yet 100% perfect
   - Hint: Dark theme + 2D map
-
+  - Lots and lots of color and symbol adjustments to make the dark theme
+    look really good now
+  - Example for W10 theme limits
  
 * Tour Book View (Frederic)
 
