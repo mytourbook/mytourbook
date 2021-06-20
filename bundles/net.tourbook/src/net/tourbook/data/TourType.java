@@ -36,8 +36,13 @@ public class TourType implements Comparable<Object> {
    /** Width/height of the tour type image. */
    public static final int  TOUR_TYPE_IMAGE_SIZE                  = 16;
 
-   /** Color which is transparent in the tour type image. */
-   public static final RGB  TRANSPARENT_COLOR                     = new RGB(0x01, 0xfe, 0x00);
+   /**
+    * Color which is transparent in the tour type image.
+    * <p>
+    * The color is used in the easy import view, the previous color looked really ugly with a dark
+    * background.
+    */
+   public static final RGB  TRANSPARENT_COLOR                     = new RGB(67, 67, 67);
 
    public static final long IMAGE_KEY_DIALOG_SELECTION            = -2;
 

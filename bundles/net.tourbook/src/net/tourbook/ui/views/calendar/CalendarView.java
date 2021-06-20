@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -54,8 +56,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
@@ -76,20 +76,20 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    /**
     * The ID of the view as specified by the extension.
     */
-   public static final String      ID                              = "net.tourbook.views.calendar.CalendarView";                //$NON-NLS-1$
+   public static final String      ID                              = "net.tourbook.views.calendar.CalendarView";  //$NON-NLS-1$
 
-   private static final String     STATE_IS_LINKED                 = "STATE_IS_LINKED";                                         //$NON-NLS-1$
-   private static final String     STATE_IS_SHOW_TOUR_INFO         = "STATE_IS_SHOW_TOUR_INFO";                                 //$NON-NLS-1$
-   static final String             STATE_TOUR_TOOLTIP_DELAY        = "STATE_TOUR_TOOLTIP_DELAY";                                //$NON-NLS-1$
+   private static final String     STATE_IS_LINKED                 = "STATE_IS_LINKED";                           //$NON-NLS-1$
+   private static final String     STATE_IS_SHOW_TOUR_INFO         = "STATE_IS_SHOW_TOUR_INFO";                   //$NON-NLS-1$
+   static final String             STATE_TOUR_TOOLTIP_DELAY        = "STATE_TOUR_TOOLTIP_DELAY";                  //$NON-NLS-1$
 
-   private static final String     STATE_FIRST_DISPLAYED_EPOCH_DAY = "STATE_FIRST_DISPLAYED_EPOCH_DAY";                         //$NON-NLS-1$
-   private static final String     STATE_SELECTED_TOURS            = "STATE_SELECTED_TOURS";                                    //$NON-NLS-1$
+   private static final String     STATE_FIRST_DISPLAYED_EPOCH_DAY = "STATE_FIRST_DISPLAYED_EPOCH_DAY";           //$NON-NLS-1$
+   private static final String     STATE_SELECTED_TOURS            = "STATE_SELECTED_TOURS";                      //$NON-NLS-1$
 
-   static final int                DEFAULT_TOUR_TOOLTIP_DELAY      = 100;                                                       // ms
+   static final int                DEFAULT_TOUR_TOOLTIP_DELAY      = 100;                                         // ms
 
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView");               //$NON-NLS-1$
+   private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView"); //$NON-NLS-1$
 
    private boolean                 _stateIsLinked;
    private boolean                 _stateIsShowTourInfo;
@@ -125,6 +125,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private Composite     _parent;
    private Composite     _calendarContainer;
+   private Composite     _headerContainer;
 
    private Combo         _comboProfiles;
 
@@ -135,6 +136,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
+
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {}
 
@@ -174,6 +176,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {}
       };
+
       getViewSite().getPage().addPartListener(_partListener);
    }
 
@@ -388,13 +391,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void createUI(final Composite parent) {
 
-      parent.addControlListener(new ControlAdapter() {
-
-         @Override
-         public void controlResized(final ControlEvent e) {
-            updateUI_Title(null, null);
-         }
-      });
+      parent.addControlListener(controlResizedAdapter(controlEvent -> updateUI_Title(null, null)));
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
@@ -414,16 +411,16 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void createUI_10_Header(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+      _headerContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_headerContainer);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_headerContainer);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          {
             /*
              * Title
              */
-            _lblTitle = new Label(container, SWT.NONE);
+            _lblTitle = new Label(_headerContainer, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
@@ -435,7 +432,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             /*
              * Combo: Profiles
              */
-            _comboProfiles = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboProfiles = new Combo(_headerContainer, SWT.READ_ONLY | SWT.BORDER);
             _comboProfiles.setVisibleItemCount(30);
             _comboProfiles.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -716,7 +713,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    void updateUI_Title(final LocalDate calendarFirstDay, final LocalDate calendarLastDay) {
 
-      if (calendarFirstDay != null) {
+      if (calendarFirstDay != null && calendarLastDay != null) {
 
          if (calendarFirstDay.equals(_titleFirstDay) && calendarLastDay.equals(_titleLastDay)) {
 
@@ -728,69 +725,82 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          _titleLastDay = calendarLastDay;
       }
 
-      if (_titleFirstDay == null) {
-         // this can occure when resized and not setup
-         return;
-      }
+      // re-layout to get the available width
+      _headerContainer.layout(true, true);
 
-      // reset to default header font
-      MTFont.setHeaderFont(_lblTitle);
+      _headerContainer.getDisplay().asyncExec(() -> {
 
-      /*
-       * Get title text
-       */
-      String titleText = UI.EMPTY_STRING;
-      GC gc = new GC(_lblTitle);
-      {
-         final int availableWidth = _lblTitle.getSize().x;
+         if (_headerContainer.isDisposed()) {
+            return;
+         }
 
-         titleText = _titleFirstDay.format(TimeTools.Formatter_Date_L)
-               + UI.DASH_WITH_DOUBLE_SPACE
-               + _titleLastDay.format(TimeTools.Formatter_Date_L);
+         if (_titleFirstDay == null) {
+            return;
+         }
 
-         int titleWidth = gc.stringExtent(titleText).x;
+         // reset to default header font
+         MTFont.setHeaderFont(_lblTitle);
 
-         if (titleWidth > availableWidth) {
+         /*
+          * Get title text
+          */
+         String titleText = UI.EMPTY_STRING;
+         GC gc = new GC(_lblTitle);
+         {
+            final int availableWidth = _lblTitle.getSize().x;
 
-            titleText = _titleFirstDay.format(TimeTools.Formatter_Date_M)
+            titleText = _titleFirstDay.format(TimeTools.Formatter_Date_L)
                   + UI.DASH_WITH_DOUBLE_SPACE
-                  + _titleLastDay.format(TimeTools.Formatter_Date_M);
+                  + _titleLastDay.format(TimeTools.Formatter_Date_L);
 
-            titleWidth = gc.stringExtent(titleText).x;
+            int titleWidth = gc.stringExtent(titleText).x;
 
             if (titleWidth > availableWidth) {
 
-               titleText = _titleFirstDay.format(TimeTools.Formatter_Date_S)
-                     + UI.DASH_WITH_SPACE
-                     + _titleLastDay.format(TimeTools.Formatter_Date_S);
+               titleText = _titleFirstDay.format(TimeTools.Formatter_Date_M)
+                     + UI.DASH_WITH_DOUBLE_SPACE
+                     + _titleLastDay.format(TimeTools.Formatter_Date_M);
 
                titleWidth = gc.stringExtent(titleText).x;
 
                if (titleWidth > availableWidth) {
 
-                  // set default font
-                  _lblTitle.setFont(null);
-
-                  gc.dispose();
-                  gc = new GC(_lblTitle);
+                  titleText = _titleFirstDay.format(TimeTools.Formatter_Date_S)
+                        + UI.DASH_WITH_SPACE
+                        + _titleLastDay.format(TimeTools.Formatter_Date_S);
 
                   titleWidth = gc.stringExtent(titleText).x;
 
                   if (titleWidth > availableWidth) {
 
-                     /*
-                      * Force that the title is displayed the next time. There was a problem when
-                      * resizing the canvas and the title was empty.
-                      */
-                     _titleFirstDay = null;
+                     // set default font
+                     _lblTitle.setFont(null);
+
+                     gc.dispose();
+                     gc = new GC(_lblTitle);
+
+                     titleWidth = gc.stringExtent(titleText).x;
+
+                     if (titleWidth > availableWidth) {
+
+                        /*
+                         * Force that the title is displayed the next time. There was a problem when
+                         * resizing the canvas and the title was empty.
+                         */
+                        _titleFirstDay = null;
+                     }
                   }
                }
             }
          }
-      }
-      gc.dispose();
+         gc.dispose();
 
-      _lblTitle.setText(titleText);
+         _lblTitle.setText(titleText);
+
+         // re-layout to center vertically the text
+         _headerContainer.layout(true, true);
+      });
+
    }
 
 }

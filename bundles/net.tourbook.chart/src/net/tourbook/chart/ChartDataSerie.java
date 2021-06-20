@@ -111,6 +111,10 @@ public abstract class ChartDataSerie {
    private RGB                     _rgbBright[]                          = new RGB[] { new RGB(255, 0, 0) };
    private RGB                     _rgbDark[]                            = new RGB[] { new RGB(0, 0, 255) };
    private RGB                     _rgbLine[]                            = new RGB[] { new RGB(0, 255, 0) };
+
+   /**
+    * Is mainly used for the graph title, unit or graph value
+    */
    private RGB                     _rgbText[]                            = new RGB[] { new RGB(0, 0, 0) };
 
    private RGB                     _defaultRGB;

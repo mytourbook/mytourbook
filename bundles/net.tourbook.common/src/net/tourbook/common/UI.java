@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
@@ -24,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -63,9 +69,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -244,10 +247,7 @@ public class UI {
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean IS_DARK_THEME;
-
-   // this is the old field before using IS_DARK_THEME
-   private static boolean      _isDarkThemeSelected;
+   public static boolean       IS_DARK_THEME;
 
    /**
     * On Linux an async selection event is fired since e4
@@ -755,35 +755,37 @@ public class UI {
     */
    public static void addSashColorHandler(final Sash sash) {
 
-      sash.addMouseTrackListener(new MouseTrackListener() {
+      final Display display = Display.getCurrent();
 
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+      final Color mouseEnterColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultForegroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+
+      final Color mouseExitColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultBackgroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+      final Color mouseDragColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultForegroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+
+      sash.addMouseTrackListener(mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
+      sash.addMouseTrackListener(mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
+
+      // set color when sash is initially displayed
+      sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
+
+      sash.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+         // hide background when sash is dragged
+
+         if (selectionEvent.detail == SWT.DRAG) {
+            sash.setBackground(null);
+         } else {
+            sash.setBackground(mouseDragColor);
          }
 
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
-
-      sash.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-
-            // hide background when sash is dragged
-
-            if (e.detail == SWT.DRAG) {
-               sash.setBackground(null);
-            } else {
-               sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-            }
-         }
-      });
+      }));
    }
 
    public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
@@ -1618,7 +1620,7 @@ public class UI {
     * @return <code>true</code> when a dark theme is selected in the UI
     */
    public static boolean isDarkTheme() {
-      return _isDarkThemeSelected;
+      return IS_DARK_THEME;
    }
 
    public static boolean isLinuxAsyncEvent(final Widget widget) {
@@ -2250,8 +2252,6 @@ public class UI {
    }
 
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
-
-      _isDarkThemeSelected = isDarkThemeSelected;
 
       IS_DARK_THEME = isDarkThemeSelected;
    }
