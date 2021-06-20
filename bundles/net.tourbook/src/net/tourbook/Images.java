@@ -51,7 +51,6 @@ public class Images {
    public static final String App_EmptyIcon_Placeholder                  = "icon-placeholder.gif";                                //$NON-NLS-1$
    public static final String App_Hide                                   = "app-hide.png";                                        //$NON-NLS-1$
    public static final String App_OK                                     = "16px-Crystal_Clear_action_apply.png";                 //$NON-NLS-1$
-   public static final String App_Paste                                  = "paste_edit.png";                                      //$NON-NLS-1$
    public static final String App_Placeholder16                          = "placeholder16.png";                                   //$NON-NLS-1$
    public static final String App_Refresh                                = "refresh.png";                                         //$NON-NLS-1$
    public static final String App_Refresh_All                            = "refresh-all.png";                                     //$NON-NLS-1$

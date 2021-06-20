@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2021 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,8 +63,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -653,12 +651,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
             redraw();
          }
       });
-      addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      addDisposeListener(disposeEvent -> onDispose());
    }
 
    private void addListener_Key() {
@@ -1409,6 +1402,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          }
       }
 
+      gc.dispose();
+
       // draw the selection on top of our calendar graph image so we can reuse that image
       final Image selectedImage = new Image(getDisplay(), canvasWidth, canvasHeight);
       final GC selectedGC = new GC(selectedImage);
@@ -1428,12 +1423,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
          // graph is dirty again, this can occure when data are loaded -> rescedule a new update
 
-         getDisplay().timerExec(5, new Runnable() {
-            @Override
-            public void run() {
-               redraw();
-            }
-         });
+         getDisplay().timerExec(5, () -> redraw());
       }
    }
 
@@ -2940,6 +2930,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
    }
 
    private void onDispose() {
+
+      if (_calendarImage != null) {
+         _calendarImage.dispose();
+      }
 
       _colorCache.dispose();
 

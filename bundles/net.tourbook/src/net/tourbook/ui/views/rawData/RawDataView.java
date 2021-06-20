@@ -2223,11 +2223,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Database
        */
-      _images.put(IMAGE_DATABASE,               TourbookPlugin.getImageDescriptor(Images.Saved_Tour));
-      _images.put(IMAGE_DATABASE_OTHER_PERSON,  TourbookPlugin.getImageDescriptor(Images.Saved_Tour_OtherPerson));
-      _images.put(IMAGE_ASSIGN_MERGED_TOUR,     TourbookPlugin.getImageDescriptor(Images.Saved_MergedTour));
-      _images.put(IMAGE_ICON_PLACEHOLDER,       TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder));
-      _images.put(IMAGE_DELETE,                 TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      _images.put(IMAGE_DATABASE,               TourbookPlugin.getImageDescriptor      (Images.Saved_Tour));
+      _images.put(IMAGE_DATABASE_OTHER_PERSON,  TourbookPlugin.getThemedImageDescriptor(Images.Saved_Tour_OtherPerson));
+      _images.put(IMAGE_ASSIGN_MERGED_TOUR,     TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour));
+      _images.put(IMAGE_ICON_PLACEHOLDER,       TourbookPlugin.getImageDescriptor      (Images.App_EmptyIcon_Placeholder));
+      _images.put(IMAGE_DELETE,                 TourbookPlugin.getImageDescriptor      (Images.App_Delete));
 
       /*
        * Import state
@@ -4932,7 +4932,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.subLog_Error(String.format(
+            TourLogManager.subLog_Info(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -5832,7 +5832,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
       jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
 
-      final String js = UI.EMPTY_STRING + NL //                                                                //$NON-NLS-1$
+      final String js = UI.EMPTY_STRING + NL //
 
             + "var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";" + NL //                                         //$NON-NLS-1$ //$NON-NLS-2$
             + "document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;" + NL // //$NON-NLS-1$ //$NON-NLS-2$

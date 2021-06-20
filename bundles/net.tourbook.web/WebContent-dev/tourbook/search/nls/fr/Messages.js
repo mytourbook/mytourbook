@@ -25,7 +25,7 @@ define(//
 		Search_Options_Group_Content                       : 'Que faut-il rechercher ?',
 		Search_Options_Group_Result                        : 'Résultats',
 		Search_Options_Group_Sorting                       : 'Tri',
-		Search_Options_Label_SortAscending                 : 'Par Date',
+		Search_Options_Label_SortAscending                 : 'Par date',
 		Search_Options_Radio_SortAscending                 : 'Ascendant',
 		Search_Options_Radio_SortDescending                : 'Descendant',
 		Search_Validation_SearchFilter                     : 'Aucun résultat trouvé avec ces options de recherche.'

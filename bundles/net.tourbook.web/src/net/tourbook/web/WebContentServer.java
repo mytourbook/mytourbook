@@ -41,6 +41,7 @@ import java.util.concurrent.Executors;
 
 import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -49,6 +50,8 @@ import net.tourbook.common.util.Util;
  * http://www.microhowto.info/howto/serve_web_pages_using_an_embedded_http_server_in_java.html
  */
 public class WebContentServer {
+
+   private static final char    NL                       = UI.NEW_LINE;
 
    private static final boolean IS_DEBUG_PORT            = false;
    private static final int     NUMBER_OF_SERVER_THREADS = 1;
@@ -61,39 +64,41 @@ public class WebContentServer {
    private static boolean LOG_HEADER = false;
 
    // logs: xhr
-   public static boolean  LOG_XHR    = false;
+   public static boolean       LOG_XHR                     = false;
 
-   private static boolean IS_LOGGING = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
+   private static boolean      IS_LOGGING                  = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 
-   // variables which are replaced in .mthtml files
-   private static final String            MTHTML_DOJO_SEARCH          = "DOJO_SEARCH";          //$NON-NLS-1$
-   private static final String            MTHTML_LOCALE               = "LOCALE";               //$NON-NLS-1$
+   private static final String MTHTML_DOJO_SEARCH          = "DOJO_SEARCH";                               //$NON-NLS-1$
+   private static final String MTHTML_LOCALE               = "LOCALE";                                    //$NON-NLS-1$
 
-   private static final String            MTHTML_MESSAGE_LOADING      = "MESSAGE_LOADING";      //$NON-NLS-1$
-   private static final String            MTHTML_MESSAGE_SEARCH_TITLE = "MESSAGE_SEARCH_TITLE"; //$NON-NLS-1$
+   private static final String MTHTML_MESSAGE_LOADING      = "MESSAGE_LOADING";                           //$NON-NLS-1$
+   private static final String MTHTML_MESSAGE_SEARCH_TITLE = "MESSAGE_SEARCH_TITLE";                      //$NON-NLS-1$
 
-   private static final String            ROOT_FILE_PATH_NAME         = "/";                    //$NON-NLS-1$
+   private static final String SEARCH_CSS                  = "search.css";                                //$NON-NLS-1$
 
-   private static final String            URI_INNER_PROTOCOL_FILE     = "/file:";               //$NON-NLS-1$
+   private static final String ROOT_FILE_PATH_NAME         = "/";                                         //$NON-NLS-1$
+   private static final String URI_INNER_PROTOCOL_FILE     = "/file:";                                    //$NON-NLS-1$
+   private static final String REQUEST_PATH_TOURBOOK       = "/tourbook";                                 //$NON-NLS-1$
 
-   private static final String            REQUEST_PATH_TOURBOOK       = "/tourbook";            //$NON-NLS-1$
+   private static final String XHR_HEADER_KEY              = "X-requested-with";                          //$NON-NLS-1$
+   private static final String XHR_HEADER_VALUE            = "XMLHttpRequest";                            //$NON-NLS-1$
 
-   private static final String            XHR_HEADER_KEY              = "X-requested-with";     //$NON-NLS-1$
-   private static final String            XHR_HEADER_VALUE            = "XMLHttpRequest";       //$NON-NLS-1$
+   private static final String ICON_RESOURCE_REQUEST       = "/$MT-ICON$/";                               //$NON-NLS-1$
+   private static final String CSS_TAG__IS_THEMED          = "$CSS_TAG__IS_THEMED$";                      //$NON-NLS-1$
 
-   private static final String            ICON_RESOURCE_REQUEST       = "/$MT-ICON$/";          //$NON-NLS-1$
-
-   private static final String            DOJO_ROOT                   = "/dojo/";               //$NON-NLS-1$
-   private static final String            DOJO_DIJIT                  = "/dijit/";              //$NON-NLS-1$
-   private static final String            DOJO_DGRID                  = "/dgrid/";              //$NON-NLS-1$
-   private static final String            DOJO_DSTORE                 = "/dstore/";             //$NON-NLS-1$
-   private static final String            DOJO_PUT_SELECTOR           = "/put-selector/";       //$NON-NLS-1$
-   private static final String            DOJO_XSTYLE                 = "/xstyle/";             //$NON-NLS-1$
+   private static final String DOJO_ROOT                   = "/dojo/";                                    //$NON-NLS-1$
+   private static final String DOJO_DIJIT                  = "/dijit/";                                   //$NON-NLS-1$
+   private static final String DOJO_DGRID                  = "/dgrid/";                                   //$NON-NLS-1$
+   private static final String DOJO_DSTORE                 = "/dstore/";                                  //$NON-NLS-1$
+   private static final String DOJO_PUT_SELECTOR           = "/put-selector/";                            //$NON-NLS-1$
+   private static final String DOJO_XSTYLE                 = "/xstyle/";                                  //$NON-NLS-1$
 
    public static final String             SERVER_URL;
 
-   private static Map<String, XHRHandler> _allXHRHandler              = new HashMap<>();
-   private static Map<String, Object>     _mthtmlValues               = new HashMap<>();
+   //
+   private static Map<String, XHRHandler> _allXHRHandler           = new HashMap<>();
+   private static Map<String, Object>     _mtHtmlReplacementValues = new HashMap<>();
+   private static Map<String, Object>     _cssReplacementValues;
 
    /**
     * Possible alternative: https://github.com/NanoHttpd/nanohttpd
@@ -120,28 +125,28 @@ public class WebContentServer {
 //
 // This font is disabled because it is not easy to read it.
 //
-//		/*
-//		 * Set css font to the same as the whole app.
-//		 */
-//		final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
+//      /*
+//       * Set css font to the same as the whole app.
+//       */
+//      final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
 //
-//		final float fontHeight = dlgFont.getHeight() * 1.0f;
-//		final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
+//      final float fontHeight = dlgFont.getHeight() * 1.0f;
+//      final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
 //
-//		final String cssFont = ""//
-//				+ "<style>															\n"
-//				+ "body																\n"
-//				+ "{																\n"
-//				+ ("	font-family:	" + dlgFont.getName() + ", sans-serif;		\n")
-//				+ ("	font-size:		" + fontSize + "pt;							\n")
+//      final String cssFont = ""//
+//            + "<style>                                             " + NL
+//            + "body                                                " + NL
+//            + "{                                                " + NL
+//            + ("   font-family:   " + dlgFont.getName() + ", sans-serif;      " + NL )
+//            + ("   font-size:      " + fontSize + "pt;                     " + NL )
 //
-//				/*
-//				 * IE do not set the font weight correctly, 599 is too light compared the external
-//				 * IE, 600 is heavier than the external IE, 400 is by definition the default.
-//				 */
-//				+ "		font-weight:	400;										\n"
-//				+ "}																\n"
-//				+ "</STYLE>															\n";
+//            /*
+//             * IE do not set the font weight correctly, 599 is too light compared the external
+//             * IE, 600 is heavier than the external IE, 400 is by definition the default.
+//             */
+//            + "      font-weight:   400;                              " + NL
+//            + "}                                                " + NL
+//            + "</STYLE>                                             " + NL ;
 
       // Steps when switching between DEBUG and RELEASE build:
       // =====================================================
@@ -149,23 +154,30 @@ public class WebContentServer {
       // - Run ant file Create-Dojo-Bundle.xml when RELEASE build is enabled.
       // - Restart app.
 
-      final String dojoSearch = WEB.IS_DEBUG //
+      final String dojoSearch = WEB.IS_DEBUG
 
             ? UI.EMPTY_STRING
 
                   // DEBUG build
-                  + "	<link rel='stylesheet' href='search.css'>					\n" //$NON-NLS-1$
-                  + "	<script src='/dojo/dojo.js'></script>						\n" //$NON-NLS-1$
+                  + "   <link rel='stylesheet' href='mt-dojo.css'>" + NL //                  //$NON-NLS-1$
+                  + "   <link rel='stylesheet' href='search.css'>" + NL //                   //$NON-NLS-1$
+
+                  + "   <script src='/dojo/dojo.js'></script>" + NL //                       //$NON-NLS-1$
 
             : UI.EMPTY_STRING
 
                   // RELEASE build
-                  + "	<link rel='stylesheet' href='search.css.jgz'>				\n" //$NON-NLS-1$
-                  + "	<script src='/dojo/dojo.js.jgz'></script>					\n" //$NON-NLS-1$
-                  + "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
+
+                  + "   <link rel='stylesheet' href='mt-dojo.css.jgz'>" + NL //              //$NON-NLS-1$
+
+                  // use css without compression to support the dark theme
+                  + "   <link rel='stylesheet' href='search.css'>" + NL //                   //$NON-NLS-1$
+
+                  + "   <script src='/dojo/dojo.js.jgz'></script>" + NL //                   //$NON-NLS-1$
+                  + "   <script src='/tourbook/search/SearchApp.js.jgz'></script>" + NL //   //$NON-NLS-1$
       ;
 
-//		dojoSearch += cssFont;
+//      dojoSearch += cssFont;
 
       /*
        * Get valid locale, invalid locale will cause errors of not supported Dojo files.
@@ -183,15 +195,15 @@ public class WebContentServer {
       /*
        * Text replacements for common messages.
        */
-      _mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
-      _mthtmlValues.put(MTHTML_LOCALE, dojoLocale);
+      _mtHtmlReplacementValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
+      _mtHtmlReplacementValues.put(MTHTML_LOCALE, dojoLocale);
 
       try {
 
          // these text must be converted into UTF-8 otherwise they are displayed unusable
 
-         _mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading.getBytes(UI.UTF_8));
-         _mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title.getBytes(UI.UTF_8));
+         _mtHtmlReplacementValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading.getBytes(UI.UTF_8));
+         _mtHtmlReplacementValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title.getBytes(UI.UTF_8));
 
       } catch (final UnsupportedEncodingException e) {
          e.printStackTrace();
@@ -250,7 +262,7 @@ public class WebContentServer {
                      || requestUriPath.startsWith(DOJO_DGRID)
                      || requestUriPath.startsWith(DOJO_DSTORE)
                      || requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
-         //
+
          ) {
             isDojoRequest = true;
             requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
@@ -285,9 +297,18 @@ public class WebContentServer {
           */
          if (isIconRequest) {
 
-            final String iconFilename = requestUriPath.substring(
+            String iconFilename = requestUriPath.substring(
                   ICON_RESOURCE_REQUEST.length(),
                   requestUriPath.length());
+
+            // replace themed marker
+            if (iconFilename.contains(CSS_TAG__IS_THEMED)) {
+
+               iconFilename = iconFilename.replace(CSS_TAG__IS_THEMED,
+                     UI.IS_DARK_THEME
+                           ? ThemeUtil.DARK_THEME_POSTFIX
+                           : UI.EMPTY_STRING);
+            }
 
             handle_Icon(httpExchange, iconFilename, log);
 
@@ -332,24 +353,24 @@ public class WebContentServer {
                final File file = new File(requestedOSPath).getCanonicalFile();
 
                if (LOG_URL) {
-//						log.append("\t-->\t" + file.toString());
+//                  log.append("\t-->\t" + file.toString());
                }
 
-               if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
+               if (!file.getPath().startsWith(rootPath) && isResourceUrl == false) {
 
-                  // Suspected path traversal attack: reject with 403 error.
+                  // Suspected path traversal attack: reject with 403 error
 
                   handle_403(httpExchange, file);
 
                } else if (!file.isFile()) {
 
-                  // Object does not exist or is not a file: reject with 404 error.
+                  // Object does not exist or is not a file: reject with 404 error
 
                   handle_404(httpExchange, file, requestUriPath);
 
                } else {
 
-                  // Object exists and is a file: accept with response code 200.
+                  // Object exists and is a file: accept with response code 200
 
                   handle_File(httpExchange, file);
                }
@@ -362,7 +383,7 @@ public class WebContentServer {
 
          if (log.length() > 0 && IS_LOGGING) {
 
-            final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", // //$NON-NLS-1$
+            final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", //$NON-NLS-1$
                   UI.timeStampNano(),
                   (float) (System.nanoTime() - start) / 1000000,
                   Thread.currentThread().getName(),
@@ -380,13 +401,13 @@ public class WebContentServer {
 
       try {
 
-         final String response = "403 (Forbidden)\n";//$NON-NLS-1$
+         final String response = "403 (Forbidden)" + NL; //$NON-NLS-1$
          httpExchange.sendResponseHeaders(403, response.length());
 
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
+         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -401,13 +422,13 @@ public class WebContentServer {
 
       try {
 
-         final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);//$NON-NLS-1$
+         final String response = String.format("%s\n404 (Not Found)" + NL, requestUriPath);//$NON-NLS-1$
          httpExchange.sendResponseHeaders(404, response.length());
 
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
+         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -418,9 +439,9 @@ public class WebContentServer {
 
    private static void handle_File(final HttpExchange httpExchange, final File file) {
 
-      OutputStream os = null;
+      OutputStream outputStream = null;
 
-      ReplacingOutputStream replacingOS = null;
+      ReplacingOutputStream replacingOutputStream = null;
 
       try (FileInputStream fs = new FileInputStream(file)) {
 
@@ -428,18 +449,36 @@ public class WebContentServer {
 
          httpExchange.sendResponseHeaders(200, 0);
 
-         os = httpExchange.getResponseBody();
+         outputStream = httpExchange.getResponseBody();
 
          if (extension.equals(WEB.FILE_EXTENSION_MTHTML)) {
 
-            // replaces also values in .mthtml files
+            // replaces values in .mthtml files
 
-            replacingOS = new ReplacingOutputStream(os, _mthtmlValues);
+            replacingOutputStream = new ReplacingOutputStream(outputStream, _mtHtmlReplacementValues);
+
+            int byteValue;
+
+            while ((byteValue = fs.read()) != -1) {
+               replacingOutputStream.write(byteValue);
+            }
+
+         } else if (file.getName().equals(SEARCH_CSS)) {
+
+            // replace values in search.css file
+
+//            // for debugging - START
+//            _cssReplacementValues.clear();
+//            _cssReplacementValues = null;
+//            setupCssReplacements();
+//            // for debugging - END
+
+            replacingOutputStream = new ReplacingOutputStream(outputStream, _cssReplacementValues);
 
             int c;
 
             while ((c = fs.read()) != -1) {
-               replacingOS.write(c);
+               replacingOutputStream.write(c);
             }
 
          } else {
@@ -447,7 +486,7 @@ public class WebContentServer {
             final byte[] buffer = new byte[0x10000];
             int count = 0;
             while ((count = fs.read(buffer)) >= 0) {
-               os.write(buffer, 0, count);
+               outputStream.write(buffer, 0, count);
             }
          }
 
@@ -455,11 +494,11 @@ public class WebContentServer {
          StatusUtil.log(e);
       } finally {
 
-         if (Util.close(os) == false) {
-            StatusUtil.log(String.format("File: '%s'", file.toString()));//$NON-NLS-1$
+         if (Util.close(outputStream) == false) {
+            StatusUtil.log(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
          }
 
-         Util.close(replacingOS);
+         Util.close(replacingOutputStream);
       }
    }
 
@@ -468,7 +507,7 @@ public class WebContentServer {
       try {
 
          if (_iconRequestHandler == null) {
-            StatusUtil.logError("IconRequestHandler is not set for " + iconFilename);//$NON-NLS-1$
+            StatusUtil.logError("IconRequestHandler is not set for " + iconFilename); //$NON-NLS-1$
          } else {
             _iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log);
          }
@@ -484,19 +523,19 @@ public class WebContentServer {
 
          if (LOG_XHR) {
 
-//				reqBody = httpExchange.getRequestBody();
+//            reqBody = httpExchange.getRequestBody();
 //
-//				final StringBuilder sb = new StringBuilder();
-//				final byte[] buffer = new byte[0x10000];
+//            final StringBuilder sb = new StringBuilder();
+//            final byte[] buffer = new byte[0x10000];
 //
-//				while (reqBody.read(buffer) != -1) {
-//					sb.append(buffer);
-//				}
+//            while (reqBody.read(buffer) != -1) {
+//               sb.append(buffer);
+//            }
 //
-//				// log content
-//				log.append("\nXHR-\n");
-//				log.append(sb.toString());
-//				log.append("\n-XHR\n");
+//            // log content
+//            log.append("\nXHR-" + NL );
+//            log.append(sb.toString());
+//            log.append("\n-XHR" + NL );
          }
 
          final String xhrKey = requestUriPath;
@@ -516,10 +555,10 @@ public class WebContentServer {
 
    private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
 
-      log.append("\n");//$NON-NLS-1$
+      log.append(NL);
 
       for (final Entry<String, List<String>> entry : headerEntries) {
-         log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));//$NON-NLS-1$
+         log.append(String.format("%-20s %s" + NL, entry.getKey(), entry.getValue()));//$NON-NLS-1$
       }
    }
 
@@ -528,8 +567,7 @@ public class WebContentServer {
       // get parameters from url query string
 
       @SuppressWarnings("unchecked")
-      final Map<String, Object> params = (Map<String, Object>) httpExchange
-            .getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
+      final Map<String, Object> params = (Map<String, Object>) httpExchange.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
       if (params.size() > 0) {
          log.append("\tparams: " + params);//$NON-NLS-1$
@@ -549,11 +587,50 @@ public class WebContentServer {
       _iconRequestHandler = iconRequestHandler;
    }
 
+   private static void setupCssReplacements() {
+
+      if (_cssReplacementValues != null) {
+         return;
+      }
+
+      _cssReplacementValues = new HashMap<>();
+
+// SET_FORMATTING_OFF
+
+      _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");           //$NON-NLS-1$
+      _cssReplacementValues.put("BODY__COLOR",                             ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
+      _cssReplacementValues.put("BODY__BACKGROUND_COLOR",                  ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
+      _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.IS_DARK_THEME                                //$NON-NLS-1$
+                                                                              ? WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK
+                                                                              : UI.EMPTY_STRING);
+
+      _cssReplacementValues.put("DRGID_CONTENT__COLOR",                    ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
+      _cssReplacementValues.put("DRGID_CONTENT__BACKGROUND_COLOR",         ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
+
+      _cssReplacementValues.put("DRGID_ROW__BACKGROUND_COLOR",             UI.IS_DARK_THEME ? "444" : "eee");        //$NON-NLS-1$
+      _cssReplacementValues.put("DRGID_SELECTED__BACKGROUND_COLOR",        UI.IS_DARK_THEME ? "555" : "ddd");        //$NON-NLS-1$
+      _cssReplacementValues.put("DRGID_SELECTED_HOVER__BACKGROUND_COLOR",  UI.IS_DARK_THEME ? "666" : "ccc");        //$NON-NLS-1$
+
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__COLOR",               UI.IS_DARK_THEME ? "ddd" : "666");        //$NON-NLS-1$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__BACKGROUND_COLOR",    UI.IS_DARK_THEME ? "666" : "ddd");        //$NON-NLS-1$
+
+      _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");     //$NON-NLS-1$
+      _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");        //$NON-NLS-1$
+
+//      _cssReplacementValues.put("",  UI.IS_DARK_THEME ? "" : "");        //$NON-NLS-1$
+
+
+// SET_FORMATTING_ON
+
+   }
+
    public static void start() {
 
       if (_server != null) {
          return;
       }
+
+      setupCssReplacements();
 
       try {
 
