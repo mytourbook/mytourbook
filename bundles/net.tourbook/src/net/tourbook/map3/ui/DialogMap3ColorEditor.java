@@ -934,8 +934,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             imageWidth,
             imageHeight,
             true,
-            true,
-            false);
+            true);
 
       _canvasProfileImage.setImage(_profileImage);
    }

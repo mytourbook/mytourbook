@@ -191,7 +191,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    /**
-    * Creates an legend image, this image must be disposed who created it.
+    * Creates a legend image with AWT framework. This image must be disposed who created it.
     *
     * @param display
     * @param colorProvider
@@ -202,40 +202,31 @@ public class TourMapPainter extends MapPainter {
     * @param isDrawLegendText
     * @return
     */
-   public static Image createMap2_LegendImage(final Display display,
-                                              final IGradientColorProvider colorProvider,
-                                              final int imageWidth,
-                                              final int imageHeight,
-                                              final boolean isDrawVertical,
-                                              final boolean isDarkBackground) {
+   public static Image createMap2_LegendImage_AWT(final IGradientColorProvider colorProvider,
+                                                  final int imageWidth,
+                                                  final int imageHeight) {
 
-      /*
-       * Use a color which is likely not used, the previous color 0xfefefe was used and had bad
-       * effects.
-       */
-      final RGB rgbTransparent = new RGB(0xfa, 0xfb, 0xfc);
+      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
 
-      final ImageData imageData = new ImageData(
-            imageWidth,
-            imageHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
+      final Graphics2D g2d = image.createGraphics();
+      try {
 
-      imageData.transparentPixel = imageData.palette.getPixel(rgbTransparent);
+         drawMap_Legend_AWT(
+               g2d,
+               colorProvider,
+               ColorProviderConfig.MAP2,
+               imageWidth,
+               imageHeight,
+               true, // isVertical
+               true // isDrawUnits
+         );
 
-      final Image image = new Image(display, imageData);
-      final Rectangle legendImageBounds = image.getBounds();
-
-      final GC gc = new GC(image);
-      {
-         gc.setBackground(new Color(rgbTransparent));
-         gc.fillRectangle(legendImageBounds);
-
-         drawMap2_Legend(gc, legendImageBounds, colorProvider, isDrawVertical, isDarkBackground);
+      } finally {
+         g2d.dispose();
       }
-      gc.dispose();
 
-      return image;
+      return ImageConverter.convertIntoSWT(image);
+
    }
 
    public static Image createMap3_LegendImage(final IGradientColorProvider colorProvider,
@@ -243,23 +234,21 @@ public class TourMapPainter extends MapPainter {
                                               final int imageWidth,
                                               final int imageHeight,
                                               final boolean isVertical,
-                                              final boolean isDrawUnits,
-                                              final boolean isDrawBorder) {
+                                              final boolean isDrawUnits) {
 
       final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
 
       final Graphics2D g2d = image.createGraphics();
       try {
 
-         drawMap3_Legend_GradientColors_AWT(
+         drawMap_Legend_AWT(
                g2d,
                colorProvider,
                config,
                imageWidth,
                imageHeight,
                isVertical,
-               isDrawUnits,
-               isDrawBorder);
+               isDrawUnits);
 
       } finally {
          g2d.dispose();
@@ -268,295 +257,31 @@ public class TourMapPainter extends MapPainter {
       return ImageConverter.convertIntoSWT(image);
    }
 
-   /**
-    * Draws map legend colors into the legend bounds.
-    *
-    * @param gc
-    * @param legendImageBounds
-    * @param colorProvider
-    * @param isDrawVertical
-    * @param isDrawVertical
-    *           When <code>true</code> the legend is drawn vertically otherwise it's drawn
-    *           horizontally.
-    * @param isDarkBackground
-    * @param isDrawLegendText
-    */
-   public static void drawMap2_Legend(final GC gc,
-                                      final Rectangle legendImageBounds,
-                                      final IMapColorProvider colorProvider,
-                                      final boolean isDrawVertical,
-                                      final boolean isDarkBackground) {
-
-      if (colorProvider instanceof IGradientColorProvider) {
-
-         drawMap2_Legend_GradientColors_SWT(
-               gc,
-               legendImageBounds,
-               (IGradientColorProvider) colorProvider,
-               isDrawVertical,
-               isDarkBackground);
-      }
-   }
-
-   private static void drawMap2_Legend_GradientColors_SWT(final GC gc,
-                                                          final Rectangle imageBounds,
-                                                          final IGradientColorProvider colorProvider,
-                                                          final boolean isDrawVertical,
-                                                          final boolean isDarkBackground) {
-
-      final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP2);
-
-      // ensure units are available
-      if (mapUnits.units == null) {
-
-         if (!_isErrorLogged) {
-            _isErrorLogged = true;
-            StatusUtil.log(new Throwable("Color provider is not configured: " + colorProvider));//$NON-NLS-1$
-         }
-
-         return;
-      }
-
-      // get configuration for the legend
-      final ArrayList<Float> legendUnits = new ArrayList<>(mapUnits.units);
-      final float legendMaxValue = mapUnits.legendMaxValue;
-      final float legendMinValue = mapUnits.legendMinValue;
-      final float legendDiffValue = legendMaxValue - legendMinValue;
-      final List<String> unitLabels = mapUnits.unitLabels;
-      final int legendFormatDigits = mapUnits.numberFormatDigits;
-      final LegendUnitFormat unitFormat = mapUnits.unitFormat;
-
-      final String unitText = UI.SPACE + mapUnits.unitText;
-
-      final int borderSize = 0;
-//      Rectangle contentBorder;
-
-      int contentX;
-      int contentY;
-      int contentWidth;
-      int contentHeight;
-      int availableLegendPixels;
-
-      if (isDrawVertical) {
-
-         // vertical legend
-
-         final int marginTopBottom = IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
-
-         contentX = borderSize;
-         contentY = marginTopBottom + borderSize;
-
-         contentWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
-         contentHeight = imageBounds.height - 2 * marginTopBottom - 2 * borderSize;
-
-         availableLegendPixels = contentHeight - 0;
-
-//         contentBorder = new Rectangle(
-//               contentX - borderSize,
-//               contentY - borderSize,
-//               contentWidth + borderSize,
-//               contentHeight + 2 * borderSize + 0);
-
-      } else {
-
-         // horizontal legend
-
-         contentX = imageBounds.x + borderSize;
-         contentY = imageBounds.y + borderSize;
-
-         contentWidth = imageBounds.width - 2 * borderSize;
-         contentHeight = imageBounds.height - 2 * borderSize;
-
-         availableLegendPixels = contentWidth - borderSize;
-
-//         contentBorder = new Rectangle(
-//               contentX - borderSize,
-//               contentY - borderSize,
-//               contentWidth + 2 * borderSize - 1,
-//               contentHeight + 2 * borderSize - 1);
-      }
-
-      // pixelValue contains the value for ONE pixel
-      final float pixelValue = legendDiffValue / availableLegendPixels;
-
-      final float roundingValue = pixelValue / 100;
-
-      final Device display = gc.getDevice();
-
-      // draw border around the colors
-//      final Color borderColor = display.getSystemColor(SWT.COLOR_RED);
-//      gc.setForeground(borderColor);
-//      gc.drawRectangle(contentBorder);
-
-      Color textForegroundColor;
-
-      if (isDarkBackground) {
-         textForegroundColor = display.getSystemColor(SWT.COLOR_WHITE);
-      } else {
-         textForegroundColor = display.getSystemColor(SWT.COLOR_BLACK);
-      }
-
-      int unitLabelIndex = 0;
-
-      for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
-
-         final float legendValue = legendMinValue + pixelValue * pixelIndex;
-
-         int devXorY_Value;
-
-         if (isDrawVertical) {
-            devXorY_Value = contentY + availableLegendPixels - pixelIndex;
-         } else {
-            devXorY_Value = contentX + pixelIndex;
-         }
-
-         /*
-          * draw legend unit
-          */
-
-         if (isDrawVertical) {
-
-            // find a unit which corresponds to the current legend value
-
-            // Rounding value is necessary otherwise the uppermost unit is sometimes not drawn.
-            final float legendUnitValue = legendValue + roundingValue;
-
-            for (final Float unitValue : legendUnits) {
-
-               if (legendUnitValue >= unitValue) {
-
-                  /*
-                   * get unit label
-                   */
-                  String valueText;
-                  if (unitLabels == null) {
-
-                     // set default unit label
-
-                     if (unitFormat == LegendUnitFormat.Pace) {
-
-                        valueText = Util.format_mm_ss(unitValue.longValue()) + unitText;
-
-                     } else {
-
-                        if (legendFormatDigits == 0) {
-                           valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
-                        } else {
-                           // currently only 1 digit is supported
-                           valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
-                        }
-                     }
-
-                  } else {
-
-                     // when unitLabels are available, they will overwrite the default labeling
-                     valueText = unitLabels.get(unitLabelIndex++);
-                  }
-
-                  final org.eclipse.swt.graphics.Point valueTextExtent = gc.textExtent(valueText);
-
-                  final int devXText = contentWidth + 7;
-                  final int devYText = devXorY_Value - valueTextExtent.y / 2;
-
-                  if (isDarkBackground) {
-
-                     // dark background
-
-                     /*
-                      * SWT do not support (or have not found how to do it) text drawing with
-                      * antialias that alpha values are set -> do a simple text drawing, an
-                      * antialiased text drawing looks ugly
-                      */
-                     gc.setTextAntialias(SWT.OFF);
-
-                  } else {
-
-                     // light background -> draw a text shadow
-
-                     gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-
-                     gc.drawText(valueText, devXText - 1, devYText, true);
-                     gc.drawText(valueText, devXText + 1, devYText, true);
-                     gc.drawText(valueText, devXText, devYText - 1, true);
-                     gc.drawText(valueText, devXText, devYText + 1, true);
-                  }
-
-                  gc.setForeground(textForegroundColor);
-                  gc.drawText(valueText, devXText, devYText, true);
-
-                  gc.setTextAntialias(SWT.ON);
-
-                  // prevent to draw this unit again
-                  legendUnits.remove(unitValue);
-
-                  break;
-               }
-            }
-         }
-
-         /*
-          * draw legend color line
-          */
-
-         final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
-         final Color valueColor = _colorCache.getColor((int) valueRGB);
-
-         gc.setForeground(valueColor);
-
-         if (isDrawVertical) {
-
-            // vertical legend
-
-            gc.drawLine(contentX, devXorY_Value, contentWidth, devXorY_Value);
-
-         } else {
-
-            // horizontal legend
-
-            gc.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
-         }
-      }
-
-      _colorCache.dispose();
-   }
-
-   public static void drawMap3_Legend(final Graphics2D g2d,
-                                      final IMapColorProvider colorProvider,
-                                      final ColorProviderConfig config,
-                                      final int legendWidth,
-                                      final int legendHeight) {
-
-      if (colorProvider instanceof IGradientColorProvider) {
-
-         drawMap3_Legend_GradientColors_AWT(
-               g2d,
-               (IGradientColorProvider) colorProvider,
-               config,
-               legendWidth,
-               legendHeight,
-               true,
-               false,
-               true);
-      }
-   }
-
-   private static void drawMap3_Legend_GradientColors_AWT(final Graphics2D g2d,
-                                                          final IGradientColorProvider colorProvider,
-                                                          final ColorProviderConfig config,
-                                                          final int legendWidth,
-                                                          final int legendHeight,
-                                                          final boolean isDrawVertical,
-                                                          final boolean isDrawUnits,
-                                                          final boolean isDrawBorder) {
+   private static void drawMap_Legend_AWT(final Graphics2D g2d,
+                                          final IGradientColorProvider colorProvider,
+                                          final ColorProviderConfig config,
+                                          final int legendWidth,
+                                          final int legendHeight,
+                                          final boolean isDrawVertical,
+                                          final boolean isDrawUnits) {
 
 // SET_FORMATTING_OFF
 
-      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR);
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR);
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB);
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+
+// sometimes it looks better with this parameter but sometimes not
+      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+
+//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 //      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,          RenderingHints.VALUE_ANTIALIAS_ON);
 //      g2d.setRenderingHint(RenderingHints.KEY_DITHERING,             RenderingHints.VALUE_DITHER_ENABLE);
 //      g2d.setRenderingHint(RenderingHints.KEY_RENDERING,             RenderingHints.VALUE_RENDER_QUALITY);
 //      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST,     100);
-//      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 //      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,   RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 //      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,       RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 //      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,        RenderingHints.VALUE_STROKE_PURE);
@@ -586,7 +311,8 @@ public class TourMapPainter extends MapPainter {
        * Setup font
        */
       final Font font = DEFAULT_FONT;
-
+//      final Font largerFont = font.deriveFont(font.getSize() * 1.1f);
+//      g2d.setFont(largerFont);
       g2d.setFont(font);
 
       // Measure the font and the message
@@ -608,7 +334,6 @@ public class TourMapPainter extends MapPainter {
        */
       final int borderSize = 1;
       final int borderSize2 = 2 * borderSize;
-      Rectangle borderRect;
 
       int availableLegendPixels;
       int contentX;
@@ -637,12 +362,6 @@ public class TourMapPainter extends MapPainter {
             contentHeight = legendHeight - borderSize2 - 1;
          }
 
-         borderRect = new Rectangle(
-               contentX - borderSize,
-               contentY - borderSize,
-               contentWidth + borderSize2 - 1,
-               contentHeight + borderSize2);
-
          availableLegendPixels = contentHeight;
 
       } else {
@@ -655,15 +374,7 @@ public class TourMapPainter extends MapPainter {
          contentWidth = legendWidth - borderSize2;
          contentHeight = legendHeight - borderSize2 - 1;
 
-         borderRect = new Rectangle(contentX, contentY, contentWidth, contentHeight);
-
          availableLegendPixels = contentWidth;
-      }
-
-      // draw border
-      if (isDrawBorder) {
-         g2d.setColor(java.awt.Color.WHITE);
-         g2d.drawRect(borderRect.x, borderRect.y, borderRect.width, borderRect.height);
       }
 
       // pixelValue contains the value for ONE pixel
@@ -724,12 +435,25 @@ public class TourMapPainter extends MapPainter {
                   final int devXText = contentWidth + 7;
                   final int devYText = (int) (devValue + lineheight / 2);
 
-                  if (UI.isDarkTheme()) {
-                     g2d.setColor(java.awt.Color.WHITE);
-                  } else {
+                  if (UI.IS_DARK_THEME) {
+
                      g2d.setColor(java.awt.Color.BLACK);
+                     g2d.drawString(valueText, devXText + 1, devYText + 1);
+
+                     g2d.setColor(java.awt.Color.WHITE);
+                     g2d.drawString(valueText, devXText, devYText);
+
+                  } else {
+
+//                     g2d.setColor(java.awt.Color.WHITE);
+//                     g2d.drawString(valueText, devXText + 1, devYText + 1);
+//                     g2d.drawString(valueText, devXText + 1, devYText - 1);
+//                     g2d.drawString(valueText, devXText - 1, devYText - 1);
+//                     g2d.drawString(valueText, devXText - 1, devYText + 1);
+
+                     g2d.setColor(java.awt.Color.BLACK);
+                     g2d.drawString(valueText, devXText, devYText);
                   }
-                  g2d.drawString(valueText, devXText, devYText);
 
                   // prevent to draw this unit again
                   legendUnits.remove(unitValue);
@@ -762,6 +486,117 @@ public class TourMapPainter extends MapPainter {
             g2d.drawLine(devValue, contentY, devValue, contentHeight);
          }
 
+      }
+   }
+
+   /**
+    * Draws map legend colors into the legend bounds.
+    *
+    * @param gc
+    * @param legendImageBounds
+    * @param colorProvider
+    * @param isDrawVertical
+    * @param isDrawVertical
+    *           When <code>true</code> the legend is drawn vertically otherwise it's drawn
+    *           horizontally.
+    * @param isDarkBackground
+    * @param isDrawLegendText
+    */
+   public static void drawMap2_Legend(final GC gc,
+                                      final Rectangle legendImageBounds,
+                                      final IMapColorProvider colorProvider) {
+
+      if (colorProvider instanceof IGradientColorProvider) {
+
+         drawMap2_Legend_GradientColors_SWT(
+               gc,
+               legendImageBounds,
+               (IGradientColorProvider) colorProvider);
+      }
+   }
+
+   private static void drawMap2_Legend_GradientColors_SWT(final GC gc,
+                                                          final Rectangle imageBounds,
+                                                          final IGradientColorProvider colorProvider) {
+
+      final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP2);
+
+      // ensure units are available
+      if (mapUnits.units == null) {
+
+         if (!_isErrorLogged) {
+            _isErrorLogged = true;
+            StatusUtil.log(new Throwable("Color provider is not configured: " + colorProvider));//$NON-NLS-1$
+         }
+
+         return;
+      }
+
+      // get configuration for the legend
+      final float legendMaxValue = mapUnits.legendMaxValue;
+      final float legendMinValue = mapUnits.legendMinValue;
+      final float legendDiffValue = legendMaxValue - legendMinValue;
+
+      int contentX;
+      int contentY;
+      int contentWidth;
+      int contentHeight;
+      int availableLegendPixels;
+
+      // horizontal legend
+      contentX = imageBounds.x;
+      contentY = imageBounds.y;
+
+      contentWidth = imageBounds.width - 2;
+      contentHeight = imageBounds.height - 2;
+
+      availableLegendPixels = contentWidth;
+
+      // pixelValue contains the value for ONE pixel
+      final float pixelValue = legendDiffValue / availableLegendPixels;
+
+      for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
+
+         final float legendValue = legendMinValue + pixelValue * pixelIndex;
+
+         int devXorY_Value;
+
+         devXorY_Value = contentX + pixelIndex;
+
+         /*
+          * Draw legend color line
+          */
+
+         final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
+         final Color valueColor = _colorCache.getColor((int) valueRGB);
+
+         gc.setForeground(valueColor);
+
+         // horizontal legend
+
+         gc.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
+      }
+
+      _colorCache.dispose();
+   }
+
+   public static void drawMap3_Legend(final Graphics2D g2d,
+                                      final IMapColorProvider colorProvider,
+                                      final ColorProviderConfig config,
+                                      final int legendWidth,
+                                      final int legendHeight) {
+
+      if (colorProvider instanceof IGradientColorProvider) {
+
+         drawMap_Legend_AWT(
+               g2d,
+               (IGradientColorProvider) colorProvider,
+               config,
+               legendWidth,
+               legendHeight,
+               true, // isVertical
+               false // isDrawUnits
+         );
       }
    }
 

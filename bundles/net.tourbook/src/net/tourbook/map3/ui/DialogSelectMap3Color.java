@@ -773,7 +773,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
                imageWidth,
                imageHeight,
                false,
-               false,
                false);
 
          final Image oldImage = _profileImages.put(colorProvider, image);

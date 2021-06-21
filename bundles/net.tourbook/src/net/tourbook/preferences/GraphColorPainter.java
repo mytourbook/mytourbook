@@ -146,9 +146,7 @@ public class GraphColorPainter {
                   TourMapPainter.drawMap2_Legend(
                         gc,
                         imageBounds,
-                        colorProvider,
-                        false,
-                        false);
+                        colorProvider);
 
                } else {
 
@@ -246,9 +244,7 @@ public class GraphColorPainter {
                TourMapPainter.drawMap2_Legend(
                      gc,
                      drawableBounds,
-                     colorProvider,
-                     false,
-                     false);
+                     colorProvider);
 
             } else {
 

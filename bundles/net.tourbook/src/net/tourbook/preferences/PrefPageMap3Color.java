@@ -1173,7 +1173,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
                imageWidth,
                imageHeight,
                false,
-               false,
                false);
 
          final Image oldImage = _profileImages.put(colorProvider, image);

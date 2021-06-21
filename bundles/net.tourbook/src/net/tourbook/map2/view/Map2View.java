@@ -133,7 +133,6 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
-import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
@@ -160,11 +159,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -1648,31 +1644,22 @@ public class Map2View extends ViewPart implements
 
       // dispose old legend image
       if ((legendImage != null) && !legendImage.isDisposed()) {
+
          legendImage.dispose();
+         legendImage = null;
       }
+
       final int legendWidth = IMapColorProvider.DEFAULT_LEGEND_WIDTH;
       int legendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
 
       final Rectangle mapBounds = _map.getBounds();
       legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height - IMapColorProvider.LEGEND_TOP_MARGIN));
 
-      final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
-
-      final ImageData overlayImageData = new ImageData(
-            legendWidth,
-            legendHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
-
-      overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
-
-      final Display display = Display.getCurrent();
-      legendImage = new Image(display, overlayImageData);
-      final Rectangle imageBounds = legendImage.getBounds();
-      final int legendHeightNoMargin = imageBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
-
       boolean isDataAvailable = false;
+
       if (mapColorProvider instanceof IGradientColorProvider) {
+
+         final int legendHeightNoMargin = legendHeight - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
          isDataAvailable = MapUtils.configureColorProvider(
                _allTourData,
@@ -1680,60 +1667,55 @@ public class Map2View extends ViewPart implements
                ColorProviderConfig.MAP2,
                legendHeightNoMargin);
 
+         if (isDataAvailable) {
+
+            legendImage = TourMapPainter.createMap2_LegendImage_AWT((IGradientColorProvider) mapColorProvider, legendWidth, legendHeight);
+
+         } else {
+
+            // return null image to hide the legend
+         }
+
       } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
-         isDataAvailable = createLegendImage_20_SetProviderValues(
-               (IDiscreteColorProvider) mapColorProvider);
-      }
+         // return null image to hide the legend -> there is currenly no legend provider for a IDiscreteColorProvider
 
-      final Color transparentColor = new Color(display, rgbTransparent);
-      final GC gc = new GC(legendImage);
-      {
-         gc.setBackground(transparentColor);
-         gc.fillRectangle(imageBounds);
-
-         if (isDataAvailable) {
-            TourMapPainter.drawMap2_Legend(gc, imageBounds, mapColorProvider, true, false);
-         } else {
-            // draws only a transparent image to hide the legend
-         }
+//         isDataAvailable = createLegendImage_20_SetProviderValues((IDiscreteColorProvider) mapColorProvider);
       }
-      gc.dispose();
-      transparentColor.dispose();
 
       _mapLegend.setImage(legendImage);
    }
 
-   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider) {
-
-      if (_allTourData.isEmpty()) {
-         return false;
-      }
-
-      // tell the legend provider how to draw the legend
-      switch (legendProvider.getGraphId()) {
-
-      case HrZone:
-
-         boolean isValidData = false;
-
-         for (final TourData tourData : _allTourData) {
-
-            if (TrainingManager.isRequiredHrZoneDataAvailable(tourData) == false) {
-               continue;
-            }
-
-            isValidData = true;
-         }
-
-         return isValidData;
-
-      default:
-         break;
-      }
-
-      return false;
-   }
+//   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider) {
+//
+//      if (_allTourData.isEmpty()) {
+//         return false;
+//      }
+//
+//      // tell the legend provider how to draw the legend
+//      switch (legendProvider.getGraphId()) {
+//
+//      case HrZone:
+//
+//         boolean isValidData = false;
+//
+//         for (final TourData tourData : _allTourData) {
+//
+//            if (TrainingManager.isRequiredHrZoneDataAvailable(tourData) == false) {
+//               continue;
+//            }
+//
+//            isValidData = true;
+//         }
+//
+//         return isValidData;
+//
+//      default:
+//         break;
+//      }
+//
+//      return false;
+//   }
 
    @Override
    public void createPartControl(final Composite parent) {
