@@ -1542,10 +1542,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void onField_Select_DateTime(final SelectionEvent selectionEvent) {
 
-      //TODO FB here ?
-      if (UI.isLinuxAsyncEvent(selectionEvent.widget)) {
-         System.out.println("adf");
-      }
       final DateTime dateTime = (DateTime) (selectionEvent.widget);
 
       final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
@@ -1811,10 +1807,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void onProfile_Modify(final ModifyEvent modifyEvent) {
 
-      //TODO FB here ?
-      if (UI.isLinuxAsyncEvent(modifyEvent.widget)) {
-         System.out.println("adf");
-      }
       if (_selectedProfile == null) {
          return;
       }
