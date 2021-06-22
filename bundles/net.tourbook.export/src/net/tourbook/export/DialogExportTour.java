@@ -60,8 +60,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -219,7 +218,7 @@ public class DialogExportTour extends TitleAreaDialog {
    private Composite _dlgContainer;
    private Composite _inputContainer;
 
-   private Label     _lblCoumouflageSpeedUnit;
+   private Label     _lblCamouflageSpeedUnit;
    private Label     _lblTcxActivityType;
    private Label     _lblTcxCourseName;
    private Label     _lblTcxNameFrom;
@@ -644,13 +643,13 @@ public class DialogExportTour extends TitleAreaDialog {
          _spinnerCamouflageSpeed.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
 
          // label: unit
-         _lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
-         _lblCoumouflageSpeedUnit.setText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
+         _lblCamouflageSpeedUnit = new Label(container, SWT.NONE);
+         _lblCamouflageSpeedUnit.setText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
          GridDataFactory
                .fillDefaults()
                .grab(true, false)
                .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_lblCoumouflageSpeedUnit);
+               .applyTo(_lblCamouflageSpeedUnit);
       }
    }
 
@@ -692,22 +691,19 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void createUI_80_Option_TCX_ActivitiesCourses(final Composite parent) {
 
-      final SelectionAdapter defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableFields();
-            setFileName();
-         }
-      };
+      final SelectionListener defaultSelectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
+               enableFields();
+               setFileName();
+            });
 
-      final SelectionAdapter nameSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            updateUI_CourseName();
-            enableFields();
-            setFileName();
-         }
-      };
+      final SelectionListener nameSelectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
+
+               updateUI_CourseName();
+               enableFields();
+               setFileName();
+            });
 
       final ModifyListener nameModifyListener = modifyEvent -> validateFields();
 
@@ -1228,7 +1224,7 @@ public class DialogExportTour extends TitleAreaDialog {
       _btnSelectFile.setEnabled(isSingleTour || isMergeIntoOneTour);
 
       _spinnerCamouflageSpeed.setEnabled(isCamouflageSpeed);
-      _lblCoumouflageSpeedUnit.setEnabled(isCamouflageSpeed);
+      _lblCamouflageSpeedUnit.setEnabled(isCamouflageSpeed);
 
       setFileName();
    }

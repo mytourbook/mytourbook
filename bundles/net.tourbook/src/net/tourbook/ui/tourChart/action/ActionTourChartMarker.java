@@ -64,6 +64,8 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
       _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker).createImage();
       _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled).createImage();
+
+      parent.addDisposeListener(disposeEvent -> onDispose());
    }
 
    @Override
@@ -141,6 +143,17 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
       }
 
       _tourChart.actionShowTourMarker(isMarkerVisible);
+   }
+
+   private void onDispose() {
+
+      if (_imageEnabled != null) {
+         _imageEnabled.dispose();
+      }
+
+      if (_imageDisabled != null) {
+         _imageDisabled.dispose();
+      }
    }
 
    private void onMouseMove(final ToolItem item) {
