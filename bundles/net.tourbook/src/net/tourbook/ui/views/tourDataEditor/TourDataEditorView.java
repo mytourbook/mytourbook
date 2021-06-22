@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.BufferedWriter;
@@ -156,7 +157,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -2836,19 +2836,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          setTourDirty();
       };
 
-      _selectionListener =
-            SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> {
+      _selectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
 
-                     if (_isSetField || _isSavingInProgress) {
-                        return;
-                     }
+               if (_isSetField || _isSavingInProgress) {
+                  return;
+               }
 
-                     updateModel_FromUI();
-                     setTourDirty();
-                  });
+               updateModel_FromUI();
+               setTourDirty();
+            });
 
-      _selectionListener_Temperature = SelectionListener.widgetSelectedAdapter(
+      _selectionListener_Temperature = widgetSelectedAdapter(
             selectionEvent -> {
 
                if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
@@ -2862,7 +2861,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * listener for elapsed/moving/paused time
        */
-      _tourTimeListener = SelectionListener.widgetSelectedAdapter(
+      _tourTimeListener = widgetSelectedAdapter(
             selectionEvent -> {
 
                if (_isSetField || _isSavingInProgress) {
@@ -4459,7 +4458,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _tab1Container = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
       _tab1Container.setExpandVertical(true);
       _tab1Container.setExpandHorizontal(true);
-      _tab1Container.addControlListener(ControlListener.controlResizedAdapter(
+      _tab1Container.addControlListener(controlResizedAdapter(
             controlEvent -> onResizeTab1()));
       {
          _tourContainer = new Composite(_tab1Container, SWT.NONE);
@@ -8952,10 +8951,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * check if a time control is currently used
        */
-      if (((widget != _deviceTime_Elapsed._spinHours) && (widget != _deviceTime_Elapsed._spinMinutes) && (widget != _deviceTime_Elapsed._spinSeconds) && (widget != _deviceTime_Recorded._spinHours)
-            && (widget != _deviceTime_Recorded._spinMinutes) && (widget != _deviceTime_Recorded._spinSeconds) && (widget != _deviceTime_Paused._spinHours) && (widget != _deviceTime_Paused._spinMinutes)
-            && (widget != _deviceTime_Paused._spinSeconds) && (widget != _computedTime_Moving._spinHours) && (widget != _computedTime_Moving._spinMinutes) && (widget != _computedTime_Moving._spinSeconds)
-            && (widget != _computedTime_Break._spinHours) && (widget != _computedTime_Break._spinMinutes) && (widget != _computedTime_Break._spinSeconds))) {
+      if (((widget != _deviceTime_Elapsed._spinHours) && (widget != _deviceTime_Elapsed._spinMinutes) && (widget != _deviceTime_Elapsed._spinSeconds)
+            && (widget != _deviceTime_Recorded._spinHours)
+            && (widget != _deviceTime_Recorded._spinMinutes) && (widget != _deviceTime_Recorded._spinSeconds)
+            && (widget != _deviceTime_Paused._spinHours) && (widget != _deviceTime_Paused._spinMinutes)
+            && (widget != _deviceTime_Paused._spinSeconds) && (widget != _computedTime_Moving._spinHours)
+            && (widget != _computedTime_Moving._spinMinutes) && (widget != _computedTime_Moving._spinSeconds)
+            && (widget != _computedTime_Break._spinHours) && (widget != _computedTime_Break._spinMinutes)
+            && (widget != _computedTime_Break._spinSeconds))) {
 
          return;
       }
