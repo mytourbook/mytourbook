@@ -779,7 +779,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       protected boolean canEdit(final Object element) {
 
-         if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
+         if ((__dataSerie == null) || !isTourInDb() || !_isEditMode) {
             return false;
          }
 
@@ -854,9 +854,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       protected boolean canEdit(final Object element) {
 
          if ((__dataSerie == null)
-               || (isTourInDb() == false)
-               || (_isEditMode == false)
-               || (__canEditSlice == false)
+               || !isTourInDb()
+               || !_isEditMode
+               || !__canEditSlice
 
          ) {
             return false;
@@ -971,8 +971,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       protected boolean canEdit(final Object element) {
 
          if ((__dataSerie == null)
-               || (isTourInDb() == false)
-               || (_isEditMode == false)
+               || !isTourInDb()
+               || !_isEditMode
 
          ) {
             return false;
@@ -1048,9 +1048,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       protected boolean canEdit(final Object element) {
 
          if ((__dataSerie == null)
-               || (isTourInDb() == false)
-               || (_isEditMode == false)
-               || (__canEditSlice == false)
+               || !isTourInDb()
+               || !_isEditMode
+               || !__canEditSlice
 
          ) {
             return false;
@@ -1829,7 +1829,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    void actionComputeDistanceValuesFromGeoPosition() {
 
-      if (TourManager.computeDistanceValuesFromGeoPosition(getSelectedTours()) == false) {
+      if (!TourManager.computeDistanceValuesFromGeoPosition(getSelectedTours())) {
          return;
       }
 
@@ -1944,7 +1944,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _state.put(STATE_CSV_EXPORT_PATH, exportFilePath.getPath());
 
       if (exportFilePath.exists()) {
-         if (net.tourbook.ui.UI.confirmOverwrite(exportFilePath) == false) {
+         if (!net.tourbook.ui.UI.confirmOverwrite(exportFilePath)) {
             // don't overwrite file, nothing more to do
             return;
          }
@@ -2078,10 +2078,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    void actionDeleteDistanceValues() {
 
-      if (MessageDialog.openConfirm(
+      if (!MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.TourEditor_Dialog_DeleteDistanceValues_Title,
-            NLS.bind(Messages.TourEditor_Dialog_DeleteDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+            NLS.bind(Messages.TourEditor_Dialog_DeleteDistanceValues_Message, UI.UNIT_LABEL_DISTANCE))) {
          return;
       }
 
@@ -2127,7 +2127,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          return;
       }
 
-      if (isRowSelectionMode() == false) {
+      if (!isRowSelectionMode()) {
          return;
       }
 
@@ -2177,7 +2177,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       // check if markers are within the selection
-      if (canDeleteMarkers(firstIndex, lastIndex) == false) {
+      if (!canDeleteMarkers(firstIndex, lastIndex)) {
          return;
       }
 
@@ -4568,7 +4568,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       table.addKeyListener(KeyListener.keyPressedAdapter(
             keyEvent -> {
-               if ((_isEditMode == false) || (isTourInDb() == false)) {
+               if (!_isEditMode || !isTourInDb()) {
                   return;
                }
 
@@ -4579,7 +4579,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _timeSlice_Viewer = new TableViewer(table);
 
-      if (_isRowEditMode == false) {
+      if (!_isRowEditMode) {
          UI.setCellEditSupport(_timeSlice_Viewer);
       }
 
@@ -4690,7 +4690,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _swimSlice_Viewer = new TableViewer(table);
 
-      if (_isRowEditMode == false) {
+      if (!_isRowEditMode) {
          UI.setCellEditSupport(_swimSlice_Viewer);
       }
 
@@ -5186,7 +5186,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                }
             }
 
-            if (isColorSet == false) {
+            if (!isColorSet) {
 
                cell.setForeground(_foregroundColor_1stColumn_NoRefTour);
                cell.setBackground(_backgroundColor_1stColumn_NoRefTour);
@@ -5783,14 +5783,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          Display.getCurrent().asyncExec(() -> {
 
-            if (_pageBook.isDisposed()) {
-               return;
-            }
-
             /*
              * check if tour is set from a selection provider
              */
-            if (_tourData != null) {
+            if (_pageBook.isDisposed() || (_tourData != null)) {
                return;
             }
 
@@ -5828,12 +5824,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void displayTour(final TourData tourData) {
 
-      if (tourData == null) {
-         return;
-      }
-
       // don't reload the same tour
-      if (_tourData == tourData) {
+      if ((tourData == null) || (_tourData == tourData)) {
          return;
       }
 
@@ -5934,7 +5926,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    public void editTimeSlicesValues() {
 
-      if (isRowSelectionMode() == false) {
+      if (!isRowSelectionMode()) {
          return;
       }
 
@@ -6074,11 +6066,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final boolean isTourInDb = isTourInDb();
       final boolean isTourValid = isTourValid() && isTourInDb;
-      final boolean isNotManualTour = _isManualTour == false;
+      final boolean isNotManualTour = !_isManualTour;
       final boolean canEdit = _isEditMode && isTourInDb;
 
       // all actions are disabled when a cell editor is activated
-      final boolean isCellEditorInactive = _isCellEditorActive == false;
+      final boolean isCellEditorInactive = !_isCellEditorActive;
 
       final CTabItem selectedTab = _tabFolder.getSelection();
       final boolean isTimeSlice_ViewerTab = selectedTab == _tab_20_TimeSlices;
@@ -6149,13 +6141,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final boolean isTourInDb = isTourInDb();
 
       // deleting time slices with swim data is very complex
-      final boolean isNoSwimData = _isTourWithSwimData == false;
+      final boolean isNoSwimData = !_isTourWithSwimData;
 
       // check if a marker can be created
       boolean canCreateMarker = false;
       if (isOneSliceSelected) {
          final TimeSlice oneTimeSlice = (TimeSlice) sliceSelection.getFirstElement();
-         canCreateMarker = _markerMap.containsKey(oneTimeSlice.serieIndex) == false;
+         canCreateMarker = !_markerMap.containsKey(oneTimeSlice.serieIndex);
       }
       // get selected Marker
       TourMarker selectedMarker = null;
@@ -6228,12 +6220,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          public IStatus runInUIThread(final IProgressMonitor monitor) {
 
             // check if view is not disposed
-            if (_pageBook.isDisposed()) {
-               return Status.OK_STATUS;
-            }
-
             // check if a newer runnable was created
-            if (__runnableCounter != _enableActionCounter) {
+            if (_pageBook.isDisposed() || (__runnableCounter != _enableActionCounter)) {
                return Status.OK_STATUS;
             }
 
@@ -6256,7 +6244,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final boolean canEdit = _isEditMode && isTourInDb();
       final boolean isManualAndEdit = _isManualTour && canEdit;
-      final boolean isDeviceTour = _isManualTour == false;
+      final boolean isDeviceTour = !_isManualTour;
 
       final float[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
       final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
@@ -6305,7 +6293,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _computedTime_Break.setEditMode(isManualAndEdit);
 
       // distance can be edited when no distance time slices are available
-      _txtDistance.setEnabled(canEdit && isDistanceSerie == false);
+      _txtDistance.setEnabled(canEdit && !isDistanceSerie);
       _txtAltitudeUp.setEnabled(isManualAndEdit);
       _txtAltitudeDown.setEnabled(isManualAndEdit);
 
@@ -6429,7 +6417,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
 
-         if ((tourChart != null) && (tourChart.isDisposed() == false)) {
+         if ((tourChart != null) && !tourChart.isDisposed()) {
             _tourChart = tourChart;
          }
       }
@@ -6614,7 +6602,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _tourStartTime = _tourData.getTourStartTime();
 
-      if (_isManualTour == false) {
+      if (!_isManualTour) {
 
          // tour is imported
 
@@ -6939,7 +6927,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private boolean isRowSelectionMode() {
 
-      if (_isRowEditMode == false) {
+      if (!_isRowEditMode) {
          final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
                Display.getCurrent().getActiveShell(),
                Messages.tour_editor_dlg_delete_rows_title,
@@ -6997,7 +6985,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (_isTourDirty) {
 
-         if (_tourData.isValidForSave() == false) {
+         if (!_tourData.isValidForSave()) {
             return false;
          }
 
@@ -7169,7 +7157,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          if (_isTourDirty) {
 
-            if (_isInfoInTitle == false) {
+            if (!_isInfoInTitle) {
 
                /*
                 * Show info only when it is not yet displayed, this is an optimization because
@@ -7713,7 +7701,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private boolean saveTourConfirmation() {
 
-      if (_isTourDirty == false) {
+      if (!_isTourDirty) {
          return true;
       }
 
@@ -8590,7 +8578,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * Cadence is edited in swim slices, cadence in time slices cannot be edited
        */
-      _timeSlice_CadenceEditingSupport.setCanEditSlices(_isTourWithSwimData == false);
+      _timeSlice_CadenceEditingSupport.setCanEditSlices(!_isTourWithSwimData);
 
       // this action displays selected unit label
       _actionSetStartDistanceTo_0.setText(
@@ -8964,21 +8952,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * check if a time control is currently used
        */
-      if ((widget == _deviceTime_Elapsed._spinHours
-            || widget == _deviceTime_Elapsed._spinMinutes
-            || widget == _deviceTime_Elapsed._spinSeconds
-            || widget == _deviceTime_Recorded._spinHours
-            || widget == _deviceTime_Recorded._spinMinutes
-            || widget == _deviceTime_Recorded._spinSeconds
-            || widget == _deviceTime_Paused._spinHours
-            || widget == _deviceTime_Paused._spinMinutes
-            || widget == _deviceTime_Paused._spinSeconds
-            || widget == _computedTime_Moving._spinHours
-            || widget == _computedTime_Moving._spinMinutes
-            || widget == _computedTime_Moving._spinSeconds
-            || widget == _computedTime_Break._spinHours
-            || widget == _computedTime_Break._spinMinutes
-            || widget == _computedTime_Break._spinSeconds) == false) {
+      if (((widget != _deviceTime_Elapsed._spinHours) && (widget != _deviceTime_Elapsed._spinMinutes) && (widget != _deviceTime_Elapsed._spinSeconds) && (widget != _deviceTime_Recorded._spinHours)
+            && (widget != _deviceTime_Recorded._spinMinutes) && (widget != _deviceTime_Recorded._spinSeconds) && (widget != _deviceTime_Paused._spinHours) && (widget != _deviceTime_Paused._spinMinutes)
+            && (widget != _deviceTime_Paused._spinSeconds) && (widget != _computedTime_Moving._spinHours) && (widget != _computedTime_Moving._spinMinutes) && (widget != _computedTime_Moving._spinSeconds)
+            && (widget != _computedTime_Break._spinHours) && (widget != _computedTime_Break._spinMinutes) && (widget != _computedTime_Break._spinSeconds))) {
 
          return;
       }
@@ -9141,12 +9118,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void run() {
 
-            if (_page_EditorForm.isDisposed()) {
-               return;
-            }
-
             // check if this is the last runnable
-            if (runnableCounter != _uiUpdateTitleCounter) {
+            if (_page_EditorForm.isDisposed() || (runnableCounter != _uiUpdateTitleCounter)) {
                // a new runnable was created
                return;
             }
