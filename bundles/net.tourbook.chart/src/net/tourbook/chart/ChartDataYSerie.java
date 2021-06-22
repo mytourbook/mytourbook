@@ -258,12 +258,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
             for (final float value : outerValues) {
 
-               if (value != value) {
-                  // ignore NaN
-                  continue;
-               }
-
-               if (value == Float.POSITIVE_INFINITY) {
+               if ((value != value) || (value == Float.POSITIVE_INFINITY)) {
                   // ignore infinity
                   continue;
                }
@@ -286,12 +281,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
             for (final float value : outerValues) {
 
-               if (value != value) {
-                  // ignore NaN
-                  continue;
-               }
-
-               if (value == Float.POSITIVE_INFINITY) {
+               if ((value != value) || (value == Float.POSITIVE_INFINITY)) {
                   // ignore infinity
                   continue;
                }
@@ -626,7 +616,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
          case ChartDataYSerie.BAR_LAYOUT_STACKED:
 
-            final float serieMax[] = new float[valueSeries[0].length];
+            final float[] serieMax = new float[valueSeries[0].length];
 
             // get the max value for the data which are stacked on each
             // other
@@ -688,12 +678,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
             for (final float value : valueSerie) {
 
-               if (value != value) {
-                  // ignore Nan
-                  continue;
-               }
-
-               if (value == Float.POSITIVE_INFINITY) {
+               if ((value != value) || (value == Float.POSITIVE_INFINITY)) {
                   // ignore infinity
                   continue;
                }
