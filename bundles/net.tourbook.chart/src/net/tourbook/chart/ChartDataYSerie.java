@@ -258,7 +258,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
             for (final float value : outerValues) {
 
-               if ((value != value) || (value == Float.POSITIVE_INFINITY)) {
+               if (value != value) {
+                  // ignore NaN
+                  continue;
+               }
+
+               if (value == Float.POSITIVE_INFINITY) {
                   // ignore infinity
                   continue;
                }
@@ -281,7 +286,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
             for (final float value : outerValues) {
 
-               if ((value != value) || (value == Float.POSITIVE_INFINITY)) {
+               if (value != value) {
+                  // ignore NaN
+                  continue;
+               }
+
+               if (value == Float.POSITIVE_INFINITY) {
                   // ignore infinity
                   continue;
                }
@@ -678,7 +688,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
             for (final float value : valueSerie) {
 
-               if ((value != value) || (value == Float.POSITIVE_INFINITY)) {
+               if (value != value) {
+                  // ignore NaN
+                  continue;
+               }
+
+               if (value == Float.POSITIVE_INFINITY) {
                   // ignore infinity
                   continue;
                }
