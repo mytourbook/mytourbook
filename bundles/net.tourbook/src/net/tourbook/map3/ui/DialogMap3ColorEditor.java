@@ -487,13 +487,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       final int vertexSize = rgbVerticies.size();
 
-      if (vertexSize == 0) {
-         // this case should not happen
-         return;
-      }
-
       // check if required vertex fields are already available
-      if (_lblVertexColor != null && _lblVertexColor.length == vertexSize) {
+      if ((vertexSize == 0) || (_lblVertexColor != null && _lblVertexColor.length == vertexSize)) {
          return;
       }
 
@@ -961,7 +956,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
        * Save/Apply buttons
        */
       final boolean isLiveUpdate = _chkLiveUpdate.getSelection();
-      final boolean canSave = isValidVertices && isLiveUpdate == false;
+      final boolean canSave = isValidVertices && !isLiveUpdate;
 
       _btnApply.setEnabled(canSave);
       _btnSave.setEnabled(canSave);
@@ -1077,17 +1072,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
    @Override
    public void modifiedColor(final RGB modifiedRGB) {
 
-      if (_isInProntoUpdate) {
-
-         /*
-          * !!! prevent slow down when setting pronto color into the color chooser, it's very
-          * complicated and this is the easiest way to solve it !!!
-          */
-
-         return;
-      }
-
-      if (_prontoColorVertexIndex == null || _isProntoColorEnabled == false) {
+      if (_isInProntoUpdate || _prontoColorVertexIndex == null || !_isProntoColorEnabled) {
 
          // a pronto color is not selected or is disabled
 
@@ -1227,13 +1212,9 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
    private void onModifyProfileName(final TraverseEvent event) {
 
-      if (_isInUIUpdate) {
-         return;
-      }
-
       if (
 
-      // Ignore arrow left/right that within the text it can be navigated
+      _isInUIUpdate || // Ignore arrow left/right that within the text it can be navigated
       event.keyCode == SWT.ARROW_LEFT || event.keyCode == SWT.ARROW_RIGHT
 
       // Ignore Escape key, otherwise a new profile can be created when immediately closing a new created profile without doing anything.
@@ -1249,7 +1230,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       updateModel_FromUI();
 
-      if (onApply(false) == false) {
+      if (!onApply(false)) {
 
          // UI is not yet updated from the model
          updateUI_FromModel();

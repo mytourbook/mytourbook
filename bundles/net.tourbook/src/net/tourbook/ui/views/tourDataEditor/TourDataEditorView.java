@@ -6085,7 +6085,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final boolean isSwimSlice_ViewerTab = selectedTab == _tab_30_SwimSlices;
       final boolean isTourData = _tourData != null;
 
-      final boolean canUseTool = _isEditMode && isTourValid && (_isManualTour == false);
+      final boolean canUseTool = _isEditMode && isTourValid && isNotManualTour;
 
       // at least 2 positions are necessary to compute the distance
       final boolean isGeoAvailable = isTourData
@@ -6107,7 +6107,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             isCellEditorInactive
                   && (isTimeSlice_ViewerTab || isSwimSlice_ViewerTab)
                   && isTourValid
-                  && (_isManualTour == false));
+                  && isNotManualTour);
       _actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
       _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
