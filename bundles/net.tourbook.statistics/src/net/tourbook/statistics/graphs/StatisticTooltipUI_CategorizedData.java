@@ -30,6 +30,7 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -150,7 +151,7 @@ public class StatisticTooltipUI_CategorizedData {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
@@ -434,7 +435,7 @@ public class StatisticTooltipUI_CategorizedData {
             // column 6: Summary unit
             final Label lblSummaryUnit = createUI_Label(parent, UI.EMPTY_STRING);
 
-            if (_isShowSummary == false) {
+            if (!_isShowSummary) {
                lblSummaryUnit.setVisible(false);
             }
          }
@@ -712,7 +713,7 @@ public class StatisticTooltipUI_CategorizedData {
    private void updateUI() {
 
       // tour type image
-      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+      if (_lblTourType_Image != null && !_lblTourType_Image.isDisposed()) {
 
          if (_tourTypeId < 0) {
             _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));

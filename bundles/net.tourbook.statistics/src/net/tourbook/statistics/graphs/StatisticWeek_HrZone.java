@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,31 +48,31 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticWeek_HrZone extends TourbookStatistic {
 
-   private static final String      STATE_HR_ZONE_WEEK_BAR_ORDERING_START = "STATE_HR_ZONE_WEEK_BAR_ORDERING_START"; //$NON-NLS-1$
+   private static final String           STATE_HR_ZONE_WEEK_BAR_ORDERING_START = "STATE_HR_ZONE_WEEK_BAR_ORDERING_START"; //$NON-NLS-1$
 
-   private TourStatisticData_WeekHrZones     _tourWeekData;
-   private DataProvider_HrZone_Week _tourWeek_DataProvider                = new DataProvider_HrZone_Week();
+   private TourStatisticData_WeekHrZones _tourWeekData;
+   private DataProvider_HrZone_Week      _tourWeek_DataProvider                = new DataProvider_HrZone_Week();
 
-   private TourPerson               _appPerson;
-   private TourTypeFilter           _appTourTypeFilter;
-   private int                      _statYoungestYear;
-   private int                      _statNumberOfYears;
+   private TourPerson                    _appPerson;
+   private TourTypeFilter                _appTourTypeFilter;
+   private int                           _statYoungestYear;
+   private int                           _statNumberOfYears;
 
-   private Chart                    _chart;
+   private Chart                         _chart;
 
-   private IChartInfoProvider       _tooltipProvider;
+   private IChartInfoProvider            _tooltipProvider;
 
-   private final MinMaxKeeper_YData _minMaxKeeper                         = new MinMaxKeeper_YData();
-   private boolean                  _isSynchScaleEnabled;
+   private final MinMaxKeeper_YData      _minMaxKeeper                         = new MinMaxKeeper_YData();
+   private boolean                       _isSynchScaleEnabled;
 
-   private int                      _barOrderStart;
+   private int                           _barOrderStart;
 
-   private TourPersonHRZone[]       _personHrZones;
-   private TourPersonHRZone[]       _resortedPersonHrZones;
+   private TourPersonHRZone[]            _personHrZones;
+   private TourPersonHRZone[]            _resortedPersonHrZones;
 
-   private int[][]                  _resortedHrZoneValues;
+   private int[][]                       _resortedHrZoneValues;
 
-   private String[]                 _barNames;
+   private String[]                      _barNames;
 
    public StatisticWeek_HrZone() {
       super();
@@ -83,8 +83,8 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
     */
    ChartStatisticSegments createChartSegments() {
 
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -129,7 +129,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    private double[] createWeekData() {
 
       final int weekCounter = _resortedHrZoneValues[0].length;
-      final double allWeeks[] = new double[weekCounter];
+      final double[] allWeeks = new double[weekCounter];
 
       for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
          allWeeks[weekIndex] = weekIndex;
@@ -452,7 +452,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
       setupBars_20_BarNames(statContext);
 
       // reset min/max values
-      if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
+      if (!_isSynchScaleEnabled && statContext.isRefreshData) {
          _minMaxKeeper.resetMinMax();
       }
 

@@ -26,8 +26,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -237,7 +236,7 @@ public class ChartComponents extends Composite {
       setLayout(gl);
 
       // left: create left axis canvas
-      componentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
+      componentAxisLeft = new ChartComponentAxis(parent, this);
       gd = new GridData(SWT.NONE, SWT.FILL, false, true);
       gd.widthHint = _yAxisWidthLeft;
       componentAxisLeft.setLayoutData(gd);
@@ -248,7 +247,7 @@ public class ChartComponents extends Composite {
       componentGraph.setLayoutData(gd);
 
       // right: create right axis canvas
-      componentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
+      componentAxisRight = new ChartComponentAxis(parent, this);
       gd = new GridData(SWT.NONE, SWT.FILL, false, true);
       gd.widthHint = _yAxisWidthRight;
       componentAxisRight.setLayoutData(gd);
@@ -264,12 +263,7 @@ public class ChartComponents extends Composite {
    private void addListener() {
 
       // this is the only resize listener for the whole chart
-      addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent event) {
-            onResize();
-         }
-      });
+      addControlListener(ControlListener.controlResizedAdapter(controlEvent -> onResize()));
    }
 
    /**
@@ -1377,7 +1371,7 @@ public class ChartComponents extends Composite {
       final int devChartHeight = getDevChartHeightWithoutTrim();
 
       int devGraphHeight = devChartHeight;
-      final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
+      final boolean isChartStacked = !_chartDataModel.isGraphOverlapped();
 
       /*
        * adjust graph device height for stacked graphs, a gap is between two graphs
@@ -1425,7 +1419,7 @@ public class ChartComponents extends Composite {
       final int devChartHeight = getDevChartHeightWithoutTrim();
 
       int devGraphHeight = devChartHeight;
-      final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
+      final boolean isChartStacked = !_chartDataModel.isGraphOverlapped();
 
       /*
        * adjust graph device height for stacked graphs, a gap is between two graphs
@@ -1473,7 +1467,7 @@ public class ChartComponents extends Composite {
        */
       final long valueScaling = Util.getValueScaling(graphUnit);
 
-      final BigDecimal bigGraphUnit = new BigDecimal(Double.valueOf(graphUnit));
+      final BigDecimal bigGraphUnit = BigDecimal.valueOf(graphUnit);
       final BigDecimal bigValueScaling = new BigDecimal(valueScaling);
       final BigDecimal bigScaledUnit = bigGraphUnit.multiply(bigValueScaling);
 
@@ -1511,7 +1505,7 @@ public class ChartComponents extends Composite {
       /*
        * ensure that min value is not at the bottom of the graph, except values which start at 0
        */
-      if (isMinMaxAdjusted == false && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
+      if (!isMinMaxAdjusted && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
          scaledMinValue = adjustedScaledMinValue - scaledUnit;
       } else if (isMinMaxAdjusted && isMinAdjusted) {
          scaledMinValue = adjustedScaledMinValue;// - scaledUnit;
@@ -1530,7 +1524,7 @@ public class ChartComponents extends Composite {
       final long adjustedScaledMaxValue = ((long) ((scaledMaxValue + adjustMaxValue) / scaledUnit) * scaledUnit);
 
       // ensure that max value is not at the top of the graph
-      if (isMinMaxAdjusted == false && scaledMaxValue == adjustedScaledMaxValue) {
+      if (!isMinMaxAdjusted && scaledMaxValue == adjustedScaledMaxValue) {
          scaledMaxValue = adjustedScaledMaxValue + scaledUnit;
       } else if (isMinMaxAdjusted && isMaxAdjusted) {
          scaledMaxValue = adjustedScaledMaxValue;// + scaledUnit;
@@ -1634,7 +1628,7 @@ public class ChartComponents extends Composite {
       final int devChartHeight = getDevChartHeightWithoutTrim();
 
       int devGraphHeight = devChartHeight;
-      final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
+      final boolean isChartStacked = !_chartDataModel.isGraphOverlapped();
 
       // adjust graph device height for stacked graphs, a gap is between two
       // graphs
@@ -1720,7 +1714,7 @@ public class ChartComponents extends Composite {
          graphMaxValue = Math.min(24 * 3600, ((((int) yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
 
          // adjust to the whole hour
-         graphMinValue = Math.max(0, ((((int) yData.getVisibleMinValue() / 3600) * 3600)));
+         graphMinValue = Math.max(0, (((int) yData.getVisibleMinValue() / 3600) * 3600));
 
          graphUnit = (graphMaxValue - graphMinValue) / unitCounter;
          graphUnit = (long) Util.roundTimeValue(graphUnit, unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H);
@@ -2269,7 +2263,7 @@ public class ChartComponents extends Composite {
       // compute the visual size of the graph
       setVisibleGraphRect();
 
-      if (setWidthToSynchedChart() == false) {
+      if (!setWidthToSynchedChart()) {
 
          // chart is not synchronized, compute the 'normal' graph width
          componentGraph.updateGraphSize();
@@ -2323,30 +2317,25 @@ public class ChartComponents extends Composite {
           * delay the change event when the key down was pressed several times
           */
          final Display display = Display.getCurrent();
-         display.asyncExec(new Runnable() {
+         display.asyncExec(() -> display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
+
+            final int __runnableKeyDownCounter = _keyDownCounter[0];
+
             @Override
             public void run() {
-               display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
+               if (__runnableKeyDownCounter == _keyDownCounter[0]
+                     && __runnableKeyDownCounter != _lastKeyDownCounter[0]) {
 
-                  final int __runnableKeyDownCounter = _keyDownCounter[0];
+                  /*
+                   * prevent redoing it, this happened when the selectNext/Previous
+                   * Method took a long time when the chart was drawn
+                   */
+                  _lastKeyDownCounter[0] = __runnableKeyDownCounter;
 
-                  @Override
-                  public void run() {
-                     if (__runnableKeyDownCounter == _keyDownCounter[0]
-                           && __runnableKeyDownCounter != _lastKeyDownCounter[0]) {
-
-                        /*
-                         * prevent redoing it, this happened when the selectNext/Previous
-                         * Method took a long time when the chart was drawn
-                         */
-                        _lastKeyDownCounter[0] = __runnableKeyDownCounter;
-
-                        _chart.fireBarSelectionEvent(0, selectedIndex[0]);
-                     }
-                  }
-               });
+                  _chart.fireBarSelectionEvent(0, selectedIndex[0]);
+               }
             }
-         });
+         }));
       }
    }
 
@@ -2532,15 +2521,7 @@ public class ChartComponents extends Composite {
     */
    void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition, final boolean isFireEvent) {
 
-      if (sliderPosition == null) {
-         /*
-          * nothing to do when the position was not set, this can happen when the chart was not
-          * yet created
-          */
-         return;
-      }
-
-      if (_chartDataModel == null) {
+      if ((sliderPosition == null) || (_chartDataModel == null)) {
          return;
       }
 
@@ -2630,7 +2611,7 @@ public class ChartComponents extends Composite {
       if (_synchConfigOut == null) {
          // synch new config
          fireEvent = true;
-      } else if (_synchConfigOut.isEqual(newSynchConfigOut) == false) {
+      } else if (!_synchConfigOut.isEqual(newSynchConfigOut)) {
          // synch when config changed
          fireEvent = true;
       }
