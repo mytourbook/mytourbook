@@ -4602,7 +4602,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       table.addKeyListener(KeyListener.keyPressedAdapter(
             keyEvent -> {
-               if (!_isEditMode || !isTourInDb()) {
+               if ((_isEditMode == false) || (isTourInDb() == false)) {
                   return;
                }
 
