@@ -421,7 +421,6 @@ public interface ITourbookPreferences {
    public static final String MAP_LAYOUT_BORDER_COLOR              = "MAP_LAYOUT_BORDER_COLOR";                 //$NON-NLS-1$
    public static final String MAP_LAYOUT_BORDER_DIMM_VALUE         = "MAP_LAYOUT_BORDER_DIMM_VALUE";            //$NON-NLS-1$
    public static final String MAP_LAYOUT_BORDER_WIDTH              = "map.layout.borderWidth";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_MAP_DIMM_COLOR            = "map.layout.dim-color";                    //$NON-NLS-1$
    public static final String MAP_LAYOUT_LIVE_UPDATE               = "MAP_LAYOUT_LIVE_UPDATE";                  //$NON-NLS-1$
    public static final String MAP_LAYOUT_PAINT_WITH_BORDER         = "map.layout.paintWithBorder";              //$NON-NLS-1$
    public static final String MAP_LAYOUT_PLOT_TYPE                 = "map.layout.symbol";                       //$NON-NLS-1$

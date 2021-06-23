@@ -1081,9 +1081,9 @@ public class Map extends Canvas {
       MapProviderManager.deleteOfflineMap(_mp, true);
    }
 
-   public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
+   public synchronized void dimMap(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
 
-      _mp.setDimLevel(dimLevel, dimColor);
+      _mp.setDimLevel(isDimMap, dimLevel, dimColor);
 
       // remove all cached map images
       _mp.disposeTileImages();
@@ -5615,10 +5615,12 @@ public class Map extends Canvas {
     *
     * @param mapDimLevel
     * @param dimColor
+    * @param isDimMap
     */
-   public void setDimLevel(final int mapDimLevel, final RGB dimColor) {
+   public void setDimLevel(final boolean isDimMap, final int mapDimLevel, final RGB dimColor) {
+
       if (_mp != null) {
-         _mp.setDimLevel(mapDimLevel, dimColor);
+         _mp.setDimLevel(isDimMap, mapDimLevel, dimColor);
       }
    }
 

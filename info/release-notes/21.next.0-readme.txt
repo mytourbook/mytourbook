@@ -37,7 +37,8 @@ New
 Improvements
 ============
 
-* 
+* 2D Map
+  - Enable/disable map dimming, moved map dimming parameters into "2D Map Options" slideout
 
 Changes  
 =======

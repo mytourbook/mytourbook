@@ -1570,7 +1570,6 @@ public class Messages extends NLS {
    public static String        pref_general_restart_app_title;
 
    public static String        pref_map_layout_BorderWidth;
-   public static String        pref_map_layout_dim_color;
    public static String        pref_map_layout_PaintBorder;
    public static String        pref_map_layout_symbol;
    public static String        pref_map_layout_symbol_dot;
@@ -2012,6 +2011,7 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String Slideout_Map_Options_Checkbox_DimMap;
    public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
    public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
