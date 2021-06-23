@@ -42,7 +42,8 @@ Improvements
 Changes  
 =======
 
-* 
+* Strava Upload (Frederic)
+ - Enhanced the tour type comparison when mapping tour types to Strava activity types
     
 
 Bugfix
