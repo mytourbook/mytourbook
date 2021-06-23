@@ -460,7 +460,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       reorderStatisticData();
 
       // reset min/max values
-      if (!_isSynchScaleEnabled && statContext.isRefreshData) {
+      if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
          _minMaxKeeper.resetMinMax();
       }
 
