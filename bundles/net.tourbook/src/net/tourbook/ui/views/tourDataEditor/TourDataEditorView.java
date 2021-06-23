@@ -4613,7 +4613,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _timeSlice_Viewer = new TableViewer(table);
 
-      if (!_isRowEditMode) {
+      if (_isRowEditMode == false) {
          UI.setCellEditSupport(_timeSlice_Viewer);
       }
 
@@ -7868,9 +7868,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * Linux needs async, otherwise the tour is modified again when pressing Ctrl+S
        */
-      _parent.getDisplay().asyncExec(() -> {
-         _isSavingInProgress = false;
-      });
+      _parent.getDisplay().asyncExec(() -> _isSavingInProgress = false);
 
       getDataSeriesFromTourData();
 
