@@ -456,7 +456,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       setupBars_20_BarNames(statContext);
 
       // reset min/max values
-      if (!_isSynchScaleEnabled && statContext.isRefreshData) {
+      if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
          _minMaxKeeper.resetMinMax();
       }
 
