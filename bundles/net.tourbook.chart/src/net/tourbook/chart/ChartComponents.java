@@ -1371,7 +1371,7 @@ public class ChartComponents extends Composite {
       final int devChartHeight = getDevChartHeightWithoutTrim();
 
       int devGraphHeight = devChartHeight;
-      final boolean isChartStacked = !_chartDataModel.isGraphOverlapped();
+      final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
 
       /*
        * adjust graph device height for stacked graphs, a gap is between two graphs
@@ -1419,7 +1419,7 @@ public class ChartComponents extends Composite {
       final int devChartHeight = getDevChartHeightWithoutTrim();
 
       int devGraphHeight = devChartHeight;
-      final boolean isChartStacked = !_chartDataModel.isGraphOverlapped();
+      final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
 
       /*
        * adjust graph device height for stacked graphs, a gap is between two graphs
@@ -1505,7 +1505,7 @@ public class ChartComponents extends Composite {
       /*
        * ensure that min value is not at the bottom of the graph, except values which start at 0
        */
-      if (!isMinMaxAdjusted && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
+      if (isMinMaxAdjusted == false && scaledMinValue == adjustedScaledMinValue && scaledMinValue != 0) {
          scaledMinValue = adjustedScaledMinValue - scaledUnit;
       } else if (isMinMaxAdjusted && isMinAdjusted) {
          scaledMinValue = adjustedScaledMinValue;// - scaledUnit;
@@ -1524,7 +1524,7 @@ public class ChartComponents extends Composite {
       final long adjustedScaledMaxValue = ((long) ((scaledMaxValue + adjustMaxValue) / scaledUnit) * scaledUnit);
 
       // ensure that max value is not at the top of the graph
-      if (!isMinMaxAdjusted && scaledMaxValue == adjustedScaledMaxValue) {
+      if (isMinMaxAdjusted == false && scaledMaxValue == adjustedScaledMaxValue) {
          scaledMaxValue = adjustedScaledMaxValue + scaledUnit;
       } else if (isMinMaxAdjusted && isMaxAdjusted) {
          scaledMaxValue = adjustedScaledMaxValue;// + scaledUnit;
@@ -1628,7 +1628,7 @@ public class ChartComponents extends Composite {
       final int devChartHeight = getDevChartHeightWithoutTrim();
 
       int devGraphHeight = devChartHeight;
-      final boolean isChartStacked = !_chartDataModel.isGraphOverlapped();
+      final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
 
       // adjust graph device height for stacked graphs, a gap is between two
       // graphs
@@ -2263,7 +2263,7 @@ public class ChartComponents extends Composite {
       // compute the visual size of the graph
       setVisibleGraphRect();
 
-      if (!setWidthToSynchedChart()) {
+      if (setWidthToSynchedChart() == false) {
 
          // chart is not synchronized, compute the 'normal' graph width
          componentGraph.updateGraphSize();
@@ -2521,7 +2521,15 @@ public class ChartComponents extends Composite {
     */
    void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition, final boolean isFireEvent) {
 
-      if ((sliderPosition == null) || (_chartDataModel == null)) {
+      if (sliderPosition == null) {
+         /*
+          * nothing to do when the position was not set, this can happen when the chart was not
+          * yet created
+          */
+         return;
+      }
+
+      if (_chartDataModel == null) {
          return;
       }
 
@@ -2611,7 +2619,7 @@ public class ChartComponents extends Composite {
       if (_synchConfigOut == null) {
          // synch new config
          fireEvent = true;
-      } else if (!_synchConfigOut.isEqual(newSynchConfigOut)) {
+      } else if (_synchConfigOut.isEqual(newSynchConfigOut) == false) {
          // synch when config changed
          fireEvent = true;
       }

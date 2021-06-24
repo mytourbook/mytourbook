@@ -435,7 +435,7 @@ public class StatisticTooltipUI_CategorizedData {
             // column 6: Summary unit
             final Label lblSummaryUnit = createUI_Label(parent, UI.EMPTY_STRING);
 
-            if (!_isShowSummary) {
+            if (_isShowSummary == false) {
                lblSummaryUnit.setVisible(false);
             }
          }
@@ -713,7 +713,7 @@ public class StatisticTooltipUI_CategorizedData {
    private void updateUI() {
 
       // tour type image
-      if (_lblTourType_Image != null && !_lblTourType_Image.isDisposed()) {
+      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
 
          if (_tourTypeId < 0) {
             _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
