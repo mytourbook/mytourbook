@@ -1382,7 +1382,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    public void setDimLevel(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
 
       // convert dimLevel 0...10 into alpha value 0...255
-      final int dimAlphaValue = (int) (dimLevel * 255 / Map2View.MAX_DIM_INTERVALS);
+      final int dimAlphaValue = 255 - dimLevel * 255 / Map2View.MAX_DIM_STEPS;
 
       // check if the dimming value is modified
       if (_isDimMap == isDimMap && _dimmingAlphaValue == dimAlphaValue && dimColor.equals(_dimmingColor)) {

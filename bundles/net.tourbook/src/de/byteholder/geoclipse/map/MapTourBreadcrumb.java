@@ -19,6 +19,7 @@ import de.byteholder.geoclipse.Messages;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -32,20 +33,30 @@ import org.eclipse.swt.widgets.Display;
 
 public class MapTourBreadcrumb {
 
-   private static final String        CRUMB_SEPARATOR    = " >";                                                                //$NON-NLS-1$
+   private static final Color         SYSTEM_COLOR_BLUE      = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+   private static final Color         SYSTEM_COLOR_BLACK     = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+   private static final Color         SYSTEM_COLOR_RED       = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+   private static final Color         SYSTEM_COLOR_WHITE     = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
-   private static final int           NOT_HOVERED_INDEX  = -1;
+   private static final String        CRUMB_SEPARATOR        = " >";                                                                //$NON-NLS-1$
 
-   private ArrayList<ArrayList<Long>> _allTours          = new ArrayList<>();
-   private ArrayList<Rectangle>       _allCrumbs         = new ArrayList<>();
+   private static final int           NOT_HOVERED_INDEX      = -1;
+
+   private ArrayList<ArrayList<Long>> _allTours              = new ArrayList<>();
+   private ArrayList<Rectangle>       _allCrumbs             = new ArrayList<>();
 
    private Rectangle                  _outline;
 
-   private int                        _hoveredCrumbIndex = NOT_HOVERED_INDEX;
+   private int                        _hoveredCrumbIndex     = NOT_HOVERED_INDEX;
 
-   private Font                       _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                       _boldFont              = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-   public MapTourBreadcrumb() {}
+   private Map                        _map;
+
+   public MapTourBreadcrumb(final Map map) {
+
+      _map = map;
+   }
 
    /**
     * Reset bread crumbs to the hovered crumb, all following crums are removed
@@ -165,17 +176,39 @@ public class MapTourBreadcrumb {
          return;
       }
 
+      Color bgColor;
+      Color fgColor;
+      Color bgColorHovered;
+      Color fgColorHovered;
+
+      if (net.tourbook.common.UI.IS_DARK_THEME && _map.isMapBackgroundDark()) {
+
+         bgColor = ThemeUtil.getDefaultBackgroundColor_Table();
+         fgColor = ThemeUtil.getDefaultForegroundColor_Table();
+
+      } else {
+
+         if (_map.isMapBackgroundDark()) {
+
+            bgColor = new Color(0x40, 0x40, 0x40);
+            fgColor = SYSTEM_COLOR_WHITE;
+
+         } else {
+
+            bgColor = SYSTEM_COLOR_WHITE;
+            fgColor = SYSTEM_COLOR_BLACK;
+         }
+      }
+
+      bgColorHovered = SYSTEM_COLOR_BLUE;
+      fgColorHovered = SYSTEM_COLOR_WHITE;
+
       final int marginVertical = 2;
       final int marginHorizontal_Crumb = 6;
       final int marginHorizontal_Separator = 1;
 
       int devX = 0;
       final int devY = 0;
-
-      final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-      final Color bgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-      final Color fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-      final Color fgColorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
       // this is VERY important otherwise hovered tours have another spacing !!!
       gc.setAntialias(SWT.ON);
@@ -222,7 +255,11 @@ public class MapTourBreadcrumb {
          final String numTourDataCrumbs = Integer.toString(tourDataCrumb.size());
 
          final String crumbText = crumbIndex == 0
-               ? Messages.Map2_TourBreadcrumb_Label_Tours + UI.SPACE + UI.SPACE + UI.SPACE + numTourDataCrumbs
+               ? Messages.Map2_TourBreadcrumb_Label_Tours 
+                     + net.tourbook.common.UI.SPACE 
+                     + net.tourbook.common.UI.SPACE 
+                     + net.tourbook.common.UI.SPACE
+                     + numTourDataCrumbs
                : numTourDataCrumbs;
 
          final Point contentSize = gc.textExtent(crumbText);
@@ -263,14 +300,14 @@ public class MapTourBreadcrumb {
          final int devXWarning = devX + 0;
          final int devYWarning = 0;
 
-         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         gc.setBackground(SYSTEM_COLOR_RED);
          gc.fillRectangle(
                devXWarning,
                devYWarning,
                warningSize.x + 2 * marginHorizontal_Crumb,
                warningSize.y + 2 * marginVertical);
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+         gc.setForeground(SYSTEM_COLOR_WHITE);
          gc.drawString(
                warningText,
                devXWarning + marginHorizontal_Crumb,

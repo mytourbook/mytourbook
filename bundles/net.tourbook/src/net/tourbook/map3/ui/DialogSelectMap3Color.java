@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
@@ -39,7 +40,6 @@ import net.tourbook.map3.view.Map3View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap3Color;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -281,7 +281,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditSelectedColor();
          }
       };
-      _actionEditSelectedColor.setImageDescriptor(UI.getGraphImageDescriptor(_graphId));
+      _actionEditSelectedColor.setImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor(_graphId));
       _actionEditSelectedColor.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditSelectedColors);
 
       /*
@@ -761,7 +761,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
          final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
          final ArrayList<RGBVertex> rgbVertices = colorProfile.getProfileImage().getRgbVertices();
 
-         colorProvider.configureColorProvider(//
+         colorProvider.configureColorProvider(
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,
                rgbVertices,
@@ -772,8 +772,11 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,
                imageHeight,
-               false,
-               false);
+               false, // horizontal
+               false, // no unit
+               net.tourbook.common.UI.IS_DARK_THEME, // is dark background
+               false // no shadow
+         );
 
          final Image oldImage = _profileImages.put(colorProvider, image);
 

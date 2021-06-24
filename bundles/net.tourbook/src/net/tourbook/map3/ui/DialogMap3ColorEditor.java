@@ -918,7 +918,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       final boolean isDrawUnits = _dialogColorProvider.getMap3ColorProfile().isAbsoluteValues();
 
-      _dialogColorProvider.configureColorProvider(//
+      _dialogColorProvider.configureColorProvider(
             ColorProviderConfig.MAP3_PROFILE,
             imageHeight,
             getRgbVertices(),
@@ -929,8 +929,11 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             ColorProviderConfig.MAP3_PROFILE,
             imageWidth,
             imageHeight,
-            true,
-            true);
+            true, // is vertical
+            true, // draw units
+            UI.IS_DARK_THEME,
+            false // no shadow
+      );
 
       _canvasProfileImage.setImage(_profileImage);
    }

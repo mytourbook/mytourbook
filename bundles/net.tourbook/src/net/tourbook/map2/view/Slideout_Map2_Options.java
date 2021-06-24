@@ -234,7 +234,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                   // spinner
                   _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
                   _spinnerDimValue.setMinimum(0);
-                  _spinnerDimValue.setMaximum(Map2View.MAX_DIM_INTERVALS);
+                  _spinnerDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
                   _spinnerDimValue.setIncrement(1);
                   _spinnerDimValue.setPageIncrement(4);
                   _spinnerDimValue.addSelectionListener(_defaultSelectionListener);

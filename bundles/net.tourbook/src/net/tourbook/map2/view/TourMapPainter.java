@@ -197,14 +197,18 @@ public class TourMapPainter extends MapPainter {
     * @param colorProvider
     * @param imageWidth
     * @param imageHeight
+    * @param isDarkBackground
     * @param isDrawVertical
     * @param isDarkBackground
+    * @param isDrawUnitShadow
     * @param isDrawLegendText
     * @return
     */
    public static Image createMap2_LegendImage_AWT(final IGradientColorProvider colorProvider,
                                                   final int imageWidth,
-                                                  final int imageHeight) {
+                                                  final int imageHeight,
+                                                  final boolean isDarkBackground,
+                                                  final boolean isDrawUnitShadow) {
 
       final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -218,8 +222,9 @@ public class TourMapPainter extends MapPainter {
                imageWidth,
                imageHeight,
                true, // isVertical
-               true // isDrawUnits
-         );
+               true, // isDrawUnits
+               isDarkBackground,
+               isDrawUnitShadow);
 
       } finally {
          g2d.dispose();
@@ -234,7 +239,9 @@ public class TourMapPainter extends MapPainter {
                                               final int imageWidth,
                                               final int imageHeight,
                                               final boolean isVertical,
-                                              final boolean isDrawUnits) {
+                                              final boolean isDrawUnits,
+                                              final boolean isDarkBackground,
+                                              final boolean isDrawUnitShadow) {
 
       final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -248,7 +255,9 @@ public class TourMapPainter extends MapPainter {
                imageWidth,
                imageHeight,
                isVertical,
-               isDrawUnits);
+               isDrawUnits,
+               isDarkBackground,
+               isDrawUnitShadow);
 
       } finally {
          g2d.dispose();
@@ -257,13 +266,26 @@ public class TourMapPainter extends MapPainter {
       return ImageConverter.convertIntoSWT(image);
    }
 
+   /**
+    * @param g2d
+    * @param colorProvider
+    * @param config
+    * @param legendWidth
+    * @param legendHeight
+    * @param isDrawVertical
+    * @param isDrawUnits
+    * @param isDarkBackground
+    * @param isDrawUnitShadow
+    */
    private static void drawMap_Legend_AWT(final Graphics2D g2d,
                                           final IGradientColorProvider colorProvider,
                                           final ColorProviderConfig config,
                                           final int legendWidth,
                                           final int legendHeight,
                                           final boolean isDrawVertical,
-                                          final boolean isDrawUnits) {
+                                          final boolean isDrawUnits,
+                                          final boolean isDarkBackground,
+                                          final boolean isDrawUnitShadow) {
 
 // SET_FORMATTING_OFF
 
@@ -275,7 +297,7 @@ public class TourMapPainter extends MapPainter {
 //      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
 // sometimes it looks better with this parameter but sometimes not
-      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
 //      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 //      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,          RenderingHints.VALUE_ANTIALIAS_ON);
@@ -311,23 +333,14 @@ public class TourMapPainter extends MapPainter {
        * Setup font
        */
       final Font font = DEFAULT_FONT;
+      g2d.setFont(font);
 //      final Font largerFont = font.deriveFont(font.getSize() * 1.1f);
 //      g2d.setFont(largerFont);
-      g2d.setFont(font);
 
       // Measure the font and the message
-      final FontRenderContext frc = g2d.getFontRenderContext();
-      final LineMetrics metrics = font.getLineMetrics(unitText, frc);
-
-//    final float width = (float) bounds.getWidth(); // The width of our text
+      final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
+      final LineMetrics metrics = font.getLineMetrics(unitText, fontRenderContext);
       final float lineheight = metrics.getHeight(); // Total line height
-//    final float ascent = metrics.getAscent(); // Top of text to baseline
-
-      // Now display the message centered horizontally and vertically in box
-//    final float x0 = (float) (box.getX() + (box.getWidth() - width) / 2);
-//    final float y0 = (float) (box.getY() + (box.getHeight() - lineheight) / 2 + ascent);
-//    g2d.setFont(font);
-//    g2d.drawString(unitText, x0, y0);
 
       /*
        * Setup legend image
@@ -431,25 +444,35 @@ public class TourMapPainter extends MapPainter {
                      // when unitLabels are available, they will overwrite the default labeling
                      valueText = unitLabels.get(unitLabelIndex++);
                   }
-
                   final int devXText = contentWidth + 7;
                   final int devYText = (int) (devValue + lineheight / 2);
 
-                  if (UI.IS_DARK_THEME) {
+                  if (isDarkBackground) {
 
-                     g2d.setColor(java.awt.Color.BLACK);
-                     g2d.drawString(valueText, devXText + 1, devYText + 1);
+                     // dark background
+
+                     if (isDrawUnitShadow) {
+                        g2d.setColor(java.awt.Color.DARK_GRAY);
+                        g2d.drawString(valueText, devXText + 1, devYText + 1);
+                        g2d.drawString(valueText, devXText + 1, devYText - 1);
+                        g2d.drawString(valueText, devXText - 1, devYText + 1);
+                        g2d.drawString(valueText, devXText - 1, devYText - 1);
+                     }
 
                      g2d.setColor(java.awt.Color.WHITE);
                      g2d.drawString(valueText, devXText, devYText);
 
                   } else {
 
-//                     g2d.setColor(java.awt.Color.WHITE);
-//                     g2d.drawString(valueText, devXText + 1, devYText + 1);
-//                     g2d.drawString(valueText, devXText + 1, devYText - 1);
-//                     g2d.drawString(valueText, devXText - 1, devYText - 1);
-//                     g2d.drawString(valueText, devXText - 1, devYText + 1);
+                     // bright background
+
+                     if (isDrawUnitShadow) {
+                        g2d.setColor(java.awt.Color.WHITE);
+                        g2d.drawString(valueText, devXText + 1, devYText + 1);
+                        g2d.drawString(valueText, devXText + 1, devYText - 1);
+                        g2d.drawString(valueText, devXText - 1, devYText + 1);
+                        g2d.drawString(valueText, devXText - 1, devYText - 1);
+                     }
 
                      g2d.setColor(java.awt.Color.BLACK);
                      g2d.drawString(valueText, devXText, devYText);
@@ -547,8 +570,8 @@ public class TourMapPainter extends MapPainter {
       contentX = imageBounds.x;
       contentY = imageBounds.y;
 
-      contentWidth = imageBounds.width - 2;
-      contentHeight = imageBounds.height - 2;
+      contentWidth = imageBounds.width;
+      contentHeight = imageBounds.height;
 
       availableLegendPixels = contentWidth;
 
@@ -584,7 +607,9 @@ public class TourMapPainter extends MapPainter {
                                       final IMapColorProvider colorProvider,
                                       final ColorProviderConfig config,
                                       final int legendWidth,
-                                      final int legendHeight) {
+                                      final int legendHeight,
+                                      final boolean isDarkBackground,
+                                      final boolean isDrawUnitShadow) {
 
       if (colorProvider instanceof IGradientColorProvider) {
 
@@ -595,8 +620,9 @@ public class TourMapPainter extends MapPainter {
                legendWidth,
                legendHeight,
                true, // isVertical
-               false // isDrawUnits
-         );
+               false, // isDrawUnits
+               isDarkBackground,
+               isDrawUnitShadow);
       }
    }
 

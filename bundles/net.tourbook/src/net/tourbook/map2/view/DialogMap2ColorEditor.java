@@ -204,7 +204,10 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
       _imageMappingColor = TourMapPainter.createMap2_LegendImage_AWT(
             _colorProvider,
             legendWidth,
-            legendHeight);
+            legendHeight,
+            UI.IS_DARK_THEME, // is dark background
+            false // no shadow
+      );
    }
 
    private void createUI(final Composite parent) {

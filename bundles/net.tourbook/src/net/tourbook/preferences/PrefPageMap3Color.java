@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
@@ -40,7 +41,6 @@ import net.tourbook.map3.Messages;
 import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.map3.ui.IMap3ColorUpdater;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
@@ -1172,8 +1172,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,
                imageHeight,
-               false,
-               false);
+               false, // is horizontal
+               false, // no units
+               UI.IS_DARK_THEME, // is dark background
+               false // no shadow
+         );
 
          final Image oldImage = _profileImages.put(colorProvider, image);
 
@@ -1359,7 +1362,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
             final Map3ColorDefinition colorDef = (Map3ColorDefinition) itemData;
 
-            final Image image = UI.getGraphImage(colorDef.getGraphId());
+            final Image image = net.tourbook.ui.UI.getGraphImage(colorDef.getGraphId());
 
             if (image != null) {
 

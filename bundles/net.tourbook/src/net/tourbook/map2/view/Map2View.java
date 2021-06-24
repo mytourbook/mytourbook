@@ -260,13 +260,13 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_PHOTO_FILTER_RATING_STARS                       = "STATE_PHOTO_FILTER_RATING_STARS";                     //$NON-NLS-1$
    private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR               = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
 
-   public static final int       MAX_DIM_INTERVALS                                     = 20;
+   public static final int       MAX_DIM_STEPS                                         = 10;
    public static final String    STATE_IS_DIM_MAP                                      = "STATE_IS_DIM_MAP";                                    //$NON-NLS-1$
    public static final boolean   STATE_IS_DIM_MAP_DEFAULT                              = false;
    public static final String    STATE_DIM_MAP_COLOR                                   = "STATE_DIM_MAP_COLOR";                                    //$NON-NLS-1$
-   public static final RGB       STATE_DIM_MAP_COLOR_DEFAULT                           = new RGB(0, 0, 0);
+   public static final RGB       STATE_DIM_MAP_COLOR_DEFAULT                           = new RGB(0x2f, 0x2f, 0x2f);
    public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                    //$NON-NLS-1$
-   public static final int       STATE_DIM_MAP_VALUE_DEFAULT                           = MAX_DIM_INTERVALS / 2;
+   public static final int       STATE_DIM_MAP_VALUE_DEFAULT                           = MAX_DIM_STEPS / 2;
 
 
    private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
@@ -1637,7 +1637,12 @@ public class Map2View extends ViewPart implements
 
          if (isDataAvailable) {
 
-            legendImage = TourMapPainter.createMap2_LegendImage_AWT((IGradientColorProvider) mapColorProvider, legendWidth, legendHeight);
+            legendImage = TourMapPainter.createMap2_LegendImage_AWT((IGradientColorProvider) mapColorProvider,
+                  legendWidth,
+                  legendHeight,
+                  isBackgroundDark(),
+                  true // draw unit shadow
+            );
 
          } else {
 
@@ -1653,37 +1658,6 @@ public class Map2View extends ViewPart implements
 
       _mapLegend.setImage(legendImage);
    }
-
-//   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider) {
-//
-//      if (_allTourData.isEmpty()) {
-//         return false;
-//      }
-//
-//      // tell the legend provider how to draw the legend
-//      switch (legendProvider.getGraphId()) {
-//
-//      case HrZone:
-//
-//         boolean isValidData = false;
-//
-//         for (final TourData tourData : _allTourData) {
-//
-//            if (TrainingManager.isRequiredHrZoneDataAvailable(tourData) == false) {
-//               continue;
-//            }
-//
-//            isValidData = true;
-//         }
-//
-//         return isValidData;
-//
-//      default:
-//         break;
-//      }
-//
-//      return false;
-//   }
 
    @Override
    public void createPartControl(final Composite parent) {
@@ -1782,7 +1756,7 @@ public class Map2View extends ViewPart implements
          _map.setPainting(true);
 
          final int mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-         if (mapDimValue < (MAX_DIM_INTERVALS / 5)) {
+         if (mapDimValue < (MAX_DIM_STEPS / 5)) {
             showDimWarning();
          }
       });
@@ -2459,6 +2433,19 @@ public class Map2View extends ViewPart implements
    private void hideGeoGrid() {
 
       _map.showGeoGrid(null);
+   }
+
+   /**
+    * @return Returns <code>true</code> when the map is dimmed to a specific level
+    */
+   boolean isBackgroundDark() {
+
+      final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_DIM_MAP, Map2View.STATE_IS_DIM_MAP_DEFAULT);
+      final float mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
+
+      final float dimLevelPercent = mapDimValue / MAX_DIM_STEPS * 100;
+
+      return isMapDimmed && dimLevelPercent >= 30;
    }
 
    private boolean isMapSynched() {
@@ -3719,7 +3706,10 @@ public class Map2View extends ViewPart implements
       final boolean isDimMap = Util.getStateBoolean(_state, Map2View.STATE_IS_DIM_MAP, Map2View.STATE_IS_DIM_MAP_DEFAULT);
       final int mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
       final RGB mapDimColor = Util.getStateRGB(_state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
-      _map.setDimLevel(isDimMap, mapDimValue, mapDimColor);
+      _map.setDimLevel(isDimMap, mapDimValue, mapDimColor, isBackgroundDark());
+
+      // create legend image after the dim level is modified
+      createLegendImage(_tourPainterConfig.getMapColorProvider());
 
       _map.redraw();
    }
