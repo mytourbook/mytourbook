@@ -158,7 +158,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
@@ -374,8 +373,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ModifyListener                     _modifyListener_Temperature;
    private MouseWheelListener                 _mouseWheelListener;
    private MouseWheelListener                 _mouseWheelListener_Temperature;
-   private SelectionAdapter                   _selectionListener;
-   private SelectionAdapter                   _selectionListener_Temperature;
+   private SelectionListener                  _selectionListener;
+   private SelectionListener                  _selectionListener_Temperature;
    private SelectionListener                  _columnSortListener;
    private SelectionAdapter                   _tourTimeListener;
    private ModifyListener                     _verifyFloatValue;
@@ -797,7 +796,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       @Override
       protected Object getValue(final Object element) {
-         return Double.valueOf(__dataSerie[((TimeSlice) element).serieIndex]).toString();
+         return Double.toString(__dataSerie[((TimeSlice) element).serieIndex]);
       }
 
       public void setDataSerie(final double[] dataSerie) {
@@ -2840,31 +2839,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          setTourDirty();
       };
 
-      _selectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      _selectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
+               if (_isSetField || _isSavingInProgress) {
+                  return;
+               }
 
-            updateModel_FromUI();
-            setTourDirty();
-         }
-      };
+               updateModel_FromUI();
+               setTourDirty();
+            });
 
-      _selectionListener_Temperature = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      _selectionListener_Temperature = widgetSelectedAdapter(
+            selectionEvent -> {
 
-            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-               return;
-            }
+               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+                  return;
+               }
 
-            _isTemperatureManuallyModified = true;
-            setTourDirty();
-         }
-      };
+               _isTemperatureManuallyModified = true;
+               setTourDirty();
+            });
 
       /*
        * listener for elapsed/moving/paused time
@@ -4605,19 +4600,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //       }
 //    });
 
-      table.addKeyListener(new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
+      table.addKeyListener(KeyListener.keyPressedAdapter(
+            keyEvent -> {
+               if ((_isEditMode == false) || (isTourInDb() == false)) {
+                  return;
+               }
 
-            if ((_isEditMode == false) || (isTourInDb() == false)) {
-               return;
-            }
-
-            if (e.keyCode == SWT.DEL) {
-               actionDeleteTimeSlices(true);
-            }
-         }
-      });
+               if (keyEvent.keyCode == SWT.DEL) {
+                  actionDeleteTimeSlices(true);
+               }
+            }));
 
       _timeSlice_Viewer = new TableViewer(table);
 
@@ -7876,9 +7868,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * Linux needs async, otherwise the tour is modified again when pressing Ctrl+S
        */
-      _parent.getDisplay().asyncExec(() -> {
-         _isSavingInProgress = false;
-      });
+      _parent.getDisplay().asyncExec(() -> _isSavingInProgress = false);
 
       getDataSeriesFromTourData();
 
