@@ -2074,7 +2074,11 @@ public class Messages extends NLS {
    public static String Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip;
    public static String Slideout_TourBookOptions_Label_Title;
 
+   public static String Slideout_TourChartGraph_Checkbox_DefaultWhenOpened_Tooltip;
    public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
+   public static String Slideout_TourChartGraph_Label_DefaultWhenOpened;
+   public static String Slideout_TourChartGraph_Label_ShowActionInToolbar;
+   public static String Slideout_TourChartGraph_Label_ShowGraph;
    public static String Slideout_TourChartGraph_Label_Title;
 
    public static String Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
