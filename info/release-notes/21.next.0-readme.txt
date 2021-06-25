@@ -44,6 +44,10 @@ Improvements
   - Legend units and scale colors are depending on the map dim level
   
 
+* Tour Chart
+  - Set default graphs in the graph slideout, previously it could be set only in the pref dialog
+
+
 Changes  
 =======
 
