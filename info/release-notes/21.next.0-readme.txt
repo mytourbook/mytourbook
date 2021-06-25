@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Mac OS       - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
+
 * Tour Chart   - Select color for 2nd graph line instead of compliment color
                - Set default graphs in the graph slideout, sorting still needs the pref page
 
