@@ -202,8 +202,8 @@ public interface ITourbookPreferences {
     */
    public static final String GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES = "GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES"; //$NON-NLS-1$
    public static final String GRAPH_IS_SHOW_PACE_GRAPH_INVERTED     = "GRAPH_IS_SHOW_PACE_GRAPH_INVERTED";     //$NON-NLS-1$
-   public static final String GRAPH_IS_SHOW_NIGHT_SECTIONS          = "GRAPH_IS_SHOW_NIGHT_SECTIONS"; //$NON-NLS-1$
-   public static final String GRAPH_OPACITY_NIGHT_SECTIONS          = "GRAPH_OPACITY_NIGHT_SECTIONS"; //$NON-NLS-1$
+   public static final String GRAPH_IS_SHOW_NIGHT_SECTIONS          = "GRAPH_IS_SHOW_NIGHT_SECTIONS";          //$NON-NLS-1$
+   public static final String GRAPH_OPACITY_NIGHT_SECTIONS          = "GRAPH_OPACITY_NIGHT_SECTIONS";          //$NON-NLS-1$
    public static final String GRAPH_MOUSE_MODE                      = "graph.toggle-mouse";                    //$NON-NLS-1$
    public static final String GRAPH_MOVE_SLIDERS_WHEN_ZOOMED        = "graphs.move-sliders-when-zoomed";       //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_FILLING            = "Graph_Transparency_Filling";            //$NON-NLS-1$
@@ -442,8 +442,9 @@ public interface ITourbookPreferences {
    /*
     * id's for preference pages
     */
-   public static final String PREF_PAGE_TOUR_TYPE        = "net.tourbook.preferences.PrefPageTourTypeDefinition"; //$NON-NLS-1$
-   public static final String PREF_PAGE_TOUR_TYPE_FILTER = "net.tourbook.preferences.PrefPageTourTypeFilter";     //$NON-NLS-1$
+   public static final String PREF_PAGE_TOUR_TYPE                   = "net.tourbook.preferences.PrefPageTourTypeDefinition";       //$NON-NLS-1$
+   public static final String PREF_PAGE_TOUR_TYPE_FILTER            = "net.tourbook.preferences.PrefPageTourTypeFilter";           //$NON-NLS-1$
+   public static final String PREF_PAGE_TOUR_TYPE_STRAVA_ACTIVITIES = "net.tourbook.preferences.PrefPageTourTypeStravaActivities"; //$NON-NLS-1$
 
    /*
     * tour data editor
