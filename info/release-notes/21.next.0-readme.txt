@@ -39,6 +39,8 @@ Improvements
 
 * 2D Map
   - Enable/disable map dimming, moved map dimming parameters into "2D Map Options" slideout
+  - Legend units and scale colors are depending on the map dim level
+  
 
 Changes  
 =======
