@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Mac OS       - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
+
 * Tour Chart   - Select color for 2nd graph line instead of compliment color
                - Set default graphs in the graph slideout, sorting still needs the pref page
 
@@ -37,7 +39,14 @@ New
 Improvements
 ============
 
-* 
+* 2D Map
+  - Enable/disable map dimming, moved map dimming parameters into "2D Map Options" slideout
+  - Legend units and scale colors are depending on the map dim level
+  
+
+* Tour Chart
+  - Set default graphs in the graph slideout, previously it could be set only in the pref dialog
+
 
 Changes  
 =======

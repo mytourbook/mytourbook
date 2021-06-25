@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.LinkedHashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -35,13 +39,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -49,23 +55,30 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-   final private IDialogSettings _state;
+   final static IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
+   final private IDialogSettings   _state;
 
-   private SelectionAdapter      _defaultState_SelectionListener;
+   private IPropertyChangeListener _defaultChangePropertyListener;
+   private SelectionListener       _defaultSelectionListener;
+   private MouseWheelListener      _defaultMouseWheelListener;
 
-   private ActionResetToDefaults _actionRestoreDefaults;
+   private ActionResetToDefaults   _actionRestoreDefaults;
 
-   private Map2View              _map2View;
+   private Map2View                _map2View;
 
    /*
     * UI controls
     */
-   private Composite _parent;
+   private Composite             _parent;
 
-   private Button    _chkIsToggleKeyboardPanning;
-   private Button    _chkIsShowHoveredTour;
-   private Button    _chkIsZoomWithMousePosition;
+   private Button                _chkIsDimMap;
+   private Button                _chkIsToggleKeyboardPanning;
+   private Button                _chkIsShowHoveredTour;
+   private Button                _chkIsZoomWithMousePosition;
+
+   private Spinner               _spinnerDimValue;
+
+   private ColorSelectorExtended _colorMapDimmColor;
 
    /**
     * @param ownerControl
@@ -174,12 +187,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
                _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
                _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
-               _chkIsShowHoveredTour.addSelectionListener(new SelectionAdapter() {
-                  @Override
-                  public void widgetSelected(final SelectionEvent e) {
-                     onChangeUI_ShowHoveredTour();
-                  }
-               });
+               _chkIsShowHoveredTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
             }
          }
@@ -192,7 +200,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
                _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
                _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-               _chkIsZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
+               _chkIsZoomWithMousePosition.addSelectionListener(_defaultSelectionListener);
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
             }
          }
@@ -205,8 +213,40 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                _chkIsToggleKeyboardPanning = new Button(container, SWT.CHECK);
                _chkIsToggleKeyboardPanning.setText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning);
                _chkIsToggleKeyboardPanning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip);
-               _chkIsToggleKeyboardPanning.addSelectionListener(_defaultState_SelectionListener);
+               _chkIsToggleKeyboardPanning.addSelectionListener(_defaultSelectionListener);
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsToggleKeyboardPanning);
+            }
+         }
+         {
+            /*
+             * Dim map
+             */
+            {
+               // checkbox
+               _chkIsDimMap = new Button(container, SWT.CHECK);
+               _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
+               _chkIsDimMap.addSelectionListener(_defaultSelectionListener);
+
+               final Composite dimContainer = new Composite(container, SWT.NONE);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(dimContainer);
+               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
+               {
+                  // spinner
+                  _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
+                  _spinnerDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
+                  _spinnerDimValue.setMinimum(0);
+                  _spinnerDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
+                  _spinnerDimValue.setIncrement(1);
+                  _spinnerDimValue.setPageIncrement(4);
+                  _spinnerDimValue.addSelectionListener(_defaultSelectionListener);
+                  _spinnerDimValue.addMouseWheelListener(_defaultMouseWheelListener);
+
+                  // dimming color
+                  _colorMapDimmColor = new ColorSelectorExtended(dimContainer);
+                  _colorMapDimmColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
+                  _colorMapDimmColor.addListener(_defaultChangePropertyListener);
+                  _colorMapDimmColor.addOpenListener(this);
+               }
             }
          }
       }
@@ -214,27 +254,25 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
    private void enableControls() {
 
+      final boolean isDimMap = _chkIsDimMap.getSelection();
+
+      _colorMapDimmColor.setEnabled(isDimMap);
+      _spinnerDimValue.setEnabled(isDimMap);
    }
 
    private void initUI(final Composite parent) {
 
       _parent = parent;
 
-      _defaultState_SelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI_MapUpdate();
-         }
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI_UpdateMap());
+
+      _defaultChangePropertyListener = propertyChangeEvent -> onChangeUI_UpdateMap();
+
+      _defaultMouseWheelListener = mouseEvent -> {
+
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI_UpdateMap();
       };
-   }
-
-   private void onChangeUI_MapUpdate() {
-
-      saveState();
-
-      enableControls();
-
-      _map2View.restoreState_Map2_Options();
    }
 
    private void onChangeUI_ShowHoveredTour() {
@@ -284,7 +322,16 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
          }
       }
 
-      onChangeUI_MapUpdate();
+      onChangeUI_UpdateMap();
+   }
+
+   private void onChangeUI_UpdateMap() {
+
+      saveState();
+
+      enableControls();
+
+      _map2View.restoreState_Map2_Options();
    }
 
    @Override
@@ -292,22 +339,37 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _chkIsToggleKeyboardPanning.setSelection(   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
       _chkIsShowHoveredTour.setSelection(          Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
+      _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
       _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
+
+
+      /*
+       * Map dimming
+       */
+      _chkIsDimMap.setSelection(                   Map2View.STATE_IS_DIM_MAP_DEFAULT);
+      _spinnerDimValue.setSelection(               Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
+      _colorMapDimmColor.setColorValue(            Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
 
 // SET_FORMATTING_ON
 
-      onChangeUI_MapUpdate();
+      onChangeUI_UpdateMap();
    }
 
    private void restoreState() {
 
 // SET_FORMATTING_OFF
 
-      _chkIsToggleKeyboardPanning.setSelection(   Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _chkIsShowHoveredTour.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
-      _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+      _chkIsShowHoveredTour.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
+      _chkIsToggleKeyboardPanning.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,     Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+
+      /*
+       * Map dimming
+       */
+      _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_DIM_MAP,    Map2View.STATE_IS_DIM_MAP_DEFAULT));
+      _spinnerDimValue.setSelection(      Util.getStateInt(    _state,  Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
+      _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
 
 // SET_FORMATTING_ON
    }
@@ -316,9 +378,16 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   _chkIsToggleKeyboardPanning.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, _chkIsShowHoveredTour.getSelection());
+      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
       _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
+
+      /*
+       * Map dimming
+       */
+      _state.put(Map2View.STATE_IS_DIM_MAP,                    _chkIsDimMap.getSelection());
+      _state.put(Map2View.STATE_DIM_MAP_VALUE,                 _spinnerDimValue.getSelection());
+      Util.setState(_state,Map2View.STATE_DIM_MAP_COLOR,       _colorMapDimmColor.getColorValue());
 
 // SET_FORMATTING_ON
    }

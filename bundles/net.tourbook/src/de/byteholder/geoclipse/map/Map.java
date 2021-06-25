@@ -571,6 +571,7 @@ public class Map extends Canvas {
    private boolean                   _isTourPaintMethodEnhanced;
    private boolean                   _isShowTourPaintMethodEnhancedWarning;
 
+   private boolean                   _isMapBackgroundDark;
    private boolean                   _isFastMapPainting;
    private boolean                   _isFastMapPainting_Active;
    private boolean                   _isInInverseKeyboardPanning;
@@ -647,7 +648,7 @@ public class Map extends Canvas {
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
 
-      _tourBreadcrumb = new MapTourBreadcrumb();
+      _tourBreadcrumb = new MapTourBreadcrumb(this);
 
       paint_Overlay_0_SetupThread();
 
@@ -1081,9 +1082,9 @@ public class Map extends Canvas {
       MapProviderManager.deleteOfflineMap(_mp, true);
    }
 
-   public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
+   public synchronized void dimMap(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
 
-      _mp.setDimLevel(dimLevel, dimColor);
+      _mp.setDimLevel(isDimMap, dimLevel, dimColor);
 
       // remove all cached map images
       _mp.disposeTileImages();
@@ -2012,6 +2013,10 @@ public class Map extends Canvas {
 
       _worldPixel_MapCenter = new Point2D.Double(tileDefaultCenter, tileDefaultCenter);
       _worldPixel_TopLeft_Viewport = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
+   }
+
+   public boolean isMapBackgroundDark() {
+      return _isMapBackgroundDark;
    }
 
    private boolean isPaintTile_With_BasicMethod() {
@@ -3368,7 +3373,7 @@ public class Map extends Canvas {
       final double latitude = mapCenter.latitude;
       final double longitude = mapCenter.longitude;
 
-      final double devDistance = _mp.getDistance(//
+      final double devDistance = _mp.getDistance(
             new GeoPosition(latitude - 0.5, longitude),
             new GeoPosition(latitude + 0.5, longitude),
             _mapZoomLevel);
@@ -3419,21 +3424,38 @@ public class Map extends Canvas {
       final int devYText = devYScaleLines - textExtent.y;
       final int devXText = devX1 + devScaleWidthRounded - textExtent.x;
 
-      // paint text with shadow
-      final Color borderColor = new Color(_display, 0xF1, 0xEE, 0xE8);
-      {
-         gc.setForeground(borderColor);
-//         gc.drawText(scaleText, devXText + 1, devYText + 1, true);
+      /*
+       * Paint text with shadow
+       */
 
-         gc.drawText(scaleText, devXText - 1, devYText, true);
-         gc.drawText(scaleText, devXText + 1, devYText, true);
-         gc.drawText(scaleText, devXText, devYText - 1, true);
-         gc.drawText(scaleText, devXText, devYText + 1, true);
+      Color shadeColor;
+      Color textColor;
 
-         gc.setForeground(SYS_COLOR_BLACK);
-         gc.drawText(scaleText, devXText, devYText, true);
+      if (_isMapBackgroundDark) {
+
+         // dark background
+
+         shadeColor = SYS_COLOR_BLACK;
+         textColor = SYS_COLOR_WHITE;
+
+      } else {
+
+         // bright background
+
+         shadeColor = SYS_COLOR_WHITE;
+         textColor = SYS_COLOR_BLACK;
       }
-      borderColor.dispose();
+
+      // draw shade
+      gc.setForeground(shadeColor);
+      gc.drawText(scaleText, devXText + 1, devYText, true);
+      gc.drawText(scaleText, devXText - 1, devYText, true);
+      gc.drawText(scaleText, devXText, devYText + 1, true);
+      gc.drawText(scaleText, devXText, devYText - 1, true);
+
+      // draw text
+      gc.setForeground(textColor);
+      gc.drawText(scaleText, devXText, devYText, true);
    }
 
    private void paint_Debug_GeoGrid(final GC gc) {
@@ -5615,10 +5637,15 @@ public class Map extends Canvas {
     *
     * @param mapDimLevel
     * @param dimColor
+    * @param isDimMap
+    * @param isBackgroundDark
     */
-   public void setDimLevel(final int mapDimLevel, final RGB dimColor) {
+   public void setDimLevel(final boolean isDimMap, final int mapDimLevel, final RGB dimColor, final boolean isBackgroundDark) {
+
+      _isMapBackgroundDark = isBackgroundDark;
+
       if (_mp != null) {
-         _mp.setDimLevel(mapDimLevel, dimColor);
+         _mp.setDimLevel(isDimMap, mapDimLevel, dimColor);
       }
    }
 

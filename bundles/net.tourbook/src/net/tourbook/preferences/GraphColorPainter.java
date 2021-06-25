@@ -146,9 +146,7 @@ public class GraphColorPainter {
                   TourMapPainter.drawMap2_Legend(
                         gc,
                         imageBounds,
-                        colorProvider,
-                        false,
-                        false);
+                        colorProvider);
 
                } else {
 
@@ -183,8 +181,17 @@ public class GraphColorPainter {
       return colorDefinitionImage;
    }
 
+   /**
+    * Draw graph and map colors into the defintion image.
+    *
+    * @param colorDefinition
+    * @param numHorizontalImages
+    * @param isRecreateTourTypeImages
+    * @param defaultBackgroundColor
+    * @return
+    */
    Image drawGraphColorImage(final GraphColorItem graphColorItem,
-                             final int horizontalImages,
+                             final int numHorizontalImages,
                              final boolean isRecreateTourTypeImages,
                              final Color backgroundColor) {
 
@@ -217,7 +224,7 @@ public class GraphColorPainter {
          final int imageSize = _itemHeight - 2;
          final int imageSpacing = GRAPH_COLOR_SPACING;
 
-         final int imageWidth = (horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing);
+         final int imageWidth = (numHorizontalImages * imageSize) + ((numHorizontalImages - 1) * imageSpacing);
          final int imageHeight = imageSize;
 
          colorImage = new Image(
@@ -246,9 +253,7 @@ public class GraphColorPainter {
                TourMapPainter.drawMap2_Legend(
                      gc,
                      drawableBounds,
-                     colorProvider,
-                     false,
-                     false);
+                     colorProvider);
 
             } else {
 

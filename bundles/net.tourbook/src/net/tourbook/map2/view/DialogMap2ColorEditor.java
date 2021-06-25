@@ -46,7 +46,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
@@ -202,13 +201,13 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
       final int legendWidth = Math.max(140, canvasSize.x);
       final int legendHeight = Math.max(100, canvasSize.y);
 
-      _imageMappingColor = TourMapPainter.createMap2_LegendImage(
-            Display.getCurrent(),
+      _imageMappingColor = TourMapPainter.createMap2_LegendImage_AWT(
             _colorProvider,
             legendWidth,
             legendHeight,
-            true,
-            UI.IS_DARK_THEME);
+            UI.IS_DARK_THEME, // is dark background
+            false // no shadow
+      );
    }
 
    private void createUI(final Composite parent) {

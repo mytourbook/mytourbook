@@ -584,6 +584,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
                } else if (element instanceof GraphColorItem) {
 
+                  // draw map legend image horizontally
+
                   cell.setImage(_graphColorPainter.drawGraphColorImage(
                         (GraphColorItem) element,
                         numHorizontalImages,
