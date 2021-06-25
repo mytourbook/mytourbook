@@ -233,6 +233,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                {
                   // spinner
                   _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
+                  _spinnerDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
                   _spinnerDimValue.setMinimum(0);
                   _spinnerDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
                   _spinnerDimValue.setIncrement(1);
@@ -242,6 +243,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
                   // dimming color
                   _colorMapDimmColor = new ColorSelectorExtended(dimContainer);
+                  _colorMapDimmColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
                   _colorMapDimmColor.addListener(_defaultChangePropertyListener);
                   _colorMapDimmColor.addOpenListener(this);
                }

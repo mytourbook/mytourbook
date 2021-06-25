@@ -2007,9 +2007,6 @@ public class Messages extends NLS {
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_Title;
 
-   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
-   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
-   public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
    public static String Slideout_Map_Options_Checkbox_DimMap;
    public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
@@ -2022,14 +2019,19 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
+   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
+   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
+   public static String Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String Slideout_Map_Options_Group_TourTrack;
    public static String Slideout_Map_Options_Label_SliderLocation_Color;
    public static String Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
    public static String Slideout_Map_Options_Label_SliderLocation_Size;
    public static String Slideout_Map_Options_Label_SliderPath_Color;
    public static String Slideout_Map_Options_Label_SliderPath_Color_Tooltip;
+   public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
+   public static String Slideout_Map_Options_Spinner_DimValue_Tooltip;
 
    public static String Slideout_Map_PhotoOptions_Label_Title;
 
