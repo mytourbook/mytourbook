@@ -64,6 +64,8 @@ public class FitDataReader extends TourbookDevice {
    private static final String SYS_PROP__LOG_FIT_DATA = "logFitData";                                      //$NON-NLS-1$
    private static boolean      _isLogging_FitData     = System.getProperty(SYS_PROP__LOG_FIT_DATA) != null;
 
+   private int                 _logCounter;
+
    static {
 
       if (_isLogging_FitData) {
@@ -74,11 +76,6 @@ public class FitDataReader extends TourbookDevice {
       }
    }
    private boolean _isVersionLogged;
-
-   private void addDebugLogListener(final MesgBroadcaster broadcaster) {
-
-      broadcaster.addListener((MesgListener) this::onMessage_Mesg);
-   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -436,38 +433,40 @@ public class FitDataReader extends TourbookDevice {
 
          final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
-         System.out.println(
-               String.format(UI.EMPTY_STRING
+         System.out.println(String.format(UI.EMPTY_STRING
 
-                     + "[%s]" //$NON-NLS-1$
+               + "[%s]" //       Java class name //$NON-NLS-1$
 
-                     // time
-                     + " %-42s %-10d  %-10s  " //$NON-NLS-1$
+               + " %-7s" //      #           //$NON-NLS-1$
 
-                     + " %5d" //    Num            //$NON-NLS-1$
-                     + " %40s" //   Name           //$NON-NLS-1$
-                     + " %20s" //   Value          //$NON-NLS-1$
-                     + " %-12s" //  Units          //$NON-NLS-1$
+               + " %-42s %-10d  %-10s  " //  time        //$NON-NLS-1$
 
-//                     + " %s" //     RawValue       //$NON-NLS-1$
+               + " %5d" //       Num         //$NON-NLS-1$
+               + " %40s" //      Name        //$NON-NLS-1$
+               + " %20s" //      Value       //$NON-NLS-1$
+               + " %-12s" //     Units       //$NON-NLS-1$
 
-                     + UI.EMPTY_STRING,
+//             + " %s" //        RawValue    //$NON-NLS-1$
 
-                     FitDataReader.class.getSimpleName(),
+               + UI.EMPTY_STRING,
 
-                     TimeTools.getZonedDateTime(javaTime), //  show readable date/time
-                     javaTime / 1000, //                       java time in s
-                     Long.toString(garminTimestamp), //        garmin timestamp
+               FitDataReader.class.getSimpleName(),
 
-                     field.getNum(), //         Num
-                     fieldName, //              Name
+               _logCounter++,
 
-                     field.getValue(), //       Value
-                     field.getUnits() //       Units
+               TimeTools.getZonedDateTime(javaTime), //  show readable date/time
+               javaTime / 1000, //                       java time in s
+               Long.toString(garminTimestamp), //        garmin timestamp
 
-//                     field.getRawValue().getClass().getCanonicalName()
+               field.getNum(), //         Num
+               fieldName, //              Name
 
-               ));
+               field.getValue(), //       Value
+               field.getUnits() //        Units
+
+//             field.getRawValue().getClass().getCanonicalName()
+
+         ));
       }
 
       for (final DeveloperField field : mesg.getDeveloperFields()) {
@@ -500,38 +499,40 @@ public class FitDataReader extends TourbookDevice {
 
          final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
-         System.out.println(
-               String.format(UI.EMPTY_STRING
+         System.out.println(String.format(UI.EMPTY_STRING
 
-                     + "[%s]" //$NON-NLS-1$
+               + "[%s]" //                   Java class name //$NON-NLS-1$
 
-                     // time
-                     + " %-42s %-10d  %-10s  " //$NON-NLS-1$
+               + " %-7s" //                  #        //$NON-NLS-1$
 
-                     + " %5d" //    Num            //$NON-NLS-1$
-                     + " %-40s" //   Name           //$NON-NLS-1$
-                     + " %20s" //   Value          //$NON-NLS-1$
-                     + " %-12s" //  Units          //$NON-NLS-1$
+               + " %-42s %-10d  %-10s  " //  time     //$NON-NLS-1$
 
-//                     + " %s" //     RawValue       //$NON-NLS-1$
+               + " %5d" //                   Num      //$NON-NLS-1$
+               + " %-40s" //                 Name     //$NON-NLS-1$
+               + " %20s" //                  Value    //$NON-NLS-1$
+               + " %-12s" //                 Units    //$NON-NLS-1$
 
-                     + UI.EMPTY_STRING,
+//             + " %s" //                    RawValue //$NON-NLS-1$
 
-                     FitDataReader.class.getSimpleName(),
+               + UI.EMPTY_STRING,
 
-                     TimeTools.getZonedDateTime(javaTime), //  show readable date/time
-                     javaTime / 1000, //                       java time in s
-                     Long.toString(garminTimestamp), //        garmin timestamp
+               FitDataReader.class.getSimpleName(),
 
-                     field.getNum(), //         Num
-                     fieldName, //              Name
+               _logCounter++,
 
-                     field.getValue(), //       Value
-                     field.getUnits() //       Units
+               TimeTools.getZonedDateTime(javaTime), //  show readable date/time
+               javaTime / 1000, //                       java time in s
+               Long.toString(garminTimestamp), //        garmin timestamp
+
+               field.getNum(), //            Num
+               fieldName, //                 Name
+
+               field.getValue(), //          Value
+               field.getUnits() //        Units
 
 //                     field.getRawValue().getClass().getCanonicalName()
 
-               ));
+         ));
       }
    }
 
@@ -586,25 +587,30 @@ public class FitDataReader extends TourbookDevice {
 
             System.out.println(String.format(UI.EMPTY_STRING
 
-                  + "%-16s" //   Java //$NON-NLS-1$
-                  + "%-70s" //  Timestamp //$NON-NLS-1$
-                  + "%-5s" //   Num //$NON-NLS-1$
-                  + "%-40s" //  Name //$NON-NLS-1$
-                  + "%21s" //   Value //$NON-NLS-1$
-                  + " %s", //     Units //$NON-NLS-1$
+                  + "%-16s" //   Java        //$NON-NLS-1$
+                  + "%-8s" //    #           //$NON-NLS-1$
+                  + "%-70s" //   Timestamp   //$NON-NLS-1$
+                  + "%-5s" //    Num         //$NON-NLS-1$
+                  + "%-40s" //   Name        //$NON-NLS-1$
+                  + "%20s" //    Value       //$NON-NLS-1$
+                  + " %s", //    Units       //$NON-NLS-1$
 
-                  "Java", //$NON-NLS-1$
-                  "Timestamp", //$NON-NLS-1$
-                  "Num", //$NON-NLS-1$
-                  "Name", //$NON-NLS-1$
-                  "Value", //$NON-NLS-1$
-                  "Units" //$NON-NLS-1$
+                  "Java", //                 //$NON-NLS-1$
+                  "#", //                    //$NON-NLS-1$
+                  "Timestamp", //            //$NON-NLS-1$
+                  "Num", //                  //$NON-NLS-1$
+                  "Name", //                 //$NON-NLS-1$
+                  "Value", //                //$NON-NLS-1$
+                  "Units" //                 //$NON-NLS-1$
 
             ));
 
             System.out.println();
 
-            addDebugLogListener(fitBroadcaster);
+            _logCounter = 0;
+
+            // add debug logger
+            fitBroadcaster.addListener((MesgListener) this::onMessage_Mesg);
          }
 
          fitBroadcaster.run(fileInputStream);
