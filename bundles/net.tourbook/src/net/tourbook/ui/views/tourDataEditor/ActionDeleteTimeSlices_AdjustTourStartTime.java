@@ -18,25 +18,29 @@ package net.tourbook.ui.views.tourDataEditor;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.Action;
 
-class ActionDeleteTimeSlicesKeepTime extends Action {
+class ActionDeleteTimeSlices_AdjustTourStartTime extends Action {
 
-   private final TourDataEditorView fTourPropertiesView;
+   private final TourDataEditorView _tourDataEditorView;
 
-   public ActionDeleteTimeSlicesKeepTime(final TourDataEditorView tourPropertiesView) {
+   public ActionDeleteTimeSlices_AdjustTourStartTime(final TourDataEditorView tourPropertiesView) {
 
-      super(Messages.action_tour_editor_delete_time_slices_keep_time, AS_PUSH_BUTTON);
+      super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+      setText(Messages.Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime);
+      setToolTipText(Messages.Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
-      fTourPropertiesView = tourPropertiesView;
+      _tourDataEditorView = tourPropertiesView;
    }
 
    @Override
    public void run() {
-      fTourPropertiesView.actionDeleteTimeSlices(false);
+      _tourDataEditorView.actionDeleteTimeSlices(true, true);
    }
 }

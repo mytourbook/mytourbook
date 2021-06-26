@@ -50,6 +50,11 @@ Improvements
   - Set default graphs in the graph slideout, previously it could be set only in the pref dialog
 
 
+* Tour Data Editor
+  - New action to delete time sliced and adjust the tour start time
+    This can be helpfull when a GPS device had no connection at the tour start and the tour start time is totally wrong.
+    Had a tour, which tour start time was 19 hours off until the GPS signal was received
+
 Changes  
 =======
 

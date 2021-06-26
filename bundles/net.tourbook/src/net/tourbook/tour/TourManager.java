@@ -2022,15 +2022,19 @@ public class TourManager {
     * @param firstIndex
     * @param lastIndex
     * @param isRemoveTime
+    * @param isAdjustTourStartTime
     */
    public static void removeTimeSlices(final TourData tourData,
                                        final int firstIndex,
                                        final int lastIndex,
-                                       final boolean isRemoveTime) {
+                                       final boolean isRemoveTime,
+                                       final boolean isAdjustTourStartTime) {
 
-      if (isRemoveTime) {
+      if (isRemoveTime || isAdjustTourStartTime) {
+
          // this must be done before the time series are modified
-         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex);
+
+         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex, isAdjustTourStartTime);
       }
 
       short[] shortSerie;
@@ -2303,12 +2307,13 @@ public class TourManager {
       return newDataSerie;
    }
 
-   private static void removeTimeSlices_TimeAndDistance(final TourData _tourData,
+   private static void removeTimeSlices_TimeAndDistance(final TourData tourData,
                                                         final int firstIndex,
-                                                        final int lastIndex) {
+                                                        final int lastIndex,
+                                                        final boolean isAdjustTourStartTime) {
 
-      final int[] timeSerie = _tourData.timeSerie;
-      final float[] distSerie = _tourData.distanceSerie;
+      final int[] timeSerie = tourData.timeSerie;
+      final float[] distSerie = tourData.distanceSerie;
 
       if ((timeSerie == null) || (timeSerie.length == 0)) {
          return;
@@ -2336,6 +2341,14 @@ public class TourManager {
          if (distDiff != -1) {
             distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
          }
+      }
+
+      if (isAdjustTourStartTime) {
+
+         final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+         final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);
+
+         tourData.setTourStartTime(newTourStartTime);
       }
    }
 
