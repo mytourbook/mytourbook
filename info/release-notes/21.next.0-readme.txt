@@ -6,8 +6,6 @@ TODO's
 
 * Mac OS          - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
 
-* Win Installer   - Fix Win Icon https://github.com/wolfgang-ch/mytourbook/commit/da54573cd5616dbe45a6bab7c31030ccf89dbc56#r52666766
-
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
