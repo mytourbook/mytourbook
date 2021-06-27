@@ -41,17 +41,17 @@ Improvements
 
 * 2D Map
   - Enable/disable map dimming, moved map dimming parameters into "2D Map Options" slideout
-  - Legend units and scale colors are depending on the map dim level
+  - Legend units and scale colors depend on the map dim level
   
 
 * Tour Chart
-  - Set default graphs in the graph slideout, previously it could be set only in the pref dialog
+  - Set the default graphs in the graph slideout, previously it could be set only in the pref dialog
 
 
 * Tour Data Editor
   - New action to delete time sliced and adjust the tour start time
     This can be helpfull when a GPS device had no connection at the tour start and the tour start time is totally wrong.
-    Had a tour, which tour start time was 19 hours off until the GPS signal was received
+    The author had a tour whose tour start time was postponed 19 hours until the GPS signal was received
 
 Changes  
 =======

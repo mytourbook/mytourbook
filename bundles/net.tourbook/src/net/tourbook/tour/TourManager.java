@@ -2030,7 +2030,7 @@ public class TourManager {
                                        final boolean isRemoveTime,
                                        final boolean isAdjustTourStartTime) {
 
-      if (isRemoveTime || isAdjustTourStartTime) {
+      if (isRemoveTime || (isRemoveTime && isAdjustTourStartTime)) {
 
          // this must be done before the time series are modified
 
