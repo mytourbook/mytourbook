@@ -284,6 +284,11 @@ public class TourChartConfiguration {
     */
    public boolean    isGeoCompareDiff;
 
+   /**
+    * Show/hide value point value label when mouse is hovering a graph
+    */
+   public boolean    isShowValuePointValue;
+
    @SuppressWarnings("unused")
    private TourChartConfiguration() {}
 

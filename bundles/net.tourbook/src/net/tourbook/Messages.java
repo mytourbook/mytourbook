@@ -2324,6 +2324,7 @@ public class Messages extends NLS {
    public static String Tour_Action_ShowBreaktimeValues;
    public static String Tour_Action_ShowTourPauses;
    public static String Tour_Action_ShowTourPauses_Tooltip;
+   public static String Tour_Action_ShowValuePointValue;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
    public static String Tour_Action_TourInfo_Tooltip;

@@ -45,13 +45,16 @@ Improvements
   
 
 * Tour Chart
+  - Show value of the hovered graph point  
   - Set the default graphs in the graph slideout, previously it could be set only in the pref dialog
+  - Show values in the value point tooltip with the correct color when using the dark theme  
 
 
 * Tour Data Editor
   - New action to delete time sliced and adjust the tour start time
     This can be helpfull when a GPS device had no connection at the tour start and the tour start time is totally wrong.
     The author had a tour whose tour start time was postponed 19 hours until the GPS signal was received
+
 
 Changes  
 =======

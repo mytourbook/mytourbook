@@ -736,6 +736,7 @@ public class TourManager {
       tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
 
       tcc.isShowBreaktimeValues = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+      tcc.isShowValuePointValue = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
 
       tcc.updateZoomOptions();
 
@@ -3888,8 +3889,9 @@ public class TourManager {
          createStatisticSegments(tourData, chartDataModel);
       }
 
-      chartDataModel.setShowNoLineValues(tcc.isShowBreaktimeValues);
       chartDataModel.setIsGraphOverlapped(tcc.isGraphOverlapped);
+      chartDataModel.setShowNoLineValues(tcc.isShowBreaktimeValues);
+      chartDataModel.setShowValuePointValue(tcc.isShowValuePointValue);
 
       chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
       chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDist);
