@@ -54,6 +54,11 @@ Improvements
   - New action to delete time sliced and adjust the tour start time
     This can be helpfull when a GPS device had no connection at the tour start and the tour start time is totally wrong.
     The author had a tour whose tour start time was postponed 19 hours until the GPS signal was received
+    
+* Tour Search
+  - New action in the context menu to select a tour with the mouse. 
+    Selecting a tour with the mouse was not working anymore (since a while) when using the embedded browser in MyTourbook    
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/745a5ebd1b/#227a/ede2
 
 
 Changes  

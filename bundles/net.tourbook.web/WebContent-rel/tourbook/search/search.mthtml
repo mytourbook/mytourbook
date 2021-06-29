@@ -82,20 +82,25 @@ $DOJO_SEARCH$
    <!-- Context menu -->
 
    <div 
-      id="domContextMenu_SearchResult" 
-      data-dojo-type="dijit/Menu" 
-      data-dojo-props="targetNodeIds:['domGrid'], selector:'div.dgrid-row'" 
-      style="display: none;">
+      id                ="domContextMenu_SearchResult" 
+      data-dojo-type    ="dijit/Menu" 
+      data-dojo-props   ="targetNodeIds:['domGrid'], selector:'div.dgrid-row'" 
+      style             ="display: none;">
       
       <div 
-         id="domAction_EditTour"
-         data-dojo-type="dijit/MenuItem" 
-         data-dojo-props="iconClass:'iconTourChart'"></div>
+         id                ="domAction_SelectTour"
+         data-dojo-type    ="dijit/MenuItem" 
+         data-dojo-props   ="iconClass:'iconTourChart'"></div>
+      
+      <div 
+         id                ="domAction_EditTour"
+         data-dojo-type    ="dijit/MenuItem" 
+         data-dojo-props   ="iconClass:'iconTourChart'"></div>
 
       <div 
-         id="domAction_EditMarker"
-         data-dojo-type="dijit/MenuItem" 
-         data-dojo-props="iconClass:'iconTourMarker'"></div>
+         id                ="domAction_EditMarker"
+         data-dojo-type    ="dijit/MenuItem" 
+         data-dojo-props   ="iconClass:'iconTourMarker'"></div>
    </div>
 
 </body>
