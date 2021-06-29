@@ -3830,7 +3830,10 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_ZOOM_CENTERED,                          _actionZoom_Centered.isChecked());
       _state.put(STATE_ZOOM_LEVEL_ADJUSTMENT,                     _actionZoomLevelAdjustment.getZoomLevel());
 
-      _state.put(STATE_SELECTED_MAP_PROVIDER_ID,                  _actionMap2_MapProvider.getSelectedMapProvider().getId());
+      final MP selectedMapProvider = _actionMap2_MapProvider.getSelectedMapProvider();
+      if (selectedMapProvider != null) {
+         _state.put(STATE_SELECTED_MAP_PROVIDER_ID,               selectedMapProvider.getId());
+      }
 
       if (_defaultPosition == null) {
 
