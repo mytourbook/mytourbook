@@ -33,6 +33,7 @@
       
    </script>
 
+$CUSTOM_JS$
 $DOJO_SEARCH$
    
    <script>require(['tourbook/search/SearchApp']);</script>
@@ -86,11 +87,6 @@ $DOJO_SEARCH$
       data-dojo-type    ="dijit/Menu" 
       data-dojo-props   ="targetNodeIds:['domGrid'], selector:'div.dgrid-row'" 
       style             ="display: none;">
-      
-      <div 
-         id                ="domAction_SelectTour"
-         data-dojo-type    ="dijit/MenuItem" 
-         data-dojo-props   ="iconClass:'iconTourChart'"></div>
       
       <div 
          id                ="domAction_EditTour"

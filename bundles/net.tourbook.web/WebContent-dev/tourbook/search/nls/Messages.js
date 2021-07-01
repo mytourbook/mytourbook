@@ -7,7 +7,6 @@ define(//
 		Search_App_Action_EditMarker                       : 'Edit Marker',
 		Search_App_Action_EditTour                         : 'Edit Tour',
 		Search_App_Action_SearchOptions_Tooltip            : 'Search Options',
-		Search_App_Action_SelectTour                       : 'Select Tour',
 		Search_App_Action_StartSearch_Tooltip              : 'Start searching',
 		Search_App_Label_Status_Tooltip                    : 'Number of search results - Search time',
 		Search_App_Text_Search_PlaceHolder                 : 'Search Tours, Marker and Waypoints',

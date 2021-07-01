@@ -78,8 +78,6 @@ Messages //
 
    var SearchApp = declare('tourbook.search.SearchApp', [],
    {
-      _rowIdToBeCleaned : undefined,
-
       createUI : function() {
 
          this.createUI_Actions();
@@ -309,46 +307,19 @@ Messages //
          }, 'domGrid');
          
          var contextMenu_RowData
-         var isInCleanRowId
-         var isSelectionFromContextMenu
-
-debugger
 
          /**
           * @callback
           */
          var selectionCallback = function(event) {
 
-            if (isInCleanRowId) {
-               return
-            }
-
-            var rows = event.rows
-
             var selectedItems = []
 
-            if (isSelectionFromContextMenu) {
+            for (var rowId in grid.selection) {
 
-               // get row from the context menu
-
-               isSelectionFromContextMenu = false
-
-               var row = grid.row(contextMenu_RowData.id);
+               var row = grid.row(rowId);
 
                selectedItems.push(row.data);
-
-               app._rowIdToBeCleaned = contextMenu_RowData.id
-
-            } else {
-
-               app.cleanPreviousContextMenuSelection(grid)
-               
-               for (var rowId in grid.selection) {
-   
-                  var row = grid.row(rowId);
-   
-                  selectedItems.push(row.data);
-               }
             }
 
             if (selectedItems.length === 0) {
@@ -381,8 +352,33 @@ debugger
          grid.on('dgrid-deselect',  selectionCallback)
 
          grid.on('.dgrid-row:click', function (event) {
+
+            if (mt_IsUsingEmbeddedBrowser === false) {
+               
+               // external browser is used -> this needs no hack
+
+               return
+            }
+
+            /**
+             * The embedded browser IE is used and is not fireing the "dgrid-select" event since a while,
+             * however it is fireing this event
+             */
+
+            if (event.ctrlKey == false) {
+
+               // there is no multiple selection -> clear previous selection
+               // -> supporting the shiftKey is too complicated
+               // -> Ctrl-A for all is still working
+               
+               grid.clearSelection()
+            }
+
+
             var row = grid.row(event)
-            console.log('Row clicked:', row.id)
+
+            // this is calling selectionCallback()
+            grid.select(row.id)
          })
 
          /**
@@ -391,11 +387,9 @@ debugger
          
          var actionEditMarker = registry.byId('domAction_EditMarker')
          var actionEditTour   = registry.byId('domAction_EditTour')
-         var actionSelectTour = registry.byId('domAction_SelectTour')
 
          actionEditMarker.set('label', Messages.Search_App_Action_EditMarker)
          actionEditTour.set  ('label', Messages.Search_App_Action_EditTour)
-         actionSelectTour.set('label', Messages.Search_App_Action_SelectTour)
 
          /*
           * Setup context menu action
@@ -417,7 +411,6 @@ debugger
 
             actionEditMarker.set('disabled', !isMarker)
             actionEditTour.set  ('disabled', !isTour)
-            actionSelectTour.set('disabled', !isTour)
          });
 
          /*
@@ -429,45 +422,10 @@ debugger
             SearchApp.action(actionUrl);
          }
 
-         var onSelectTour = function() {
-
-            app.cleanPreviousContextMenuSelection(grid)
-            
-            // IE is not setting a selection with the mouse in the embedded browser, 
-            // -> workaround: get selected tour from the context menu event,
-            //                this works for a single tour but not for multiple tours
-
-            isSelectionFromContextMenu = true
-
-            // deselect selection which was selected previously with the keyboard
-            // otherwise this selection workaround is not working !
-            grid.clearSelection()
-
-            // select row programatically, this will call "selectionCallback()"
-            grid.select(contextMenu_RowData.id)
-         }
-         
          actionEditMarker.on('click', runUrlAction)
          actionEditTour.on  ('click', runUrlAction)
-         actionSelectTour.on('click', onSelectTour)
 
          return grid;
-      },
-
-      cleanPreviousContextMenuSelection : function(grid) {
-
-         if (this._rowIdToBeCleaned) {
-
-            // cleanup previous row from the context menu
-
-            isInCleanRowId = true
-            {
-               grid.deselect(this._rowIdToBeCleaned)
-            }
-            isInCleanRowId = false
-
-            this._rowIdToBeCleaned = undefined
-         }
       },
 
       restoreState : function() {
