@@ -198,7 +198,7 @@ public class WebContentServer {
       }
 
       /*
-       * Replacement tags which are replaced when HTML page is loaded
+       * Tags which are replaced when HTML page is loaded
        */
       _mtHtmlReplacementValues.put(MTHTML_CUSTOM_JS, createCustomJS());
       _mtHtmlReplacementValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
@@ -241,7 +241,6 @@ public class WebContentServer {
             + "<script>" + NL //$NON-NLS-1$
             + "   var mt_IsUsingEmbeddedBrowser = " + Boolean.toString(_isUsingEmbeddedBrowser) + NL //$NON-NLS-1$
             + "</script>" + NL //$NON-NLS-1$
-
       ;
 
       return js;
