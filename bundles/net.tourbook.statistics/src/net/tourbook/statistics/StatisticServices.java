@@ -346,16 +346,16 @@ public class StatisticServices {
 //
 //         final StringBuilder sb = new StringBuilder();
 //
-//         RGB rgb = tourType.getRGBBright();
+//         RGB rgb = tourType.getRGB_Gradient_Bright();
 //         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//         rgb = tourType.getRGBDark();
+//         rgb = tourType.getRGB_Gradient_Dark();
 //         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//         rgb = tourType.getRGBLine();
+//         rgb = tourType.getRGB_Line_Themed();
 //         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//         rgb = tourType.getRGBText();
+//         rgb = tourType.getRGB_Text_Themed();
 //         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
 //         System.out.println(sb.toString());

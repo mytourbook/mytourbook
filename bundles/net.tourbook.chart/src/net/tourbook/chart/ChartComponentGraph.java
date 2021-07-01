@@ -3461,9 +3461,10 @@ public class ChartComponentGraph extends Canvas {
             devXPosNextBar = devXPos + devBarWidthPositioned;
 
             /*
-             * get colors
+             * Get colors
              */
             final int colorIndex = colorsIndex[serieIndex][valueIndex];
+
             final RGB rgbBrightDef = rgbBright[colorIndex];
             final RGB rgbDarkDef = rgbDark[colorIndex];
             final RGB rgbLineDef = rgbLine[colorIndex];
@@ -9653,25 +9654,28 @@ public class ChartComponentGraph extends Canvas {
 
          // compute only top and bottom labels
 
-         int labelIndex = 0;
+         if (allTopLabels != null) {
 
-         for (final ChartXSliderLabel topLabel : allTopLabels) {
+            int labelIndex = 0;
 
-            final ChartXSliderLabel bottomLabel = allBottomLabels.get(labelIndex);
+            for (final ChartXSliderLabel topLabel : allTopLabels) {
 
-            final int topWidth2 = topLabel.width / 2;
-            final int topDevX = topLabel.x;
+               final ChartXSliderLabel bottomLabel = allBottomLabels.get(labelIndex);
 
-            final int bottomWidth2 = bottomLabel.width / 2;
-            final int bottomDevX = bottomLabel.x;
+               final int topWidth2 = topLabel.width / 2;
+               final int topDevX = topLabel.x;
 
-            if (topDevX + topWidth2 > bottomDevX - bottomWidth2
-                  && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+               final int bottomWidth2 = bottomLabel.width / 2;
+               final int bottomDevX = bottomLabel.x;
 
-               bottomLabel.y = bottomLabel.y + bottomLabel.height + 5;
+               if (topDevX + topWidth2 > bottomDevX - bottomWidth2
+                     && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+
+                  bottomLabel.y = bottomLabel.y + bottomLabel.height + 5;
+               }
+
+               labelIndex++;
             }
-
-            labelIndex++;
          }
 
       } else {
@@ -9680,44 +9684,50 @@ public class ChartComponentGraph extends Canvas {
 
          int labelIndex = 0;
 
-         for (final ChartXSliderLabel topLabel : allTopLabels) {
+         if (allTopLabels != null) {
 
-            final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
+            for (final ChartXSliderLabel topLabel : allTopLabels) {
 
-            final int topWidth2 = topLabel.width / 2;
-            final int topDevX = topLabel.x;
+               final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
 
-            final int bottomWidth2 = valuePointLabel.width / 2;
-            final int bottomDevX = valuePointLabel.x;
+               final int topWidth2 = topLabel.width / 2;
+               final int topDevX = topLabel.x;
 
-            if (topDevX + topWidth2 > bottomDevX - bottomWidth2
-                  && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+               final int bottomWidth2 = valuePointLabel.width / 2;
+               final int bottomDevX = valuePointLabel.x;
 
-               valuePointLabel.y = valuePointLabel.y + valuePointLabel.height + 4;
+               if (topDevX + topWidth2 > bottomDevX - bottomWidth2
+                     && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+
+                  valuePointLabel.y = valuePointLabel.y + valuePointLabel.height + 4;
+               }
+
+               labelIndex++;
             }
-
-            labelIndex++;
          }
 
-         labelIndex = 0;
+         if (allBottomLabels != null) {
 
-         for (final ChartXSliderLabel topLabel : allBottomLabels) {
+            labelIndex = 0;
 
-            final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
+            for (final ChartXSliderLabel topLabel : allBottomLabels) {
 
-            final int topWidth2 = topLabel.width / 2;
-            final int topDevX = topLabel.x;
+               final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
 
-            final int bottomWidth2 = valuePointLabel.width / 2;
-            final int bottomDevX = valuePointLabel.x;
+               final int topWidth2 = topLabel.width / 2;
+               final int topDevX = topLabel.x;
 
-            if (topDevX + topWidth2 > bottomDevX - bottomWidth2
-                  && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+               final int bottomWidth2 = valuePointLabel.width / 2;
+               final int bottomDevX = valuePointLabel.x;
 
-               valuePointLabel.y = valuePointLabel.y + valuePointLabel.height + 4;
+               if (topDevX + topWidth2 > bottomDevX - bottomWidth2
+                     && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+
+                  valuePointLabel.y = valuePointLabel.y + valuePointLabel.height + 4;
+               }
+
+               labelIndex++;
             }
-
-            labelIndex++;
          }
       }
    }
