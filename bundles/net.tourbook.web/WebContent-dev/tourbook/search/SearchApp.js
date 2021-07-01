@@ -78,6 +78,7 @@ Messages //
 
    var SearchApp = declare('tourbook.search.SearchApp', [],
    {
+      _rowIdToBeCleaned : undefined,
 
       createUI : function() {
 
@@ -308,43 +309,52 @@ Messages //
          }, 'domGrid');
          
          var contextMenu_RowData
+         var isInCleanRowId
          var isSelectionFromContextMenu
+
+debugger
 
          /**
           * @callback
           */
-         var selectionCallback = function(evt) {
+         var selectionCallback = function(event) {
 
-            var selectedItems = [];
-
-            for (var rowId in grid.selection) {
-
-               var row = grid.row(rowId);
-
-               selectedItems.push(row.data);
+            if (isInCleanRowId) {
+               return
             }
-            
-            if (selectedItems.length === 0) {
 
-               // IE is not setting a selection with the mouse in the embedded browser, 
-               // -> workaround: get selected tour from the context menu event,
-               //                this works for a single tour but not for multiple tours
-               
-               if (isSelectionFromContextMenu && contextMenu_RowData) {
+            var rows = event.rows
 
-                  // select row programatically
-                  grid.select(contextMenu_RowData.id)
-                  
-                  return
-                  
-               } else {
-                  
-                  // nothing to do
-               }
-               
+            var selectedItems = []
+
+            if (isSelectionFromContextMenu) {
+
+               // get row from the context menu
+
                isSelectionFromContextMenu = false
 
-               return;
+               var row = grid.row(contextMenu_RowData.id);
+
+               selectedItems.push(row.data);
+
+               app._rowIdToBeCleaned = contextMenu_RowData.id
+
+            } else {
+
+               app.cleanPreviousContextMenuSelection(grid)
+               
+               for (var rowId in grid.selection) {
+   
+                  var row = grid.row(rowId);
+   
+                  selectedItems.push(row.data);
+               }
+            }
+
+            if (selectedItems.length === 0) {
+               
+               // nothing to do
+               return
             }
 
             var jsonSelectedItems = JSON.stringify(selectedItems);
@@ -367,16 +377,21 @@ Messages //
 
          // fire an event when tour, marker or waypoint is selected in the UI
          // fire the event also when multiple items are selected and one is deselected !!!
-         grid.on('dgrid-select', selectionCallback);
-         grid.on('dgrid-deselect', selectionCallback);
+         grid.on('dgrid-select',    selectionCallback)
+         grid.on('dgrid-deselect',  selectionCallback)
+
+         grid.on('.dgrid-row:click', function (event) {
+            var row = grid.row(event)
+            console.log('Row clicked:', row.id)
+         })
 
          /**
           * Context menu, is defined declaratively.
           */
          
-         var actionEditMarker 	= registry.byId('domAction_EditMarker')
-         var actionEditTour     = registry.byId('domAction_EditTour')
-         var actionSelectTour   = registry.byId('domAction_SelectTour')
+         var actionEditMarker = registry.byId('domAction_EditMarker')
+         var actionEditTour   = registry.byId('domAction_EditTour')
+         var actionSelectTour = registry.byId('domAction_SelectTour')
 
          actionEditMarker.set('label', Messages.Search_App_Action_EditMarker)
          actionEditTour.set  ('label', Messages.Search_App_Action_EditTour)
@@ -416,13 +431,20 @@ Messages //
 
          var onSelectTour = function() {
 
+            app.cleanPreviousContextMenuSelection(grid)
+            
+            // IE is not setting a selection with the mouse in the embedded browser, 
+            // -> workaround: get selected tour from the context menu event,
+            //                this works for a single tour but not for multiple tours
+
+            isSelectionFromContextMenu = true
+
             // deselect selection which was selected previously with the keyboard
             // otherwise this selection workaround is not working !
             grid.clearSelection()
-            
-            isSelectionFromContextMenu = true
 
-            selectionCallback()
+            // select row programatically, this will call "selectionCallback()"
+            grid.select(contextMenu_RowData.id)
          }
          
          actionEditMarker.on('click', runUrlAction)
@@ -430,6 +452,22 @@ Messages //
          actionSelectTour.on('click', onSelectTour)
 
          return grid;
+      },
+
+      cleanPreviousContextMenuSelection : function(grid) {
+
+         if (this._rowIdToBeCleaned) {
+
+            // cleanup previous row from the context menu
+
+            isInCleanRowId = true
+            {
+               grid.deselect(this._rowIdToBeCleaned)
+            }
+            isInCleanRowId = false
+
+            this._rowIdToBeCleaned = undefined
+         }
       },
 
       restoreState : function() {
@@ -519,7 +557,6 @@ Messages //
 
       xhr(SearchMgr.XHR_SEARCH_HANDLER,
       {
-
          handleAs : 'json',
          preventCache : true,
          timeout : SearchMgr.XHR_TIMEOUT,
