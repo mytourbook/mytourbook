@@ -2324,6 +2324,7 @@ public class Messages extends NLS {
    public static String Tour_Action_ShowBreaktimeValues;
    public static String Tour_Action_ShowTourPauses;
    public static String Tour_Action_ShowTourPauses_Tooltip;
+   public static String Tour_Action_ShowValuePointValue;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
    public static String Tour_Action_TourInfo_Tooltip;
@@ -2412,6 +2413,8 @@ public class Messages extends NLS {
    public static String Tour_Database_UpdateDone;
    public static String Tour_Database_UpdateInfo;
 
+   public static String Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
+   public static String Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
    public static String Tour_Editor_Decorator_TimeZone_Tooltip;
    public static String Tour_Editor_Dialog_DeleteSwimTimeSlices_Message;
    public static String Tour_Editor_Dialog_DeleteSwimTimeSlices_Title;
