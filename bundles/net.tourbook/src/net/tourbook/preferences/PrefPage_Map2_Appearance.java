@@ -105,7 +105,6 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
    private Button                _rdoSymbolSquare;
 
    private ColorSelector         _colorBorderColor;
-   private ColorSelector         _colorMapDimmColor;
 
    private Label                 _lblBorderWidth;
    private Label                 _lblBorderColor;
@@ -139,7 +138,6 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
       {
          createUI_10_TourProperties(_containerPage);
          createUI_60_PaintingMethod(_containerPage);
-         createUI_80_DimmingColor(_containerPage);
          createUI_90_LiveUpdate(_containerPage);
       }
    }
@@ -376,26 +374,6 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
       GridLayoutFactory.swtDefaults().margins(0, 5).numColumns(2).applyTo(groupMethod);
    }
 
-   private void createUI_80_DimmingColor(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         // label
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory
-               .fillDefaults()//
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(label);
-         label.setText(Messages.pref_map_layout_dim_color);
-
-         // dimming color
-         _colorMapDimmColor = new ColorSelector(container);
-         _colorMapDimmColor.addListener(_defaultChangePropertyListener);
-      }
-   }
-
    private void createUI_90_LiveUpdate(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -562,13 +540,8 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
             PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
       /*
-       * Dimming
+       * Live update
        */
-      _colorMapDimmColor.setColorValue(
-            PreferenceConverter.getDefaultColor(
-                  _prefStore,
-                  ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
-
       _chkLiveUpdate.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE));
 
       super.performDefaults();
@@ -665,11 +638,8 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
                   ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
       /*
-       * Map dimming
+       * Live update
        */
-      _colorMapDimmColor.setColorValue(
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
-
       _chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE));
 
       // display info for the selected paint method
@@ -706,14 +676,6 @@ public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implemen
             _prefStore,
             ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,
             _colorBorderColor.getColorValue());
-
-      /*
-       * Map dimming
-       */
-      PreferenceConverter.setValue(
-            _prefStore,
-            ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR,
-            _colorMapDimmColor.getColorValue());
 
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, _chkLiveUpdate.getSelection());
    }

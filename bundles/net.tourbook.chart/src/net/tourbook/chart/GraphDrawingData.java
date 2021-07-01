@@ -183,7 +183,7 @@ public class GraphDrawingData {
     */
    public int getDevYTitle() {
 
-      return getDevYBottom() //
+      return getDevYBottom()
             - devGraphHeight
             - chartDrawingData.devSliderBarHeight
             - chartDrawingData.devXTitelBarHeight;

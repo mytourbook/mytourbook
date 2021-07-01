@@ -220,6 +220,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, true);
       store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, 200);
 
+      store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE, true);
+
       // is photo visible
       store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);
       store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE, true);
@@ -237,7 +239,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // the low speeds/high paces at the bottom of the graph
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
 
-      //
+      // night section
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
       store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 50);
 
@@ -384,7 +386,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,        80); // 0...100
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,    new RGB(0x50, 0x50, 0x50));
-      PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR,  new RGB(0x00, 0x00, 0x00));
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);

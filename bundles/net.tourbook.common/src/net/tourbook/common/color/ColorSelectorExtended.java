@@ -347,6 +347,7 @@ public class ColorSelectorExtended extends EventManager {
     *           The new color.
     */
    public void setColorValue(final RGB rgb) {
+
       fColorValue = rgb;
       updateColorImage();
    }
@@ -357,6 +358,7 @@ public class ColorSelectorExtended extends EventManager {
     * @param allCustomRGBs
     */
    public void setCustomColors(final RGB[] allCustomRGBs) {
+
       _allCustomRGBs = allCustomRGBs;
    }
 
@@ -367,7 +369,13 @@ public class ColorSelectorExtended extends EventManager {
     *           the enabled state.
     */
    public void setEnabled(final boolean state) {
+
       getButton().setEnabled(state);
+   }
+
+   public void setToolTipText(final String tooltipText) {
+
+      fButton.setToolTipText(tooltipText);
    }
 
    /**

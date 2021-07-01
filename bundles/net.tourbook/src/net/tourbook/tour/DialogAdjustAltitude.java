@@ -938,6 +938,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       // overwrite x-axis from pref store
       _tourChartConfig.setIsShowTimeOnXAxis(
             _prefStore.getString(ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT).equals(TourManager.X_AXIS_TIME));
+
+      // force to show hovered value point value
+      _tourChartConfig.isShowValuePointValue = true;
    }
 
    /**
