@@ -248,9 +248,14 @@ public class ChartComponentGraph extends Canvas {
    private ChartXSlider               _xSliderOnTop;
 
    /**
-    * this is the slider which is below the top slider
+    * This is the slider which is below the top slider
     */
    private ChartXSlider               _xSliderOnBottom;
+
+   /**
+    * This is a dummy slider to keep the value points
+    */
+   private ChartXSlider               _xSliderValuePoint;
 
    /**
     * contains the x-slider when the mouse is over it, or <code>null</code> when the mouse is not
@@ -506,6 +511,7 @@ public class ChartComponentGraph extends Canvas {
       // setup the x-slider
       _xSliderA = new ChartXSlider(this, Integer.MIN_VALUE, ChartXSlider.SLIDER_TYPE_LEFT);
       _xSliderB = new ChartXSlider(this, Integer.MIN_VALUE, ChartXSlider.SLIDER_TYPE_RIGHT);
+      _xSliderValuePoint = new ChartXSlider(this, Integer.MIN_VALUE, ChartXSlider.SLIDER_TYPE_VALUE_POINT);
 
       _xSliderOnTop = _xSliderB;
       _xSliderOnBottom = _xSliderA;
@@ -1039,10 +1045,11 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param gc
     * @param xSlider
+    * @param xxDevSliderLinePos
     */
-   private void createXSliderLabel(final GC gc, final ChartXSlider xSlider) {
+   private void createXSliderLabel(final GC gc, final ChartXSlider xSlider, final long xxDevSliderLinePos) {
 
-      final int devSliderLinePos = (int) (xSlider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
+      final int devSliderLinePos = (int) (xxDevSliderLinePos - _xxDevViewPortLeftBorder);
 
       int sliderValueIndex = xSlider.getValuesIndex();
       // final int valueX = slider.getValueX();
@@ -1079,9 +1086,6 @@ public class ChartComponentGraph extends Canvas {
             _nf.setMinimumFractionDigits(displayedDigits);
             _nf.setMaximumFractionDigits(displayedDigits);
          }
-
-         final ChartXSliderLabel label = new ChartXSliderLabel();
-         allSliderLabel.add(label);
 
          // draw label on the left or on the right side of the slider,
          // depending on the slider position
@@ -1160,36 +1164,41 @@ public class ChartComponentGraph extends Canvas {
             }
          }
 
+         final int devYBottom = drawingData.getDevYBottom();
+         final int devYTop = drawingData.getDevYTop();
+         final float graphYBottom = drawingData.getGraphYBottom();
+
+         final ChartXSliderLabel xSliderLabel = new ChartXSliderLabel();
+         allSliderLabel.add(xSliderLabel);
+
 // show also the value index for debugging
-//       label.text = labelText.toString() + " " + xSlider.getValuesIndex();
-         label.text = labelText.toString();
+//       xSliderLabel.text = labelText.toString() + " " + xSlider.getValuesIndex();
+         xSliderLabel.text = labelText.toString();
 
-         label.height = labelExtend.y - 5;
-         label.width = labelWidth;
+         xSliderLabel.height = labelExtend.y - 5;
+         xSliderLabel.width = labelWidth;
 
-         label.x = labelXPos;
-         label.y = drawingData.getDevYBottom() - drawingData.devGraphHeight + 4;
+         xSliderLabel.x = labelXPos;
+         xSliderLabel.y = devYBottom - drawingData.devGraphHeight + 4;
 
          /*
-          * get the y position of the marker which marks the y value in the graph
+          * Set the y position of the marker which marks the y value in the graph
           */
          int devYGraph = 0;
 
          if (drawingData.getYData().isYAxisDirection()) {
-            devYGraph = drawingData.getDevYBottom()
-                  - (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+            devYGraph = devYBottom - (int) ((yValue - graphYBottom) * drawingData.getScaleY());
          } else {
-            devYGraph = drawingData.getDevYTop()
-                  + (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+            devYGraph = devYTop + (int) ((yValue - graphYBottom) * drawingData.getScaleY());
          }
 
          if (yValue < yData.getVisibleMinValue()) {
-            devYGraph = drawingData.getDevYBottom();
+            devYGraph = devYBottom;
          }
          if (yValue > yData.getVisibleMaxValue()) {
-            devYGraph = drawingData.getDevYTop();
+            devYGraph = devYTop;
          }
-         label.devYGraph = devYGraph;
+         xSliderLabel.devYGraph = devYGraph;
       }
    }
 
@@ -3452,9 +3461,10 @@ public class ChartComponentGraph extends Canvas {
             devXPosNextBar = devXPos + devBarWidthPositioned;
 
             /*
-             * get colors
+             * Get colors
              */
             final int colorIndex = colorsIndex[serieIndex][valueIndex];
+
             final RGB rgbBrightDef = rgbBright[colorIndex];
             final RGB rgbDarkDef = rgbDark[colorIndex];
             final RGB rgbLineDef = rgbLine[colorIndex];
@@ -5545,9 +5555,9 @@ public class ChartComponentGraph extends Canvas {
           */
          if (_isXSliderVisible) {
 
-            createXSliderLabel(gcOverlay, _xSliderOnTop);
-            createXSliderLabel(gcOverlay, _xSliderOnBottom);
-            updateXSliderYPosition();
+            createXSliderLabel(gcOverlay, _xSliderOnTop, _xSliderOnTop.getXXDevSliderLinePos());
+            createXSliderLabel(gcOverlay, _xSliderOnBottom, _xSliderOnBottom.getXXDevSliderLinePos());
+            updateXSliderYPosition(_xSliderOnTop.getLabelList(), _xSliderOnBottom.getLabelList(), null);
 
             drawSync_410_XSlider(gcOverlay, _xSliderOnBottom);
             drawSync_410_XSlider(gcOverlay, _xSliderOnTop);
@@ -5633,9 +5643,8 @@ public class ChartComponentGraph extends Canvas {
          final ChartDataYSerie yData = drawingData.getYData();
          final ChartXSliderLabel label = labelList.get(graphNo - 1);
 
-         final Color colorLine = new Color(yData.getRgbLine()[0]);
-         final Color colorBright = new Color(yData.getRgbBright()[0]);
          final Color colorDark = new Color(yData.getRgbDark()[0]);
+         final Color colorLine = new Color(yData.getRgbLine()[0]);
 
          final int labelHeight = label.height;
          final int labelWidth = label.width;
@@ -5663,18 +5672,14 @@ public class ChartComponentGraph extends Canvas {
 
          // draw label background
          gcGraph.setBackground(_backgroundColor);
-         gcGraph.fillRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
-
-         gcGraph.setBackground(colorDark);
-         gcGraph.setForeground(colorBright);
+         gcGraph.fillRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3);
 
          // draw label border
          gcGraph.setForeground(colorLine);
          gcGraph.setLineStyle(SWT.LINE_SOLID);
-         gcGraph.drawRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
+         gcGraph.drawRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3);
 
          // draw slider label
-//         gcGraph.setForeground(colorTxt);
          gcGraph.setForeground(_foregroundColor);
          gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
@@ -6304,6 +6309,31 @@ public class ChartComponentGraph extends Canvas {
 
    private void drawSync_460_HoveredLine(final GC gcOverlay) {
 
+      /*
+       * Create labels for the hovered value point
+       */
+      final ChartDataXSerie xData = getXData();
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final int xValueLastIndex = xValues.length - 1;
+
+      // adjust index to the array bounds
+      int valueIndex = _hoveredValuePointIndex;
+      valueIndex = valueIndex < 0
+            ? 0
+            : valueIndex > xValueLastIndex
+                  ? xValueLastIndex
+                  : valueIndex;
+
+      final double xValue = xValues[valueIndex];
+      final double lastXValue = xValues[xValueLastIndex];
+      final long xxDevLinePos = (long) (_xxDevGraphWidth * xValue / lastXValue);
+
+      _xSliderValuePoint.setValueIndex(valueIndex);
+      createXSliderLabel(gcOverlay, _xSliderValuePoint, xxDevLinePos);
+      updateXSliderYPosition(_xSliderOnTop.getLabelList(),
+            _xSliderOnBottom.getLabelList(),
+            _xSliderValuePoint.getLabelList());
+
       int graphIndex = 0;
 
       // draw value point marker
@@ -6311,6 +6341,7 @@ public class ChartComponentGraph extends Canvas {
       final int devOffsetPoint = _pc.convertHorizontalDLUsToPixels(2);// 3;
 
       gcOverlay.setAntialias(SWT.ON);
+      gcOverlay.setLineWidth(1);
 
       // loop: all graphs
       for (final GraphDrawingData drawingData : _allGraphDrawingData) {
@@ -6359,7 +6390,7 @@ public class ChartComponentGraph extends Canvas {
          Color colorLine;
 
          /*
-          * paint the points which are outside of the visible area at the border with gray color
+          * Paint the points which are outside of the visible area at the border with gray color
           */
          if (devPosition.x < 0) {
 
@@ -6386,20 +6417,63 @@ public class ChartComponentGraph extends Canvas {
          gcOverlay.setBackground(colorLine);
 
          gcOverlay.setAlpha(0x40);
-         gcOverlay.fillOval(//
+         gcOverlay.fillOval(
                devX - devOffsetFill + 1,
                (int) (devPosition.y - devOffsetFill + 1),
                devOffsetFill * 2,
                devOffsetFill * 2);
 
          gcOverlay.setAlpha(0xff);
-         gcOverlay.fillOval(//
+         gcOverlay.fillOval(
                devX - devOffsetPoint + 1,
                (int) (devPosition.y - devOffsetPoint + 1),
                devOffsetPoint * 2,
                devOffsetPoint * 2);
 
-//         // debug: draw hovered rectangle
+         /*
+          * Draw label for the hovered value but don't draw when the x-slider is moved
+          */
+         final ChartDataModel chartDataModel = _chartDrawingData.chartDataModel;
+         final boolean isShowValuePointValue = chartDataModel.isShowValuePointValue();
+
+         if (isShowValuePointValue &&
+
+         // x-slider is not moved
+               _xSliderDragged == null) {
+
+            final boolean isGraphOverlapped = chartDataModel.isGraphOverlapped();
+            final ChartType chartType = drawingData.getChartType();
+            final boolean isLastOverlappedGraph = isGraphOverlapped
+                  && graphIndex == _allGraphDrawingData.size() - 1
+                  && (chartType == ChartType.LINE || chartType == ChartType.HORIZONTAL_BAR);
+
+            // draw only for the last overlapped graph or when not overlapped
+            if (isGraphOverlapped == false || isLastOverlappedGraph) {
+
+               final ChartXSliderLabel xSliderLabel = _xSliderValuePoint.getLabelList().get(graphIndex);
+               final int labelHeight = xSliderLabel.height;
+               final int labelWidth = xSliderLabel.width;
+               final int devXLabel = xSliderLabel.x;
+               final int devYLabel = xSliderLabel.y;
+
+               // draw label background
+               gcOverlay.setBackground(_backgroundColor);
+               gcOverlay.fillRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 2);
+
+               // draw label border
+               gcOverlay.setForeground(colorLine);
+               gcOverlay.setLineStyle(SWT.LINE_SOLID);
+               gcOverlay.drawRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 2);
+
+               // draw slider label
+               gcOverlay.setForeground(_foregroundColor);
+               gcOverlay.drawText(xSliderLabel.text, devXLabel + 2, devYLabel - 5, true);
+            }
+         }
+
+         /*
+          * Debug: Draw hovered rectangle
+          */
 //         gcOverlay.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 //         gcOverlay.drawRectangle(
 //               (int) hoveredRectangle.x,
@@ -7082,9 +7156,9 @@ public class ChartComponentGraph extends Canvas {
 
       // adjust the slider index to the array bounds
       valueIndex = valueIndex < 0
-            ? 0 //
+            ? 0
             : valueIndex > xValueLastIndex
-                  ? xValueLastIndex //
+                  ? xValueLastIndex
                   : valueIndex;
 
       final double xValue = xValues[valueIndex];
@@ -7535,11 +7609,11 @@ public class ChartComponentGraph extends Canvas {
                redraw();
             }
 
-         } else if (_isXSliderVisible //
-               //
+         } else if (_isXSliderVisible
+
                // x-slider is NOT dragged
                && _xSliderDragged == null
-               //
+
                && (isShift || isCtrl || _isSetXSliderPositionLeft || _isSetXSliderPositionRight)) {
 
             // position the x-slider and start dragging it
@@ -9566,30 +9640,95 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * adjust the y-position for the bottom label when the top label is drawn over it
+    * Adjust the y-position for the bottom label when the top label is drawn over it
+    *
+    * @param allTopLabels
+    * @param allBottomLabels
+    * @param arrayList
     */
-   private void updateXSliderYPosition() {
+   private void updateXSliderYPosition(final ArrayList<ChartXSliderLabel> allTopLabels,
+                                       final ArrayList<ChartXSliderLabel> allBottomLabels,
+                                       final ArrayList<ChartXSliderLabel> allValuePointLabels) {
 
-      int labelIndex = 0;
-      final ArrayList<ChartXSliderLabel> onTopLabels = _xSliderOnTop.getLabelList();
-      final ArrayList<ChartXSliderLabel> onBotLabels = _xSliderOnBottom.getLabelList();
+      if (allValuePointLabels == null) {
 
-      for (final ChartXSliderLabel onTopLabel : onTopLabels) {
+         // compute only top and bottom labels
 
-         final ChartXSliderLabel onBotLabel = onBotLabels.get(labelIndex);
+         if (allTopLabels != null) {
 
-         final int onTopWidth2 = onTopLabel.width / 2;
-         final int onTopDevX = onTopLabel.x;
-         final int onBotWidth2 = onBotLabel.width / 2;
-         final int onBotDevX = onBotLabel.x;
+            int labelIndex = 0;
 
-         if (onTopDevX + onTopWidth2 > onBotDevX - onBotWidth2
-               && onTopDevX - onTopWidth2 < onBotDevX + onBotWidth2) {
+            for (final ChartXSliderLabel topLabel : allTopLabels) {
 
-            onBotLabel.y = onBotLabel.y + onBotLabel.height + 5;
+               final ChartXSliderLabel bottomLabel = allBottomLabels.get(labelIndex);
+
+               final int topWidth2 = topLabel.width / 2;
+               final int topDevX = topLabel.x;
+
+               final int bottomWidth2 = bottomLabel.width / 2;
+               final int bottomDevX = bottomLabel.x;
+
+               if (topDevX + topWidth2 > bottomDevX - bottomWidth2
+                     && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+
+                  bottomLabel.y = bottomLabel.y + bottomLabel.height + 5;
+               }
+
+               labelIndex++;
+            }
          }
 
-         labelIndex++;
+      } else {
+
+         // compute only value point labels
+
+         int labelIndex = 0;
+
+         if (allTopLabels != null) {
+
+            for (final ChartXSliderLabel topLabel : allTopLabels) {
+
+               final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
+
+               final int topWidth2 = topLabel.width / 2;
+               final int topDevX = topLabel.x;
+
+               final int bottomWidth2 = valuePointLabel.width / 2;
+               final int bottomDevX = valuePointLabel.x;
+
+               if (topDevX + topWidth2 > bottomDevX - bottomWidth2
+                     && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+
+                  valuePointLabel.y = valuePointLabel.y + valuePointLabel.height + 4;
+               }
+
+               labelIndex++;
+            }
+         }
+
+         if (allBottomLabels != null) {
+
+            labelIndex = 0;
+
+            for (final ChartXSliderLabel topLabel : allBottomLabels) {
+
+               final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
+
+               final int topWidth2 = topLabel.width / 2;
+               final int topDevX = topLabel.x;
+
+               final int bottomWidth2 = valuePointLabel.width / 2;
+               final int bottomDevX = valuePointLabel.x;
+
+               if (topDevX + topWidth2 > bottomDevX - bottomWidth2
+                     && topDevX - topWidth2 < bottomDevX + bottomWidth2) {
+
+                  valuePointLabel.y = valuePointLabel.y + valuePointLabel.height + 4;
+               }
+
+               labelIndex++;
+            }
+         }
       }
    }
 

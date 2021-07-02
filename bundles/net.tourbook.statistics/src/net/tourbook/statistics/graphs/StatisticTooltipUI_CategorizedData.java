@@ -30,6 +30,7 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -150,7 +151,7 @@ public class StatisticTooltipUI_CategorizedData {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));

@@ -13,9 +13,9 @@ repositories/
 **/*vtm*/**/build/
 
 .apt_generated
-.log
-
 .gradle
+.log
+.vs
 
 *.js.map
 *.js.uncompressed.js

@@ -4,11 +4,10 @@
 TODO's
 ======
 
-* Tour Chart   - Select color for 2nd graph line instead of compliment color
-               - Set default graphs in the graph slideout, sorting still needs the pref page
+* Mac OS          - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
 
-* Tour Search  - Test Edge browser if the tour selection in the result list is working with the mouse
-               - Implement workaround: Select tour with an action in the context menu
+* Tour Chart      - Select color for 2nd graph line instead of compliment color
+                  - Set default graphs in the graph slideout, sorting still needs the pref page
 
 * Compare Tours by Elevation
                - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
@@ -39,6 +38,7 @@ Improvements
 
 * 
 
+
 Changes  
 =======
 
@@ -49,6 +49,7 @@ Bugfix
 ======
 
 * 
+
 
 Translation    
 ===========
