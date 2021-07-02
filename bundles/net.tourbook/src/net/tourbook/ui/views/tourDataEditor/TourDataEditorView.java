@@ -158,7 +158,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
@@ -362,7 +361,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean                            _isSavingInProgress     = false;
 
    /**
-    * when <code>true</code> data are loaded into fields
+    * When <code>true</code> then data are loaded into fields
     */
    private boolean                            _isSetField             = false;
 
@@ -374,8 +373,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ModifyListener                     _modifyListener_Temperature;
    private MouseWheelListener                 _mouseWheelListener;
    private MouseWheelListener                 _mouseWheelListener_Temperature;
-   private SelectionAdapter                   _selectionListener;
-   private SelectionAdapter                   _selectionListener_Temperature;
+   private SelectionListener                  _selectionListener;
+   private SelectionListener                  _selectionListener_Temperature;
    private SelectionListener                  _columnSortListener;
    private SelectionAdapter                   _tourTimeListener;
    private ModifyListener                     _verifyFloatValue;
@@ -475,58 +474,59 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * Measurement unit values
     */
-   private float                            _unitValueDistance;
-   private float                            _unitValueElevation;
-   private int[]                            _unitValueWindSpeed;
+   private float                                      _unitValueDistance;
+   private float                                      _unitValueElevation;
+   private int[]                                      _unitValueWindSpeed;
    //
-   private MenuManager                      _swimViewer_MenuManager;
-   private MenuManager                      _timeViewer_MenuManager;
-   private IContextMenuProvider             _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
-   private IContextMenuProvider             _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
+   private MenuManager                                _swimViewer_MenuManager;
+   private MenuManager                                _timeViewer_MenuManager;
+   private IContextMenuProvider                       _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
+   private IContextMenuProvider                       _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
    //
-   private Action_RemoveSwimStyle           _action_RemoveSwimStyle;
-   private Action_SetSwimStyle_Header       _action_SetSwimStyle_Header;
-   private ActionComputeDistanceValues      _actionComputeDistanceValues;
-   private ActionCreateTourMarker           _actionCreateTourMarker;
-   private ActionCSVTimeSliceExport         _actionCsvTimeSliceExport;
-   private ActionDeleteDistanceValues       _actionDeleteDistanceValues;
-   private ActionDeleteTimeSlicesKeepTime   _actionDeleteTimeSlicesKeepTime;
-   private ActionDeleteTimeSlicesRemoveTime _actionDeleteTimeSlicesRemoveTime;
-   private ActionEditTimeSlicesValues       _actionEditTimeSlicesValues;
-   private ActionExport                     _actionExportTour;
-   private ActionExtractTour                _actionExtractTour;
-   private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
-   private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
-   private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
-   private ActionSplitTour                  _actionSplitTour;
-   private ActionToggleReadEditMode         _actionToggleReadEditMode;
-   private ActionToggleRowSelectMode        _actionToggleRowSelectMode;
-   private ActionViewSettings               _actionViewSettings;
+   private Action_RemoveSwimStyle                     _action_RemoveSwimStyle;
+   private Action_SetSwimStyle_Header                 _action_SetSwimStyle_Header;
+   private ActionComputeDistanceValues                _actionComputeDistanceValues;
+   private ActionCreateTourMarker                     _actionCreateTourMarker;
+   private ActionCSVTimeSliceExport                   _actionCsvTimeSliceExport;
+   private ActionDeleteDistanceValues                 _actionDeleteDistanceValues;
+   private ActionDeleteTimeSlices_AdjustTourStartTime _actionDeleteTimeSlices_AdjustTourStartTime;
+   private ActionDeleteTimeSlices_KeepTime            _actionDeleteTimeSlices_KeepTime;
+   private ActionDeleteTimeSlices_RemoveTime          _actionDeleteTimeSlices_RemoveTime;
+   private ActionEditTimeSlicesValues                 _actionEditTimeSlicesValues;
+   private ActionExport                               _actionExportTour;
+   private ActionExtractTour                          _actionExtractTour;
+   private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
+   private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
+   private ActionSetStartDistanceTo0                  _actionSetStartDistanceTo_0;
+   private ActionSplitTour                            _actionSplitTour;
+   private ActionToggleReadEditMode                   _actionToggleReadEditMode;
+   private ActionToggleRowSelectMode                  _actionToggleRowSelectMode;
+   private ActionViewSettings                         _actionViewSettings;
    //
-   private ArrayList<Action_SetSwimStyle>   _allSwimStyleActions;
+   private ArrayList<Action_SetSwimStyle>             _allSwimStyleActions;
    //
-   private TagMenuManager                   _tagMenuMgr;
+   private TagMenuManager                             _tagMenuMgr;
 
    /**
     * Number of digits for the lat/lon columns.
     */
-   private int                              _latLonDigits;
+   private int                                        _latLonDigits;
 
    /**
     * Number of lines for the description text.
     */
-   private int                              _descriptionNumLines;
+   private int                                        _descriptionNumLines;
 
-   private final NumberFormat               _nfLatLon                       = NumberFormat.getNumberInstance();
+   private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
 
-   private TourData                         _tourData;
+   private TourData                                   _tourData;
 
-   private Color                            _foregroundColor_Default;
-   private Color                            _backgroundColor_Default;
-   private Color                            _foregroundColor_1stColumn_RefTour;
-   private Color                            _backgroundColor_1stColumn_RefTour;
-   private Color                            _foregroundColor_1stColumn_NoRefTour;
-   private Color                            _backgroundColor_1stColumn_NoRefTour;
+   private Color                                      _foregroundColor_Default;
+   private Color                                      _backgroundColor_Default;
+   private Color                                      _foregroundColor_1stColumn_RefTour;
+   private Color                                      _backgroundColor_1stColumn_RefTour;
+   private Color                                      _foregroundColor_1stColumn_NoRefTour;
+   private Color                                      _backgroundColor_1stColumn_NoRefTour;
 
    //
    // ################################################## UI controls ##################################################
@@ -797,7 +797,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       @Override
       protected Object getValue(final Object element) {
-         return Double.valueOf(__dataSerie[((TimeSlice) element).serieIndex]).toString();
+         return Double.toString(__dataSerie[((TimeSlice) element).serieIndex]);
       }
 
       public void setDataSerie(final double[] dataSerie) {
@@ -2107,8 +2107,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * delete selected time slices
     *
     * @param isRemoveTime
+    * @param isAdjustTourStartTime
     */
-   void actionDeleteTimeSlices(final boolean isRemoveTime) {
+   void actionDeleteTimeSlices(final boolean isRemoveTime, final boolean isAdjustTourStartTime) {
 
       // a tour with reference tours is currently not supported
       if (_isReferenceTourAvailable) {
@@ -2144,7 +2145,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Object[] selectedTimeSlices = selection.toArray();
 
       /*
-       * check if time slices have a successive selection
+       * Check if time slices have a successive selection
        */
       int lastIndex = -1;
       int firstIndex = -1;
@@ -2186,20 +2187,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       /*
-       * get first selection index to select a time slice after removal
+       * Get first selection index to select a time slice after removal
        */
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int[] indices = table.getSelectionIndices();
       Arrays.sort(indices);
       int lastSelectionIndex = indices[0];
 
-      TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime);
+      TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime, isAdjustTourStartTime);
 
       getDataSeriesFromTourData();
 
       // update UI
-      updateUI_Tab_1_Tour();
-      updateUI_ReferenceTourRanges();
+      _isSetField = true;
+      {
+         updateUI_Tab_1_Tour();
+         updateUI_ReferenceTourRanges();
+
+         // adjust tour editor start time in the UI
+         if (isAdjustTourStartTime) {
+            updateUI_Title();
+         }
+      }
+      _isSetField = false;
 
       // update slice viewer
       _timeSlice_ViewerItems = getRemainingSliceItems(_timeSlice_ViewerItems, firstIndex, lastIndex);
@@ -2220,7 +2230,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       fireModifyNotification();
 
       /*
-       * select next available time slice
+       * Select next available time slice
        */
       final int itemCount = table.getItemCount();
       if (itemCount > 0) {
@@ -2769,8 +2779,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
 
-      _actionDeleteTimeSlicesKeepTime = new ActionDeleteTimeSlicesKeepTime(this);
-      _actionDeleteTimeSlicesRemoveTime = new ActionDeleteTimeSlicesRemoveTime(this);
+      _actionDeleteTimeSlices_AdjustTourStartTime = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
+      _actionDeleteTimeSlices_KeepTime = new ActionDeleteTimeSlices_KeepTime(this);
+      _actionDeleteTimeSlices_RemoveTime = new ActionDeleteTimeSlices_RemoveTime(this);
 
       _actionCreateTourMarker = new ActionCreateTourMarker(this);
       _actionExportTour = new ActionExport(this);
@@ -2840,31 +2851,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          setTourDirty();
       };
 
-      _selectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      _selectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
+               if (_isSetField || _isSavingInProgress) {
+                  return;
+               }
 
-            updateModel_FromUI();
-            setTourDirty();
-         }
-      };
+               updateModel_FromUI();
+               setTourDirty();
+            });
 
-      _selectionListener_Temperature = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      _selectionListener_Temperature = widgetSelectedAdapter(
+            selectionEvent -> {
 
-            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-               return;
-            }
+               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+                  return;
+               }
 
-            _isTemperatureManuallyModified = true;
-            setTourDirty();
-         }
-      };
+               _isTemperatureManuallyModified = true;
+               setTourDirty();
+            });
 
       /*
        * listener for elapsed/moving/paused time
@@ -4605,19 +4612,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //       }
 //    });
 
-      table.addKeyListener(new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
+      table.addKeyListener(KeyListener.keyPressedAdapter(
+            keyEvent -> {
+               if ((_isEditMode == false) || (isTourInDb() == false)) {
+                  return;
+               }
 
-            if ((_isEditMode == false) || (isTourInDb() == false)) {
-               return;
-            }
-
-            if (e.keyCode == SWT.DEL) {
-               actionDeleteTimeSlices(true);
-            }
-         }
-      });
+               if (keyEvent.keyCode == SWT.DEL) {
+                  actionDeleteTimeSlices(true, false);
+               }
+            }));
 
       _timeSlice_Viewer = new TableViewer(table);
 
@@ -6208,14 +6212,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
 
+      final boolean canDeleteTimeSliced = _isEditMode && isTourInDb && isSliceSelected && isNoSwimData;
+
       _actionCreateTourMarker.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
       _actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && selectedMarker != null);
 
       // select marker
       _actionOpenMarkerDialog.setTourMarker(selectedMarker);
 
-      _actionDeleteTimeSlicesRemoveTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected && isNoSwimData);
-      _actionDeleteTimeSlicesKeepTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected && isNoSwimData);
+      _actionDeleteTimeSlices_AdjustTourStartTime.setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_KeepTime.setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_RemoveTime.setEnabled(canDeleteTimeSliced);
 
       _actionExportTour.setEnabled(true);
       _actionCsvTimeSliceExport.setEnabled(isSliceSelected);
@@ -6385,8 +6392,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       menuMgr.add(_actionOpenMarkerDialog);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionDeleteTimeSlicesRemoveTime);
-      menuMgr.add(_actionDeleteTimeSlicesKeepTime);
+      menuMgr.add(_actionDeleteTimeSlices_RemoveTime);
+      menuMgr.add(_actionDeleteTimeSlices_KeepTime);
+      menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetStartDistanceTo_0);
@@ -7876,9 +7884,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * Linux needs async, otherwise the tour is modified again when pressing Ctrl+S
        */
-      _parent.getDisplay().asyncExec(() -> {
-         _isSavingInProgress = false;
-      });
+      _parent.getDisplay().asyncExec(() -> _isSavingInProgress = false);
 
       getDataSeriesFromTourData();
 
@@ -8618,7 +8624,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _page_EditorForm.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
       }
 
-      updateUI_Title_Asynch(getTourTitle());
+      updateUI_Title_Async(getTourTitle());
 
       updateUI_Tab_1_Tour();
       updateUI_Tab_2_TimeSlices();
@@ -9164,14 +9170,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final String tourTitle = TourManager.getTourTitle(tourStartTime);
 
-      updateUI_Title_Asynch(tourTitle);
+      updateUI_Title_Async(tourTitle);
    }
 
    /**
     * Update the title is a really performance hog because of the date/time controls when they are
     * layouted
     */
-   private void updateUI_Title_Asynch(final String title) {
+   private void updateUI_Title_Async(final String title) {
 
       _uiUpdateTitleCounter++;
 

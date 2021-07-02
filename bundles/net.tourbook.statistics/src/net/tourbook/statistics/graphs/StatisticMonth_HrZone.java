@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,26 +48,26 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
 
-   private TourStatisticData_MonthHrZones     _tourMonth_Data;
-   private DataProvider_HrZone_Month _tourMonth_DataProvider = new DataProvider_HrZone_Month();
+   private TourStatisticData_MonthHrZones _tourMonth_Data;
+   private DataProvider_HrZone_Month      _tourMonth_DataProvider = new DataProvider_HrZone_Month();
 
-   private TourPerson                _appPerson;
-   private TourTypeFilter            _appTourTypeFilter;
+   private TourPerson                     _appPerson;
+   private TourTypeFilter                 _appTourTypeFilter;
 
-   private int                       _statYoungestYear;
-   private int                       _statNumberOfYears;
+   private int                            _statYoungestYear;
+   private int                            _statNumberOfYears;
 
-   private Chart                     _chart;
-   private final MinMaxKeeper_YData  _minMaxKeeper           = new MinMaxKeeper_YData();
-   private IChartInfoProvider        _tooltipProvider;
+   private Chart                          _chart;
+   private final MinMaxKeeper_YData       _minMaxKeeper           = new MinMaxKeeper_YData();
+   private IChartInfoProvider             _tooltipProvider;
 
-   private boolean                   _isSynchScaleEnabled;
+   private boolean                        _isSynchScaleEnabled;
 
-   private int                       _barOrderStart;
+   private int                            _barOrderStart;
 
-   private TourPersonHRZone[]        _personHrZones;
-   private TourPersonHRZone[]        _resortedPersonHrZones;
-   private int[][]                   _resortedHrZoneValues;
+   private TourPersonHRZone[]             _personHrZones;
+   private TourPersonHRZone[]             _resortedPersonHrZones;
+   private int[][]                        _resortedHrZoneValues;
 
    public StatisticMonth_HrZone() {
       super();
@@ -79,8 +79,8 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
        * create segments for each year
        */
       final int monthCounter = monthData.hrZoneValues[0].length;
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -117,7 +117,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
        * create segments for each year
        */
       final int monthCounter = monthData.hrZoneValues[0].length;
-      final double allMonths[] = new double[monthCounter];
+      final double[] allMonths = new double[monthCounter];
 
       // get start/end and title for each segment
       for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -141,7 +141,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       // set x-axis
 
       final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonth_Data));
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_MONTH);
       xData.setChartSegments(createChartSegments(_tourMonth_Data));
 
       chartDataModel.setXData(xData);

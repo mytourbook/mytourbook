@@ -91,8 +91,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
        * create segments for each year
        */
       final int monthCounter = tourMonthData.elevationUp_High[0].length;
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statSelectedYear - _statNumberOfYears + 1;
@@ -405,17 +405,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
    private void setChartProviders(final ChartDataModel chartModel) {
 
       // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider,
-                                     final Composite parent,
-                                     final int hoveredBar_Serie_VerticalIndex,
-                                     final int hoveredBar_Value_HorizontalIndex) {
-
-            StatisticMonth.this.createToolTipUI(toolTipProvider, parent, hoveredBar_Serie_VerticalIndex, hoveredBar_Value_HorizontalIndex);
-         }
-      });
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
+            (IChartInfoProvider) StatisticMonth.this::createToolTipUI);
    }
 
    @Override

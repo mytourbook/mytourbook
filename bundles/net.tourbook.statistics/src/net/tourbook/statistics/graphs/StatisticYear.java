@@ -18,7 +18,6 @@ package net.tourbook.statistics.graphs;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -46,14 +45,11 @@ import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticYear extends TourbookStatistic {
-
-   private final IPreferenceStore   _prefStore             = TourbookPlugin.getPrefStore();
 
    private TourStatisticData_Year   _statisticData_Year;
    private DataProvider_Tour_Year   _tourYear_DataProvider = new DataProvider_Tour_Year();
@@ -84,8 +80,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       final int yearCounter = tourDataYear.elevationUp_High[0].length;
 
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
@@ -158,7 +154,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       // set the x-axis
       final ChartDataXSerie xData = new ChartDataXSerie(createYearData(_statisticData_Year));
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_YEAR);
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_YEAR);
       xData.setChartSegments(createChartSegments(_statisticData_Year));
       chartDataModel.setXData(xData);
    }
@@ -315,7 +311,7 @@ public abstract class StatisticYear extends TourbookStatistic {
    private double[] createYearData(final TourStatisticData_Year tourDataYear) {
 
       final int yearCounter = tourDataYear.elevationUp_High[0].length;
-      final double allYears[] = new double[yearCounter];
+      final double[] allYears = new double[yearCounter];
 
       for (int yearIndex = 0; yearIndex < yearCounter; yearIndex++) {
          allYears[yearIndex] = yearIndex;
@@ -388,13 +384,9 @@ public abstract class StatisticYear extends TourbookStatistic {
    private void setChartProviders(final ChartDataModel chartModel) {
 
       // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticYear.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-      });
+      chartModel.setCustomData(
+            ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
+            (IChartInfoProvider) StatisticYear.this::createToolTipUI);
    }
 
    @Override

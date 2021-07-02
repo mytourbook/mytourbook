@@ -938,7 +938,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       /*
        * create a list with all available graphs
        */
-      final String[] prefAllGraphIds = StringToArrayConverter.convertStringToArray(//
+      final String[] prefAllGraphIds = StringToArrayConverter.convertStringToArray(
             _prefStore.getString(ITourbookPreferences.GRAPH_ALL));
 
       _viewerGraphs = new ArrayList<>();
@@ -962,7 +962,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
       _graphCheckboxList.setInput(this);
 
-      final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(//
+      final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(
             _prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
 
       // check all graphs which are defined in the prefs

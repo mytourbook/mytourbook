@@ -461,7 +461,10 @@ public class TourLegendLayer extends RenderableLayer {
                   gradientColorProvider,
                   ColorProviderConfig.MAP3_TOUR,
                   legendWidth,
-                  legendHeight);
+                  legendHeight,
+                  UI.IS_DARK_THEME,
+                  false // no unit shadow
+            );
          }
 
       } finally {

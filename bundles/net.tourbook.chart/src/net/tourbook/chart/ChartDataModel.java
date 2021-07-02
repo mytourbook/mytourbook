@@ -66,6 +66,11 @@ public class ChartDataModel {
    private boolean                    _isGraphOverlapped;
 
    /**
+    * Show/hide the hovered value point value label
+    */
+   private boolean                    _isShowValuePointValue;
+
+   /**
     * Minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
     * each day at least one pixel
     */
@@ -202,6 +207,10 @@ public class ChartDataModel {
       return _isNoLinesValuesDisplayed;
    }
 
+   public boolean isShowValuePointValue() {
+      return _isShowValuePointValue;
+   }
+
    /**
     * reset the min/max values of the chart to the min/max values from the original data
     */
@@ -242,6 +251,10 @@ public class ChartDataModel {
 
    public void setShowNoLineValues(final boolean isNoLinesValuesDisplayed) {
       _isNoLinesValuesDisplayed = isNoLinesValuesDisplayed;
+   }
+
+   public void setShowValuePointValue(final boolean isShowValuePointValue) {
+      _isShowValuePointValue = isShowValuePointValue;
    }
 
    public void setTitle(final String title) {

@@ -48,8 +48,6 @@ import org.json.JSONObject;
  */
 public class WEB {
 
-   private static final char NL       = UI.NEW_LINE;
-
    /**
     * This is the <b>MAIN</b> switch to run Dojo in the dev or release folder. In debug mode the
     * Dojo files are delivered separately to debug them, in release mode all Dojo files are
@@ -59,7 +57,7 @@ public class WEB {
     * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
     * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
     */
-   static boolean            IS_DEBUG = false;
+   static boolean IS_DEBUG = false;
 
    /*
     * It is very complicated to support testing for language translators, therefore it is currently
@@ -102,6 +100,7 @@ public class WEB {
          ? WEB_CONTENT_DEVELOPMENT_FOLDER
          : WEB_CONTENT_RELEASE_FOLDER;
 
+   private static final char            NL                                       = UI.NEW_LINE;
    private static final String          URL_SPACE                                = " ";                                       //$NON-NLS-1$
    private static final String          URL_SPACE_REPLACEMENT                    = "%20";                                     //$NON-NLS-1$
    private static final String          URL_SQB_OPEN                             = "\\[";                                     //$NON-NLS-1$
