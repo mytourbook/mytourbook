@@ -343,11 +343,10 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
       _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
 
-
       /*
        * Map dimming
        */
-      _chkIsDimMap.setSelection(                   Map2View.STATE_IS_DIM_MAP_DEFAULT);
+      _chkIsDimMap.setSelection(                   Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
       _spinnerDimValue.setSelection(               Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
       _colorMapDimmColor.setColorValue(            Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
 
@@ -367,7 +366,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       /*
        * Map dimming
        */
-      _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_DIM_MAP,    Map2View.STATE_IS_DIM_MAP_DEFAULT));
+      _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
       _spinnerDimValue.setSelection(      Util.getStateInt(    _state,  Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
       _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
 
@@ -385,7 +384,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       /*
        * Map dimming
        */
-      _state.put(Map2View.STATE_IS_DIM_MAP,                    _chkIsDimMap.getSelection());
+      _state.put(Map2View.STATE_IS_MAP_DIMMED,                 _chkIsDimMap.getSelection());
       _state.put(Map2View.STATE_DIM_MAP_VALUE,                 _spinnerDimValue.getSelection());
       Util.setState(_state,Map2View.STATE_DIM_MAP_COLOR,       _colorMapDimmColor.getColorValue());
 

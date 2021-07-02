@@ -1726,10 +1726,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       // set map dim level
       final IDialogSettings state_Map2 = Map2View.getState();
-      final boolean isDimMap = Util.getStateBoolean(state_Map2, Map2View.STATE_IS_DIM_MAP, Map2View.STATE_IS_DIM_MAP_DEFAULT);
+      final boolean isMapDimmed = Util.getStateBoolean(state_Map2, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
       final int mapDimValue = Util.getStateInt(state_Map2, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
       final RGB mapDimColor = Util.getStateRGB(state_Map2, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
-      map.setDimLevel(isDimMap, mapDimValue, mapDimColor, _map2View.isBackgroundDark());
+      map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, _map2View.isBackgroundDark());
    }
 
    private void setWidth_ForColumn_IsVisible() {
