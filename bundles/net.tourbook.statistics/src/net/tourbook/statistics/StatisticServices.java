@@ -22,22 +22,16 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartTitleSegmentConfig;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 
 public class StatisticServices {
-
-   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
    /**
     * @param serieIndex
@@ -204,28 +198,7 @@ public class StatisticServices {
 
    public static void setTourTypeColors(final ChartDataYSerie yData, final String graphName) {
 
-      /*
-       * Set graph colors
-       */
-      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
-
-      final String prefColorLineThemed = UI.IS_DARK_THEME
-            ? GraphColorManager.PREF_COLOR_LINE_DARK
-            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
-
-      final String prefColorTextThemed = UI.IS_DARK_THEME
-            ? GraphColorManager.PREF_COLOR_TEXT_DARK
-            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
-
-// SET_FORMATTING_OFF
-
-      // put the colors into the chart data
-      yData.setRgbGraph_Gradient_Bright(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT));
-      yData.setRgbGraph_Gradient_Dark(  PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_DARK));
-      yData.setRgbGraph_Line(           PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorLineThemed));
-      yData.setRgbGraph_Text(           PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorTextThemed));
-
-// SET_FORMATTING_ON
+      TourManager.setGraphColors(yData, graphName);
 
       /*
        * Set tour type colors
@@ -233,7 +206,6 @@ public class StatisticServices {
       final ArrayList<RGB> rgbGradient_Bright = new ArrayList<>();
       final ArrayList<RGB> rgbGradient_Dark = new ArrayList<>();
       final ArrayList<RGB> rgbLine = new ArrayList<>();
-      final ArrayList<RGB> rgbText = new ArrayList<>();
 
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 
@@ -243,14 +215,12 @@ public class StatisticServices {
          rgbGradient_Dark.add(tourType.getRGB_Gradient_Dark());
 
          rgbLine.add(tourType.getRGB_Line_Themed());
-         rgbText.add(tourType.getRGB_Text_Themed());
       }
 
       // put the colors into the chart data
-      yData.setRgbTourType_Gradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
-      yData.setRgbTourType_Gradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
-      yData.setRgbTourType_Line(rgbLine.toArray(new RGB[rgbLine.size()]));
-      yData.setRgbTourType_Text(rgbText.toArray(new RGB[rgbText.size()]));
+      yData.setRgbBar_Gradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
+      yData.setRgbBar_Gradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
+      yData.setRgbBar_Line(rgbLine.toArray(new RGB[rgbLine.size()]));
 
 //      /*
 //       * Dump tour type colors

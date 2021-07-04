@@ -1387,10 +1387,11 @@ public class TrainingView extends ViewPart {
       yData.setYTitle(Messages.App_Label_H_MM);
 
       yData.setColorIndex(new int[][] { colorIndex });
-      yData.setRgbTourType_Line(allRgbLine);
-      yData.setRgbTourType_Text(new RGB[] { rgbTextColor });
-      yData.setRgbTourType_Gradient_Bright(allRgbBright);
-      yData.setRgbTourType_Gradient_Dark(allRgbDark);
+      yData.setRgbBar_Gradient_Bright(allRgbBright);
+      yData.setRgbBar_Gradient_Dark(allRgbDark);
+      yData.setRgbBar_Line(allRgbLine);
+
+      yData.setRgbGraph_Text(rgbTextColor);
 
       chartDataModel.addYData(yData);
 

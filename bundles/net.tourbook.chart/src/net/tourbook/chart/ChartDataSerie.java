@@ -39,8 +39,8 @@ public abstract class ChartDataSerie {
    public static final int         X_AXIS_UNIT_HOUR_MINUTE               = 202;
    public static final int         X_AXIS_UNIT_HISTORY                   = 500;
 
-   public static final String      CHART_TYPE_BAR_ADJACENT               = "CHART_TYPE_BAR_ADJACENT";       //$NON-NLS-1$
-   public static final String      CHART_TYPE_BAR_STACKED                = "CHART_TYPE_BAR_STACKED";        //$NON-NLS-1$
+   public static final String      CHART_TYPE_BAR_ADJACENT               = "CHART_TYPE_BAR_ADJACENT"; //$NON-NLS-1$
+   public static final String      CHART_TYPE_BAR_STACKED                = "CHART_TYPE_BAR_STACKED";  //$NON-NLS-1$
 
    /**
     * Default color, when default color is not set
@@ -108,19 +108,20 @@ public abstract class ChartDataSerie {
 
    private HashMap<String, Object> _customData                           = new HashMap<>();
 
-   private RGB                     _rgbTourType_Gradient_Bright[]        = new RGB[] { new RGB(255, 0, 0) };
-   private RGB                     _rgbTourType_Gradient_Dark[]          = new RGB[] { new RGB(0, 0, 255) };
-   private RGB                     _rgbTourType_Line[]                   = new RGB[] { new RGB(0, 255, 0) };
-
-   /**
-    * Is mainly used for the graph title, unit or graph value
+   /*
+    * Bar colors are mainly used for bar graphs
     */
-   private RGB                     _rgbTourType_Text[]                   = new RGB[] { new RGB(0, 0, 0) };
+   private RGB _rgbBar_Gradient_Bright[] = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB _rgbBar_Gradient_Dark[]   = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB _rgbBar_Line[]            = new RGB[] { DEFAULT_GRAPH_RGB };
 
-   private RGB                     _rgbGraph_Gradient_Bright             = DEFAULT_GRAPH_RGB;
-   private RGB                     _rgbGraph_Gradient_Dark               = DEFAULT_GRAPH_RGB;
-   private RGB                     _rgbGraph_Line                        = DEFAULT_GRAPH_RGB;
-   private RGB                     _rgbGraph_Text                        = DEFAULT_GRAPH_RGB;
+   /*
+    * Graph colors are mainly used for line graphs, graph title or units
+    */
+   private RGB _rgbGraph_Gradient_Bright = DEFAULT_GRAPH_RGB;
+   private RGB _rgbGraph_Gradient_Dark   = DEFAULT_GRAPH_RGB;
+   private RGB _rgbGraph_Line            = DEFAULT_GRAPH_RGB;
+   private RGB _rgbGraph_Text            = DEFAULT_GRAPH_RGB;
 
    public double getAvgPositiveValue() {
       return _avgPositiveValue;
@@ -158,6 +159,18 @@ public abstract class ChartDataSerie {
       return _originalMinValue;
    }
 
+   public RGB[] getRgbBar_Gradient_Bright() {
+      return _rgbBar_Gradient_Bright;
+   }
+
+   public RGB[] getRgbBar_Gradient_Dark() {
+      return _rgbBar_Gradient_Dark;
+   }
+
+   public RGB[] getRgbBar_Line() {
+      return _rgbBar_Line;
+   }
+
    public RGB getRgbGraph_Gradient_Bright() {
       return _rgbGraph_Gradient_Bright;
    }
@@ -170,24 +183,13 @@ public abstract class ChartDataSerie {
       return _rgbGraph_Line;
    }
 
+   /**
+    * This color is mainly used to draw the graph tile, graph value or unit label
+    *
+    * @return
+    */
    public RGB getRgbGraph_Text() {
       return _rgbGraph_Text;
-   }
-
-   public RGB[] getRgbTourType_Line() {
-      return _rgbTourType_Line;
-   }
-
-   public RGB[] getRgbTourType_Text() {
-      return _rgbTourType_Text;
-   }
-
-   public RGB[] getRgbTourType_Gradient_Bright() {
-      return _rgbTourType_Gradient_Bright;
-   }
-
-   public RGB[] getRgbTourType_Gradient_Dark() {
-      return _rgbTourType_Gradient_Dark;
    }
 
    /**
@@ -251,12 +253,16 @@ public abstract class ChartDataSerie {
       _label = label;
    }
 
-   public void setRgbTourType_Gradient_Bright(final RGB[] rgbGradient_Bright) {
-      _rgbTourType_Gradient_Bright = rgbGradient_Bright;
+   public void setRgbBar_Gradient_Bright(final RGB[] rgbGradient_Bright) {
+      _rgbBar_Gradient_Bright = rgbGradient_Bright;
    }
 
-   public void setRgbTourType_Gradient_Dark(final RGB[] rgbGradient_Dark) {
-      _rgbTourType_Gradient_Dark = rgbGradient_Dark;
+   public void setRgbBar_Gradient_Dark(final RGB[] rgbGradient_Dark) {
+      _rgbBar_Gradient_Dark = rgbGradient_Dark;
+   }
+
+   public void setRgbBar_Line(final RGB[] rgbLine) {
+      _rgbBar_Line = rgbLine;
    }
 
    public void setRgbGraph_Gradient_Bright(final RGB rgbDefault_Gradient_Bright) {
@@ -271,16 +277,13 @@ public abstract class ChartDataSerie {
       _rgbGraph_Line = rgbDefault_Line;
    }
 
-   public void setRgbGraph_Text(final RGB rgbDefault_Text) {
-      _rgbGraph_Text = rgbDefault_Text;
-   }
-
-   public void setRgbTourType_Line(final RGB[] rgbLine) {
-      _rgbTourType_Line = rgbLine;
-   }
-
-   public void setRgbTourType_Text(final RGB rgbText[]) {
-      _rgbTourType_Text = rgbText;
+   /**
+    * This color is used to draw the graph tile, graph value or unit label
+    *
+    * @param rgbGraph_Text
+    */
+   public void setRgbGraph_Text(final RGB rgbGraph_Text) {
+      _rgbGraph_Text = rgbGraph_Text;
    }
 
    /**
