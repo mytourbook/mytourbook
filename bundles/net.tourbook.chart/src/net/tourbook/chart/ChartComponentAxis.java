@@ -365,8 +365,7 @@ public class ChartComponentAxis extends Canvas {
             final int xPos = labelExtend.y / 2;
             final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
-            final Color fgColor = new Color(yData.getRgbText()[0]);
-            gc.setForeground(fgColor);
+            gc.setForeground(new Color(yData.getRgbGraph_Text()));
 
             final Transform tr = new Transform(_display);
             {

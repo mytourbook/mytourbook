@@ -2753,20 +2753,10 @@ public class TourManager {
       final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
       final RGB rgbTextColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorText);
 
-      /**
-       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-       * <p>
-       * Default color is used to draw the y-axis text, using the prefTextColor can cause problems
-       * when the color is white for a dark gradient color.
-       * <p>
-       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-       */
-      yData.setDefaultRGB(rgbLineColor);
-
-      yData.setRgbGradient_Dark(new RGB[] { rgbGradient_Dark });
-      yData.setRgbGradient_Bright(new RGB[] { rgbGradient_Bright });
-      yData.setRgbLine(new RGB[] { rgbLineColor });
-      yData.setRgbText(new RGB[] { rgbTextColor });
+      yData.setRgbTourType_Gradient_Dark(new RGB[] { rgbGradient_Dark });
+      yData.setRgbTourType_Gradient_Bright(new RGB[] { rgbGradient_Bright });
+      yData.setRgbTourType_Line(new RGB[] { rgbLineColor });
+      yData.setRgbTourType_Text(new RGB[] { rgbTextColor });
    }
 
    public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
@@ -3566,7 +3556,7 @@ public class TourManager {
          xDataDist.setLabel(Messages.tour_editor_label_distance);
          xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
          xDataDist.setValueDivisor(1000);
-         xDataDist.setRgbText(new RGB[] { rgbText_Distance });
+         xDataDist.setRgbTourType_Text(new RGB[] { rgbText_Distance });
 
          // do not show average values but show the other values with 3 digits
          xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
@@ -3578,7 +3568,7 @@ public class TourManager {
       final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
-      xDataTime.setRgbText(new RGB[] { rgbText_Time });
+      xDataTime.setRgbTourType_Text(new RGB[] { rgbText_Time });
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*

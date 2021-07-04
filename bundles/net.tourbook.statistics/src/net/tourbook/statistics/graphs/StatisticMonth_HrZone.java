@@ -43,7 +43,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
@@ -194,10 +193,9 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       yData.setShowYSlider(true);
 
       yData.setColorIndex(hrColorIndex);
-      yData.setRgbLine(rgbLine);
-      yData.setRgbGradient_Bright(rgbBright);
-      yData.setRgbGradient_Dark(rgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      yData.setRgbTourType_Line(rgbLine);
+      yData.setRgbTourType_Gradient_Bright(rgbBright);
+      yData.setRgbTourType_Gradient_Dark(rgbDark);
 
       chartDataModel.addYData(yData);
    }

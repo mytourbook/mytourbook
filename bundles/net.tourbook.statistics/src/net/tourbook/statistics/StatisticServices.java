@@ -37,12 +37,7 @@ import org.eclipse.swt.graphics.RGB;
 
 public class StatisticServices {
 
-   /**
-    * Offset for tour types in the color index
-    */
-   public static int                     TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
-
-   private static final IPreferenceStore _prefStore_Common            = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
    /**
     * @param serieIndex
@@ -51,62 +46,14 @@ public class StatisticServices {
     */
    public static long getTourTypeId(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
 
-      int colorOffset = 0;
-      if (activeTourTypeFilter.showUndefinedTourTypes()) {
-         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      if (serieIndex - colorOffset < 0) {
+      if (serieIndex < 0) {
          return -1;
       }
 
       final ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
-      final long typeId = allTourTypes.get(serieIndex - colorOffset).getTypeId();
+      final long typeId = allTourTypes.get(serieIndex).getTypeId();
 
       return typeId;
-   }
-
-   /**
-    * @param serieIndex
-    * @param valueIndex
-    * @param resortedTypeIds
-    * @param activeTourTypeFilter
-    * @return Returns the tour type name for a data serie
-    */
-   public static String getTourTypeName(final int serieIndex,
-                                        final int valueIndex,
-                                        final long[][] resortedTypeIds,
-                                        final TourTypeFilter activeTourTypeFilter) {
-
-      final long typeId = resortedTypeIds[serieIndex][valueIndex];
-
-      final String tourTypeName = TourDatabase.getTourTypeName(typeId);
-
-      return tourTypeName;
-   }
-
-   /**
-    * @param serieIndex
-    * @param activeTourTypeFilter
-    * @return Returns the tour type name for a data serie
-    */
-   public static String getTourTypeName(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
-
-      int colorOffset = 0;
-      if (activeTourTypeFilter.showUndefinedTourTypes()) {
-         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      if (serieIndex - colorOffset < 0) {
-         return Messages.ui_tour_not_defined;
-      }
-
-      final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-      final long typeId = tourTypeList.get(serieIndex - colorOffset).getTypeId();
-
-      final String tourTypeName = TourDatabase.getTourTypeName(typeId);
-
-      return tourTypeName;
    }
 
    /**
@@ -132,8 +79,8 @@ public class StatisticServices {
 
       ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
 
-      final boolean isShowNoTourTypes = TourbookPlugin.getActiveTourTypeFilter().showUndefinedTourTypes();
-      if (isShowNoTourTypes) {
+      final boolean isShowMultipleTourTypes = TourbookPlugin.getActiveTourTypeFilter().containsMultipleTourTypes();
+      if (isShowMultipleTourTypes) {
 
          ArrayList<TourType> clonedTourTypes = new ArrayList<>();
 
@@ -214,24 +161,7 @@ public class StatisticServices {
    }
 
    /**
-    * Set default colors for the y-axis, the color is defined in
-    * {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}
-    *
-    * @param yData
-    * @param graphName
-    */
-   public static void setDefaultColors(final ChartDataYSerie yData, final String graphName) {
-
-      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
-
-      // put the color into the chart data
-      yData.setDefaultRGB(PreferenceConverter.getColor(
-            _prefStore_Common,
-            defaultColorName + GraphColorManager.PREF_COLOR_LINE_LIGHT));
-   }
-
-   /**
-    * create the color index for every tour type, <code>typeIds</code> contain all tour types
+    * Create the color index for every tour type, <code>typeIds</code> contain all tour types
     *
     * @param tourTypeFilter
     */
@@ -240,11 +170,6 @@ public class StatisticServices {
                                             final TourTypeFilter tourTypeFilter) {
 
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
-
-      int colorOffset = 0;
-      if (tourTypeFilter.showUndefinedTourTypes()) {
-         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
 
       final int[][] colorIndex = new int[resortedTypeIds.length][resortedTypeIds[0].length];
 
@@ -261,7 +186,7 @@ public class StatisticServices {
             if (typeId != -1) {
                for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
                   if ((tourTypes.get(typeIndex)).getTypeId() == typeId) {
-                     tourTypeColorIndex = colorOffset + typeIndex;
+                     tourTypeColorIndex = typeIndex;
                      break;
                   }
                }
@@ -277,44 +202,39 @@ public class StatisticServices {
       yData.setColorIndex(colorIndex);
    }
 
-   public static void setTourTypeColors(final ChartDataYSerie yData,
-                                        final String graphName,
-                                        final TourTypeFilter tourTypeFilter) {
+   public static void setTourTypeColors(final ChartDataYSerie yData, final String graphName) {
 
+      /*
+       * Set graph colors
+       */
+      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
+
+      final String prefColorLineThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final String prefColorTextThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+// SET_FORMATTING_OFF
+
+      // put the colors into the chart data
+      yData.setRgbGraph_Gradient_Bright(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT));
+      yData.setRgbGraph_Gradient_Dark(  PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_DARK));
+      yData.setRgbGraph_Line(           PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorLineThemed));
+      yData.setRgbGraph_Text(           PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorTextThemed));
+
+// SET_FORMATTING_ON
+
+      /*
+       * Set tour type colors
+       */
       final ArrayList<RGB> rgbGradient_Bright = new ArrayList<>();
       final ArrayList<RGB> rgbGradient_Dark = new ArrayList<>();
       final ArrayList<RGB> rgbLine = new ArrayList<>();
       final ArrayList<RGB> rgbText = new ArrayList<>();
 
-      /*
-       * Set default color when tours are displayed where the tour type is not set, these tour will
-       * be painted in the default color
-       */
-      if (tourTypeFilter.showUndefinedTourTypes()) {
-
-         /*
-          * Color index 0: default color
-          */
-         final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
-
-         final String prefColorLineThemed = UI.IS_DARK_THEME
-               ? GraphColorManager.PREF_COLOR_LINE_DARK
-               : GraphColorManager.PREF_COLOR_LINE_LIGHT;
-
-         final String prefColorTextThemed = UI.IS_DARK_THEME
-               ? GraphColorManager.PREF_COLOR_TEXT_DARK
-               : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
-
-         rgbGradient_Bright.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT));
-         rgbGradient_Dark.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_DARK));
-
-         rgbLine.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorLineThemed));
-         rgbText.add(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorTextThemed));
-      }
-
-      /*
-       * Color index 1...n+1: tour type colors
-       */
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 
       for (final TourType tourType : tourTypes) {
@@ -327,10 +247,10 @@ public class StatisticServices {
       }
 
       // put the colors into the chart data
-      yData.setRgbGradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
-      yData.setRgbGradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
-      yData.setRgbLine(rgbLine.toArray(new RGB[rgbLine.size()]));
-      yData.setRgbText(rgbText.toArray(new RGB[rgbText.size()]));
+      yData.setRgbTourType_Gradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
+      yData.setRgbTourType_Gradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
+      yData.setRgbTourType_Line(rgbLine.toArray(new RGB[rgbLine.size()]));
+      yData.setRgbTourType_Text(rgbText.toArray(new RGB[rgbText.size()]));
 
 //      /*
 //       * Dump tour type colors

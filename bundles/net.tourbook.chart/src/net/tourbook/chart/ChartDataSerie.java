@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ public abstract class ChartDataSerie {
    /**
     * Default color, when default color is not set
     */
-   private static RGB              DEFAULT_DEFAULT_RGB                   = new RGB(0xFF, 0xA5, 0xCB);
+   private static RGB              DEFAULT_GRAPH_RGB                     = new RGB(0xFF, 0xA5, 0xCB);
 
    /**
     * divisor for highValues
@@ -108,16 +108,19 @@ public abstract class ChartDataSerie {
 
    private HashMap<String, Object> _customData                           = new HashMap<>();
 
-   private RGB                     _rgbBright[]                          = new RGB[] { new RGB(255, 0, 0) };
-   private RGB                     _rgbDark[]                            = new RGB[] { new RGB(0, 0, 255) };
-   private RGB                     _rgbLine[]                            = new RGB[] { new RGB(0, 255, 0) };
+   private RGB                     _rgbTourType_Gradient_Bright[]        = new RGB[] { new RGB(255, 0, 0) };
+   private RGB                     _rgbTourType_Gradient_Dark[]          = new RGB[] { new RGB(0, 0, 255) };
+   private RGB                     _rgbTourType_Line[]                   = new RGB[] { new RGB(0, 255, 0) };
 
    /**
     * Is mainly used for the graph title, unit or graph value
     */
-   private RGB                     _rgbText[]                            = new RGB[] { new RGB(0, 0, 0) };
+   private RGB                     _rgbTourType_Text[]                   = new RGB[] { new RGB(0, 0, 0) };
 
-   private RGB                     _defaultRGB;
+   private RGB                     _rgbGraph_Gradient_Bright             = DEFAULT_GRAPH_RGB;
+   private RGB                     _rgbGraph_Gradient_Dark               = DEFAULT_GRAPH_RGB;
+   private RGB                     _rgbGraph_Line                        = DEFAULT_GRAPH_RGB;
+   private RGB                     _rgbGraph_Text                        = DEFAULT_GRAPH_RGB;
 
    public double getAvgPositiveValue() {
       return _avgPositiveValue;
@@ -139,22 +142,6 @@ public abstract class ChartDataSerie {
       }
    }
 
-   /**
-    * @return Returns the default color for this data serie
-    */
-   public RGB getDefaultRGB() {
-
-      /*
-       * When default color is not set, return an ugly color to see in the ui that something is
-       * wrong
-       */
-      if (_defaultRGB == null) {
-         return DEFAULT_DEFAULT_RGB;
-      }
-
-      return _defaultRGB;
-   }
-
    public int getDisplayedFractionalDigits() {
       return _displayedFractionalDigits;
    }
@@ -171,20 +158,36 @@ public abstract class ChartDataSerie {
       return _originalMinValue;
    }
 
-   public RGB[] getRgbBright() {
-      return _rgbBright;
+   public RGB getRgbGraph_Gradient_Bright() {
+      return _rgbGraph_Gradient_Bright;
    }
 
-   public RGB[] getRgbDark() {
-      return _rgbDark;
+   public RGB getRgbGraph_Gradient_Dark() {
+      return _rgbGraph_Gradient_Dark;
    }
 
-   public RGB[] getRgbLine() {
-      return _rgbLine;
+   public RGB getRgbGraph_Line() {
+      return _rgbGraph_Line;
    }
 
-   public RGB[] getRgbText() {
-      return _rgbText;
+   public RGB getRgbGraph_Text() {
+      return _rgbGraph_Text;
+   }
+
+   public RGB[] getRgbTourType_Line() {
+      return _rgbTourType_Line;
+   }
+
+   public RGB[] getRgbTourType_Text() {
+      return _rgbTourType_Text;
+   }
+
+   public RGB[] getRgbTourType_Gradient_Bright() {
+      return _rgbTourType_Gradient_Bright;
+   }
+
+   public RGB[] getRgbTourType_Gradient_Dark() {
+      return _rgbTourType_Gradient_Dark;
    }
 
    /**
@@ -240,15 +243,6 @@ public abstract class ChartDataSerie {
       _customData.put(key, value);
    }
 
-   /**
-    * This value is sometimes used to draw the axis text for the data serie
-    *
-    * @param color
-    */
-   public void setDefaultRGB(final RGB color) {
-      _defaultRGB = color;
-   }
-
    public void setDisplayedFractionalDigits(final int displayedFractionalDigits) {
       _displayedFractionalDigits = displayedFractionalDigits;
    }
@@ -257,20 +251,36 @@ public abstract class ChartDataSerie {
       _label = label;
    }
 
-   public void setRgbGradient_Bright(final RGB[] rgbBright) {
-      _rgbBright = rgbBright;
+   public void setRgbTourType_Gradient_Bright(final RGB[] rgbGradient_Bright) {
+      _rgbTourType_Gradient_Bright = rgbGradient_Bright;
    }
 
-   public void setRgbGradient_Dark(final RGB[] rgbDark) {
-      _rgbDark = rgbDark;
+   public void setRgbTourType_Gradient_Dark(final RGB[] rgbGradient_Dark) {
+      _rgbTourType_Gradient_Dark = rgbGradient_Dark;
    }
 
-   public void setRgbLine(final RGB[] rgbLine) {
-      _rgbLine = rgbLine;
+   public void setRgbGraph_Gradient_Bright(final RGB rgbDefault_Gradient_Bright) {
+      _rgbGraph_Gradient_Bright = rgbDefault_Gradient_Bright;
    }
 
-   public void setRgbText(final RGB rgbText[]) {
-      _rgbText = rgbText;
+   public void setRgbGraph_Gradient_Dark(final RGB rgbDefault_Gradient_Dark) {
+      _rgbGraph_Gradient_Dark = rgbDefault_Gradient_Dark;
+   }
+
+   public void setRgbGraph_Line(final RGB rgbDefault_Line) {
+      _rgbGraph_Line = rgbDefault_Line;
+   }
+
+   public void setRgbGraph_Text(final RGB rgbDefault_Text) {
+      _rgbGraph_Text = rgbDefault_Text;
+   }
+
+   public void setRgbTourType_Line(final RGB[] rgbLine) {
+      _rgbTourType_Line = rgbLine;
+   }
+
+   public void setRgbTourType_Text(final RGB rgbText[]) {
+      _rgbTourType_Text = rgbText;
    }
 
    /**

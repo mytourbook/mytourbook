@@ -177,8 +177,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -201,8 +200,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -225,8 +223,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -251,8 +248,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setValueDivisor(1000);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -276,8 +272,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       _yData_Duration.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
       _yData_Duration.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColorIndex(_yData_Duration, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(_yData_Duration);
@@ -301,8 +296,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
