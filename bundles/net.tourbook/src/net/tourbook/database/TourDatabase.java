@@ -1821,7 +1821,9 @@ public class TourDatabase {
       }
 
       synchronized (DB_LOCK) {
+
          // check again
+
          if (_instance == null) {
             _instance = new TourDatabase();
          }

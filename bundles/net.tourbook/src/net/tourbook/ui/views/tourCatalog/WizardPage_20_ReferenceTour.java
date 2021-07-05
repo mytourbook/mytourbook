@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,13 +26,13 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.common.UI;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.IReferenceTourProvider;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -72,7 +72,9 @@ import org.eclipse.ui.part.PageBook;
 
 public class WizardPage_20_ReferenceTour extends WizardPage {
 
-   public static final int COLUMN_REF_TOUR = 0;
+   private static final char NL              = UI.NEW_LINE;
+
+   public static final int   COLUMN_REF_TOUR = 0;
 
    // dialog settings
    private static final String          REF_TOUR_CHECKED      = "RefTour.checkedTours";       //$NON-NLS-1$
@@ -175,10 +177,10 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
          final Composite masterDetailContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 
-         /*
-          * Reference tours
-          */
          {
+            /*
+             * Reference tours
+             */
             _refContainer = new Composite(masterDetailContainer, SWT.NONE);
             GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_refContainer);
             {
@@ -191,6 +193,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
           * Sash
           */
          final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
+         UI.addSashColorHandler(sash);
 
          /*
           * Chart
@@ -218,7 +221,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
             }
          }
 
-         _viewerDetailForm = new SashLeftFixedForm(masterDetailContainer, _refContainer, sash, _groupChart);
+         _viewerDetailForm = new SashLeftFixedForm(masterDetailContainer, _refContainer, sash, _groupChart, 50, 5);
       }
 
       return container;
@@ -344,18 +347,19 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
       _refTours.clear();
 
       final String sql = UI.EMPTY_STRING
-            //
-            + "SELECT" //$NON-NLS-1$
-            //
-            + " refId," //$NON-NLS-1$
-            + " TourData_tourId," //$NON-NLS-1$
-            //
-            + " label," //$NON-NLS-1$
-            + " startIndex," //$NON-NLS-1$
-            + " endIndex" //$NON-NLS-1$
-            //
-            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE //$NON-NLS-1$
-            + " ORDER BY label"; //$NON-NLS-1$
+
+            + "SELECT" + NL //               //$NON-NLS-1$
+
+            + " refId," + NL //              //$NON-NLS-1$
+            + " TourData_tourId," + NL //    //$NON-NLS-1$
+
+            + " label," + NL //              //$NON-NLS-1$
+            + " startIndex," + NL //         //$NON-NLS-1$
+            + " endIndex" + NL //            //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + NL//$NON-NLS-1$
+            + " ORDER BY label" + NL //      //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -377,7 +381,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
    }
 
@@ -528,7 +532,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
          _groupChart.setText(NLS.bind(refTour.label + ": " //$NON-NLS-1$
                + Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDateShort(tourData)));
 
-         UI.updateChartProperties(_refTourChart, WizardTourComparer.GRID_PREFIX_REF_TOUR_REF_TOUR);
+         net.tourbook.ui.UI.updateChartProperties(_refTourChart, WizardTourComparer.GRID_PREFIX_REF_TOUR_REF_TOUR);
 
          // show title
          _refTourChart.getChartTitleSegmentConfig().isShowSegmentTitle = true;

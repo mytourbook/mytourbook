@@ -4,22 +4,23 @@
 TODO's
 ======
 
-* Mac OS          - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
+
+* Compare Tours by Elevation
+                  - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
-* Compare Tours by Elevation
-               - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
-* Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                 Need to check how to apply it to all projects, must maybe be done with the already existing ant script
-
-               - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                 mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                 
+* Mac OS          - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
 
 * Tour modification (Frederic) 
-               - Use multi-threading (ThreadPoolExecutor)
+                  - Use multi-threading (ThreadPoolExecutor)
 
 Issues
 ======

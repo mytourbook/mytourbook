@@ -73,7 +73,7 @@ public class WizardTourComparer extends Wizard {
       final RefTourItem[] refTours = _pageReferenceTour.getReferenceTours();
       final Object[] comparedTours = _pageCompareTour.getComparedTours();
 
-      TourCompareManager.getInstance().compareTours(refTours, comparedTours);
+      TourCompareManager.compareTours(refTours, comparedTours);
 
       return true;
    }
@@ -85,8 +85,8 @@ public class WizardTourComparer extends Wizard {
 
    private void saveState() {
 
-      _pageReferenceTour.saveState();
       _pageCompareTour.saveState();
+      _pageReferenceTour.saveState();
    }
 
 }

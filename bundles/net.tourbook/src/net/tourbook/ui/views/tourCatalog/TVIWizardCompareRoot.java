@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,25 +31,26 @@ public class TVIWizardCompareRoot extends TVIWizardCompareItem {
    protected void fetchChildren() {
 
       /*
-       * set the children for the root item, these are year items
+       * Set the children for the root item, these are year items
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
+      final String sql = UI.EMPTY_STRING
 
-      sb.append("SELECT"); //$NON-NLS-1$
+            + "SELECT" + NL //                                 //$NON-NLS-1$
 
-      sb.append(" startYear "); //$NON-NLS-1$
+            + " startYear " + NL //                            //$NON-NLS-1$
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //  //$NON-NLS-1$
 
-      sb.append(" GROUP BY startYear"); //$NON-NLS-1$
-      sb.append(" ORDER BY startYear"); //$NON-NLS-1$
+            + " GROUP BY startYear" + NL //                    //$NON-NLS-1$
+            + " ORDER BY startYear" + NL //                    //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sql);
 
          final ResultSet result = statement.executeQuery();
          while (result.next()) {

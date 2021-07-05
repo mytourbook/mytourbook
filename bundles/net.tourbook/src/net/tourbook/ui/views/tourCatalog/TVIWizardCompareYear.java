@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,26 +36,30 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
    @Override
    protected void fetchChildren() {
 
-      final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+      /*
+       * Set the children for the year item, these are month items
+       */
+      final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
+      final String sql = NL
 
-      sb.append("SELECT"); //$NON-NLS-1$
+            + "SELECT" + NL //                                 //$NON-NLS-1$
 
-      sb.append(" startYear, "); //$NON-NLS-1$
-      sb.append(" startMonth "); //$NON-NLS-1$
+            + " startYear, " + NL //                           //$NON-NLS-1$
+            + " startMonth " + NL //                           //$NON-NLS-1$
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //  //$NON-NLS-1$
 
-      sb.append(" WHERE startYear=?"); //$NON-NLS-1$
+            + " WHERE startYear=?" + NL //                     //$NON-NLS-1$
 
-      sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
-      sb.append(" ORDER BY startMonth"); //$NON-NLS-1$
+            + " GROUP BY startYear, startMonth" + NL //        //$NON-NLS-1$
+            + " ORDER BY startMonth" + NL //                   //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setInt(1, tourYear);
 
          final ResultSet result = statement.executeQuery();
@@ -67,7 +71,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
             final int dbYear = result.getInt(1);
             final int dbMonth = result.getInt(2);
 
-            monthItem.treeColumn = calendar8//
+            monthItem.treeColumn = monthDateTime
                   .withYear(dbYear)
                   .withMonth(dbMonth)
                   .format(TimeTools.Formatter_Month);

@@ -326,7 +326,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
             if (partRef.getPart(false) == TourCompareResultView.this) {
 
-               TourCompareManager.getInstance().clearCompareResult();
+               TourCompareManager.clearCompareResult();
             }
          }
 

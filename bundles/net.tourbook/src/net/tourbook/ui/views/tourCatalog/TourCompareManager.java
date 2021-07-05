@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,17 +54,338 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class TourCompareManager {
 
-   private static TourCompareManager                     _instance;
+   private static RefTourItem[]                                 _refTourItems;
+   private static TourData[]                                    _refToursData;
 
-   private RefTourItem[]                                 _refTourItems;
-   private TourData[]                                    _refToursData;
-
-   private final ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
+   private final static ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
 
    /**
     * internal constructor
     */
    private TourCompareManager() {}
+
+   public static void clearCompareResult() {
+
+      _comparedTourItems.clear();
+   }
+
+   /**
+    * @param refTourIndex
+    *           Index into refTourContext and refToursData
+    * @param compareTourData
+    *           Tour data of the tour which will be compared
+    * @param compareTourData2
+    * @return returns the start index for the ref tour in the compare tour
+    */
+   private static TVICompareResultComparedTour compareTour(final RefTourItem refTour_Item,
+                                                           final TourData refTour_Data,
+                                                           final TourData compareTourData) {
+
+      final TVICompareResultComparedTour compareResultItem = new TVICompareResultComparedTour();
+
+      /*
+       * normalize the compare tour
+       */
+      final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
+      final float[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
+      final int[] compareTourDataTime = compareTourData.timeSerie;
+
+      if (compareTourDataDistance == null || compareTourDataTime == null) {
+         return compareResultItem;
+      }
+
+      final int numTourSlices = compareTourDataDistance.length;
+
+      // normalize the tour which will be compared
+      compareTourNormalizer.normalizeAltitude(compareTourData, 0, numTourSlices - 1);
+
+      final float[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
+      final float[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
+
+      if (normCompAltitudes == null || normCompDistances == null) {
+         return compareResultItem;
+      }
+
+      final int numCompareSlices = normCompAltitudes.length;
+
+      final float[] normCompAltiDiff = new float[numCompareSlices];
+
+      /*
+       * Reference tour item
+       */
+      final int refMeasureStartIndex = refTour_Item.startIndex;
+      final int refMeasureEndIndex = refTour_Item.endIndex;
+
+      // get the reference tour
+      if (refTour_Data == null) {
+         return compareResultItem;
+      }
+
+      // normalize the reference tour
+      final TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
+      refTourNormalizer.normalizeAltitude(refTour_Data, refMeasureStartIndex, refMeasureEndIndex);
+
+      final float[] normRefAltitudes = refTourNormalizer.getNormalizedAltitude();
+      if (normRefAltitudes == null) {
+         return compareResultItem;
+      }
+
+      float minAltiDiff = Float.MAX_VALUE;
+
+      // start index of the reference tour in the compare tour
+      int normCompareIndexStart = -1;
+
+      final int compareLastIndex = numCompareSlices;
+
+      for (int normCompareIndex = 0; normCompareIndex < numCompareSlices; normCompareIndex++) {
+
+         float altitudeDiff = -1;
+
+         // loop: all data in the reference tour
+         for (int normRefIndex = 0; normRefIndex < normRefAltitudes.length; normRefIndex++) {
+
+            final int compareRefIndex = normCompareIndex + normRefIndex;
+
+            /*
+             * make sure the ref index is not bigger than the compare index, this can happen
+             * when the reference data exeed the compare data
+             */
+            if (compareRefIndex == compareLastIndex) {
+               altitudeDiff = -1;
+               break;
+            }
+
+            // get the altitude difference between the reference and the compared value
+            altitudeDiff += Math.abs(normRefAltitudes[normRefIndex] - normCompAltitudes[compareRefIndex]);
+         }
+
+         // keep altitude difference
+         normCompAltiDiff[normCompareIndex] = altitudeDiff;
+
+         /*
+          * find the lowest altitude difference, this will be the start point of the reference
+          * tour in the compared tour
+          */
+         if (altitudeDiff < minAltiDiff && altitudeDiff != -1) {
+            minAltiDiff = altitudeDiff;
+            normCompareIndexStart = normCompareIndex;
+         }
+      }
+
+      // exit if tour was not found
+      if (normCompareIndexStart == -1) {
+         return compareResultItem;
+      }
+
+      // get distance for the reference tour
+      final float[] distanceSerie = refTour_Data.getMetricDistanceSerie();
+      final float refDistance = distanceSerie[refMeasureEndIndex] - distanceSerie[refMeasureStartIndex];
+
+      // get the start/end point in the compared tour
+      final float compDistanceStart = normCompDistances[normCompareIndexStart];
+      final float compDistanceEnd = compDistanceStart + refDistance;
+
+      /*
+       * get the start point in the compare tour
+       */
+      int compareStartIndex = 0;
+      for (; compareStartIndex < numTourSlices; compareStartIndex++) {
+         if (compareTourDataDistance[compareStartIndex] >= compDistanceStart) {
+            break;
+         }
+      }
+
+      /*
+       * get the end point in the compare tour
+       */
+      int compareEndIndex = compareStartIndex;
+      float oldDistance = compareTourDataDistance[compareEndIndex];
+      for (; compareEndIndex < numTourSlices; compareEndIndex++) {
+         if (compareTourDataDistance[compareEndIndex] >= compDistanceEnd) {
+            break;
+         }
+
+         final float newDistance = compareTourDataDistance[compareEndIndex];
+
+         if (oldDistance == newDistance) {} else {
+            oldDistance = newDistance;
+         }
+      }
+      compareEndIndex = Math.min(compareEndIndex, numTourSlices - 1);
+
+      /*
+       * create data serie for altitude difference
+       */
+      final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
+      final float[] compAltiDif = new float[numTourSlices];
+
+      final int maxNormIndex = normDistanceSerie.length - 1;
+      int normIndex = 0;
+
+      for (int compIndex = 0; compIndex < numTourSlices; compIndex++) {
+
+         final float compDistance = compareTourDataDistance[compIndex];
+         float normDistance = normDistanceSerie[normIndex];
+
+         while (compDistance > normDistance && normIndex < maxNormIndex) {
+            normDistance = normDistanceSerie[++normIndex];
+         }
+
+         compAltiDif[compIndex] = normCompAltiDiff[normIndex];
+      }
+      compareResultItem.altitudeDiffSerie = compAltiDif;
+
+      // create the compare result
+      compareResultItem.minAltitudeDiff = minAltiDiff;
+
+      compareResultItem.computedStartIndex = compareStartIndex;
+      compareResultItem.computedEndIndex = compareEndIndex;
+
+      final int normIndexDiff = (int) (refDistance / TourDataNormalizer.NORMALIZED_DISTANCE);
+      compareResultItem.normalizedStartIndex = normCompareIndexStart;
+      compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
+
+      final float compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
+      final int elapsedTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
+      final int movingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
+
+      compareResultItem.compareMovingTime = movingTime;
+      compareResultItem.compareElapsedTime = elapsedTime;
+      compareResultItem.compareDistance = compareDistance;
+      compareResultItem.compareSpeed = compareDistance / movingTime * 3.6f;
+      compareResultItem.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
+
+      compareResultItem.timeInterval = compareTourData.getDeviceTimeInterval();
+
+      return compareResultItem;
+   }
+
+   /**
+    * Compares all reference tours with all compare tours
+    *
+    * @param refTours
+    * @param comparedTours
+    */
+   public static void compareTours(final RefTourItem[] refTours, final Object[] comparedTours) {
+
+      final int numRefTours = refTours.length;
+      final int numComparedTours = comparedTours.length;
+
+      _refTourItems = refTours;
+      _refToursData = new TourData[numRefTours];
+
+      final int numTours2Compare = numComparedTours * numRefTours;
+
+      final Job compareJob = new Job(Messages.tourCatalog_view_compare_job_title) {
+
+         private void compareTourJob(final RefTourItem[] refTourItems,
+                                     final Object[] comparedTours,
+                                     final IProgressMonitor monitor) {
+
+            int tourCounter = 0;
+            _comparedTourItems.clear();
+
+            // get all reference tours
+            loadRefTours();
+
+            // loop: all compare tours
+            for (final Object tour : comparedTours) {
+
+               Long tourId;
+
+               if (tour instanceof TVIWizardCompareTour) {
+                  tourId = ((TVIWizardCompareTour) tour).tourId;
+               } else if (tour instanceof Long) {
+                  tourId = (Long) tour;
+               } else {
+                  // ignore checked year/month
+                  continue;
+               }
+
+               // load compared tour from the database
+               final TourData compareTourData = TourManager.getInstance().getTourData(tourId);
+
+               if (compareTourData != null
+                     && compareTourData.timeSerie != null
+                     && compareTourData.timeSerie.length > 0) {
+
+                  // loop: all reference tours
+                  for (int refTourIndex = 0; refTourIndex < refTourItems.length; refTourIndex++) {
+
+                     if (monitor.isCanceled()) {
+                        showCompareResults();
+                        return;
+                     }
+
+                     // compare the tour
+                     final TVICompareResultComparedTour compareResult = compareTour(
+                           _refTourItems[refTourIndex],
+                           _refToursData[refTourIndex],
+                           compareTourData);
+
+                     // ignore tours which could not be compared
+                     if (compareResult.computedStartIndex != -1) {
+
+                        compareResult.refTour = refTourItems[refTourIndex];
+                        compareResult.comparedTourData = compareTourData;
+
+                        _comparedTourItems.add(compareResult);
+                     }
+
+                     // update the message in the progress monitor
+                     monitor.subTask(NLS.bind(
+                           Messages.tourCatalog_view_compare_job_subtask,
+                           ++tourCounter,
+                           numTours2Compare));
+
+                     monitor.worked(1);
+                  }
+               }
+
+            }
+         }
+
+         @Override
+         protected IStatus run(final IProgressMonitor monitor) {
+
+            monitor.beginTask(Messages.tourCatalog_view_compare_job_task, numTours2Compare);
+
+            compareTourJob(refTours, comparedTours, monitor);
+
+            monitor.done();
+
+            showCompareResults();
+
+            return Status.OK_STATUS;
+         }
+      };
+
+      compareJob.setUser(true);
+      compareJob.schedule();
+   }
+
+   private static float getAvgAltimeter(final TourData tourData, final int compareStartIndex, final int compareEndIndex) {
+
+      final float[] altimeterSerie = tourData.getAltimeterSerie();
+
+      return tourData.computeAvg_FromValues(altimeterSerie, compareStartIndex, compareEndIndex);
+   }
+
+   /**
+    * @return Returns the reference tours which has been compared
+    */
+   public static RefTourItem[] getComparedReferenceTours() {
+
+      return _refTourItems;
+   }
+
+   /**
+    * @return Returns the compare result with all compared tours
+    */
+   public static TVICompareResultComparedTour[] getComparedTours() {
+
+      return _comparedTourItems.toArray(new TVICompareResultComparedTour[_comparedTourItems.size()]);
+   }
 
    /**
     * @param refId
@@ -115,11 +436,47 @@ public class TourCompareManager {
       return storedComparedTours;
    }
 
-   public static TourCompareManager getInstance() {
-      if (_instance == null) {
-         _instance = new TourCompareManager();
+   /**
+    * Get the tour data for all reference tours
+    *
+    * @param refTourContext
+    */
+   private static void loadRefTours() {
+
+      for (int tourIndex = 0; tourIndex < _refTourItems.length; tourIndex++) {
+
+         final RefTourItem refTour = _refTourItems[tourIndex];
+
+         _refTourItems[tourIndex] = refTour;
+         _refToursData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
       }
-      return _instance;
+   }
+
+   /**
+    * @param isNextTour
+    *           When <code>true</code> then navigate to the next tour, when <code>false</code>
+    *           then navigate to the previous tour.
+    * @return Returns the navigated tour or <code>null</code> when there is no next/previous tour.
+    */
+   static Object navigateTour(final boolean isNextTour) {
+
+      Object navigatedTour = null;
+
+      final IWorkbench workbench = PlatformUI.getWorkbench();
+      final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+      final IWorkbenchPage activePage = window.getActivePage();
+
+      final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
+      if (yearStatView instanceof RefTour_YearStatistic_View) {
+         navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
+      }
+
+      final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+      if (comparedTours instanceof TourCompareResultView) {
+         navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
+      }
+
+      return navigatedTour;
    }
 
    /**
@@ -212,402 +569,39 @@ public class TourCompareManager {
       comparedTourItem.dbElapsedTime = tourDeviceTime_Elapsed;
    }
 
-   public void clearCompareResult() {
+   private static void showCompareResults() {
 
-      _comparedTourItems.clear();
-   }
+      Display.getDefault().asyncExec(() -> {
 
-   /**
-    * @param refTourIndex
-    *           Index into refTourContext and refToursData
-    * @param compareTourData
-    *           Tour data of the tour which will be compared
-    * @return returns the start index for the ref tour in the compare tour
-    */
-   private TVICompareResultComparedTour compareTour(final int refTourIndex, final TourData compareTourData) {
+         final IWorkbench workbench = PlatformUI.getWorkbench();
+         final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-      final TVICompareResultComparedTour compareResultItem = new TVICompareResultComparedTour();
+         if (window != null) {
+            try {
 
-      /*
-       * normalize the compare tour
-       */
-      final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
-      final float[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
-      final int[] compareTourDataTime = compareTourData.timeSerie;
+               // show compare result perspective
+               workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
-      if (compareTourDataDistance == null || compareTourDataTime == null) {
-         return compareResultItem;
-      }
+               final TourCompareResultView view = (TourCompareResultView) Util.showView(
+                     TourCompareResultView.ID,
+                     true);
 
-      final int numTourSlices = compareTourDataDistance.length;
-
-      // normalize the tour which will be compared
-      compareTourNormalizer.normalizeAltitude(compareTourData, 0, numTourSlices - 1);
-
-      final float[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
-      final float[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
-
-      if (normCompAltitudes == null || normCompDistances == null) {
-         return compareResultItem;
-      }
-
-      final int numCompareSlices = normCompAltitudes.length;
-
-      final float[] normCompAltiDiff = new float[numCompareSlices];
-
-      /*
-       * reference tour
-       */
-      final RefTourItem refTour = _refTourItems[refTourIndex];
-      final int refMeasureStartIndex = refTour.startIndex;
-      final int refMeasureEndIndex = refTour.endIndex;
-
-      // get the reference tour
-      final TourData refTourData = _refToursData[refTourIndex];
-      if (refTourData == null) {
-         return compareResultItem;
-      }
-
-      // normalize the reference tour
-      final TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
-      refTourNormalizer.normalizeAltitude(refTourData, refMeasureStartIndex, refMeasureEndIndex);
-
-      final float[] normRefAltitudes = refTourNormalizer.getNormalizedAltitude();
-      if (normRefAltitudes == null) {
-         return compareResultItem;
-      }
-
-      float minAltiDiff = Float.MAX_VALUE;
-
-      // start index of the reference tour in the compare tour
-      int normCompareIndexStart = -1;
-
-      final int compareLastIndex = numCompareSlices;
-
-      for (int normCompareIndex = 0; normCompareIndex < numCompareSlices; normCompareIndex++) {
-
-         float altitudeDiff = -1;
-
-         // loop: all data in the reference tour
-         for (int normRefIndex = 0; normRefIndex < normRefAltitudes.length; normRefIndex++) {
-
-            final int compareRefIndex = normCompareIndex + normRefIndex;
-
-            /*
-             * make sure the ref index is not bigger than the compare index, this can happen
-             * when the reference data exeed the compare data
-             */
-            if (compareRefIndex == compareLastIndex) {
-               altitudeDiff = -1;
-               break;
-            }
-
-            // get the altitude difference between the reference and the compared value
-            altitudeDiff += Math.abs(normRefAltitudes[normRefIndex] - normCompAltitudes[compareRefIndex]);
-         }
-
-         // keep altitude difference
-         normCompAltiDiff[normCompareIndex] = altitudeDiff;
-
-         /*
-          * find the lowest altitude difference, this will be the start point of the reference
-          * tour in the compared tour
-          */
-         if (altitudeDiff < minAltiDiff && altitudeDiff != -1) {
-            minAltiDiff = altitudeDiff;
-            normCompareIndexStart = normCompareIndex;
-         }
-      }
-
-      // exit if tour was not found
-      if (normCompareIndexStart == -1) {
-         return compareResultItem;
-      }
-
-      // get distance for the reference tour
-      final float[] distanceSerie = refTourData.getMetricDistanceSerie();
-      final float refDistance = distanceSerie[refMeasureEndIndex] - distanceSerie[refMeasureStartIndex];
-
-      // get the start/end point in the compared tour
-      final float compDistanceStart = normCompDistances[normCompareIndexStart];
-      final float compDistanceEnd = compDistanceStart + refDistance;
-
-      /*
-       * get the start point in the compare tour
-       */
-      int compareStartIndex = 0;
-      for (; compareStartIndex < numTourSlices; compareStartIndex++) {
-         if (compareTourDataDistance[compareStartIndex] >= compDistanceStart) {
-            break;
-         }
-      }
-
-      /*
-       * get the end point in the compare tour
-       */
-      int compareEndIndex = compareStartIndex;
-      float oldDistance = compareTourDataDistance[compareEndIndex];
-      for (; compareEndIndex < numTourSlices; compareEndIndex++) {
-         if (compareTourDataDistance[compareEndIndex] >= compDistanceEnd) {
-            break;
-         }
-
-         final float newDistance = compareTourDataDistance[compareEndIndex];
-
-         if (oldDistance == newDistance) {} else {
-            oldDistance = newDistance;
-         }
-      }
-      compareEndIndex = Math.min(compareEndIndex, numTourSlices - 1);
-
-      /*
-       * create data serie for altitude difference
-       */
-      final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
-      final float[] compAltiDif = new float[numTourSlices];
-
-      final int maxNormIndex = normDistanceSerie.length - 1;
-      int normIndex = 0;
-
-      for (int compIndex = 0; compIndex < numTourSlices; compIndex++) {
-
-         final float compDistance = compareTourDataDistance[compIndex];
-         float normDistance = normDistanceSerie[normIndex];
-
-         while (compDistance > normDistance && normIndex < maxNormIndex) {
-            normDistance = normDistanceSerie[++normIndex];
-         }
-
-         compAltiDif[compIndex] = normCompAltiDiff[normIndex];
-      }
-      compareResultItem.altitudeDiffSerie = compAltiDif;
-
-      // create the compare result
-      compareResultItem.minAltitudeDiff = minAltiDiff;
-
-      compareResultItem.computedStartIndex = compareStartIndex;
-      compareResultItem.computedEndIndex = compareEndIndex;
-
-      final int normIndexDiff = (int) (refDistance / TourDataNormalizer.NORMALIZED_DISTANCE);
-      compareResultItem.normalizedStartIndex = normCompareIndexStart;
-      compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
-
-      final float compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
-      final int elapsedTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
-      final int movingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
-
-      compareResultItem.compareMovingTime = movingTime;
-      compareResultItem.compareElapsedTime = elapsedTime;
-      compareResultItem.compareDistance = compareDistance;
-      compareResultItem.compareSpeed = compareDistance / movingTime * 3.6f;
-      compareResultItem.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
-
-      compareResultItem.timeInterval = compareTourData.getDeviceTimeInterval();
-
-      return compareResultItem;
-   }
-
-   /**
-    * Compares all reference tours with all compare tours
-    *
-    * @param refTours
-    * @param comparedTours
-    */
-   public void compareTours(final RefTourItem[] refTours, final Object[] comparedTours) {
-
-      _refTourItems = refTours;
-      _refToursData = new TourData[refTours.length];
-
-      final int tours2Compare = comparedTours.length * refTours.length;
-
-      final Job compareJob = new Job(Messages.tourCatalog_view_compare_job_title) {
-
-         private void compareTourJob(final RefTourItem[] refTourItems,
-                                     final Object[] comparedTours,
-                                     final IProgressMonitor monitor) {
-
-            int tourCounter = 0;
-            _comparedTourItems.clear();
-
-            // get all reference tours
-            loadRefTours();
-
-            // loop: all compare tours
-            for (final Object tour : comparedTours) {
-
-               Long tourId;
-
-               if (tour instanceof TVIWizardCompareTour) {
-                  tourId = ((TVIWizardCompareTour) tour).tourId;
-               } else if (tour instanceof Long) {
-                  tourId = (Long) tour;
-               } else {
-                  // ignore checked year/month
-                  continue;
+               if (view != null) {
+                  view.reloadViewer();
                }
 
-               // load compared tour from the database
-               final TourData compareTourData = TourManager.getInstance().getTourData(tourId);
-
-               if (compareTourData != null
-                     && compareTourData.timeSerie != null
-                     && compareTourData.timeSerie.length > 0) {
-
-                  // loop: all reference tours
-                  for (int refTourIndex = 0; refTourIndex < refTourItems.length; refTourIndex++) {
-
-                     if (monitor.isCanceled()) {
-                        showCompareResults();
-                        return;
-                     }
-
-                     // compare the tour
-                     final TVICompareResultComparedTour compareResult = compareTour(
-                           refTourIndex,
-                           compareTourData);
-
-                     // ignore tours which could not be compared
-                     if (compareResult.computedStartIndex != -1) {
-
-                        compareResult.refTour = refTourItems[refTourIndex];
-                        compareResult.comparedTourData = compareTourData;
-
-                        _comparedTourItems.add(compareResult);
-                     }
-
-                     // update the message in the progress monitor
-                     monitor.subTask(NLS.bind(//
-                           Messages.tourCatalog_view_compare_job_subtask,
-                           ++tourCounter,
-                           tours2Compare));
-
-                     monitor.worked(1);
-                  }
-               }
-
+            } catch (final PartInitException e1) {
+               ErrorDialog.openError(window.getShell(),
+                     "Error", //$NON-NLS-1$
+                     e1.getMessage(),
+                     e1
+                           .getStatus());
+               e1.printStackTrace();
+            } catch (final WorkbenchException e2) {
+               e2.printStackTrace();
             }
          }
 
-         @Override
-         protected IStatus run(final IProgressMonitor monitor) {
-
-            monitor.beginTask(Messages.tourCatalog_view_compare_job_task, tours2Compare);
-
-            compareTourJob(refTours, comparedTours, monitor);
-
-            monitor.done();
-
-            showCompareResults();
-
-            return Status.OK_STATUS;
-         }
-      };
-
-      compareJob.setUser(true);
-      compareJob.schedule();
-   }
-
-   private float getAvgAltimeter(final TourData tourData, final int compareStartIndex, final int compareEndIndex) {
-
-      final float[] altimeterSerie = tourData.getAltimeterSerie();
-
-      return tourData.computeAvg_FromValues(altimeterSerie, compareStartIndex, compareEndIndex);
-   }
-
-   /**
-    * @return Returns the reference tours which has been compared
-    */
-   public RefTourItem[] getComparedReferenceTours() {
-      return _refTourItems;
-   }
-
-   /**
-    * @return Returns the compare result with all compared tours
-    */
-   public TVICompareResultComparedTour[] getComparedTours() {
-      return _comparedTourItems.toArray(new TVICompareResultComparedTour[_comparedTourItems.size()]);
-   }
-
-   /**
-    * Get the tour data for all reference tours
-    *
-    * @param refTourContext
-    */
-   private void loadRefTours() {
-
-      for (int tourIndex = 0; tourIndex < _refTourItems.length; tourIndex++) {
-
-         final RefTourItem refTour = _refTourItems[tourIndex];
-
-         _refTourItems[tourIndex] = refTour;
-         _refToursData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
-      }
-   }
-
-   /**
-    * @param isNextTour
-    *           When <code>true</code> then navigate to the next tour, when <code>false</code>
-    *           then navigate to the previous tour.
-    * @return Returns the navigated tour or <code>null</code> when there is no next/previous tour.
-    */
-   Object navigateTour(final boolean isNextTour) {
-
-      Object navigatedTour = null;
-
-      final IWorkbench workbench = PlatformUI.getWorkbench();
-      final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-      final IWorkbenchPage activePage = window.getActivePage();
-
-      final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
-      if (yearStatView instanceof RefTour_YearStatistic_View) {
-         navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
-      }
-
-      final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
-      if (comparedTours instanceof TourCompareResultView) {
-         navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
-      }
-
-      return navigatedTour;
-   }
-
-   private void showCompareResults() {
-
-      Display.getDefault().asyncExec(new Runnable() {
-
-         @Override
-         public void run() {
-
-            final IWorkbench workbench = PlatformUI.getWorkbench();
-            final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-            if (window != null) {
-               try {
-
-                  // show compare result perspective
-                  workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
-
-                  final TourCompareResultView view = (TourCompareResultView) Util.showView(
-                        TourCompareResultView.ID,
-                        true);
-
-                  if (view != null) {
-                     view.reloadViewer();
-                  }
-
-               } catch (final PartInitException e) {
-                  ErrorDialog.openError(window.getShell(),
-                        "Error", //$NON-NLS-1$
-                        e.getMessage(),
-                        e
-                              .getStatus());
-                  e.printStackTrace();
-               } catch (final WorkbenchException e) {
-                  e.printStackTrace();
-               }
-            }
-
-         }
       });
    }
 }
