@@ -49,7 +49,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -808,15 +807,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _spinnerCadenceDelimiter.setMinimum(0);
          _spinnerCadenceDelimiter.setMaximum(200);
          _spinnerCadenceDelimiter.addSelectionListener(_selectionListener);
-         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onModifyCadenceZonesDelimiter();
+         _spinnerCadenceDelimiter.addMouseWheelListener(mouseEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            onModifyCadenceZonesDelimiter();
          });
 
          // label: unit
@@ -923,15 +919,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          }
       };
 
-      _spinnerMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            if (_isUpdateUI) {
-               return;
-            }
-            Util.adjustSpinnerValueOnMouseScroll(event);
-            onModifyBreakTime();
+      _spinnerMouseWheelListener = mouseEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModifyBreakTime();
       };
    }
 
