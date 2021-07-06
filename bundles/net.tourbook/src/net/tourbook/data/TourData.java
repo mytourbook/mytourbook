@@ -3449,6 +3449,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          prevTime = time;
 
          // check if a break occurred, break time is ignored
+         //todo fb if recording time is chosen, we should ignore this?
+         //should I also test if its a pause time ?
          if (breakTimeSerie != null) {
 
             /*
