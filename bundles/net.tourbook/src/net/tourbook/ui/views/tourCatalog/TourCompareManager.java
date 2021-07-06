@@ -15,18 +15,24 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
@@ -35,17 +41,14 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
@@ -54,19 +57,206 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class TourCompareManager {
 
-   private static RefTourItem[]                                 _refTourItems;
-   private static TourData[]                                    _refToursData;
+   private static final String                                  NL                 = UI.NEW_LINE;
+
+   private static final String                                  NUMBER_FORMAT_1F   = "%.1f";                                             //$NON-NLS-1$
+
+   private static RefTourItem[]                                 _allRefTourItems;
+   private static TourData[]                                    _allRefTourData;
 
    private final static ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
 
-   /**
-    * internal constructor
-    */
-   private TourCompareManager() {}
+   private static ThreadPoolExecutor                            _compareTour_Executor;
+   private static ArrayBlockingQueue<Long>                      _compareTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+
+   static {
+
+      final ThreadFactory threadFactory = new ThreadFactory() {
+
+         @Override
+         public Thread newThread(final Runnable r) {
+
+            final Thread thread = new Thread(r, "Comparing tours by elevation");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         }
+      };
+
+      _compareTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+   }
 
    public static void clearCompareResult() {
 
       _comparedTourItems.clear();
+   }
+
+   /**
+    * Compares all reference tours with all compare tours
+    *
+    * @param allRefTourItems
+    * @param allComparedItems
+    */
+   public static void compareTours(final RefTourItem[] allRefTourItems, final Object[] allComparedItems) {
+
+      final int numRefTours = allRefTourItems.length;
+      final int numComparedTours = allComparedItems.length;
+
+      _allRefTourItems = allRefTourItems;
+      _allRefTourData = new TourData[numRefTours];
+
+      try {
+
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+               final long startTime = System.currentTimeMillis();
+               long lastUpdateTime = startTime;
+
+               monitor.beginTask(String.format("Comparing tours"), numComparedTours);
+
+               _comparedTourItems.clear();
+
+               // get all reference tours
+               loadRefTours();
+
+               int tourCounter = 1;
+               int lastUpdateNumItems = 1;
+               int sumComparedTours = 0;
+
+               // loop: all compared tours
+               for (final Object comparedItem : allComparedItems) {
+
+                  final long currentTime = System.currentTimeMillis();
+                  final long timeDiff = currentTime - lastUpdateTime;
+
+                  Long tourId;
+
+                  if (comparedItem instanceof TVIWizardCompareTour) {
+
+                     tourId = ((TVIWizardCompareTour) comparedItem).tourId;
+
+                  } else if (comparedItem instanceof Long) {
+
+                     tourId = (Long) comparedItem;
+
+                  } else {
+
+                     // ignore checked year/month
+                     continue;
+                  }
+
+                  // reduce logging
+                  if (timeDiff > 200
+
+                        // update UI for the last tour otherwise it looks like that not all data are converted
+                        || tourCounter == numComparedTours) {
+
+                     lastUpdateTime = currentTime;
+
+                     final long numTourDiff = tourCounter - lastUpdateNumItems;
+                     lastUpdateNumItems = tourCounter;
+                     sumComparedTours += numTourDiff;
+
+                     final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourCounter / numComparedTours * 100.0);
+
+                     // Compared tours: {0} of {1} - {2} % - {3} Δ
+                     monitor.subTask(NLS.bind("Compared tours: {0} of {1} - {2} % - {3} Δ",
+                           new Object[] {
+                                 sumComparedTours,
+                                 numComparedTours,
+                                 percentValue,
+                                 numTourDiff,
+                           }));
+                  }
+
+                  tourCounter++;
+
+                  final boolean isLastCompare = tourCounter > numComparedTours;
+
+                  compareTours_Concurrent(tourId, monitor, isLastCompare);
+               }
+            }
+
+         };
+
+         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+
+      } catch (final InvocationTargetException | InterruptedException e) {
+
+         StatusUtil.showStatus(e);
+         Thread.currentThread().interrupt();
+      }
+   }
+
+   private static void compareTours_Concurrent(final Long tourId,
+                                               final IProgressMonitor monitor,
+                                               final boolean isLastCompare) {
+
+      // put tour ID (queue item) into the queue AND wait when it is full
+
+      try {
+
+         _compareTour_Queue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _compareTour_Executor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _compareTour_Queue.poll();
+
+         if (queueItem_TourId == null) {
+//            showCompareResults();
+            return;
+         }
+
+         // load compared tour from the database
+         final TourData compareTourData = TourManager.getInstance().getTourData(tourId);
+
+         if (compareTourData != null
+               && compareTourData.timeSerie != null
+               && compareTourData.timeSerie.length > 0) {
+
+            // loop: all reference tours
+            for (int refTourIndex = 0; refTourIndex < _allRefTourItems.length; refTourIndex++) {
+
+               if (monitor.isCanceled()) {
+                  showCompareResults();
+                  return;
+               }
+
+               // compare the tour
+               final TVICompareResultComparedTour compareResult = compareTours_OneTour(
+                     _allRefTourItems[refTourIndex],
+                     _allRefTourData[refTourIndex],
+                     compareTourData);
+
+               // ignore tours which could not be compared
+               if (compareResult.computedStartIndex != -1) {
+
+                  compareResult.refTour = _allRefTourItems[refTourIndex];
+                  compareResult.comparedTourData = compareTourData;
+
+                  _comparedTourItems.add(compareResult);
+               }
+            }
+
+            monitor.worked(1);
+         }
+
+         if (isLastCompare) {
+            showCompareResults();
+         }
+
+      });
    }
 
    /**
@@ -77,11 +267,11 @@ public class TourCompareManager {
     * @param compareTourData2
     * @return returns the start index for the ref tour in the compare tour
     */
-   private static TVICompareResultComparedTour compareTour(final RefTourItem refTour_Item,
-                                                           final TourData refTour_Data,
-                                                           final TourData compareTourData) {
+   private static TVICompareResultComparedTour compareTours_OneTour(final RefTourItem refTour_Item,
+                                                                    final TourData refTour_Data,
+                                                                    final TourData compareTourData) {
 
-      final TVICompareResultComparedTour compareResultItem = new TVICompareResultComparedTour();
+      final TVICompareResultComparedTour compareResult = new TVICompareResultComparedTour();
 
       /*
        * normalize the compare tour
@@ -91,7 +281,7 @@ public class TourCompareManager {
       final int[] compareTourDataTime = compareTourData.timeSerie;
 
       if (compareTourDataDistance == null || compareTourDataTime == null) {
-         return compareResultItem;
+         return compareResult;
       }
 
       final int numTourSlices = compareTourDataDistance.length;
@@ -103,7 +293,7 @@ public class TourCompareManager {
       final float[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
 
       if (normCompAltitudes == null || normCompDistances == null) {
-         return compareResultItem;
+         return compareResult;
       }
 
       final int numCompareSlices = normCompAltitudes.length;
@@ -118,7 +308,7 @@ public class TourCompareManager {
 
       // get the reference tour
       if (refTour_Data == null) {
-         return compareResultItem;
+         return compareResult;
       }
 
       // normalize the reference tour
@@ -127,7 +317,7 @@ public class TourCompareManager {
 
       final float[] normRefAltitudes = refTourNormalizer.getNormalizedAltitude();
       if (normRefAltitudes == null) {
-         return compareResultItem;
+         return compareResult;
       }
 
       float minAltiDiff = Float.MAX_VALUE;
@@ -174,7 +364,7 @@ public class TourCompareManager {
 
       // exit if tour was not found
       if (normCompareIndexStart == -1) {
-         return compareResultItem;
+         return compareResult;
       }
 
       // get distance for the reference tour
@@ -233,135 +423,74 @@ public class TourCompareManager {
 
          compAltiDif[compIndex] = normCompAltiDiff[normIndex];
       }
-      compareResultItem.altitudeDiffSerie = compAltiDif;
+      compareResult.altitudeDiffSerie = compAltiDif;
 
       // create the compare result
-      compareResultItem.minAltitudeDiff = minAltiDiff;
+      compareResult.minAltitudeDiff = minAltiDiff;
 
-      compareResultItem.computedStartIndex = compareStartIndex;
-      compareResultItem.computedEndIndex = compareEndIndex;
+      compareResult.computedStartIndex = compareStartIndex;
+      compareResult.computedEndIndex = compareEndIndex;
 
       final int normIndexDiff = (int) (refDistance / TourDataNormalizer.NORMALIZED_DISTANCE);
-      compareResultItem.normalizedStartIndex = normCompareIndexStart;
-      compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
+      compareResult.normalizedStartIndex = normCompareIndexStart;
+      compareResult.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
 
       final float compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
       final int elapsedTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
       final int movingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
 
-      compareResultItem.compareMovingTime = movingTime;
-      compareResultItem.compareElapsedTime = elapsedTime;
-      compareResultItem.compareDistance = compareDistance;
-      compareResultItem.compareSpeed = compareDistance / movingTime * 3.6f;
-      compareResultItem.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
+      compareResult.compareMovingTime = movingTime;
+      compareResult.compareElapsedTime = elapsedTime;
+      compareResult.compareDistance = compareDistance;
+      compareResult.compareSpeed = compareDistance / movingTime * 3.6f;
+      compareResult.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
 
-      compareResultItem.timeInterval = compareTourData.getDeviceTimeInterval();
+      compareResult.timeInterval = compareTourData.getDeviceTimeInterval();
 
-      return compareResultItem;
+      return compareResult;
    }
 
-   /**
-    * Compares all reference tours with all compare tours
-    *
-    * @param refTours
-    * @param comparedTours
-    */
-   public static void compareTours(final RefTourItem[] refTours, final Object[] comparedTours) {
+   static void createAllRefTourItems(final ArrayList<RefTourItem> allRefTours) {
 
-      final int numRefTours = refTours.length;
-      final int numComparedTours = comparedTours.length;
+      allRefTours.clear();
 
-      _refTourItems = refTours;
-      _refToursData = new TourData[numRefTours];
+      final String sql = UI.EMPTY_STRING
 
-      final int numTours2Compare = numComparedTours * numRefTours;
+            + "SELECT" + NL //                                       //$NON-NLS-1$
 
-      final Job compareJob = new Job(Messages.tourCatalog_view_compare_job_title) {
+            + " refId," + NL //                                   1  //$NON-NLS-1$
+            + " TourData_tourId," + NL //                         2  //$NON-NLS-1$
 
-         private void compareTourJob(final RefTourItem[] refTourItems,
-                                     final Object[] comparedTours,
-                                     final IProgressMonitor monitor) {
+            + " label," + NL //                                   3  //$NON-NLS-1$
+            + " startIndex," + NL //                              4  //$NON-NLS-1$
+            + " endIndex" + NL //                                 5  //$NON-NLS-1$
 
-            int tourCounter = 0;
-            _comparedTourItems.clear();
+            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + NL //   //$NON-NLS-1$
+            + " ORDER BY label" + NL //                              //$NON-NLS-1$
+      ;
 
-            // get all reference tours
-            loadRefTours();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-            // loop: all compare tours
-            for (final Object tour : comparedTours) {
+         final PreparedStatement statement = conn.prepareStatement(sql);
+         final ResultSet result = statement.executeQuery();
 
-               Long tourId;
+         while (result.next()) {
 
-               if (tour instanceof TVIWizardCompareTour) {
-                  tourId = ((TVIWizardCompareTour) tour).tourId;
-               } else if (tour instanceof Long) {
-                  tourId = (Long) tour;
-               } else {
-                  // ignore checked year/month
-                  continue;
-               }
+            final RefTourItem refItem = new RefTourItem();
 
-               // load compared tour from the database
-               final TourData compareTourData = TourManager.getInstance().getTourData(tourId);
+            refItem.refId = result.getLong(1);
+            refItem.tourId = result.getLong(2);
 
-               if (compareTourData != null
-                     && compareTourData.timeSerie != null
-                     && compareTourData.timeSerie.length > 0) {
+            refItem.label = result.getString(3);
+            refItem.startIndex = result.getInt(4);
+            refItem.endIndex = result.getInt(5);
 
-                  // loop: all reference tours
-                  for (int refTourIndex = 0; refTourIndex < refTourItems.length; refTourIndex++) {
-
-                     if (monitor.isCanceled()) {
-                        showCompareResults();
-                        return;
-                     }
-
-                     // compare the tour
-                     final TVICompareResultComparedTour compareResult = compareTour(
-                           _refTourItems[refTourIndex],
-                           _refToursData[refTourIndex],
-                           compareTourData);
-
-                     // ignore tours which could not be compared
-                     if (compareResult.computedStartIndex != -1) {
-
-                        compareResult.refTour = refTourItems[refTourIndex];
-                        compareResult.comparedTourData = compareTourData;
-
-                        _comparedTourItems.add(compareResult);
-                     }
-
-                     // update the message in the progress monitor
-                     monitor.subTask(NLS.bind(
-                           Messages.tourCatalog_view_compare_job_subtask,
-                           ++tourCounter,
-                           numTours2Compare));
-
-                     monitor.worked(1);
-                  }
-               }
-
-            }
+            allRefTours.add(refItem);
          }
 
-         @Override
-         protected IStatus run(final IProgressMonitor monitor) {
-
-            monitor.beginTask(Messages.tourCatalog_view_compare_job_task, numTours2Compare);
-
-            compareTourJob(refTours, comparedTours, monitor);
-
-            monitor.done();
-
-            showCompareResults();
-
-            return Status.OK_STATUS;
-         }
-      };
-
-      compareJob.setUser(true);
-      compareJob.schedule();
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      }
    }
 
    private static float getAvgAltimeter(final TourData tourData, final int compareStartIndex, final int compareEndIndex) {
@@ -376,7 +505,7 @@ public class TourCompareManager {
     */
    public static RefTourItem[] getComparedReferenceTours() {
 
-      return _refTourItems;
+      return _allRefTourItems;
    }
 
    /**
@@ -396,23 +525,23 @@ public class TourCompareManager {
    public static HashMap<Long, StoredComparedTour> getComparedToursFromDb(final long refId) {
 
       final HashMap<Long, StoredComparedTour> storedComparedTours = new HashMap<>();
+      final String sql = UI.EMPTY_STRING
 
-      final StringBuilder sb = new StringBuilder();
+            + "SELECT" + NL //               //$NON-NLS-1$
 
-      sb.append("SELECT"); //$NON-NLS-1$
+            + " tourId," + NL //          1  //$NON-NLS-1$
+            + " comparedId," + NL //      2  //$NON-NLS-1$
+            + " startIndex," + NL //      3  //$NON-NLS-1$
+            + " endIndex," + NL //        4  //$NON-NLS-1$
+            + " tourSpeed" + NL //        5  //$NON-NLS-1$
 
-      sb.append(" tourId,"); //      1 //$NON-NLS-1$
-      sb.append(" comparedId,"); //   2 //$NON-NLS-1$
-      sb.append(" startIndex,"); //   3 //$NON-NLS-1$
-      sb.append(" endIndex,"); //      4 //$NON-NLS-1$
-      sb.append(" tourSpeed"); //      5    //$NON-NLS-1$
-
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
-      sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //  //$NON-NLS-1$
+            + " WHERE refTourId=?" + NL //   //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, refId);
 
          final ResultSet result = statement.executeQuery();
@@ -443,12 +572,12 @@ public class TourCompareManager {
     */
    private static void loadRefTours() {
 
-      for (int tourIndex = 0; tourIndex < _refTourItems.length; tourIndex++) {
+      for (int tourIndex = 0; tourIndex < _allRefTourItems.length; tourIndex++) {
 
-         final RefTourItem refTour = _refTourItems[tourIndex];
+         final RefTourItem refTour = _allRefTourItems[tourIndex];
 
-         _refTourItems[tourIndex] = refTour;
-         _refToursData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
+         _allRefTourItems[tourIndex] = refTour;
+         _allRefTourData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
       }
    }
 
@@ -577,6 +706,7 @@ public class TourCompareManager {
          final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
          if (window != null) {
+
             try {
 
                // show compare result perspective
@@ -587,21 +717,13 @@ public class TourCompareManager {
                      true);
 
                if (view != null) {
-                  view.reloadViewer();
+                  view.updateViewer();
                }
 
-            } catch (final PartInitException e1) {
-               ErrorDialog.openError(window.getShell(),
-                     "Error", //$NON-NLS-1$
-                     e1.getMessage(),
-                     e1
-                           .getStatus());
-               e1.printStackTrace();
-            } catch (final WorkbenchException e2) {
-               e2.printStackTrace();
+            } catch (final WorkbenchException e) {
+               StatusUtil.log(e);
             }
          }
-
       });
    }
 }

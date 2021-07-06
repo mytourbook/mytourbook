@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -30,7 +26,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -72,9 +67,7 @@ import org.eclipse.ui.part.PageBook;
 
 public class WizardPage_20_ReferenceTour extends WizardPage {
 
-   private static final char NL              = UI.NEW_LINE;
-
-   public static final int   COLUMN_REF_TOUR = 0;
+   public static final int COLUMN_REF_TOUR = 0;
 
    // dialog settings
    private static final String          REF_TOUR_CHECKED      = "RefTour.checkedTours";       //$NON-NLS-1$
@@ -82,7 +75,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
    final IPreferenceStore               _prefStore            = TourbookPlugin.getPrefStore();
 
-   private ArrayList<RefTourItem>       _refTours             = new ArrayList<>();
+   private ArrayList<RefTourItem>       _allRefTours          = new ArrayList<>();
    private final IReferenceTourProvider _refTourProvider;
 
    /*
@@ -116,7 +109,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
       @Override
       public Object[] getElements(final Object parent) {
-         return _refTours.toArray();
+         return _allRefTours.toArray();
       }
 
       @Override
@@ -142,7 +135,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
       // control must be set, otherwise nothing is displayed
       setControl(pageContainer);
 
-      loadRefTours();
+      TourCompareManager.createAllRefTourItems(_allRefTours);
       _refTourViewer.setInput(this);
 
       restoreState();
@@ -342,49 +335,6 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
       return refTours;
    }
 
-   private void loadRefTours() {
-
-      _refTours.clear();
-
-      final String sql = UI.EMPTY_STRING
-
-            + "SELECT" + NL //               //$NON-NLS-1$
-
-            + " refId," + NL //              //$NON-NLS-1$
-            + " TourData_tourId," + NL //    //$NON-NLS-1$
-
-            + " label," + NL //              //$NON-NLS-1$
-            + " startIndex," + NL //         //$NON-NLS-1$
-            + " endIndex" + NL //            //$NON-NLS-1$
-
-            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + NL//$NON-NLS-1$
-            + " ORDER BY label" + NL //      //$NON-NLS-1$
-      ;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final RefTourItem refItem = new RefTourItem();
-
-            refItem.refId = result.getLong(1);
-            refItem.tourId = result.getLong(2);
-
-            refItem.label = result.getString(3);
-            refItem.startIndex = result.getInt(4);
-            refItem.endIndex = result.getInt(5);
-
-            _refTours.add(refItem);
-         }
-
-      } catch (final SQLException e) {
-         net.tourbook.ui.UI.showSQLException(e);
-      }
-   }
-
    private void onCheckRefTour(final CheckStateChangedEvent event) {
 
       /*
@@ -418,7 +368,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
          if (persistedTourIds != null) {
 
-            for (final RefTourItem refTourItem : _refTours) {
+            for (final RefTourItem refTourItem : _allRefTours) {
 
                final long refId = refTourItem.refId;
 
@@ -448,7 +398,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
             for (final Long selectedRefTourId : selectedRefTours) {
 
                // loop: all available reference tours
-               for (final Object refTour : _refTours) {
+               for (final Object refTour : _allRefTours) {
 
                   final RefTourItem tourReference = (RefTourItem) refTour;
 
@@ -476,8 +426,8 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
       } else {
 
          // select first ref tour
-         if (_refTours.size() > 0) {
-            _refTourViewer.setSelection(new StructuredSelection(_refTours.get(0)), true);
+         if (_allRefTours.size() > 0) {
+            _refTourViewer.setSelection(new StructuredSelection(_allRefTours.get(0)), true);
          }
       }
    }

@@ -1472,15 +1472,21 @@ public class TourDatabase {
       return _activeTourTypes;
    }
 
-   private static ArrayList<Long> getAllTourIds() {
+   public static ArrayList<Long> getAllTourIds() {
 
       final ArrayList<Long> tourIds = new ArrayList<>();
 
       try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final ResultSet result = stmt.executeQuery(
-               "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY TourStartTime"); //$NON-NLS-1$ //$NON-NLS-2$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT tourId" + NL //                             //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //     //$NON-NLS-1$
+               + " ORDER BY TourStartTime" + NL //                   //$NON-NLS-1$
+         ;
+
+         final ResultSet result = stmt.executeQuery(sql);
 
          while (result.next()) {
             tourIds.add(result.getLong(1));
@@ -1509,9 +1515,9 @@ public class TourDatabase {
          final long dateFromMS = dateStart.toInstant().toEpochMilli();
          final long dateUntilMS = dateEnd.toInstant().toEpochMilli();
 
-         final String sql = UI.EMPTY_STRING +
+         final String sql = UI.EMPTY_STRING
 
-               "SELECT tourId" //                                       //$NON-NLS-1$
+               + "SELECT tourId" //                                     //$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_DATA //             //$NON-NLS-1$
                + " WHERE TourStartTime >= ? AND TourStartTime < ?" //   //$NON-NLS-1$
                + " ORDER BY TourStartTime"; //                          //$NON-NLS-1$
@@ -8138,6 +8144,7 @@ public class TourDatabase {
    private void updateDb_042_To_043_DataUpdate_Concurrent(final Long tourId) {
 
       // put tour ID (queue item) into the queue AND wait when it is full
+
       try {
 
          _dbUpdateQueue.put(tourId);

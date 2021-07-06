@@ -918,6 +918,8 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
+   public static String        Elevation_Compare_Action_CompareAllTours;
+
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
    public static String        External_Link_Weather_ApiSignup;

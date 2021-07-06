@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -63,6 +65,7 @@ import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -163,19 +166,19 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    private MenuManager               _viewerMenuManager;
    private IContextMenuProvider      _viewerContextMenuProvider = new TreeContextMenuProvider();
 
-   private ActionRemoveComparedTours _actionRemoveComparedTours;
-   private ActionRenameRefTour       _actionRenameRefTour;
-   private ActionLinkTour            _actionLinkTour;
    private ActionCollapseAll         _actionCollapseAll;
    private ActionCollapseOthers      _actionCollapseOthers;
-   private ActionExpandSelection     _actionExpandSelection;
-   private ActionRefreshView         _actionRefreshView;
+   private ActionCompareAllTours     _actionCompareAllTours;
    private ActionEditQuick           _actionEditQuick;
    private ActionEditTour            _actionEditTour;
-   private ActionSetTourTypeMenu     _actionSetTourType;
-
-   private ActionTourCompareWizard   _actionTourCompareWizard;
+   private ActionExpandSelection     _actionExpandSelection;
+   private ActionLinkTour            _actionLinkTour;
    private ActionOpenTour            _actionOpenTour;
+   private ActionRefreshView         _actionRefreshView;
+   private ActionRemoveComparedTours _actionRemoveComparedTours;
+   private ActionRenameRefTour       _actionRenameRefTour;
+   private ActionSetTourTypeMenu     _actionSetTourType;
+   private ActionTourCompareWizard   _actionTourCompareWizard;
 
    private PixelConverter            _pc;
 
@@ -186,6 +189,23 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    private TreeViewer _tourViewer;
 
    private Menu       _treeContextMenu;
+
+   private class ActionCompareAllTours extends Action {
+
+      public ActionCompareAllTours() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setText(Messages.Elevation_Compare_Action_CompareAllTours);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCatalog_CompareWizard));
+      }
+
+      @Override
+      public void run() {
+         onAction_CompareAllTours();
+      }
+   }
 
    class TourContentProvider implements ITreeContentProvider {
 
@@ -520,6 +540,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       _actionRemoveComparedTours = new ActionRemoveComparedTours(this);
       _actionRenameRefTour = new ActionRenameRefTour(this);
       _actionTourCompareWizard = new ActionTourCompareWizard(this);
+      _actionCompareAllTours = new ActionCompareAllTours();
       _actionLinkTour = new ActionLinkTour(this);
       _actionRefreshView = new ActionRefreshView(this);
 
@@ -979,29 +1000,31 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
       final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
 
-      int refItems = 0;
-      int yearItems = 0;
-      int tourItems = 0;
+      int numRefItems = 0;
+      int numYearItems = 0;
+      int numTourItems = 0;
+
       TVICatalogComparedTour firstTourItem = null;
 
       // count number of items
       for (final Object treeItem : selection) {
 
          if (treeItem instanceof TVICatalogRefTourItem) {
-            refItems++;
+            numRefItems++;
          } else if (treeItem instanceof TVICatalogComparedTour) {
-            if (tourItems == 0) {
+            if (numTourItems == 0) {
                firstTourItem = (TVICatalogComparedTour) treeItem;
             }
-            tourItems++;
+            numTourItems++;
          } else if (treeItem instanceof TVICatalogYearItem) {
-            yearItems++;
+            numYearItems++;
          }
       }
 
-      final boolean isTourSelected = tourItems > 0;
-      final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
-      final boolean isOneRefTour = refItems == 1 && yearItems == 0 && tourItems == 0;
+      final boolean isTourSelected = numTourItems > 0;
+      final boolean isRefItemSelected = numRefItems > 0;
+      final boolean isOneTour = numTourItems == 1 && numRefItems == 0 && numYearItems == 0;
+      final boolean isOneRefTour = numRefItems == 1 && numYearItems == 0 && numTourItems == 0;
       final boolean isEditableTour = isOneTour || isOneRefTour;
 
       final int selectedItems = selection.size();
@@ -1016,10 +1039,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
       _actionRemoveComparedTours.setEnabled(isOneTour);
 
-      _actionTourCompareWizard.setEnabled(refItems > 0);
+      _actionCompareAllTours.setEnabled(isRefItemSelected);
+      _actionTourCompareWizard.setEnabled(isRefItemSelected);
 
       // enable remove button when only one type of item is selected
-      if (yearItems == 0 && ((refItems > 0 && tourItems == 0) || (refItems == 0 && tourItems > 0))) {
+      if (numYearItems == 0 && ((isRefItemSelected && numTourItems == 0) || (numRefItems == 0 && numTourItems > 0))) {
          _actionRemoveComparedTours.setEnabled(true);
       } else {
          _actionRemoveComparedTours.setEnabled(false);
@@ -1029,7 +1053,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       _actionEditTour.setEnabled(isEditableTour);
       _actionOpenTour.setEnabled(isEditableTour);
 
-      _actionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
+      _actionRenameRefTour.setEnabled(numRefItems == 1 && numTourItems == 0 && numYearItems == 0);
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -1057,6 +1081,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionTourCompareWizard);
+      menuMgr.add(_actionCompareAllTours);
       menuMgr.add(_actionRenameRefTour);
 
       menuMgr.add(new Separator());
@@ -1184,12 +1209,42 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
       // loop: all selected items
       for (final Object treeItem : selectedItems) {
+
          if (treeItem instanceof TVICatalogRefTourItem) {
             selectedReferenceTour.add(((TVICatalogRefTourItem) treeItem).refId);
          }
       }
 
       return selectedReferenceTour;
+   }
+
+   private RefTourItem[] getSelectedRefTourItems() {
+      
+      final ArrayList<Long> allSelectedRefTourIds = getSelectedReferenceTours();
+      final ArrayList<RefTourItem> allRefTourItems = new ArrayList<>();
+      TourCompareManager.createAllRefTourItems(allRefTourItems);
+
+      final ArrayList<RefTourItem> allSelectedRefTourItems = new ArrayList<>();
+
+      // get ref tour items for all selected ref tours
+      for (final Long refId : allSelectedRefTourIds) {
+
+         final long refIdValue = refId.longValue();
+
+         for (final RefTourItem refTourItem : allRefTourItems) {
+
+            if (refIdValue == refTourItem.refId) {
+
+               allSelectedRefTourItems.add(refTourItem);
+
+               break;
+            }
+         }
+      }
+
+      final RefTourItem[] selectedRefTourItemsAsArray = allSelectedRefTourItems.toArray(new RefTourItem[allSelectedRefTourItems.size()]);
+      
+      return selectedRefTourItemsAsArray;
    }
 
    @Override
@@ -1238,6 +1293,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    @Override
    public ColumnViewer getViewer() {
       return _tourViewer;
+   }
+
+   private void onAction_CompareAllTours() {
+
+      final RefTourItem[] selectedRefTourItems = getSelectedRefTourItems();
+
+      final ArrayList<Long> allTourIds = TourDatabase.getAllTourIds();
+      final Long[] allTourIdsAsArray = allTourIds.toArray(new Long[allTourIds.size()]);
+
+      TourCompareManager.compareTours(selectedRefTourItems, allTourIdsAsArray);
    }
 
    /**

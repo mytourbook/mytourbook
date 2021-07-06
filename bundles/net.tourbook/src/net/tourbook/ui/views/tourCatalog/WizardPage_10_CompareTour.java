@@ -17,10 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -443,30 +439,8 @@ public class WizardPage_10_CompareTour extends WizardPage {
       _tourViewer.getControl().setEnabled(isEnabled);
    }
 
-   private Long[] getAllTourIds() {
-
-      final ArrayList<Long> allTourIds = new ArrayList<>();
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final String sqlString = "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
-
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-
-         final ResultSet result = statement.executeQuery();
-         while (result.next()) {
-            allTourIds.add(result.getLong(1));
-         }
-
-      } catch (final SQLException e) {
-         net.tourbook.ui.UI.showSQLException(e);
-      }
-
-      return allTourIds.toArray(new Long[allTourIds.size()]);
-   }
-
    /**
-    * @return return all checked tours
+    * @return Returns all checked tours, can also contain checked year or month items
     */
    public Object[] getComparedTours() {
 
@@ -474,7 +448,9 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
          // return all tours
 
-         return getAllTourIds();
+         final ArrayList<Long> allTourIds = TourDatabase.getAllTourIds();
+
+         return allTourIds.toArray(new Long[allTourIds.size()]);
 
       } else {
 

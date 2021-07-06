@@ -37,7 +37,9 @@ New
 Improvements
 ============
 
-* 
+* Compare tour by elevation
+  - New action to compare reference tour with all tours
+  - Compare tours concurrently -> much less waiting time
 
 
 Changes  

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,7 +174,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
    private Menu               _treeContextMenu;
 
-   class ResultContentProvider implements ITreeContentProvider {
+   private class ResultContentProvider implements ITreeContentProvider {
 
       @Override
       public void dispose() {}
@@ -203,7 +203,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public class TreeContextMenuProvider implements IContextMenuProvider {
+   private class TreeContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -1750,5 +1750,20 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             updateTourViewer(treeItem, modifiedTours);
          }
       }
+   }
+
+   public void updateViewer() {
+
+      reloadViewer();
+
+      // expand 1st ref tour
+
+      final ArrayList<TreeViewerItem> refTourItems = _rootItem.getFetchedChildren();
+
+      if (refTourItems.size() > 0) {
+
+         _tourViewer.expandToLevel(refTourItems.get(0), 1, true);
+      }
+
    }
 }
