@@ -93,6 +93,7 @@ public class GarminTcxTester {
    @Test
    void testTcxImportLyons() throws SAXException, IOException {
 
+		// TODO FB has a pause
       final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
       final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
