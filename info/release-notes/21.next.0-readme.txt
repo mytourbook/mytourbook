@@ -17,7 +17,6 @@ TODO's
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
                  
-* Mac OS          - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
 
 * Tour modification (Frederic) 
                   - Use multi-threading (ThreadPoolExecutor)
@@ -38,8 +37,9 @@ Improvements
 ============
 
 * Compare tour by elevation
-  - New action to compare reference tour with all tours
   - Compare tours concurrently -> much less waiting time
+  - New shortcut action to compare reference tour(s) with all tours
+  - Automatically expand reference tour in compare result view after comparison is done
 
 
 Changes  

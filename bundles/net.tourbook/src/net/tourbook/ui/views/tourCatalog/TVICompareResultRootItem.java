@@ -30,19 +30,19 @@ public class TVICompareResultRootItem extends TVICompareResultItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final RefTourItem[] refTourItems = TourCompareManager.getComparedReferenceTours();
+      final ArrayList<RefTourItem> allSelectedRefTourItems = TourCompareManager.getComparedReferenceTours();
 
-      if (refTourItems == null) {
+      if (allSelectedRefTourItems == null) {
          return;
       }
 
-      for (final RefTourItem refTour : refTourItems) {
+      for (final RefTourItem refTourItem : allSelectedRefTourItems) {
 
          children.add(new TVICompareResultReferenceTour(
                this,
-               refTour.label,
-               refTour,
-               refTour.tourId));
+               refTourItem.label,
+               refTourItem,
+               refTourItem.tourId));
       }
    }
 

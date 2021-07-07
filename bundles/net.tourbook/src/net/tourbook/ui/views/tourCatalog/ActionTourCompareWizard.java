@@ -50,18 +50,20 @@ public class ActionTourCompareWizard extends Action {
 
       final WizardTourComparer wizard = new WizardTourComparer(_refTourProvider);
 
-      final WizardDialog dialog = new PositionedWizardDialog(Display.getCurrent().getActiveShell(),
+      final Display display = Display.getCurrent();
+
+      final WizardDialog dialog = new PositionedWizardDialog(display.getActiveShell(),
             wizard,
             WizardTourComparer.DIALOG_SETTINGS_SECTION,
             800,
             600);
 
-      BusyIndicator.showWhile(null, () -> {
+      BusyIndicator.showWhile(display, () -> {
 
          if (dialog.open() == Window.OK) {
 
             /*
-             * show the compare tour perspective
+             * Show the compare tour perspective
              */
             final IWorkbench workbench = PlatformUI.getWorkbench();
             final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();

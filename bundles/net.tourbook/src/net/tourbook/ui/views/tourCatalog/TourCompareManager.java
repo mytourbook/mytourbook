@@ -61,8 +61,7 @@ public class TourCompareManager {
 
    private static final String                                  NUMBER_FORMAT_1F   = "%.1f";                                             //$NON-NLS-1$
 
-   private static RefTourItem[]                                 _allRefTourItems;
-   private static TourData[]                                    _allRefTourData;
+   private static ArrayList<RefTourItem>                        _allRefTourItems;
 
    private final static ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
 
@@ -96,16 +95,14 @@ public class TourCompareManager {
    /**
     * Compares all reference tours with all compare tours
     *
-    * @param allRefTourItems
+    * @param selectedRefTourItems
     * @param allComparedItems
     */
-   public static void compareTours(final RefTourItem[] allRefTourItems, final Object[] allComparedItems) {
+   public static void compareTours(final ArrayList<RefTourItem> selectedRefTourItems, final Object[] allComparedItems) {
 
-      final int numRefTours = allRefTourItems.length;
       final int numComparedTours = allComparedItems.length;
 
-      _allRefTourItems = allRefTourItems;
-      _allRefTourData = new TourData[numRefTours];
+      _allRefTourItems = selectedRefTourItems;
 
       try {
 
@@ -120,8 +117,11 @@ public class TourCompareManager {
 
                _comparedTourItems.clear();
 
-               // get all reference tours
-               loadRefTours();
+               // load all reference tour data
+               final ArrayList<TourData> allRefTourData = new ArrayList<>();
+               for (final RefTourItem refTourItem : _allRefTourItems) {
+                  allRefTourData.add(TourManager.getInstance().getTourData(refTourItem.tourId));
+               }
 
                int tourCounter = 1;
                int lastUpdateNumItems = 1;
@@ -177,7 +177,7 @@ public class TourCompareManager {
 
                   final boolean isLastCompare = tourCounter > numComparedTours;
 
-                  compareTours_Concurrent(tourId, monitor, isLastCompare);
+                  compareTours_Concurrent(tourId, allRefTourData, monitor, isLastCompare);
                }
             }
 
@@ -193,6 +193,7 @@ public class TourCompareManager {
    }
 
    private static void compareTours_Concurrent(final Long tourId,
+                                               final ArrayList<TourData> allRefTourData,
                                                final IProgressMonitor monitor,
                                                final boolean isLastCompare) {
 
@@ -226,23 +227,25 @@ public class TourCompareManager {
                && compareTourData.timeSerie.length > 0) {
 
             // loop: all reference tours
-            for (int refTourIndex = 0; refTourIndex < _allRefTourItems.length; refTourIndex++) {
+            for (int refTourIndex = 0; refTourIndex < _allRefTourItems.size(); refTourIndex++) {
 
                if (monitor.isCanceled()) {
                   showCompareResults();
                   return;
                }
 
+               final RefTourItem refTourItem = _allRefTourItems.get(refTourIndex);
+
                // compare the tour
                final TVICompareResultComparedTour compareResult = compareTours_OneTour(
-                     _allRefTourItems[refTourIndex],
-                     _allRefTourData[refTourIndex],
+                     refTourItem,
+                     allRefTourData.get(refTourIndex),
                      compareTourData);
 
                // ignore tours which could not be compared
                if (compareResult.computedStartIndex != -1) {
 
-                  compareResult.refTour = _allRefTourItems[refTourIndex];
+                  compareResult.refTour = refTourItem;
                   compareResult.comparedTourData = compareTourData;
 
                   _comparedTourItems.add(compareResult);
@@ -450,9 +453,44 @@ public class TourCompareManager {
       return compareResult;
    }
 
-   static void createAllRefTourItems(final ArrayList<RefTourItem> allRefTours) {
+   /**
+    * @param modifiedTours
+    * @return Returns an expression to select tour id's in the WHERE clause
+    */
+   private static String createRefId_IN(final ArrayList<Long> allSelectedRefTourIds) {
 
-      allRefTours.clear();
+      if (allSelectedRefTourIds.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+      boolean isFirst = true;
+
+      for (final Long refTourId : allSelectedRefTourIds) {
+
+         if (isFirst) {
+            isFirst = false;
+         } else {
+            sb.append(',');
+         }
+
+         sb.append(Long.toString(refTourId));
+      }
+
+      return sb.toString();
+   }
+
+   /**
+    * Create {@link RefTourItem}'s for all provided ref tour id's
+    *
+    * @param allRefTourIds
+    * @return
+    */
+   static ArrayList<RefTourItem> createRefTourItems(final ArrayList<Long> allRefTourIds) {
+
+      final ArrayList<RefTourItem> allSelectedRefTourItems = new ArrayList<>();
+
+      final String refId_IN = createRefId_IN(allRefTourIds);
 
       final String sql = UI.EMPTY_STRING
 
@@ -466,6 +504,9 @@ public class TourCompareManager {
             + " endIndex" + NL //                                 5  //$NON-NLS-1$
 
             + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + NL //   //$NON-NLS-1$
+
+            + " WHERE refId IN (" + refId_IN + " )" + NL //          //$NON-NLS-1$
+
             + " ORDER BY label" + NL //                              //$NON-NLS-1$
       ;
 
@@ -485,12 +526,14 @@ public class TourCompareManager {
             refItem.startIndex = result.getInt(4);
             refItem.endIndex = result.getInt(5);
 
-            allRefTours.add(refItem);
+            allSelectedRefTourItems.add(refItem);
          }
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
       }
+
+      return allSelectedRefTourItems;
    }
 
    private static float getAvgAltimeter(final TourData tourData, final int compareStartIndex, final int compareEndIndex) {
@@ -503,7 +546,7 @@ public class TourCompareManager {
    /**
     * @return Returns the reference tours which has been compared
     */
-   public static RefTourItem[] getComparedReferenceTours() {
+   public static ArrayList<RefTourItem> getComparedReferenceTours() {
 
       return _allRefTourItems;
    }
@@ -563,22 +606,6 @@ public class TourCompareManager {
       }
 
       return storedComparedTours;
-   }
-
-   /**
-    * Get the tour data for all reference tours
-    *
-    * @param refTourContext
-    */
-   private static void loadRefTours() {
-
-      for (int tourIndex = 0; tourIndex < _allRefTourItems.length; tourIndex++) {
-
-         final RefTourItem refTour = _allRefTourItems[tourIndex];
-
-         _allRefTourItems[tourIndex] = refTour;
-         _allRefTourData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
-      }
    }
 
    /**

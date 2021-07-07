@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.IReferenceTourProvider;
@@ -24,17 +26,15 @@ import org.eclipse.jface.wizard.Wizard;
 
 public class WizardTourComparer extends Wizard {
 
-   public static final String          DIALOG_SETTINGS_SECTION           = "WizardTourComparer";                            //$NON-NLS-1$
+   public static final String        DIALOG_SETTINGS_SECTION           = "WizardTourComparer";                            //$NON-NLS-1$
 
-   static final String                 GRID_PREFIX_REF_TOUR_COMPARE_TOUR = "GRID_PREFIX_REF_TOUR_COMPARE_TOUR";             //$NON-NLS-1$
-   static final String                 GRID_PREFIX_REF_TOUR_REF_TOUR     = "GRID_PREFIX_REF_TOUR_REF_TOUR";                 //$NON-NLS-1$
+   static final String               GRID_PREFIX_REF_TOUR_COMPARE_TOUR = "GRID_PREFIX_REF_TOUR_COMPARE_TOUR";             //$NON-NLS-1$
 
-   private final IDialogSettings       _state                            = TourbookPlugin.getState(DIALOG_SETTINGS_SECTION);
+   private final IDialogSettings     _state                            = TourbookPlugin.getState(DIALOG_SETTINGS_SECTION);
 
-   private WizardPage_10_CompareTour   _pageCompareTour;
-   private WizardPage_20_ReferenceTour _pageReferenceTour;
+   private WizardPage_10_CompareTour _pageCompareTour;
 
-   private IReferenceTourProvider      _refTourProvider;
+   private IReferenceTourProvider    _refTourProvider;
 
    public WizardTourComparer() {
 
@@ -54,7 +54,6 @@ public class WizardTourComparer extends Wizard {
    public void addPages() {
 
       addPage(_pageCompareTour = new WizardPage_10_CompareTour());
-      addPage(_pageReferenceTour = new WizardPage_20_ReferenceTour(_refTourProvider));
    }
 
    @Override
@@ -70,10 +69,10 @@ public class WizardTourComparer extends Wizard {
 
       saveState();
 
-      final RefTourItem[] refTours = _pageReferenceTour.getReferenceTours();
-      final Object[] comparedTours = _pageCompareTour.getComparedTours();
+      final ArrayList<RefTourItem> allSelectedRefTourItems = _refTourProvider.getSelectedRefTourItems();
+      final Object[] allComparedTours = _pageCompareTour.getComparedTours();
 
-      TourCompareManager.compareTours(refTours, comparedTours);
+      TourCompareManager.compareTours(allSelectedRefTourItems, allComparedTours);
 
       return true;
    }
@@ -86,7 +85,6 @@ public class WizardTourComparer extends Wizard {
    private void saveState() {
 
       _pageCompareTour.saveState();
-      _pageReferenceTour.saveState();
    }
 
 }

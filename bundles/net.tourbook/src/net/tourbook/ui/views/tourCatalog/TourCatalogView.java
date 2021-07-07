@@ -1201,8 +1201,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       return null;
    }
 
-   @Override
-   public ArrayList<Long> getSelectedReferenceTours() {
+   private ArrayList<Long> getSelectedRefTourIds() {
 
       final IStructuredSelection selectedItems = ((IStructuredSelection) _tourViewer.getSelection());
       final ArrayList<Long> selectedReferenceTour = new ArrayList<>();
@@ -1211,6 +1210,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       for (final Object treeItem : selectedItems) {
 
          if (treeItem instanceof TVICatalogRefTourItem) {
+
             selectedReferenceTour.add(((TVICatalogRefTourItem) treeItem).refId);
          }
       }
@@ -1218,33 +1218,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       return selectedReferenceTour;
    }
 
-   private RefTourItem[] getSelectedRefTourItems() {
-      
-      final ArrayList<Long> allSelectedRefTourIds = getSelectedReferenceTours();
-      final ArrayList<RefTourItem> allRefTourItems = new ArrayList<>();
-      TourCompareManager.createAllRefTourItems(allRefTourItems);
+   @Override
+   public ArrayList<RefTourItem> getSelectedRefTourItems() {
 
-      final ArrayList<RefTourItem> allSelectedRefTourItems = new ArrayList<>();
+      final ArrayList<Long> allSelectedRefTourIds = getSelectedRefTourIds();
+      final ArrayList<RefTourItem> allSelectedRefTourItems = TourCompareManager.createRefTourItems(allSelectedRefTourIds);
 
-      // get ref tour items for all selected ref tours
-      for (final Long refId : allSelectedRefTourIds) {
-
-         final long refIdValue = refId.longValue();
-
-         for (final RefTourItem refTourItem : allRefTourItems) {
-
-            if (refIdValue == refTourItem.refId) {
-
-               allSelectedRefTourItems.add(refTourItem);
-
-               break;
-            }
-         }
-      }
-
-      final RefTourItem[] selectedRefTourItemsAsArray = allSelectedRefTourItems.toArray(new RefTourItem[allSelectedRefTourItems.size()]);
-      
-      return selectedRefTourItemsAsArray;
+      return allSelectedRefTourItems;
    }
 
    @Override
@@ -1297,7 +1277,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
    private void onAction_CompareAllTours() {
 
-      final RefTourItem[] selectedRefTourItems = getSelectedRefTourItems();
+      final ArrayList<RefTourItem> selectedRefTourItems = getSelectedRefTourItems();
 
       final ArrayList<Long> allTourIds = TourDatabase.getAllTourIds();
       final Long[] allTourIdsAsArray = allTourIds.toArray(new Long[allTourIds.size()]);
