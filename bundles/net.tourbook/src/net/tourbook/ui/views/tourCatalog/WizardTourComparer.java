@@ -53,7 +53,7 @@ public class WizardTourComparer extends Wizard {
    @Override
    public void addPages() {
 
-      addPage(_pageCompareTour = new WizardPage_10_CompareTour());
+      addPage(_pageCompareTour = new WizardPage_10_CompareTour(_refTourProvider));
    }
 
    @Override
@@ -72,7 +72,11 @@ public class WizardTourComparer extends Wizard {
       final ArrayList<RefTourItem> allSelectedRefTourItems = _refTourProvider.getSelectedRefTourItems();
       final Object[] allComparedTours = _pageCompareTour.getComparedTours();
 
-      TourCompareManager.compareTours(allSelectedRefTourItems, allComparedTours);
+      // close wizard before running the compare
+      _pageCompareTour.getControl().getDisplay().asyncExec(() -> {
+
+         TourCompareManager.compareTours(allSelectedRefTourItems, allComparedTours);
+      });
 
       return true;
    }

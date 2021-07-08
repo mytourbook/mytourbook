@@ -32,11 +32,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-public class ActionTourCompareWizard extends Action {
+public class ActionCompareByElevation_WithWizard extends Action {
 
    private final IReferenceTourProvider _refTourProvider;
 
-   public ActionTourCompareWizard(final IReferenceTourProvider refTourProvider) {
+   public ActionCompareByElevation_WithWizard(final IReferenceTourProvider refTourProvider) {
 
       _refTourProvider = refTourProvider;
 
@@ -69,6 +69,7 @@ public class ActionTourCompareWizard extends Action {
             final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 
             try {
+
                // show tour compare perspective
                workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 

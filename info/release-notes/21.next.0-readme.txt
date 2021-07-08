@@ -39,7 +39,8 @@ Improvements
 * Compare tour by elevation
   - Compare tours concurrently -> much less waiting time
   - New shortcut action to compare reference tour(s) with all tours
-  - Automatically expand reference tour in compare result view after comparison is done
+  - Automatically expand reference tour in compare result view, after comparison is done
+  - Tour comparison can be restarted with other parameters in the "Compare Result" view, e.g. different years, other tour filter 
 
 
 Changes  

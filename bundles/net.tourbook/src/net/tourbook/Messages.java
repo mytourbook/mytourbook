@@ -918,7 +918,10 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
+   public static String        Elevation_Compare_Action_AppTourFilter_Tooltip;
    public static String        Elevation_Compare_Action_CompareAllTours;
+   public static String        Elevation_Compare_Monitor_SubTask;
+   public static String        Elevation_Compare_Monitor_Task;
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
@@ -2797,7 +2800,6 @@ public class Messages extends NLS {
    public static String tourCatalog_view_label_year_chart_title;
    public static String tourCatalog_view_label_year_not_selected;
 
-   public static String tourCatalog_wizard_Action_select_all_tours;
    public static String tourCatalog_wizard_Column_altitude_up_tooltip;
    public static String tourCatalog_wizard_Column_distance_tooltip;
    public static String tourCatalog_wizard_Column_h;

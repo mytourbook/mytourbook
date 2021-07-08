@@ -21,16 +21,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 public class TVIWizardCompareYear extends TVIWizardCompareItem {
 
    int tourYear;
 
-   TVIWizardCompareYear(final TVIWizardCompareItem parentItem) {
+   TVIWizardCompareYear(final TVIWizardCompareItem parentItem, final boolean isUseAppFilter) {
+
       setParentItem(parentItem);
+
+      this.isUseAppFilter = isUseAppFilter;
    }
 
    @Override
@@ -42,6 +47,15 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
+      // use fast app filter
+      final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+
+      String sqlWhere = UI.EMPTY_STRING;
+
+      if (isUseAppFilter) {
+         sqlWhere = UI.SPACE + appFilter.getWhereClause() + NL; //
+      }
+
       final String sql = NL
 
             + "SELECT" + NL //                                 //$NON-NLS-1$
@@ -52,6 +66,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //  //$NON-NLS-1$
 
             + " WHERE startYear=?" + NL //                     //$NON-NLS-1$
+            + sqlWhere
 
             + " GROUP BY startYear, startMonth" + NL //        //$NON-NLS-1$
             + " ORDER BY startMonth" + NL //                   //$NON-NLS-1$
@@ -59,13 +74,18 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         statement.setInt(1, tourYear);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+         stmt.setInt(1, tourYear);
 
-         final ResultSet result = statement.executeQuery();
+         // app filter parameters
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmt, 2);
+         }
+
+         final ResultSet result = stmt.executeQuery();
          while (result.next()) {
 
-            final TVIWizardCompareMonth monthItem = new TVIWizardCompareMonth(this);
+            final TVIWizardCompareMonth monthItem = new TVIWizardCompareMonth(this, isUseAppFilter);
             children.add(monthItem);
 
             final int dbYear = result.getInt(1);

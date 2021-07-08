@@ -21,17 +21,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.SQLFilter;
 
 public class TVIWizardCompareMonth extends TVIWizardCompareItem {
 
    int tourYear;
    int tourMonth;
 
-   TVIWizardCompareMonth(final TVIWizardCompareItem parentItem) {
+   TVIWizardCompareMonth(final TVIWizardCompareItem parentItem, final boolean isUseAppFilter) {
+
       setParentItem(parentItem);
+
+      this.isUseAppFilter = isUseAppFilter;
    }
 
    @Override
@@ -42,6 +46,15 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
+
+      // use fast app filter
+      final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+
+      String sqlWhere = UI.EMPTY_STRING;
+
+      if (isUseAppFilter) {
+         sqlWhere = UI.SPACE + appFilter.getWhereClause() + NL; //
+      }
 
       final String sql = UI.EMPTY_STRING + NL
 
@@ -59,16 +72,23 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
 
             + " WHERE startYear=? AND startMonth=?" + NL //          //$NON-NLS-1$
+            + sqlWhere
+
             + " ORDER BY startDay, startHour, startMinute" + NL //   //$NON-NLS-1$
       ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         statement.setInt(1, tourYear);
-         statement.setInt(2, tourMonth);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+         stmt.setInt(1, tourYear);
+         stmt.setInt(2, tourMonth);
 
-         final ResultSet result = statement.executeQuery();
+         // app filter parameters
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmt, 3);
+         }
+
+         final ResultSet result = stmt.executeQuery();
          while (result.next()) {
 
             // new tour is in the resultset
@@ -99,7 +119,7 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
    }
 

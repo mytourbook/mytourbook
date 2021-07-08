@@ -29,4 +29,9 @@ public interface IReferenceTourProvider {
     * not selected
     */
    ArrayList<RefTourItem> getSelectedRefTourItems();
+
+   /**
+    * @return Returns <code>true</code> when the fast app filter should be used
+    */
+   boolean isUseFastAppFilter();
 }

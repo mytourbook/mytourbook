@@ -26,4 +26,5 @@ public abstract class TVIWizardCompareItem extends TreeViewerItem {
 
    String               treeColumn;
 
+   boolean              isUseAppFilter;
 }

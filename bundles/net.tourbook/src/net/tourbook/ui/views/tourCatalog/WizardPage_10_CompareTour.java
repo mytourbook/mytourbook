@@ -15,10 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.text.NumberFormat;
-import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -30,8 +27,8 @@ import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -57,10 +54,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -73,22 +68,22 @@ import org.eclipse.ui.part.PageBook;
 
 public class WizardPage_10_CompareTour extends WizardPage {
 
-   private static final String  COMP_TOUR_VIEWER_WIDTH   = "CompTour.viewerWidth";          //$NON-NLS-1$
-   private static final String  COMP_TOUR_SELECT_ALL     = "CompTour.selectAll";            //$NON-NLS-1$
+   private static final String       STATE_LEFT_SASH_WIDTH = "STATE_LEFT_SASH_WIDTH";         //$NON-NLS-1$
 
-   final IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
-   IDialogSettings              _state;
+   static final IPreferenceStore     _prefStore            = TourbookPlugin.getPrefStore();
+   static IDialogSettings            _state;
 
-   private TVIWizardCompareRoot _rootItem;
-   private SashLeftFixedForm    _viewerDetailForm;
+   private static final NumberFormat _nf1                  = NumberFormat.getNumberInstance();
 
-   private boolean              _isTourViewerInitialized = false;
-
-   private NumberFormat         _nf1                     = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
    }
+
+   private IReferenceTourProvider _refTourProvider;
+   private TVIWizardCompareRoot   _rootItem;
+
+   private SashLeftFixedForm      _viewerDetailForm;
 
    /*
     * UI controls
@@ -96,7 +91,6 @@ public class WizardPage_10_CompareTour extends WizardPage {
    private PageBook           _pageBook;
    private Label              _pageTourIsNotSelected;
 
-   private Button             _chkSelectAllTours;
    private Chart              _compareTourChart;
    private Group              _groupChart;
    private CheckboxTreeViewer _tourViewer;
@@ -130,9 +124,11 @@ public class WizardPage_10_CompareTour extends WizardPage {
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   WizardPage_10_CompareTour() {
+   WizardPage_10_CompareTour(final IReferenceTourProvider refTourProvider) {
 
       super("compare-tour");//$NON-NLS-1$
+
+      _refTourProvider = refTourProvider;
 
       setTitle(Messages.tourCatalog_wizard_Page_compared_tours_title);
    }
@@ -174,11 +170,6 @@ public class WizardPage_10_CompareTour extends WizardPage {
             final Composite tourChart = createUI_50_TourChart(parent, detailContainer);
 
             _viewerDetailForm = new SashLeftFixedForm(detailContainer, viewer, sash, tourChart, 50, 5);
-         }
-         {
-            _chkSelectAllTours = new Button(container, SWT.CHECK);
-            _chkSelectAllTours.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
-            _chkSelectAllTours.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectAllTours()));
          }
       }
 
@@ -415,73 +406,27 @@ public class WizardPage_10_CompareTour extends WizardPage {
    }
 
    /**
-    * Enables/disables the controls which belong to the tour
-    *
-    * @param isChecked
-    */
-   private void enableTours(final boolean isChecked) {
-
-      final boolean isEnabled = !isChecked;
-
-      // load tour data into the viewer if not yet done
-      if (isEnabled && _isTourViewerInitialized == false) {
-
-         BusyIndicator.showWhile(_pageBook.getDisplay(), () -> {
-
-            // initialize the data before the view input is set
-            _rootItem = new TVIWizardCompareRoot();
-            _tourViewer.setInput(this);
-
-            _isTourViewerInitialized = true;
-         });
-      }
-
-      _tourViewer.getControl().setEnabled(isEnabled);
-   }
-
-   /**
     * @return Returns all checked tours, can also contain checked year or month items
     */
    public Object[] getComparedTours() {
 
-      if (_chkSelectAllTours.getSelection()) {
-
-         // return all tours
-
-         final ArrayList<Long> allTourIds = TourDatabase.getAllTourIds();
-
-         return allTourIds.toArray(new Long[allTourIds.size()]);
-
-      } else {
-
-         return _tourViewer.getCheckedElements();
-      }
-   }
-
-   private void onSelectAllTours() {
-
-      enableTours(_chkSelectAllTours.getSelection());
-      validatePage();
+      return _tourViewer.getCheckedElements();
    }
 
    private void restoreState() {
 
       // restore viewer width
-      _viewerDetailForm.setViewerWidth(Util.getStateInt(_state, COMP_TOUR_VIEWER_WIDTH, 100));
+      _viewerDetailForm.setViewerWidth(Util.getStateInt(_state, STATE_LEFT_SASH_WIDTH, 300));
 
-      // restore checkbox: select all tours
-      final boolean isAllToursSelected = Util.getStateBoolean(_state, COMP_TOUR_SELECT_ALL, true);
-      _chkSelectAllTours.setSelection(isAllToursSelected);
-
-      enableTours(isAllToursSelected);
+      // initialize the data before the view input is set
+      _rootItem = new TVIWizardCompareRoot(_refTourProvider.isUseFastAppFilter());
+      _tourViewer.setInput(this);
    }
 
    void saveState() {
 
       // save the viewer width
-      _state.put(COMP_TOUR_VIEWER_WIDTH, _tourViewer.getTree().getSize().x);
-
-      _state.put(COMP_TOUR_SELECT_ALL, _chkSelectAllTours.getSelection());
+      _state.put(STATE_LEFT_SASH_WIDTH, _tourViewer.getTree().getSize().x);
    }
 
    @Override
@@ -489,16 +434,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       super.setVisible(visible);
 
-      final boolean isSelectAll = _chkSelectAllTours.getSelection();
-
-      if (isSelectAll) {
-
-         _chkSelectAllTours.setFocus();
-
-      } else {
-
-         _tourViewer.getTree().setFocus();
-      }
+      _tourViewer.getTree().setFocus();
    }
 
    private void showCompareTour(final SelectionChangedEvent event) {
@@ -521,14 +457,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
          final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
          chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-//				fTourChart.updateTourChart(tourData, chartConfig, false);
-
          final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
-
-         // set grid size
-//				final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-//				fTourChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-//						prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
          _compareTourChart.updateChart(chartDataModel, false);
 
@@ -550,26 +479,25 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       setMessage(Messages.tourCatalog_wizard_Label_page_message);
 
-      if (_chkSelectAllTours.getSelection()) {
+      final Object[] checkedElements = _tourViewer.getCheckedElements();
 
-         setPageComplete(true);
-         setErrorMessage(null);
-         return true;
+      if (checkedElements.length == 0) {
+
+         // page is invalid
+
+         setPageComplete(false);
+         setErrorMessage(Messages.tourCatalog_wizard_Error_tour_must_be_selected);
+
+         return false;
 
       } else {
 
-         final Object[] checkedElements = _tourViewer.getCheckedElements();
+         // page is valid
 
-         if (checkedElements.length == 0) {
-            setPageComplete(false);
-            setErrorMessage(Messages.tourCatalog_wizard_Error_tour_must_be_selected);
-            return false;
+         setPageComplete(true);
+         setErrorMessage(null);
 
-         } else {
-            setPageComplete(true);
-            setErrorMessage(null);
-            return true;
-         }
+         return true;
       }
    }
 
