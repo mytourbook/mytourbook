@@ -3452,8 +3452,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // Check if the user has selected to use the recorded time instead of
          // the moving time.
-         if(isPaceAndSpeedFromRecordedTime)
-         {
+         if (isPaceAndSpeedFromRecordedTime) {
             // Check if a pause occurred. Pauses time is ignored.
             if (getPausedTime(serieIndex, serieIndex - 1) > 0) {
                continue;
@@ -7790,7 +7789,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int totalPausedTime = 0;
 
-      if (timeSerie == null || pausedTime_Start == null) {
+      if (timeSerie == null || pausedTime_Start == null ||
+            startIndex < 0 || endIndex < 0 || startIndex == endIndex) {
          return totalPausedTime;
       }
 
