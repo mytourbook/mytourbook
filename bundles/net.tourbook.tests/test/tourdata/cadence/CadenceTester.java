@@ -29,6 +29,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,6 +52,13 @@ public class CadenceTester {
 
 	private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
+   @AfterAll
+   public static void cleanUp(){
+
+		// Restoring the default value
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
+   }
+
    @BeforeAll
    static void initAll() {
       parser = Initializer.initializeParser();
@@ -60,7 +68,7 @@ public class CadenceTester {
       deviceDataReader = new GarminDeviceDataReader();
    }
 
-   @AfterEach
+	@AfterEach
    void tearDown() {
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
