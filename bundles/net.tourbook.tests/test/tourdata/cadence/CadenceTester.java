@@ -99,7 +99,7 @@ public class CadenceTester {
 		Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
 		Assertions.assertEquals(69, tour.getCadenceZone_FastTime());
 		Assertions.assertEquals(440, tour.getCadenceZone_SlowTime());
-		Assertions.assertEquals(tour.getCadenceZone_SlowTime() + tour.getCadenceZone_FastTime(),
+		Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
 				tour.getTourComputedTime_Moving());
    }
 
@@ -126,13 +126,12 @@ public class CadenceTester {
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-
 		tour.computeCadenceZonesTimes();
 
 		Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
 		Assertions.assertEquals(294, tour.getCadenceZone_FastTime());
 		Assertions.assertEquals(1601, tour.getCadenceZone_SlowTime());
-		Assertions.assertEquals(tour.getCadenceZone_SlowTime() + tour.getCadenceZone_FastTime(),
+		Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
 				tour.getTourDeviceTime_Recorded());
    }
 }
