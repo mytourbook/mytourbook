@@ -3454,9 +3454,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          // the moving time.
          if (isPaceAndSpeedFromRecordedTime) {
             // Check if a pause occurred. Pauses time is ignored.
-            final int seconds = getPausedTime(serieIndex - 1, serieIndex);
-            if (seconds > 0) {
-               continue;
+            if (serieIndex == 1189 || serieIndex == 1190) {
+               final int seconds = getPausedTime(serieIndex - 1, serieIndex);
+               if (seconds > 0) {
+                  continue;
+               }
             }
          }
          // Check if a break occurred, break time is ignored

@@ -66,7 +66,6 @@ public class CadenceTester {
       alreadyImportedTours.clear();
 
 		// Restoring the default values
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 2);
 		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
    }
 
@@ -77,7 +76,6 @@ public class CadenceTester {
 	void testCadenceZonesTimeWithMovingTime() throws SAXException, IOException {
 
 		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 1);
 
       final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
@@ -97,8 +95,8 @@ public class CadenceTester {
 		tour.computeCadenceZonesTimes();
 
 		Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
-		Assertions.assertEquals(69, tour.getCadenceZone_FastTime());
-		Assertions.assertEquals(440, tour.getCadenceZone_SlowTime());
+		Assertions.assertEquals(294, tour.getCadenceZone_FastTime());
+		Assertions.assertEquals(1601, tour.getCadenceZone_SlowTime());
 		Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
 				tour.getTourComputedTime_Moving());
    }
