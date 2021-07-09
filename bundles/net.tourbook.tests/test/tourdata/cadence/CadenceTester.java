@@ -76,12 +76,9 @@ public class CadenceTester {
    @Test
 	void testCadenceZonesTimeWithMovingTime() throws SAXException, IOException {
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, true);
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 1);
 
-		// TODO FB has a pause
-		// fast time 294
-		// slow time 1601
       final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
 		final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
@@ -112,10 +109,8 @@ public class CadenceTester {
    @Test
 	void testCadenceZonesTimeWithRecordedTime() throws SAXException, IOException {
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
-		// TODO FB has a pause
-		// fast time 294
-		// slow time 1601
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, true);
+
       final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
 		final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
