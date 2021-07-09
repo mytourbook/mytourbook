@@ -29,7 +29,6 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -52,13 +51,6 @@ public class CadenceTester {
 
 	private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   @AfterAll
-   public static void cleanUp(){
-
-		// Restoring the default value
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
-   }
-
    @BeforeAll
    static void initAll() {
       parser = Initializer.initializeParser();
@@ -72,6 +64,10 @@ public class CadenceTester {
    void tearDown() {
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
+
+		// Restoring the default values
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 2);
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
    }
 
    	/**
@@ -79,6 +75,9 @@ public class CadenceTester {
 	 */
    @Test
 	void testCadenceZonesTimeWithMovingTime() throws SAXException, IOException {
+
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, true);
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, 1);
 
 		// TODO FB has a pause
 		// fast time 294
@@ -98,13 +97,11 @@ public class CadenceTester {
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, true);
-
 		tour.computeCadenceZonesTimes();
 
 		Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
-		Assertions.assertEquals(294, tour.getCadenceZone_FastTime());
-		Assertions.assertEquals(294, tour.getCadenceZone_SlowTime());
+		Assertions.assertEquals(69, tour.getCadenceZone_FastTime());
+		Assertions.assertEquals(440, tour.getCadenceZone_SlowTime());
 		Assertions.assertEquals(tour.getCadenceZone_SlowTime() + tour.getCadenceZone_FastTime(),
 				tour.getTourComputedTime_Moving());
    }
@@ -115,6 +112,7 @@ public class CadenceTester {
    @Test
 	void testCadenceZonesTimeWithRecordedTime() throws SAXException, IOException {
 
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
 		// TODO FB has a pause
 		// fast time 294
 		// slow time 1601
@@ -133,13 +131,12 @@ public class CadenceTester {
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
 
 		tour.computeCadenceZonesTimes();
 
 		Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
 		Assertions.assertEquals(294, tour.getCadenceZone_FastTime());
-		Assertions.assertEquals(294, tour.getCadenceZone_SlowTime());
+		Assertions.assertEquals(1601, tour.getCadenceZone_SlowTime());
 		Assertions.assertEquals(tour.getCadenceZone_SlowTime() + tour.getCadenceZone_FastTime(),
 				tour.getTourDeviceTime_Recorded());
    }

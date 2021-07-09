@@ -3456,7 +3456,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             // Check if a pause occurred. Pauses time is ignored.
             final int seconds = getPausedTime(serieIndex - 1, serieIndex);
             if (seconds > 0) {
-               System.out.println(seconds);
                continue;
             }
          }
