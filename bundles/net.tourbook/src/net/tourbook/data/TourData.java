@@ -3453,12 +3453,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          // Check if the user has selected to use the recorded time instead of
          // the moving time.
          if (isPaceAndSpeedFromRecordedTime) {
+
+            if (serieIndex == 1188) {
+               System.out.print(true);
+            }
             // Check if a pause occurred. Pauses time is ignored.
-            if (serieIndex == 1189 || serieIndex == 1190) {
-               final int seconds = getPausedTime(serieIndex - 1, serieIndex);
-               if (seconds > 0) {
-                  continue;
-               }
+            final int pausedTime = getPausedTime(serieIndex, serieIndex + 1);
+            if (pausedTime > 0 && timeDiff == pausedTime) {
+               continue;
             }
          }
          // Check if a break occurred, break time is ignored
@@ -3487,12 +3489,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          cadenceZones_DelimiterValue = cadenceZonesDelimiter;
       }
 
-      //Total recording time in secs
-      System.out.println(tourDeviceTime_Recorded);
-      //Total moving time in secs
-      System.out.println(tourComputedTime_Moving);
-      //Total cadence time in secs
-      System.out.println(cadenceZone_FastTime + cadenceZone_SlowTime);
       return true;
    }
 
