@@ -3447,21 +3447,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float cadence = cadenceSerie[serieIndex];
          final int time = timeSerie[serieIndex];
 
-         final int timeDiff = time - prevTime;
+         int timeDiff = time - prevTime;
          prevTime = time;
 
          // Check if the user has selected to use the recorded time instead of
          // the moving time.
+         int toto = 0;
          if (isPaceAndSpeedFromRecordedTime) {
 
             if (serieIndex == 380) {
-               System.out.print(true);
+               toto = 1;
             }
             // Check if a pause occurred. Pauses time is ignored.
             final int pausedTime = getPausedTime(serieIndex - 1, serieIndex);
             if (pausedTime > 0 && timeDiff >= pausedTime) {
-               continue;
+               timeDiff = Math.max(0, timeDiff - pausedTime);
             }
+//            if (pausedTime > 0 && timeDiff >= pausedTime) {
+//               continue;
+//            }
          }
          // Check if a break occurred, break time is ignored
          else if (breakTimeSerie != null) {
@@ -3489,12 +3493,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          cadenceZones_DelimiterValue = cadenceZonesDelimiter;
       }
 
-      final long totalTime = cadenceZone_SlowTime + cadenceZone_FastTime;
+      final long totalTime = cadenceZone_SlowTime + (long) cadenceZone_FastTime;
          final long recordedtime = getTourDeviceTime_Recorded();
          if (totalTime != recordedtime) {
 
          System.out.println(
-                  "Difference: " + (recordedtime - totalTime) +
+               "Difference: " + String.valueOf(totalTime - recordedtime) + "-" +
                      getTourStartTime().getYear() + "-" +
                      getTourStartTime().getMonthValue() + "-" +
                getTourStartTime().getDayOfMonth());
@@ -7806,7 +7810,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       int totalPausedTime = 0;
 
       if (timeSerie == null || pausedTime_Start == null ||
-            startIndex < 0 || endIndex < 0 || startIndex == endIndex) {
+            startIndex < 0 || endIndex < 0 || startIndex == endIndex ||
+            startIndex > timeSerie.length || endIndex > timeSerie.length) {
          return totalPausedTime;
       }
 
