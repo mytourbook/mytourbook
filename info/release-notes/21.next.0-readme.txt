@@ -36,8 +36,9 @@ New
 Improvements
 ============
 
-* Compare tour by elevation
+* Compare Tours by Elevation
   - Compare tours concurrently -> much less waiting time
+  - Use fast app tour filters (person, tour type, tour, photo...)
   - New shortcut action to compare reference tour(s) with all tours
   - Automatically expand reference tour in compare result view, after comparison is done
   - Tour comparison can be restarted with other parameters in the "Compare Result" view, e.g. different years, other tour filter 
