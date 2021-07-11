@@ -2,23 +2,23 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="744.09448819"
-   height="1052.3622047"
+   width="1122.5197"
+   height="1587.4016"
    id="svg2"
    version="1.1"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
    sodipodi:docname="mytourbook-icon-2.svg"
    inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\splash.png"
    inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-ydpi="90"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
     <linearGradient
@@ -3369,10 +3369,258 @@
        xlink:href="#mt-fill-2"
        id="linearGradient2093"
        x1="13.830187"
-       y1="270.66508"
-       x2="281.42762"
-       y2="270.66508"
+       y1="270.66507"
+       x2="281.42761"
+       y2="270.66507"
        gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4730"
+       id="radialGradient4726-5-9"
+       cx="103.89014"
+       cy="150.04361"
+       fx="103.89014"
+       fy="150.04361"
+       r="6.8971772"
+       gradientTransform="matrix(-2.3115417,0.01804091,-0.01566156,-2.0066835,352.40435,438.73029)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4748"
+       id="radialGradient4746-4-6"
+       cx="103.41459"
+       cy="150.02072"
+       fx="103.41459"
+       fy="150.02072"
+       r="6.8248601"
+       gradientTransform="matrix(-2.3360343,0.01823266,-0.01582796,-2.027945,353.8626,441.86279)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4492-0-1-8-4"
+       id="linearGradient15653"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.41204561,0.01798017,-0.01797965,0.41205766,9.9282249,98.067492)"
+       x1="241.26166"
+       y1="85.232475"
+       x2="254.03822"
+       y2="87.012444" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4758-3"
+       id="linearGradient15655"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.96421782,0,0,0.96424604,-113.18912,24.533741)"
+       x1="229.19688"
+       y1="117.18208"
+       x2="234.62358"
+       y2="118.18096" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4353-2-4-3-1-0"
+       id="linearGradient15657"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.16588423,0,0,0.16588909,49.173668,131.19436)"
+       x1="333.6282"
+       y1="102.02556"
+       x2="333.46893"
+       y2="124.01388" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4470-2-85-3-8"
+       id="linearGradient15659"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.25003444,0,0,0.25004178,46.269309,118.01808)"
+       x1="232.95992"
+       y1="120.38477"
+       x2="232.85425"
+       y2="134.97282" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4730"
+       id="radialGradient4726-5-9-4"
+       cx="103.89014"
+       cy="150.04361"
+       fx="103.89014"
+       fy="150.04361"
+       r="6.8971772"
+       gradientTransform="matrix(-2.3115417,0.01804091,-0.01566156,-2.0066835,352.40435,438.73029)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4748"
+       id="radialGradient4746-4-6-5"
+       cx="103.41459"
+       cy="150.02072"
+       fx="103.41459"
+       fy="150.02072"
+       r="6.8248601"
+       gradientTransform="matrix(-2.3360343,0.01823266,-0.01582796,-2.027945,353.8626,441.86279)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4492-0-1-8-4"
+       id="linearGradient15936"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.41204561,0.01798017,-0.01797965,0.41205766,9.9282249,98.067492)"
+       x1="241.26166"
+       y1="85.232475"
+       x2="254.03822"
+       y2="87.012444" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4758-3"
+       id="linearGradient15938"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.96421782,0,0,0.96424604,-113.18912,24.533741)"
+       x1="229.19688"
+       y1="117.18208"
+       x2="234.62358"
+       y2="118.18096" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4353-2-4-3-1-0"
+       id="linearGradient15940"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.16588423,0,0,0.16588909,49.173668,131.19436)"
+       x1="333.6282"
+       y1="102.02556"
+       x2="333.46893"
+       y2="124.01388" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4470-2-85-3-8"
+       id="linearGradient15942"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.25003444,0,0,0.25004178,46.269309,118.01808)"
+       x1="232.95992"
+       y1="120.38477"
+       x2="232.85425"
+       y2="134.97282" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4730"
+       id="radialGradient4726-5-9-4-0"
+       cx="103.89014"
+       cy="150.04361"
+       fx="103.89014"
+       fy="150.04361"
+       r="6.8971772"
+       gradientTransform="matrix(-2.3115417,0.01804091,-0.01566156,-2.0066835,352.40435,438.73029)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4748"
+       id="radialGradient4746-4-6-5-1"
+       cx="103.41459"
+       cy="150.02072"
+       fx="103.41459"
+       fy="150.02072"
+       r="6.8248601"
+       gradientTransform="matrix(-2.3360343,0.01823266,-0.01582796,-2.027945,353.8626,441.86279)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4492-0-1-8-4"
+       id="linearGradient16072"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.41204561,0.01798017,-0.01797965,0.41205766,9.9282249,98.067492)"
+       x1="241.26166"
+       y1="85.232475"
+       x2="254.03822"
+       y2="87.012444" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4758-3"
+       id="linearGradient16074"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.96421782,0,0,0.96424604,-113.18912,24.533741)"
+       x1="229.19688"
+       y1="117.18208"
+       x2="234.62358"
+       y2="118.18096" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4353-2-4-3-1-0"
+       id="linearGradient16076"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.16588423,0,0,0.16588909,49.173668,131.19436)"
+       x1="333.6282"
+       y1="102.02556"
+       x2="333.46893"
+       y2="124.01388" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4470-2-85-3-8"
+       id="linearGradient16078"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.25003444,0,0,0.25004178,46.269309,118.01808)"
+       x1="232.95992"
+       y1="120.38477"
+       x2="232.85425"
+       y2="134.97282" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4730"
+       id="radialGradient4726-5-9-4-0-1"
+       cx="103.89014"
+       cy="150.04361"
+       fx="103.89014"
+       fy="150.04361"
+       r="6.8971772"
+       gradientTransform="matrix(-2.3115417,0.01804091,-0.01566156,-2.0066835,352.40435,438.73029)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4748"
+       id="radialGradient4746-4-6-5-1-7"
+       cx="103.41459"
+       cy="150.02072"
+       fx="103.41459"
+       fy="150.02072"
+       r="6.8248601"
+       gradientTransform="matrix(-2.3360343,0.01823266,-0.01582796,-2.027945,353.8626,441.86279)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4492-0-1-8-4"
+       id="linearGradient16208"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.41204561,0.01798017,-0.01797965,0.41205766,9.9282249,98.067492)"
+       x1="241.26166"
+       y1="85.232475"
+       x2="254.03822"
+       y2="87.012444" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4758-3"
+       id="linearGradient16210"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.96421782,0,0,0.96424604,-113.18912,24.533741)"
+       x1="229.19688"
+       y1="117.18208"
+       x2="234.62358"
+       y2="118.18096" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4353-2-4-3-1-0"
+       id="linearGradient16212"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.16588423,0,0,0.16588909,49.173668,131.19436)"
+       x1="333.6282"
+       y1="102.02556"
+       x2="333.46893"
+       y2="124.01388" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4470-2-85-3-8"
+       id="linearGradient16214"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.25003444,0,0,0.25004178,46.269309,118.01808)"
+       x1="232.95992"
+       y1="120.38477"
+       x2="232.85425"
+       y2="134.97282" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -3381,17 +3629,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="20.680973"
-     inkscape:cx="594.60334"
-     inkscape:cy="956.27003"
+     inkscape:zoom="2.0000001"
+     inkscape:cx="266.99999"
+     inkscape:cy="554.24999"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1847"
-     inkscape:window-height="1328"
-     inkscape:window-x="389"
-     inkscape:window-y="80"
-     inkscape:window-maximized="0"
+     inkscape:window-width="2483"
+     inkscape:window-height="1417"
+     inkscape:window-x="69"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      inkscape:snap-global="true"
      inkscape:snap-grids="true"
      showguides="false"
@@ -3404,7 +3652,9 @@
      inkscape:bbox-nodes="true"
      inkscape:snap-bbox-edge-midpoints="true"
      inkscape:snap-bbox-midpoints="true"
-     inkscape:snap-text-baseline="true">
+     inkscape:snap-text-baseline="true"
+     inkscape:pagecheckerboard="0"
+     units="px">
     <inkscape:grid
        type="xygrid"
        id="grid2985"
@@ -3426,7 +3676,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -3435,7 +3684,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.37795278;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.377953;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="rect5311"
        width="64"
        height="64"
@@ -3445,7 +3694,7 @@
        inkscape:export-xdpi="96.000275"
        inkscape:export-ydpi="96.000275" />
     <rect
-       style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.37795275;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.377953;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="rect1645"
        width="16"
        height="15.999994"
@@ -3468,7 +3717,8 @@
            y="198.17719"
            style="font-family:sans-serif" /></flowRegion><flowPara
          id="flowPara4166"
-         style="font-size:9px;line-height:1.25;font-family:sans-serif"> </flowPara></flowRoot>    <g
+         style="font-size:9px;line-height:1.25;font-family:sans-serif"> </flowPara></flowRoot>
+    <g
        id="g4467-8-4"
        transform="matrix(5.4406066,0,0,5.4405951,-124.30719,-736.57883)"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\application\tourbook-about80.png"
@@ -3481,9 +3731,9 @@
          inkscape:connector-curvature="0"
          id="path4529-2-9-2-4"
          d="m 107.3549,138.6056 c -3.76926,0 -6.83992,3.04061 -6.83992,6.80999 0,3.76936 3.07066,6.84011 6.83992,6.84011 3.76928,0 6.8098,-3.07075 6.8098,-6.84011 0,-3.76938 -3.04052,-6.80999 -6.8098,-6.80999 z m 0,3.46526 c 1.84721,0 3.3145,1.49747 3.3145,3.34473 0,1.84724 -1.46729,3.34472 -3.3145,3.34472 -1.84718,0 -3.37476,-1.49748 -3.37476,-3.34472 0,-1.84726 1.52758,-3.34473 3.37476,-3.34473 z"
-         style="fill:url(#radialGradient4726-5);fill-opacity:1;stroke:url(#radialGradient4746-4);stroke-width:0.1446348;stroke-miterlimit:4;stroke-dasharray:none" />
+         style="fill:url(#radialGradient4726-5);fill-opacity:1;stroke:url(#radialGradient4746-4);stroke-width:0.144635;stroke-miterlimit:4;stroke-dasharray:none" />
       <path
-         style="fill:url(#linearGradient4476-3-1);fill-opacity:1;stroke:url(#linearGradient4478-4-0);stroke-width:0.18604447;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.04999995;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:url(#linearGradient4476-3-1);fill-opacity:1;stroke:url(#linearGradient4478-4-0);stroke-width:0.186044;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1"
          d="m 106.96653,137.89831 c 2.08114,-0.255 4.35941,0.70478 5.77836,2.24829 0.9383,-2.89655 -1.65517,-3.35758 -2.64092,-3.31173 -0.13902,0.006 -1.60631,-0.0745 -3.13744,1.06344 z"
          id="path3829-9-2-3-0-1-6-5-4-2-9-1"
          inkscape:connector-curvature="0"
@@ -3501,16 +3751,50 @@
          d="m 103.20661,152.29144 c 0.52394,0 0.61043,-0.39089 1.10717,-0.37406 0.38937,0.0132 0.3148,-0.003 0.82078,0.20495 0.50601,0.20705 2.03191,0.22135 3.08213,0.10214 1.23598,-0.14027 2.88805,-0.5407 2.88805,-1.54881 0,-0.69099 -1.03071,-0.61978 -1.2892,-0.60958 -0.61633,0.0243 -0.81488,0.0673 -1.90641,-0.30076 -1.19744,-0.59829 -2.64058,-1.95286 -3.48403,-1.95286 -0.61603,0 -1.53787,0.63483 -2.07907,0.75205 -0.54124,0.11724 -0.63074,-0.0737 -1.10984,-0.57485 0,0 -0.12963,-0.11717 -0.3402,-0.004 -0.21057,0.11294 -0.35744,1.01368 -0.57291,1.9966 -0.21563,0.98367 -0.372418,1.51429 0.0537,2.04792 0.22269,0.2789 0.74316,0.26425 1.03756,0.26425 0.7117,0 1.36223,-0.01 1.79227,-0.003 z"
          style="fill:url(#linearGradient4806);fill-opacity:1;stroke:url(#linearGradient4808);stroke-width:0.125;stroke-miterlimit:4;stroke-dasharray:none" />
     </g>
+    <g
+       id="g4467-8-4-7"
+       transform="matrix(16.506106,0,0,16.495816,-1620.4288,-1812.6476)"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-256px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       style="stroke-width:0.329714">
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:connector-curvature="0"
+         id="path4529-2-9-2-4-4"
+         d="m 107.3549,138.6056 c -3.76926,0 -6.83992,3.04061 -6.83992,6.80999 0,3.76936 3.07066,6.84011 6.83992,6.84011 3.76928,0 6.8098,-3.07075 6.8098,-6.84011 0,-3.76938 -3.04052,-6.80999 -6.8098,-6.80999 z m 0,3.46526 c 1.84721,0 3.3145,1.49747 3.3145,3.34473 0,1.84724 -1.46729,3.34472 -3.3145,3.34472 -1.84718,0 -3.37476,-1.49748 -3.37476,-3.34472 0,-1.84726 1.52758,-3.34473 3.37476,-3.34473 z"
+         style="fill:url(#radialGradient4726-5-9);fill-opacity:1;stroke:url(#radialGradient4746-4-6);stroke-width:0.0476882;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         style="fill:url(#linearGradient15653);fill-opacity:1;stroke:url(#linearGradient15655);stroke-width:0.0613414;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1"
+         d="m 106.96653,137.89831 c 2.08114,-0.255 4.35941,0.70478 5.77836,2.24829 0.9383,-2.89655 -1.65517,-3.35758 -2.64092,-3.31173 -0.13902,0.006 -1.60631,-0.0745 -3.13744,1.06344 z"
+         id="path3829-9-2-3-0-1-6-5-4-2-9-1-2"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccsc"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-ydpi="269.78387" />
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         sodipodi:nodetypes="cscssscscszsascc"
+         inkscape:connector-curvature="0"
+         id="path4333-0-52-7-1-9-0"
+         d="m 103.20661,152.29144 c 0.52394,0 0.61043,-0.39089 1.10717,-0.37406 0.38937,0.0132 0.3148,-0.003 0.82078,0.20495 0.50601,0.20705 2.03191,0.22135 3.08213,0.10214 1.23598,-0.14027 2.88805,-0.5407 2.88805,-1.54881 0,-0.69099 -1.03071,-0.61978 -1.2892,-0.60958 -0.61633,0.0243 -0.81488,0.0673 -1.90641,-0.30076 -1.19744,-0.59829 -2.64058,-1.95286 -3.48403,-1.95286 -0.61603,0 -1.53787,0.63483 -2.07907,0.75205 -0.54124,0.11724 -0.63074,-0.0737 -1.10984,-0.57485 0,0 -0.12963,-0.11717 -0.3402,-0.004 -0.21057,0.11294 -0.35744,1.01368 -0.57291,1.9966 -0.21563,0.98367 -0.372418,1.51429 0.0537,2.04792 0.22269,0.2789 0.74316,0.26425 1.03756,0.26425 0.7117,0 1.36223,-0.01 1.79227,-0.003 z"
+         style="fill:url(#linearGradient15657);fill-opacity:1;stroke:url(#linearGradient15659);stroke-width:0.0412143;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
     <flowRoot
        xml:space="preserve"
        id="flowRoot4042-5"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3430);fill-opacity:1;stroke:url(#linearGradient3432);stroke-width:0.80116796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3430);fill-opacity:1;stroke:url(#linearGradient3432);stroke-width:0.801168;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        transform="matrix(0.94350418,0,0,0.94350462,-188.67194,68.106643)"
        inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampplite\htdocs\mytourbook\images\mytb\logo\mytourbook-text-12.1-2.png"
        inkscape:export-xdpi="109.19061"
        inkscape:export-ydpi="109.19061"><flowRegion
          id="flowRegion4044-1"
-         style="fill:url(#linearGradient3422);fill-opacity:1;stroke:url(#linearGradient3424);stroke-width:0.80116796;stroke-miterlimit:4;stroke-dasharray:none"><rect
+         style="fill:url(#linearGradient3422);fill-opacity:1;stroke:url(#linearGradient3424);stroke-width:0.801168;stroke-miterlimit:4;stroke-dasharray:none"><rect
            id="rect4046-2"
            width="267.95447"
            height="116.11359"
@@ -3518,10 +3802,11 @@
            y="81.027298"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:48px;line-height:125%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3418);fill-opacity:1;stroke:url(#linearGradient3420);stroke-width:0.80116796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></flowRegion><flowPara
          id="flowPara4048-0"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:48px;line-height:124.00000095%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3426);fill-opacity:1;stroke:url(#linearGradient3428);stroke-width:0.80116796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">MyTourbook</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:48px;line-height:124%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3426);fill-opacity:1;stroke:url(#linearGradient3428);stroke-width:0.801168;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">MyTourbook</flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot4042-5-9"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4485-3);fill-opacity:1;stroke:url(#linearGradient4519-0);stroke-width:0.80000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4485-3);fill-opacity:1;stroke:url(#linearGradient4519-0);stroke-width:0.8;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        transform="matrix(0.94350418,0,0,0.94350462,-188.6725,22.444555)"
        inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampplite\htdocs\mytourbook\images\mytb\logo\mytourbook-text-12.1-2.png"
        inkscape:export-xdpi="109.19061"
@@ -3535,16 +3820,17 @@
            y="81.027298"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:48px;line-height:125%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient13745);fill-opacity:1;stroke:url(#linearGradient13747);stroke-width:0.80000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></flowRegion><flowPara
          id="flowPara4048-0-9"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:48px;line-height:125%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient13753);fill-opacity:1;stroke:url(#linearGradient13755);stroke-width:0.80000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">MyTourbook</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:48px;line-height:125%;font-family:Calibri;-inkscape-font-specification:'Calibri Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient13753);fill-opacity:1;stroke:url(#linearGradient13755);stroke-width:0.8;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">MyTourbook</flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot1565"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40.7804451px;line-height:70.49999833%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:url(#linearGradient1671);fill-opacity:1.0;stroke:url(#linearGradient1685);stroke-width:0.57790715;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40.7804px;line-height:70.5%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:url(#linearGradient1671);fill-opacity:1;stroke:url(#linearGradient1685);stroke-width:0.577907;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        transform="matrix(1.3054442,0,0,1.3105691,-3.0537981,-125.03596)"
        inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampp\htdocs\mytourbook\images\mytb\logo\mytourbook-text-1709.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><flowRegion
          id="flowRegion1567"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:55.50000072%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;text-anchor:start;fill:url(#linearGradient1675);fill-opacity:1.0;stroke:url(#linearGradient1689);stroke-width:0.57790715;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"><rect
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:55.5%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;text-anchor:start;fill:url(#linearGradient1675);fill-opacity:1;stroke:url(#linearGradient1689);stroke-width:0.577907;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"><rect
            id="rect1569"
            width="356.9805"
            height="76.160889"
@@ -3553,7 +3839,8 @@
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:55.50000072%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;text-anchor:start;fill:url(#linearGradient1673);fill-opacity:1.0;stroke:url(#linearGradient1687);stroke-width:0.57790715;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            ry="0" /></flowRegion><flowPara
          id="flowPara1571"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:45.33333206px;line-height:52.49999762%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;letter-spacing:0px;text-anchor:start;fill:url(#linearGradient1677);fill-opacity:1.0;stroke:url(#linearGradient1691);stroke-width:0.57790715;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">MyTourbook</flowPara></flowRoot>    <text
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:45.3333px;line-height:52.5%;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;letter-spacing:0px;text-anchor:start;fill:url(#linearGradient1677);fill-opacity:1;stroke:url(#linearGradient1691);stroke-width:0.577907;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">MyTourbook</flowPara></flowRoot>
+    <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:64px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#d0ec86;fill-opacity:1;stroke:#d0ec86;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        x="3.71875"
@@ -3569,7 +3856,7 @@
    style="stroke:#566f11;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
    id="tspan1630">To</tspan>urbook</tspan></text>
     <path
-       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.37795281;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.377953;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 550.41217,34.863677 c -15.82341,0 -28.71347,12.767134 -28.71347,28.593981 0,15.826736 12.89006,28.720007 28.71347,28.720007 C 566.23558,92.177665 579,79.284394 579,63.457658 579,47.630811 566.23558,34.863677 550.41217,34.863677 Z m 0,14.549959 c 7.75483,0 13.91421,6.287958 13.91421,14.044022 0,7.756329 -6.15938,14.043912 -13.91421,14.043912 -7.75425,0 -14.16683,-6.287583 -14.16683,-14.043912 0,-7.756064 6.41258,-14.044022 14.16683,-14.044022 z"
        id="path4529-2-9-2-4-6"
        inkscape:connector-curvature="0"
@@ -3584,9 +3871,9 @@
        inkscape:connector-curvature="0"
        id="path3829-9-2-3-0-1-6-5-4-2-9-1-7"
        d="m 549.53889,32.98089 c 8.73677,-1.070456 18.30087,2.959533 24.25764,9.440053 3.93922,-12.162039 -6.94827,-14.097709 -11.08676,-13.90504 -0.58323,0.02688 -6.74325,-0.313324 -13.17088,4.464987 z"
-       style="fill:#7b991b;fill-opacity:1;stroke:none;stroke-width:0.5000003;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.04999995;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#7b991b;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:#7b991b;fill-opacity:1;stroke:none;stroke-width:0.5000003;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#7b991b;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 532.99804,92.327985 c 2.19904,0 2.56241,-1.641587 4.64758,-1.57097 1.63483,0.05427 1.32151,-0.01075 3.4455,0.860698 2.1243,0.869351 8.53033,0.929705 12.93914,0.427259 5.18843,-0.588972 12.12357,-2.270436 12.12357,-6.503254 0,-2.901435 -4.32676,-2.602192 -5.41173,-2.55979 -2.58741,0.09996 -3.42085,0.283765 -8.00334,-1.262696 -5.02647,-2.512175 -11.08509,-8.199607 -14.62549,-8.199607 -2.58626,0 -6.45621,2.665666 -8.72816,3.157901 -2.27232,0.490674 -2.64781,-0.3101 -4.65894,-2.413825 0,0 -0.54605,-0.491212 -1.4285,-0.01613 -0.88397,0.471866 -1.50018,4.25598 -2.40512,8.382977 -0.90504,4.130383 -1.56324,6.358039 0.22733,8.599024 0.93508,1.171226 3.11997,1.109583 4.35599,1.109583 2.98733,0 5.71868,-0.04299 7.52392,-0.01075 z"
        id="path4333-0-52-7-1-9-8"
        inkscape:connector-curvature="0"
@@ -3595,7 +3882,7 @@
        inkscape:export-xdpi="96.000275"
        inkscape:export-ydpi="96.000275" />
     <path
-       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.37795275;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.377953;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 602.98244,77.94153 c -3.8917,0 -7.06195,3.170306 -7.06195,7.100393 0,3.93006 3.17025,7.131689 7.06195,7.131689 3.89171,0 7.03106,-3.201629 7.03106,-7.131689 0,-3.930087 -3.13935,-7.100393 -7.03106,-7.100393 z m 0,3.613013 c 1.90727,0 3.42214,1.561412 3.42214,3.48738 0,1.926035 -1.51487,3.487356 -3.42214,3.487356 -1.90713,0 -3.48427,-1.561321 -3.48427,-3.487356 0,-1.925968 1.57714,-3.48738 3.48427,-3.48738 z"
        id="path4529-2-9-2-4-6-7"
        inkscape:connector-curvature="0"
@@ -3610,14 +3897,156 @@
        inkscape:connector-curvature="0"
        id="path3829-9-2-3-0-1-6-5-4-2-9-1-7-7"
        d="m 602.76766,77.474 c 2.14878,-0.265813 4.50103,0.734905 5.96607,2.344133 0.96884,-3.020051 -1.7089,-3.500711 -2.72675,-3.452868 -0.14344,0.0066 -1.65847,-0.0778 -3.23932,1.108735 z"
-       style="fill:#6c7b1b;fill-opacity:1;stroke:none;stroke-width:0.50000024;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.04999995;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#6c7b1b;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:#6c7b1b;fill-opacity:1;stroke:none;stroke-width:0.50000024;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6c7b1b;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 598.6995,92.21094 c 0.54086,0 0.63022,-0.407635 1.14307,-0.390099 0.40207,0.01349 0.32501,-0.0027 0.84739,0.213727 0.52247,0.215874 2.098,0.230862 3.18234,0.106096 1.27607,-0.146253 2.98174,-0.563792 2.98174,-1.614874 0,-0.72048 -1.06415,-0.646171 -1.33099,-0.635643 -0.63637,0.02482 -0.84135,0.07046 -1.96839,-0.313548 -1.23624,-0.62382 -2.72634,-2.036109 -3.59709,-2.036109 -0.63607,0 -1.58786,0.66193 -2.14664,0.784163 -0.55888,0.121843 -0.65122,-0.07701 -1.14585,-0.599396 0,0 -0.1343,-0.121977 -0.35133,-0.004 -0.21742,0.117171 -0.36897,1.056834 -0.59154,2.081642 -0.22259,1.025646 -0.38447,1.578813 0.0559,2.135291 0.22999,0.290836 0.76734,0.275527 1.07135,0.275527 0.73472,0 1.40648,-0.01068 1.85047,-0.0027 z"
        id="path4333-0-52-7-1-9-8-0"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cscssscscszsascc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\tourbook16.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:0.600002;stroke-linecap:round"
+       id="rect15687"
+       width="256"
+       height="256"
+       x="20"
+       y="444"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-256px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <g
+       id="g4467-8-4-7-4"
+       transform="matrix(3.0504354,0,0,3.0484967,17.1676,235.37492)"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-48px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       style="stroke-width:1.78411">
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:connector-curvature="0"
+         id="path4529-2-9-2-4-4-8"
+         d="m 107.3549,138.6056 c -3.76926,0 -6.83992,3.04061 -6.83992,6.80999 0,3.76936 3.07066,6.84011 6.83992,6.84011 3.76928,0 6.8098,-3.07075 6.8098,-6.84011 0,-3.76938 -3.04052,-6.80999 -6.8098,-6.80999 z m 0,3.46526 c 1.84721,0 3.3145,1.49747 3.3145,3.34473 0,1.84724 -1.46729,3.34472 -3.3145,3.34472 -1.84718,0 -3.37476,-1.49748 -3.37476,-3.34472 0,-1.84726 1.52758,-3.34473 3.37476,-3.34473 z"
+         style="fill:url(#radialGradient4726-5-9-4);fill-opacity:1;stroke:url(#radialGradient4746-4-6-5);stroke-width:0.258045;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         style="fill:url(#linearGradient15936);fill-opacity:1;stroke:url(#linearGradient15938);stroke-width:0.331924;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1"
+         d="m 106.96653,137.89831 c 2.08114,-0.255 4.35941,0.70478 5.77836,2.24829 0.9383,-2.89655 -1.65517,-3.35758 -2.64092,-3.31173 -0.13902,0.006 -1.60631,-0.0745 -3.13744,1.06344 z"
+         id="path3829-9-2-3-0-1-6-5-4-2-9-1-2-6"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccsc"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-ydpi="269.78387" />
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         sodipodi:nodetypes="cscssscscszsascc"
+         inkscape:connector-curvature="0"
+         id="path4333-0-52-7-1-9-0-2"
+         d="m 103.20661,152.29144 c 0.52394,0 0.61043,-0.39089 1.10717,-0.37406 0.38937,0.0132 0.3148,-0.003 0.82078,0.20495 0.50601,0.20705 2.03191,0.22135 3.08213,0.10214 1.23598,-0.14027 2.88805,-0.5407 2.88805,-1.54881 0,-0.69099 -1.03071,-0.61978 -1.2892,-0.60958 -0.61633,0.0243 -0.81488,0.0673 -1.90641,-0.30076 -1.19744,-0.59829 -2.64058,-1.95286 -3.48403,-1.95286 -0.61603,0 -1.53787,0.63483 -2.07907,0.75205 -0.54124,0.11724 -0.63074,-0.0737 -1.10984,-0.57485 0,0 -0.12963,-0.11717 -0.3402,-0.004 -0.21057,0.11294 -0.35744,1.01368 -0.57291,1.9966 -0.21563,0.98367 -0.372418,1.51429 0.0537,2.04792 0.22269,0.2789 0.74316,0.26425 1.03756,0.26425 0.7117,0 1.36223,-0.01 1.79227,-0.003 z"
+         style="fill:url(#linearGradient15940);fill-opacity:1;stroke:url(#linearGradient15942);stroke-width:0.223015;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
+    <rect
+       style="fill:none;stroke:none;stroke-width:0.600002;stroke-linecap:round"
+       id="rect15687-6"
+       width="48"
+       height="47.999992"
+       x="320"
+       y="652"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-48px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <g
+       id="g4467-8-4-7-4-4"
+       transform="matrix(2.0261728,0,0,2.014231,183.85944,392.89417)"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-32px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       style="stroke-width:2.6931">
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:connector-curvature="0"
+         id="path4529-2-9-2-4-4-8-1"
+         d="m 107.3549,138.6056 c -3.76926,0 -6.83992,3.04061 -6.83992,6.80999 0,3.76936 3.07066,6.84011 6.83992,6.84011 3.76928,0 6.8098,-3.07075 6.8098,-6.84011 0,-3.76938 -3.04052,-6.80999 -6.8098,-6.80999 z m 0,3.46526 c 1.84721,0 3.3145,1.49747 3.3145,3.34473 0,1.84724 -1.46729,3.34472 -3.3145,3.34472 -1.84718,0 -3.37476,-1.49748 -3.37476,-3.34472 0,-1.84726 1.52758,-3.34473 3.37476,-3.34473 z"
+         style="fill:url(#radialGradient4726-5-9-4-0);fill-opacity:1;stroke:url(#radialGradient4746-4-6-5-1);stroke-width:0.389517;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         style="fill:url(#linearGradient16072);fill-opacity:1;stroke:url(#linearGradient16074);stroke-width:0.501037;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1"
+         d="m 106.96653,137.89831 c 2.08114,-0.255 4.35941,0.70478 5.77836,2.24829 0.9383,-2.89655 -1.65517,-3.35758 -2.64092,-3.31173 -0.13902,0.006 -1.60631,-0.0745 -3.13744,1.06344 z"
+         id="path3829-9-2-3-0-1-6-5-4-2-9-1-2-6-9"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccsc"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-ydpi="269.78387" />
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         sodipodi:nodetypes="cscssscscszsascc"
+         inkscape:connector-curvature="0"
+         id="path4333-0-52-7-1-9-0-2-5"
+         d="m 103.20661,152.29144 c 0.52394,0 0.61043,-0.39089 1.10717,-0.37406 0.38937,0.0132 0.3148,-0.003 0.82078,0.20495 0.50601,0.20705 2.03191,0.22135 3.08213,0.10214 1.23598,-0.14027 2.88805,-0.5407 2.88805,-1.54881 0,-0.69099 -1.03071,-0.61978 -1.2892,-0.60958 -0.61633,0.0243 -0.81488,0.0673 -1.90641,-0.30076 -1.19744,-0.59829 -2.64058,-1.95286 -3.48403,-1.95286 -0.61603,0 -1.53787,0.63483 -2.07907,0.75205 -0.54124,0.11724 -0.63074,-0.0737 -1.10984,-0.57485 0,0 -0.12963,-0.11717 -0.3402,-0.004 -0.21057,0.11294 -0.35744,1.01368 -0.57291,1.9966 -0.21563,0.98367 -0.372418,1.51429 0.0537,2.04792 0.22269,0.2789 0.74316,0.26425 1.03756,0.26425 0.7117,0 1.36223,-0.01 1.79227,-0.003 z"
+         style="fill:url(#linearGradient16076);fill-opacity:1;stroke:url(#linearGradient16078);stroke-width:0.336639;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
+    <rect
+       style="fill:none;stroke:none;stroke-width:0.600002;stroke-linecap:round"
+       id="rect15687-6-7"
+       width="32.000004"
+       height="32"
+       x="385.00003"
+       y="668.00012"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-32px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <g
+       id="g4467-8-4-7-4-4-5"
+       transform="matrix(0.9851361,0,0,0.97924343,332.42102,550.51354)"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-16px-32bit.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       style="stroke-width:5.53926">
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:connector-curvature="0"
+         id="path4529-2-9-2-4-4-8-1-1"
+         d="m 107.3549,138.6056 c -3.76926,0 -6.83992,3.04061 -6.83992,6.80999 0,3.76936 3.07066,6.84011 6.83992,6.84011 3.76928,0 6.8098,-3.07075 6.8098,-6.84011 0,-3.76938 -3.04052,-6.80999 -6.8098,-6.80999 z m 0,3.46526 c 1.84721,0 3.3145,1.49747 3.3145,3.34473 0,1.84724 -1.46729,3.34472 -3.3145,3.34472 -1.84718,0 -3.37476,-1.49748 -3.37476,-3.34472 0,-1.84726 1.52758,-3.34473 3.37476,-3.34473 z"
+         style="fill:url(#radialGradient4726-5-9-4-0-1);fill-opacity:1;stroke:url(#radialGradient4746-4-6-5-1-7);stroke-width:0.801173;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         style="fill:url(#linearGradient16208);fill-opacity:1;stroke:url(#linearGradient16210);stroke-width:1.03055;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.05;stroke-dasharray:none;stroke-opacity:1"
+         d="m 106.96653,137.89831 c 2.08114,-0.255 4.35941,0.70478 5.77836,2.24829 0.9383,-2.89655 -1.65517,-3.35758 -2.64092,-3.31173 -0.13902,0.006 -1.60631,-0.0745 -3.13744,1.06344 z"
+         id="path3829-9-2-3-0-1-6-5-4-2-9-1-2-6-9-3"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccsc"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-ydpi="269.78387" />
+      <path
+         inkscape:export-ydpi="269.78387"
+         inkscape:export-xdpi="269.78387"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\mytourbook-icon10-48.png"
+         sodipodi:nodetypes="cscssscscszsascc"
+         inkscape:connector-curvature="0"
+         id="path4333-0-52-7-1-9-0-2-5-6"
+         d="m 103.20661,152.29144 c 0.52394,0 0.61043,-0.39089 1.10717,-0.37406 0.38937,0.0132 0.3148,-0.003 0.82078,0.20495 0.50601,0.20705 2.03191,0.22135 3.08213,0.10214 1.23598,-0.14027 2.88805,-0.5407 2.88805,-1.54881 0,-0.69099 -1.03071,-0.61978 -1.2892,-0.60958 -0.61633,0.0243 -0.81488,0.0673 -1.90641,-0.30076 -1.19744,-0.59829 -2.64058,-1.95286 -3.48403,-1.95286 -0.61603,0 -1.53787,0.63483 -2.07907,0.75205 -0.54124,0.11724 -0.63074,-0.0737 -1.10984,-0.57485 0,0 -0.12963,-0.11717 -0.3402,-0.004 -0.21057,0.11294 -0.35744,1.01368 -0.57291,1.9966 -0.21563,0.98367 -0.372418,1.51429 0.0537,2.04792 0.22269,0.2789 0.74316,0.26425 1.03756,0.26425 0.7117,0 1.36223,-0.01 1.79227,-0.003 z"
+         style="fill:url(#linearGradient16212);fill-opacity:1;stroke:url(#linearGradient16214);stroke-width:0.692411;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
+    <rect
+       style="fill:none;stroke:none;stroke-width:0.600004;stroke-linecap:round"
+       id="rect15687-6-7-0"
+       width="16"
+       height="15.99994"
+       x="430"
+       y="684"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\win\mytourbook-launcher-16px-32bit.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
   </g>
