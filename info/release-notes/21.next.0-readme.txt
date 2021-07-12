@@ -53,7 +53,8 @@ Changes
 Bugfix
 ======
 
-* 
+* 4k Display
+  - Fixed positions for the vertical x-Axis units and vertical tour chart markers
 
 
 Translation    
