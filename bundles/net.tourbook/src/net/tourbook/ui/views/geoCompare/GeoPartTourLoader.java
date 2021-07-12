@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
 public class GeoPartTourLoader {
+
+   private static final char                             NL                  = UI.NEW_LINE;
 
    private static final AtomicLong                       _loaderExecuterId   = new AtomicLong();
    private static final LinkedBlockingDeque<GeoPartItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
@@ -100,38 +102,37 @@ public class GeoPartTourLoader {
 //       final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
          final SQLFilter appFilter = new SQLFilter();
 
-         final char NL = UI.NEW_LINE;
-
          final String selectGeoPart = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                       //$NON-NLS-1$
+               + "SELECT" + NL //                                          //$NON-NLS-1$
 
-               + " DISTINCT TourId " + NL //                           //$NON-NLS-1$
+               + " DISTINCT TourId " + NL //                               //$NON-NLS-1$
 
-               + (" FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL) //      //$NON-NLS-1$
-               + (" WHERE GeoPart IN (" + sqlInParameters + ")") + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + " FROM " + TourDatabase.TABLE_TOUR_GEO_PARTS + NL //      //$NON-NLS-1$
+               + " WHERE GeoPart IN (" + sqlInParameters + ")" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
          ;
 
          if (isAppFilter) {
 
             final String selectAppFilter = UI.EMPTY_STRING
 
-                  + "SELECT" + NL //                    //$NON-NLS-1$
+                  + "SELECT" + NL //                                       //$NON-NLS-1$
 
-                  + " TourId" + NL //                                 //$NON-NLS-1$
-                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
+                  + " TourId" + NL //                                      //$NON-NLS-1$
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
 
 // this is very slow
 //                // get tag id's
 //                + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
 //                + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-                  + " WHERE 1=1 " + appFilter.getWhereClause() + NL//         //$NON-NLS-1$
+                  + " WHERE 1=1 " + appFilter.getWhereClause() + NL //     //$NON-NLS-1$
             ;
 
             select = selectGeoPart
 
-                  + " AND TourId IN (" + selectAppFilter + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+                  + " AND TourId IN (" + selectAppFilter + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
+
          } else {
 
             select = selectGeoPart;

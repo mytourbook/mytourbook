@@ -80,6 +80,7 @@ import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -1472,15 +1473,21 @@ public class TourDatabase {
       return _activeTourTypes;
    }
 
-   private static ArrayList<Long> getAllTourIds() {
+   public static ArrayList<Long> getAllTourIds() {
 
       final ArrayList<Long> tourIds = new ArrayList<>();
 
       try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final ResultSet result = stmt.executeQuery(
-               "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY TourStartTime"); //$NON-NLS-1$ //$NON-NLS-2$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT tourId" + NL //                             //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //     //$NON-NLS-1$
+               + " ORDER BY TourStartTime" + NL //                   //$NON-NLS-1$
+         ;
+
+         final ResultSet result = stmt.executeQuery(sql);
 
          while (result.next()) {
             tourIds.add(result.getLong(1));
@@ -1509,9 +1516,9 @@ public class TourDatabase {
          final long dateFromMS = dateStart.toInstant().toEpochMilli();
          final long dateUntilMS = dateEnd.toInstant().toEpochMilli();
 
-         final String sql = UI.EMPTY_STRING +
+         final String sql = UI.EMPTY_STRING
 
-               "SELECT tourId" //                                       //$NON-NLS-1$
+               + "SELECT tourId" //                                     //$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_DATA //             //$NON-NLS-1$
                + " WHERE TourStartTime >= ? AND TourStartTime < ?" //   //$NON-NLS-1$
                + " ORDER BY TourStartTime"; //                          //$NON-NLS-1$
@@ -1530,6 +1537,48 @@ public class TourDatabase {
          UI.showSQLException(e);
       } finally {
          Util.closeSql(stmt);
+      }
+
+      return tourIds;
+   }
+
+   /**
+    * @return Returns tour id's which are filtered by the fast app tour filter.
+    *         <p>
+    *         <b>Fast app tour filter</b>
+    *         <p>
+    *         Contains all app tour filters which are performed very fast, e.g. person, tour type.
+    *         This filter do not contain e.g. geo compare or tag filters
+    */
+   public static ArrayList<Long> getAllTourIds_WithFastAppFilter() {
+
+      final ArrayList<Long> tourIds = new ArrayList<>();
+
+      try (Connection conn = getInstance().getConnection()) {
+
+         // get app filter without geo location
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT tourId" + NL //                                   //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //           //$NON-NLS-1$
+               + " WHERE 1=1 " + appFilter.getWhereClause() + NL //        //$NON-NLS-1$
+               + " ORDER BY TourStartTime" + NL //                         //$NON-NLS-1$
+         ;
+
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+
+         appFilter.setParameters(stmt, 1);
+
+         final ResultSet result = stmt.executeQuery();
+
+         while (result.next()) {
+            tourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
       }
 
       return tourIds;
@@ -1821,7 +1870,9 @@ public class TourDatabase {
       }
 
       synchronized (DB_LOCK) {
+
          // check again
+
          if (_instance == null) {
             _instance = new TourDatabase();
          }
@@ -8136,6 +8187,7 @@ public class TourDatabase {
    private void updateDb_042_To_043_DataUpdate_Concurrent(final Long tourId) {
 
       // put tour ID (queue item) into the queue AND wait when it is full
+
       try {
 
          _dbUpdateQueue.put(tourId);
