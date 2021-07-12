@@ -55,6 +55,7 @@ Bugfix
 
 * 4k Display
   - Fixed positions for the vertical x-Axis units and vertical tour chart markers
+  - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
 
 
 Translation    

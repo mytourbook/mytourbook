@@ -2459,7 +2459,7 @@ public class ChartComponentGraph extends Canvas {
       }
    }
 
-   private void drawAsync_240_TourSegments(final GC gcChart, final GraphDrawingData graphDrawingData) {
+   private void drawAsync_240_TourSegments(final GC gcGraph, final GraphDrawingData graphDrawingData) {
 
       final ArrayList<ChartTitleSegment> chartTitleSegments = _chartDrawingData.chartTitleSegments;
 
@@ -2470,8 +2470,17 @@ public class ChartComponentGraph extends Canvas {
 
       final Display display = getDisplay();
 
-      gcChart.setLineAttributes(LINE_DASHED);
-      gcChart.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
+      gcGraph.setLineAttributes(LINE_DASHED);
+
+      /**
+       * VERY VERY IMPORTANT
+       * <p>
+       * setLineWidth() MUST be set AFTER setLineAttributes() otherwise the line width is growing
+       * every time on a 4k display !!!
+       */
+      gcGraph.setLineWidth(1);
+
+      gcGraph.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 
       for (int segmentIndex = 0; segmentIndex < chartTitleSegments.size(); segmentIndex++) {
 
@@ -2484,7 +2493,7 @@ public class ChartComponentGraph extends Canvas {
 
                final int devX = chartTitleSegment.devXSegment;
 
-               gcChart.drawLine(//
+               gcGraph.drawLine(
                      devX,
                      0,
                      devX,
@@ -2493,7 +2502,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      gcChart.setLineStyle(SWT.LINE_SOLID);
+      gcGraph.setLineStyle(SWT.LINE_SOLID);
    }
 
    private void drawAsync_250_GraphTitle(final GC gcGraph, final GraphDrawingData drawingData) {

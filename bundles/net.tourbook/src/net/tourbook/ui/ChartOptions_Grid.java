@@ -228,50 +228,38 @@ public class ChartOptions_Grid {
 
    public void resetToDefaults() {
 
-      _chkShowGrid_HorizontalLines.setSelection(
-            _prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-      _spinnerGridHorizontalDistance.setSelection(
-            _prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
-      _chkShowGrid_VerticalLines.setSelection(
-            _prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
-      _spinnerGridVerticalDistance.setSelection(
-            _prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
+      _chkShowGrid_HorizontalLines.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+      _chkShowGrid_VerticalLines.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+
+      _spinnerGridHorizontalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
+      _spinnerGridVerticalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
       onChangeUI();
    }
 
    public void restoreState() {
 
+      _chkShowGrid_HorizontalLines.setSelection(
+            Util.getPrefixPrefBoolean(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+      _chkShowGrid_VerticalLines.setSelection(
+            Util.getPrefixPrefBoolean(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+
       _spinnerGridHorizontalDistance.setSelection(
-            Util.getPrefixPrefInt(
-                  _prefStore,
-                  _prefStorePrefix,
-                  ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
+            Util.getPrefixPrefInt(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
       _spinnerGridVerticalDistance.setSelection(
             Util.getPrefixPrefInt(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
-
-      _chkShowGrid_HorizontalLines.setSelection(
-            Util.getPrefixPrefBoolean(
-                  _prefStore,
-                  _prefStorePrefix,
-                  ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-      _chkShowGrid_VerticalLines.setSelection(
-            Util.getPrefixPrefBoolean(
-                  _prefStore,
-                  _prefStorePrefix,
-                  ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
    }
 
    public void saveState() {
-
-      _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE,
-            _spinnerGridHorizontalDistance.getSelection());
-      _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE,
-            _spinnerGridVerticalDistance.getSelection());
 
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES,
             _chkShowGrid_HorizontalLines.getSelection());
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES,
             _chkShowGrid_VerticalLines.getSelection());
+
+      _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE,
+            _spinnerGridHorizontalDistance.getSelection());
+      _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE,
+            _spinnerGridVerticalDistance.getSelection());
    }
 }
