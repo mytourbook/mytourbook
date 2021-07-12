@@ -2850,9 +2850,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final DPPoint[] dpPoints = new DPPoint[serieLength];
       for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
 
+         final int valueIndex = serieIndex + valueIndexLeft;
+
+         if (valueIndex >= distanceSerie.length) {
+
+            StatusUtil.logError(String.format(
+
+                  "[TourData.computeAvg_Altitude()] valueIndex=%d is larger than the distanceSerie.length=%d", //$NON-NLS-1$
+
+                  valueIndex,
+                  distanceSerie.length));
+
+            return Float.MAX_VALUE;
+         }
+
          dpPoints[serieIndex] = new DPPoint(
-               distanceSerie[serieIndex + valueIndexLeft],
-               altitudeSerie[serieIndex + valueIndexLeft],
+
+               distanceSerie[valueIndex],
+               altitudeSerie[valueIndex],
+
                serieIndex);
       }
 
