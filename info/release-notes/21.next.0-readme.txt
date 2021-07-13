@@ -59,7 +59,7 @@ Bugfix
 
 * Tour cadence zones times (Frederic)
   
-  - Cadence zone computations should use either the recorded time or moving
+  - Cadence zone times computation should use either the recorded time or moving
     time per the computed values preference 
 
 
