@@ -3468,14 +3468,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // Check if the user has selected to use the recorded time instead of
          // the moving time.
-         int toto = 0;
+         int pausedTime = 0;
          if (isPaceAndSpeedFromRecordedTime) {
 
-            if (serieIndex == 380) {
-               toto = 1;
-            }
             // Check if a pause occurred. Pauses time is ignored.
-            final int pausedTime = getPausedTime(serieIndex - 1, serieIndex);
+            pausedTime = getPausedTime(serieIndex - 1, serieIndex);
             if (pausedTime > 0 && timeDiff >= pausedTime) {
                timeDiff = Math.max(0, timeDiff - pausedTime);
             }
@@ -3507,17 +3504,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // If the cadence zones times were computed, we store the delimiter value used
       if (cadenceZone_SlowTime > 0 || cadenceZone_FastTime > 0) {
          cadenceZones_DelimiterValue = cadenceZonesDelimiter;
-      }
-
-      final long totalTime = cadenceZone_SlowTime + (long) cadenceZone_FastTime;
-         final long recordedtime = getTourDeviceTime_Recorded();
-         if (totalTime != recordedtime) {
-
-         System.out.println(
-               "Difference: " + String.valueOf(totalTime - recordedtime) + "-" +
-                     getTourStartTime().getYear() + "-" +
-                     getTourStartTime().getMonthValue() + "-" +
-               getTourStartTime().getDayOfMonth());
       }
 
       return true;
@@ -7833,16 +7819,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-         final long currentPausedTime_Start = pausedTime_Start[index] / 1000;
          final long currentRelativePausedTime_Start = (pausedTime_Start[index] - tourStartTime) / 1000;
 
          if (currentRelativePausedTime_Start >= timeSerie[startIndex] &&
                currentRelativePausedTime_Start <= timeSerie[endIndex]) {
-            totalPausedTime += (pausedTime_End[index] / 1000) - currentPausedTime_Start;
+            totalPausedTime += pausedTime_End[index] - pausedTime_Start[index];
          }
       }
 
-      return totalPausedTime;
+      return Math.round(totalPausedTime / 1000f);
    }
 
    public long[] getPausedTime_End() {
