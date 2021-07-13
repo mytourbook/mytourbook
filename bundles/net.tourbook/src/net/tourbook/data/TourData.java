@@ -3476,9 +3476,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (pausedTime > 0 && timeDiff >= pausedTime) {
                timeDiff = Math.max(0, timeDiff - pausedTime);
             }
-//            if (pausedTime > 0 && timeDiff >= pausedTime) {
-//               continue;
-//            }
          }
          // Check if a break occurred, break time is ignored
          else if (breakTimeSerie != null) {
@@ -7819,15 +7816,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (int index = 0; index < pausedTime_Start.length; ++index) {
 
+         final long currentPausedTime_Start = pausedTime_Start[index] / 1000;
          final long currentRelativePausedTime_Start = (pausedTime_Start[index] - tourStartTime) / 1000;
 
          if (currentRelativePausedTime_Start >= timeSerie[startIndex] &&
                currentRelativePausedTime_Start <= timeSerie[endIndex]) {
-            totalPausedTime += pausedTime_End[index] - pausedTime_Start[index];
+            totalPausedTime += (pausedTime_End[index] / 1000) - currentPausedTime_Start;
          }
       }
 
-      return Math.round(totalPausedTime / 1000f);
+      return totalPausedTime;
    }
 
    public long[] getPausedTime_End() {
