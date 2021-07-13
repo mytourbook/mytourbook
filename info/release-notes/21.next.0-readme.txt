@@ -57,6 +57,11 @@ Bugfix
   - Fixed positions for the vertical x-Axis units and vertical tour chart markers
   - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
 
+* Tour cadence zones times (Frederic)
+  
+  - Cadence zone computations should use either the recorded time or moving
+    time per the computed values preference 
+
 
 Translation    
 ===========
