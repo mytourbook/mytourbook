@@ -3468,11 +3468,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // Check if the user has selected to use the recorded time instead of
          // the moving time.
-         int pausedTime = 0;
          if (isPaceAndSpeedFromRecordedTime) {
 
             // Check if a pause occurred. Pauses time is ignored.
-            pausedTime = getPausedTime(serieIndex - 1, serieIndex);
+            final int pausedTime = getPausedTime(serieIndex - 1, serieIndex);
             if (pausedTime > 0 && timeDiff >= pausedTime) {
                timeDiff = Math.max(0, timeDiff - pausedTime);
             }
