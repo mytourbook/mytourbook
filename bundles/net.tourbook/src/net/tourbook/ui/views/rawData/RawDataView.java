@@ -5579,7 +5579,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-                  final int waitingTime = 30000; // in ms
+                  final int waitingTime = 10000; // in ms
 
                   THREAD_WATCHER_LOCK.lock();
                   _watchingStoresThread.interrupt();

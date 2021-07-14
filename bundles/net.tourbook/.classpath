@@ -12,6 +12,7 @@
 		<accessrules>
 			<accessrule kind="accessible" pattern="org/eclipse/core/internal/databinding/conversion/**"/>
 			<accessrule kind="accessible" pattern="org/eclipse/e4/ui/css/swt/theme/**"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/internal/DPIUtil"/>
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>

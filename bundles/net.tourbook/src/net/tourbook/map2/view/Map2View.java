@@ -261,8 +261,8 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR               = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
 
    public static final int       MAX_DIM_STEPS                                         = 10;
-   public static final String    STATE_IS_DIM_MAP                                      = "STATE_IS_DIM_MAP";                                    //$NON-NLS-1$
-   public static final boolean   STATE_IS_DIM_MAP_DEFAULT                              = false;
+   public static final String    STATE_IS_MAP_DIMMED                                   = "STATE_IS_MAP_DIMMED";                                    //$NON-NLS-1$
+   public static final boolean   STATE_IS_MAP_DIMMED_DEFAULT                           = false;
    public static final String    STATE_DIM_MAP_COLOR                                   = "STATE_DIM_MAP_COLOR";                                    //$NON-NLS-1$
    public static final RGB       STATE_DIM_MAP_COLOR_DEFAULT                           = new RGB(0x2f, 0x2f, 0x2f);
    public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                    //$NON-NLS-1$
@@ -1755,9 +1755,15 @@ public class Map2View extends ViewPart implements
           */
          _map.setPainting(true);
 
-         final int mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-         if (mapDimValue < (MAX_DIM_STEPS / 5)) {
-            showDimWarning();
+         final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
+         if (isMapDimmed) {
+
+            final float mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
+            final float dimLevelPercent = mapDimValue / MAX_DIM_STEPS * 100;
+
+            if (dimLevelPercent > 80) {
+               showDimWarning();
+            }
          }
       });
    }
@@ -2440,7 +2446,7 @@ public class Map2View extends ViewPart implements
     */
    boolean isBackgroundDark() {
 
-      final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_DIM_MAP, Map2View.STATE_IS_DIM_MAP_DEFAULT);
+      final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
       final float mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
 
       final float dimLevelPercent = mapDimValue / MAX_DIM_STEPS * 100;
@@ -3703,15 +3709,15 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
 
       // set dim level/color after the map providers are set
-      final boolean isDimMap = Util.getStateBoolean(_state, Map2View.STATE_IS_DIM_MAP, Map2View.STATE_IS_DIM_MAP_DEFAULT);
+      final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
       final int mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
       final RGB mapDimColor = Util.getStateRGB(_state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
-      _map.setDimLevel(isDimMap, mapDimValue, mapDimColor, isBackgroundDark());
+      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark());
 
       // create legend image after the dim level is modified
       createLegendImage(_tourPainterConfig.getMapColorProvider());
 
-      _map.redraw();
+      _map.paint();
    }
 
    void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {

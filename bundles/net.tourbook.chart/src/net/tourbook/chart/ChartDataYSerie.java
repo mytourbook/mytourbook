@@ -222,9 +222,11 @@ public class ChartDataYSerie extends ChartDataSerie {
     * @return Returns the valueColors.
     */
    public int[][] getColorsIndex() {
+
       if (_colorIndex == null || _colorIndex.length == 0 || _colorIndex[0] == null || _colorIndex[0].length == 0) {
          setAllValueColors(0);
       }
+
       return _colorIndex;
    }
 

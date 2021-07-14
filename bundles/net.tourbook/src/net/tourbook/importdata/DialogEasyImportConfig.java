@@ -1140,8 +1140,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          createUI_250_IC_Name(group);
-         createUI_252_IC_BackupFolder(group);
-         createUI_254_IC_DeviceFileFolder(group);
+         createUI_252_IC_1_BackupFolder(group);
+         createUI_254_IC_2_DeviceFileFolder(group);
          createUI_270_IC_3_99_Actions(group);
          createUI_280_IC_100(group);
       }
@@ -1172,7 +1172,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_252_IC_BackupFolder(final Composite parent) {
+   private void createUI_252_IC_1_BackupFolder(final Composite parent) {
 
       {
          /*
@@ -1234,9 +1234,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: browse...
           */
          _btnIC_SelectBackupFolder = new Button(container, SWT.PUSH);
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_btnIC_SelectBackupFolder);
          _btnIC_SelectBackupFolder.setText(Messages.app_btn_browse);
          _btnIC_SelectBackupFolder.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1244,6 +1241,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                onSelect_IC_Folder_Backup();
             }
          });
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_btnIC_SelectBackupFolder);
          setButtonLayoutData(_btnIC_SelectBackupFolder);
       }
 
@@ -1267,7 +1267,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_254_IC_DeviceFileFolder(final Composite parent) {
+   private void createUI_254_IC_2_DeviceFileFolder(final Composite parent) {
 
       final ModifyListener deviceTypeListener = modifyEvent -> onSelectDevice();
 
@@ -3982,7 +3982,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void onSelect_IC_Folder_Backup() {
 
-      final String filterOSPath = _backupHistoryItems.getOSPath(//
+      final String filterOSPath = _backupHistoryItems.getOSPath(
             _comboIC_BackupFolder.getText(),
             _selectedIC.getBackupFolder());
 

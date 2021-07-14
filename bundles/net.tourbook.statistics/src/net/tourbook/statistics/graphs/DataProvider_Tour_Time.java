@@ -35,7 +35,6 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
@@ -230,11 +229,6 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          setupYearNumbers();
 
-         int colorOffset = 0;
-         if (tourTypeFilter.showUndefinedTourTypes()) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
-
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
@@ -408,7 +402,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                }
 
                /*
-                * convert type id to the type index in the tour type array, this is also the
+                * Convert type id to the type index in the tour type array, this is also the
                 * color index for the tour type
                 */
                int colorIndex = 0;
@@ -420,7 +414,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                   for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
                      if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-                        colorIndex = colorOffset + typeIndex;
+                        colorIndex = typeIndex;
                         break;
                      }
                   }

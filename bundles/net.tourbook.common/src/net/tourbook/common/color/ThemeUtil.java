@@ -34,21 +34,24 @@ import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
 
-   public static final String  DEFAULT_BACKGROUND_LIGHT_THEME = "fff";   //$NON-NLS-1$
-   public static final String  DEFAULT_FOREGROUND_LIGHT_THEME = "333";   //$NON-NLS-1$
+   public static final String  DEFAULT_BACKGROUND_LIGHT_THEME = "fff";                                             //$NON-NLS-1$
+   public static final String  DEFAULT_FOREGROUND_LIGHT_THEME = "333";                                             //$NON-NLS-1$
 
-   public static final String  DEFAULT_FOREGROUND_DARK_THEME  = "ddd";   //$NON-NLS-1$
-   public static final String  DEFAULT_BACKGROUND_DARK_THEME  = "333";   //$NON-NLS-1$
+   public static final String  DEFAULT_FOREGROUND_DARK_THEME  = "ddd";                                             //$NON-NLS-1$
+   public static final String  DEFAULT_BACKGROUND_DARK_THEME  = "333";                                             //$NON-NLS-1$
+
+   private static final Color  THEMED_COLOR_ERROR             = new Color(255, 88, 88);
+   private static final Color  SYSTEM_COLOR_RED               = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 
    /**
     * Currently only .png files are supported for themed images !!!
     */
-   private static final String IMAGE_NAME_EXTENSION_PNG       = ".png";  //$NON-NLS-1$
+   private static final String IMAGE_NAME_EXTENSION_PNG       = ".png";                                            //$NON-NLS-1$
 
    /**
     * All images for the dark theme should have this postfix before the file extension
     */
-   public static final String  DARK_THEME_POSTFIX             = "-dark"; //$NON-NLS-1$
+   public static final String  DARK_THEME_POSTFIX             = "-dark";                                           //$NON-NLS-1$
 
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
@@ -145,6 +148,16 @@ public class ThemeUtil {
       allThemes.sort((final ITheme t1, final ITheme t2) -> t1.getLabel().compareTo(t2.getLabel()));
 
       return allThemes;
+   }
+
+   /**
+    * @return Returns themed color for displaying errors
+    */
+   public static Color getColor_Error() {
+
+      return UI.IS_DARK_THEME
+            ? THEMED_COLOR_ERROR
+            : SYSTEM_COLOR_RED;
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,56 +21,79 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.SQLFilter;
 
 public class TVIWizardCompareMonth extends TVIWizardCompareItem {
 
    int tourYear;
    int tourMonth;
 
-   TVIWizardCompareMonth(final TVIWizardCompareItem parentItem) {
+   TVIWizardCompareMonth(final TVIWizardCompareItem parentItem, final boolean isUseAppFilter) {
+
       setParentItem(parentItem);
+
+      this.isUseAppFilter = isUseAppFilter;
    }
 
    @Override
    protected void fetchChildren() {
 
       /*
-       * set the children for the month item, these are tour items
+       * Set the children for the month item, these are tour items
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
+      // use fast app filter
+      final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
 
-      sb.append("SELECT"); //$NON-NLS-1$
+      String sqlWhere = UI.EMPTY_STRING;
 
-      sb.append(" tourId,"); //				1 //$NON-NLS-1$
-      sb.append(" startYear,"); //			2 //$NON-NLS-1$
-      sb.append(" startMonth,"); //			3 //$NON-NLS-1$
-      sb.append(" startDay,"); //				4 //$NON-NLS-1$
-      sb.append(" tourType_typeId,"); //		5	 //$NON-NLS-1$
-      sb.append(" tourDistance,"); //			6 //$NON-NLS-1$
-      sb.append(" tourDeviceTime_Elapsed,"); //	7		 //$NON-NLS-1$
-      sb.append(" tourAltUp"); //				8 //$NON-NLS-1$
+      if (isUseAppFilter) {
+         sqlWhere = UI.SPACE + appFilter.getWhereClause() + NL; //
+      }
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
-      sb.append(" WHERE startYear=? AND startMonth=?"); //$NON-NLS-1$
-      sb.append(" ORDER BY startDay, startHour, startMinute"); //$NON-NLS-1$
+      final String sql = UI.EMPTY_STRING + NL
+
+            + "SELECT" + NL //                                       //$NON-NLS-1$
+
+            + " tourId," + NL //                                  1  //$NON-NLS-1$
+            + " startYear," + NL //                               2  //$NON-NLS-1$
+            + " startMonth," + NL //                              3  //$NON-NLS-1$
+            + " startDay," + NL //                                4  //$NON-NLS-1$
+            + " tourType_typeId," + NL //                         5  //$NON-NLS-1$
+            + " tourDistance," + NL //                            6  //$NON-NLS-1$
+            + " tourDeviceTime_Elapsed," + NL //                  7  //$NON-NLS-1$
+            + " tourAltUp" + NL //                                8  //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
+
+            + " WHERE startYear=? AND startMonth=?" + NL //          //$NON-NLS-1$
+            + sqlWhere
+
+            + " ORDER BY startDay, startHour, startMinute" + NL //   //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
-         statement.setInt(1, tourYear);
-         statement.setInt(2, tourMonth);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+         stmt.setInt(1, tourYear);
+         stmt.setInt(2, tourMonth);
 
-         final ResultSet result = statement.executeQuery();
+         // app filter parameters
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmt, 3);
+         }
+
+         final ResultSet result = stmt.executeQuery();
          while (result.next()) {
 
             // new tour is in the resultset
             final TVIWizardCompareTour tourItem = new TVIWizardCompareTour(this);
+
             children.add(tourItem);
 
             tourItem.tourId = result.getLong(1);
@@ -84,22 +107,30 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
             tourItem.tourMonth = dbMonth;
             tourItem.tourDay = dbDay;
 
-//				fCalendar.set(dbYear, dbMonth - 1, dbDay);
-//				tourItem.tourDate = fCalendar.getTimeInMillis();
-
             final Object tourTypeId = result.getObject(5);
-            tourItem.tourTypeId = (tourTypeId == null ? //
-                  TourDatabase.ENTITY_IS_NOT_SAVED
+
+            tourItem.tourTypeId = (tourTypeId == null
+                  ? TourDatabase.ENTITY_IS_NOT_SAVED
                   : (Long) tourTypeId);
 
             tourItem.colDistance = result.getLong(6);
             tourItem.colElapsedTime = result.getLong(7);
             tourItem.colAltitudeUp = result.getLong(8);
-
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
+   }
+
+   @Override
+   public String toString() {
+
+      return "TVIWizardCompareMonth\n[\n" //$NON-NLS-1$
+
+            + "tourYear=" + tourYear + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "tourMonth=" + tourMonth + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]\n"; //$NON-NLS-1$
    }
 }

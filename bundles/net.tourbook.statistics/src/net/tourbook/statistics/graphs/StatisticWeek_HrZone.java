@@ -43,7 +43,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticWeek_HrZone extends TourbookStatistic {
@@ -151,7 +150,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    private void createYDataHrZone(final ChartDataModel chartDataModel) {
 
       /*
-       * number of person hr zones decides how many hr zones are displayed
+       * Number of person hr zones decides how many hr zones are displayed
        */
       final int zoneSize = _resortedPersonHrZones.length;
 
@@ -202,10 +201,11 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
       yData.setShowYSlider(true);
 
       yData.setColorIndex(hrColorIndex);
-      yData.setRgbLine(rgbLine);
-      yData.setRgbGradient_Bright(rgbBright);
-      yData.setRgbGradient_Dark(rgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      yData.setRgbBar_Gradient_Bright(rgbBright);
+      yData.setRgbBar_Gradient_Dark(rgbDark);
+      yData.setRgbBar_Line(rgbLine);
+
+      yData.setRgbGraph_Text(getRgbGraph_Text_4_Time());
 
       chartDataModel.addYData(yData);
    }

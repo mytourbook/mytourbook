@@ -55,28 +55,26 @@ public class ActionHandler_TourCompareWizard extends AbstractHandler implements 
             800,
             600);
 
-      BusyIndicator.showWhile(null, new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(null, () -> {
 
-            if (dialog.open() == Window.OK) {
+         if (dialog.open() == Window.OK) {
 
-               /*
-                * show the compare tour perspective
-                */
-               final IWorkbench workbench = PlatformUI.getWorkbench();
-               final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            /*
+             * Show the compare tour perspective
+             */
+            final IWorkbench workbench = PlatformUI.getWorkbench();
+            final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 
-               try {
-                  // show tour compare perspective
-                  workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
+            try {
 
-                  // show tour compare view
-                  Util.showView(TourCompareResultView.ID, true);
+               // show tour compare perspective
+               workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
-               } catch (final WorkbenchException e) {
-                  e.printStackTrace();
-               }
+               // show tour compare view
+               Util.showView(TourCompareResultView.ID, true);
+
+            } catch (final WorkbenchException e) {
+               e.printStackTrace();
             }
          }
       });

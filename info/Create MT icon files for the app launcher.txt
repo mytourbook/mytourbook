@@ -1,0 +1,7 @@
+
+Gimp cannot export uncompressed bmp files which IconExe needs !
+
+* Export 32 bit png with Incscape
+* Convert into 8 bit bmp with FastStone Image Viewer
+* Convert into 32 bit bmp with Image Converter from Johnny Westlake (from W$ store)
+  - Use Bitmap V5 Header
