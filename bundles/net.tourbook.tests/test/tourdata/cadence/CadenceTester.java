@@ -101,7 +101,7 @@ public class CadenceTester {
 
 	/**
 	 * Suunto JSON.GZ with pauses using the recorded time. It's a special case
-	 * because the total time for both cadence zones will be at most 1 second
+	 * because the total time for both cadence zones could be at most 1 second
 	 * different than the total tour recorded time as the milliseconds omitted
 	 * when calling {@link TourData#getPausedTime()} can create this
 	 * discrepancy. It does not exist for the FIT files for example since the
