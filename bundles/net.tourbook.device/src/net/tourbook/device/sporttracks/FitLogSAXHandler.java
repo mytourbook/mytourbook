@@ -1007,6 +1007,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (_isInTimeZoneUtcOffset) {
 
          _isInTimeZoneUtcOffset = false;
+         //todo fb on remet ca https://github.com/wolfgang-ch/mytourbook/pull/332/commits/1e680f7a3cd417c17d212096470fe527698f7ade
          _currentActivity.hasTimeZoneUtcOffset = StringUtils.hasContent(_characters.toString());
 
       } else if (_isInHasStartTime) {
