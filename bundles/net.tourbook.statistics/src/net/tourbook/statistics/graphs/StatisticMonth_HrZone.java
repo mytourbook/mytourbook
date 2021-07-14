@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
@@ -36,14 +37,12 @@ import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
@@ -150,20 +149,20 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    private void createYDataHrZone(final ChartDataModel chartDataModel) {
 
       /*
-       * number of person hr zones decides how many hr zones are displayed
+       * Number of person hr zones decides how many hr zones are displayed
        */
-      final int zoneSize = _resortedPersonHrZones.length;
+      final int numZones = _resortedPersonHrZones.length;
 
       final int[][] monthHrZones = _resortedHrZoneValues;
       final int serieValueLength = monthHrZones[0].length;
 
-      final int[][] hrZones0 = new int[zoneSize][serieValueLength];
-      final int[][] hrColorIndex = new int[zoneSize][serieValueLength];
-      final int[][] hrZoneValues = new int[zoneSize][];
+      final int[][] hrZones0 = new int[numZones][serieValueLength];
+      final int[][] hrColorIndex = new int[numZones][serieValueLength];
+      final int[][] hrZoneValues = new int[numZones][];
 
-      final RGB[] rgbBright = new RGB[zoneSize];
-      final RGB[] rgbDark = new RGB[zoneSize];
-      final RGB[] rgbLine = new RGB[zoneSize];
+      final RGB[] rgbBright = new RGB[numZones];
+      final RGB[] rgbDark = new RGB[numZones];
+      final RGB[] rgbLine = new RGB[numZones];
 
       int zoneIndex = 0;
 
@@ -182,7 +181,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
          zoneIndex++;
       }
 
-      final ChartDataYSerie yData = new ChartDataYSerie(//
+      final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             ChartDataYSerie.BAR_LAYOUT_STACKED,
             Util.convertIntToFloat(hrZones0),
@@ -194,10 +193,11 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       yData.setShowYSlider(true);
 
       yData.setColorIndex(hrColorIndex);
-      yData.setRgbLine(rgbLine);
-      yData.setRgbGradient_Bright(rgbBright);
-      yData.setRgbGradient_Dark(rgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      yData.setRgbBar_Gradient_Bright(rgbBright);
+      yData.setRgbBar_Gradient_Dark(rgbDark);
+      yData.setRgbBar_Line(rgbLine);
+
+      yData.setRgbGraph_Text(getRgbGraph_Text_4_Time());
 
       chartDataModel.addYData(yData);
    }

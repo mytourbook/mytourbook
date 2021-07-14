@@ -506,11 +506,11 @@ public class HeartRateVariabilityView extends ViewPart {
       final ChartDataYSerie yDataRR1 = new ChartDataYSerie(ChartType.XY_SCATTER, rr1Series);
       yDataRR1.setYTitle(GRAPH_LABEL_HEART_RATE_VARIABILITY);
       yDataRR1.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
-      yDataRR1.setDefaultRGB(rgbLineColor);
-      yDataRR1.setRgbGradient_Dark(allRgbDark);
-      yDataRR1.setRgbGradient_Bright(allRgbGradient_Bright);
-      yDataRR1.setRgbLine(allRgbLine);
-      yDataRR1.setRgbText(new RGB[] { rgbTextColor });
+      yDataRR1.setRgbBar_Gradient_Dark(allRgbDark);
+      yDataRR1.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
+      yDataRR1.setRgbBar_Line(allRgbLine);
+      
+      yDataRR1.setRgbGraph_Text(rgbTextColor);
 
       yDataRR1.forceYAxisMinValue(yDataRR1.getOriginalMinValue() - ADJUST_PULSE_VALUE);
       yDataRR1.forceYAxisMaxValue(yDataRR1.getOriginalMaxValue() + ADJUST_PULSE_VALUE);

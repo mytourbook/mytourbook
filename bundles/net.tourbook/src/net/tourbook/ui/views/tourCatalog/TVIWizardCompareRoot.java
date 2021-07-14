@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,40 +23,61 @@ import java.util.ArrayList;
 
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 public class TVIWizardCompareRoot extends TVIWizardCompareItem {
+
+   public TVIWizardCompareRoot(final boolean isUseAppFilter) {
+
+      this.isUseAppFilter = isUseAppFilter;
+   }
 
    @Override
    protected void fetchChildren() {
 
       /*
-       * set the children for the root item, these are year items
+       * Set the children for the root item, these are year items
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
-
-      sb.append("SELECT"); //$NON-NLS-1$
-
-      sb.append(" startYear "); //$NON-NLS-1$
-
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
-
-      sb.append(" GROUP BY startYear"); //$NON-NLS-1$
-      sb.append(" ORDER BY startYear"); //$NON-NLS-1$
-
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         // use fast app filter
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
 
-         final ResultSet result = statement.executeQuery();
+         String sqlWhere = UI.EMPTY_STRING;
+
+         if (isUseAppFilter) {
+            sqlWhere = " WHERE 1=1 " + appFilter.getWhereClause() + NL;//      //$NON-NLS-1$
+         }
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                 //$NON-NLS-1$
+
+               + " startYear " + NL //                            //$NON-NLS-1$
+
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //  //$NON-NLS-1$
+               + sqlWhere
+               + " GROUP BY startYear" + NL //                    //$NON-NLS-1$
+               + " ORDER BY startYear" + NL //                    //$NON-NLS-1$
+         ;
+
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+
+         // app filter parameters
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmt, 1);
+         }
+
+         final ResultSet result = stmt.executeQuery();
          while (result.next()) {
 
             final int dbYear = result.getInt(1);
 
-            final TVIWizardCompareYear yearItem = new TVIWizardCompareYear(this);
+            final TVIWizardCompareYear yearItem = new TVIWizardCompareYear(this, isUseAppFilter);
             children.add(yearItem);
 
             yearItem.treeColumn = Integer.toString(dbYear);

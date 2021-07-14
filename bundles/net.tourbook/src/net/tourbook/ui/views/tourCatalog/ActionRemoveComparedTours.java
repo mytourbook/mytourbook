@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,11 +38,11 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionRemoveComparedTours extends Action {
 
-   private TourCatalogView fTourView;
+   private TourCatalogView _tourView;
 
    public ActionRemoveComparedTours(final TourCatalogView view) {
 
-      fTourView = view;
+      _tourView = view;
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
@@ -62,18 +62,18 @@ public class ActionRemoveComparedTours extends Action {
                                        final SelectionRemovedComparedTours removedTours) {
 
       // confirm removal
-      if (MessageDialog.openConfirm(fTourView.getSite().getShell(),
+      if (MessageDialog.openConfirm(_tourView.getSite().getShell(),
             Messages.tourCatalog_view_dlg_delete_comparedTour_title,
             Messages.tourCatalog_view_dlg_delete_comparedTour_msg) == false) {
 
          return false;
       }
 
-      final TreeViewer tourViewer = fTourView.getTourViewer();
+      final TreeViewer tourViewer = _tourView.getTourViewer();
       final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
 
       // loop: selected items
-      for (Object element : selection) {
+      for (final Object element : selection) {
          if (element instanceof TVICatalogComparedTour) {
 
             final TVICatalogComparedTour compTourItem = (TVICatalogComparedTour) element;
@@ -108,14 +108,15 @@ public class ActionRemoveComparedTours extends Action {
       if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
             Messages.tourCatalog_view_dlg_delete_refTour_title,
             Messages.tourCatalog_view_dlg_delete_refTour_msg) == false) {
+
          return false;
       }
 
-      final TreeViewer tourViewer = fTourView.getTourViewer();
+      final TreeViewer tourViewer = _tourView.getTourViewer();
       final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
       final ArrayList<Long> modifiedRefTours = new ArrayList<>();
 
-      for (Object element : selection) {
+      for (final Object element : selection) {
 
          if (element instanceof TVICatalogRefTourItem) {
 
@@ -124,8 +125,7 @@ public class ActionRemoveComparedTours extends Action {
              */
 
             final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) element;
-            final Collection<StoredComparedTour> storedCompTours = TourCompareManager.getComparedToursFromDb(refTourItem.refId)
-                  .values();
+            final Collection<StoredComparedTour> storedCompTours = TourCompareManager.getComparedToursFromDb(refTourItem.refId).values();
 
             for (final StoredComparedTour storedComparedTour : storedCompTours) {
 
@@ -179,7 +179,7 @@ public class ActionRemoveComparedTours extends Action {
          return;
       }
 
-      final TreeViewer tourViewer = fTourView.getTourViewer();
+      final TreeViewer tourViewer = _tourView.getTourViewer();
 
       final SelectionRemovedComparedTours removedTours = new SelectionRemovedComparedTours();
 
@@ -201,8 +201,9 @@ public class ActionRemoveComparedTours extends Action {
       }
 
       if (isRemoved) {
+
          // update the compare result view
-         fTourView.fireSelection(removedTours);
+         _tourView.fireSelection(removedTours);
       }
    }
 

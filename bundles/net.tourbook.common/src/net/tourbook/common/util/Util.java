@@ -1819,10 +1819,11 @@ public class Util {
 
    public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
 
-      System.out.println(UI.timeStampNano()
-            + " [" + clazz.getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
-            + " - System property \"" + propertyName + "\" is enabled -> " //$NON-NLS-1$ //$NON-NLS-2$
-            + propertyDescription);
+      StatusUtil.log(String.format("%s [%s] - System property \"%s\" is enabled -> %s", //$NON-NLS-1$
+            UI.timeStampNano(),
+            clazz.getSimpleName(),
+            propertyName,
+            propertyDescription));
    }
 
    public static void logSystemProperty_Value(final Class<?> clazz,
@@ -1830,10 +1831,12 @@ public class Util {
                                               final String propertyValue,
                                               final String propertyDescription) {
 
-      System.out.println(UI.timeStampNano()
-            + " [" + clazz.getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
-            + " - System property \"" + propertyName + "=" + propertyValue + "\" -> " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + propertyDescription);
+      StatusUtil.log(String.format("%s [%s] - System property \"%s=%s\" -> %s", //$NON-NLS-1$
+            UI.timeStampNano(),
+            clazz.getSimpleName(),
+            propertyName,
+            propertyValue,
+            propertyDescription));
    }
 
    /**
