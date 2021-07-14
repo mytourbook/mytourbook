@@ -3445,7 +3445,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return false;
       }
 
-      if (breakTimeSerie == null) {
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
+      if (!isPaceAndSpeedFromRecordedTime && breakTimeSerie == null) {
          getBreakTime();
       }
 
@@ -3461,11 +3463,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float cadence = cadenceSerie[serieIndex];
          final int time = timeSerie[serieIndex];
 
-         final int timeDiff = time - prevTime;
+         int timeDiff = time - prevTime;
          prevTime = time;
 
-         // check if a break occurred, break time is ignored
-         if (breakTimeSerie != null) {
+         // Check if the user has selected to use the recorded time instead of
+         // the moving time.
+         if (isPaceAndSpeedFromRecordedTime) {
+
+            // Check if a pause occurred. Pauses time is ignored.
+            final int pausedTime = getPausedTime(serieIndex - 1, serieIndex);
+            if (pausedTime > 0 && timeDiff >= pausedTime) {
+               timeDiff = Math.max(0, timeDiff - pausedTime);
+            }
+         }
+         // Check if a break occurred, break time is ignored
+         else if (breakTimeSerie != null) {
 
             /*
              * break time requires distance data, so it's possible that break time data are not
@@ -5111,7 +5123,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (serieData.powerSerie != null) {
 
-         if (isPowerSerieFromDevice & isDataSerieWithContent(serieData.powerSerie)) {
+         if (isPowerSerieFromDevice && isDataSerieWithContent(serieData.powerSerie)) {
             serieData.powerSerie20 = convertDataSeries_ToFloat(serieData.powerSerie, 0);
          }
 
@@ -7795,7 +7807,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int totalPausedTime = 0;
 
-      if (timeSerie == null || pausedTime_Start == null) {
+      if (timeSerie == null || pausedTime_Start == null ||
+            startIndex < 0 || endIndex < 0 || startIndex == endIndex ||
+            startIndex > timeSerie.length || endIndex > timeSerie.length) {
          return totalPausedTime;
       }
 
