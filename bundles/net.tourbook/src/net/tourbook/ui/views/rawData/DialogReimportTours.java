@@ -247,6 +247,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                   try {
 
                      _dbUpdateQueue.put(tourId);
+
                   } catch (final InterruptedException e) {
 
                      StatusUtil.log(e);
@@ -254,13 +255,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
 
                   final Runnable executorTask = () -> {
-                     // Do work.
-
-                     if (monitor.isCanceled()) {
-                        //TODO FB
-                        System.out.println("DOINGNOTHING");
-                        return;
-                     }
 
                      // get last added item
                      Long queueItem_TourId;
@@ -269,15 +263,12 @@ public class DialogReimportTours extends TitleAreaDialog {
                      if (queueItem_TourId == null) {
                         return;
                      }
-                     System.out.println("STARTED THE IMPORT");
-                     monitor.worked(1);
 
                      final RawDataManager rawDataManager = new RawDataManager();
                      rawDataManager.setImportId();
                      rawDataManager.setImportCanceled(false);
                      rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
 
-                     System.out.println("Stopping.");
                   };
 
                   _futureTasks.add(_dbUpdateExecutor.submit(executorTask));
@@ -305,21 +296,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                while (!_dbUpdateExecutor.isTerminated()) {
 
-                  if (monitor.isCanceled()) {
-
-//                     final Collection<? super Long> list = new ArrayList<>();
-//                     _dbUpdateQueue.drainTo(list);
-//                     System.out.println(list.size() + " were not reimported");
-
-                     System.out.println("cancelling ALL tasks");
-                     for (final Future<?> f : _futureTasks) {
-                        System.out.println("cancelling a task");
-                        f.cancel(true);
-                     }
-                     System.out.println("DONE cancelling ALL tasks");
-                     break;
-                  }
-
                   monitor.subTask(NLS.bind(
                         Messages.Import_Data_Dialog_Reimport_SubTask,
                         new Object[] { _dbUpdateExecutor.getCompletedTaskCount(), numberOfTours }));
@@ -338,7 +314,9 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       try {
 
-         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
+         final boolean isCancelable = !isReimportConcurrent;
+         new ProgressMonitorDialog(Display.getDefault().getActiveShell())
+               .run(true, isCancelable, importRunnable);
 
       } catch (final Exception e) {
 
