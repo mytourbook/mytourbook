@@ -306,8 +306,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
             if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
                   && propertyData instanceof TourPropertyCompareTourChanged) {
 
-               final TourPropertyCompareTourChanged compareTourProperty =
-                     (TourPropertyCompareTourChanged) propertyData;
+               final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
                if (compareTourProperty.isDataSaved) {
                   updateUI_YearChart(false);
@@ -325,6 +324,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private void computeMinMaxValues(final ChartDataYSerie yData) {
 
       final TVICatalogRefTourItem refItem = _currentRefItem;
+
       final float minValue = (float) yData.getVisibleMinValue();
       final float maxValue = (float) yData.getVisibleMaxValue();
 
@@ -837,6 +837,24 @@ public class RefTour_YearStatistic_View extends ViewPart {
          if (removedCompTours.removedComparedTours.size() > 0) {
             updateUI_YearChart(false);
          }
+
+      } else if (selection instanceof SelectionPersistedCompareResults) {
+
+         final SelectionPersistedCompareResults savedCompTours = (SelectionPersistedCompareResults) selection;
+
+         final ArrayList<TVICompareResultComparedTour> persistedCompareResults = savedCompTours.persistedCompareResults;
+
+         if (persistedCompareResults.size() > 0) {
+
+            final TVICompareResultComparedTour tviCompareResultComparedTour = persistedCompareResults.get(0);
+            final RefTourItem refTour = tviCompareResultComparedTour.refTour;
+            final long savedRefId = refTour.refId;
+
+            // create new ref item which contains the newly persisted compared tours
+            _currentRefItem = TourCompareManager.createCatalogRefItem(savedRefId);
+
+            updateUI_YearChart(false);
+         }
       }
    }
 
@@ -1006,6 +1024,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _tourSpeed.clear();
 
       for (final Object yearItemObj : yearItems) {
+
          if (yearItemObj instanceof TVICatalogYearItem) {
 
             final TVICatalogYearItem yearItem = (TVICatalogYearItem) yearItemObj;

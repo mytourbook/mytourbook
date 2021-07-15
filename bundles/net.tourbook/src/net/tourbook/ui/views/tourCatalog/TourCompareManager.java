@@ -35,6 +35,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
@@ -63,7 +64,7 @@ public class TourCompareManager {
 
    private static final String                                  NUMBER_FORMAT_1F   = "%.1f";                                             //$NON-NLS-1$
 
-   private static ArrayList<RefTourItem>                        _allRefTourItems;
+   private static ArrayList<RefTourItem>                        _allRefTourItemsFromLastCompare;
 
    private final static ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
 
@@ -105,7 +106,7 @@ public class TourCompareManager {
 
       final int numComparedTours = allComparedItems.length;
 
-      _allRefTourItems = selectedRefTourItems;
+      _allRefTourItemsFromLastCompare = selectedRefTourItems;
 
       _countDownLatch = new CountDownLatch(numComparedTours);
       _compareTour_Queue.clear();
@@ -125,7 +126,7 @@ public class TourCompareManager {
 
                // load all reference tour data
                final ArrayList<TourData> allRefTourData = new ArrayList<>();
-               for (final RefTourItem refTourItem : _allRefTourItems) {
+               for (final RefTourItem refTourItem : _allRefTourItemsFromLastCompare) {
                   allRefTourData.add(TourManager.getInstance().getTourData(refTourItem.tourId));
                }
 
@@ -246,9 +247,9 @@ public class TourCompareManager {
                   && compareTourData.timeSerie.length > 0) {
 
                // loop: all reference tours
-               for (int refTourIndex = 0; refTourIndex < _allRefTourItems.size(); refTourIndex++) {
+               for (int refTourIndex = 0; refTourIndex < _allRefTourItemsFromLastCompare.size(); refTourIndex++) {
 
-                  final RefTourItem refTourItem = _allRefTourItems.get(refTourIndex);
+                  final RefTourItem refTourItem = _allRefTourItemsFromLastCompare.get(refTourIndex);
 
                   // compare the tour
                   final TVICompareResultComparedTour compareResult = compareTours_OneTour(
@@ -466,6 +467,33 @@ public class TourCompareManager {
    }
 
    /**
+    * @param refId
+    * @return Returns a {@link TVICatalogRefTourItem} for the refId or <code>null</code> when not
+    *         available
+    */
+   public static TVICatalogRefTourItem createCatalogRefItem(final Long refId) {
+
+      // create "dummy" root item that the year statistic works also for ref tours from the compare result view
+      final TVICatalogRootItem catalogRootItem = new TVICatalogRootItem();
+
+      // get ref item which are children of the root item
+      for (final TreeViewerItem treeItem : catalogRootItem.getFetchedChildren()) {
+
+         if (treeItem instanceof TVICatalogRefTourItem) {
+
+            final TVICatalogRefTourItem catalogRefItem = (TVICatalogRefTourItem) treeItem;
+
+            if (catalogRefItem.refId == refId) {
+
+               return catalogRefItem;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   /**
     * @param modifiedTours
     * @return Returns an expression to select tour id's in the WHERE clause
     */
@@ -560,7 +588,7 @@ public class TourCompareManager {
     */
    public static ArrayList<RefTourItem> getComparedReferenceTours() {
 
-      return _allRefTourItems;
+      return _allRefTourItemsFromLastCompare;
    }
 
    /**

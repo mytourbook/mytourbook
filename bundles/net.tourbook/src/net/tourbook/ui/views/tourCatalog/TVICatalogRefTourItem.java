@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,6 +39,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
    int    tourCounter;
 
    public TVICatalogRefTourItem(final TVICatalogRootItem parentItem) {
+
       setParentItem(parentItem);
    }
 
@@ -67,37 +68,39 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
       setChildren(children);
 
       /**
-       * derby does not support expression in "GROUP BY" statements, this is a workaround found
+       * Derby does not support expression in "GROUP BY" statements, this is a workaround found
        * here: http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300
        * .1147889647479.JavaMail.jira@brutus%3E <br>
        * <code>
-       * 	String subSQLString = "(SELECT YEAR(tourDate)\n"
-       * 		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
-       * 		+ (" WHERE "
-       * 				+ TourDatabase.TABLE_TOUR_REFERENCE
-       * 				+ "_generatedId="
-       * 				+ refId + "\n")
-       * 		+ ")";
+       *    String subSQLString = "(SELECT YEAR(tourDate)\n"
+       *       + ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
+       *       + (" WHERE "
+       *             + TourDatabase.TABLE_TOUR_REFERENCE
+       *             + "_generatedId="
+       *             + refId + "\n")
+       *       + ")";
        *
-       * 	String sqlString = "SELECT years FROM \n"
-       * 		+ subSQLString
-       * 		+ (" REFYEARS(years) GROUP BY years");
+       *    String sqlString = "SELECT years FROM \n"
+       *       + subSQLString
+       *       + (" REFYEARS(years) GROUP BY years");
        * </code>
        */
 
-      final StringBuilder sb = new StringBuilder();
+      final String sql = UI.EMPTY_STRING
 
-      sb.append("SELECT"); //$NON-NLS-1$
-      sb.append(" startYear,"); //$NON-NLS-1$
-      sb.append(" SUM(1)"); //$NON-NLS-1$
+            + "SELECT" + NL //                                       //$NON-NLS-1$
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
-      sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
-      sb.append(" GROUP BY startYear"); //$NON-NLS-1$
+            + " StartYear," + NL //                                  //$NON-NLS-1$
+            + " SUM(1)" + NL //                                      //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //    //$NON-NLS-1$
+            + " WHERE refTourId=?" + NL //                           //$NON-NLS-1$
+            + " GROUP BY startYear" + NL //                          //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, refId);
 
          final ResultSet result = statement.executeQuery();
@@ -140,6 +143,26 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
       if (unfetchedParentChildren != null) {
          unfetchedParentChildren.remove(this);
       }
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "TVICatalogRefTourItem" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+            + "label=" + label + NL //$NON-NLS-1$
+            + "refId=" + refId + NL //$NON-NLS-1$
+            + "yearMapMinValue=" + yearMapMinValue + NL //$NON-NLS-1$
+            + "yearMapMaxValue=" + yearMapMaxValue + NL //$NON-NLS-1$
+            + "tourCounter=" + tourCounter + NL //$NON-NLS-1$
+
+            + "]" + NL //$NON-NLS-1$
+
+      ;
    }
 
 }

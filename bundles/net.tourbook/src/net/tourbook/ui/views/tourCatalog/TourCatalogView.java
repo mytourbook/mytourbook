@@ -483,8 +483,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             if (eventId == TourEventId.COMPARE_TOUR_CHANGED
                   && eventData instanceof TourPropertyCompareTourChanged) {
 
-               final TourPropertyCompareTourChanged compareTourProperty =
-                     (TourPropertyCompareTourChanged) eventData;
+               final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) eventData;
 
                // check if the compared tour was saved in the database
                if (compareTourProperty.isDataSaved) {
@@ -593,7 +592,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       // set selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-      _rootItem = new TVICatalogRootItem(this);
+      _rootItem = new TVICatalogRootItem();
 
       // delay loading, that the UI and app filters are initialized
       Display.getCurrent().asyncExec(new Runnable() {
@@ -1351,7 +1350,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
          createUI_10_TourViewer(_viewerContainer);
          _viewerContainer.layout();
 
-         _tourViewer.setInput(_rootItem = new TVICatalogRootItem(this));
+         _tourViewer.setInput(_rootItem = new TVICatalogRootItem());
 
          _tourViewer.setExpandedElements(expandedElements);
          _tourViewer.setSelection(selection);
@@ -1370,7 +1369,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
          final Object[] expandedElements = _tourViewer.getExpandedElements();
          final ISelection selection = _tourViewer.getSelection();
 
-         _tourViewer.setInput(_rootItem = new TVICatalogRootItem(this));
+         _tourViewer.setInput(_rootItem = new TVICatalogRootItem());
 
          _tourViewer.setExpandedElements(expandedElements);
          _tourViewer.setSelection(selection);

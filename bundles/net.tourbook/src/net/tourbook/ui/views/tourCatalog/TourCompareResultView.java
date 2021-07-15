@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -78,14 +80,9 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -96,8 +93,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
@@ -552,6 +547,7 @@ public class TourCompareResultView extends ViewPart implements
 
       // tour tree
       final Tree tree = new Tree(parent,
+
             SWT.H_SCROLL
                   | SWT.V_SCROLL
                   | SWT.BORDER
@@ -570,61 +566,52 @@ public class TourCompareResultView extends ViewPart implements
       _tourViewer.setContentProvider(new ResultContentProvider());
       _tourViewer.setUseHashlookup(true);
 
-      _tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect(event);
+      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect(selectionChangedEvent));
+
+      _tourViewer.addDoubleClickListener(doubleClickEvent -> {
+
+         // expand/collapse current item
+
+         final Object treeItem = ((IStructuredSelection) doubleClickEvent.getSelection()).getFirstElement();
+
+         if (_tourViewer.getExpandedState(treeItem)) {
+            _tourViewer.collapseToLevel(treeItem, 1);
+         } else {
+            _tourViewer.expandToLevel(treeItem, 1);
          }
       });
 
-      _tourViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+      _tourViewer.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
 
-            // expand/collapse current item
+         if (keyEvent.keyCode == SWT.DEL) {
+            removeComparedTourFromDb();
+         }
+      }));
 
-            final Object treeItem = ((IStructuredSelection) event.getSelection()).getFirstElement();
+      _tourViewer.addCheckStateListener(checkStateChangedEvent -> {
 
-            if (_tourViewer.getExpandedState(treeItem)) {
-               _tourViewer.collapseToLevel(treeItem, 1);
+         if (checkStateChangedEvent.getElement() instanceof TVICompareResultComparedTour) {
+
+            final TVICompareResultComparedTour compareResult = (TVICompareResultComparedTour) checkStateChangedEvent.getElement();
+
+            if (checkStateChangedEvent.getChecked() && compareResult.isSaved()) {
+
+               /*
+                * uncheck elements which are already stored for the reftour, it would be better
+                * to disable them, but this is not possible because this is a limitation by the
+                * OS
+                */
+               _tourViewer.setChecked(compareResult, false);
+
             } else {
-               _tourViewer.expandToLevel(treeItem, 1);
+
+               enableActions();
             }
-         }
-      });
 
-      _tourViewer.getTree().addKeyListener(new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent keyEvent) {
-            if (keyEvent.keyCode == SWT.DEL) {
-               removeComparedTourFromDb();
-            }
-         }
-      });
+         } else {
 
-      _tourViewer.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
-
-            if (event.getElement() instanceof TVICompareResultComparedTour) {
-
-               final TVICompareResultComparedTour compareResult = (TVICompareResultComparedTour) event
-                     .getElement();
-
-               if (event.getChecked() && compareResult.isSaved()) {
-                  /*
-                   * uncheck elements which are already stored for the reftour, it would be better
-                   * to disable them, but this is not possible because this is a limitation by the
-                   * OS
-                   */
-                  _tourViewer.setChecked(compareResult, false);
-               } else {
-                  enableActions();
-               }
-            } else {
-               // uncheck all other tree items
-               _tourViewer.setChecked(event.getElement(), false);
-            }
+            // uncheck all other tree items
+            _tourViewer.setChecked(checkStateChangedEvent.getElement(), false);
          }
       });
 
@@ -1679,29 +1666,31 @@ public class TourCompareResultView extends ViewPart implements
 
          try {
 
-            final ArrayList<TVICompareResultComparedTour> updatedItems = new ArrayList<>();
+            final ArrayList<TVICompareResultComparedTour> allUpdatedItems = new ArrayList<>();
+
             final SelectionPersistedCompareResults compareResultSelection = new SelectionPersistedCompareResults();
-            final ArrayList<TVICompareResultComparedTour> persistedCompareResults = compareResultSelection.persistedCompareResults;
+            final ArrayList<TVICompareResultComparedTour> allPersistedCompareResults = compareResultSelection.persistedCompareResults;
 
             /*
-             * save checked items
+             * Save checked items
              */
             for (final Object checkedItem : _tourViewer.getCheckedElements()) {
                if (checkedItem instanceof TVICompareResultComparedTour) {
 
                   final TVICompareResultComparedTour checkedCompareItem = (TVICompareResultComparedTour) checkedItem;
                   if (checkedCompareItem.isSaved() == false) {
+
                      TourCompareManager.saveComparedTourItem(checkedCompareItem, em, ts);
 
-                     persistedCompareResults.add(checkedCompareItem);
+                     allPersistedCompareResults.add(checkedCompareItem);
 
-                     updatedItems.add(checkedCompareItem);
+                     allUpdatedItems.add(checkedCompareItem);
                   }
                }
             }
 
             /*
-             * save selected items which are not checked
+             * Save selected items which are not checked
              */
             final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
             for (final Object treeItem : selection) {
@@ -1713,9 +1702,9 @@ public class TourCompareResultView extends ViewPart implements
 
                      TourCompareManager.saveComparedTourItem(selectedComparedItem, em, ts);
 
-                     persistedCompareResults.add(selectedComparedItem);
+                     allPersistedCompareResults.add(selectedComparedItem);
 
-                     updatedItems.add(selectedComparedItem);
+                     allUpdatedItems.add(selectedComparedItem);
                   }
                }
             }
@@ -1724,7 +1713,7 @@ public class TourCompareResultView extends ViewPart implements
             _tourViewer.setCheckedElements(new Object[0]);
 
             // update persistent status
-            _tourViewer.update(updatedItems.toArray(), null);
+            _tourViewer.update(allUpdatedItems.toArray(), null);
 
             // fire post selection to update the tour catalog view
             _postSelectionProvider.setSelection(compareResultSelection);

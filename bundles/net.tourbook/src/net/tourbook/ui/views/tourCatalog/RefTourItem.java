@@ -21,11 +21,13 @@ public class RefTourItem {
    public long   tourId;
 
    public String label;
+
    public int    startIndex;
    public int    endIndex;
 
    @Override
    public boolean equals(final Object obj) {
+
       if (this == obj) {
          return true;
       }
