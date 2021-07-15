@@ -28,7 +28,7 @@ New
 ===
 
 * Tour re-import (Frederic) 
-  - Using multi-threading to speed up when re-importing a lot of tours (Note: This require to skip tours for which the file location isn't found)
+  - Using multi-threading to speed up the re-import process when having selected a lot of tours (Note: This requires to skip tours for which the file location isn't found)
 
 
 
