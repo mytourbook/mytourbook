@@ -18,9 +18,6 @@ TODO's
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
                  
 
-* Tour modification (Frederic) 
-                  - Use multi-threading (ThreadPoolExecutor)
-
 Issues
 ======
 
@@ -30,7 +27,9 @@ Issues
 New
 ===
 
-*
+* Tour re-import (Frederic) 
+  - Using multi-threading to speed up when re-importing a lot of tours (Note: This require to skip tours for which the file location isn't found)
+
 
 
 Improvements

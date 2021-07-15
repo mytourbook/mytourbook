@@ -2693,14 +2693,8 @@ public class TourDatabase {
 
             tourData.onPrePersist();
 
-            if (Thread.currentThread().isInterrupted()) {
-               System.out.println("INTERRUPTED SO WE GET OUT HERE SAFELY");
-               return persistedEntity;
-            }
-
             ts.begin();
             {
-
                final TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
                if (tourDataEntity == null) {
 
