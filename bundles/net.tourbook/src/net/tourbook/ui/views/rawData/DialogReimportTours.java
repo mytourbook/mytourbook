@@ -23,7 +23,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
@@ -314,13 +313,13 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   if (monitor.isCanceled()) {
 
-                     final Collection<? super Long> list = new ArrayList<>();
-                     _dbUpdateQueue.drainTo(list);
-                     System.out.println(list.size() + " were not reimported");
+//                     final Collection<? super Long> list = new ArrayList<>();
+//                     _dbUpdateQueue.drainTo(list);
+//                     System.out.println(list.size() + " were not reimported");
 
-//                     for (final Future<?> f : _futureTasks) {
-//                        f.cancel(true);
-//                     }
+                     for (final Future<?> f : _futureTasks) {
+                        f.cancel(true);
+                     }
                      break;
                   }
 
