@@ -257,16 +257,17 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final Runnable executorTask = () -> {
 
-                     if (monitor.isCanceled()) {
-                        System.out.println("DOINGNOTHING");
-                        return;
-                     }
-
                      // get last added item
                      Long queueItem_TourId;
                      queueItem_TourId = _dbUpdateQueue.poll();
 
                      if (queueItem_TourId == null) {
+                        return;
+                     }
+
+                     if (monitor.isCanceled()) {
+                        //TODO FB
+                        System.out.println("DOINGNOTHING");
                         return;
                      }
 
