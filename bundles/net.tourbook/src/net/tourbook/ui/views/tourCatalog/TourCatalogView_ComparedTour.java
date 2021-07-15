@@ -220,7 +220,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       boolean isNavigated = false;
 
-      final Object navigatedTour = TourCompareManager.getInstance().navigateTour(isNextTour);
+      final Object navigatedTour = TourCompareManager.navigateTour(isNextTour);
 
       if (navigatedTour instanceof TVICatalogComparedTour) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -297,6 +297,9 @@ public abstract class GalleryMT20 extends Canvas {
     * hovered.
     */
    private GalleryMT20Item                   _currentHoveredItem;
+
+   private Color                             _galleryForegroundColor;
+   private Color                             _galleryBackgroundColor;
 
    //private int                               _debugCounter;
 
@@ -2061,6 +2064,9 @@ public abstract class GalleryMT20 extends Canvas {
             _initialSelectedItems = null;
          }
 
+         gc.setForeground(_galleryForegroundColor);
+         gc.setBackground(_galleryBackgroundColor);
+
          clippingArea = gc.getClipping();
          gc.fillRectangle(clippingArea);
 
@@ -2613,8 +2619,8 @@ public abstract class GalleryMT20 extends Canvas {
 
    public void setColors(final Color fgColor, final Color bgColor) {
 
-      setForeground(fgColor);
-      setBackground(bgColor);
+      _galleryForegroundColor = fgColor;
+      _galleryBackgroundColor = bgColor;
 
       _fullScreenImageViewer.setColors(fgColor, bgColor);
    }

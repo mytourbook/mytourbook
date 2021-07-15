@@ -128,12 +128,32 @@ public class SashLeftFixedForm {
     * @param flexRightPart
     * @param relFixedDefaultSize
     *           The initial size of the fixed (left) part is relative in %.
+    * @param sashMargin
     */
    public SashLeftFixedForm(final Composite parent,
                             final Control fixedLeftPart,
                             final Control sash,
                             final Control flexRightPart,
                             final int relFixedDefaultSize) {
+
+      this(parent, fixedLeftPart, sash, flexRightPart, relFixedDefaultSize, 0);
+   }
+
+   /**
+    * @param parent
+    * @param fixedLeftPart
+    * @param sash
+    * @param flexRightPart
+    * @param relFixedDefaultSize
+    *           The initial size of the fixed (left) part is relative in %.
+    * @param sashMargin
+    */
+   public SashLeftFixedForm(final Composite parent,
+                            final Control fixedLeftPart,
+                            final Control sash,
+                            final Control flexRightPart,
+                            final int relFixedDefaultSize,
+                            final int sashMargin) {
 
       initUI(parent);
 
@@ -158,7 +178,7 @@ public class SashLeftFixedForm {
        */
       final FormData fixedLayoutData = new FormData();
       fixedLayoutData.left = new FormAttachment(0, 0);
-      fixedLayoutData.right = new FormAttachment(sash, 0);
+      fixedLayoutData.right = new FormAttachment(sash, -sashMargin);
       fixedLayoutData.top = topAttachment;
       fixedLayoutData.bottom = bottomAttachment;
       _fixedLeftPart.setLayoutData(fixedLayoutData);
@@ -179,7 +199,7 @@ public class SashLeftFixedForm {
        * Right flex part
        */
       final FormData flexLayoutData = new FormData();
-      flexLayoutData.left = new FormAttachment(sash, 0);
+      flexLayoutData.left = new FormAttachment(sash, sashMargin);
       flexLayoutData.right = new FormAttachment(100, 0);
       flexLayoutData.top = topAttachment;
       flexLayoutData.bottom = bottomAttachment;

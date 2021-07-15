@@ -9,7 +9,7 @@
       <WeightKilograms/>
     </Athlete>
     <Activity Id="66a6b5c4-5163-4b5b-ab5f-148df5060c06" StartTime="2016-09-19T19:06:55.000Z">
-      <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset>
+      <TimeZoneUtcOffset>-21600</TimeZoneUtcOffset>
       <HasStartTime>True</HasStartTime>
       <UseEnteredData>False</UseEnteredData>
       <Metadata Source="" Created="2016-09-23T03:25:27.000Z" Modified="2021-03-07T02:28:55.000Z"/>

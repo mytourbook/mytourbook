@@ -59,8 +59,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -516,12 +516,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       /*
        * Field listener
        */
-      final MouseAdapter colorMouseListener = new MouseAdapter() {
-         @Override
-         public void mouseDown(final MouseEvent e) {
-            onFieldMouseDown(display, e);
-         }
-      };
+      final MouseListener colorMouseListener = MouseListener.mouseDownAdapter(
+            mouseEvent -> onFieldMouseDown(display, mouseEvent));
 
       // value listener
       final SelectionListener valueSelectionListener = new SelectionAdapter() {
@@ -922,7 +918,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       final boolean isDrawUnits = _dialogColorProvider.getMap3ColorProfile().isAbsoluteValues();
 
-      _dialogColorProvider.configureColorProvider(//
+      _dialogColorProvider.configureColorProvider(
             ColorProviderConfig.MAP3_PROFILE,
             imageHeight,
             getRgbVertices(),
@@ -933,9 +929,11 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             ColorProviderConfig.MAP3_PROFILE,
             imageWidth,
             imageHeight,
-            true,
-            true,
-            false);
+            true, // is vertical
+            true, // draw units
+            UI.IS_DARK_THEME,
+            false // no shadow
+      );
 
       _canvasProfileImage.setImage(_profileImage);
    }

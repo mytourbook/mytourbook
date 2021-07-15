@@ -104,7 +104,7 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
       _storedComparedTours = TourCompareManager.getComparedToursFromDb(refId);
 
-      final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
+      final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getComparedTours();
 
       // create children for one reference tour
       for (final TVICompareResultComparedTour compTour : comparedTours) {

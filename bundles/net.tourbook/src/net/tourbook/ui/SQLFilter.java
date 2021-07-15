@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,31 +34,43 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
  */
 public class SQLFilter {
 
-   private static final Set<SQLAppFilter> _defaultAppFilter = new HashSet<>();
+   private static final String            NL                 = UI.NEW_LINE;
+
+   private static final Set<SQLAppFilter> DEFAULT_APP_FILTER = new HashSet<>();
+
+   /**
+    * Contains all app tour filters which are performed very fast, e.g. person, tour type.
+    * <p>
+    * This filter do not contain e.g. geo compare or tag filters.
+    */
+   public static final Set<SQLAppFilter>  FAST_APP_FILTER    = new HashSet<>();
 
    /**
     * Exclude all special app filter
     */
-   public static final Set<SQLAppFilter>  NO_PHOTOS         = new HashSet<>();
+   public static final Set<SQLAppFilter>  NO_PHOTOS          = new HashSet<>();
 
-   public static final Set<SQLAppFilter>  NO_GEO_LOCATION   = new HashSet<>();
+   public static final Set<SQLAppFilter>  NO_GEO_LOCATION    = new HashSet<>();
 
    /**
     * Use sql app filter with {@link SQLAppFilter#Photo} and {@link SQLAppFilter#Tag}
     */
-   public static final Set<SQLAppFilter>  TAG_FILTER        = new HashSet<>();
+   public static final Set<SQLAppFilter>  TAG_FILTER         = new HashSet<>();
 
    static {
 
       // default is using the photo filter
-      _defaultAppFilter.add(SQLAppFilter.Photo);
-      _defaultAppFilter.add(SQLAppFilter.GeoLocation);
+      DEFAULT_APP_FILTER.add(SQLAppFilter.Photo);
+      DEFAULT_APP_FILTER.add(SQLAppFilter.GeoLocation);
+
+      FAST_APP_FILTER.add(SQLAppFilter.Photo);
 
       NO_GEO_LOCATION.add(SQLAppFilter.Photo);
 
       TAG_FILTER.add(SQLAppFilter.Photo);
       TAG_FILTER.add(SQLAppFilter.GeoLocation);
       TAG_FILTER.add(SQLAppFilter.Tag);
+
    }
 
    private String            _sqlWhereClause = UI.EMPTY_STRING;
@@ -72,10 +84,13 @@ public class SQLFilter {
     * Create sql app filter with the photo filter
     */
    public SQLFilter() {
-      this(_defaultAppFilter);
+      this(DEFAULT_APP_FILTER);
    }
 
    /**
+    * Creates the WHERE statement for the selected app filters by appending an AND to an existing
+    * sql statement.
+    *
     * @param appFilter
     */
    public SQLFilter(final Set<SQLAppFilter> appFilter) {
@@ -94,7 +109,7 @@ public class SQLFilter {
 
          // select only one person
 
-         sb.append(" AND TourData.tourPerson_personId = ?\n"); //$NON-NLS-1$
+         sb.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
          _parameters.add(activePerson.getPersonId());
       }
 
@@ -103,7 +118,7 @@ public class SQLFilter {
        */
       if (appFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
-         sb.append(" AND TourData.NumberOfPhotos > 0\n"); //$NON-NLS-1$
+         sb.append(" AND TourData.NumberOfPhotos > 0" + NL); //$NON-NLS-1$
       }
 
       /*
@@ -146,9 +161,9 @@ public class SQLFilter {
        */
       _isTagFilterActive = false;
 
-      if (TourTagFilterManager.isTourTagFilterEnabled() && TourTagFilterManager.getSelectedProfile().isOrOperator) {
+      if (appFilter.contains(SQLAppFilter.Tag)) {
 
-         if (appFilter.contains(SQLAppFilter.Tag)) {
+         if (TourTagFilterManager.isTourTagFilterEnabled() && TourTagFilterManager.getSelectedProfile().isOrOperator) {
 
             final SQLData tourTagSqlData = TourTagFilterManager.getSQL_WherePart();
 

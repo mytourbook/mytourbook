@@ -80,8 +80,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
     */
    ChartStatisticSegments createChartSegments() {
 
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
@@ -122,13 +122,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _chart.setShowZoomActions(true);
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
-      _chartInfoProvider = new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticWeek.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-      };
+      _chartInfoProvider = StatisticWeek.this::createToolTipUI;
    }
 
    /**
@@ -212,7 +206,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
    private double[] createWeekData() {
 
       final int weekCounter = _statisticData_Week.elevationUp_High[0].length;
-      final double allWeeks[] = new double[weekCounter];
+      final double[] allWeeks = new double[weekCounter];
 
       for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
          allWeeks[weekIndex] = weekIndex;
@@ -247,9 +241,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setVisibleMinValue(0);
       yData.setShowYSlider(true);
 
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds, _appTourTypeFilter);
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
 
       chartDataModel.addYData(yData);
    }
@@ -271,8 +264,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -295,8 +287,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -319,9 +310,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setVisibleMinValue(0);
       yData.setShowYSlider(true);
 
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds, _appTourTypeFilter);
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
 
       chartDataModel.addYData(yData);
    }
@@ -342,9 +332,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _yData_Duration.setVisibleMinValue(0);
       _yData_Duration.setShowYSlider(true);
 
-      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColorIndex(_yData_Duration, _statisticData_Week.typeIds, _appTourTypeFilter);
-      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
 
       chartDataModel.addYData(_yData_Duration);
    }
@@ -367,8 +356,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);

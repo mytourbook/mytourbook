@@ -1052,7 +1052,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       computeMinMaxValues(yDataSpeed);
 
-      TourManager.setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+      TourManager.setBarColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+      TourManager.setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
       yDataSpeed.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
       yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -1077,7 +1078,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       computeMinMaxValues(yDataPulse);
 
-      TourManager.setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+      TourManager.setBarColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+      TourManager.setGraphColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
       yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
       yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);

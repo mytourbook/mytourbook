@@ -467,6 +467,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
       saveState();
 
+      if (_tk != null) {
+         _tk.dispose();
+      }
+
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
 

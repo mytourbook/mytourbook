@@ -4,23 +4,22 @@
 TODO's
 ======
 
-* Tour Chart   - Select color for 2nd graph line instead of compliment color
-               - Set default graphs in the graph slideout, sorting still needs the pref page
-
-* Tour Search  - Test Edge browser if the tour selection in the result list is working with the mouse
-               - Implement workaround: Select tour with an action in the context menu
 
 * Compare Tours by Elevation
-               - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
+                  - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
 
-* Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                 Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+* Tour Chart      - Select color for 2nd graph line instead of compliment color
+                  - Set default graphs in the graph slideout, sorting still needs the pref page
 
-               - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                 mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                 
 
 * Tour modification (Frederic) 
-               - Use multi-threading (ThreadPoolExecutor)
+                  - Use multi-threading (ThreadPoolExecutor)
 
 Issues
 ======
@@ -37,7 +36,20 @@ New
 Improvements
 ============
 
-* 
+* Compare tours by elevation
+  - Compare tours concurrently -> much less waiting time
+  - Use fast app tour filters (person, tour type, tour, photo...)
+  - New shortcut action to compare reference tour(s) with all tours
+  - Automatically expand reference tour in compare result view, after comparison is done
+  - Tour comparison can be restarted with other parameters in the "Compare Result" view, e.g. different years, other tour filter 
+
+* Repair close button in all views
+  - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
+    This is an experimental feature and can be activated with the command line parameter -DsetAllViewsClosable 
+
+* Fitlog/FitlogEx import (Frederic)
+  - The timezone is used only when available, otherwise it's determined with the GPS position
+
 
 Changes  
 =======
@@ -48,7 +60,15 @@ Changes
 Bugfix
 ======
 
-* 
+* 4k Display
+  - Fixed positions for the vertical x-Axis units and vertical tour chart markers
+  - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
+
+* Tour cadence zones times (Frederic)
+  
+  - Cadence zone times computation should use either the recorded time or moving
+    time per the computed values preference 
+
 
 Translation    
 ===========

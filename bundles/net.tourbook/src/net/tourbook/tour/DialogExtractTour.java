@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,73 +78,78 @@ import org.eclipse.swt.widgets.Text;
  */
 public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2 {
 
-   private static final String   STATE_TOUR_TITLE                      = "TourTitle";                     //$NON-NLS-1$
-   private static final String   STATE_PERSON_ID                       = "PersonId";                      //$NON-NLS-1$
-   private static final String   STATE_TOUR_TYPE_ID                    = "TourTypeId";                    //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE                      = "TourTitle";                            //$NON-NLS-1$
+   private static final String   STATE_PERSON_ID                       = "PersonId";                             //$NON-NLS-1$
+   private static final String   STATE_TOUR_TYPE_ID                    = "TourTypeId";                           //$NON-NLS-1$
 
-   private static final String   STATE_IS_KEEP_ORIGINAL_TIME           = "isKeepOriginalTime";            //$NON-NLS-1$
-   private static final String   STATE_IS_INCLUDE_DESCRIPTION          = "isIncludeDescription";          //$NON-NLS-1$
-   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS     = "isIncludeMarkerWaypoints";      //$NON-NLS-1$
+   private static final String   STATE_IS_KEEP_ORIGINAL_TIME           = "isKeepOriginalTime";                   //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_DESCRIPTION          = "isIncludeDescription";                 //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS     = "isIncludeMarkerWaypoints";             //$NON-NLS-1$
 
-   private static final String   STATE_TOUR_TITLE_SOURCE               = "TourTitleSource";               //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR     = "fromTour";                      //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_MARKER   = "fromFirstMarker";               //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM        = "custom";                        //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE               = "TourTitleSource";                      //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR     = "fromTour";                             //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_MARKER   = "fromFirstMarker";                      //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM        = "custom";                               //$NON-NLS-1$
 
-   private static final String   STATE_EXTRACT_METHOD                  = "ExtractMethod";                 //$NON-NLS-1$
-   private static final String   STATE_EXTRACT_METHOD_REMOVE           = "remove";                        //$NON-NLS-1$
-   private static final String   STATE_EXTRACT_METHOD_KEEP             = "keep";                          //$NON-NLS-1$
+   private static final String   STATE_EXTRACT_METHOD                  = "ExtractMethod";                        //$NON-NLS-1$
+   private static final String   STATE_EXTRACT_METHOD_REMOVE           = "remove";                               //$NON-NLS-1$
+   private static final String   STATE_EXTRACT_METHOD_KEEP             = "keep";                                 //$NON-NLS-1$
 
-   private static final String   STATE_TYPE_SOURCE                     = "TourTypeSource";                //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS = "fromTour";                      //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_FROM_PREVIOUS_TOUR  = "previous";                      //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_CUSTOM              = "custom";                        //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE                     = "TourTypeSource";                       //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS = "fromTour";                             //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_FROM_PREVIOUS_TOUR  = "previous";                             //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_CUSTOM              = "custom";                               //$NON-NLS-1$
 
    /**
     * state: tour title
     */
    private static final String[] ALL_STATES_TOUR_TILE_SOURCE           = new String[] {
+
          STATE_TOUR_TITLE_SOURCE_FROM_TOUR,
-         STATE_TOUR_TITLE_SOURCE_FROM_MARKER,                                                             //
-         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                  //
+         STATE_TOUR_TITLE_SOURCE_FROM_MARKER,
+         STATE_TOUR_TITLE_SOURCE_CUSTOM,
    };
+
    private static final String[] STATE_COMBO_TEXT_TOUR_TITLE_SOURCE    = new String[] {
+
          Messages.Dialog_SplitTour_ComboText_TourTitleFromTour,
          Messages.Dialog_SplitTour_ComboText_TourTitleFromFirstMarker,
          Messages.Dialog_SplitTour_ComboText_TourTileCustom,
-         //
    };
+
    /**
     * state: split/extract method
     */
    private static final String[] ALL_STATES_EXTRACT_METHOD             = new String[] {
+
          STATE_EXTRACT_METHOD_KEEP,
          STATE_EXTRACT_METHOD_REMOVE,
-         //
    };
+
    private static final String[] STATE_COMBO_TEXT_EXTRACT_METHOD       = new String[] {
+
          Messages.Dialog_SplitTour_ComboText_KeepSlices,
          Messages.Dialog_SplitTour_ComboText_RemoveSlices,
-         //
    };
 
    /**
     * state: tour type splitted tour
     */
    private static final String[] ALL_STATES_TOUR_TYPE                  = new String[] {
+
          STATE_TYPE_SOURCE_FROM_SELECTED_TOURS,
          STATE_TYPE_SOURCE_FROM_PREVIOUS_TOUR,
-         STATE_TYPE_SOURCE_CUSTOM                                                                         //
-   };
-   private static final String[] STATE_TEXT_TOUR_TYPE_SOURCE           = new String[] {
-         Messages.Dialog_SplitTour_ComboText_TourTypeFromTour,
-         Messages.Dialog_SplitTour_ComboText_TourTypePrevious,
-         Messages.Dialog_SplitTour_ComboText_TourTypeCustom                                               //
+         STATE_TYPE_SOURCE_CUSTOM
    };
 
-   private final IDialogSettings _state                                = TourbookPlugin.getDefault()      //
-         .getDialogSettingsSection(
-               "DialogSplit");                                                                            //$NON-NLS-1$
+   private static final String[] STATE_TEXT_TOUR_TYPE_SOURCE           = new String[] {
+
+         Messages.Dialog_SplitTour_ComboText_TourTypeFromTour,
+         Messages.Dialog_SplitTour_ComboText_TourTypePrevious,
+         Messages.Dialog_SplitTour_ComboText_TourTypeCustom
+   };
+
+   private final IDialogSettings _state                                = TourbookPlugin.getState("DialogSplit"); //$NON-NLS-1$
 
    private TourDataEditorView    _tourDataEditor;
 
@@ -301,11 +306,12 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       super.create();
 
-      setTitle(_isSplitTour ? //
-            Messages.Dialog_SplitTour_DlgArea_Title
+      setTitle(_isSplitTour
+            ? Messages.Dialog_SplitTour_DlgArea_Title
             : Messages.Dialog_ExtractTour_DlgArea_Title);
-      setMessage(_isSplitTour ? //
-            Messages.Dialog_SplitTour_DlgArea_Message
+
+      setMessage(_isSplitTour
+            ? Messages.Dialog_SplitTour_DlgArea_Message
             : Messages.Dialog_ExtractTour_DlgArea_Message);
    }
 
@@ -1069,7 +1075,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       // check if time slices should be removed
       if (getStateSplitMethod().equals(STATE_EXTRACT_METHOD_REMOVE)) {
 
-         TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true);
+         TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true, false);
 
          _tourDataEditor.updateUI(_tourDataSource, true);
 

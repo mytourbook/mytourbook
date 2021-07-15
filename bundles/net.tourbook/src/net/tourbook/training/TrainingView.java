@@ -32,7 +32,10 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
@@ -65,6 +68,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -122,8 +126,9 @@ public class TrainingView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore      _prefStore     = TourbookPlugin.getPrefStore();
-   private final IDialogSettings       _state         = TourbookPlugin.getState(ID);
+   private final IPreferenceStore      _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore      _prefStore_Common = CommonActivator.getPrefStore();
+   private final IDialogSettings       _state            = TourbookPlugin.getState(ID);
 
    private IPartListener2              _partListener;
    private ISelectionListener          _postSelectionListener;
@@ -149,10 +154,10 @@ public class TrainingView extends ViewPart {
 
    private double[]                    _xSeriePulse;
 
-   private ArrayList<TourPersonHRZone> _personHrZones = new ArrayList<>();
-   private final MinMaxKeeper_YData    _minMaxKeeper  = new MinMaxKeeper_YData();
+   private ArrayList<TourPersonHRZone> _personHrZones    = new ArrayList<>();
+   private final MinMaxKeeper_YData    _minMaxKeeper     = new MinMaxKeeper_YData();
 
-   private final NumberFormat          _nf1           = NumberFormat.getNumberInstance();
+   private final NumberFormat          _nf1              = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -254,7 +259,12 @@ public class TrainingView extends ViewPart {
       getViewSite().getPage().addPartListener(_partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == TrainingView.this) {
+               fixThemedColors();
+            }
+         }
 
          @Override
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -263,7 +273,12 @@ public class TrainingView extends ViewPart {
          public void partClosed(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == TrainingView.this) {
+               fixThemedColors();
+            }
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {}
@@ -746,7 +761,7 @@ public class TrainingView extends ViewPart {
       for (int zoneIndex = hrZoneSize - 1; zoneIndex >= 0; zoneIndex--) {
 
          final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
-         final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(hrZone.getColor());
+         _hrZoneColors[zoneIndex] = new Color(hrZone.getColor());
          _hrZoneColorsBright[zoneIndex] = new Color(hrZone.getColorBright());
          _hrZoneColorsDark[zoneIndex] = new Color(hrZone.getColorDark());
 
@@ -796,10 +811,7 @@ public class TrainingView extends ViewPart {
          GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
       }
 
-      // must be run async otherwise it is overwritten when using the dark theme
-      parent.getDisplay().asyncExec(() -> {
-         updateUI_HrZoneColors();
-      });
+      fixThemedColors();
    }
 
    @Override
@@ -870,11 +882,32 @@ public class TrainingView extends ViewPart {
       _headerToolbarManager.update(true);
    }
 
+   private void fixThemedColors() {
+
+      // must be run async otherwise it is overwritten when using the dark theme
+      _pageBook.getDisplay().asyncExec(() -> {
+
+         if (_pageBook.isDisposed()) {
+            return;
+         }
+
+         for (int zoneIndex = 0; zoneIndex < _lblHRZoneColor.length; zoneIndex++) {
+
+            final Label label = _lblHRZoneColor[zoneIndex];
+            final Color zoneColor = _hrZoneColors[zoneIndex];
+
+            label.setBackground(zoneColor);
+         }
+      });
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
       _tk = new FormToolkit(parent.getDisplay());
       _fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
+
+      parent.addControlListener(controlResizedAdapter(controlEvent -> fixThemedColors()));
 
       _defaultSpinnerModifyListener = modifyEvent -> {
 
@@ -1040,6 +1073,7 @@ public class TrainingView extends ViewPart {
    @Override
    public void setFocus() {
 
+      fixThemedColors();
    }
 
    private void showTour() {
@@ -1051,6 +1085,7 @@ public class TrainingView extends ViewPart {
       }
 
       enableControls();
+
    }
 
    private void showTourFromTourProvider() {
@@ -1204,19 +1239,28 @@ public class TrainingView extends ViewPart {
       final int timeSerieSize = timeSerie.length;
 
       final ArrayList<TourPersonHRZone> hrSortedZones = _currentPerson.getHrZonesSorted();
-      final int zoneSize = hrSortedZones.size();
+      final int numZones = hrSortedZones.size();
 
-      final RGB[] rgbBright = new RGB[zoneSize];
-      final RGB[] rgbDark = new RGB[zoneSize];
-      final RGB[] rgbLine = new RGB[zoneSize];
+      final RGB[] allRgbBright = new RGB[numZones];
+      final RGB[] allRgbDark = new RGB[numZones];
+      final RGB[] allRgbLine = new RGB[numZones];
+
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
+
+      final String prefColorText = net.tourbook.common.UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      // get colors from common pref store
+      final RGB rgbTextColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorText);
 
       int zoneIndex = 0;
 
       for (final TourPersonHRZone hrZone : hrSortedZones) {
 
-         rgbDark[zoneIndex] = hrZone.getColor();
-         rgbBright[zoneIndex] = hrZone.getColorBright();
-         rgbLine[zoneIndex] = hrZone.getColorDark();
+         allRgbDark[zoneIndex] = hrZone.getColor();
+         allRgbBright[zoneIndex] = hrZone.getColorBright();
+         allRgbLine[zoneIndex] = hrZone.getColorDark();
 
          zoneIndex++;
       }
@@ -1262,7 +1306,7 @@ public class TrainingView extends ViewPart {
          _xSeriePulse[pulseIndex] = pulseIndex;
 
          // set color index for each pulse value
-         for (zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
+         for (zoneIndex = 0; zoneIndex < numZones; zoneIndex++) {
 
             final float minValue = zoneMinBpm[zoneIndex];
             final float maxValue = zoneMaxBpm[zoneIndex];
@@ -1343,10 +1387,11 @@ public class TrainingView extends ViewPart {
       yData.setYTitle(Messages.App_Label_H_MM);
 
       yData.setColorIndex(new int[][] { colorIndex });
-      yData.setRgbLine(rgbLine);
-      yData.setRgbGradient_Bright(rgbBright);
-      yData.setRgbGradient_Dark(rgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      yData.setRgbBar_Gradient_Bright(allRgbBright);
+      yData.setRgbBar_Gradient_Dark(allRgbDark);
+      yData.setRgbBar_Line(allRgbLine);
+
+      yData.setRgbGraph_Text(rgbTextColor);
 
       chartDataModel.addYData(yData);
 
@@ -1541,16 +1586,5 @@ public class TrainingView extends ViewPart {
             _canvasHrZoneImage.redraw();
          }
       });
-   }
-
-   private void updateUI_HrZoneColors() {
-
-      for (int zoneIndex = 0; zoneIndex < _lblHRZoneColor.length; zoneIndex++) {
-
-         final Label label = _lblHRZoneColor[zoneIndex];
-         final Color zoneColor = _hrZoneColors[zoneIndex];
-
-         label.setBackground(zoneColor);
-      }
    }
 }

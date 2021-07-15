@@ -2223,11 +2223,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Database
        */
-      _images.put(IMAGE_DATABASE,               TourbookPlugin.getImageDescriptor(Images.Saved_Tour));
-      _images.put(IMAGE_DATABASE_OTHER_PERSON,  TourbookPlugin.getImageDescriptor(Images.Saved_Tour_OtherPerson));
-      _images.put(IMAGE_ASSIGN_MERGED_TOUR,     TourbookPlugin.getImageDescriptor(Images.Saved_MergedTour));
-      _images.put(IMAGE_ICON_PLACEHOLDER,       TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder));
-      _images.put(IMAGE_DELETE,                 TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      _images.put(IMAGE_DATABASE,               TourbookPlugin.getImageDescriptor      (Images.Saved_Tour));
+      _images.put(IMAGE_DATABASE_OTHER_PERSON,  TourbookPlugin.getThemedImageDescriptor(Images.Saved_Tour_OtherPerson));
+      _images.put(IMAGE_ASSIGN_MERGED_TOUR,     TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour));
+      _images.put(IMAGE_ICON_PLACEHOLDER,       TourbookPlugin.getImageDescriptor      (Images.App_EmptyIcon_Placeholder));
+      _images.put(IMAGE_DELETE,                 TourbookPlugin.getImageDescriptor      (Images.App_Delete));
 
       /*
        * Import state
@@ -5579,7 +5579,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-                  final int waitingTime = 30000; // in ms
+                  final int waitingTime = 10000; // in ms
 
                   THREAD_WATCHER_LOCK.lock();
                   _watchingStoresThread.interrupt();
