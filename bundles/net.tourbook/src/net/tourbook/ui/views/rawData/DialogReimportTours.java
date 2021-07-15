@@ -254,6 +254,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
 
                   final Runnable executorTask = () -> {
+                     // Do work.
 
                      if (monitor.isCanceled()) {
                         //TODO FB
@@ -274,13 +275,9 @@ public class DialogReimportTours extends TitleAreaDialog {
                      final RawDataManager rawDataManager = new RawDataManager();
                      rawDataManager.setImportId();
                      rawDataManager.setImportCanceled(false);
-                     try {
-                        rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
-                     } catch (final Exception e) {
+                     rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
 
-                        System.out.println("INTERRUPTED");
-                     }
-
+                     System.out.println("Stopping.");
                   };
 
                   _futureTasks.add(_dbUpdateExecutor.submit(executorTask));
@@ -306,10 +303,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                //(preventing new tasks from being submitted)
                _dbUpdateExecutor.shutdown();
 
-               long completedTaskCount = 0;
                while (!_dbUpdateExecutor.isTerminated()) {
-
-                  final long newCompletedTaskCount = _dbUpdateExecutor.getCompletedTaskCount();
 
                   if (monitor.isCanceled()) {
 
@@ -317,22 +311,18 @@ public class DialogReimportTours extends TitleAreaDialog {
 //                     _dbUpdateQueue.drainTo(list);
 //                     System.out.println(list.size() + " were not reimported");
 
+                     System.out.println("cancelling ALL tasks");
                      for (final Future<?> f : _futureTasks) {
+                        System.out.println("cancelling a task");
                         f.cancel(true);
                      }
+                     System.out.println("DONE cancelling ALL tasks");
                      break;
                   }
 
-                  if (newCompletedTaskCount > completedTaskCount) {
-
-                     final long difference = newCompletedTaskCount - completedTaskCount;
-                     monitor.worked((int) difference);
-                     monitor.subTask(NLS.bind(
-                           Messages.Import_Data_Dialog_Reimport_SubTask,
-                           new Object[] { newCompletedTaskCount, numberOfTours }));
-
-                     completedTaskCount = newCompletedTaskCount;
-                  }
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { _dbUpdateExecutor.getCompletedTaskCount(), numberOfTours }));
                }
             }
 
@@ -349,21 +339,13 @@ public class DialogReimportTours extends TitleAreaDialog {
       try {
 
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
+
       } catch (final Exception e) {
 
          TourLogManager.logEx(e);
          Thread.currentThread().interrupt();
+
       } finally {
-//
-//         for (final Future<?> future : _futureTasks) {
-//            try {
-//               future.get(200, TimeUnit.MILLISECONDS);
-//            } catch (final InterruptedException | ExecutionException | TimeoutException e) {
-//               e.printStackTrace();
-//               Thread.currentThread().interrupt();
-//
-//            }
-//         }
 
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(//
