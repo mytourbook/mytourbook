@@ -47,6 +47,9 @@ Improvements
   - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
     This is an experimental feature and can be activated with the command line parameter -DsetAllViewsClosable 
 
+* Fitlog/FitlogEx import (Frederic)
+  - The timezone is used only when available, otherwise it's determined with the GPS position
+
 
 Changes  
 =======
