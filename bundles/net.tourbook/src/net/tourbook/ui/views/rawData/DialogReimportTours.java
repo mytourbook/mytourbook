@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -152,6 +153,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
    private ThreadPoolExecutor       _dbUpdateExecutor;
    private ArrayBlockingQueue<Long> _dbUpdateQueue;
+   private List<Future<?>>          _futureTasks;
 
    private ThreadFactory            _threadFactory;
 
@@ -179,7 +181,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                                             final boolean skipToursWithFileNotFound) {
 
       final long start = System.currentTimeMillis();
-
       if (!RawDataManager.getInstance().actionModifyTourValues_10_Confirm(tourValueTypes, true)) {
          return;
       }
@@ -238,7 +239,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                }
 
                final TourData oldTourData = TourManager.getTour(tourId);
-
                if (oldTourData == null) {
                   continue;
                }
@@ -248,7 +248,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                   try {
 
                      _dbUpdateQueue.put(tourId);
-
                   } catch (final InterruptedException e) {
 
                      StatusUtil.log(e);
@@ -257,6 +256,12 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final Runnable executorTask = () -> {
 
+                     if (monitor.isCanceled()) {
+                        //TODO FB
+                        System.out.println("DOINGNOTHING");
+                        return;
+                     }
+
                      // get last added item
                      Long queueItem_TourId;
                      queueItem_TourId = _dbUpdateQueue.poll();
@@ -264,20 +269,22 @@ public class DialogReimportTours extends TitleAreaDialog {
                      if (queueItem_TourId == null) {
                         return;
                      }
-
-                     if (monitor.isCanceled()) {
-                        //TODO FB
-                        System.out.println("DOINGNOTHING");
-                        return;
-                     }
+                     System.out.println("STARTED THE IMPORT");
+                     monitor.worked(1);
 
                      final RawDataManager rawDataManager = new RawDataManager();
                      rawDataManager.setImportId();
                      rawDataManager.setImportCanceled(false);
-                     rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+                     try {
+                        rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+                     } catch (final Exception e) {
+
+                        System.out.println("INTERRUPTED");
+                     }
+
                   };
 
-                  _dbUpdateExecutor.submit(executorTask);
+                  _futureTasks.add(_dbUpdateExecutor.submit(executorTask));
 
                } else {
 
@@ -306,9 +313,14 @@ public class DialogReimportTours extends TitleAreaDialog {
                   final long newCompletedTaskCount = _dbUpdateExecutor.getCompletedTaskCount();
 
                   if (monitor.isCanceled()) {
+
                      final Collection<? super Long> list = new ArrayList<>();
                      _dbUpdateQueue.drainTo(list);
-                     System.out.println(list.size());
+                     System.out.println(list.size() + " were not reimported");
+
+//                     for (final Future<?> f : _futureTasks) {
+//                        f.cancel(true);
+//                     }
                      break;
                   }
 
@@ -336,11 +348,23 @@ public class DialogReimportTours extends TitleAreaDialog {
       };
 
       try {
+
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
       } catch (final Exception e) {
+
          TourLogManager.logEx(e);
          Thread.currentThread().interrupt();
       } finally {
+//
+//         for (final Future<?> future : _futureTasks) {
+//            try {
+//               future.get(200, TimeUnit.MILLISECONDS);
+//            } catch (final InterruptedException | ExecutionException | TimeoutException e) {
+//               e.printStackTrace();
+//               Thread.currentThread().interrupt();
+//
+//            }
+//         }
 
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(//
@@ -992,6 +1016,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _dbUpdateExecutor.prestartAllCoreThreads();
 
       _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+      _futureTasks = new ArrayList<>();
    }
 
    private void initUI() {
