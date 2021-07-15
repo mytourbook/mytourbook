@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -397,13 +396,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
    }
 
    private void displayError(final ParseException e) {
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            final String message = e.getMessage();
-            MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-            System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-         }
+      Display.getDefault().syncExec(() -> {
+         final String message = e.getMessage();
+         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
+         System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
       });
    }
 
@@ -1475,21 +1471,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       if (needsSort) {
          /* sort the _timeDataList */
-         Collections.sort(_timeDataList, new Comparator<TimeData>() {
-            @Override
-            public int compare(final TimeData td1, final TimeData td2) {
-               if (td1.absoluteTime < td2.absoluteTime) {
-                  return -1;
-               }
-               if (td1.absoluteTime > td2.absoluteTime) {
-                  return 1;
-               }
-
-               return 0;
+         Collections.sort(_timeDataList, (timeData1, timeData2) -> {
+            if (timeData1.absoluteTime < timeData2.absoluteTime) {
+               return -1;
             }
+            if (timeData1.absoluteTime > timeData2.absoluteTime) {
+               return 1;
+            }
+
+            return 0;
          });
       }
-
    }
 
    /**
