@@ -150,7 +150,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private int                               _lastYear                = TimeTools.now().getYear();
 
    /**
-    * year item for the visible statistics
+    * Reference tour item for which the statistic is displayed. This statistic can display only
+    * compared tours for ONE reference tour.
     */
    private TVICatalogRefTourItem             _currentRefItem;
 
@@ -834,7 +835,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
 
-         if (removedCompTours.removedComparedTours.size() > 0) {
+         final ArrayList<Long> removedComparedTours = removedCompTours.removedComparedTours;
+
+         if (removedComparedTours.size() > 0) {
             updateUI_YearChart(false);
          }
 

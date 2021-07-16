@@ -55,11 +55,11 @@ public class ActionRemoveComparedTours extends Action {
 
    /**
     * @param selection
-    * @param removedTours
+    * @param selectionRemovedTours
     * @return Returns <code>true</code> when the tours are removed
     */
    private boolean removeComparedTours(final IStructuredSelection selection,
-                                       final SelectionRemovedComparedTours removedTours) {
+                                       final SelectionRemovedComparedTours selectionRemovedTours) {
 
       // confirm removal
       if (MessageDialog.openConfirm(_tourView.getSite().getShell(),
@@ -70,7 +70,7 @@ public class ActionRemoveComparedTours extends Action {
       }
 
       final TreeViewer tourViewer = _tourView.getTourViewer();
-      final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
+      final ArrayList<Long> removedComparedTours = selectionRemovedTours.removedComparedTours;
 
       // loop: selected items
       for (final Object element : selection) {
@@ -98,11 +98,11 @@ public class ActionRemoveComparedTours extends Action {
 
    /**
     * @param selection
-    * @param removedTours
+    * @param selectionRemovedTours
     * @return Returns <code>true</code> when the tours are deleted
     */
    private boolean removeRefTours(final IStructuredSelection selection,
-                                  final SelectionRemovedComparedTours removedTours) {
+                                  final SelectionRemovedComparedTours selectionRemovedTours) {
 
       // confirm deletion
       if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
@@ -113,7 +113,7 @@ public class ActionRemoveComparedTours extends Action {
       }
 
       final TreeViewer tourViewer = _tourView.getTourViewer();
-      final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
+      final ArrayList<Long> removedComparedTours = selectionRemovedTours.removedComparedTours;
       final ArrayList<Long> modifiedRefTours = new ArrayList<>();
 
       for (final Object element : selection) {
