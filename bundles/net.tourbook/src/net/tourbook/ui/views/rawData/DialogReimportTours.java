@@ -25,8 +25,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -77,84 +77,87 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
-   private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
+   private static final String             STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
+   private static final String             STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
 
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";           //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";      //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
+   private static final String             STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";           //$NON-NLS-1$
+   private static final String             STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";      //$NON-NLS-1$
+   private static final String             STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
 
-   private static final String          STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_CADENCE                      = "STATE_IS_IMPORT_CADENCE";                      //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_CALORIES                     = "STATE_IS_IMPORT_CALORIES";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_ELEVATION                    = "STATE_IS_IMPORT_ELEVATION";                    //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                  //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_FILE_LOCATION                = "STATE_IS_IMPORT_FILE_LOCATION";                //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_GEAR                         = "STATE_IS_IMPORT_GEAR";                         //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_POWER_AND_PULSE              = "STATE_IS_IMPORT_POWER_AND_PULSE";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_POWER_AND_SPEED              = "STATE_IS_IMPORT_POWER_AND_SPEED";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_RUNNING_DYNAMICS             = "STATE_IS_IMPORT_RUNNING_DYNAMICS";             //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_SWIMMING                     = "STATE_IS_IMPORT_SWIMMING";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TEMPERATURE                  = "STATE_IS_IMPORT_TEMPERATURE";                  //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TRAINING                     = "STATE_IS_IMPORT_TRAINING";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TOUR_MARKERS                 = "STATE_IS_IMPORT_TOUR_MARKERS";                 //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TIMER_PAUSES                 = "STATE_IS_IMPORT_TIMER_PAUSES";                 //$NON-NLS-1$
-   private static final String          STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";              //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_CADENCE                      = "STATE_IS_IMPORT_CADENCE";                      //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_CALORIES                     = "STATE_IS_IMPORT_CALORIES";                     //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_ELEVATION                    = "STATE_IS_IMPORT_ELEVATION";                    //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                  //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_FILE_LOCATION                = "STATE_IS_IMPORT_FILE_LOCATION";                //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_GEAR                         = "STATE_IS_IMPORT_GEAR";                         //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_POWER_AND_PULSE              = "STATE_IS_IMPORT_POWER_AND_PULSE";              //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_POWER_AND_SPEED              = "STATE_IS_IMPORT_POWER_AND_SPEED";              //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_RUNNING_DYNAMICS             = "STATE_IS_IMPORT_RUNNING_DYNAMICS";             //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_SWIMMING                     = "STATE_IS_IMPORT_SWIMMING";                     //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_TEMPERATURE                  = "STATE_IS_IMPORT_TEMPERATURE";                  //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_TRAINING                     = "STATE_IS_IMPORT_TRAINING";                     //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_TOUR_MARKERS                 = "STATE_IS_IMPORT_TOUR_MARKERS";                 //$NON-NLS-1$
+   private static final String             STATE_IS_IMPORT_TIMER_PAUSES                 = "STATE_IS_IMPORT_TIMER_PAUSES";                 //$NON-NLS-1$
+   private static final String             STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
 
-   private static final int             VERTICAL_SECTION_MARGIN                      = 10;
+   private static final int                VERTICAL_SECTION_MARGIN                      = 10;
 
-   private static final IDialogSettings _state                                       = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
+   private static final IDialogSettings    _state                                       = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
 
-   private final ITourViewer3           _tourViewer;
+   private static CountDownLatch           _countDownLatch;
 
-   private SelectionAdapter             _defaultListener;
+   private static ArrayBlockingQueue<Long> _dbUpdateQueue;
 
-   private PixelConverter               _pc;
+   private static ThreadPoolExecutor       _dbUpdateExecutor;
 
+   private static ThreadFactory            _threadFactory;
+   private final ITourViewer3              _tourViewer;
+
+   private SelectionAdapter                _defaultListener;
+
+   private PixelConverter                  _pc;
    //
-   private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
-   private Image _imageLockOpen   = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Open).createImage();
+   private Image                           _imageLockClosed                             = CommonActivator.getThemedImageDescriptor(
+         CommonImages.Lock_Closed).createImage();
+   private Image                           _imageLockOpen                               = CommonActivator.getThemedImageDescriptor(
+         CommonImages.Lock_Open).createImage();
 
    /*
     * UI controls
     */
-   private Composite                _parent;
+   private Composite _parent;
+   private Button    _btnDeselectAll;
+   private Button    _btnUnlockAllToursSelection;
+   private Button    _btnUnlockBetweenDatesSelection;
+   private Button    _chkData_AllTimeSlices;
+   private Button    _chkData_Cadence;
+   private Button    _chkData_Calories;
+   private Button    _chkData_Elevation;
+   private Button    _chkData_EntireTour;
+   private Button    _chkData_Gear;
+   private Button    _chkData_ImportFileLocation;
+   private Button    _chkData_PowerAndPulse;
+   private Button    _chkData_PowerAndSpeed;
+   private Button    _chkData_RunningDynamics;
+   private Button    _chkSkip_Tours_With_ImportFile_NotFound;
+   private Button    _chkData_Swimming;
 
-   private Button                   _btnDeselectAll;
-   private Button                   _btnUnlockAllToursSelection;
-   private Button                   _btnUnlockBetweenDatesSelection;
+   private Button    _chkData_Temperature;
+   private Button    _chkData_Training;
+   private Button    _chkData_TourMarkers;
 
-   private Button                   _chkData_AllTimeSlices;
-   private Button                   _chkData_Cadence;
-   private Button                   _chkData_Calories;
-   private Button                   _chkData_Elevation;
-   private Button                   _chkData_EntireTour;
-   private Button                   _chkData_Gear;
-   private Button                   _chkData_ImportFileLocation;
-   private Button                   _chkData_PowerAndPulse;
-   private Button                   _chkData_PowerAndSpeed;
-   private Button                   _chkData_RunningDynamics;
-   private Button                   _chkSkip_Tours_With_ImportFile_NotFound;
-   private Button                   _chkData_Swimming;
-   private Button                   _chkData_Temperature;
-   private Button                   _chkData_Training;
-   private Button                   _chkData_TourMarkers;
-   private Button                   _chkData_TourTimerPauses;
+   private Button    _chkData_TourTimerPauses;
+   private Button    _rdoReimport_Tours_All;
 
-   private Button                   _rdoReimport_Tours_All;
-   private Button                   _rdoReimport_Tours_BetweenDates;
-   private Button                   _rdoReimport_Tours_Selected;
+   private Button    _rdoReimport_Tours_BetweenDates;
 
-   private DateTime                 _dtTourDate_From;
-   private DateTime                 _dtTourDate_Until;
+   private Button    _rdoReimport_Tours_Selected;
+   private DateTime  _dtTourDate_From;
+   private DateTime  _dtTourDate_Until;
+   private Group     _groupTours;
 
-   private Group                    _groupTours;
-
-   private ThreadPoolExecutor       _dbUpdateExecutor;
-   private ArrayBlockingQueue<Long> _dbUpdateQueue;
-   private List<Future<?>>          _futureTasks;
-
-   private ThreadFactory            _threadFactory;
+   //private List<Future<?>> _futureTasks;
 
    /**
     * @param parentShell
@@ -175,9 +178,9 @@ public class DialogReimportTours extends TitleAreaDialog {
     * @param skipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
-   private void actionReimportSelectedTours(final List<TourValueType> tourValueTypes,
-                                            final ITourViewer3 tourViewer,
-                                            final boolean skipToursWithFileNotFound) {
+   private static void actionReimportSelectedTours(final List<TourValueType> tourValueTypes,
+                                                   final ITourViewer3 tourViewer,
+                                                   final boolean skipToursWithFileNotFound) {
 
       final long start = System.currentTimeMillis();
       if (!RawDataManager.getInstance().actionModifyTourValues_10_Confirm(tourValueTypes, true)) {
@@ -208,20 +211,21 @@ public class DialogReimportTours extends TitleAreaDialog {
       if (isReimportConcurrent) {
 
          initializeThreadPoolExecutor();
+
+         _countDownLatch = new CountDownLatch(selectedTourIds.length);
+
       } else {
 
          RawDataManager.getInstance().setImportId();
          RawDataManager.getInstance().setImportCanceled(false);
       }
 
+      final ReImportStatus[] reImportStatus = new ReImportStatus[1];
+      reImportStatus[0] = new ReImportStatus();
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
-
-         Display display = Display.getDefault();
 
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-            final ReImportStatus reImportStatus = new ReImportStatus();
 
             final File[] reimportedFile = new File[1];
             int reimported = 0;
@@ -232,11 +236,6 @@ public class DialogReimportTours extends TitleAreaDialog {
             // loop: all selected tours in the viewer
             for (final Long tourId : selectedTourIds) {
 
-               if (monitor.isCanceled()) {
-                  // stop re-importing but process re-imported tours
-                  break;
-               }
-
                final TourData oldTourData = TourManager.getTour(tourId);
                if (oldTourData == null) {
                   continue;
@@ -244,92 +243,182 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                if (isReimportConcurrent) {
 
-                  try {
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { _dbUpdateExecutor.getCompletedTaskCount(), numberOfTours }));
 
-                     _dbUpdateQueue.put(tourId);
+                  if (monitor.isCanceled()) {
 
-                  } catch (final InterruptedException e) {
+                     // count down all, that the compare task can finish and display the compare result
+                     System.out.println("CANCELLED RECEIVED");
 
-                     StatusUtil.log(e);
-                     Thread.currentThread().interrupt();
-                  }
+                     long numCounts = _countDownLatch.getCount();
+                     while (numCounts-- > 0) {
 
-                  final Runnable executorTask = () -> {
-
-                     // get last added item
-                     Long queueItem_TourId;
-                     queueItem_TourId = _dbUpdateQueue.poll();
-
-                     if (queueItem_TourId == null) {
-                        return;
+                        System.out.println(numCounts);
+                        _countDownLatch.countDown();
                      }
 
-                     final RawDataManager rawDataManager = new RawDataManager();
-                     rawDataManager.setImportId();
-                     rawDataManager.setImportCanceled(false);
-                     rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+                     return;
+                  }
 
-                  };
-
-                  _futureTasks.add(_dbUpdateExecutor.submit(executorTask));
+                  reimportTour_Concurrent(
+                        tourId,
+                        monitor,
+                        tourValueTypes,
+                        oldTourData,
+                        reimportedFile,
+                        reImportStatus[0]);
 
                } else {
+
+                  if (monitor.isCanceled()) {
+                     // stop re-importing but process re-imported tours
+                     break;
+                  }
 
                   monitor.worked(1);
                   monitor.subTask(NLS.bind(
                         Messages.Import_Data_Dialog_Reimport_SubTask,
                         new Object[] { ++reimported, numberOfTours }));
 
-                  RawDataManager.getInstance().reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+                  RawDataManager.getInstance().reimportTour(tourValueTypes,
+                        oldTourData,
+                        reimportedFile,
+                        skipToursWithFileNotFound,
+                        reImportStatus[0]);
 
-                  if (handleFileLocationDialog_UserCancellation(reImportStatus, skipToursWithFileNotFound)) {
+                  if (handleFileLocationDialog_UserCancellation(reImportStatus[0], skipToursWithFileNotFound)) {
                      break;
                   }
                }
             }
 
-            if (isReimportConcurrent && !monitor.isCanceled()) {
-
-               // All tasks have been submitted, we can begin the shutdown of our executor
-               //(preventing new tasks from being submitted)
-               _dbUpdateExecutor.shutdown();
-
-               while (!_dbUpdateExecutor.isTerminated()) {
-
-                  monitor.subTask(NLS.bind(
-                        Messages.Import_Data_Dialog_Reimport_SubTask,
-                        new Object[] { _dbUpdateExecutor.getCompletedTaskCount(), numberOfTours }));
-               }
-            }
-
-            if (reImportStatus.isReImported()) {
-
-               RawDataManager.getInstance().updateTourData_InImportView_FromDb(monitor);
-
-               // reselect tours, run in UI thread
-               display.asyncExec(tourViewer::reloadViewer);
-            }
          }
       };
 
       try {
 
-         final boolean isCancelable = !isReimportConcurrent;
          new ProgressMonitorDialog(Display.getDefault().getActiveShell())
-               .run(true, isCancelable, importRunnable);
+               .run(true, true, importRunnable);
+
+         // wait until all comparisons are performed
+         _countDownLatch.await();
+
+         final double time = (System.currentTimeMillis() - start) / 1000.0;
+         TourLogManager.addLog(//
+               TourLogState.DEFAULT,
+               String.format(RawDataManager.LOG_REIMPORT_END, time));
+
+         if (reImportStatus[0].isReImported()) {
+
+            RawDataManager.getInstance().updateTourData_InImportView_FromDb(null);
+
+            // reselect tours, run in UI thread
+            Display.getDefault().asyncExec(tourViewer::reloadViewer);
+         }
 
       } catch (final Exception e) {
 
          TourLogManager.logEx(e);
          Thread.currentThread().interrupt();
 
-      } finally {
-
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(//
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_REIMPORT_END, time));
       }
+   }
+
+   private static boolean handleFileLocationDialog_UserCancellation(final ReImportStatus reImportStatus,
+                                                                    final boolean skipToursWithFileNotFound) {
+
+      final boolean[] isUserAsked_ToCancelReImport = { false };
+
+      if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() &&
+            isUserAsked_ToCancelReImport[0] == false &&
+            skipToursWithFileNotFound == false) {
+
+         // user has canceled the re-import -> ask if the whole re-import should be canceled
+
+         final boolean[] isCancelReimport = { false };
+
+         final Display display = Display.getDefault();
+
+         display.syncExec(() -> {
+
+            if (MessageDialog.openQuestion(display.getActiveShell(),
+                  Messages.Import_Data_Dialog_IsCancelReImport_Title,
+                  Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+
+               isCancelReimport[0] = true;
+
+            } else {
+
+               isUserAsked_ToCancelReImport[0] = true;
+            }
+         });
+
+         return isCancelReimport[0];
+      }
+
+      return false;
+   }
+
+   private static void initializeThreadPoolExecutor() {
+
+      _threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, _threadFactory);
+      _dbUpdateExecutor.prestartAllCoreThreads();
+
+      _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+      //  _futureTasks = new ArrayList<>();
+   }
+
+   private static void reimportTour_Concurrent(final Long tourId,
+                                               final IProgressMonitor monitor,
+                                               final List<TourValueType> tourValueTypes,
+                                               final TourData oldTourData,
+                                               final File[] reimportedFile,
+                                               final ReImportStatus reImportStatus) {
+      try {
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      final Runnable executorTask = () -> {
+
+         // get last added item
+         Long queueItem_TourId;
+         queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final RawDataManager rawDataManager = new RawDataManager();
+         rawDataManager.setImportId();
+         rawDataManager.setImportCanceled(false);
+         rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, true, reImportStatus);
+
+         monitor.worked(1);
+
+         _countDownLatch.countDown();
+      };
+
+      _dbUpdateExecutor.submit(executorTask);
+
+      // _futureTasks.add(_dbUpdateExecutor.submit(executorTask));
    }
 
    @Override
@@ -922,60 +1011,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       //Helpful during development
 //    return null;
-   }
-
-   public boolean handleFileLocationDialog_UserCancellation(final ReImportStatus reImportStatus,
-                                                            final boolean skipToursWithFileNotFound) {
-
-      final boolean[] isUserAsked_ToCancelReImport = { false };
-
-      if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() &&
-            isUserAsked_ToCancelReImport[0] == false &&
-            skipToursWithFileNotFound == false) {
-
-         // user has canceled the re-import -> ask if the whole re-import should be canceled
-
-         final boolean[] isCancelReimport = { false };
-
-         final Display display = Display.getDefault();
-
-         display.syncExec(() -> {
-
-            if (MessageDialog.openQuestion(display.getActiveShell(),
-                  Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                  Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
-
-               isCancelReimport[0] = true;
-
-            } else {
-
-               isUserAsked_ToCancelReImport[0] = true;
-            }
-         });
-
-         return isCancelReimport[0];
-      }
-
-      return false;
-   }
-
-   private void initializeThreadPoolExecutor() {
-
-      _threadFactory = runnable -> {
-
-         final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
-
-         thread.setPriority(Thread.MIN_PRIORITY);
-         thread.setDaemon(true);
-
-         return thread;
-      };
-
-      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, _threadFactory);
-      _dbUpdateExecutor.prestartAllCoreThreads();
-
-      _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
-      _futureTasks = new ArrayList<>();
    }
 
    private void initUI() {
