@@ -272,12 +272,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     *
     * @param comparedTours
     * @param parentItem
-    * @param findCompIds
+    * @param removedComparedTours
     *           comp id's which should be found
     */
    private static void getComparedTours(final ArrayList<TVICatalogComparedTour> comparedTours,
                                         final TreeViewerItem parentItem,
-                                        final ArrayList<Long> findCompIds) {
+                                        final ArrayList<ElevationCompareResult> removedComparedTours) {
 
       final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
 
@@ -292,15 +292,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                final TVICatalogComparedTour ttiCompResult = (TVICatalogComparedTour) tourTreeItem;
                final long ttiCompId = ttiCompResult.getCompId();
 
-               for (final Long compId : findCompIds) {
-                  if (ttiCompId == compId) {
+               for (final ElevationCompareResult compareResultItem : removedComparedTours) {
+
+                  if (ttiCompId == compareResultItem.compareId) {
                      comparedTours.add(ttiCompResult);
                   }
                }
 
             } else {
                // this is a child which can be the parent for other children
-               getComparedTours(comparedTours, tourTreeItem, findCompIds);
+               getComparedTours(comparedTours, tourTreeItem, removedComparedTours);
             }
          }
       }
@@ -488,13 +489,17 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                // check if the compared tour was saved in the database
                if (compareTourProperty.isDataSaved) {
 
-                  final ArrayList<Long> compareIds = new ArrayList<>();
-                  compareIds.add(compareTourProperty.compareId);
+                  final ArrayList<ElevationCompareResult> allCompareItems = new ArrayList<>();
+                  allCompareItems.add(new ElevationCompareResult(
+
+                        compareTourProperty.compareId,
+                        compareTourProperty.tourId,
+                        compareTourProperty.refTourId));
 
                   // find the compared tour in the viewer
                   final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<>();
 
-                  getComparedTours(comparedTours, _rootItem, compareIds);
+                  getComparedTours(comparedTours, _rootItem, allCompareItems);
 
                   if (comparedTours.size() > 0) {
 
@@ -1480,7 +1485,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       }
 
       // clear selection
-      persistedCompareResults.clear();
+// have no idea why it was cleared but it prevents to update other views
+//      persistedCompareResults.clear();
 
       // loop: all ref tours where children have been added
       for (final Long refId : viewRefIds.values()) {

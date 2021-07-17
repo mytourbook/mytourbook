@@ -18,6 +18,8 @@ package net.tourbook.ui.views.tourCatalog;
 public class TourPropertyCompareTourChanged {
 
    long    compareId;
+   long    tourId;
+   long    refTourId;
 
    int     startIndex;
    int     endIndex;
@@ -30,13 +32,27 @@ public class TourPropertyCompareTourChanged {
 
    Object  comparedTourItem;
 
+   /**
+    * @param compareId
+    * @param tourId
+    * @param startIndex
+    * @param endIndex
+    * @param isDataSaved
+    * @param comparedTourItem
+    */
    public TourPropertyCompareTourChanged(final long compareId,
+                                         final long tourId,
+                                         final long refTourId,
+
                                          final int startIndex,
                                          final int endIndex,
+
                                          final boolean isDataSaved,
                                          final Object comparedTourItem) {
 
       this.compareId = compareId;
+      this.tourId = tourId;
+      this.refTourId = refTourId;
 
       this.startIndex = startIndex;
       this.endIndex = endIndex;

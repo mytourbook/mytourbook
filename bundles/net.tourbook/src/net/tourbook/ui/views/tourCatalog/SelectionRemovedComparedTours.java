@@ -22,9 +22,9 @@ import org.eclipse.jface.viewers.ISelection;
 public class SelectionRemovedComparedTours implements ISelection {
 
    /**
-    * contains compared tours which have been deleted in the tour map view
+    * Contains compared tours which have been removed in the reference tours view
     */
-   public ArrayList<Long> removedComparedTours = new ArrayList<>();
+   public ArrayList<ElevationCompareResult> removedComparedTours = new ArrayList<>();
 
    @Override
    public boolean isEmpty() {

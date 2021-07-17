@@ -144,23 +144,6 @@
                
       </perspectiveExtension>
 
-      <perspectiveExtension targetID="net.tourbook.perspective.TourCatalog">
-
-         <viewShortcut id="net.tourbook.views.tourCatalog.comparedTourView"/>
-         <viewShortcut id="net.tourbook.views.tourCatalog.referenceTourView"/>
-         <viewShortcut id="net.tourbook.views.tourCatalog.yearStatisticView"/>
-      
-      </perspectiveExtension>
-
-
-      <perspectiveExtension targetID="net.tourbook.perspective.CompareTours">
-
-         <viewShortcut id="net.tourbook.views.tourCatalog.CompareResultView"/>
-         <viewShortcut id="net.tourbook.views.tourCatalog.referenceTourView"/>
-         <viewShortcut id="net.tourbook.views.tourCatalog.comparedTourView"/>
-      
-      </perspectiveExtension>
-
    </extension>
 
 

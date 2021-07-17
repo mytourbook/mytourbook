@@ -29,6 +29,7 @@ import net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourCompareResultView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -52,6 +53,12 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
       layout.setEditorAreaVisible(false);
 
+      layout.addShowViewShortcut(TourCompareResultView.ID);
+      layout.addShowViewShortcut(TourCatalogView.ID);
+      layout.addShowViewShortcut(TourCatalogView_ComparedTour.ID);
+      layout.addShowViewShortcut(TourCatalogView_ReferenceTour.ID);
+      layout.addShowViewShortcut(RefTour_YearStatistic_View.ID);
+
 // SET_FORMATTING_OFF
 
       //--------------------------------------------------------------------------------
@@ -63,6 +70,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
             IPageLayout.LEFT, 0.4f, IPageLayout.ID_EDITOR_AREA);
 
       folderTourDirectory.addView(TourCatalogView.ID);
+      folderTourDirectory.addPlaceholder(TourCompareResultView.ID);
       folderTourDirectory.addPlaceholder(TourBookView.ID);
       folderTourDirectory.addPlaceholder(CalendarView.ID);
       folderTourDirectory.addPlaceholder(StatisticView.ID);
@@ -121,7 +129,6 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
             IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_CHART_COMPARED_TOUR);
 
       folderTourChart.addView(TourChartView.ID);
-
 
 // SET_FORMATTING_ON
    }

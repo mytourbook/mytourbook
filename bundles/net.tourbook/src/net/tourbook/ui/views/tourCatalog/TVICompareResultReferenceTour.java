@@ -117,21 +117,21 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
             compTour.setParentItem(this);
 
             /*
-             * set the status if the compared tour is already stored in the database and set the
+             * Set the status if the compared tour is already stored in the database and set the
              * id for the compared tour
              */
-            final Long comparedTourId = compTour.comparedTourData.getTourId();
+            final Long comparedTourId = compTour.getTourId();
             final boolean isStoredForRefTour = _storedComparedTours.containsKey(comparedTourId);
 
             if (isStoredForRefTour) {
                final StoredComparedTour storedComparedTour = _storedComparedTours.get(comparedTourId);
-               compTour.compId = storedComparedTour.comparedId;
+               compTour.compareId = storedComparedTour.comparedId;
                compTour.dbStartIndex = storedComparedTour.startIndex;
                compTour.dbEndIndex = storedComparedTour.endIndex;
                compTour.dbSpeed = storedComparedTour.tourSpeed;
                compTour.dbElapsedTime = storedComparedTour.tourElapsedTime;
             } else {
-               compTour.compId = -1;
+               compTour.compareId = -1;
             }
 
             children.add(compTour);

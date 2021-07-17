@@ -16,6 +16,7 @@
 package net.tourbook.application;
 
 import net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
 import net.tourbook.ui.views.tourCatalog.TourCompareResultView;
@@ -38,6 +39,12 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
       layout.setEditorAreaVisible(false);
 
+      layout.addShowViewShortcut(TourCompareResultView.ID);
+      layout.addShowViewShortcut(TourCatalogView.ID);
+      layout.addShowViewShortcut(TourCatalogView_ComparedTour.ID);
+      layout.addShowViewShortcut(TourCatalogView_ReferenceTour.ID);
+      layout.addShowViewShortcut(RefTour_YearStatistic_View.ID);
+
 // SET_FORMATTING_OFF
 
       //--------------------------------------------------------------------------------
@@ -49,6 +56,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
             IPageLayout.LEFT,       0.4f,    IPageLayout.ID_EDITOR_AREA);
 
       listFolder.addView(TourCompareResultView.ID);
+      listFolder.addPlaceholder(TourCatalogView.ID);
 
       //--------------------------------------------------------------------------------
 

@@ -261,7 +261,7 @@ public class TourCompareManager {
                   if (compareResult.computedStartIndex != -1) {
 
                      compareResult.refTour = refTourItem;
-                     compareResult.comparedTourData = compareTourData;
+                     compareResult.setComparedTourData(compareTourData);
 
                      _comparedTourItems.add(compareResult);
                   }
@@ -608,6 +608,7 @@ public class TourCompareManager {
    public static HashMap<Long, StoredComparedTour> getComparedToursFromDb(final long refId) {
 
       final HashMap<Long, StoredComparedTour> storedComparedTours = new HashMap<>();
+
       final String sql = UI.EMPTY_STRING
 
             + "SELECT" + NL //               //$NON-NLS-1$
@@ -632,7 +633,9 @@ public class TourCompareManager {
 
             final StoredComparedTour storedComparedTour = new StoredComparedTour();
 
-            final long dbTourId = result.getLong(1);
+            final long dbTourId;
+
+            storedComparedTour.tourId = dbTourId = result.getLong(1);
             storedComparedTour.comparedId = result.getLong(2);
             storedComparedTour.startIndex = result.getInt(3);
             storedComparedTour.endIndex = result.getInt(4);
@@ -721,7 +724,7 @@ public class TourCompareManager {
                                            final EntityManager em,
                                            final EntityTransaction ts) {
 
-      final TourData tourData = comparedTourItem.comparedTourData;
+      final TourData tourData = comparedTourItem.getComparedTourData();
 
       final float avgPulse = tourData.computeAvg_PulseSegment(
             comparedTourItem.computedStartIndex,
@@ -757,7 +760,7 @@ public class TourCompareManager {
       ts.commit();
 
       // updata saved data
-      comparedTourItem.compId = comparedTour.getComparedId();
+      comparedTourItem.compareId = comparedTour.getComparedId();
       comparedTourItem.dbStartIndex = comparedTourItem.computedStartIndex;
       comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
 

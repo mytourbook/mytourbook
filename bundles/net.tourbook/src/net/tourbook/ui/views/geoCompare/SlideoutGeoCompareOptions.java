@@ -583,11 +583,11 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
 // SET_FORMATTING_OFF
 
-      _spinnerGeo_DistanceInterval                 .setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
-      _spinnerGeo_Accuracy                      .setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
+      _spinnerGeo_DistanceInterval                    .setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
+      _spinnerGeo_Accuracy                            .setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
 
-      _chkGeo_RelativeDifferences_Filter           .setSelection(GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER);
-      _spinnerGeo_RelativeDifferences_Filter    .setSelection(GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER);
+      _chkGeo_RelativeDifferences_Filter              .setSelection(GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER);
+      _spinnerGeo_RelativeDifferences_Filter          .setSelection(GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER);
 
       /*
        * Map options
