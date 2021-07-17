@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,4 +30,12 @@ public class ReImportStatus {
    boolean isCanceled_Auto_ImportFilePathIsEmpty;
 
    boolean isCanceled_Auto_TheFileLocationDialog;
+
+   public boolean isReImported() {
+      return isReImported;
+   }
+
+   public boolean isCanceled_ByUser_TheFileLocationDialog() {
+      return isCanceled_ByUser_TheFileLocationDialog;
+   }
 }
