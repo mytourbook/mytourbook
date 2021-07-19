@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,18 +29,18 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    /**
     * unique id for the {@link TourCompared} entity
     */
-   long compareId;
+   long            compareId;
 
    /**
     *
     */
-   long refId      = -1;
+   long            refId      = -1;
 
-   int  startIndex = -1;
-   int  endIndex   = -1;
+   int             startIndex = -1;
+   int             endIndex   = -1;
 
    /*
-    * fields from TourData
+    * Fields from TourData
     */
    long            tourTypeId;
    String          tourTitle;
@@ -153,5 +153,19 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    void setTourSpeed(final float tourSpeed) {
       this.tourSpeed = tourSpeed;
+   }
+
+   @Override
+   public String toString() {
+
+      return NL
+
+            + "TVICatalogComparedTour" + NL //$NON-NLS-1$
+
+//            + " compareId = " + compareId + NL //$NON-NLS-1$
+//            + " refId     = " + refId + NL //$NON-NLS-1$
+            + " tourDate  = " + tourDate + NL //$NON-NLS-1$
+            + " tourTitle = " + tourTitle + NL //$NON-NLS-1$
+      ;
    }
 }

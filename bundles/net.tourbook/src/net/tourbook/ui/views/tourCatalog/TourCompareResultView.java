@@ -67,7 +67,6 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -118,7 +117,6 @@ public class TourCompareResultView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-
    private static final String COLUMN_FACTORY_MOTION_ALTIMETER          = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter;
    private static final String COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter_Tooltip;
 
@@ -146,7 +144,7 @@ public class TourCompareResultView extends ViewPart implements
    private boolean                             _isToolbarCreated;
    private boolean                             _isToolTipInTour;
 
-   private CompareFilter                       _compareFilter                    = CompareFilter.NOTHING;
+   private CompareFilter                       _compareFilter                    = CompareFilter.ALL_IS_DISPLAYED;
 
    private ColumnManager                       _columnManager;
 
@@ -157,18 +155,20 @@ public class TourCompareResultView extends ViewPart implements
    private IContextMenuProvider                _viewerContextMenuProvider        = new TreeContextMenuProvider();
 
    private ActionAppTourFilter                 _actionAppTourFilter;
-   private ActionCheckTours                    _actionCheckTours;
    private ActionCollapseAll                   _actionCollapseAll;
-   private ActionCompareByElevation_AllTours   _actionCompareAllTours;
-   private ActionCompareByElevation_WithWizard _actionCompareWithWizard;
-   private ActionEditQuick                     _actionEditQuick;
-   private ActionEditTour                      _actionEditTour;
    private ActionElevationCompareFilter        _actionElevationCompareFilter;
-   private ActionOpenTour                      _actionOpenTour;
-   private ActionRemoveComparedTourSaveStatus  _actionRemoveComparedTourSaveStatus;
-   private ActionSetTourTypeMenu               _actionSetTourType;
-   private ActionSaveComparedTours             _actionSaveComparedTours;
-   private ActionUncheckTours                  _actionUncheckTours;
+   private ActionReRunComparision              _actionReRunComparision;
+
+   private ActionCheckTours                    _actionContext_CheckTours;
+   private ActionCompareByElevation_AllTours   _actionContext_CompareAllTours;
+   private ActionCompareByElevation_WithWizard _actionContext_CompareWithWizard;
+   private ActionEditQuick                     _actionContext_EditQuick;
+   private ActionEditTour                      _actionContext_EditTour;
+   private ActionOpenTour                      _actionContext_OpenTour;
+   private ActionRemoveComparedTourSaveStatus  _actionContext_RemoveComparedTourSaveStatus;
+   private ActionSetTourTypeMenu               _actionContext_SetTourType;
+   private ActionSaveComparedTours             _actionContext_SaveComparedTours;
+   private ActionUncheckTours                  _actionContext_UncheckTours;
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
 
@@ -216,10 +216,36 @@ public class TourCompareResultView extends ViewPart implements
       }
    }
 
+   private class ActionReRunComparision extends Action {
+
+      public ActionReRunComparision() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Elevation_Compare_Action_ReRunComparison_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Refresh));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Refresh_Disabled));
+      }
+
+      @Override
+      public void run() {
+         action_ReRunComparision();
+      }
+   }
+
    private enum CompareFilter {
 
-      NOTHING, //
-      SAVED, //
+      ALL_IS_DISPLAYED,
+
+      /**
+       * Only saved tours are displayed
+       */
+      SAVED,
+
+      /**
+       * Only not saved tours are displayed
+       */
       NOT_SAVED
    }
 
@@ -257,7 +283,7 @@ public class TourCompareResultView extends ViewPart implements
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-         if (_compareFilter == CompareFilter.NOTHING) {
+         if (_compareFilter == CompareFilter.ALL_IS_DISPLAYED) {
 
             // nothing is filtered
             return true;
@@ -327,7 +353,7 @@ public class TourCompareResultView extends ViewPart implements
 
       // toggle compare Filter
 
-      if (_compareFilter == CompareFilter.NOTHING) {
+      if (_compareFilter == CompareFilter.ALL_IS_DISPLAYED) {
 
          _compareFilter = CompareFilter.SAVED;
          _actionElevationCompareFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourElevationCompareFilter_Saved));
@@ -339,11 +365,25 @@ public class TourCompareResultView extends ViewPart implements
 
       } else {
 
-         _compareFilter = CompareFilter.NOTHING;
+         _compareFilter = CompareFilter.ALL_IS_DISPLAYED;
          _actionElevationCompareFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourElevationCompareFilter));
       }
 
       _tourViewer.refresh();
+   }
+
+   private void action_ReRunComparision() {
+
+      final ArrayList<RefTourItem> selectedRefTourItems = TourCompareManager.getComparedReferenceTours();
+
+      final ArrayList<Long> allTourIds = isUseFastAppFilter()
+
+            ? TourDatabase.getAllTourIds_WithFastAppFilter()
+            : TourDatabase.getAllTourIds();
+
+      final Long[] allTourIdsAsArray = allTourIds.toArray(new Long[allTourIds.size()]);
+
+      TourCompareManager.compareTours(selectedRefTourItems, allTourIdsAsArray);
    }
 
    private void addCompareTourPropertyListener() {
@@ -564,24 +604,21 @@ public class TourCompareResultView extends ViewPart implements
 
    private void createActions() {
 
-      _actionSaveComparedTours = new ActionSaveComparedTours(this);
-      _actionRemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
-
-      _actionCheckTours = new ActionCheckTours(this);
-      _actionUncheckTours = new ActionUncheckTours(this);
-
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
-
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionOpenTour = new ActionOpenTour(this);
-
-      _actionCollapseAll = new ActionCollapseAll(this);
-
       _actionAppTourFilter = new ActionAppTourFilter();
+      _actionCollapseAll = new ActionCollapseAll(this);
       _actionElevationCompareFilter = new ActionElevationCompareFilter();
-      _actionCompareAllTours = new ActionCompareByElevation_AllTours(this);
-      _actionCompareWithWizard = new ActionCompareByElevation_WithWizard(this);
+      _actionReRunComparision = new ActionReRunComparision();
+
+      _actionContext_CheckTours = new ActionCheckTours(this);
+      _actionContext_CompareAllTours = new ActionCompareByElevation_AllTours(this);
+      _actionContext_CompareWithWizard = new ActionCompareByElevation_WithWizard(this);
+      _actionContext_EditQuick = new ActionEditQuick(this);
+      _actionContext_EditTour = new ActionEditTour(this);
+      _actionContext_OpenTour = new ActionOpenTour(this);
+      _actionContext_RemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
+      _actionContext_SaveComparedTours = new ActionSaveComparedTours(this);
+      _actionContext_SetTourType = new ActionSetTourTypeMenu(this);
+      _actionContext_UncheckTours = new ActionUncheckTours(this);
    }
 
    private void createMenuManager() {
@@ -590,12 +627,7 @@ public class TourCompareResultView extends ViewPart implements
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-         }
-      });
+      _viewerMenuManager.addMenuListener(menuManager -> fillContextMenu(menuManager));
    }
 
    @Override
@@ -625,6 +657,7 @@ public class TourCompareResultView extends ViewPart implements
       _tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
 
       restoreState();
+      enableActions();
 
       updateToolTipState();
    }
@@ -699,7 +732,7 @@ public class TourCompareResultView extends ViewPart implements
 
             } else {
 
-               enableActions();
+               enableActions_ContextMenu();
             }
 
          } else {
@@ -1172,6 +1205,15 @@ public class TourCompareResultView extends ViewPart implements
 
    private void enableActions() {
 
+      final boolean canReRunComparision = _rootItem != null
+            && _rootItem.getUnfetchedChildren() != null
+            && _rootItem.getUnfetchedChildren().size() > 0;
+
+      _actionReRunComparision.setEnabled(canReRunComparision);
+   }
+
+   private void enableActions_ContextMenu() {
+
       final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
 
       int numTourItems = 0;
@@ -1255,26 +1297,26 @@ public class TourCompareResultView extends ViewPart implements
          isOneTourSelected = true;
       }
 
-      _actionCheckTours.setEnabled(numUnsavedTourItems > 0);
-      _actionUncheckTours.setEnabled(checkedTours > 0);
+      _actionContext_CheckTours.setEnabled(numUnsavedTourItems > 0);
+      _actionContext_UncheckTours.setEnabled(checkedTours > 0);
 
       // action: save compare result
-      _actionSaveComparedTours.setEnabled(numUnsavedTourItems > 0);
+      _actionContext_SaveComparedTours.setEnabled(numUnsavedTourItems > 0);
 
       // action: remove tour from saved compare result, currently only one tour item is supported
-      _actionRemoveComparedTourSaveStatus.setEnabled(numSavedTourItems > 0);
+      _actionContext_RemoveComparedTourSaveStatus.setEnabled(numSavedTourItems > 0);
 
-      _actionCompareAllTours.setEnabled(isRefItemSelected);
-      _actionCompareWithWizard.setEnabled(isRefItemSelected);
+      _actionContext_CompareAllTours.setEnabled(isRefItemSelected);
+      _actionContext_CompareWithWizard.setEnabled(isRefItemSelected);
 
       // actions: edit tour
-      _actionEditQuick.setEnabled(isOneTourSelected);
-      _actionEditTour.setEnabled(isOneTourSelected);
-      _actionOpenTour.setEnabled(isOneTourSelected);
+      _actionContext_EditQuick.setEnabled(isOneTourSelected);
+      _actionContext_EditTour.setEnabled(isOneTourSelected);
+      _actionContext_OpenTour.setEnabled(isOneTourSelected);
 
       // action: tour type
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      _actionContext_SetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       // tags: add/remove/remove all
       Set<TourTag> allExistingTags = null;
@@ -1296,29 +1338,29 @@ public class TourCompareResultView extends ViewPart implements
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionSaveComparedTours);
-      menuMgr.add(_actionRemoveComparedTourSaveStatus);
-      menuMgr.add(_actionCheckTours);
-      menuMgr.add(_actionUncheckTours);
+      menuMgr.add(_actionContext_SaveComparedTours);
+      menuMgr.add(_actionContext_RemoveComparedTourSaveStatus);
+      menuMgr.add(_actionContext_CheckTours);
+      menuMgr.add(_actionContext_UncheckTours);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionCompareWithWizard);
-      menuMgr.add(_actionCompareAllTours);
+      menuMgr.add(_actionContext_CompareWithWizard);
+      menuMgr.add(_actionContext_CompareAllTours);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionEditQuick);
-      menuMgr.add(_actionEditTour);
-      menuMgr.add(_actionOpenTour);
+      menuMgr.add(_actionContext_EditQuick);
+      menuMgr.add(_actionContext_EditTour);
+      menuMgr.add(_actionContext_OpenTour);
 
       // tour tag actions
       _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());
-      menuMgr.add(_actionSetTourType);
+      menuMgr.add(_actionContext_SetTourType);
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-      enableActions();
+      enableActions_ContextMenu();
    }
 
    private void fillToolbar() {
@@ -1334,6 +1376,7 @@ public class TourCompareResultView extends ViewPart implements
 
       tbm.add(_actionElevationCompareFilter);
       tbm.add(_actionAppTourFilter);
+      tbm.add(_actionReRunComparision);
       tbm.add(_actionCollapseAll);
 
       tbm.update(true);
@@ -1936,7 +1979,7 @@ public class TourCompareResultView extends ViewPart implements
    public void updateViewer() {
 
       // disable filter, show all compared tours
-      _compareFilter = CompareFilter.NOTHING;
+      _compareFilter = CompareFilter.ALL_IS_DISPLAYED;
       _actionElevationCompareFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourElevationCompareFilter));
 
       reloadViewer();
@@ -1950,5 +1993,6 @@ public class TourCompareResultView extends ViewPart implements
          _tourViewer.expandToLevel(refTourItems.get(0), 1, true);
       }
 
+      enableActions();
    }
 }

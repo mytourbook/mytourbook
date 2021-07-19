@@ -33,7 +33,6 @@ import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -64,7 +63,7 @@ public class TourCompareManager {
 
    private static final String                                  NUMBER_FORMAT_1F   = "%.1f";                                             //$NON-NLS-1$
 
-   private static ArrayList<RefTourItem>                        _allRefTourItemsFromLastCompare;
+   private static ArrayList<RefTourItem>                        _allRefTourItems_FromLastCompare;
 
    private final static ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
 
@@ -106,7 +105,7 @@ public class TourCompareManager {
 
       final int numComparedTours = allComparedItems.length;
 
-      _allRefTourItemsFromLastCompare = selectedRefTourItems;
+      _allRefTourItems_FromLastCompare = selectedRefTourItems;
 
       _countDownLatch = new CountDownLatch(numComparedTours);
       _compareTour_Queue.clear();
@@ -126,7 +125,7 @@ public class TourCompareManager {
 
                // load all reference tour data
                final ArrayList<TourData> allRefTourData = new ArrayList<>();
-               for (final RefTourItem refTourItem : _allRefTourItemsFromLastCompare) {
+               for (final RefTourItem refTourItem : _allRefTourItems_FromLastCompare) {
                   allRefTourData.add(TourManager.getInstance().getTourData(refTourItem.tourId));
                }
 
@@ -202,7 +201,7 @@ public class TourCompareManager {
             }
          };
 
-         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, runnable);
 
          // wait until all comparisons are performed
          _countDownLatch.await();
@@ -247,9 +246,9 @@ public class TourCompareManager {
                   && compareTourData.timeSerie.length > 0) {
 
                // loop: all reference tours
-               for (int refTourIndex = 0; refTourIndex < _allRefTourItemsFromLastCompare.size(); refTourIndex++) {
+               for (int refTourIndex = 0; refTourIndex < _allRefTourItems_FromLastCompare.size(); refTourIndex++) {
 
-                  final RefTourItem refTourItem = _allRefTourItemsFromLastCompare.get(refTourIndex);
+                  final RefTourItem refTourItem = _allRefTourItems_FromLastCompare.get(refTourIndex);
 
                   // compare the tour
                   final TVICompareResultComparedTour compareResult = compareTours_OneTour(
@@ -588,7 +587,7 @@ public class TourCompareManager {
     */
    public static ArrayList<RefTourItem> getComparedReferenceTours() {
 
-      return _allRefTourItemsFromLastCompare;
+      return _allRefTourItems_FromLastCompare;
    }
 
    /**

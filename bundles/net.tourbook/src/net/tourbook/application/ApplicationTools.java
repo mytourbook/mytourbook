@@ -49,18 +49,20 @@ import org.w3c.dom.NodeList;
 
 public class ApplicationTools {
 
-   private static final char   NL                                     = UI.NEW_LINE;
-   private static final String WORKBENCH_XMI                          = "workbench.xmi";                     //$NON-NLS-1$
-   private static final String WORKBENCH_XMI_BACKUP                   = "workbench-BACKUP.xmi";              //$NON-NLS-1$
-   private static final String WORKBENCH_XMI_ADJUSTED                 = "workbench-ADJUSTED.xmi";            //$NON-NLS-1$
+   private static final char    NL                                     = UI.NEW_LINE;
+   private static final String  WORKBENCH_XMI                          = "workbench.xmi";                     //$NON-NLS-1$
+   private static final String  WORKBENCH_XMI_BACKUP                   = "workbench-BACKUP.xmi";              //$NON-NLS-1$
+   private static final String  WORKBENCH_XMI_ADJUSTED                 = "workbench-ADJUSTED.xmi";            //$NON-NLS-1$
 
-   private static final String TRUE                                   = "true";                              //$NON-NLS-1$
+   private static final String  TRUE                                   = "true";                              //$NON-NLS-1$
 
-   private static final String PART_ORG_ECLIPSE_UI_EDITORSS           = "org.eclipse.ui.editorss";           //$NON-NLS-1$
-   private static final String PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview"; //$NON-NLS-1$
+   private static final String  PART_ORG_ECLIPSE_UI_EDITORSS           = "org.eclipse.ui.editorss";           //$NON-NLS-1$
+   private static final String  PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview"; //$NON-NLS-1$
 
-   private static final String ATTR_CLOSEABLE                         = "closeable";                         //$NON-NLS-1$
-   private static final String ATTR_ELEMENT_ID                        = "elementId";                         //$NON-NLS-1$
+   private static final String  ATTR_CLOSEABLE                         = "closeable";                         //$NON-NLS-1$
+   private static final String  ATTR_ELEMENT_ID                        = "elementId";                         //$NON-NLS-1$
+
+   private static final boolean IS_DEBUGGING                           = false;
 
    /**
     * Source: https://howtodoinjava.com/java/xml/xpath-namespace-resolution-example/
@@ -153,7 +155,9 @@ public class ApplicationTools {
 
                // skip parts which do not have a closeable attribute
 
-               sb.append(String.format("%-30s Skipped part            %s" + NL, LocalDateTime.now(), attrElementId));
+               if (IS_DEBUGGING) {
+                  sb.append(String.format("%-30s Skipped part            %s" + NL, LocalDateTime.now(), attrElementId));
+               }
 
                continue;
             }

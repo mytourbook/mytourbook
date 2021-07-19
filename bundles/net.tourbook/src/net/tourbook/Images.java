@@ -53,6 +53,7 @@ public class Images {
    public static final String App_OK                                     = "16px-Crystal_Clear_action_apply.png";                 //$NON-NLS-1$
    public static final String App_Placeholder16                          = "placeholder16.png";                                   //$NON-NLS-1$
    public static final String App_Refresh                                = "refresh.png";                                         //$NON-NLS-1$
+   public static final String App_Refresh_Disabled                       = "refresh-disabled.png";                                //$NON-NLS-1$
    public static final String App_Refresh_All                            = "refresh-all.png";                                     //$NON-NLS-1$
    public static final String App_Refresh_All_Disabled                   = "refresh-all_disabled.png";                            //$NON-NLS-1$
    public static final String App_Refresh_NotAssessed                    = "refresh-not-assessed.png";                            //$NON-NLS-1$

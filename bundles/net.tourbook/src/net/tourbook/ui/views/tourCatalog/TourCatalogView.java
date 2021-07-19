@@ -1318,17 +1318,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
          // fire selection for the selected tour catalog item
          _postSelectionProvider.setSelection(new SelectionTourCatalogView(yearItem));
 
-         /*
-          * get selection from year statistic view, this selection is set from the previous fired
-          * selection
-          */
-         final ISelection selectionInTourChart = getSite()
-               .getWorkbenchWindow()
-               .getSelectionService()
-               .getSelection(RefTour_YearStatistic_View.ID);
-
-         _postSelectionProvider.setSelection(selectionInTourChart);
-
       } else if (item instanceof TVICatalogComparedTour) {
 
          // compared tour is selected

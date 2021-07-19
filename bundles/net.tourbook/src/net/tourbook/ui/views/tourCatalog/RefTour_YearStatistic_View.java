@@ -43,6 +43,7 @@ import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -776,6 +777,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
                selectTourInYearChart(_allTours.get(yearIndex).getTourId());
             }
          }
+
       } else if (selection instanceof StructuredSelection) {
 
          final StructuredSelection structuredSelection = (StructuredSelection) selection;
@@ -787,6 +789,42 @@ public class RefTour_YearStatistic_View extends ViewPart {
             if (firstElement instanceof TVICatalogComparedTour) {
 
                final TVICatalogComparedTour compareItem = (TVICatalogComparedTour) firstElement;
+
+               // get year item
+               final TreeViewerItem compareParentItem = compareItem.getParentItem();
+               if (compareParentItem instanceof TVICatalogYearItem) {
+
+                  final TVICatalogYearItem yearItem = (TVICatalogYearItem) compareParentItem;
+
+                  // get ref tour item
+                  final TreeViewerItem yearParentItem = yearItem.getParentItem();
+                  if (yearParentItem instanceof TVICatalogRefTourItem) {
+
+                     final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) yearParentItem;
+
+                     final long refId = refTourItem.refId;
+
+                     if (_currentRefItem == null) {
+
+                        // create new ref item for the ref tour
+                        _currentRefItem = TourCompareManager.createCatalogRefItem(refId);
+
+                        updateUI_YearChart(false);
+
+                     } else {
+
+                        if (_currentRefItem.refId != refId) {
+
+                           // the current statistic do not show the ref tour for the compared tour
+                           // -> show also the ref tour
+
+                           _currentRefItem = refTourItem;
+
+                           updateUI_YearChart(false);
+                        }
+                     }
+                  }
+               }
 
                // select tour in the year chart
                final Long tourId = compareItem.getTourId();
@@ -806,7 +844,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
                   final long refId = refTour.refId;
                   if (_currentRefItem == null || _currentRefItem.refId != refId) {
 
-                     // the current statistic do not show the ref tour for the compared tour -> first show the ref tour
+                     // the current statistic do not show the ref tour for the compared tour
+                     // -> first show the ref tour
 
                      // create new ref item for the ref tour
                      _currentRefItem = TourCompareManager.createCatalogRefItem(refId);
@@ -949,7 +988,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          // a tour is not selected, select first tour
 
-         selectedTours[0] = true;
+// disable it can be confusing when the wrong tour is selected         
+//         selectedTours[0] = true;
       }
 
       _yearChart.setSelectedBars(selectedTours);
