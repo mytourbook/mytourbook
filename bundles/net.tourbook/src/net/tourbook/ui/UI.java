@@ -496,6 +496,28 @@ public class UI {
     * @param labelText
     * @return
     */
+   public static Composite createPage(final Composite parent, final String labelText) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.WRAP);
+         label.setText(labelText);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      }
+
+      return container;
+   }
+
+   /**
+    * Creates a page with a static text by using a {@link FormToolkit}
+    *
+    * @param formToolkit
+    * @param parent
+    * @param labelText
+    * @return
+    */
    public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
 
       final Composite container = formToolkit.createComposite(parent);

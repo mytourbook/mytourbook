@@ -185,7 +185,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private PageBook  _pageBook;
    private Composite _pageChart;
-   private Label     _pageNoChart;
+   private Composite _pageNoChart;
 
    private Chart     _yearChart;
 
@@ -490,8 +490,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoChart = new Label(_pageBook, SWT.NONE);
-      _pageNoChart.setText(Messages.tourCatalog_view_label_year_not_selected);
+      _pageNoChart = net.tourbook.ui.UI.createPage(_pageBook, Messages.tourCatalog_view_label_year_not_selected);
 
       _pageChart = createUI_10_PageYearChart(_pageBook);
    }
@@ -988,7 +987,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          // a tour is not selected, select first tour
 
-// disable it can be confusing when the wrong tour is selected         
+// disable it can be confusing when the wrong tour is selected
 //         selectedTours[0] = true;
       }
 
@@ -1029,6 +1028,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private void updateUI_YearChart(final boolean isShowLatestYear) {
 
       if (_currentRefItem == null) {
+
+         _pageBook.showPage(_pageNoChart);
+
          return;
       }
 
