@@ -531,7 +531,6 @@ public class Messages extends NLS {
    public static String        App_Action_Cancel;
    public static String        App_Action_Close_ToolTip;
    public static String        App_Action_CollapseAll;
-   public static String        App_Action_CollapseAll_Tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
