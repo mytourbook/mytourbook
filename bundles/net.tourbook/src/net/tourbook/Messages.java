@@ -920,6 +920,9 @@ public class Messages extends NLS {
 
    public static String        Elevation_Compare_Action_AppTourFilter_Tooltip;
    public static String        Elevation_Compare_Action_CompareAllTours;
+   public static String        Elevation_Compare_Action_IsNotUsingAppFilter_Tooltip;
+   public static String        Elevation_Compare_Action_IsUsingAppFilter_Tooltip;
+   public static String        Elevation_Compare_Action_RemoveReferenceTours;
    public static String        Elevation_Compare_Action_ReRunComparison_Tooltip;
    public static String        Elevation_Compare_Action_TourCompareFilter_Tooltip;
    public static String        Elevation_Compare_Monitor_SubTask;

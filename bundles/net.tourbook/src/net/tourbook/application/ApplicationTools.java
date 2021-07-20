@@ -82,8 +82,11 @@ public class ApplicationTools {
       public String getNamespaceURI(final String prefix) {
 
          if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+
             return sourceDocument.lookupNamespaceURI(null);
+
          } else {
+
             return sourceDocument.lookupNamespaceURI(prefix);
          }
       }
@@ -133,19 +136,19 @@ public class ApplicationTools {
          final NamespaceResolver nsContext = new NamespaceResolver(domDocument);
          xpath.setNamespaceContext(nsContext);
 
-         final NodeList nodes = (NodeList) xpath.evaluate(
+         final NodeList allNodes = (NodeList) xpath.evaluate(
                "//children[@xsi:type='advanced:Placeholder']", //$NON-NLS-1$
                domDocument,
                XPathConstants.NODESET);
 
-         final int numNodes = nodes.getLength();
+         final int numViews = allNodes.getLength();
 
-         sb.append(String.format("%-30s numNodes:               %d" + NL, LocalDateTime.now(), numNodes));
+         sb.append(String.format("%-30s numViews:               %d" + NL, LocalDateTime.now(), numViews));
 
          // Updated the selected nodes
-         for (int nodeIndex = 0; nodeIndex < numNodes; nodeIndex++) {
+         for (int nodeIndex = 0; nodeIndex < numViews; nodeIndex++) {
 
-            final Element domElement = (Element) nodes.item(nodeIndex);
+            final Element domElement = (Element) allNodes.item(nodeIndex);
 
             final String attrCloseable = domElement.getAttribute(ATTR_CLOSEABLE);
             final String attrElementId = domElement.getAttribute(ATTR_ELEMENT_ID);
@@ -156,7 +159,7 @@ public class ApplicationTools {
                // skip parts which do not have a closeable attribute
 
                if (IS_DEBUGGING) {
-                  sb.append(String.format("%-30s Skipped part            %s" + NL, LocalDateTime.now(), attrElementId));
+                  sb.append(String.format("%-30s Skipped view            %s" + NL, LocalDateTime.now(), attrElementId));
                }
 
                continue;
@@ -172,7 +175,7 @@ public class ApplicationTools {
             }
          }
 
-         sb.append(String.format("%-30s closeable='true' is set in %d parts" + NL, LocalDateTime.now(), numAdjustments));
+         sb.append(String.format("%-30s closeable='true' is set in %d views" + NL, LocalDateTime.now(), numAdjustments));
 
          if (numAdjustments > 0) {
 

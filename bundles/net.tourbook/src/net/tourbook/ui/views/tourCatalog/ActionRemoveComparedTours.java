@@ -148,6 +148,7 @@ public class ActionRemoveComparedTours extends Action {
 
             /*
              * Remove the reference tour from the tour and save it
+             * -> this will also delete TourReference in the db !
              */
             final EntityManager em = TourDatabase.getInstance().getEntityManager();
             final TourReference refTour = em.find(TourReference.class, refTourItem.refId);
@@ -193,7 +194,7 @@ public class ActionRemoveComparedTours extends Action {
 
       final SelectionRemovedComparedTours removedTours = new SelectionRemovedComparedTours();
 
-      // get selected reference tours
+      // get selected tours
       final IStructuredSelection selection = (IStructuredSelection) tourViewer.getSelection();
 
       final Object firstItem = selection.getFirstElement();

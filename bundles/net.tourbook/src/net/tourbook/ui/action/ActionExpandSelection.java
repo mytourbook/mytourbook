@@ -40,7 +40,6 @@ public class ActionExpandSelection extends Action {
       _treeViewerProvider = treeViewerProvider;
 
       setText(Messages.app_action_expand_selection_tooltip);
-      setToolTipText(Messages.app_action_expand_selection_tooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_ExpandAll));
       setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_ExpandAll_Disabled));

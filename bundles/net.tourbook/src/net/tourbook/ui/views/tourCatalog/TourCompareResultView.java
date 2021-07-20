@@ -160,8 +160,8 @@ public class TourCompareResultView extends ViewPart implements
    private ActionReRunComparision              _actionReRunComparision;
 
    private ActionCheckTours                    _actionContext_CheckTours;
-   private ActionCompareByElevation_AllTours   _actionContext_CompareAllTours;
-   private ActionCompareByElevation_WithWizard _actionContext_CompareWithWizard;
+   private ActionCompareByElevation_AllTours   _actionContext_Compare_AllTours;
+   private ActionCompareByElevation_WithWizard _actionContext_Compare_WithWizard;
    private ActionEditQuick                     _actionContext_EditQuick;
    private ActionEditTour                      _actionContext_EditTour;
    private ActionOpenTour                      _actionContext_OpenTour;
@@ -610,8 +610,8 @@ public class TourCompareResultView extends ViewPart implements
       _actionReRunComparision = new ActionReRunComparision();
 
       _actionContext_CheckTours = new ActionCheckTours(this);
-      _actionContext_CompareAllTours = new ActionCompareByElevation_AllTours(this);
-      _actionContext_CompareWithWizard = new ActionCompareByElevation_WithWizard(this);
+      _actionContext_Compare_AllTours = new ActionCompareByElevation_AllTours(this);
+      _actionContext_Compare_WithWizard = new ActionCompareByElevation_WithWizard(this);
       _actionContext_EditQuick = new ActionEditQuick(this);
       _actionContext_EditTour = new ActionEditTour(this);
       _actionContext_OpenTour = new ActionOpenTour(this);
@@ -1306,8 +1306,8 @@ public class TourCompareResultView extends ViewPart implements
       // action: remove tour from saved compare result, currently only one tour item is supported
       _actionContext_RemoveComparedTourSaveStatus.setEnabled(numSavedTourItems > 0);
 
-      _actionContext_CompareAllTours.setEnabled(isRefItemSelected);
-      _actionContext_CompareWithWizard.setEnabled(isRefItemSelected);
+      _actionContext_Compare_AllTours.setEnabled(isRefItemSelected);
+      _actionContext_Compare_WithWizard.setEnabled(isRefItemSelected);
 
       // actions: edit tour
       _actionContext_EditQuick.setEnabled(isOneTourSelected);
@@ -1338,14 +1338,21 @@ public class TourCompareResultView extends ViewPart implements
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
+      final String compareTooltip = isUseFastAppFilter()
+            ? Messages.Elevation_Compare_Action_IsUsingAppFilter_Tooltip
+            : Messages.Elevation_Compare_Action_IsNotUsingAppFilter_Tooltip;
+
+      _actionContext_Compare_AllTours.setToolTipText(compareTooltip);
+      _actionContext_Compare_WithWizard.setToolTipText(compareTooltip);
+
       menuMgr.add(_actionContext_SaveComparedTours);
       menuMgr.add(_actionContext_RemoveComparedTourSaveStatus);
       menuMgr.add(_actionContext_CheckTours);
       menuMgr.add(_actionContext_UncheckTours);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionContext_CompareWithWizard);
-      menuMgr.add(_actionContext_CompareAllTours);
+      menuMgr.add(_actionContext_Compare_WithWizard);
+      menuMgr.add(_actionContext_Compare_AllTours);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionContext_EditQuick);
