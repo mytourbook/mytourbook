@@ -59,16 +59,15 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class TourCompareManager {
 
-   private static final String                                  NL                 = UI.NEW_LINE;
+   private static final String                                  NL                    = UI.NEW_LINE;
 
-   private static final String                                  NUMBER_FORMAT_1F   = "%.1f";                                             //$NON-NLS-1$
+   private static final String                                  NUMBER_FORMAT_1F      = "%.1f";                                             //$NON-NLS-1$
 
    private static ArrayList<RefTourItem>                        _allRefTourItems_FromLastCompare;
-
-   private final static ArrayList<TVICompareResultComparedTour> _comparedTourItems = new ArrayList<>();
+   private final static ArrayList<TVICompareResultComparedTour> _allComparedTourItems = new ArrayList<>();
 
    private static ThreadPoolExecutor                            _compareTour_Executor;
-   private static ArrayBlockingQueue<Long>                      _compareTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static ArrayBlockingQueue<Long>                      _compareTour_Queue    = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static CountDownLatch                                _countDownLatch;
 
    static {
@@ -92,7 +91,11 @@ public class TourCompareManager {
 
    public static void clearCompareResult() {
 
-      _comparedTourItems.clear();
+      _allComparedTourItems.clear();
+
+      if (_allRefTourItems_FromLastCompare != null) {
+         _allRefTourItems_FromLastCompare.clear();
+      }
    }
 
    /**
@@ -121,7 +124,7 @@ public class TourCompareManager {
 
                monitor.beginTask(String.format(Messages.Elevation_Compare_Monitor_Task), numComparedTours);
 
-               _comparedTourItems.clear();
+               _allComparedTourItems.clear();
 
                // load all reference tour data
                final ArrayList<TourData> allRefTourData = new ArrayList<>();
@@ -262,7 +265,7 @@ public class TourCompareManager {
                      compareResult.refTour = refTourItem;
                      compareResult.setComparedTourData(compareTourData);
 
-                     _comparedTourItems.add(compareResult);
+                     _allComparedTourItems.add(compareResult);
                   }
                }
             }
@@ -595,7 +598,7 @@ public class TourCompareManager {
     */
    public static TVICompareResultComparedTour[] getComparedTours() {
 
-      return _comparedTourItems.toArray(new TVICompareResultComparedTour[_comparedTourItems.size()]);
+      return _allComparedTourItems.toArray(new TVICompareResultComparedTour[_allComparedTourItems.size()]);
    }
 
    /**
@@ -664,14 +667,24 @@ public class TourCompareManager {
       final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
       final IWorkbenchPage activePage = window.getActivePage();
 
+      /*
+       * First navigate in the year statistic view
+       */
       final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
       if (yearStatView instanceof RefTour_YearStatistic_View) {
          navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
       }
 
-      final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
-      if (comparedTours instanceof TourCompareResultView) {
-         navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
+      /*
+       * Second navigate in the compare result view
+       */
+      if (navigatedTour == null) {
+
+         final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+
+         if (comparedTours instanceof TourCompareResultView) {
+            navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
+         }
       }
 
       return navigatedTour;

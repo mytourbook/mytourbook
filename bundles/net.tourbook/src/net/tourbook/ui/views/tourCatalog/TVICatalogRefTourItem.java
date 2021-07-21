@@ -154,11 +154,11 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
             + "[" + NL //$NON-NLS-1$
 
-            + "label=" + label + NL //$NON-NLS-1$
-            + "refId=" + refId + NL //$NON-NLS-1$
-            + "yearMapMinValue=" + yearMapMinValue + NL //$NON-NLS-1$
-            + "yearMapMaxValue=" + yearMapMaxValue + NL //$NON-NLS-1$
-            + "tourCounter=" + tourCounter + NL //$NON-NLS-1$
+            + "label             = " + label + NL //$NON-NLS-1$
+            + "refId             = " + refId + NL //$NON-NLS-1$
+            + "yearMapMinValue   = " + yearMapMinValue + NL //$NON-NLS-1$
+            + "yearMapMaxValue   = " + yearMapMaxValue + NL //$NON-NLS-1$
+            + "tourCounter       = " + tourCounter + NL //$NON-NLS-1$
 
             + "]" + NL //$NON-NLS-1$
 

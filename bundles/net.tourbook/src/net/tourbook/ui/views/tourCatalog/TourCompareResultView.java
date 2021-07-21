@@ -593,6 +593,16 @@ public class TourCompareResultView extends ViewPart implements
                   updateTourViewer(_rootItem, modifiedTours);
                }
 
+            } else if (eventId == TourEventId.UPDATE_UI) {
+
+               // ref tour is removed -> remove all compare results
+
+               TourCompareManager.clearCompareResult();
+
+               reloadViewer();
+
+               enableActions();
+
             } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
                reloadViewer();

@@ -38,6 +38,7 @@ import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -362,10 +363,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                   updateTourViewer(persistedCompareResults);
                }
 
-            } else if (selection instanceof SelectionNewRefTours) {
-
-               reloadViewer();
-
             } else if (selection instanceof SelectionRemovedComparedTours) {
 
                final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
@@ -522,14 +519,33 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                   updateTourViewer(_rootItem, modifiedTours);
                }
 
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
-                  || eventId == TourEventId.REFERENCE_TOUR_IS_CREATED) {
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
                reloadViewer();
+
+            } else if (eventId == TourEventId.REFERENCE_TOUR_IS_CREATED && eventData instanceof TourEvent) {
+
+               reloadViewer();
+
+               /*
+                * Select newly created ref tour
+                */
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours.size() > 0) {
+
+                  final TourData tourData = modifiedTours.get(0);
+                  for (final TourReference refTour : tourData.getTourReferences()) {
+
+                     selectRefTour(refTour.getRefId());
+
+                     // LIMIT: only the first ref tour is selected
+                     break;
+                  }
+               }
+
             }
          }
       };
-
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
@@ -1036,7 +1052,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       _tourDoubleClickState.canQuickEditTour = isEditableTour;
       _tourDoubleClickState.canEditMarker = isEditableTour;
       _tourDoubleClickState.canAdjustAltitude = isEditableTour;
-
 
       _actionContext_Compare_AllTours.setEnabled(isRefItemSelected);
       _actionContext_Compare_WithWizard.setEnabled(isRefItemSelected);

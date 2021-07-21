@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -31,110 +31,128 @@ import net.tourbook.ui.UI;
 @Entity
 public class TourReference {
 
-	public static final int	DB_LENGTH_LABEL	= 80;
+   private static final String NL              = UI.NEW_LINE;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			refId;
+   public static final int     DB_LENGTH_LABEL = 80;
 
-	@ManyToOne(optional = false)
-	private TourData		tourData;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long                refId;
 
-	/**
-	 * value index position for the reference tour in the original tour
-	 */
-	private int				startIndex;
+   @ManyToOne(optional = false)
+   private TourData            tourData;
 
-	private int				endIndex;
+   /**
+    * value index position for the reference tour in the original tour
+    */
+   private int                 startIndex;
 
-	private String			label			= UI.EMPTY_STRING;
+   private int                 endIndex;
 
-	public TourReference() {}
+   private String              label           = UI.EMPTY_STRING;
 
-	public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
+   public TourReference() {}
 
-		this.tourData = tourData;
-		this.label = label;
+   public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
 
-		this.startIndex = startIndex;
-		this.endIndex = endIndex;
-	}
+      this.tourData = tourData;
+      this.label = label;
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TourReference)) {
-			return false;
-		}
-		final TourReference other = (TourReference) obj;
-		if (refId != other.refId) {
-			return false;
-		}
-		return true;
-	}
+      this.startIndex = startIndex;
+      this.endIndex = endIndex;
+   }
 
-	public int getEndValueIndex() {
-		return endIndex;
-	}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TourReference)) {
+         return false;
+      }
+      final TourReference other = (TourReference) obj;
+      if (refId != other.refId) {
+         return false;
+      }
+      return true;
+   }
 
-	/**
-	 * @return Return the name for the reference tour
-	 */
-	public String getLabel() {
-		return label;
-	}
+   public int getEndValueIndex() {
+      return endIndex;
+   }
 
-	/**
-	 * @return Returns the primary key for a {@link TourReference} entity
-	 */
-	public long getRefId() {
-		return refId;
-	}
+   /**
+    * @return Return the name for the reference tour
+    */
+   public String getLabel() {
+      return label;
+   }
 
-	public int getStartValueIndex() {
-		return startIndex;
-	}
+   /**
+    * @return Returns the primary key for a {@link TourReference} entity
+    */
+   public long getRefId() {
+      return refId;
+   }
 
-	public TourData getTourData() {
+   public int getStartValueIndex() {
+      return startIndex;
+   }
 
-		/*
-		 * ensure to have the correct tour data, load tour data because tour data in the ref tour
-		 * could be changed, this is a wrong concept which could be changed but requires additonal
-		 * work
-		 */
-		return TourManager.getInstance().getTourData(tourData.getTourId());
-	}
+   public TourData getTourData() {
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (refId ^ (refId >>> 32));
-		return result;
-	}
+      /*
+       * ensure to have the correct tour data, load tour data because tour data in the ref tour
+       * could be changed, this is a wrong concept which could be changed but requires additonal
+       * work
+       */
+      return TourManager.getInstance().getTourData(tourData.getTourId());
+   }
 
-	public void setEndValueIndex(final int endIndex) {
-		this.endIndex = endIndex;
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (refId ^ (refId >>> 32));
+      return result;
+   }
 
-	public void setGeneratedId(final long generatedId) {
-		this.refId = generatedId;
-	}
+   public void setEndValueIndex(final int endIndex) {
+      this.endIndex = endIndex;
+   }
 
-	public void setLabel(final String label) {
-		this.label = label;
-	}
+   public void setGeneratedId(final long generatedId) {
+      this.refId = generatedId;
+   }
 
-	public void setStartValueIndex(final int startIndex) {
-		this.startIndex = startIndex;
-	}
+   public void setLabel(final String label) {
+      this.label = label;
+   }
 
-	public void setTourData(final TourData tourData) {
-		this.tourData = tourData;
-	}
+   public void setStartValueIndex(final int startIndex) {
+      this.startIndex = startIndex;
+   }
+
+   public void setTourData(final TourData tourData) {
+      this.tourData = tourData;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TourReference" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+            + "label       = " + label + NL //$NON-NLS-1$
+            + "refId       = " + refId + NL //$NON-NLS-1$
+            + "startIndex  = " + startIndex + NL //$NON-NLS-1$
+            + "endIndex    = " + endIndex + NL //$NON-NLS-1$
+            + "tourData    = " + tourData + NL //$NON-NLS-1$
+
+            + "]"; //$NON-NLS-1$
+   }
 }

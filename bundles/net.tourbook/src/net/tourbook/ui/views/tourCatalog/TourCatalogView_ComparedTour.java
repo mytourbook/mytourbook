@@ -104,7 +104,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
     */
    private TourChart                         _comparedTour_RefTourChart;
 
-   private ITourEventListener                _refTourPropertyListener;
+   private ITourEventListener                _tourEventListener;
 
    private ActionSynchChartHorizontalByScale _actionSynchChartsByScale;
    private ActionSynchChartHorizontalBySize  _actionSynchChartsBySize;
@@ -240,22 +240,23 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
       }
    }
 
-   private void addRefTourPropertyListener() {
+   private void addTourEventListener() {
 
-      _refTourPropertyListener = new ITourEventListener() {
+      _tourEventListener = new ITourEventListener() {
+
          @Override
          public void tourChanged(final IWorkbenchPart part,
-                                 final TourEventId propertyId,
-                                 final Object propertyData) {
+                                 final TourEventId eventId,
+                                 final Object eventData) {
 
-            if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
-                  && propertyData instanceof TourPropertyRefTourChanged) {
+            if (eventId == TourEventId.REFERENCE_TOUR_CHANGED
+                  && eventData instanceof TourPropertyRefTourChanged) {
 
                /*
-                * reference tour changed
+                * Reference tour changed
                 */
 
-               final TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
+               final TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) eventData;
 
                _refTour_RefId = tourProperty.refId;
                _refTour_TourChart = tourProperty.refTourChart;
@@ -268,11 +269,17 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
                   }
                }
                _isInRefTourChanged = false;
+
+            } else if (eventId == TourEventId.UPDATE_UI) {
+
+               // ref tour is removed -> hide tour chart
+
+               _pageBook.showPage(_pageNoData);
             }
          }
       };
 
-      TourManager.getInstance().addTourEventListener(_refTourPropertyListener);
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
    private void createActions() {
@@ -300,7 +307,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       fillToolbar();
 
-      addRefTourPropertyListener();
+      addTourEventListener();
 
       _pageBook.showPage(_pageNoData);
 
@@ -381,7 +388,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       saveComparedTourDialog();
 
-      TourManager.getInstance().removeTourEventListener(_refTourPropertyListener);
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       super.dispose();
    }

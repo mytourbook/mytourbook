@@ -785,34 +785,6 @@ public class UI {
    }
 
    /**
-    * Checks if propertyData has the same tour as the oldTourData
-    *
-    * @param propertyData
-    * @param oldTourData
-    * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
-    *         tour
-    */
-   public static TourData getTourPropertyTourData(final TourEvent propertyData, final TourData oldTourData) {
-
-      final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
-      if (modifiedTours == null) {
-         return null;
-      }
-
-      final long oldTourId = oldTourData.getTourId();
-
-      for (final TourData tourData : modifiedTours) {
-         if (tourData.getTourId() == oldTourId) {
-
-            // nothing more to do, only one tour is supported
-            return tourData;
-         }
-      }
-
-      return null;
-   }
-
-   /**
     * @param tourTypeId
     * @return Returns the {@link TourType} or <code>null</code>.
     */

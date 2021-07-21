@@ -38,7 +38,7 @@ import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
-   static final String         PERSPECTIVE_ID                     = "net.tourbook.perspective.TourCatalog"; //$NON-NLS-1$
+   public static final String  PERSPECTIVE_ID                     = "net.tourbook.perspective.TourCatalog"; //$NON-NLS-1$
 
    private static final String FOLDER_ID_GEO_COMPARE_TOOL         = "folderGeoCompareTool";                 //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART               = "folderTourChart";                      //$NON-NLS-1$
