@@ -369,7 +369,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
-      table.setLinesVisible(true);
 
       _partViewer = new TableViewer(table);
 
