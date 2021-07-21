@@ -38,15 +38,16 @@ Improvements
 
 * Compare tours by elevation
   - Reference tour view
-    - New shortcut action in context menu to compare reference tour(s) with all tours
-    - A newly create reference tour is selected in this view
+    - Show compared tours with year categories or without year categories
+    - New shortcut action in context menu to compare reference tours with all tours
+    - A newly create reference tour is selected in this view and perspective
   - Compare result view
     - Compare tours concurrently -> much less waiting time
     - Use fast app tour filters (person, tour type, tour, photo...)
-    - Filter tour compare results between all/saved/not saved
-    - Automatically expand reference tour in compare result view, after comparison is done
+    - Tour compare results can be filtered by: all/saved/not saved
+    - Automatically expand reference tour in compare result view after a comparison is done
     - New shortcut action in context menu to compare reference tour(s) with all tours
-    - Tour comparison can be restarted with other parameters, e.g. different years, other tour filter
+    - Tour comparison can be restarted with other parameters, e.g. different years, other tour filters
   - Year statistic view
     - Show reference tour title
     - Show year statistic view in "Compare Result" perspective

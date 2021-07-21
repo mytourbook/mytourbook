@@ -54,7 +54,8 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    ArrayList<Long> tagIds;
 
-   public TVICatalogComparedTour(final TVICatalogYearItem parentItem) {
+   public TVICatalogComparedTour(final TreeViewerItem parentItem) {
+
       setParentItem(parentItem);
    }
 
