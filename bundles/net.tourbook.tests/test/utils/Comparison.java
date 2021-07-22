@@ -118,8 +118,8 @@ public class Comparison {
    }
 
    public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
-      final Map.Entry<Long, TourData> entry = newlyImportedTours.entrySet().iterator().next();
-      return entry.getValue();
+
+		return newlyImportedTours.entrySet().iterator().next().getValue();
    }
 
    /**
@@ -135,6 +135,7 @@ public class Comparison {
 
       try (Writer writer = new FileWriter(myFile);
             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+
          bufferedWriter.write(testContent);
       } catch (final IOException e) {
          e.printStackTrace();

@@ -22,10 +22,10 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TourTypeColorDefinition extends ColorDefinition implements Comparable<Object> {
 
-   private static final RGB DEFAULT_GRADIENT_BRIGHT = new RGB(255, 255, 255);
-   private static final RGB DEFAULT_GRADIENT_DARK   = new RGB(255, 167, 199);
-   private static final RGB DEFAULT_LINE_COLOR      = new RGB(232, 152, 180);
-   private static final RGB DEFAULT_TEXT_COLOR      = new RGB(98, 23, 49);
+   public static final RGB DEFAULT_GRADIENT_BRIGHT = new RGB(255, 255, 255);
+   public static final RGB DEFAULT_GRADIENT_DARK   = new RGB(255, 167, 199);
+   public static final RGB DEFAULT_LINE_COLOR      = new RGB(232, 152, 180);
+   public static final RGB DEFAULT_TEXT_COLOR      = new RGB(98, 23, 49);
 
    private TourType         _tourType;
 

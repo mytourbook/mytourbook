@@ -2459,7 +2459,7 @@ public class ChartComponentGraph extends Canvas {
       }
    }
 
-   private void drawAsync_240_TourSegments(final GC gcChart, final GraphDrawingData graphDrawingData) {
+   private void drawAsync_240_TourSegments(final GC gcGraph, final GraphDrawingData graphDrawingData) {
 
       final ArrayList<ChartTitleSegment> chartTitleSegments = _chartDrawingData.chartTitleSegments;
 
@@ -2470,8 +2470,17 @@ public class ChartComponentGraph extends Canvas {
 
       final Display display = getDisplay();
 
-      gcChart.setLineAttributes(LINE_DASHED);
-      gcChart.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
+      gcGraph.setLineAttributes(LINE_DASHED);
+
+      /**
+       * VERY VERY IMPORTANT
+       * <p>
+       * setLineWidth() MUST be set AFTER setLineAttributes() otherwise the line width is growing
+       * every time on a 4k display !!!
+       */
+      gcGraph.setLineWidth(1);
+
+      gcGraph.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 
       for (int segmentIndex = 0; segmentIndex < chartTitleSegments.size(); segmentIndex++) {
 
@@ -2484,7 +2493,7 @@ public class ChartComponentGraph extends Canvas {
 
                final int devX = chartTitleSegment.devXSegment;
 
-               gcChart.drawLine(//
+               gcGraph.drawLine(
                      devX,
                      0,
                      devX,
@@ -2493,7 +2502,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      gcChart.setLineStyle(SWT.LINE_SOLID);
+      gcGraph.setLineStyle(SWT.LINE_SOLID);
    }
 
    private void drawAsync_250_GraphTitle(final GC gcGraph, final GraphDrawingData drawingData) {
@@ -2511,8 +2520,7 @@ public class ChartComponentGraph extends Canvas {
 
       final int devYTop = drawingData.getDevYTop() - labelHeight;
 
-      final Color colorText = new Color(yData.getRgbText()[0]);
-      gcGraph.setForeground(colorText);
+      gcGraph.setForeground(new Color(yData.getRgbGraph_Text()));
       gcGraph.drawString(graphTitle, 0, devYTop, true);
    }
 
@@ -2531,9 +2539,9 @@ public class ChartComponentGraph extends Canvas {
       _lineDevPositions.add(new PointLong[serieSize]);
       _isHoveredLineVisible = true;
 
-      final RGB rgbFg = yData.getRgbLine()[0];
-      final RGB rgbBgDark = yData.getRgbDark()[0];
-      final RGB rgbBgBright = yData.getRgbBright()[0];
+      final RGB rgbFgLine = yData.getRgbGraph_Line();
+      final RGB rgbBgDark = yData.getRgbGraph_Gradient_Dark();
+      final RGB rgbBgBright = yData.getRgbGraph_Gradient_Bright();
 
       // get the horizontal offset for the graph
       float graphValueOffset;
@@ -2560,7 +2568,7 @@ public class ChartComponentGraph extends Canvas {
                graphDrawingData,
                0,
                serieSize,
-               rgbFg,
+               rgbFgLine,
                rgbBgDark,
                rgbBgBright,
                graphLineAlpha,
@@ -2582,7 +2590,7 @@ public class ChartComponentGraph extends Canvas {
                graphDrawingData,
                0,
                serieSize,
-               rgbFg,
+               rgbFgLine,
                rgbBgDark,
                rgbBgBright,
                noneMarkerLineAlpha,
@@ -2595,7 +2603,7 @@ public class ChartComponentGraph extends Canvas {
                graphDrawingData,
                synchMarkerStartIndex,
                synchMarkerEndIndex + 0,
-               rgbFg,
+               rgbFgLine,
                rgbBgDark,
                rgbBgBright,
                _chart.graphTransparency_Line,
@@ -3236,16 +3244,19 @@ public class ChartComponentGraph extends Canvas {
 
       final double scaleX = drawingData.getScaleX();
 
-      final RGB rgbFg = yData.getRgbLine()[0];
-      final RGB rgbBg1 = yData.getRgbDark()[0];
-      final RGB rgbBg2 = yData.getRgbBright()[0];
+      final RGB rgbFg = yData.getRgbGraph_Line();
+      final RGB rgbBg1 = yData.getRgbGraph_Gradient_Dark();
+      final RGB rgbBg2 = yData.getRgbGraph_Gradient_Bright();
 
       // get the horizontal offset for the graph
       double graphValueOffset;
       if (_chartComponents._synchConfigSrc == null) {
+
          // a zoom marker is not set, draw it normally
          graphValueOffset = (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+
       } else {
+
          // adjust the start position to the zoom marker position
          graphValueOffset = (_xxDevViewPortLeftBorder / scaleX);
       }
@@ -3294,9 +3305,9 @@ public class ChartComponentGraph extends Canvas {
       gcGraph.setLineStyle(SWT.LINE_SOLID);
 
       // get the colors
-      final RGB[] rgbLine = yData.getRgbLine();
-      final RGB[] rgbDark = yData.getRgbDark();
-      final RGB[] rgbBright = yData.getRgbBright();
+      final RGB[] rgbLine = yData.getRgbBar_Line();
+      final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
+      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
       // get the chart values
       final double scaleX = drawingData.getScaleX();
@@ -3550,9 +3561,9 @@ public class ChartComponentGraph extends Canvas {
       gc.setLineStyle(SWT.LINE_SOLID);
 
       // get the colors
-      final RGB[] rgbLine = yData.getRgbLine();
-      final RGB[] rgbDark = yData.getRgbDark();
-      final RGB[] rgbBright = yData.getRgbBright();
+      final RGB[] rgbLine = yData.getRgbBar_Line();
+      final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
+      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
       // get the chart values
       final double scaleX = drawingData.getScaleX();
@@ -3703,7 +3714,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleXExtended = ((devGraphWidth - 1) / Math.pow(scalingMaxValue, scalingFactor));
 
       // get colors
-      final RGB[] rgbLine = yData.getRgbLine();
+      final RGB[] rgbLine = yData.getRgbBar_Line();
 
       // get the top/bottom of the graph
       final int devYTop = 0;
@@ -3851,11 +3862,8 @@ public class ChartComponentGraph extends Canvas {
       final int barHeight2 = barHeight / 2;
 
       // get the colors
-      final RGB[] rgbDark = yData.getRgbText();
-      final RGB[] rgbBright = yData.getRgbLine();
-
-      final Color colorBgDark = new Color(rgbDark[0]);
-      final Color colorBgBright = new Color(rgbBright[0]);
+      final Color colorBgDark = new Color(yData.getRgbGraph_Text());
+      final Color colorBgBright = new Color(yData.getRgbGraph_Line());
 
       gc.setLineStyle(SWT.LINE_SOLID);
 
@@ -4218,7 +4226,7 @@ public class ChartComponentGraph extends Canvas {
       final int dotSize2 = dotSize / 2;
 
       // get color
-      final RGB[] rgbLine = yData.getRgbLine();
+      final RGB[] rgbLine = yData.getRgbBar_Line();
       final Color colorLine = new Color(rgbLine[0]);
 
       gc.setAntialias(_chart.graphAntialiasing);
@@ -4423,7 +4431,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleX = graphDrawingData.getScaleX();
       final double scaleY = graphDrawingData.getScaleY();
 
-      final RGB rgbFg = yData.getRgbLine()[0];
+      final RGB rgbFgLine = yData.getRgbGraph_Line();
 
       // get the horizontal offset for the graph
       float graphValueOffset;
@@ -4643,7 +4651,7 @@ public class ChartComponentGraph extends Canvas {
        */
 
       // this color is not yet user defined
-      final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
+      final RGB complimentColor = ColorUtil.getComplimentColor(rgbFgLine);
       final Color pathColor = new Color(complimentColor);
 
       gc.setForeground(pathColor);
@@ -4937,9 +4945,9 @@ public class ChartComponentGraph extends Canvas {
          devY1Prev = devY1;
       }
 
-      final RGB rgbFg = yData.getRgbLine()[0];
-      final RGB rgbBgDark = yData.getRgbDark()[0];
-      final RGB rgbBgBright = yData.getRgbBright()[0];
+      final RGB rgbFg = yData.getRgbGraph_Line();
+      final RGB rgbBgDark = yData.getRgbGraph_Gradient_Dark();
+      final RGB rgbBgBright = yData.getRgbGraph_Gradient_Bright();
 
       final Color colorLine = new Color(rgbFg);
       final Color colorBgDark = new Color(rgbBgDark);
@@ -5643,8 +5651,8 @@ public class ChartComponentGraph extends Canvas {
          final ChartDataYSerie yData = drawingData.getYData();
          final ChartXSliderLabel label = labelList.get(graphNo - 1);
 
-         final Color colorDark = new Color(yData.getRgbDark()[0]);
-         final Color colorLine = new Color(yData.getRgbLine()[0]);
+         final Color colorDark = new Color(yData.getRgbGraph_Gradient_Dark());
+         final Color colorLine = new Color(yData.getRgbGraph_Line());
 
          final int labelHeight = label.height;
          final int labelWidth = label.width;
@@ -5789,8 +5797,6 @@ public class ChartComponentGraph extends Canvas {
 
             final ChartDataYSerie yData = ySlider.getYData();
 
-            final Color colorLine = new Color(yData.getRgbLine()[0]);
-
             final GraphDrawingData drawingData = ySlider.getDrawingData();
             final int devYBottom = drawingData.getDevYBottom();
             final int devYTop = devYBottom - drawingData.devGraphHeight;
@@ -5837,6 +5843,8 @@ public class ChartComponentGraph extends Canvas {
             final int labelWidth = labelExtend.x + 1;
             final int labelX = _ySliderGraphX - labelWidth - 5;
             final int labelY = devYLabelPos - labelHeight;
+
+            final Color colorLine = new Color(yData.getRgbGraph_Line());
 
             // draw label background
             gcGraph.setBackground(_backgroundColor);
@@ -6058,9 +6066,9 @@ public class ChartComponentGraph extends Canvas {
       final int[][] colorsIndex = yData.getColorsIndex();
 
       // get the colors
-      final RGB[] rgbLine = yData.getRgbLine();
-      final RGB[] rgbDark = yData.getRgbDark();
-      final RGB[] rgbBright = yData.getRgbBright();
+      final RGB[] rgbLine = yData.getRgbBar_Line();
+      final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
+      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
       final int devYBottom = drawingData.getDevYBottom();
 //      final int devYBottom = drawingData.devGraphHeight;
@@ -6225,9 +6233,9 @@ public class ChartComponentGraph extends Canvas {
          final int[][] colorsIndex = yData.getColorsIndex();
 
          // get the colors
-         final RGB[] rgbLine = yData.getRgbLine();
-         final RGB[] rgbDark = yData.getRgbDark();
-         final RGB[] rgbBright = yData.getRgbBright();
+         final RGB[] rgbLine = yData.getRgbBar_Line();
+         final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
+         final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
          final int devYBottom = drawingData.getDevYBottom();
 //         final int devYBottom = drawingData.devGraphHeight;
@@ -6405,13 +6413,7 @@ public class ChartComponentGraph extends Canvas {
          } else {
 
             devX = (int) devPosition.x;
-
-            // get the colors
-            final RGB[] rgbLine = yData.getRgbLine();
-            final int colorIndex = lineColorIndex[_hoveredValuePointIndex];
-
-            final RGB rgbLineDef = rgbLine[colorIndex];
-            colorLine = getColor(rgbLineDef);
+            colorLine = getColor(yData.getRgbGraph_Line());
          }
 
          gcOverlay.setBackground(colorLine);

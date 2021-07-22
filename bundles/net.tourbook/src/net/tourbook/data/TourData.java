@@ -2850,9 +2850,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final DPPoint[] dpPoints = new DPPoint[serieLength];
       for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
 
+         final int valueIndex = serieIndex + valueIndexLeft;
+
+         if (valueIndex >= distanceSerie.length) {
+
+            StatusUtil.logError(String.format(
+
+                  "[TourData.computeAvg_Altitude()] valueIndex=%d is larger than the distanceSerie.length=%d", //$NON-NLS-1$
+
+                  valueIndex,
+                  distanceSerie.length));
+
+            return Float.MAX_VALUE;
+         }
+
          dpPoints[serieIndex] = new DPPoint(
-               distanceSerie[serieIndex + valueIndexLeft],
-               altitudeSerie[serieIndex + valueIndexLeft],
+
+               distanceSerie[valueIndex],
+               altitudeSerie[valueIndex],
+
                serieIndex);
       }
 
@@ -3429,7 +3445,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return false;
       }
 
-      if (breakTimeSerie == null) {
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
+      if (!isPaceAndSpeedFromRecordedTime && breakTimeSerie == null) {
          getBreakTime();
       }
 
@@ -3445,11 +3463,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float cadence = cadenceSerie[serieIndex];
          final int time = timeSerie[serieIndex];
 
-         final int timeDiff = time - prevTime;
+         int timeDiff = time - prevTime;
          prevTime = time;
 
-         // check if a break occurred, break time is ignored
-         if (breakTimeSerie != null) {
+         // Check if the user has selected to use the recorded time instead of
+         // the moving time.
+         if (isPaceAndSpeedFromRecordedTime) {
+
+            // Check if a pause occurred. Pauses time is ignored.
+            final int pausedTime = getPausedTime(serieIndex - 1, serieIndex);
+            if (pausedTime > 0 && timeDiff >= pausedTime) {
+               timeDiff = Math.max(0, timeDiff - pausedTime);
+            }
+         }
+         // Check if a break occurred, break time is ignored
+         else if (breakTimeSerie != null) {
 
             /*
              * break time requires distance data, so it's possible that break time data are not
@@ -5095,7 +5123,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (serieData.powerSerie != null) {
 
-         if (isPowerSerieFromDevice & isDataSerieWithContent(serieData.powerSerie)) {
+         if (isPowerSerieFromDevice && isDataSerieWithContent(serieData.powerSerie)) {
             serieData.powerSerie20 = convertDataSeries_ToFloat(serieData.powerSerie, 0);
          }
 
@@ -7779,7 +7807,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int totalPausedTime = 0;
 
-      if (timeSerie == null || pausedTime_Start == null) {
+      if (timeSerie == null || pausedTime_Start == null ||
+            startIndex < 0 || endIndex < 0 || startIndex == endIndex ||
+            startIndex > timeSerie.length || endIndex > timeSerie.length) {
          return totalPausedTime;
       }
 
@@ -11199,17 +11229,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Override
    public String toString() {
 
-      return "TourData [" + NL //                                                                  //$NON-NLS-1$
+      return "TourData [" + NL //                                                                     //$NON-NLS-1$
 
-            + "start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //       //$NON-NLS-1$
+            + "start    = " + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //     //$NON-NLS-1$
             + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + "tourId=" + tourId + NL //                                                           //$NON-NLS-1$
+            + "tourId   = " + tourId + NL //                                                          //$NON-NLS-1$
 
-            + "object=" + super.toString() + NL //                                                 //$NON-NLS-1$
-            + "identityHashCode=" + System.identityHashCode(this) + NL //                          //$NON-NLS-1$
+//            + "object   = " + super.toString() + NL //                                              //$NON-NLS-1$
+//            + "identityHashCode=" + System.identityHashCode(this) + NL //                           //$NON-NLS-1$
 
-//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                    //$NON-NLS-1$
+//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                       //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

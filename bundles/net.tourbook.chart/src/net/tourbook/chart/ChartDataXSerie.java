@@ -273,11 +273,13 @@ public class ChartDataXSerie extends ChartDataSerie {
     * @param rangeMarkerEndIndex
     */
    public void setRangeMarkers(final int[] rangeMarkerStartIndex, final int[] rangeMarkerEndIndex) {
+
       _rangeMarkerStartIndex = rangeMarkerStartIndex;
       _rangeMarkerEndIndex = rangeMarkerEndIndex;
    }
 
    public void setScalingFactors(final double scalingFactor, final double scalingMaxValue) {
+
       _scalingFactor = scalingFactor;
       _scalingMaxValue = scalingMaxValue;
    }

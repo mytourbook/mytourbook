@@ -736,7 +736,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
             } else if (firstElement instanceof TVICompareResultComparedTour) {
 
                final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-               final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
+               final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
                updateChart(tourData);
 
             } else if (firstElement instanceof GeoPartComparerItem) {

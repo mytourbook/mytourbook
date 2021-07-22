@@ -490,11 +490,11 @@ public class ConconiView extends ViewPart {
       _yDataPulse = new ChartDataYSerie(ChartType.XY_SCATTER, pulseSerieFloat);
       _yDataPulse.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
       _yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-      _yDataPulse.setDefaultRGB(rgbLineColor);
-      _yDataPulse.setRgbLine(allRgbLine);
-      _yDataPulse.setRgbGradient_Dark(allRgbGradient_Dark);
-      _yDataPulse.setRgbGradient_Bright(allRgbGradient_Bright);
-      _yDataPulse.setRgbText(new RGB[] { rgbTextColor });
+      _yDataPulse.setRgbBar_Gradient_Dark(allRgbGradient_Dark);
+      _yDataPulse.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
+      _yDataPulse.setRgbBar_Line(allRgbLine);
+      
+      _yDataPulse.setRgbGraph_Text(rgbTextColor);
 
 // check x-data visible min value
       //adjust min/max values that the chart do not stick to a border

@@ -451,8 +451,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       yData.setShowYSlider(true);
 
       yData.setColorIndex(new int[][] { _statisticData_DayTime.allTypeColorIndices });
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFiler);
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 
       chartModel.addYData(yData);
 

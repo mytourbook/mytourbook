@@ -50,7 +50,7 @@ It is scrambeling text and values. This is used to create anynymous screenshots
 -DcreateRandomTourId
 
 
-** Log selected color values 
+**Log selected color values**
 
 This can be used to update default values in the Java code
 

@@ -365,8 +365,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
 
       chartDataModel.addYData(yData);
    }
@@ -388,8 +387,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
 
       chartDataModel.addYData(yData);
    }
@@ -412,8 +410,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
 
       chartModel.addYData(yData);
    }
@@ -433,8 +430,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_PACE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE);
 
       chartDataModel.addYData(yData);
    }
@@ -454,8 +450,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
 
       chartDataModel.addYData(yData);
    }
@@ -479,8 +474,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setValueDivisor(1000);
       yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
 
       chartModel.addYData(yData);
    }
@@ -503,8 +497,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       _yData_Duration.setVisibleMinValue(0);
       _yData_Duration.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
-      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
 
       chartModel.addYData(_yData_Duration);
    }
