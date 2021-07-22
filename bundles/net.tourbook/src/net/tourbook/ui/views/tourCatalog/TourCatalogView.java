@@ -111,26 +111,22 @@ public class TourCatalogView extends ViewPart implements
       IReferenceTourProvider,
       ITreeViewer {
 
-   public static final String     ID                                  = "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
+   public static final String     ID                                 = "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
 
-   public static final int        COLUMN_LABEL                        = 0;
-   public static final int        COLUMN_SPEED                        = 1;
+   public static final int        COLUMN_LABEL                       = 0;
+   public static final int        COLUMN_SPEED                       = 1;
 
-   static final int               VIEW_LAYOUT_WITH_YEAR_CATEGORIES    = 0;
-   static final int               VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES = 10;
+   private static final String    MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID = "tour.catalog.active.ref.id";                     //$NON-NLS-1$
+   private static final String    MEMENTO_TOUR_CATALOG_LINK_TOUR     = "tour.catalog.link.tour";                         //$NON-NLS-1$
+   private static final String    STATE_IS_USE_FAST_APP_TOUR_FILTER  = "STATE_IS_USE_FAST_APP_TOUR_FILTER";              //$NON-NLS-1$
 
-   private static final String    MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID  = "tour.catalog.active.ref.id";                     //$NON-NLS-1$
-   private static final String    MEMENTO_TOUR_CATALOG_LINK_TOUR      = "tour.catalog.link.tour";                         //$NON-NLS-1$
-   private static final String    STATE_IS_USE_FAST_APP_TOUR_FILTER   = "STATE_IS_USE_FAST_APP_TOUR_FILTER";              //$NON-NLS-1$
-   private static final String    STATE_VIEW_LAYOUT                   = "STATE_VIEW_LAYOUT";                              //$NON-NLS-1$
-
-   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore _prefStore_Common                   = CommonActivator.getPrefStore();
-   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
+   private final IPreferenceStore _prefStore                         = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore_Common                  = CommonActivator.getPrefStore();
+   private final IDialogSettings  _state                             = TourbookPlugin.getState(ID);
 
    private TVICatalogRootItem     _rootItem;
 
-   private final NumberFormat     _nf1                                = NumberFormat.getNumberInstance();
+   private final NumberFormat     _nf1                               = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -161,7 +157,6 @@ public class TourCatalogView extends ViewPart implements
 
    private TreeViewer                          _tourViewer;
    private ColumnManager                       _columnManager;
-   private int                                 _viewLayout;
 
    private boolean                             _isToolTipInRefTour;
    private boolean                             _isToolTipInTitle;
@@ -177,7 +172,7 @@ public class TourCatalogView extends ViewPart implements
    private ActionAppTourFilter                 _action_AppTourFilter;
    private ActionLinkTour                      _action_LinkTour;
    private ActionRefreshView                   _action_RefreshView;
-   private Action_ViewLayout                    _action_ToggleRefTourLayout;
+   private Action_ViewLayout                   _action_ToggleRefTourLayout;
 
    private ActionCollapseAll                   _actionContext_CollapseAll;
    private ActionCollapseOthers                _actionContext_CollapseOthers;
@@ -616,8 +611,6 @@ public class TourCatalogView extends ViewPart implements
       _columnManager.setIsCategoryAvailable(true);
       defineAllColumns(parent);
 
-      restoreState_BeforeUI();
-
       createUI(parent);
 
       createActions();
@@ -631,7 +624,7 @@ public class TourCatalogView extends ViewPart implements
       // set selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-      _rootItem = new TVICatalogRootItem(_viewLayout);
+      _rootItem = new TVICatalogRootItem();
 
       // delay loading, that the UI and app filters are initialized
       Display.getCurrent().asyncExec(new Runnable() {
@@ -1347,16 +1340,16 @@ public class TourCatalogView extends ViewPart implements
 
    private void onAction_ToggleViewLayout() {
 
-      switch (_viewLayout) {
+      switch (TourCompareManager.getReferenceTour_ViewLayout()) {
 
-      case VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES:
+      case TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES:
 
-         _viewLayout = VIEW_LAYOUT_WITH_YEAR_CATEGORIES;
+         TourCompareManager.setReferenceTour_ViewLayout(TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES);
          break;
 
-      case VIEW_LAYOUT_WITH_YEAR_CATEGORIES:
+      case TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES:
 
-         _viewLayout = VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES;
+         TourCompareManager.setReferenceTour_ViewLayout(TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES);
          break;
       }
 
@@ -1423,7 +1416,7 @@ public class TourCatalogView extends ViewPart implements
          createUI_10_TourViewer(_viewerContainer);
          _viewerContainer.layout();
 
-         _tourViewer.setInput(_rootItem = new TVICatalogRootItem(_viewLayout));
+         _tourViewer.setInput(_rootItem = new TVICatalogRootItem());
 
          _tourViewer.setExpandedElements(expandedElements);
          _tourViewer.setSelection(selection);
@@ -1442,10 +1435,10 @@ public class TourCatalogView extends ViewPart implements
          final Object[] expandedElements = _tourViewer.getExpandedElements();
          final ISelection selection = _tourViewer.getSelection();
 
-         _tourViewer.setInput(_rootItem = new TVICatalogRootItem(_viewLayout));
+         _tourViewer.setInput(_rootItem = new TVICatalogRootItem());
 
          _tourViewer.setExpandedElements(expandedElements);
-         _tourViewer.setSelection(selection);
+         _tourViewer.setSelection(selection, true);
       }
       tree.setRedraw(true);
    }
@@ -1462,11 +1455,6 @@ public class TourCatalogView extends ViewPart implements
       selectRefTour(refId);
    }
 
-   private void restoreState_BeforeUI() {
-
-      _viewLayout = Util.getStateInt(_state, STATE_VIEW_LAYOUT, VIEW_LAYOUT_WITH_YEAR_CATEGORIES);
-   }
-
    @PersistState
    private void saveState() {
 
@@ -1474,7 +1462,6 @@ public class TourCatalogView extends ViewPart implements
       _state.put(MEMENTO_TOUR_CATALOG_LINK_TOUR, _action_LinkTour.isChecked());
 
       _state.put(STATE_IS_USE_FAST_APP_TOUR_FILTER, _action_AppTourFilter.isChecked());
-      _state.put(STATE_VIEW_LAYOUT, _viewLayout);
 
       _columnManager.saveState(_state);
    }
@@ -1644,7 +1631,7 @@ public class TourCatalogView extends ViewPart implements
 
    private void updateUI_ViewLayout() {
 
-      if (_viewLayout == VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
+      if (TourCompareManager.getReferenceTour_ViewLayout() == TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
 
          // hierarchy is displayed -> show icon/tooltip for flat view
 

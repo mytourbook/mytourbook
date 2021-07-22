@@ -29,11 +29,11 @@ public class TVICatalogRootItem extends TVICatalogItem {
 
    private int _viewLayout;
 
-   public TVICatalogRootItem(final int viewLayout) {
+   public TVICatalogRootItem() {
 
       super();
 
-      _viewLayout = viewLayout;
+      _viewLayout = TourCompareManager.getReferenceTour_ViewLayout();
    }
 
    @Override

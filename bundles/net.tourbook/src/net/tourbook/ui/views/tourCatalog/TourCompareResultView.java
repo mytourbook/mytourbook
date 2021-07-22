@@ -369,7 +369,13 @@ public class TourCompareResultView extends ViewPart implements
          _actionElevationCompareFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourElevationCompareFilter));
       }
 
-      _tourViewer.refresh();
+      // prevent too many refreshes, this is visible when the scrollthumb is moved
+      final Tree tree = _tourViewer.getTree();
+      tree.setRedraw(false);
+      {
+         _tourViewer.refresh();
+      }
+      tree.setRedraw(true);
    }
 
    private void action_ReRunComparision() {

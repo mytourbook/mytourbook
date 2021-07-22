@@ -75,7 +75,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      if (_viewLayout == TourCatalogView.VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES) {
+      if (_viewLayout == TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES) {
 
          // fetch compared tour items
 
