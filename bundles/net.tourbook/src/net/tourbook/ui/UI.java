@@ -496,6 +496,28 @@ public class UI {
     * @param labelText
     * @return
     */
+   public static Composite createPage(final Composite parent, final String labelText) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.WRAP);
+         label.setText(labelText);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      }
+
+      return container;
+   }
+
+   /**
+    * Creates a page with a static text by using a {@link FormToolkit}
+    *
+    * @param formToolkit
+    * @param parent
+    * @param labelText
+    * @return
+    */
    public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
 
       final Composite container = formToolkit.createComposite(parent);
@@ -760,34 +782,6 @@ public class UI {
 
    public static Font getLogFont() {
       return _fontForLogging;
-   }
-
-   /**
-    * Checks if propertyData has the same tour as the oldTourData
-    *
-    * @param propertyData
-    * @param oldTourData
-    * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
-    *         tour
-    */
-   public static TourData getTourPropertyTourData(final TourEvent propertyData, final TourData oldTourData) {
-
-      final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
-      if (modifiedTours == null) {
-         return null;
-      }
-
-      final long oldTourId = oldTourData.getTourId();
-
-      for (final TourData tourData : modifiedTours) {
-         if (tourData.getTourId() == oldTourId) {
-
-            // nothing more to do, only one tour is supported
-            return tourData;
-         }
-      }
-
-      return null;
    }
 
    /**

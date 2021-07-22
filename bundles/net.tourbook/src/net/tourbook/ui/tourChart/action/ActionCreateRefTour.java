@@ -15,23 +15,30 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import java.util.ArrayList;
-
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.PerspectiveFactoryTourCatalog;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
+import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 /**
  * add a new reference tour to all reference tours
@@ -81,11 +88,28 @@ public class ActionCreateRefTour extends Action {
       tourData.getTourReferences().add(newTourReference);
 
       // save tour
-      final ArrayList<TourData> modifiedTours = new ArrayList<>();
-      modifiedTours.add(tourData);
-      TourManager.saveModifiedTours(modifiedTours);
+      final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
 
-      // update tour catalog view
-      TourManager.fireEvent(TourEventId.REFERENCE_TOUR_IS_CREATED);
+      // show reference tour perspective and select the ref tour
+      Display.getDefault().asyncExec(() -> {
+
+         try {
+
+            final IWorkbench workbench = PlatformUI.getWorkbench();
+            final IWorkbenchWindow wbWindow = workbench.getActiveWorkbenchWindow();
+
+            // show compare result perspective
+            workbench.showPerspective(PerspectiveFactoryTourCatalog.PERSPECTIVE_ID, wbWindow);
+
+            // show ref tour view
+            Util.showView(TourCatalogView.ID, true);
+
+            // update reference tour view
+            TourManager.fireEvent(TourEventId.REFERENCE_TOUR_IS_CREATED, new TourEvent(savedTourData));
+
+         } catch (final WorkbenchException e) {
+            StatusUtil.log(e);
+         }
+      });
    }
 }

@@ -53,6 +53,7 @@ public class Images {
    public static final String App_OK                                     = "16px-Crystal_Clear_action_apply.png";                 //$NON-NLS-1$
    public static final String App_Placeholder16                          = "placeholder16.png";                                   //$NON-NLS-1$
    public static final String App_Refresh                                = "refresh.png";                                         //$NON-NLS-1$
+   public static final String App_Refresh_Disabled                       = "refresh-disabled.png";                                //$NON-NLS-1$
    public static final String App_Refresh_All                            = "refresh-all.png";                                     //$NON-NLS-1$
    public static final String App_Refresh_All_Disabled                   = "refresh-all_disabled.png";                            //$NON-NLS-1$
    public static final String App_Refresh_NotAssessed                    = "refresh-not-assessed.png";                            //$NON-NLS-1$
@@ -288,6 +289,9 @@ public class Images {
    public static final String TourChart                                  = "tour-chart.png";                                      //$NON-NLS-1$
    public static final String TourChart_Disabled                         = "tour-chart-disabled.png";                             //$NON-NLS-1$
    public static final String TourData                                   = "tour-data.png";                                       //$NON-NLS-1$
+   public static final String TourElevationCompareFilter                 = "tour-elevation-compare-filter.png";                   //$NON-NLS-1$
+   public static final String TourElevationCompareFilter_Saved           = "tour-elevation-compare-filter-saved.png";             //$NON-NLS-1$
+   public static final String TourElevationCompareFilter_NotSaved        = "tour-elevation-compare-filter-not-saved.png";         //$NON-NLS-1$
    public static final String TourFilter                                 = "tour-filter.png";                                     //$NON-NLS-1$
    public static final String TourFilter_Disabled                        = "tour-filter-disabled.png";                            //$NON-NLS-1$
    public static final String TourFilter_TourWithPhotos                  = "tour-filter-tour-with-photos.png";                    //$NON-NLS-1$

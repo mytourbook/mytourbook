@@ -25,6 +25,7 @@ import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -209,12 +210,30 @@ public class StatisticServices {
 
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 
-      for (final TourType tourType : tourTypes) {
+      if (tourTypes.size() == 0) {
 
-         rgbGradient_Bright.add(tourType.getRGB_Gradient_Bright());
-         rgbGradient_Dark.add(tourType.getRGB_Gradient_Dark());
+         /**
+          * Tour types are not available
+          * <p>
+          * -> set tour type colors otherwise an exception is thrown when painting the bar graphs
+          */
 
-         rgbLine.add(tourType.getRGB_Line_Themed());
+         rgbGradient_Bright.add(TourTypeColorDefinition.DEFAULT_GRADIENT_BRIGHT);
+         rgbGradient_Dark.add(TourTypeColorDefinition.DEFAULT_GRADIENT_DARK);
+
+         rgbLine.add(TourTypeColorDefinition.DEFAULT_LINE_COLOR);
+
+      } else {
+
+         // tour types are available
+
+         for (final TourType tourType : tourTypes) {
+
+            rgbGradient_Bright.add(tourType.getRGB_Gradient_Bright());
+            rgbGradient_Dark.add(tourType.getRGB_Gradient_Dark());
+
+            rgbLine.add(tourType.getRGB_Line_Themed());
+         }
       }
 
       // put the colors into the chart data

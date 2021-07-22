@@ -7325,7 +7325,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          } else if (firstElement instanceof TVICompareResultComparedTour) {
 
-            displayTour(((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId());
+            displayTour(((TVICompareResultComparedTour) firstElement).getTourId());
          }
       }
    }
@@ -7482,9 +7482,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          } else if (firstElement instanceof TVICompareResultComparedTour) {
 
-            final long comparedTourTourId = ((TVICompareResultComparedTour) firstElement)
-                  .getComparedTourData()
-                  .getTourId();
+            final long comparedTourTourId = ((TVICompareResultComparedTour) firstElement).getTourId();
 
             _selectionTourId = comparedTourTourId;
             if (currentTourId == _selectionTourId) {

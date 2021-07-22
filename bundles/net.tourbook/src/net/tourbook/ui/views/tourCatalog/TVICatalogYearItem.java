@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,41 +74,42 @@ public class TVICatalogYearItem extends TVICatalogItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
+      final String sql = UI.EMPTY_STRING
 
-      sb.append("SELECT"); //$NON-NLS-1$
+            + "SELECT" + NL //                                 //$NON-NLS-1$
 
-      sb.append(" TourCompared.comparedId,"); // 		1 //$NON-NLS-1$
-      sb.append(" TourCompared.tourId,"); //			2 //$NON-NLS-1$
-      sb.append(" TourCompared.tourDate,"); //		3 //$NON-NLS-1$
-      sb.append(" TourCompared.avgPulse,"); //		4 //$NON-NLS-1$
-      sb.append(" TourCompared.tourSpeed,"); //		5 //$NON-NLS-1$
-      sb.append(" TourCompared.startIndex,"); //		6 //$NON-NLS-1$
-      sb.append(" TourCompared.endIndex,"); //		7 //$NON-NLS-1$
+            + " TourCompared.comparedId," + NL //              1 //$NON-NLS-1$
+            + " TourCompared.tourId," + NL //                  2 //$NON-NLS-1$
+            + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
+            + " TourCompared.avgPulse," + NL //                4 //$NON-NLS-1$
+            + " TourCompared.tourSpeed," + NL //               5 //$NON-NLS-1$
+            + " TourCompared.startIndex," + NL //              6 //$NON-NLS-1$
+            + " TourCompared.endIndex," + NL //                7 //$NON-NLS-1$
 
-      sb.append(" TourData.tourTitle,"); //			8		 //$NON-NLS-1$
-      sb.append(" TourData.tourType_typeId,"); //		9 //$NON-NLS-1$
+            + " TourData.tourTitle," + NL //                   8 //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //             9 //$NON-NLS-1$
 
-      sb.append(" jTdataTtag.TourTag_tagId,"); //		10 //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId," + NL //             10 //$NON-NLS-1$
 
-      sb.append(" TourCompared.tourDeviceTime_Elapsed"); //		11 //$NON-NLS-1$
+            + " TourCompared.tourDeviceTime_Elapsed" + NL //   11 //$NON-NLS-1$
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared"); //$NON-NLS-1$ //$NON-NLS-2$
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
 
-      // get data for a tour
-      sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append(" TourCompared.tourId = TourData.tourId"); //$NON-NLS-1$
+            // get data for a tour
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$
+            + " ON TourCompared.tourId = TourData.tourId" + NL //                                        //$NON-NLS-1$
 
-      // get tag id's
-      sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append(" ON TourData.tourId = jTdataTtag.TourData_tourId"); //$NON-NLS-1$
+            // get tag id's
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
 
-      sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?"); //$NON-NLS-1$
-      sb.append(" ORDER BY TourCompared.tourDate"); //$NON-NLS-1$
+            + " WHERE TourCompared.refTourId=? AND TourCompared.startYear=?" + NL //                     //$NON-NLS-1$
+            + " ORDER BY TourCompared.tourDate" + NL //                                                  //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, refId);
          statement.setInt(2, year);
 
@@ -160,9 +161,9 @@ public class TVICatalogYearItem extends TVICatalogItem {
                }
 
                // tour type
-               tourItem.tourTypeId = (tourTypeId == null ? //
-                     TourDatabase.ENTITY_IS_NOT_SAVED
-                     : (Long) tourTypeId);
+               tourItem.tourTypeId = tourTypeId == null
+                     ? TourDatabase.ENTITY_IS_NOT_SAVED
+                     : (Long) tourTypeId;
 
                // tour tags
                if (resultTagId instanceof Long) {

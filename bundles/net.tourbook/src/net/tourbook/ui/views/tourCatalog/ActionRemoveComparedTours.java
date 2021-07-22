@@ -55,11 +55,11 @@ public class ActionRemoveComparedTours extends Action {
 
    /**
     * @param selection
-    * @param removedTours
+    * @param selectionRemovedTours
     * @return Returns <code>true</code> when the tours are removed
     */
    private boolean removeComparedTours(final IStructuredSelection selection,
-                                       final SelectionRemovedComparedTours removedTours) {
+                                       final SelectionRemovedComparedTours selectionRemovedTours) {
 
       // confirm removal
       if (MessageDialog.openConfirm(_tourView.getSite().getShell(),
@@ -70,7 +70,7 @@ public class ActionRemoveComparedTours extends Action {
       }
 
       final TreeViewer tourViewer = _tourView.getTourViewer();
-      final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
+      final ArrayList<ElevationCompareResult> removedComparedTours = selectionRemovedTours.removedComparedTours;
 
       // loop: selected items
       for (final Object element : selection) {
@@ -88,7 +88,11 @@ public class ActionRemoveComparedTours extends Action {
                tourViewer.remove(compTourItem);
 
                // update selection
-               removedComparedTours.add(compId);
+               removedComparedTours.add(new ElevationCompareResult(
+
+                     compId,
+                     compTourItem.getTourId(),
+                     compTourItem.refId));
             }
          }
       }
@@ -98,11 +102,11 @@ public class ActionRemoveComparedTours extends Action {
 
    /**
     * @param selection
-    * @param removedTours
+    * @param selectionRemovedTours
     * @return Returns <code>true</code> when the tours are deleted
     */
    private boolean removeRefTours(final IStructuredSelection selection,
-                                  final SelectionRemovedComparedTours removedTours) {
+                                  final SelectionRemovedComparedTours selectionRemovedTours) {
 
       // confirm deletion
       if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
@@ -113,7 +117,8 @@ public class ActionRemoveComparedTours extends Action {
       }
 
       final TreeViewer tourViewer = _tourView.getTourViewer();
-      final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
+
+      final ArrayList<ElevationCompareResult> removedComparedTours = selectionRemovedTours.removedComparedTours;
       final ArrayList<Long> modifiedRefTours = new ArrayList<>();
 
       for (final Object element : selection) {
@@ -121,24 +126,29 @@ public class ActionRemoveComparedTours extends Action {
          if (element instanceof TVICatalogRefTourItem) {
 
             /*
-             * remove all compared tours from the current reference tour
+             * Remove all compared tours from the current reference tour
              */
 
             final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) element;
-            final Collection<StoredComparedTour> storedCompTours = TourCompareManager.getComparedToursFromDb(refTourItem.refId).values();
+            final Collection<StoredComparedTour> allComparedToursFromDb = TourCompareManager.getComparedToursFromDb(refTourItem.refId).values();
 
-            for (final StoredComparedTour storedComparedTour : storedCompTours) {
+            for (final StoredComparedTour comparedTour : allComparedToursFromDb) {
 
-               final long compId = (storedComparedTour).comparedId;
+               final long compId = comparedTour.comparedId;
 
                TourCompareManager.removeComparedTourFromDb(compId);
 
                // change selection
-               removedComparedTours.add(compId);
+               removedComparedTours.add(new ElevationCompareResult(
+
+                     compId,
+                     comparedTour.tourId,
+                     comparedTour.refTourId));
             }
 
             /*
-             * remove the reference tour from the tour and persist it
+             * Remove the reference tour from the tour and save it
+             * -> this will also delete TourReference in the db !
              */
             final EntityManager em = TourDatabase.getInstance().getEntityManager();
             final TourReference refTour = em.find(TourReference.class, refTourItem.refId);
@@ -149,15 +159,16 @@ public class ActionRemoveComparedTours extends Action {
                final TourData tourData = refTour.getTourData();
 
                if (tourData.getTourReferences().remove(refTour)) {
+
                   TourDatabase.saveTour(tourData, false);
 
                   modifiedRefTours.add(tourData.getTourId());
                }
 
-               // remove the ref tour from the fDataModel
+               // remove the ref tour from the data model
                refTourItem.remove();
 
-               // remove the ref tour from the tree
+               // remove the ref tour from the UI
                tourViewer.remove(refTourItem);
             }
 
@@ -183,7 +194,7 @@ public class ActionRemoveComparedTours extends Action {
 
       final SelectionRemovedComparedTours removedTours = new SelectionRemovedComparedTours();
 
-      // get selected reference tours
+      // get selected tours
       final IStructuredSelection selection = (IStructuredSelection) tourViewer.getSelection();
 
       final Object firstItem = selection.getFirstElement();

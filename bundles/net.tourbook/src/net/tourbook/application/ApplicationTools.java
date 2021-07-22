@@ -49,18 +49,20 @@ import org.w3c.dom.NodeList;
 
 public class ApplicationTools {
 
-   private static final char   NL                                     = UI.NEW_LINE;
-   private static final String WORKBENCH_XMI                          = "workbench.xmi";                     //$NON-NLS-1$
-   private static final String WORKBENCH_XMI_BACKUP                   = "workbench-BACKUP.xmi";              //$NON-NLS-1$
-   private static final String WORKBENCH_XMI_ADJUSTED                 = "workbench-ADJUSTED.xmi";            //$NON-NLS-1$
+   private static final char    NL                                     = UI.NEW_LINE;
+   private static final String  WORKBENCH_XMI                          = "workbench.xmi";                     //$NON-NLS-1$
+   private static final String  WORKBENCH_XMI_BACKUP                   = "workbench-BACKUP.xmi";              //$NON-NLS-1$
+   private static final String  WORKBENCH_XMI_ADJUSTED                 = "workbench-ADJUSTED.xmi";            //$NON-NLS-1$
 
-   private static final String TRUE                                   = "true";                              //$NON-NLS-1$
+   private static final String  TRUE                                   = "true";                              //$NON-NLS-1$
 
-   private static final String PART_ORG_ECLIPSE_UI_EDITORSS           = "org.eclipse.ui.editorss";           //$NON-NLS-1$
-   private static final String PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview"; //$NON-NLS-1$
+   private static final String  PART_ORG_ECLIPSE_UI_EDITORSS           = "org.eclipse.ui.editorss";           //$NON-NLS-1$
+   private static final String  PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview"; //$NON-NLS-1$
 
-   private static final String ATTR_CLOSEABLE                         = "closeable";                         //$NON-NLS-1$
-   private static final String ATTR_ELEMENT_ID                        = "elementId";                         //$NON-NLS-1$
+   private static final String  ATTR_CLOSEABLE                         = "closeable";                         //$NON-NLS-1$
+   private static final String  ATTR_ELEMENT_ID                        = "elementId";                         //$NON-NLS-1$
+
+   private static final boolean IS_DEBUGGING                           = false;
 
    /**
     * Source: https://howtodoinjava.com/java/xml/xpath-namespace-resolution-example/
@@ -80,8 +82,11 @@ public class ApplicationTools {
       public String getNamespaceURI(final String prefix) {
 
          if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+
             return sourceDocument.lookupNamespaceURI(null);
+
          } else {
+
             return sourceDocument.lookupNamespaceURI(prefix);
          }
       }
@@ -105,7 +110,7 @@ public class ApplicationTools {
     *
     * @param workbenchFolderPath
     */
-   static void fixClosable(final File workbenchFolderPath) {
+   static void fixClosableAttribute(final File workbenchFolderPath) {
 
       final StringBuilder sb = new StringBuilder();
 
@@ -115,98 +120,111 @@ public class ApplicationTools {
       final File fileWorkbenchXMI = new File(workbenchFolderPath, WORKBENCH_XMI);
       final File fileWorkbenchXMI_Adjusted = new File(workbenchFolderPath, WORKBENCH_XMI_ADJUSTED);
 
-      try {
+      int numAdjustments = 0;
 
-         try (FileInputStream fromInputStream = new FileInputStream(fileWorkbenchXMI);
+      try (FileInputStream fromInputStream = new FileInputStream(fileWorkbenchXMI)) {
 
-               FileOutputStream intoFileOutputStream = new FileOutputStream(fileWorkbenchXMI_Adjusted);
-               OutputStreamWriter intoOutputStreamWriter = new OutputStreamWriter(intoFileOutputStream, UI.UTF8_CHARSET);
-               Writer intoCopyWriter = new BufferedWriter(intoOutputStreamWriter)) {
+         // Load the document
+         final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+         domFactory.setNamespaceAware(true);
+         final Document domDocument = domFactory.newDocumentBuilder().parse(fromInputStream);
 
-            // Load the document
-            final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-            domFactory.setNamespaceAware(true);
-            final Document domDocument = domFactory.newDocumentBuilder().parse(fromInputStream);
+         // Select the node(s) with XPath
+         final XPath xpath = XPathFactory.newInstance().newXPath();
 
-            // Select the node(s) with XPath
-            final XPath xpath = XPathFactory.newInstance().newXPath();
+         // MUST set a name space context otherwise xsi:type is ignored !!!
+         final NamespaceResolver nsContext = new NamespaceResolver(domDocument);
+         xpath.setNamespaceContext(nsContext);
 
-            // MUST set a name space context otherwise xsi:type is ignored !!!
-            final NamespaceResolver nsContext = new NamespaceResolver(domDocument);
-            xpath.setNamespaceContext(nsContext);
+         final NodeList allNodes = (NodeList) xpath.evaluate(
+               "//children[@xsi:type='advanced:Placeholder']", //$NON-NLS-1$
+               domDocument,
+               XPathConstants.NODESET);
 
-            final NodeList nodes = (NodeList) xpath.evaluate(
-                  "//children[@xsi:type='advanced:Placeholder']", //$NON-NLS-1$
-                  domDocument,
-                  XPathConstants.NODESET);
+         final int numViews = allNodes.getLength();
 
-            final int numNodes = nodes.getLength();
-            int numReplacements = 0;
+         sb.append(String.format("%-30s numViews:               %d" + NL, LocalDateTime.now(), numViews));
 
-            sb.append(String.format("%-30s numNodes:               %d" + NL, LocalDateTime.now(), numNodes));
+         // Updated the selected nodes
+         for (int nodeIndex = 0; nodeIndex < numViews; nodeIndex++) {
 
-            // Updated the selected nodes
-            for (int nodeIndex = 0; nodeIndex < numNodes; nodeIndex++) {
+            final Element domElement = (Element) allNodes.item(nodeIndex);
 
-               final Element domElement = (Element) nodes.item(nodeIndex);
+            final String attrCloseable = domElement.getAttribute(ATTR_CLOSEABLE);
+            final String attrElementId = domElement.getAttribute(ATTR_ELEMENT_ID);
 
-               final String attrCloseable = domElement.getAttribute(ATTR_CLOSEABLE);
-               final String attrElementId = domElement.getAttribute(ATTR_ELEMENT_ID);
+            if (PART_ORG_ECLIPSE_UI_EDITORSS.equals(attrElementId)
+                  || PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW.equals(attrElementId)) {
 
-               if (PART_ORG_ECLIPSE_UI_EDITORSS.equals(attrElementId)
-                     || PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW.equals(attrElementId)) {
+               // skip parts which do not have a closeable attribute
 
-                  // skip parts which do not have a closeable attribute
-
-                  sb.append(String.format("%-30s Skipped part            %s" + NL, LocalDateTime.now(), attrElementId));
-
-                  continue;
+               if (IS_DEBUGGING) {
+                  sb.append(String.format("%-30s Skipped view            %s" + NL, LocalDateTime.now(), attrElementId));
                }
 
-               if (TRUE.equals(attrCloseable) == false) {
-
-                  domElement.setAttribute(ATTR_CLOSEABLE, TRUE);
-
-                  numReplacements++;
-
-                  sb.append(String.format("%-30s Set closeable='true' in %s" + NL, LocalDateTime.now(), attrElementId));
-               }
+               continue;
             }
 
-            sb.append(String.format("%-30s closeable='true' is set in %d parts" + NL, LocalDateTime.now(), numReplacements));
+            if (TRUE.equals(attrCloseable) == false) {
 
-            // Write result into the output file
-            final TransformerFactory transformFactory = TransformerFactory.newInstance();
-            transformFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+               domElement.setAttribute(ATTR_CLOSEABLE, TRUE);
 
-            final Transformer xformer = transformFactory.newTransformer();
-            xformer.transform(new DOMSource(domDocument), new StreamResult(intoCopyWriter));
+               numAdjustments++;
 
-         } catch (final Exception e) {
-
-            e.printStackTrace();
+               sb.append(String.format("%-30s Set closeable='true' in %s" + NL, LocalDateTime.now(), attrElementId));
+            }
          }
 
-         // use a secon try/catch to close files before they are renamed
+         sb.append(String.format("%-30s closeable='true' is set in %d views" + NL, LocalDateTime.now(), numAdjustments));
 
-         try {
+         if (numAdjustments > 0) {
 
-            // rename original workbench.xmi -> workbench-BACKUP.xmi
-            final Path originalWorkbenchXMI = Paths.get(fileWorkbenchXMI.getAbsolutePath());
-            Files.move(originalWorkbenchXMI, originalWorkbenchXMI.resolveSibling(WORKBENCH_XMI_BACKUP), StandardCopyOption.REPLACE_EXISTING);
-            sb.append(String.format("%-30s Renamed workbench.xmi -> workbench-BACKUP.xmi" + NL, LocalDateTime.now()));
+            /*
+             * Replace original file with adjusted file
+             */
 
-            // rename workbench-ADJUSTED.xmi -> workbench.xmi
-            final Path newWorkbenchXMI = Paths.get(fileWorkbenchXMI_Adjusted.getAbsolutePath());
-            Files.move(newWorkbenchXMI, newWorkbenchXMI.resolveSibling(WORKBENCH_XMI), StandardCopyOption.REPLACE_EXISTING);
-            sb.append(String.format("%-30s Replaced old workbench.xmi with new workbench.xmi" + NL, LocalDateTime.now()));
+            try (FileOutputStream intoFileOutputStream = new FileOutputStream(fileWorkbenchXMI_Adjusted);
+                  OutputStreamWriter intoOutputStreamWriter = new OutputStreamWriter(intoFileOutputStream, UI.UTF8_CHARSET);
+                  Writer intoCopyWriter = new BufferedWriter(intoOutputStreamWriter)) {
 
-         } catch (final IOException e) {
+               // Write result into the output file
+               final TransformerFactory transformFactory = TransformerFactory.newInstance();
+               transformFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
-            StatusUtil.log(e);
+               final Transformer xformer = transformFactory.newTransformer();
+               xformer.transform(new DOMSource(domDocument), new StreamResult(intoCopyWriter));
+
+            } catch (final Exception e) {
+
+               StatusUtil.log(e);
+            }
+
+            // use a secon try/catch to close files before they are renamed
+
+            try {
+
+               // rename original workbench.xmi -> workbench-BACKUP.xmi
+               final Path originalWorkbenchXMI = Paths.get(fileWorkbenchXMI.getAbsolutePath());
+               Files.move(originalWorkbenchXMI, originalWorkbenchXMI.resolveSibling(WORKBENCH_XMI_BACKUP), StandardCopyOption.REPLACE_EXISTING);
+               sb.append(String.format("%-30s Renamed workbench.xmi -> workbench-BACKUP.xmi" + NL, LocalDateTime.now()));
+
+               // rename workbench-ADJUSTED.xmi -> workbench.xmi
+               final Path newWorkbenchXMI = Paths.get(fileWorkbenchXMI_Adjusted.getAbsolutePath());
+               Files.move(newWorkbenchXMI, newWorkbenchXMI.resolveSibling(WORKBENCH_XMI), StandardCopyOption.REPLACE_EXISTING);
+               sb.append(String.format("%-30s Replaced old workbench.xmi with new workbench.xmi" + NL, LocalDateTime.now()));
+
+            } catch (final IOException e) {
+
+               StatusUtil.log(e);
+            }
          }
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
 
       } finally {
+
          StatusUtil.log(sb.toString());
       }
    }
@@ -215,7 +233,7 @@ public class ApplicationTools {
 
       final String workbenchFolderPath = "C:/DAT/runtime-net.mytourbook/workspace/.metadata/.plugins/org.eclipse.e4.workbench"; //$NON-NLS-1$
 
-      ApplicationTools.fixClosable(new File(workbenchFolderPath));
+      ApplicationTools.fixClosableAttribute(new File(workbenchFolderPath));
 
    }
 

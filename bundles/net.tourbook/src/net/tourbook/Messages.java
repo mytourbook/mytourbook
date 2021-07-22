@@ -531,7 +531,6 @@ public class Messages extends NLS {
    public static String        App_Action_Cancel;
    public static String        App_Action_Close_ToolTip;
    public static String        App_Action_CollapseAll;
-   public static String        App_Action_CollapseAll_Tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
@@ -920,6 +919,11 @@ public class Messages extends NLS {
 
    public static String        Elevation_Compare_Action_AppTourFilter_Tooltip;
    public static String        Elevation_Compare_Action_CompareAllTours;
+   public static String        Elevation_Compare_Action_IsNotUsingAppFilter_Tooltip;
+   public static String        Elevation_Compare_Action_IsUsingAppFilter_Tooltip;
+   public static String        Elevation_Compare_Action_RemoveReferenceTours;
+   public static String        Elevation_Compare_Action_ReRunComparison_Tooltip;
+   public static String        Elevation_Compare_Action_TourCompareFilter_Tooltip;
    public static String        Elevation_Compare_Monitor_SubTask;
    public static String        Elevation_Compare_Monitor_Task;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,34 +15,35 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
 
-/**
- * This contains a tree item which represents a tour
- */
-public abstract class TVICatalogTourItem extends TVICatalogItem {
+public class ElevationCompareResult {
 
    /**
-    * Id for the {@link TourData} entity
+    * Id for a {@link TourCompared}
     */
-   private long tourId;
+   public long compareId;
 
    /**
-    * @return Returns the TourId for the {@link TourData} entity
+    * Elevation comparison is done with this {@link TourData}
     */
-   public long getTourId() {
-
-      return tourId;
-   }
+   public long tourId;
 
    /**
-    * Set the tour id for the tour item
-    *
-    * @param tourId
+    * Elevation comparison is done against this {@link TourReference}
     */
-   public void setTourId(final long tourId) {
+   public long refTourId;
 
+   @SuppressWarnings("unused")
+   private ElevationCompareResult() {}
+
+   public ElevationCompareResult(final long compareId, final long tourId, final long refTourId) {
+
+      this.compareId = compareId;
       this.tourId = tourId;
+      this.refTourId = refTourId;
    }
 
 }

@@ -37,15 +37,27 @@ Improvements
 ============
 
 * Compare tours by elevation
-  - Compare tours concurrently -> much less waiting time
-  - Use fast app tour filters (person, tour type, tour, photo...)
-  - New shortcut action to compare reference tour(s) with all tours
-  - Automatically expand reference tour in compare result view, after comparison is done
-  - Tour comparison can be restarted with other parameters in the "Compare Result" view, e.g. different years, other tour filter 
+  - Reference tour view
+    - New shortcut action in context menu to compare reference tour(s) with all tours
+    - A newly create reference tour is selected in this view
+  - Compare result view
+    - Compare tours concurrently -> much less waiting time
+    - Use fast app tour filters (person, tour type, tour, photo...)
+    - Filter tour compare results between all/saved/not saved
+    - Automatically expand reference tour in compare result view, after comparison is done
+    - New shortcut action in context menu to compare reference tour(s) with all tours
+    - Tour comparison can be restarted with other parameters, e.g. different years, other tour filter
+  - Year statistic view
+    - Show reference tour title
+    - Show year statistic view in "Compare Result" perspective
+    - Update year statistic view when compare result is assigned/removed
 
 * Repair close button in all views
   - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
     This is an experimental feature and can be activated with the command line parameter -DsetAllViewsClosable 
+
+* Fitlog/FitlogEx import (Frederic)
+  - The timezone is used only when available, otherwise it's determined with the GPS position
 
 
 Changes  

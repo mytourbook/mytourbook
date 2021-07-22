@@ -107,7 +107,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
          // when the timer delay is 100 ms then the task is not run
          Display.getDefault().timerExec(0, () -> {
 
-            ApplicationTools.fixClosable(getWorkbenchFolderPath());
+            ApplicationTools.fixClosableAttribute(getWorkbenchFolderPath());
          });
 
       }
