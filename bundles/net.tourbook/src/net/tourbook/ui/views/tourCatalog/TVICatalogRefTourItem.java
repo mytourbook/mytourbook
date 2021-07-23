@@ -20,6 +20,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import net.tourbook.common.util.TreeViewerItem;
@@ -248,7 +249,11 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
                // tour date
                if (tourDate != null) {
-                  tourItem.tourDate = tourDate.toLocalDate();
+
+                  final LocalDate localDate = tourDate.toLocalDate();
+
+                  tourItem.tourDate = localDate;
+                  tourItem.year = localDate.getYear();
                }
 
                // tour type

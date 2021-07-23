@@ -685,22 +685,25 @@ public class TourCompareManager {
       final IWorkbenchPage activePage = window.getActivePage();
 
       /*
-       * First navigate in the year statistic view
+       * Firstly navigate in the compare result view when view is available
        */
-      final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
-      if (yearStatView instanceof RefTour_YearStatistic_View) {
-         navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
+      final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+      
+      if (comparedTours instanceof TourCompareResultView) {
+
+         navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
       }
 
       /*
-       * Second navigate in the compare result view
+       * Secondly navigate in the year statistic view when view is available
        */
       if (navigatedTour == null) {
 
-         final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+         final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
 
-         if (comparedTours instanceof TourCompareResultView) {
-            navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
+         if (yearStatView instanceof RefTour_YearStatistic_View) {
+
+            navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
          }
       }
 

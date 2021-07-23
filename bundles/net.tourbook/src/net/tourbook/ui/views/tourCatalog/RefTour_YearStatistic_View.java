@@ -446,7 +446,29 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    private void createStatisticData_WithoutYearCategories(final int firstYear, final boolean isShowLatestYear) {
 
-      TBD
+      final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
+
+      // loop: all tours
+      for (final Object item : allItems) {
+
+         if (item instanceof TVICatalogComparedTour) {
+
+            final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) item;
+
+            final int tourYear = tourItem.year;
+
+            if (tourYear >= firstYear && tourYear <= _lastYear) {
+
+               final LocalDate tourDate = tourItem.tourDate;
+
+               _statValues_AllTours.add(tourItem);
+               _statValues_DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
+
+               _statValues_AvgPulse.add(tourItem.getAvgPulse());
+               _statValues_TourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
+            }
+         }
+      }
    }
 
    private void createStatisticData_WithYearCategories(final int firstYear, final boolean isShowLatestYear) {
@@ -837,7 +859,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
                if (tourItem.tourDate.getYear() == _lastYear) {
                   break;
                }
-               
+
                yearIndex++;
             }
 

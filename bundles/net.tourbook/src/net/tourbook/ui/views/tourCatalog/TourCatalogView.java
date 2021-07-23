@@ -99,6 +99,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -1353,9 +1354,62 @@ public class TourCatalogView extends ViewPart implements
          break;
       }
 
+      // keep current vertical position
+      final Tree tree = _tourViewer.getTree();
+      final TreeItem topItem = tree.getTopItem();
+
+      final Object itemData = topItem.getData();
+      TVICatalogRefTourItem topRefTourItem = null;
+      if (itemData instanceof TVICatalogRefTourItem) {
+         topRefTourItem = (TVICatalogRefTourItem) itemData;
+      }
+
       updateUI_ViewLayout();
 
       reloadViewer();
+
+      // set to previous vertical position but only when it is a ref tour otherwise it gets complicated
+      // -> compared tour can disappear but not the ref tours
+      if (topRefTourItem != null) {
+
+         final long topRefId = topRefTourItem.refId;
+
+         final Tree recreatedTree = _tourViewer.getTree();
+
+         /*
+          * Find ref tour tree item which was lastly at the top
+          */
+
+         // loop: all ref tour items
+         for (final TreeViewerItem treeItem : _rootItem.getChildren()) {
+
+            if (treeItem instanceof TVICatalogRefTourItem) {
+
+               final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) treeItem;
+
+               if (refTourItem.refId == topRefId) {
+
+                  // loop: all tree items
+                  for (final TreeItem recreatedTreeItem : recreatedTree.getItems()) {
+
+                     final Object treeItemData = recreatedTreeItem.getData();
+
+                     if (treeItemData instanceof TVICatalogRefTourItem) {
+
+                        final TVICatalogRefTourItem treeItemRefTour = (TVICatalogRefTourItem) treeItemData;
+
+                        if (treeItemRefTour.refId == topRefId) {
+
+                           recreatedTree.setTopItem(recreatedTreeItem);
+
+                           return;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
    }
 
    /**

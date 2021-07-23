@@ -29,15 +29,15 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    /**
     * unique id for the {@link TourCompared} entity
     */
-   long            compareId;
+   long compareId;
 
    /**
     *
     */
-   long            refId      = -1;
+   long refId      = -1;
 
-   int             startIndex = -1;
-   int             endIndex   = -1;
+   int  startIndex = -1;
+   int  endIndex   = -1;
 
    /*
     * Fields from TourData
@@ -46,6 +46,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    String          tourTitle;
 
    LocalDate       tourDate;
+   int             year;
 
    float           tourSpeed;
    int             tourDeviceTime_Elapsed;
