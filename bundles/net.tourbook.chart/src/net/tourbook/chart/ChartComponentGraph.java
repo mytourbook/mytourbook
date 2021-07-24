@@ -1687,9 +1687,9 @@ public class ChartComponentGraph extends Canvas {
 
             if (isLastGraph) {
                // draw the unit label and unit tick for the last graph
-               drawAsync_210_XUnits_VGrid(gcChart, gcGraph, graphDrawingData, true);
+               drawAsync_210_XUnits_VerticalGrid(gcChart, gcGraph, graphDrawingData, true);
             } else {
-               drawAsync_210_XUnits_VGrid(gcChart, gcGraph, graphDrawingData, false);
+               drawAsync_210_XUnits_VerticalGrid(gcChart, gcGraph, graphDrawingData, false);
             }
          }
 
@@ -1746,7 +1746,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          // draw only the x-axis, this is drawn lately because the graph can overwrite it
-         drawAsync_230_XAxis(gcGraph, graphDrawingData);
+         drawAsync_230_XAxisLine(gcGraph, graphDrawingData);
 
          // draw graph image into the chart image
          gcChart.drawImage(_chartImage_10_Graphs, 0, graphDrawingData.getDevYTop());
@@ -2075,10 +2075,10 @@ public class ChartComponentGraph extends Canvas {
     *           <code>true</code> indicate to draws the unit tick and unit label additional to the
     *           unit grid line
     */
-   private void drawAsync_210_XUnits_VGrid(final GC gcChart,
-                                           final GC gcGraph,
-                                           final GraphDrawingData graphDrawingData,
-                                           final boolean isDrawUnit) {
+   private void drawAsync_210_XUnits_VerticalGrid(final GC gcChart,
+                                                  final GC gcGraph,
+                                                  final GraphDrawingData graphDrawingData,
+                                                  final boolean isDrawUnit) {
 
       final ArrayList<ChartUnit> xUnits = graphDrawingData.getXUnits();
 
@@ -2117,17 +2117,17 @@ public class ChartComponentGraph extends Canvas {
 
       gcChart.setForeground(Chart.FOREGROUND_COLOR_UNITS);
 
-      final int xUnitSize = xUnits.size();
+      final int numXUnits = xUnits.size();
       int devNextXUnitTick = Integer.MIN_VALUE;
       int devUnitWidth = 0;
       ChartUnit nextXUnit = null;
 
       unitLoop:
 
-      for (int unitIndex = 0; unitIndex < xUnitSize; unitIndex++) {
+      for (int unitIndex = 0; unitIndex < numXUnits; unitIndex++) {
 
          /*
-          * get unit tick position and the width to the next unit tick
+          * Get unit tick position and the width to the next unit tick
           */
          int devXUnitTick;
          ChartUnit xUnit = null;
@@ -2157,7 +2157,7 @@ public class ChartComponentGraph extends Canvas {
             }
          }
 
-         if (unitIndex < xUnitSize - 1) {
+         if (unitIndex < numXUnits - 1) {
 
             nextXUnit = xUnits.get(unitIndex + 1);
 
@@ -2178,7 +2178,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * skip units which are outside of the visible area
+          * Skip units which are outside of the visible area
           */
          if (devXUnitTick < 0 && devNextXUnitTick < 0) {
             continue;
@@ -2190,25 +2190,28 @@ public class ChartComponentGraph extends Canvas {
          if (isDrawUnit) {
 
             /*
-             * draw unit tick
+             * Draw unit tick
              */
-            if (devXUnitTick > 0 && (isDrawUnits == null || isDrawUnits[unitCounter])) {
+            if (
 
-               // draw unit tick, don't draw it on the vertical 0 line
+            // don't draw it on the vertical 0 line
+            devXUnitTick > 0
+
+                  && (isDrawUnits == null || isDrawUnits[unitCounter])) {
 
                gcChart.setLineStyle(SWT.LINE_SOLID);
                gcChart.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
             }
 
             /*
-             * draw unit value
+             * Draw unit value
              */
             final int devUnitValueWidth = gcChart.textExtent(xUnit.valueLabel).x;
 
             if (devUnitWidth != 0 && xUnitTextPos == GraphDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
                /*
-                * draw unit value BETWEEN two units
+                * Draw unit value BETWEEN two units
                 */
 
                final int devXUnitCenter = (devUnitWidth - devUnitValueWidth) / 2;
@@ -2233,7 +2236,7 @@ public class ChartComponentGraph extends Canvas {
             } else {
 
                /*
-                * draw unit value in the MIDDLE of the unit tick
+                * Draw unit value in the MIDDLE of the unit tick
                 */
 
                final int devUnitValueWidth2 = devUnitValueWidth / 2;
@@ -2251,7 +2254,7 @@ public class ChartComponentGraph extends Canvas {
                   isFirstUnit = false;
 
                   /*
-                   * this is the first unit, do not center it on the unit tick, because it would be
+                   * This is the first unit, do not center it on the unit tick, because it would be
                    * clipped on the left border
                    */
                   int devXUnit = devXUnitValueDefaultPosition;
@@ -2263,12 +2266,12 @@ public class ChartComponentGraph extends Canvas {
                   gcChart.drawText(xUnit.valueLabel, devXUnit, devYBottom + 7, true);
 
                   /*
-                   * draw unit label (km, mi, h)
+                   * Draw unit label (km, mi, h)
                    */
                   final int devXUnitLabel = devXUnit + devUnitValueWidth + 2;
 
                   gcChart.drawText(
-                        unitLabel, //
+                        unitLabel,
                         devXUnitLabel,
                         devYBottom + 7,
                         true);
@@ -2291,6 +2294,7 @@ public class ChartComponentGraph extends Canvas {
 
                         // check if the unit value is overlapping the previous unit value
                         if (devXUnitValueDefaultPosition <= devXLastUnitRightPosition + 2) {
+
                            break unitLoop;
                         }
                      }
@@ -2306,8 +2310,14 @@ public class ChartComponentGraph extends Canvas {
             }
          }
 
-         // draw vertical gridline but not on the vertical 0 line
-         if (devXUnitTick > 0 && isDrawVerticalGrid) {
+         // draw vertical gridline
+         if (isDrawVerticalGrid
+
+               // draw vertical gridline but not on the vertical 0 line
+               && devXUnitTick > 0
+
+               // draw vertical line only when the unit tick is also painted
+               && (isDrawUnits == null || isDrawUnits[unitCounter])) {
 
             if (xUnit.isMajorValue) {
 
@@ -2315,7 +2325,7 @@ public class ChartComponentGraph extends Canvas {
 
             } else {
 
-               /*
+               /**
                 * The line width is a complicated topic, when it's not set the gridlines of the
                 * first graph is different than the subsequent graphs, but setting it globally
                 * degrades performance dramatically
@@ -2402,13 +2412,13 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * draw the horizontal gridlines or the x-axis
+    * Draw the horizontal x-axis line
     *
     * @param gcGraph
     * @param drawingData
     * @param isDrawOnlyXAsis
     */
-   private void drawAsync_230_XAxis(final GC gcGraph, final GraphDrawingData drawingData) {
+   private void drawAsync_230_XAxisLine(final GC gcGraph, final GraphDrawingData drawingData) {
 
       final Display display = getDisplay();
 
@@ -2451,7 +2461,7 @@ public class ChartComponentGraph extends Canvas {
             gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
             gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
 
-            // only the x-axis needs to be drawn
+            // only the x-axis needs to be painted
             break;
          }
 

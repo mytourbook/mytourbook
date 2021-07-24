@@ -640,6 +640,8 @@ public class TourCatalogView extends ViewPart implements
 
             restoreState();
 
+            updateUI_ViewLayout();
+
             // move the horizontal scrollbar to the left border
             final ScrollBar horizontalBar = _tourViewer.getTree().getHorizontalBar();
             if (horizontalBar != null) {

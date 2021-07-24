@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
+import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
@@ -1227,6 +1228,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
       });
 
       net.tourbook.ui.UI.updateChartProperties(_yearChart, GRID_PREF_PREFIX);
+
+      final ChartTitleSegmentConfig ctsConfig = _yearChart.getChartTitleSegmentConfig();
+      ctsConfig.isShowSegmentTitle = true;
 
       // show the data in the chart
       _yearChart.updateChart(chartModel, false, true);
