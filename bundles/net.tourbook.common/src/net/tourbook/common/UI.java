@@ -1463,6 +1463,14 @@ public class UI {
       return directionIndex;
    }
 
+   public static FontMetrics getDialogFontMetrics() {
+
+      // ensure that font metrics are setup
+      setupUI_FontMetrics();
+
+      return _fontMetrics;
+   }
+
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;

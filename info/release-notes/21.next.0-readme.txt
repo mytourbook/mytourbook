@@ -75,9 +75,11 @@ Bugfix
   - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
 
 * Tour cadence zones times (Frederic)
-  
   - Cadence zone times computation should use either the recorded time or moving
     time per the computed values preference 
+    
+* Tour chart
+  - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
 
 
 Translation    

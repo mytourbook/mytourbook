@@ -38,28 +38,28 @@ import org.eclipse.swt.widgets.Event;
 /**
  * Chart widget which represents the chart UI.
  * <p>
- * The chart widget consists has the following heights:
+ * The chart widget has the following heights:
  *
  * <pre>
  *  {@link #_devMarginTop}
  *  {@link #_devXTitleBarHeight}
  *
- *  |devSliderBarHeight
+ *  {@link #devSliderBarHeight}
  *  |#graph#
  *
- *   verticalDistance
+ *  {@link #_graphVerticalDistance}
  *
- *  |devSliderBarHeight
+ *  |{@link #devSliderBarHeight}
  *  |#graph#
  *
- *   verticalDistance
+ *  {@link #_graphVerticalDistance}
  *
  *     ...
  *
- *   |devSliderBarHeight
- *   |#graph#
+ *  {@link #devSliderBarHeight}
+ *  |#graph#
  *
- *   {@link #_devXAxisHeight}
+ *  {@link #_devXAxisHeight}
  * </pre>
  */
 public class ChartComponents extends Composite {
@@ -72,58 +72,69 @@ public class ChartComponents extends Composite {
    static final int        CHART_MIN_WIDTH          = 5;
    static final int        CHART_MIN_HEIGHT         = 5;
 
-//   static final int            CHART_MAX_WIDTH             = Integer.MAX_VALUE;      // 2'147'483'647
-//   static final int            CHART_MAX_WIDTH             = 1000000000;             // 1'000'000'000
-   static final long             CHART_MAX_WIDTH             = 1000000000000L;          // 1'000'000'000'000
-//                                                                                     //   308'333'095
-   static final int              CHART_MAX_HEIGHT            = 10000;
+//   static final int            CHART_MAX_WIDTH       = Integer.MAX_VALUE;      // 2'147'483'647
+//   static final int            CHART_MAX_WIDTH       = 1000000000;             // 1'000'000'000
+   static final long             CHART_MAX_WIDTH       = 1000000000000L;      //    1'000'000'000'000
+//                                                                               //   308'333'095
+   static final int              CHART_MAX_HEIGHT      = 10000;
 
-   static final int              SLIDER_BAR_HEIGHT           = 10;
-   static final int              TITLE_BAR_HEIGHT            = 18;
-   static final int              MARGIN_TOP_WITH_TITLE       = 5;
-   static final int              MARGIN_TOP_WITHOUT_TITLE    = 10;
+   private static final int      MARGIN_TOP_WITH_TITLE = 5;
 
    /**
     * Number of seconds in one day
     */
-   private static final int      DAY_IN_SECONDS              = 24 * 60 * 60;
-   private static final int      MONTH_IN_SECONDS            = 31 * DAY_IN_SECONDS;
-   private static final int      YEAR_IN_SECONDS             = 366 * DAY_IN_SECONDS;
+   private static final int      DAY_IN_SECONDS        = 24 * 60 * 60;
+   private static final int      MONTH_IN_SECONDS      = 31 * DAY_IN_SECONDS;
+   private static final int      YEAR_IN_SECONDS       = 366 * DAY_IN_SECONDS;
 
-   private static final String[] _monthLabels                = {
-         Messages.Month_jan,
-         Messages.Month_feb,
-         Messages.Month_mar,
-         Messages.Month_apr,
-         Messages.Month_mai,
-         Messages.Month_jun,
-         Messages.Month_jul,
-         Messages.Month_aug,
-         Messages.Month_sep,
-         Messages.Month_oct,
-         Messages.Month_nov,
-         Messages.Month_dec };
+   private static final String[] _monthLabels          =
+         {
+               Messages.Month_jan,
+               Messages.Month_feb,
+               Messages.Month_mar,
+               Messages.Month_apr,
+               Messages.Month_mai,
+               Messages.Month_jun,
+               Messages.Month_jul,
+               Messages.Month_aug,
+               Messages.Month_sep,
+               Messages.Month_oct,
+               Messages.Month_nov,
+               Messages.Month_dec
+         };
 
-   private static final String[] _monthShortLabels           = {
-         Integer.toString(1),
-         Integer.toString(2),
-         Integer.toString(3),
-         Integer.toString(4),
-         Integer.toString(5),
-         Integer.toString(6),
-         Integer.toString(7),
-         Integer.toString(8),
-         Integer.toString(9),
-         Integer.toString(10),
-         Integer.toString(11),
-         Integer.toString(12) };
+   private static final String[] _monthShortLabels     =
+         {
+               Integer.toString(1),
+               Integer.toString(2),
+               Integer.toString(3),
+               Integer.toString(4),
+               Integer.toString(5),
+               Integer.toString(6),
+               Integer.toString(7),
+               Integer.toString(8),
+               Integer.toString(9),
+               Integer.toString(10),
+               Integer.toString(11),
+               Integer.toString(12)
+         };
 
    private final Chart           _chart;
 
+   private int                   DIALOG_FONT_HEIGHT;
+   private int                   SLIDER_BAR_HEIGHT;
+   private int                   TITLE_BAR_HEIGHT;
+   {
+      DIALOG_FONT_HEIGHT = UI.getDialogFontMetrics().getHeight();
+
+      SLIDER_BAR_HEIGHT = DIALOG_FONT_HEIGHT - 5;
+      TITLE_BAR_HEIGHT = DIALOG_FONT_HEIGHT + 3;
+   }
+
    /**
-    * top margin of the chart (and all it's components)
+    * Top margin of the chart (and all it's components)
     */
-   private int                   _devMarginTop               = MARGIN_TOP_WITHOUT_TITLE;
+   private int               _devMarginTop               = 10;
 
    /**
     * Height of the slider bar, 0 indicates that the slider is not visible.
@@ -132,80 +143,82 @@ public class ChartComponents extends Composite {
     * label is painted in the graph, this field is propably not needed any more but now it is used
     * for additional space for the graph title.
     */
-   int                           _devSliderBarHeight         = SLIDER_BAR_HEIGHT;
+   int                       devSliderBarHeight          = SLIDER_BAR_HEIGHT;
 
    /**
-    * height of the title bar, 0 indicates that the title is not visible
+    * Height of the title bar, 0 indicates that the title is not visible
     */
-   private int                   _devXTitleBarHeight         = 0;
-   /**
-    * height of the horizontal axis
-    */
-   private final int             _devXAxisHeight             = 25;
-   /**
-    * width of the vertical axis
-    */
-   private final int             _yAxisWidthLeft             = 50;
-
-   private int                   _yAxisWidthLeftWithTitle    = _yAxisWidthLeft;
-
-   private final int             _yAxisWidthRight            = 50;
+   private int               _devXTitleBarHeight         = 0;
 
    /**
-    * vertical distance between two graphs
+    * Height of the horizontal axis
     */
-   private final int             _chartsVerticalDistance     = 15;
+   private int               _devXAxisHeight             = DIALOG_FONT_HEIGHT + 10;
+
+   /**
+    * Width of the vertical axis
+    */
+   private final int         _yAxisWidthLeft             = 50;
+
+   private int               _yAxisWidthLeftWithTitle    = _yAxisWidthLeft;
+
+   private final int         _yAxisWidthRight            = 50;
+
+   /**
+    * Vertical distance between two graphs
+    */
+   private final int         _graphVerticalDistance      = 15;
 
    /**
     * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
     * which is synchronized
     */
-   SynchConfiguration            _synchConfigOut             = null;
+   SynchConfiguration        _synchConfigOut;
 
    /**
     * when a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
     * which set's the synch config
     */
-   SynchConfiguration            _synchConfigSrc             = null;
+   SynchConfiguration        _synchConfigSrc;
+
    /**
     * visible chart rectangle
     */
-   private Rectangle             _visibleGraphRect;
-   final ChartComponentGraph     componentGraph;
+   private Rectangle         _visibleGraphRect;
 
-   final ChartComponentAxis      componentAxisLeft;
+   final ChartComponentGraph componentGraph;
+   final ChartComponentAxis  componentAxisLeft;
+   final ChartComponentAxis  componentAxisRight;
 
-   final ChartComponentAxis      componentAxisRight;
+   private ChartDataModel    _chartDataModel;
 
-   private ChartDataModel        _chartDataModel             = null;
-
-   private ChartDrawingData      _chartDrawingData;
+   private ChartDrawingData  _chartDrawingData;
 
    /**
     * Width in pixel for all months in one year
     */
-   private int                   _devAllMonthLabelWidth      = -1;
-   private int                   _devAllMonthShortLabelWidth = -1;
-   private int                   _devYearLabelWidth;
+   private int               _devAllMonthLabelWidth      = -1;
+   private int               _devAllMonthShortLabelWidth = -1;
+   private int               _devYearLabelWidth;
 
-   private final int[]           _keyDownCounter             = new int[1];
-   private final int[]           _lastKeyDownCounter         = new int[1];
+   private final int[]       _keyDownCounter             = new int[1];
+   private final int[]       _lastKeyDownCounter         = new int[1];
 
    /**
     * this error message is displayed instead of the chart when it's not <code>null</code>
     */
-   String                        errorMessage;
+   String                    errorMessage;
 
-   private long                  _historyUnitStart;
-   private long                  _historyUnitDuration;
+   private long              _historyUnitStart;
+   private long              _historyUnitDuration;
 
-   private int[]                 _historyYears;
+   private int[]             _historyYears;
 
    /**
     * Contains number of days for each month
     */
-   private int[][]               _historyMonths;
-   private int[]                 _historyDOY;
+   private int[][]           _historyMonths;
+   private int[]             _historyDOY;
 
    /**
     * Create and layout the components of the chart
@@ -302,7 +315,7 @@ public class ChartComponents extends Composite {
             // set the chart title height and margin
             final ChartStatisticSegments chartSegments = xData.getChartSegments();
 
-            if (title != null && title.length() > 0 || //
+            if (title != null && title.length() > 0 ||
                   (chartSegments != null && chartSegments.segmentTitle != null)) {
 
                _devXTitleBarHeight = TITLE_BAR_HEIGHT;
@@ -328,7 +341,7 @@ public class ChartComponents extends Composite {
       // set values after they have been computed
       chartDrawingData.devMarginTop = _devMarginTop;
       chartDrawingData.devXTitelBarHeight = _devXTitleBarHeight;
-      chartDrawingData.devSliderBarHeight = _devSliderBarHeight;
+      chartDrawingData.devSliderBarHeight = devSliderBarHeight;
       chartDrawingData.devXAxisHeight = _devXAxisHeight;
       chartDrawingData.devVisibleChartWidth = getDevVisibleChartWidth();
 
@@ -1375,7 +1388,7 @@ public class ChartComponents extends Composite {
        * adjust graph device height for stacked graphs, a gap is between two graphs
        */
       if (isChartStacked && graphCount > 1) {
-         final int devGraphHeightSpace = devGraphHeight - (_chartsVerticalDistance * (graphCount - 1));
+         final int devGraphHeightSpace = devGraphHeight - (_graphVerticalDistance * (graphCount - 1));
          devGraphHeight = (devGraphHeightSpace / graphCount);
       }
 
@@ -1383,7 +1396,7 @@ public class ChartComponents extends Composite {
       devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
 
       // remove slider bar from graph height
-      devGraphHeight -= _devSliderBarHeight;
+      devGraphHeight -= devSliderBarHeight;
 
       // calculate the vertical device offset
       int devYTop = _devMarginTop + _devXTitleBarHeight;
@@ -1391,8 +1404,8 @@ public class ChartComponents extends Composite {
       if (isChartStacked) {
          // each chart has its own drawing rectangle which are stacked on
          // top of each other
-         devYTop += (currentGraph * (devGraphHeight + _devSliderBarHeight))
-               + ((currentGraph - 1) * _chartsVerticalDistance);
+         devYTop += (currentGraph * (devGraphHeight + devSliderBarHeight))
+               + ((currentGraph - 1) * _graphVerticalDistance);
 
       } else {
          // all charts are drawn on the same rectangle
@@ -1423,7 +1436,7 @@ public class ChartComponents extends Composite {
        * adjust graph device height for stacked graphs, a gap is between two graphs
        */
       if (isChartStacked && graphCount > 1) {
-         final int devGraphHeightSpace = devGraphHeight - (_chartsVerticalDistance * (graphCount - 1));
+         final int devGraphHeightSpace = devGraphHeight - (_graphVerticalDistance * (graphCount - 1));
          devGraphHeight = (devGraphHeightSpace / graphCount);
       }
 
@@ -1431,7 +1444,7 @@ public class ChartComponents extends Composite {
       devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
 
       // remove slider bar from graph height
-      devGraphHeight -= _devSliderBarHeight;
+      devGraphHeight -= devSliderBarHeight;
 
       /*
        * all variables starting with graph... contain data values from the graph which are not
@@ -1563,13 +1576,13 @@ public class ChartComponents extends Composite {
       if (_chartDataModel.isGraphOverlapped()) {
 
          // all charts are drawn at the same rectangle
-         devYBottom += devGraphHeight + _devSliderBarHeight;
+         devYBottom += devGraphHeight + devSliderBarHeight;
 
       } else {
          // each chart has its own drawing rectangle which are stacked on
          // top of each other
-         devYBottom += (currentGraph * (devGraphHeight + _devSliderBarHeight))
-               + ((currentGraph - 1) * _chartsVerticalDistance);
+         devYBottom += (currentGraph * (devGraphHeight + devSliderBarHeight))
+               + ((currentGraph - 1) * _graphVerticalDistance);
       }
 
       drawingData.setScaleY(graphScaleY);
@@ -1581,7 +1594,7 @@ public class ChartComponents extends Composite {
       drawingData.setGraphYTop((float) scaledMaxValue / valueScaling);
 
       drawingData.devGraphHeight = devGraphHeight;
-      drawingData.setDevSliderHeight(_devSliderBarHeight);
+      drawingData.setDevSliderHeight(devSliderBarHeight);
 
       final ArrayList<ChartUnit> units = drawingData.getYUnits();
       final int valueDivisor = yData.getValueDivisor();
@@ -1631,7 +1644,7 @@ public class ChartComponents extends Composite {
       // adjust graph device height for stacked graphs, a gap is between two
       // graphs
       if (isChartStacked && graphCount > 1) {
-         final int devGraphHeightSpace = (devGraphHeight - (_chartsVerticalDistance * (graphCount - 1)));
+         final int devGraphHeightSpace = (devGraphHeight - (_graphVerticalDistance * (graphCount - 1)));
          devGraphHeight = (devGraphHeightSpace / graphCount);
       }
 
@@ -1639,7 +1652,7 @@ public class ChartComponents extends Composite {
       devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
 
       // remove slider bar from graph height
-      devGraphHeight -= _devSliderBarHeight;
+      devGraphHeight -= devSliderBarHeight;
 
       /*
        * all variables starting with graph... contain data values from the graph which are not
@@ -1742,13 +1755,13 @@ public class ChartComponents extends Composite {
       if (_chartDataModel.isGraphOverlapped()) {
 
          // all charts are drawn at the same rectangle
-         devYBottom += devGraphHeight + _devSliderBarHeight;
+         devYBottom += devGraphHeight + devSliderBarHeight;
 
       } else {
          // each chart has its own drawing rectangle which are stacked on
          // top of each other
-         devYBottom += (currentGraph * (devGraphHeight + _devSliderBarHeight))
-               + ((currentGraph - 1) * _chartsVerticalDistance);
+         devYBottom += (currentGraph * (devGraphHeight + devSliderBarHeight))
+               + ((currentGraph - 1) * _graphVerticalDistance);
       }
 
       drawingData.setScaleY(graphScaleY);
@@ -1760,7 +1773,7 @@ public class ChartComponents extends Composite {
       drawingData.setGraphYTop(graphMaxValue);
 
       drawingData.devGraphHeight = devGraphHeight;
-      drawingData.setDevSliderHeight(_devSliderBarHeight);
+      drawingData.setDevSliderHeight(devSliderBarHeight);
 
       final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
       int graphValue = graphMinValue;
@@ -2178,7 +2191,7 @@ public class ChartComponents extends Composite {
 
    private int getDevChartHeightWithoutTrim() {
 
-      return _visibleGraphRect.height //
+      return _visibleGraphRect.height
             - _devMarginTop
             - _devXTitleBarHeight
             - _devXAxisHeight;
@@ -2189,9 +2202,10 @@ public class ChartComponents extends Composite {
    }
 
    int getDevChartMarginTop() {
-      return _devMarginTop //
+
+      return _devMarginTop
             + _devXTitleBarHeight
-            + _devSliderBarHeight;
+            + devSliderBarHeight;
    }
 
    /**
@@ -2220,7 +2234,7 @@ public class ChartComponents extends Composite {
 
    int getMarginBottomStartingFromTop() {
 
-      return _visibleGraphRect.height //
+      return _visibleGraphRect.height
             - _devXAxisHeight;
    }
 
@@ -2370,7 +2384,7 @@ public class ChartComponents extends Composite {
        * onResize method
        */
       if (onResize()) {
-         if (_devSliderBarHeight > 0) {
+         if (devSliderBarHeight > 0) {
             componentGraph.resetSliders();
          }
       }
@@ -2381,7 +2395,7 @@ public class ChartComponents extends Composite {
     */
    void setSliderVisible(final boolean isSliderVisible) {
 
-      _devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
+      devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
 
       componentGraph.setXSliderVisible(isSliderVisible);
    }
