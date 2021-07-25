@@ -17,6 +17,8 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
@@ -24,6 +26,7 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class GraphDrawingData {
 
+   private static final char  NL                     = UI.NEW_LINE;
    // position for the x-axis unit text
    protected static final int X_UNIT_TEXT_POS_LEFT   = 0;
    protected static final int X_UNIT_TEXT_POS_CENTER = 1;
@@ -88,6 +91,7 @@ public class GraphDrawingData {
     * virtual graph width in dev (pixel) units
     */
    public long       devVirtualGraphWidth;
+
    /**
     * graph height in dev (pixel) units, each graph has the same height
     */
@@ -292,10 +296,9 @@ public class GraphDrawingData {
    }
 
    /**
-    * @return Returns an array for each unit tick. Unit tick is drawn when set to <code>true</code>
-    *         .
+    * @return Returns an array for each unit tick. Unit tick is drawn when set to <code>true</code>.
     *         <p>
-    *         When <code>null</code> is returned all units are drawn.
+    *         When <code>null</code> is returned then all units should be painted.
     */
    public boolean[] isDrawUnits() {
       return _isDrawUnits;
@@ -474,5 +477,19 @@ public class GraphDrawingData {
     */
    public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
       _ySliderHitRect = sliderHitRect;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "GraphDrawingData" + NL + "" //      //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "[" + NL //                          //$NON-NLS-1$
+
+            + "_xTitle=" + _xTitle + NL //         //$NON-NLS-1$
+
+            + "]"; //                              //$NON-NLS-1$
    }
 }

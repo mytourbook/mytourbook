@@ -27,9 +27,13 @@ import net.tourbook.database.TourDatabase;
 
 public class TVICatalogRootItem extends TVICatalogItem {
 
+   private int _viewLayout;
+
    public TVICatalogRootItem() {
 
       super();
+
+      _viewLayout = TourCompareManager.getReferenceTour_ViewLayout();
    }
 
    @Override
@@ -67,13 +71,13 @@ public class TVICatalogRootItem extends TVICatalogItem {
 
          while (result.next()) {
 
-            final TVICatalogRefTourItem refItem = new TVICatalogRefTourItem(this);
+            final TVICatalogRefTourItem refItem = new TVICatalogRefTourItem(this, _viewLayout);
             children.add(refItem);
 
             refItem.label = result.getString(1);
             refItem.refId = result.getLong(2);
             refItem.setTourId(result.getLong(3));
-            refItem.tourCounter = result.getInt(4);
+            refItem.numTours = result.getInt(4);
          }
 
       } catch (final SQLException e) {
