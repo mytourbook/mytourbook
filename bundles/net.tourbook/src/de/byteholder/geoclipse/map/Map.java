@@ -579,11 +579,20 @@ public class Map extends Canvas {
    private boolean                   _isFastMapPainting_Active;
    private boolean                   _isInInverseKeyboardPanning;
 
-   private int                       _fastMapPainting_skippedValues;
+   /*
+    * Direction arrows
+    */
+   private boolean           _isDrawTourDirection;
+   private int               _tourDirection_MarkerGap;
+   private int               _tourDirection_LineWidth;
+   private RGB               _tourDirection_RGB;
+   private float             _tourDirection_SymbolSize;
 
-   private MapTourBreadcrumb         _tourBreadcrumb;
+   private int               _fastMapPainting_skippedValues;
 
-   private Font                      _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private MapTourBreadcrumb _tourBreadcrumb;
+
+   private Font              _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -1241,15 +1250,13 @@ public class Map extends Canvas {
 
          final Set<GeoPosition> positions = new HashSet<>();
 
-         positions.add(
-               new GeoPosition(//
-                     Double.parseDouble(boundingBoxValues[0]),
-                     Double.parseDouble(boundingBoxValues[2])));
+         positions.add(new GeoPosition(
+               Double.parseDouble(boundingBoxValues[0]),
+               Double.parseDouble(boundingBoxValues[2])));
 
-         positions.add(
-               new GeoPosition(//
-                     Double.parseDouble(boundingBoxValues[1]),
-                     Double.parseDouble(boundingBoxValues[3])));
+         positions.add(new GeoPosition(
+               Double.parseDouble(boundingBoxValues[1]),
+               Double.parseDouble(boundingBoxValues[3])));
 
          return positions;
 
@@ -1443,7 +1450,7 @@ public class Map extends Canvas {
       while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
 
          // center position in the map
-         final java.awt.Point center = new java.awt.Point(//
+         final java.awt.Point center = new java.awt.Point(
                positionRect.x + positionRect.width / 2,
                positionRect.y + positionRect.height / 2);
 
@@ -1836,7 +1843,7 @@ public class Map extends Canvas {
       final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
 
       // get device rectangle for the position
-      final Point gridGeoPos = new Point(//
+      final Point gridGeoPos = new Point(
             worldGrid.x - _worldPixel_TopLeft_Viewport.x,
             worldGrid.y - _worldPixel_TopLeft_Viewport.y);
 
@@ -1982,7 +1989,7 @@ public class Map extends Canvas {
    private Point grid_World2Dev(final Point worldPosition) {
 
       // get device rectangle for the position
-      final Point gridGeoPos = new Point(//
+      final Point gridGeoPos = new Point(
             worldPosition.x - _worldPixel_TopLeft_Viewport.x,
             worldPosition.y - _worldPixel_TopLeft_Viewport.y);
 
@@ -2390,7 +2397,7 @@ public class Map extends Canvas {
       final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
 
       // get device rectangle for the position
-      final Point gridGeoPos = new Point(//
+      final Point gridGeoPos = new Point(
             worldGrid.x - _worldPixel_TopLeft_Viewport.x,
             worldGrid.y - _worldPixel_TopLeft_Viewport.y);
 
@@ -2428,7 +2435,7 @@ public class Map extends Canvas {
       }
 
       // get device rectangle for this tile
-      return new Point(//
+      return new Point(
             tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x,
             tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y);
    }
@@ -3814,9 +3821,7 @@ public class Map extends Canvas {
       gc.setAntialias(SWT.OFF);
       gc.setAlpha(0xff);
 
-      final boolean isDrawDirection = true;
-
-      if (devXY != null && isDrawDirection) {
+      if (_isDrawTourDirection && devXY != null) {
          paint_HoveredTour_14_DirectionArrows(gc, devXY);
       }
    }
@@ -3894,10 +3899,6 @@ public class Map extends Canvas {
 
    private void paint_HoveredTour_14_DirectionArrows(final GC gc, final int[] devXY) {
 
-      final int minDiff = 20;
-      final int lineWidth = 5;
-      final float directionScale = 5f;
-
       int devX1 = devXY[0];
       int devY1 = devXY[1];
 
@@ -3906,21 +3907,30 @@ public class Map extends Canvas {
 
       final int numSegments = devXY.length / 2;
 
-      gc.setLineWidth(lineWidth);
+      gc.setLineWidth(_tourDirection_LineWidth);
       gc.setAntialias(SWT.ON);
 
       gc.setLineCap(SWT.CAP_SQUARE);
       gc.setLineJoin(SWT.JOIN_MITER);
 
-      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+      final Color directionColor_Symbol = new Color(_tourDirection_RGB);
+      final Color directionColor_Contrast = SYS_COLOR_WHITE;
 
-      final Path directionPath = new Path(_display);
+      final Path directionPath_Color = new Path(_display);
+      final Path directionPath_Contrast = new Path(_display);
       final Transform transform = new Transform(_display);
       {
          // draw direction symbol
-         directionPath.moveTo(0, 1 * directionScale);
-         directionPath.lineTo(0.8f * directionScale, 0);
-         directionPath.lineTo(0, -1 * directionScale);
+         final float directionPos1 = 1 * _tourDirection_SymbolSize;
+         final float directionPos2 = 0.8f * _tourDirection_SymbolSize;
+
+         directionPath_Color.moveTo(0, directionPos1);
+         directionPath_Color.lineTo(directionPos2, 0);
+         directionPath_Color.lineTo(0, -directionPos1);
+
+         directionPath_Contrast.moveTo(-1, directionPos1);
+         directionPath_Contrast.lineTo(directionPos2 - 1, 0);
+         directionPath_Contrast.lineTo(-1, -directionPos1);
 
          for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
 
@@ -3947,7 +3957,7 @@ public class Map extends Canvas {
                yDiff = devY2 - devY1_LastPainted;
             }
 
-            if (xDiff > minDiff || yDiff > minDiff
+            if (xDiff > _tourDirection_MarkerGap || yDiff > _tourDirection_MarkerGap
 
             // paint 1st direction arrow
                   || segmentIndex == 1) {
@@ -3966,7 +3976,12 @@ public class Map extends Canvas {
                transform.rotate(-directionRotation);
 
                gc.setTransform(transform);
-               gc.drawPath(directionPath);
+
+               gc.setForeground(directionColor_Contrast);
+               gc.drawPath(directionPath_Contrast);
+
+               gc.setForeground(directionColor_Symbol);
+               gc.drawPath(directionPath_Color);
 
                // keep last painted position
                devX1_LastPainted = devX1;
@@ -3978,7 +3993,8 @@ public class Map extends Canvas {
             devY1 = devY2;
          }
       }
-      directionPath.dispose();
+      directionPath_Color.dispose();
+      directionPath_Contrast.dispose();
       transform.dispose();
 
       gc.setTransform(null);
@@ -4160,7 +4176,7 @@ public class Map extends Canvas {
 //         final int devX = _offline_PreviousOfflineArea.x;
 //         final int devY = _offline_PreviousOfflineArea.y;
 //         gc.setForeground(SYS_COLOR_GRAY);
-//         gc.drawRectangle(//
+//         gc.drawRectangle(
 //               devX + 1,
 //               devY + 1,
 //               _offline_PreviousOfflineArea.width - 2,
@@ -4689,7 +4705,7 @@ public class Map extends Canvas {
                final ImageDataResources idResources = tile.getOverlayImageDataResources();
 
                // draw center part into the tile image data
-               idResources.drawTileImageData(//
+               idResources.drawTileImageData(
                      imageData9Parts,
                      devXPart,
                      devYPart,
@@ -4736,7 +4752,7 @@ public class Map extends Canvas {
                final ImageDataResources neighborIDResources = neighborTile.getOverlayImageDataResources();
 
                // draw part image into the neighbor image
-               neighborIDResources.drawNeighborImageData(//
+               neighborIDResources.drawNeighborImageData(
                      imageData9Parts,
                      devXPart,
                      devYPart,
@@ -5920,7 +5936,7 @@ public class Map extends Canvas {
       wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, tourZoomLevel);
 
       // get tour center in world pixel for the max zoom level
-      wpTourCenter = new java.awt.Point(//
+      wpTourCenter = new java.awt.Point(
             wpTourRect.x + wpTourRect.width / 2,
             wpTourRect.y + wpTourRect.height / 2);
 
@@ -6245,6 +6261,20 @@ public class Map extends Canvas {
       _isScaleVisible = isScaleVisible;
    }
 
+   public void setTourDirectionConfig(final boolean isShowTourDirection,
+                                      final int markerGap,
+                                      final int lineWidth,
+                                      final float symbolSize,
+                                      final RGB tourDirection_RGB) {
+
+      _isDrawTourDirection = isShowTourDirection;
+
+      _tourDirection_MarkerGap = markerGap;
+      _tourDirection_LineWidth = lineWidth;
+      _tourDirection_SymbolSize = symbolSize;
+      _tourDirection_RGB = tourDirection_RGB;
+   }
+
    public void setTourPaintMethodEnhanced(final boolean isEnhanced, final boolean isShowWarning) {
 
       _isTourPaintMethodEnhanced = isEnhanced;
@@ -6344,7 +6374,7 @@ public class Map extends Canvas {
          // zoom behaviour until 18.5
       }
 
-      wpNewMapCenter = new Point2D.Double(//
+      wpNewMapCenter = new Point2D.Double(
             wpCurrentMapCenter.getX() * relativeWidth,
             wpCurrentMapCenter.getY() * relativeHeight);
 
@@ -6540,7 +6570,7 @@ public class Map extends Canvas {
       adjustedViewport.height += _poiImageBounds.height * 2;
 
       // check if poi is visible
-      if (adjustedViewport.intersects(//
+      if (adjustedViewport.intersects(
             worldPoiPos.x - _poiImageBounds.width / 2,
             worldPoiPos.y - _poiImageBounds.height,
             _poiImageBounds.width,

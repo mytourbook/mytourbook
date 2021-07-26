@@ -67,7 +67,8 @@ Improvements
 Changes  
 =======
 
-* 
+* 2D Map
+  - Move option "Show hovered/selected tour" from "2D Map Options" into "Track Options"
     
 
 Bugfix

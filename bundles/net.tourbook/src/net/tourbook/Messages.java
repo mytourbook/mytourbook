@@ -2024,6 +2024,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
+   public static String Slideout_Map_Options_Checkbox_ShowTourDirection;
+   public static String Slideout_Map_Options_Checkbox_ShowTourDirection_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;
    public static String Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ToggleKeyboardPanning;
@@ -2042,6 +2044,10 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
+   public static String Slideout_Map_Options_Label_TourDirection_DistanceBetweenMarkers;
+   public static String Slideout_Map_Options_Label_TourDirection_LineWidth;
+   public static String Slideout_Map_Options_Label_TourDirection_SymbolColor;
+   public static String Slideout_Map_Options_Label_TourDirection_SymbolSize;
    public static String Slideout_Map_Options_Spinner_DimValue_Tooltip;
 
    public static String Slideout_Map_PhotoOptions_Label_Title;

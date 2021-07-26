@@ -213,6 +213,17 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
    private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
 
+   static final String           STATE_IS_SHOW_TOUR_DIRECTION                          = "STATE_IS_SHOW_TOUR_DIRECTION";                        //$NON-NLS-1$
+   static final boolean          STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT                  = true;
+   static final String           STATE_TOUR_DIRECTION_LINE_WIDTH                       = "STATE_TOUR_DIRECTION_LINE_WIDTH";                     //$NON-NLS-1$
+   static final int              STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT               = 3;
+   static final String           STATE_TOUR_DIRECTION_MARKER_GAP                       = "STATE_TOUR_DIRECTION_MARKER_GAP";                     //$NON-NLS-1$
+   static final int              STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT               = 30;
+   static final String           STATE_TOUR_DIRECTION_SYMBOL_SIZE                      = "STATE_TOUR_DIRECTION_SYMBOL_SIZE";                    //$NON-NLS-1$
+   static final int              STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT              = 10;
+   static final String           STATE_TOUR_DIRECTION_RGB                              = "STATE_TOUR_DIRECTION_RGB";                            //$NON-NLS-1$
+   static final RGB              STATE_TOUR_DIRECTION_RGB_DEFAULT                      = new RGB(55, 55, 55);
+
    private static final String   STATE_MAP_SYNC_MODE                                   = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
    private static final String   STATE_MAP_SYNC_MODE_IS_ACTIVE                         = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
 
@@ -293,6 +304,7 @@ public class Map2View extends ViewPart implements
    private static final IDialogSettings  _state             = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_MapProvider = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
    private static final IDialogSettings  _state_PhotoFilter = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
+
    //
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
@@ -3694,6 +3706,37 @@ public class Map2View extends ViewPart implements
 
    void restoreState_Map2_Options() {
 
+      _map.setShowHoveredSelectedTour(Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,
+            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
+
+      final boolean isShowTourDirection = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_TOUR_DIRECTION,
+            Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
+
+      final int tourDirection_MarkerGap = Util.getStateInt(_state,
+            Map2View.STATE_TOUR_DIRECTION_MARKER_GAP,
+            Map2View.STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
+
+      final int tourDirection_LineWidth = Util.getStateInt(_state,
+            Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,
+            Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
+
+      final float tourDirection_SymbolSize = Util.getStateInt(_state,
+            Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE,
+            Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
+
+      final RGB tourDirection_RGB = Util.getStateRGB(_state,
+            Map2View.STATE_TOUR_DIRECTION_RGB,
+            Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
+
+      _map.setTourDirectionConfig(
+            isShowTourDirection,
+            tourDirection_MarkerGap,
+            tourDirection_LineWidth,
+            tourDirection_SymbolSize,
+            tourDirection_RGB);
+
       _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,
             Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,
             Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
@@ -3701,10 +3744,6 @@ public class Map2View extends ViewPart implements
       _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
-
-      _map.setShowHoveredSelectedTour(Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,
-            Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
 
       // set dim level/color after the map providers are set
       final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
