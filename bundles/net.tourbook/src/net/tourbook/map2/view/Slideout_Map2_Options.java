@@ -189,16 +189,16 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
             _chkIsShowHoveredTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
          }
-         {
-            /*
-             * Show tour direction
-             */
-TBD            _chkIsShowTourDirections = new Button(container, SWT.CHECK);
-            _chkIsShowTourDirections.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
-            _chkIsShowTourDirections.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
-            _chkIsShowTourDirections.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourDirections);
-         }
+//         {
+//            /*
+//             * Show tour direction
+//             */
+//            final TBD _chkIsShowTourDirections = new Button(container, SWT.CHECK);
+//            _chkIsShowTourDirections.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
+//            _chkIsShowTourDirections.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
+//            _chkIsShowTourDirections.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
+//            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourDirections);
+//         }
          {
             /*
              * Zoom to mouse position
