@@ -55,16 +55,16 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   final static IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
-   final private IDialogSettings   _state;
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static IDialogSettings        _state;
 
-   private IPropertyChangeListener _defaultChangePropertyListener;
-   private SelectionListener       _defaultSelectionListener;
-   private MouseWheelListener      _defaultMouseWheelListener;
+   private IPropertyChangeListener       _defaultChangePropertyListener;
+   private SelectionListener             _defaultSelectionListener;
+   private MouseWheelListener            _defaultMouseWheelListener;
 
-   private ActionResetToDefaults   _actionRestoreDefaults;
+   private ActionResetToDefaults         _actionRestoreDefaults;
 
-   private Map2View                _map2View;
+   private Map2View                      _map2View;
 
    /*
     * UI controls
@@ -74,6 +74,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
    private Button                _chkIsDimMap;
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkIsShowHoveredTour;
+   private Button                _chkIsShowTourDirections;
    private Button                _chkIsZoomWithMousePosition;
 
    private Spinner               _spinnerDimValue;
@@ -180,73 +181,72 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       {
          {
             /*
-             * Tour tooltip
+             * Show hovered/selected tour
              */
-            {
-               // checkbox
-               _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
-               _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
-               _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
-               _chkIsShowHoveredTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
-            }
+            _chkIsShowHoveredTour = new Button(container, SWT.CHECK);
+            _chkIsShowHoveredTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
+            _chkIsShowHoveredTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
+            _chkIsShowHoveredTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowHoveredTour);
          }
+//         {
+//            /*
+//             * Show tour direction
+//             */
+//            final TBD _chkIsShowTourDirections = new Button(container, SWT.CHECK);
+//            _chkIsShowTourDirections.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
+//            _chkIsShowTourDirections.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
+//            _chkIsShowTourDirections.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
+//            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourDirections);
+//         }
          {
             /*
              * Zoom to mouse position
              */
-            {
-               // checkbox
-               _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
-               _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-               _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-               _chkIsZoomWithMousePosition.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
-            }
+            _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
+            _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
+            _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
+            _chkIsZoomWithMousePosition.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
          }
          {
             /*
              * Inverse keyboard panning
              */
-            {
-               // checkbox
-               _chkIsToggleKeyboardPanning = new Button(container, SWT.CHECK);
-               _chkIsToggleKeyboardPanning.setText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning);
-               _chkIsToggleKeyboardPanning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip);
-               _chkIsToggleKeyboardPanning.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsToggleKeyboardPanning);
-            }
+            _chkIsToggleKeyboardPanning = new Button(container, SWT.CHECK);
+            _chkIsToggleKeyboardPanning.setText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning);
+            _chkIsToggleKeyboardPanning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip);
+            _chkIsToggleKeyboardPanning.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsToggleKeyboardPanning);
          }
          {
             /*
              * Dim map
              */
+            // checkbox
+            _chkIsDimMap = new Button(container, SWT.CHECK);
+            _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
+            _chkIsDimMap.addSelectionListener(_defaultSelectionListener);
+
+            final Composite dimContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(dimContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
             {
-               // checkbox
-               _chkIsDimMap = new Button(container, SWT.CHECK);
-               _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
-               _chkIsDimMap.addSelectionListener(_defaultSelectionListener);
+               // spinner
+               _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
+               _spinnerDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
+               _spinnerDimValue.setMinimum(0);
+               _spinnerDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
+               _spinnerDimValue.setIncrement(1);
+               _spinnerDimValue.setPageIncrement(4);
+               _spinnerDimValue.addSelectionListener(_defaultSelectionListener);
+               _spinnerDimValue.addMouseWheelListener(_defaultMouseWheelListener);
 
-               final Composite dimContainer = new Composite(container, SWT.NONE);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(dimContainer);
-               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
-               {
-                  // spinner
-                  _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
-                  _spinnerDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
-                  _spinnerDimValue.setMinimum(0);
-                  _spinnerDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
-                  _spinnerDimValue.setIncrement(1);
-                  _spinnerDimValue.setPageIncrement(4);
-                  _spinnerDimValue.addSelectionListener(_defaultSelectionListener);
-                  _spinnerDimValue.addMouseWheelListener(_defaultMouseWheelListener);
-
-                  // dimming color
-                  _colorMapDimmColor = new ColorSelectorExtended(dimContainer);
-                  _colorMapDimmColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
-                  _colorMapDimmColor.addListener(_defaultChangePropertyListener);
-                  _colorMapDimmColor.addOpenListener(this);
-               }
+               // dimming color
+               _colorMapDimmColor = new ColorSelectorExtended(dimContainer);
+               _colorMapDimmColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
+               _colorMapDimmColor.addListener(_defaultChangePropertyListener);
+               _colorMapDimmColor.addOpenListener(this);
             }
          }
       }

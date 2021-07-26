@@ -95,7 +95,7 @@ public class TourMapPainter extends MapPainter {
    private static final int                MARKER_MARGIN     = 2;
    private static final int                MARKER_POLE       = 16;
 
-   static final IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore   _prefStore        = TourbookPlugin.getPrefStore();
 
    private static IPropertyChangeListener  _prefChangeListener;
 
@@ -127,19 +127,22 @@ public class TourMapPainter extends MapPainter {
    private static TourPainterConfiguration _tourPaintConfig;
 
    private static final NumberFormat       _nf1              = NumberFormat.getNumberInstance();
+   static {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
+
+   private static Color               _bgColor;
+   private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
+   
+   /*
+    * Static UI resources
+    */
+   private static Image               _tourWayPointImage;
 
    /*
-    * UI resources
+    * None static fields
     */
-   private static Color               _bgColor;
-
-   /**
-    * Tour Way Point image
-    */
-   private static Image               _twpImage;
-
-   private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
-
    private float[]                    _dataSerie;
    private IMapColorProvider          _legendProvider;
 
@@ -149,11 +152,6 @@ public class TourMapPainter extends MapPainter {
 
    private boolean _isFastPainting;
    private int     _fastPainting_SkippedValues;
-
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
 
    private class LoadCallbackImage implements ILoadCallBack {
 
@@ -789,8 +787,8 @@ public class TourMapPainter extends MapPainter {
       _tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
       _tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-      _twpImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
-      _twpImageBounds = _twpImage.getBounds();
+      _tourWayPointImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
+      _twpImageBounds = _tourWayPointImage.getBounds();
 
       _isImageAvailable = true;
    }
@@ -801,7 +799,7 @@ public class TourMapPainter extends MapPainter {
       Util.disposeResource(_tourEndMarker);
       Util.disposeResource(_tourStartMarker);
 
-      Util.disposeResource(_twpImage);
+      Util.disposeResource(_tourWayPointImage);
 
       _isImageAvailable = false;
    }
@@ -2174,7 +2172,7 @@ public class TourMapPainter extends MapPainter {
          devX += devPartOffset;
          devY += devPartOffset;
 
-         gcTile.drawImage(_twpImage, devX, devY);
+         gcTile.drawImage(_tourWayPointImage, devX, devY);
 
 //       gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 //       gc.setLineWidth(1);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.util.Objects;
+
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 
@@ -27,22 +29,27 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
     * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is not
     * saved in the database
     */
-   long               compId               = -1;
+   long               compareId            = -1;
 
    public RefTourItem refTour;
 
    /**
-    * contains the {@link TourData} for the compared tour
+    * Contains the tour ID for the compared tour
     */
-   TourData           comparedTourData;
+   Long               tourId;
 
    /**
-    * contains the minimum value for the altitude differenz
+    * Contains the {@link TourData} for the compared tour
     */
-   float              minAltitudeDiff      = 0;
+   private TourData   comparedTourData;
 
    /**
-    * contains the minimum data serie for each compared value
+    * Contains the minimum value for the altitude differenz
+    */
+   float              minAltitudeDiff;
+
+   /**
+    * Contains the minimum data serie for each compared value
     */
    float[]            altitudeDiffSerie;
 
@@ -65,52 +72,39 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
    float              avgAltimeter;
 
    /*
-    * when a compared tour is stored in the database, the compId is set and the data from the
+    * When a compared tour is stored in the database, the compId is set and the data from the
     * database are stored in the field's db...
     */
    int   dbStartIndex;
-
    int   dbEndIndex;
 
    float dbSpeed;
    int   dbElapsedTime;
 
    /*
-    * the moved... fields contain the position of the compared tour when the user moved the
+    * The moved... fields contain the position of the compared tour when the user moved the
     * position
     */
-//	int				movedStartIndex;
-//	int				movedEndIndex;
-
    float movedSpeed;
 
    @Override
    public boolean equals(final Object obj) {
+
       if (this == obj) {
          return true;
       }
+
       if (obj == null) {
          return false;
       }
-      if (!(obj instanceof TVICompareResultComparedTour)) {
+
+      if (getClass() != obj.getClass()) {
          return false;
       }
+
       final TVICompareResultComparedTour other = (TVICompareResultComparedTour) obj;
-      if (comparedTourData == null) {
-         if (other.comparedTourData != null) {
-            return false;
-         }
-      } else if (!comparedTourData.equals(other.comparedTourData)) {
-         return false;
-      }
-      if (refTour == null) {
-         if (other.refTour != null) {
-            return false;
-         }
-      } else if (!refTour.equals(other.refTour)) {
-         return false;
-      }
-      return true;
+
+      return Objects.equals(refTour, other.refTour) && Objects.equals(tourId, other.tourId);
    }
 
    @Override
@@ -120,28 +114,37 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
       return comparedTourData;
    }
 
+   public Long getTourId() {
+      return tourId;
+   }
+
    @Override
    public boolean hasChildren() {
+
       /*
-       * compare result has no children, hide the expand sign
+       * Compare result has no children, hide the expand sign
        */
       return false;
    }
 
    @Override
    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((comparedTourData == null) ? 0 : comparedTourData.hashCode());
-      result = prime * result + ((refTour == null) ? 0 : refTour.hashCode());
-      return result;
+
+      return Objects.hash(refTour, tourId);
    }
 
    /**
     * @return Returns <code>true</code> when the compare result is saved in the database
     */
    boolean isSaved() {
-      return compId != -1;
+
+      return compareId != -1;
+   }
+
+   public void setComparedTourData(final TourData comparedTourData) {
+
+      this.comparedTourData = comparedTourData;
+      this.tourId = comparedTourData.getTourId();
    }
 
 }

@@ -522,7 +522,7 @@ public class UI {
    private static StringBuilder        _formatterSB               = new StringBuilder();
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
-   private static FontMetrics          _fontMetrics;
+   private static FontMetrics          _dialogFont_Metrics;
 
 // SET_FORMATTING_OFF
 
@@ -931,7 +931,7 @@ public class UI {
          return dlus * 4;
       }
 
-      return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
+      return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
    }
 
    /**
@@ -1461,6 +1461,14 @@ public class UI {
       final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
+   }
+
+   public static FontMetrics getDialogFontMetrics() {
+
+      // ensure that font metrics are setup
+      setupUI_FontMetrics();
+
+      return _dialogFont_Metrics;
    }
 
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
@@ -2304,26 +2312,22 @@ public class UI {
 
    private static boolean setupUI_FontMetrics() {
 
-      if (_fontMetrics != null) {
+      if (_dialogFont_Metrics != null) {
          return true;
       }
 
       // Compute and keep a font metric
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
-
-      if (activeShell == null) {
-
-         // this can occure when called too early
-         return false;
-      }
-
-      final GC gc = new GC(activeShell);
+      final Display display = Display.getDefault();
+      final Shell shell = new Shell(display);
+      final GC gc = new GC(shell);
       {
          gc.setFont(JFaceResources.getDialogFont());
-         _fontMetrics = gc.getFontMetrics();
+
+         _dialogFont_Metrics = gc.getFontMetrics();
       }
       gc.dispose();
+      shell.dispose();
 
       return true;
    }

@@ -1692,12 +1692,16 @@ public class TourManager {
 
       final String tourTitle = tourData.getTourTitle();
 
-      return getTourDateFull(tourData) //
+      return getTourDateFull(tourData)
             + UI.DASH_WITH_SPACE
             + getTourTimeShort(tourData)
             + ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
    }
 
+   /**
+    * @param tourData
+    * @return Returns the tour title for multiple tours
+    */
    public static String getTourTitleMultiple(final TourData tourData) {
 
       final String[] multipleTourTitles = tourData.multipleTourTitles;
@@ -2691,6 +2695,31 @@ public class TourManager {
       }
    }
 
+   /**
+    * Set the graph colors from the pref store
+    *
+    * @param yData
+    * @param graphName
+    */
+   public static void setBarColors(final ChartDataYSerie yData, final String graphName) {
+
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
+
+      // get colors from common pref store
+
+      final String prefColorLine = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final RGB rgbGradient_Dark = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbGradient_Bright = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
+
+      yData.setRgbBar_Gradient_Dark(new RGB[] { rgbGradient_Dark });
+      yData.setRgbBar_Gradient_Bright(new RGB[] { rgbGradient_Bright });
+      yData.setRgbBar_Line(new RGB[] { rgbLineColor });
+   }
+
    public static boolean setElevationValuesFromSRTM(final ArrayList<TourData> allTourData) {
 
       if (allTourData == null || allTourData.isEmpty()) {
@@ -2758,31 +2787,6 @@ public class TourManager {
 
    public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
       _tourDataEditorInstance = tourDataEditorView;
-   }
-
-   /**
-    * Set the graph colors from the pref store
-    *
-    * @param yData
-    * @param graphName
-    */
-   public static void setBarColors(final ChartDataYSerie yData, final String graphName) {
-
-      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
-
-      // get colors from common pref store
-
-      final String prefColorLine = UI.IS_DARK_THEME
-            ? GraphColorManager.PREF_COLOR_LINE_DARK
-            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
-
-      final RGB rgbGradient_Dark = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
-      final RGB rgbGradient_Bright = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
-      final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
-
-      yData.setRgbBar_Gradient_Dark(new RGB[] { rgbGradient_Dark });
-      yData.setRgbBar_Gradient_Bright(new RGB[] { rgbGradient_Bright });
-      yData.setRgbBar_Line(new RGB[] { rgbLineColor });
    }
 
    private static void setupMultiTourMarker(final TourData tourData) {

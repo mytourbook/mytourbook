@@ -83,6 +83,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
@@ -141,6 +142,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -2823,8 +2826,9 @@ public class Map extends Canvas {
          fireEvent_MapInfo();
 
          return;
+      }
 
-      } else if (_grid_Data_Hovered != null) {
+      if (_grid_Data_Hovered != null) {
 
          // tour geo filter is hovered
 
@@ -3796,6 +3800,8 @@ public class Map extends Canvas {
 
    private void paint_HoveredTour_10(final GC gc, final long tourId) {
 
+      int[] devXY;
+
       gc.setLineWidth(30);
 
       gc.setLineCap(SWT.CAP_ROUND);
@@ -3803,20 +3809,31 @@ public class Map extends Canvas {
 
       gc.setAntialias(SWT.ON);
       {
-         paint_HoveredTour_12_Tour(gc, tourId);
+         devXY = paint_HoveredTour_12_Tour(gc, tourId);
       }
       gc.setAntialias(SWT.OFF);
       gc.setAlpha(0xff);
+
+      final boolean isDrawDirection = true;
+
+      if (devXY != null && isDrawDirection) {
+         paint_HoveredTour_14_DirectionArrows(gc, devXY);
+      }
    }
 
-   private void paint_HoveredTour_12_Tour(final GC gc, final long tourId) {
+   /**
+    * @param gc
+    * @param tourId
+    * @return Return dev X/Y position of the hovered tour
+    */
+   private int[] paint_HoveredTour_12_Tour(final GC gc, final long tourId) {
 
       final TourData tourData = TourManager.getTour(tourId);
 
       if (tourData == null) {
 
          // this occurred, it can be that previously a history/multiple tour was displayed
-         return;
+         return null;
       }
 
       final MP mp = getMapProvider();
@@ -3825,15 +3842,14 @@ public class Map extends Canvas {
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;
 
-      final int lastSerieIndex = latitudeSerie.length;
-
+      // paint with much less points to speed it up
       final int numMaxSegments = 200;
-      final float numSlices = lastSerieIndex;
+      final float numSlices = latitudeSerie.length;
       final int numSegments = (int) Math.min(numMaxSegments, numSlices);
 
       final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
 
-      // get world position for the slider coordinates
+      // get world position for the first lat/lon
       final java.awt.Point worldPos_FirstAWT = mp.geoToPixel(
             new GeoPosition(latitudeSerie[0], longitudeSerie[0]),
             zoomLevel);
@@ -3844,6 +3860,7 @@ public class Map extends Canvas {
 
       final int[] devXY = new int[numSegments * 2];
 
+      // set first position
       devXY[0] = devPosX1;
       devXY[1] = devPosY1;
 
@@ -3851,7 +3868,7 @@ public class Map extends Canvas {
 
          final int nextSerieIndex = (int) (numSlices / numSegments * segmentIndex);
 
-         // get world position for the slider coordinates
+         // get world position for the current lat/lon
          final java.awt.Point worldPosAWT = mp.geoToPixel(
                new GeoPosition(latitudeSerie[nextSerieIndex], longitudeSerie[nextSerieIndex]),
                zoomLevel);
@@ -3871,6 +3888,100 @@ public class Map extends Canvas {
       }
 
       gc.drawPolyline(devXY);
+
+      return devXY;
+   }
+
+   private void paint_HoveredTour_14_DirectionArrows(final GC gc, final int[] devXY) {
+
+      final int minDiff = 20;
+      final int lineWidth = 5;
+      final float directionScale = 5f;
+
+      int devX1 = devXY[0];
+      int devY1 = devXY[1];
+
+      int devX1_LastPainted = devX1;
+      int devY1_LastPainted = devY1;
+
+      final int numSegments = devXY.length / 2;
+
+      gc.setLineWidth(lineWidth);
+      gc.setAntialias(SWT.ON);
+
+      gc.setLineCap(SWT.CAP_SQUARE);
+      gc.setLineJoin(SWT.JOIN_MITER);
+
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+      final Path directionPath = new Path(_display);
+      final Transform transform = new Transform(_display);
+      {
+         // draw direction symbol
+         directionPath.moveTo(0, 1 * directionScale);
+         directionPath.lineTo(0.8f * directionScale, 0);
+         directionPath.lineTo(0, -1 * directionScale);
+
+         for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
+
+            final int devXYIndex = segmentIndex * 2;
+
+            final int devX2 = devXY[devXYIndex + 0];
+            final int devY2 = devXY[devXYIndex + 1];
+
+            /*
+             * Skip locations which are too narrow
+             */
+            int xDiff;
+            int yDiff;
+
+            if (devX1_LastPainted > devX2) {
+               xDiff = devX1_LastPainted - devX2;
+            } else {
+               xDiff = devX2 - devX1_LastPainted;
+            }
+
+            if (devY1_LastPainted > devY2) {
+               yDiff = devY1_LastPainted - devY2;
+            } else {
+               yDiff = devY2 - devY1_LastPainted;
+            }
+
+            if (xDiff > minDiff || yDiff > minDiff
+
+            // paint 1st direction arrow
+                  || segmentIndex == 1) {
+
+               // paint direction arrow
+
+               final float directionRotation = (float) MtMath.angleOf(devX1, devY1, devX2, devY2);
+
+               final int xPos1 = DPIUtil.autoScaleUp(devX1);
+               final int yPos1 = DPIUtil.autoScaleUp(devY1);
+
+               // VERY IMPORTANT: Reset previous positions !!!
+               transform.identity();
+
+               transform.translate(xPos1, yPos1);
+               transform.rotate(-directionRotation);
+
+               gc.setTransform(transform);
+               gc.drawPath(directionPath);
+
+               // keep last painted position
+               devX1_LastPainted = devX1;
+               devY1_LastPainted = devY1;
+            }
+
+            // advance to the next segment
+            devX1 = devX2;
+            devY1 = devY2;
+         }
+      }
+      directionPath.dispose();
+      transform.dispose();
+
+      gc.setTransform(null);
    }
 
    private void paint_HoveredTour_50_TourInfo(final GC gc) {

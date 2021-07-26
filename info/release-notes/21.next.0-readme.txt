@@ -35,12 +35,25 @@ New
 Improvements
 ============
 
+* 2D map
+  - Show tour direction as marker in the tour track
+
 * Compare tours by elevation
-  - Compare tours concurrently -> much less waiting time
-  - Use fast app tour filters (person, tour type, tour, photo...)
-  - New shortcut action to compare reference tour(s) with all tours
-  - Automatically expand reference tour in compare result view, after comparison is done
-  - Tour comparison can be restarted with other parameters in the "Compare Result" view, e.g. different years, other tour filter 
+  - Reference tour view
+    - Show compared tours with year categories or without year categories
+    - New shortcut action in context menu to compare reference tours with all tours
+    - A newly create reference tour is selected in this view and perspective
+  - Compare result view
+    - Compare tours concurrently -> much less waiting time
+    - Use fast app tour filters (person, tour type, tour, photo...)
+    - Tour compare results can be filtered by: all/saved/not saved
+    - Automatically expand reference tour in compare result view after a comparison is done
+    - New shortcut action in context menu to compare reference tour(s) with all tours
+    - Tour comparison can be restarted with other parameters, e.g. different years, other tour filters
+  - Year statistic view
+    - Show reference tour title
+    - Show year statistic view in "Compare Result" perspective
+    - Update year statistic view when compare result is assigned/removed
 
 * Repair close button in all views
   - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
@@ -64,9 +77,11 @@ Bugfix
   - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
 
 * Tour cadence zones times (Frederic)
-  
   - Cadence zone times computation should use either the recorded time or moving
     time per the computed values preference 
+    
+* Tour chart
+  - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
 
 
 Translation    

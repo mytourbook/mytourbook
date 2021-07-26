@@ -808,7 +808,7 @@ public class Chart extends ViewForm {
     * @return Returns <code>true</code> when the x-sliders are visible
     */
    public boolean isXSliderVisible() {
-      return _chartComponents._devSliderBarHeight != 0;
+      return _chartComponents.devSliderBarHeight != 0;
    }
 
    void onExecuteMouseMode(final boolean isChecked) {
@@ -836,7 +836,7 @@ public class Chart extends ViewForm {
 
    void onExecuteZoomIn(final double accelerator) {
 
-      if (_chartComponents._devSliderBarHeight == 0) {
+      if (_chartComponents.devSliderBarHeight == 0) {
          _chartComponents.getChartComponentGraph().zoomInWithoutSlider();
          _chartComponents.onResize();
       } else {

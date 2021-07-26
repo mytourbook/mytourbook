@@ -2817,9 +2817,7 @@ public class Map2View extends ViewPart implements
          } else if (firstElement instanceof TVICompareResultComparedTour) {
 
             final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-            final TourData tourData = TourManager.getInstance()
-                  .getTourData(
-                        compareResultItem.getComparedTourData().getTourId());
+            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
 
             paintTours_20_One(tourData, false);
 
