@@ -2315,27 +2315,26 @@ public class RawDataManager {
        */
       for (final Object item : oldFileNames) {
 
-         if (!(item instanceof String)) {
-            continue;
-         }
+         if (item instanceof String) {
 
-         final String oldFilePath = (String) item;
-         boolean isNeeded = false;
+            final String oldFilePath = (String) item;
+            boolean isNeeded = false;
 
-         for (final TourData tourData : _toursInImportView.values()) {
+            for (final TourData tourData : _toursInImportView.values()) {
 
-            final String tourFilePathName = tourData.getImportFilePathName();
+               final String tourFilePathName = tourData.getImportFilePathName();
 
-            if (tourFilePathName != null && tourFilePathName.equals(oldFilePath)) {
-               isNeeded = true;
-               break;
+               if (tourFilePathName != null && tourFilePathName.equals(oldFilePath)) {
+                  isNeeded = true;
+                  break;
+               }
             }
-         }
 
-         if (isNeeded == false) {
+            if (isNeeded == false) {
 
-            // file path is not needed any more
-            _importedFileNames.remove(oldFilePath);
+               // file path is not needed any more
+               _importedFileNames.remove(oldFilePath);
+            }
          }
       }
    }
