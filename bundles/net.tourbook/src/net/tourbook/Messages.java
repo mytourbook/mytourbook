@@ -2036,6 +2036,12 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String Slideout_Map_Options_Group_TourTrack;
+   public static String Slideout_Map_Options_Label_HoveredAndSelectedColor;
+   public static String Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
+   public static String Slideout_Map_Options_Label_HoveredColor;
+   public static String Slideout_Map_Options_Label_HoveredColor_Tooltip;
+   public static String Slideout_Map_Options_Label_SelectedColor;
+   public static String Slideout_Map_Options_Label_SelectedColor_Tooltip;
    public static String Slideout_Map_Options_Label_SliderLocation_Color;
    public static String Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
    public static String Slideout_Map_Options_Label_SliderLocation_Size;

@@ -492,14 +492,24 @@ public class Map extends Canvas {
    private final int        _poi_Tooltip_OffsetY       = 5;
    private TourToolTip      _tour_ToolTip;
 
+   /**
+    * Hovered/selected tour
+    */
    private boolean          _isShowHoveredSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
    private long             _hovered_SelectedTourId    = Long.MIN_VALUE;
 
    private ArrayList<Long>  _allHoveredTourIds         = new ArrayList<>();
    private ArrayList<Point> _allDevHoveredPoints       = new ArrayList<>();
 
+   private int              _hoveredSelectedTour_Hovered_Opacity;
+   private Color            _hoveredSelectedTour_Hovered_Color;
+   private int              _hoveredSelectedTour_HoveredAndSelected_Opacity;
+   private Color            _hoveredSelectedTour_HoveredAndSelected_Color;
+   private int              _hoveredSelectedTour_Selected_Opacity;
+   private Color            _hoveredSelectedTour_Selected_Color;
+
    /**
-    * when <code>true</code> the loading... image is not displayed
+    * When <code>true</code> the loading... image is not displayed
     */
    private boolean          _isLiveView;
 
@@ -3236,7 +3246,8 @@ public class Map extends Canvas {
 
                // check if a newer runnable is available
                if (__asynchRunnableCounter != _redrawMapCounter.get()) {
-                  // a newer queryRedraw is available
+
+                  // a newer runnable is available
                   return;
                }
 
@@ -3773,6 +3784,9 @@ public class Map extends Canvas {
                   gc.setAlpha(0x80);
                   gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
+                  gc.setAlpha(_hoveredSelectedTour_Hovered_Opacity);
+                  gc.setForeground(_hoveredSelectedTour_Hovered_Color);
+
                   paint_HoveredTour_10(gc, hoveredTourId);
                }
             }
@@ -3785,11 +3799,20 @@ public class Map extends Canvas {
       if (_hovered_SelectedTourId != Long.MIN_VALUE) {
 
          if (isHoveredAndSelectedTour) {
+
             gc.setAlpha(0x40);
             gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+
+            gc.setAlpha(_hoveredSelectedTour_HoveredAndSelected_Opacity);
+            gc.setForeground(_hoveredSelectedTour_HoveredAndSelected_Color);
+
          } else {
+
             gc.setAlpha(0x40);
             gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+            gc.setAlpha(_hoveredSelectedTour_Selected_Opacity);
+            gc.setForeground(_hoveredSelectedTour_Selected_Color);
          }
 
          paint_HoveredTour_10(gc, _hovered_SelectedTourId);
@@ -5759,6 +5782,57 @@ public class Map extends Canvas {
       paint();
    }
 
+   public void setConfig_HoveredSelectedTour(final boolean isVisible,
+                                             final RGB hoveredRGB,
+                                             final int hoveredOpacity,
+                                             final RGB hoveredAndSelectedRGB,
+                                             final int hoveredAndSelectedOpacity,
+                                             final RGB selectedRGB,
+                                             final int selectedOpacity) {
+
+// SET_FORMATTING_OFF
+
+      _isShowHoveredSelectedTour                      = isVisible;
+
+      _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
+      _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
+      
+      _hoveredSelectedTour_HoveredAndSelected_Color   = new Color(hoveredAndSelectedRGB);
+      _hoveredSelectedTour_HoveredAndSelected_Opacity = UI.convertOpacity(hoveredAndSelectedOpacity);
+      
+      _hoveredSelectedTour_Selected_Color             = new Color(selectedRGB);
+      _hoveredSelectedTour_Selected_Opacity           = UI.convertOpacity(selectedOpacity);
+
+// SET_FORMATTING_ON
+
+      if (isVisible == false) {
+
+         // hide hovered/selected tour
+         _hovered_SelectedTourId = Long.MIN_VALUE;
+      }
+
+      _allHoveredTourIds.clear();
+      _allDevHoveredPoints.clear();
+
+      disposeOverlayImageCache();
+
+      paint();
+   }
+
+   public void setConfig_TourDirection(final boolean isShowTourDirection,
+                                       final int markerGap,
+                                       final int lineWidth,
+                                       final float symbolSize,
+                                       final RGB tourDirection_RGB) {
+
+      _isDrawTourDirection = isShowTourDirection;
+
+      _tourDirection_MarkerGap = markerGap;
+      _tourDirection_LineWidth = lineWidth;
+      _tourDirection_SymbolSize = symbolSize;
+      _tourDirection_RGB = tourDirection_RGB;
+   }
+
    /**
     * Set map dimming level for the current map factory, this will dimm the map images
     *
@@ -6213,24 +6287,6 @@ public class Map extends Canvas {
       paint();
    }
 
-   public void setShowHoveredSelectedTour(final boolean isVisible) {
-
-      if (isVisible == false) {
-
-         // hide hovered/selected tour
-         _hovered_SelectedTourId = Long.MIN_VALUE;
-      }
-
-      _isShowHoveredSelectedTour = isVisible;
-
-      _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
-
-      disposeOverlayImageCache();
-
-      paint();
-   }
-
    /**
     * Legend will be drawn into the map when the visibility is <code>true</code>
     *
@@ -6259,20 +6315,6 @@ public class Map extends Canvas {
 
    public void setShowScale(final boolean isScaleVisible) {
       _isScaleVisible = isScaleVisible;
-   }
-
-   public void setTourDirectionConfig(final boolean isShowTourDirection,
-                                      final int markerGap,
-                                      final int lineWidth,
-                                      final float symbolSize,
-                                      final RGB tourDirection_RGB) {
-
-      _isDrawTourDirection = isShowTourDirection;
-
-      _tourDirection_MarkerGap = markerGap;
-      _tourDirection_LineWidth = lineWidth;
-      _tourDirection_SymbolSize = symbolSize;
-      _tourDirection_RGB = tourDirection_RGB;
    }
 
    public void setTourPaintMethodEnhanced(final boolean isEnhanced, final boolean isShowWarning) {

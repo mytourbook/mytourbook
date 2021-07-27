@@ -272,6 +272,12 @@ public class UI {
    public static final int     DEFAULT_FIELD_WIDTH            = 40;
 
    /**
+    * The opacity can be set in SWT from 0...255 but no user want's so many steps. In the UI the
+    * user can select this max opacity value which will be converted into 255 when appied.
+    */
+   public static final int     MAX_OPACITY                    = 10;
+
+   /**
     * Convert Joule in Calorie
     * <p>
     * 1 cal = 4.1868 J<br>
@@ -932,6 +938,27 @@ public class UI {
       }
 
       return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Convert opacity value into 0...255 where 255 corresponds with {@link #MAX_OPACITY}
+    * <p>
+    * The tooltip should display
+    *
+    * <pre>
+    * 0 = transparent ... max = opaque
+    * </pre>
+    *
+    * that {@link #MAX_OPACITY} could be adjusted or customized by the user.
+    *
+    * @param opacity
+    * @return
+    */
+   public static int convertOpacity(final float opacity) {
+
+      final float opacityConverted = opacity / MAX_OPACITY * 0xff;
+
+      return (int) Math.min(0xff, opacityConverted);
    }
 
    /**

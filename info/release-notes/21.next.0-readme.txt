@@ -38,6 +38,7 @@ Improvements
 
 * 2D map
   - Show tour direction as marker in the tour track
+  - Customize colors for hovered/selected tour 
 
 * Compare tours by elevation
   - Reference tour view
