@@ -455,6 +455,10 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 // and "Tour Photos" display the photo
 //
 //         selection = _selectionConverter.convertSelection(selection);
+
+         // The selection converter is used again to ensure, that the link view is opened.
+         // This may be also the reason why the selection converter exists -> complicated
+         _selectionConverter.convertSelection(selection);
       }
 
       fireSelection(selection);

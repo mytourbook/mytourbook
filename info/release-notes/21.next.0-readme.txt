@@ -36,6 +36,10 @@ Improvements
   - Show tour direction as marker in the tour track
   - Customize colors for hovered/selected tour 
 
+* Tour Photos
+  - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
+    https://sourceforge.net/p/mytourbook/feature-requests/194/
+  
 * Compare tours by elevation
   - Reference tour view
     - Show compared tours with year categories or without year categories
