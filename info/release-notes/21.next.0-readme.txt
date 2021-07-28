@@ -86,6 +86,8 @@ Bugfix
 * Tour chart
   - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
 
+* 2D Map
+  - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
 
 Translation    
 ===========

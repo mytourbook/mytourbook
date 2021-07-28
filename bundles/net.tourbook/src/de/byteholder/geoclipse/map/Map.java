@@ -5796,10 +5796,10 @@ public class Map extends Canvas {
 
       _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
       _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
-      
+
       _hoveredSelectedTour_HoveredAndSelected_Color   = new Color(hoveredAndSelectedRGB);
       _hoveredSelectedTour_HoveredAndSelected_Opacity = UI.convertOpacity(hoveredAndSelectedOpacity);
-      
+
       _hoveredSelectedTour_Selected_Color             = new Color(selectedRGB);
       _hoveredSelectedTour_Selected_Opacity           = UI.convertOpacity(selectedOpacity);
 
@@ -6401,7 +6401,10 @@ public class Map extends Canvas {
 
       Point2D.Double wpNewMapCenter;
 
-      if (_isZoomWithMousePosition) {
+      if (_isZoomWithMousePosition
+
+            // fixes this "issue" https://github.com/wolfgang-ch/mytourbook/issues/370
+            && _mapZoomLevel != adjustedZoomLevel) {
 
          // set map center to the current mouse position
 
