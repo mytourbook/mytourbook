@@ -75,6 +75,7 @@ public class ActionHandler_SyncPhotoWithTour extends AbstractHandler implements 
             if (selectedPhotosWithExif != null) {
                TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
             }
+
          } else {
 
             // don't create tour photo links when sync is disabled

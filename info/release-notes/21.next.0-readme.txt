@@ -4,10 +4,6 @@
 TODO's
 ======
 
-
-* Compare Tours by Elevation
-                  - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
-
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
