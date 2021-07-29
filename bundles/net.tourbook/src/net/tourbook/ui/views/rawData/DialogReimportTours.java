@@ -303,8 +303,10 @@ public class DialogReimportTours extends TitleAreaDialog {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell())
                .run(true, true, importRunnable);
 
-         // wait until all comparisons are performed
-         _countDownLatch.await();
+         if (isReimportConcurrent) {
+            // wait until all comparisons are performed
+            _countDownLatch.await();
+         }
 
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(//
