@@ -95,41 +95,41 @@ public class RawDataManager {
 // SET_FORMATTING_OFF
 
    private static final String   COLUMN_FACTORY_CATEGORY_MARKER              = net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
-
    private static final String   COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL  = net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
    private static final String   COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL = net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
    private static final String   VALUE_UNIT_CADENCE                          = net.tourbook.ui.Messages.Value_Unit_Cadence;
    private static final String   VALUE_UNIT_CADENCE_SPM                      = net.tourbook.ui.Messages.Value_Unit_Cadence_Spm;
    private static final String   VALUE_UNIT_K_CALORIES                       = net.tourbook.ui.Messages.Value_Unit_KCalories;
    private static final String   VALUE_UNIT_PULSE                            = net.tourbook.ui.Messages.Value_Unit_Pulse;
-   public static final String    LOG_IMPORT_DELETE_TOUR_FILE                 = Messages.Log_Import_DeleteTourFiles;
 
+   public static final String    LOG_IMPORT_DELETE_TOUR_FILE                 = Messages.Log_Import_DeleteTourFiles;
    public static final String    LOG_IMPORT_DELETE_TOUR_FILE_END             = Messages.Log_Import_DeleteTourFiles_End;
    private static final String   LOG_IMPORT_TOUR                             = Messages.Log_Import_Tour;
    public static final String    LOG_IMPORT_TOUR_IMPORTED                    = Messages.Log_Import_Tour_Imported;
    private static final String   LOG_IMPORT_TOUR_END                         = Messages.Log_Import_Tour_End;
    public static final String    LOG_IMPORT_TOURS_IMPORTED_FROM_FILE         = Messages.Log_Import_Tours_Imported_From_File;
+
    public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
 
    public static final String    LOG_DELETE_TOURVALUES_END                   = Messages.Log_Delete_TourValues_End;
-
    public static final String    LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA       = Messages.Log_ModifiedTour_Old_Data_Vs_New_Data;
-   public static final String    LOG_REIMPORT_PREVIOUS_FILES                 = Messages.Log_Reimport_PreviousFiles;
 
+   public static final String    LOG_REIMPORT_PREVIOUS_FILES                 = Messages.Log_Reimport_PreviousFiles;
    public static final String    LOG_REIMPORT_END                            = Messages.Log_Reimport_PreviousFiles_End;
    public static final String    LOG_REIMPORT_COMBINED_VALUES                = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Reimport_Text);
    private static final String   LOG_REIMPORT_MANUAL_TOUR                    = Messages.Log_Reimport_ManualTour;
    private static final String   LOG_REIMPORT_TOUR_SKIPPED                   = Messages.Log_Reimport_Tour_Skipped;
-   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
+   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
    private static final String           TEMP_IMPORTED_FILE                    = "received-device-data.txt";                             //$NON-NLS-1$
+
    private static final String           FILE_EXTENSION_FIT                    = ".fit";                                                 //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
-
    private static final IDialogSettings  _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
+
    private static final String           INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                           //$NON-NLS-1$
 
    public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
@@ -137,7 +137,6 @@ public class RawDataManager {
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
    private static boolean                _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-
    private static boolean                _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean                _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
    private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
@@ -153,57 +152,56 @@ public class RawDataManager {
             new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed, TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
 
       };
-
    }
-   private static RawDataManager     _instance                   = null;
-   private static ArrayList<String>  _invalidFilesList           = new ArrayList<>();
+
+   private static RawDataManager           _instance                           = null;
+
+   private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
+
    /**
     * Alternative filepaths from previous re-imported tours
     */
-   private static HashSet<IPath>     _allPreviousReimportFolders = new HashSet<>();
-
-   private static IPath              _previousReimportFolder;
+   private static HashSet<IPath>           _allPreviousReimportFolders         = new HashSet<>();
+   private static IPath                    _previousReimportFolder;
 
    /**
     * Is <code>true</code> when currently a re-importing is running
     */
-   private static boolean            _isReimportingActive;
+   private static boolean                  _isReimportingActive;
 
    /**
     * Is <code>true</code> when deleting values from tour(s) is happening
     */
-   private static boolean            _isDeleteValuesActive;
+   private static boolean                  _isDeleteValuesActive;
 
    /**
     * contains the device data imported from the device/file
     */
-   private final DeviceData          _deviceData                 = new DeviceData();
+   private final DeviceData                _deviceData                         = new DeviceData();
 
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private final Map<Long, TourData> _toursInImportView          = new HashMap<>();
+   private final Map<Long, TourData>       _toursInImportView                  = new HashMap<>();
 
    /**
     * Contains tours which are imported from the last file name.
     */
-   private final Map<Long, TourData> _newlyImportedTours         = new HashMap<>();
+   private final Map<Long, TourData>       _newlyImportedTours                 = new HashMap<>();
 
-   private String                    _lastImportedFileName;
+   private String                          _lastImportedFileName;
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
     */
-   private final HashSet<String>     _importedFileNames          = new HashSet<>();
+   private final HashSet<String>           _importedFileNames                  = new HashSet<>();
 
    /**
     * Contains filenames which are not directly imported but is imported from other imported files
     */
-   private final HashSet<String>     _importedFileNamesChildren  = new HashSet<>();
-
+   private final HashSet<String>           _importedFileNamesChildren          = new HashSet<>();
    //
    private boolean                         _isImported;
-
    private boolean                         _isImportCanceled;
    //
    private int                             _importState_ImportYear             = ADJUST_IMPORT_YEAR_IS_DISABLED;
@@ -2259,7 +2257,7 @@ public class RawDataManager {
             } else if (reImportStatus.isCanceled_Auto_TheFileLocationDialog) {
                reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
 
-            } else if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog()) {
+            } else if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog) {
                reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
 
             } else {
