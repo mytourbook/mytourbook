@@ -253,7 +253,7 @@ public class RawDataManager {
       TIME_SLICES_TIMER_PAUSES //
    }
 
-   public RawDataManager() {}
+   private RawDataManager() {}
 
    /**
     * Displays the differences of data before and after the tour modifications (re-import or
