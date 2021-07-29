@@ -937,6 +937,18 @@ public class Photo {
       return _photoImageWidth;
    }
 
+   public long getPhotoTime() {
+
+      if (adjustedTimeTour != Long.MIN_VALUE) {
+
+         return adjustedTimeTour;
+
+      } else {
+
+         return imageExifTime;
+      }
+   }
+
    public AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {
       return _photoSqlLoadingState;
    }

@@ -4,10 +4,6 @@
 TODO's
 ======
 
-
-* Compare Tours by Elevation
-                  - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
-
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
@@ -37,7 +33,12 @@ Improvements
 
 * 2D map
   - Show tour direction as marker in the tour track
+  - Customize colors for hovered/selected tour 
 
+* Tour Photos
+  - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
+    https://sourceforge.net/p/mytourbook/feature-requests/194/
+  
 * Compare tours by elevation
   - Reference tour view
     - Show compared tours with year categories or without year categories
@@ -66,7 +67,8 @@ Improvements
 Changes  
 =======
 
-* 
+* 2D Map
+  - Move option "Show hovered/selected tour" from "2D Map Options" into "Track Options"
     
 
 Bugfix
@@ -83,6 +85,8 @@ Bugfix
 * Tour chart
   - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
 
+* 2D Map
+  - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
 
 Translation    
 ===========
