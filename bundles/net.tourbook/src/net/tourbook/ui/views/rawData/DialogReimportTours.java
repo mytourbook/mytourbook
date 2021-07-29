@@ -117,10 +117,11 @@ public class DialogReimportTours extends TitleAreaDialog {
    private SelectionAdapter                _defaultListener;
 
    private PixelConverter                  _pc;
+
    //
-   private Image                           _imageLockClosed                             = CommonActivator.getThemedImageDescriptor(
+   private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(
          CommonImages.Lock_Closed).createImage();
-   private Image                           _imageLockOpen                               = CommonActivator.getThemedImageDescriptor(
+   private Image _imageLockOpen   = CommonActivator.getThemedImageDescriptor(
          CommonImages.Lock_Open).createImage();
 
    /*
