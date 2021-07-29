@@ -4028,13 +4028,13 @@ public class Map extends Canvas {
       /*
        * This is for debugging
        */
-//      final boolean isShowHoverRectangle = false;
+//      final boolean isShowHoverRectangle = true;
 //      if (isShowHoverRectangle) {
 //
 //         // paint hovered rectangle
 //         gc.setLineWidth(1);
 //
-//         for (final Point hoveredPoint : _devHoveredPoint) {
+//         for (final Point hoveredPoint : _allDevHoveredPoints) {
 //
 //            gc.setAlpha(0x60);
 //            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -4068,6 +4068,9 @@ public class Map extends Canvas {
             // this occurred, it can be that previously a history/multiple tour was displayed
 
          } else {
+
+            // tour data are available
+
             paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
          }
 
@@ -6366,10 +6369,20 @@ public class Map extends Canvas {
          adjustedZoomLevel = Math.min(adjustedZoomLevel, mpMaximumZoomLevel);
       }
 
+      boolean isNewZoomLevel = false;
+
       // check if zoom level has changed
       if (oldZoomLevel == adjustedZoomLevel) {
+
          // this is disabled that a double click can set the center of the map
+
          // return;
+
+      } else {
+
+         // a new zoomlevel is set
+
+         isNewZoomLevel = true;
       }
 
       if (oldZoomLevel != adjustedZoomLevel) {
@@ -6404,7 +6417,7 @@ public class Map extends Canvas {
       if (_isZoomWithMousePosition
 
             // fixes this "issue" https://github.com/wolfgang-ch/mytourbook/issues/370
-            && _mapZoomLevel != adjustedZoomLevel) {
+            && isNewZoomLevel) {
 
          // set map center to the current mouse position
 
