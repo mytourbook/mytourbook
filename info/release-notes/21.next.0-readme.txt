@@ -38,6 +38,8 @@ Improvements
   - Hovered/selected tour tooltip 
     - Better text formatting
     - Themed foreground/background color
+  - Show themed tour pauses when map is dimmed
+    
 
 * Tour Photos
   - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   

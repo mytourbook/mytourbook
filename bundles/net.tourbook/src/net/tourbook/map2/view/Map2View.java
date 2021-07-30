@@ -3740,16 +3740,16 @@ public class Map2View extends ViewPart implements
             hoveredAndSelectedOpacity,
             selectedRGB,
             selectedOpacity
-            );
+      );
 
       /*
        * Tour direction
        */
-      final boolean isShowTourDirection      = Util.getStateBoolean(_state,      Map2View.STATE_IS_SHOW_TOUR_DIRECTION,            Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
-      final int tourDirection_MarkerGap      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_MARKER_GAP,            Map2View.STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
-      final int tourDirection_LineWidth      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,            Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
-      final float tourDirection_SymbolSize   = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE,            Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
-      final RGB tourDirection_RGB            = Util.getStateRGB(_state,          Map2View.STATE_TOUR_DIRECTION_RGB,            Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
+      final boolean isShowTourDirection      = Util.getStateBoolean(_state,      Map2View.STATE_IS_SHOW_TOUR_DIRECTION,       Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
+      final int tourDirection_MarkerGap      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_MARKER_GAP,    Map2View.STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
+      final int tourDirection_LineWidth      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,    Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
+      final float tourDirection_SymbolSize   = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE,   Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
+      final RGB tourDirection_RGB            = Util.getStateRGB(_state,          Map2View.STATE_TOUR_DIRECTION_RGB,           Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
 
       _map.setConfig_TourDirection(
             isShowTourDirection,
@@ -3758,14 +3758,20 @@ public class Map2View extends ViewPart implements
             tourDirection_SymbolSize,
             tourDirection_RGB);
 
-      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,            Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,            Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,            Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,            Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,      Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
-      // set dim level/color after the map providers are set
-      final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
-      final int mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-      final RGB mapDimColor = Util.getStateRGB(_state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
-      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark());
+      /*
+       * Set dim level/color after the map providers are set
+       */
+      final boolean isMapDimmed  = Util.getStateBoolean( _state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
+      final int mapDimValue      = Util.getStateInt(     _state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
+      final RGB mapDimColor      = Util.getStateRGB(     _state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
+
+      final boolean isBackgroundDark = isBackgroundDark();
+
+      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
+      _tourPainterConfig.isBackgroundDark = isBackgroundDark;
 
 // SET_FORMATTING_ON
 

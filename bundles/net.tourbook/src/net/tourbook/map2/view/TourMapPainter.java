@@ -45,6 +45,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.StatusUtil;
@@ -957,8 +958,9 @@ public class TourMapPainter extends MapPainter {
          _colorCache.dispose();
       }
 
-      if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints ||
-            _tourPaintConfig.isShowTourPauses) {
+      if (_tourPaintConfig.isShowTourMarker
+            || _tourPaintConfig.isShowWayPoints
+            || _tourPaintConfig.isShowTourPauses) {
 
          // draw marker/pauses above the tour
 
@@ -1011,6 +1013,7 @@ public class TourMapPainter extends MapPainter {
                      tourData,
                      latitudeSerie,
                      longitudeSerie)) {
+
                   ++staticPauseCounter;
                }
 
@@ -1994,78 +1997,6 @@ public class TourMapPainter extends MapPainter {
    }
 
    /**
-    * create an image for the tour pause
-    *
-    * @param device
-    * @param pauseDuration
-    * @param pauseBounds
-    * @return
-    */
-   private Image drawTourPauseImage(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
-
-      final int bannerWidth = pauseBounds.x;
-      final int bannerHeight = pauseBounds.y;
-      final int bannerWidth2 = bannerWidth / 2;
-
-      final int markerImageWidth = pauseBounds.width;
-      final int markerImageHeight = pauseBounds.height;
-
-      final int arcSize = 5;
-
-      final RGB rgbTransparent = Map.getTransparentRGB();
-
-      final ImageData markerImageData = new ImageData(
-            markerImageWidth,
-            markerImageHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
-
-      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
-
-      final Image markerImage = new Image(device, markerImageData);
-      final Rectangle markerImageBounds = markerImage.getBounds();
-
-      final Color transparentColor = new Color(device, rgbTransparent);
-      final Color bannerColor = new Color(device, 0xFF, 0xFF, 0xFF);
-      final Color bannerBorderColor = new Color(device, 0x69, 0xAF, 0x3D);
-
-      final GC gc = new GC(markerImage);
-
-      {
-         // fill transparent color
-         gc.setBackground(transparentColor);
-         gc.fillRectangle(markerImageBounds);
-
-         gc.setBackground(bannerColor);
-         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
-
-         // draw banner border
-         gc.setForeground(bannerBorderColor);
-         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
-
-         // draw text
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
-
-         // draw pole
-         gc.setForeground(bannerBorderColor);
-         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
-         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
-
-         gc.setForeground(bannerColor);
-         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
-      }
-
-      gc.dispose();
-
-      bannerColor.dispose();
-      bannerBorderColor.dispose();
-      transparentColor.dispose();
-
-      return markerImage;
-   }
-
-   /**
     * @param gcTile
     * @param map
     * @param tile
@@ -2120,7 +2051,7 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourPauseImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
+         final Image tourMarkerImage = drawTourPauses_Image(gcTile.getDevice(), pauseDurationText, pauseBounds);
          {
             devX = devMarkerPosX - pauseBounds.width / 2;
             devY = devMarkerPosY - pauseBounds.height;
@@ -2136,6 +2067,85 @@ public class TourMapPainter extends MapPainter {
       }
 
       return isPauseInTile;
+   }
+
+   /**
+    * create an image for the tour pause
+    *
+    * @param device
+    * @param pauseDuration
+    * @param pauseBounds
+    * @return
+    */
+   private Image drawTourPauses_Image(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
+
+      final int bannerWidth = pauseBounds.x;
+      final int bannerHeight = pauseBounds.y;
+      final int bannerWidth2 = bannerWidth / 2;
+
+      final int markerImageWidth = pauseBounds.width;
+      final int markerImageHeight = pauseBounds.height;
+
+      final int arcSize = 5;
+
+      final RGB rgbTransparent = Map.getTransparentRGB();
+
+      final ImageData markerImageData = new ImageData(
+            markerImageWidth,
+            markerImageHeight,
+            24,
+            new PaletteData(0xff, 0xff00, 0xff0000));
+
+      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
+
+      final Image markerImage = new Image(device, markerImageData);
+      final Rectangle markerImageBounds = markerImage.getBounds();
+
+      final Color transparentColor = new Color(rgbTransparent);
+      final Color bannerBorderColor = new Color(0x69, 0xAF, 0x3D);
+
+      Color textColor;
+      Color bannerColor;
+
+      if (_tourPaintConfig.isBackgroundDark) {
+
+         textColor = ThemeUtil.getDefaultForegroundColor_Shell();
+         bannerColor = ThemeUtil.getDefaultBackgroundColor_Shell();
+
+      } else {
+
+         textColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+         bannerColor = new Color(0xFF, 0xFF, 0xFF);
+      }
+
+      final GC gc = new GC(markerImage);
+      {
+         // fill transparent color
+         gc.setBackground(transparentColor);
+         gc.fillRectangle(markerImageBounds);
+
+         gc.setBackground(bannerColor);
+         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
+
+         // draw banner border
+         gc.setForeground(bannerBorderColor);
+         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
+
+         // draw text
+         gc.setForeground(textColor);
+         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
+
+         // draw pole
+         gc.setForeground(bannerBorderColor);
+         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
+         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
+
+         gc.setForeground(bannerColor);
+         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
+      }
+      gc.dispose();
+
+      return markerImage;
    }
 
    /**
