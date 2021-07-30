@@ -277,8 +277,6 @@ public class Images {
    public static final String TagLayout_Hierarchical_Disabled            = "tag-layout-hierarchical-disabled.png";                //$NON-NLS-1$
    public static final String TagsChecked                                = "tags-checked.png";                                    //$NON-NLS-1$
    public static final String TagsChecked_Disabled                       = "tags-checked-disabled.png";                           //$NON-NLS-1$
-   public static final String ToolTip_TourInfo                           = "tour-info.png";                                       //$NON-NLS-1$
-   public static final String ToolTip_TourInfo_Hovered                   = "tour-info-hovered.png";                               //$NON-NLS-1$
    public static final String Tour_Duplicate                             = "tour-duplicate.png";                                  //$NON-NLS-1$
    public static final String Tour_Duplicate_Disabled                    = "tour-duplicate-disabled.png";                         //$NON-NLS-1$
    public static final String TourAnalyzer                               = "tour-analyzer.png";                                   //$NON-NLS-1$
@@ -305,6 +303,7 @@ public class Images {
    public static final String TourGeoFilter                              = "tour-geo-filter.png";                                 //$NON-NLS-1$
    public static final String TourInfo                                   = "tour-info.png";                                       //$NON-NLS-1$
    public static final String TourInfo_Disabled                          = "tour-info-disabled.png";                              //$NON-NLS-1$
+   public static final String TourInfo_Hovered                           = "tour-info-hovered.png";                               //$NON-NLS-1$
    public static final String TourLog                                    = "tour-log.png";                                        //$NON-NLS-1$
    public static final String TourMarker                                 = "tour-marker.png";                                     //$NON-NLS-1$
    public static final String TourMarker_All                             = "tour-marker-all.png";                                 //$NON-NLS-1$

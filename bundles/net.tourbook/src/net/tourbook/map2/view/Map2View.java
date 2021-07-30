@@ -188,6 +188,8 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
+   private static final String   TOUR_TOOLTIP_LABEL_NO_GEO_TOUR                        = net.tourbook.ui.Messages.Tour_Tooltip_Label_NoGeoTour;
+
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
@@ -319,7 +321,7 @@ public class Map2View extends ViewPart implements
    private static final IDialogSettings  _state_PhotoFilter = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
    //
    //
-   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
+   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(3, 23);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
    //
@@ -1487,10 +1489,6 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.resetTourData();
       _tourPainterConfig.setPhotos(null, false, false);
 
-      _tourInfoToolTipProvider.setTourData(null);
-
-      _map.tourBreadcrumb().resetTours();
-
       showDefaultMap(false);
 
       enableActions();
@@ -1707,13 +1705,14 @@ public class Map2View extends ViewPart implements
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
+      _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
       _map.addControlListener(new ControlAdapter() {
          @Override
          public void controlResized(final ControlEvent e) {
 
             /*
-             * check if the legend size must be adjusted
+             * Check if the legend size must be adjusted
              */
             final Image legendImage = _mapLegend.getImage();
             if ((legendImage == null) || legendImage.isDisposed()) {
@@ -1725,16 +1724,17 @@ public class Map2View extends ViewPart implements
             }
 
             /*
-             * check height
+             * Check height
              */
             final Rectangle mapBounds = _map.getBounds();
             final Rectangle legendBounds = legendImage.getBounds();
 
-            if ((mapBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT + IMapColorProvider.LEGEND_TOP_MARGIN)
-                  || ((mapBounds.height > IMapColorProvider.DEFAULT_LEGEND_HEIGHT
-                        + IMapColorProvider.LEGEND_TOP_MARGIN) //
-                        && (legendBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT)) //
-            ) {
+            final int mapHeight = mapBounds.height;
+            final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
+            final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
+
+            if ((mapHeight < defaultLegendHeight + legendTopMargin)
+                  || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
 
                createLegendImage(_tourPainterConfig.getMapColorProvider());
             }
@@ -3740,16 +3740,16 @@ public class Map2View extends ViewPart implements
             hoveredAndSelectedOpacity,
             selectedRGB,
             selectedOpacity
-            );
+      );
 
       /*
        * Tour direction
        */
-      final boolean isShowTourDirection      = Util.getStateBoolean(_state,      Map2View.STATE_IS_SHOW_TOUR_DIRECTION,            Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
-      final int tourDirection_MarkerGap      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_MARKER_GAP,            Map2View.STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
-      final int tourDirection_LineWidth      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,            Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
-      final float tourDirection_SymbolSize   = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE,            Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
-      final RGB tourDirection_RGB            = Util.getStateRGB(_state,          Map2View.STATE_TOUR_DIRECTION_RGB,            Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
+      final boolean isShowTourDirection      = Util.getStateBoolean(_state,      Map2View.STATE_IS_SHOW_TOUR_DIRECTION,       Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
+      final int tourDirection_MarkerGap      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_MARKER_GAP,    Map2View.STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
+      final int tourDirection_LineWidth      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,    Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
+      final float tourDirection_SymbolSize   = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE,   Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
+      final RGB tourDirection_RGB            = Util.getStateRGB(_state,          Map2View.STATE_TOUR_DIRECTION_RGB,           Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
 
       _map.setConfig_TourDirection(
             isShowTourDirection,
@@ -3758,14 +3758,20 @@ public class Map2View extends ViewPart implements
             tourDirection_SymbolSize,
             tourDirection_RGB);
 
-      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,            Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,            Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,            Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,            Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,      Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
-      // set dim level/color after the map providers are set
-      final boolean isMapDimmed = Util.getStateBoolean(_state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
-      final int mapDimValue = Util.getStateInt(_state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-      final RGB mapDimColor = Util.getStateRGB(_state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
-      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark());
+      /*
+       * Set dim level/color after the map providers are set
+       */
+      final boolean isMapDimmed  = Util.getStateBoolean( _state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
+      final int mapDimValue      = Util.getStateInt(     _state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
+      final RGB mapDimColor      = Util.getStateRGB(     _state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
+
+      final boolean isBackgroundDark = isBackgroundDark();
+
+      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
+      _tourPainterConfig.isBackgroundDark = isBackgroundDark;
 
 // SET_FORMATTING_ON
 
@@ -4010,7 +4016,14 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setMapColorProvider(mapColorProvider);
    }
 
+   /**
+    * Show map by removing/resetting all previously displayed tours
+    *
+    * @param isShowOverlays
+    */
    private void showDefaultMap(final boolean isShowOverlays) {
+
+      _tourInfoToolTipProvider.setTourData(null);
 
       // disable tour actions in this view
       _isTourOrWayPoint = false;
@@ -4036,6 +4049,8 @@ public class Map2View extends ViewPart implements
             false, // show value point
 
             _sliderPathPaintingData);
+
+      _map.resetHoveredSelectedTours();
 
       _map.tourBreadcrumb().resetTours();
 

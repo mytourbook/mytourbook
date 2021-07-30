@@ -31,15 +31,20 @@ New
 Improvements
 ============
 
-* 2D map
+* 2D Map
   - Show tour direction as marker in the tour track
-  - Customize colors for hovered/selected tour 
+  - Customize colors for hovered/selected tour
+  - Hovered/selected tour tooltip 
+    - Better text formatting
+    - Themed foreground/background color
+  - Show themed tour pauses when map is dimmed
+    
 
 * Tour Photos
   - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
     https://sourceforge.net/p/mytourbook/feature-requests/194/
   
-* Compare tours by elevation
+* Compare Tours by Elevation
   - Reference tour view
     - Show compared tours with year categories or without year categories
     - New shortcut action in context menu to compare reference tours with all tours
@@ -56,11 +61,11 @@ Improvements
     - Show year statistic view in "Compare Result" perspective
     - Update year statistic view when compare result is assigned/removed
 
-* Repair close button in all views
+* Repair Close Button in All Views
   - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
     This is an experimental feature and can be activated with the command line parameter -DsetAllViewsClosable 
 
-* Fitlog/FitlogEx import (Frederic)
+* Fitlog/FitlogEx Import (Frederic)
   - The timezone is used only when available, otherwise it's determined with the GPS position
 
 
