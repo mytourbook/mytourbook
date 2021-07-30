@@ -133,6 +133,7 @@ public class TourExporter {
 
    private boolean      _isGPX;
    private boolean      _isTCX;
+   private String       _creatorName;
 
    public enum ExportType {
       GPX, TCX
@@ -186,6 +187,12 @@ public class TourExporter {
       //For TCX
       setIsCourse(isCourse);
       setCourseName(courseName);
+   }
+
+   public TourExporter(final String formatTemplate, final String creatorName) {
+
+      this(formatTemplate);
+      _creatorName = creatorName;
    }
 
    public boolean doExport_10_Tour(final List<GarminTrack> tracks,
@@ -263,7 +270,7 @@ public class TourExporter {
       doExport_24_MinMax_Other(vcContext, creationDate);
    }
 
-   private void doExport_21_Creator(final VelocityContext vcContext) {
+   private void doExport_21_Creator(final VelocityContext velocityContext) {
 
       final Version version = Activator.getDefault().getVersion();
 
@@ -285,16 +292,20 @@ public class TourExporter {
          }
       }
 
-      vcContext.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
-      vcContext.put("pluginMinorVersion", pluginMinorVersion); //$NON-NLS-1$
-      vcContext.put("pluginMicroVersion", pluginMicroVersion); //$NON-NLS-1$
-      vcContext.put("pluginQualifierVersion", pluginQualifierVersion); //$NON-NLS-1$
+      velocityContext.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
+      velocityContext.put("pluginMinorVersion", pluginMinorVersion); //$NON-NLS-1$
+      velocityContext.put("pluginMicroVersion", pluginMicroVersion); //$NON-NLS-1$
+      velocityContext.put("pluginQualifierVersion", pluginQualifierVersion); //$NON-NLS-1$
 
       /*
        * Creator
        */
       String creatorText = UI.EMPTY_STRING;
-      if (version != null) {
+      if (net.tourbook.common.util.StringUtils.hasContent(_creatorName)) {
+
+         creatorText = _creatorName;
+      } else if (version != null) {
+
          creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net", //$NON-NLS-1$
                version.getMajor(),
                version.getMinor(),
@@ -306,7 +317,7 @@ public class TourExporter {
          creatorText += STRAVA_WITH_BAROMETER;
       }
 
-      vcContext.put("creator", creatorText); //$NON-NLS-1$
+      velocityContext.put("creator", creatorText); //$NON-NLS-1$
    }
 
    /**

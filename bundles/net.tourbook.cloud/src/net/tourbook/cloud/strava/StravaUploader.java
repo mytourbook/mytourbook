@@ -76,7 +76,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE, "MyTourbook");
 
    // Source : https://support.strava.com/hc/en-us/articles/216919407-Supported-Activity-Types-on-Strava
    private static final List<String> StravaActivityTypes = List.of(
