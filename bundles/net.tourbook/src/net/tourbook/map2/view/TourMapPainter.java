@@ -134,17 +134,17 @@ public class TourMapPainter extends MapPainter {
 
    private static Color               _bgColor;
    private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
-   
+
    /*
     * Static UI resources
     */
-   private static Image               _tourWayPointImage;
+   private static Image _tourWayPointImage;
 
    /*
     * None static fields
     */
-   private float[]                    _dataSerie;
-   private IMapColorProvider          _legendProvider;
+   private float[]           _dataSerie;
+   private IMapColorProvider _legendProvider;
 
    // painting parameter
    private int     _lineWidth;
@@ -1793,7 +1793,12 @@ public class TourMapPainter extends MapPainter {
       gc.fillRectangle(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
    }
 
-   private void drawTour_40_Dot(final GC gc, final int devX, final int devY, final Color color, final Tile tile, final Long tourId) {
+   private void drawTour_40_Dot(final GC gc,
+                                final int devX,
+                                final int devY,
+                                final Color color,
+                                final Tile tile,
+                                final Long tourId) {
 
       if (color != null) {
          gc.setBackground(color);

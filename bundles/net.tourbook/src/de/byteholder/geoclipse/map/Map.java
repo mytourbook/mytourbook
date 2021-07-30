@@ -2001,7 +2001,7 @@ public class Map extends Canvas {
       return gridGeoPos;
    }
 
-   private void hideHoveredArea() {
+   private void hideTourTooltipHoveredArea() {
 
       if (_tour_ToolTip == null) {
          return;
@@ -2648,7 +2648,7 @@ public class Map extends Canvas {
          return;
       }
 
-      hideHoveredArea();
+      hideTourTooltipHoveredArea();
       setPoiVisible(false);
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
@@ -4125,11 +4125,11 @@ public class Map extends Canvas {
 
       if (isTourTitle) {
 
-         gc.setFont(_boldFont);
-
          wrappedTitle = WordUtils.wrap(text_TourTitle, 40);
 
+         gc.setFont(_boldFont);
          size_Title = gc.textExtent(wrappedTitle);
+
          titleHeight = size_Title.y;
       }
 
@@ -5798,6 +5798,32 @@ public class Map extends Canvas {
       paint();
    }
 
+   /**
+    * Reset hovered data
+    */
+   public void resetHoveredSelectedTours() {
+
+      _hovered_SelectedTourId = Long.MIN_VALUE;
+
+      _allHoveredTourIds.clear();
+      _allDevHoveredPoints.clear();
+
+      if (_allPaintedTiles != null) {
+
+         for (final Tile[] allTileArrays : _allPaintedTiles) {
+
+            for (final Tile tile : allTileArrays) {
+
+               if (tile != null) {
+
+                  tile.allPainted_HoverRectangle.clear();
+                  tile.allPainted_HoverTourID.clear();
+               }
+            }
+         }
+      }
+   }
+
    public void setConfig_HoveredSelectedTour(final boolean isVisible,
                                              final RGB hoveredRGB,
                                              final int hoveredOpacity,
@@ -6477,10 +6503,7 @@ public class Map extends Canvas {
          return;
       }
 
-      // reset hovered data
-      _hovered_SelectedTourId = Long.MIN_VALUE;
-      _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
+      resetHoveredSelectedTours();
 
       grid_UpdatePaintingStateData();
 
@@ -6778,7 +6801,7 @@ public class Map extends Canvas {
       }
 
       /*
-       * hide hovered area, this must be done because when a tile do not contain a way point, the
+       * Hide hovered area, this must be done because when a tile do not contain a way point, the
        * hovered area can sill be displayed when another position is set with setMapCenter()
        */
       if (oldHoveredContext != null && _hoveredAreaContext == null) {

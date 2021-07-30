@@ -1487,10 +1487,6 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.resetTourData();
       _tourPainterConfig.setPhotos(null, false, false);
 
-      _tourInfoToolTipProvider.setTourData(null);
-
-      _map.tourBreadcrumb().resetTours();
-
       showDefaultMap(false);
 
       enableActions();
@@ -4010,7 +4006,14 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setMapColorProvider(mapColorProvider);
    }
 
+   /**
+    * Show map by removing/resetting all previously displayed tours
+    *
+    * @param isShowOverlays
+    */
    private void showDefaultMap(final boolean isShowOverlays) {
+
+      _tourInfoToolTipProvider.setTourData(null);
 
       // disable tour actions in this view
       _isTourOrWayPoint = false;
@@ -4036,6 +4039,8 @@ public class Map2View extends ViewPart implements
             false, // show value point
 
             _sliderPathPaintingData);
+
+      _map.resetHoveredSelectedTours();
 
       _map.tourBreadcrumb().resetTours();
 
