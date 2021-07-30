@@ -4,10 +4,6 @@
 TODO's
 ======
 
-
-* Compare Tours by Elevation
-                  - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
-
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
@@ -36,10 +32,20 @@ New
 Improvements
 ============
 
-* 2D map
+* 2D Map
   - Show tour direction as marker in the tour track
+  - Customize colors for hovered/selected tour
+  - Hovered/selected tour tooltip 
+    - Better text formatting
+    - Themed foreground/background color
+  - Show themed tour pauses when map is dimmed
+    
 
-* Compare tours by elevation
+* Tour Photos
+  - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
+    https://sourceforge.net/p/mytourbook/feature-requests/194/
+  
+* Compare Tours by Elevation
   - Reference tour view
     - Show compared tours with year categories or without year categories
     - New shortcut action in context menu to compare reference tours with all tours
@@ -56,18 +62,19 @@ Improvements
     - Show year statistic view in "Compare Result" perspective
     - Update year statistic view when compare result is assigned/removed
 
-* Repair close button in all views
+* Repair Close Button in All Views
   - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
     This is an experimental feature and can be activated with the command line parameter -DsetAllViewsClosable 
 
-* Fitlog/FitlogEx import (Frederic)
+* Fitlog/FitlogEx Import (Frederic)
   - The timezone is used only when available, otherwise it's determined with the GPS position
 
 
 Changes  
 =======
 
-* 
+* 2D Map
+  - Move option "Show hovered/selected tour" from "2D Map Options" into "Track Options"
     
 
 Bugfix
@@ -84,6 +91,8 @@ Bugfix
 * Tour chart
   - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
 
+* 2D Map
+  - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
 
 Translation    
 ===========

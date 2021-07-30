@@ -101,6 +101,7 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -179,8 +180,8 @@ public class Map extends Canvas {
    private static final String          DIRECTION_E                      = "E";                                                     //$NON-NLS-1$
    private static final String          DIRECTION_N                      = "N";                                                     //$NON-NLS-1$
 
-   private static final String          VALUE_FORMAT_2                   = "%s %s";                                                 //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_3                   = "%s %s %s";                                              //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_TIME                = "%s\t%s";                                                //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_DISTANCE            = "%s\t\t%s %s";                                           //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -216,17 +217,17 @@ public class Map extends Canvas {
 //   private static final String      PATTERN_WIKI_POSITION_21               = "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";            //$NON-NLS-1$
 //   private static final String      PATTERN_WIKI_POSITION_22               = "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";   //$NON-NLS-1$
 
-   private static final String        PATTERN_WIKI_POSITION_D_D             = PATTERN_DOUBLE + ";"                                        //$NON-NLS-1$
+   private static final String           PATTERN_WIKI_POSITION_D_D             = PATTERN_DOUBLE + ";"                                        //$NON-NLS-1$
          + PATTERN_DOUBLE
          + PATTERN_END;
 
-   private static final String        PATTERN_WIKI_POSITION_D_N_D_E         = PATTERN_DOUBLE_SEP
+   private static final String           PATTERN_WIKI_POSITION_D_N_D_E         = PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_NS
          + PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_WE
          + PATTERN_END;
 
-   private static final String        PATTERN_WIKI_POSITION_D_M_N_D_M_E     = PATTERN_DOUBLE_SEP
+   private static final String           PATTERN_WIKI_POSITION_D_M_N_D_M_E     = PATTERN_DOUBLE_SEP
          + PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_NS
          + PATTERN_DOUBLE_SEP
@@ -234,7 +235,7 @@ public class Map extends Canvas {
          + PATTERN_DIRECTION_WE
          + PATTERN_END;
 
-   private static final String        PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E = PATTERN_DOUBLE_SEP
+   private static final String           PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E = PATTERN_DOUBLE_SEP
          + PATTERN_DOUBLE_SEP
          + PATTERN_DOUBLE_SEP
          + PATTERN_DIRECTION_NS
@@ -244,33 +245,27 @@ public class Map extends Canvas {
          + PATTERN_DIRECTION_WE
          + PATTERN_END;
 
-   private static final Pattern       _patternWikiUrl                       = Pattern.compile(PATTERN_WIKI_URL);
-   private static final Pattern       _patternWikiPosition_D_D              = Pattern.compile(PATTERN_WIKI_POSITION_D_D);
-   private static final Pattern       _patternWikiPosition_D_N_D_E          = Pattern.compile(PATTERN_WIKI_POSITION_D_N_D_E);
-   private static final Pattern       _patternWikiPosition_D_M_N_D_M_E      = Pattern.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
-   private static final Pattern       _patternWikiPosition_D_M_S_N_D_M_S_E  = Pattern.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
-   private static final Pattern       _patternWikiParamter                  = Pattern.compile(PATTERN_SEPARATOR);
-   private static final Pattern       _patternWikiKeyValue                  = Pattern.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
+   private static final Pattern          _patternWikiUrl                       = Pattern.compile(PATTERN_WIKI_URL);
+   private static final Pattern          _patternWikiPosition_D_D              = Pattern.compile(PATTERN_WIKI_POSITION_D_D);
+   private static final Pattern          _patternWikiPosition_D_N_D_E          = Pattern.compile(PATTERN_WIKI_POSITION_D_N_D_E);
+   private static final Pattern          _patternWikiPosition_D_M_N_D_M_E      = Pattern.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
+   private static final Pattern          _patternWikiPosition_D_M_S_N_D_M_S_E  = Pattern.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
+   private static final Pattern          _patternWikiParamter                  = Pattern.compile(PATTERN_SEPARATOR);
+   private static final Pattern          _patternWikiKeyValue                  = Pattern.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
 
-   private static final ColorCacheSWT _colorCache                           = new ColorCacheSWT();
+   private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
+
+   private static final ColorCacheSWT    _colorCache                           = new ColorCacheSWT();
 
    // [181,208,208] is the color of water in the standard OSM material
-   public static final RGB        OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
+   public static final RGB  OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
+   private static final RGB MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
 
-   private static final RGB       MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
-
-   private static RGB             MAP_TRANSPARENT_RGB;
-
-   private final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
-
+   private static RGB       MAP_TRANSPARENT_RGB;
    {
-      MAP_TRANSPARENT_RGB = net.tourbook.common.UI.IS_OSX //
-//            ? new RGB(0x7e, 0x7f, 0x80)
-//            ? new RGB(0xfe, 0x00, 0x00)
+      MAP_TRANSPARENT_RGB = UI.IS_OSX
             ? new RGB(0xfe, 0xfe, 0xfe)
-            : new RGB(0xfe, 0xfe, 0xfe)
-//
-      ;
+            : new RGB(0xfe, 0xfe, 0xfe);
    }
 
    private Color                  SYS_COLOR_BLACK;
@@ -492,14 +487,24 @@ public class Map extends Canvas {
    private final int        _poi_Tooltip_OffsetY       = 5;
    private TourToolTip      _tour_ToolTip;
 
+   /**
+    * Hovered/selected tour
+    */
    private boolean          _isShowHoveredSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
    private long             _hovered_SelectedTourId    = Long.MIN_VALUE;
 
    private ArrayList<Long>  _allHoveredTourIds         = new ArrayList<>();
    private ArrayList<Point> _allDevHoveredPoints       = new ArrayList<>();
 
+   private int              _hoveredSelectedTour_Hovered_Opacity;
+   private Color            _hoveredSelectedTour_Hovered_Color;
+   private int              _hoveredSelectedTour_HoveredAndSelected_Opacity;
+   private Color            _hoveredSelectedTour_HoveredAndSelected_Color;
+   private int              _hoveredSelectedTour_Selected_Opacity;
+   private Color            _hoveredSelectedTour_Selected_Color;
+
    /**
-    * when <code>true</code> the loading... image is not displayed
+    * When <code>true</code> the loading... image is not displayed
     */
    private boolean          _isLiveView;
 
@@ -579,11 +584,20 @@ public class Map extends Canvas {
    private boolean                   _isFastMapPainting_Active;
    private boolean                   _isInInverseKeyboardPanning;
 
-   private int                       _fastMapPainting_skippedValues;
+   /*
+    * Direction arrows
+    */
+   private boolean           _isDrawTourDirection;
+   private int               _tourDirection_MarkerGap;
+   private int               _tourDirection_LineWidth;
+   private RGB               _tourDirection_RGB;
+   private float             _tourDirection_SymbolSize;
 
-   private MapTourBreadcrumb         _tourBreadcrumb;
+   private int               _fastMapPainting_skippedValues;
 
-   private Font                      _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private MapTourBreadcrumb _tourBreadcrumb;
+
+   private Font              _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -1241,15 +1255,13 @@ public class Map extends Canvas {
 
          final Set<GeoPosition> positions = new HashSet<>();
 
-         positions.add(
-               new GeoPosition(//
-                     Double.parseDouble(boundingBoxValues[0]),
-                     Double.parseDouble(boundingBoxValues[2])));
+         positions.add(new GeoPosition(
+               Double.parseDouble(boundingBoxValues[0]),
+               Double.parseDouble(boundingBoxValues[2])));
 
-         positions.add(
-               new GeoPosition(//
-                     Double.parseDouble(boundingBoxValues[1]),
-                     Double.parseDouble(boundingBoxValues[3])));
+         positions.add(new GeoPosition(
+               Double.parseDouble(boundingBoxValues[1]),
+               Double.parseDouble(boundingBoxValues[3])));
 
          return positions;
 
@@ -1443,7 +1455,7 @@ public class Map extends Canvas {
       while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
 
          // center position in the map
-         final java.awt.Point center = new java.awt.Point(//
+         final java.awt.Point center = new java.awt.Point(
                positionRect.x + positionRect.width / 2,
                positionRect.y + positionRect.height / 2);
 
@@ -1836,7 +1848,7 @@ public class Map extends Canvas {
       final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
 
       // get device rectangle for the position
-      final Point gridGeoPos = new Point(//
+      final Point gridGeoPos = new Point(
             worldGrid.x - _worldPixel_TopLeft_Viewport.x,
             worldGrid.y - _worldPixel_TopLeft_Viewport.y);
 
@@ -1982,14 +1994,14 @@ public class Map extends Canvas {
    private Point grid_World2Dev(final Point worldPosition) {
 
       // get device rectangle for the position
-      final Point gridGeoPos = new Point(//
+      final Point gridGeoPos = new Point(
             worldPosition.x - _worldPixel_TopLeft_Viewport.x,
             worldPosition.y - _worldPixel_TopLeft_Viewport.y);
 
       return gridGeoPos;
    }
 
-   private void hideHoveredArea() {
+   private void hideTourTooltipHoveredArea() {
 
       if (_tour_ToolTip == null) {
          return;
@@ -2390,7 +2402,7 @@ public class Map extends Canvas {
       final java.awt.Point worldGrid = _mp.geoToPixel(new GeoPosition(geoLat, geoLon), _mapZoomLevel);
 
       // get device rectangle for the position
-      final Point gridGeoPos = new Point(//
+      final Point gridGeoPos = new Point(
             worldGrid.x - _worldPixel_TopLeft_Viewport.x,
             worldGrid.y - _worldPixel_TopLeft_Viewport.y);
 
@@ -2428,7 +2440,7 @@ public class Map extends Canvas {
       }
 
       // get device rectangle for this tile
-      return new Point(//
+      return new Point(
             tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x,
             tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y);
    }
@@ -2636,7 +2648,7 @@ public class Map extends Canvas {
          return;
       }
 
-      hideHoveredArea();
+      hideTourTooltipHoveredArea();
       setPoiVisible(false);
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
@@ -3229,7 +3241,8 @@ public class Map extends Canvas {
 
                // check if a newer runnable is available
                if (__asynchRunnableCounter != _redrawMapCounter.get()) {
-                  // a newer queryRedraw is available
+
+                  // a newer runnable is available
                   return;
                }
 
@@ -3766,6 +3779,9 @@ public class Map extends Canvas {
                   gc.setAlpha(0x80);
                   gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
+                  gc.setAlpha(_hoveredSelectedTour_Hovered_Opacity);
+                  gc.setForeground(_hoveredSelectedTour_Hovered_Color);
+
                   paint_HoveredTour_10(gc, hoveredTourId);
                }
             }
@@ -3778,11 +3794,20 @@ public class Map extends Canvas {
       if (_hovered_SelectedTourId != Long.MIN_VALUE) {
 
          if (isHoveredAndSelectedTour) {
+
             gc.setAlpha(0x40);
             gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+
+            gc.setAlpha(_hoveredSelectedTour_HoveredAndSelected_Opacity);
+            gc.setForeground(_hoveredSelectedTour_HoveredAndSelected_Color);
+
          } else {
+
             gc.setAlpha(0x40);
             gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+            gc.setAlpha(_hoveredSelectedTour_Selected_Opacity);
+            gc.setForeground(_hoveredSelectedTour_Selected_Color);
          }
 
          paint_HoveredTour_10(gc, _hovered_SelectedTourId);
@@ -3814,9 +3839,7 @@ public class Map extends Canvas {
       gc.setAntialias(SWT.OFF);
       gc.setAlpha(0xff);
 
-      final boolean isDrawDirection = true;
-
-      if (devXY != null && isDrawDirection) {
+      if (_isDrawTourDirection && devXY != null) {
          paint_HoveredTour_14_DirectionArrows(gc, devXY);
       }
    }
@@ -3894,10 +3917,6 @@ public class Map extends Canvas {
 
    private void paint_HoveredTour_14_DirectionArrows(final GC gc, final int[] devXY) {
 
-      final int minDiff = 20;
-      final int lineWidth = 5;
-      final float directionScale = 5f;
-
       int devX1 = devXY[0];
       int devY1 = devXY[1];
 
@@ -3906,21 +3925,30 @@ public class Map extends Canvas {
 
       final int numSegments = devXY.length / 2;
 
-      gc.setLineWidth(lineWidth);
+      gc.setLineWidth(_tourDirection_LineWidth);
       gc.setAntialias(SWT.ON);
 
       gc.setLineCap(SWT.CAP_SQUARE);
       gc.setLineJoin(SWT.JOIN_MITER);
 
-      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+      final Color directionColor_Symbol = new Color(_tourDirection_RGB);
+      final Color directionColor_Contrast = SYS_COLOR_WHITE;
 
-      final Path directionPath = new Path(_display);
+      final Path directionPath_Color = new Path(_display);
+      final Path directionPath_Contrast = new Path(_display);
       final Transform transform = new Transform(_display);
       {
          // draw direction symbol
-         directionPath.moveTo(0, 1 * directionScale);
-         directionPath.lineTo(0.8f * directionScale, 0);
-         directionPath.lineTo(0, -1 * directionScale);
+         final float directionPos1 = 1 * _tourDirection_SymbolSize;
+         final float directionPos2 = 0.8f * _tourDirection_SymbolSize;
+
+         directionPath_Color.moveTo(0, directionPos1);
+         directionPath_Color.lineTo(directionPos2, 0);
+         directionPath_Color.lineTo(0, -directionPos1);
+
+         directionPath_Contrast.moveTo(-1, directionPos1);
+         directionPath_Contrast.lineTo(directionPos2 - 1, 0);
+         directionPath_Contrast.lineTo(-1, -directionPos1);
 
          for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
 
@@ -3947,7 +3975,7 @@ public class Map extends Canvas {
                yDiff = devY2 - devY1_LastPainted;
             }
 
-            if (xDiff > minDiff || yDiff > minDiff
+            if (xDiff > _tourDirection_MarkerGap || yDiff > _tourDirection_MarkerGap
 
             // paint 1st direction arrow
                   || segmentIndex == 1) {
@@ -3966,7 +3994,12 @@ public class Map extends Canvas {
                transform.rotate(-directionRotation);
 
                gc.setTransform(transform);
-               gc.drawPath(directionPath);
+
+               gc.setForeground(directionColor_Contrast);
+               gc.drawPath(directionPath_Contrast);
+
+               gc.setForeground(directionColor_Symbol);
+               gc.drawPath(directionPath_Color);
 
                // keep last painted position
                devX1_LastPainted = devX1;
@@ -3978,7 +4011,8 @@ public class Map extends Canvas {
             devY1 = devY2;
          }
       }
-      directionPath.dispose();
+      directionPath_Color.dispose();
+      directionPath_Contrast.dispose();
       transform.dispose();
 
       gc.setTransform(null);
@@ -3989,13 +4023,13 @@ public class Map extends Canvas {
       /*
        * This is for debugging
        */
-//      final boolean isShowHoverRectangle = false;
+//      final boolean isShowHoverRectangle = true;
 //      if (isShowHoverRectangle) {
 //
 //         // paint hovered rectangle
 //         gc.setLineWidth(1);
 //
-//         for (final Point hoveredPoint : _devHoveredPoint) {
+//         for (final Point hoveredPoint : _allDevHoveredPoints) {
 //
 //            gc.setAlpha(0x60);
 //            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -4029,6 +4063,9 @@ public class Map extends Canvas {
             // this occurred, it can be that previously a history/multiple tour was displayed
 
          } else {
+
+            // tour data are available
+
             paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
          }
 
@@ -4050,53 +4087,69 @@ public class Map extends Canvas {
 
       final Font normalFont = gc.getFont();
 
-      final String tourDateTime = TourManager.getTourDateTimeFull(tourData);
-      final String tourTitle = tourData.getTourTitle();
-      final boolean isTourTitle = tourTitle.length() > 0;
+      final String text_TourDateTime = TourManager.getTourDateTimeFull(tourData);
+      final String text_TourTitle = tourData.getTourTitle();
+      final boolean isTourTitle = text_TourTitle.length() > 0;
 
       final long movingTime = tourData.getTourComputedTime_Moving();
-      final String textMovingTime = String.format(VALUE_FORMAT_2,
+      final long recordedTime = tourData.getTourDeviceTime_Recorded();
+      final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
+
+      final String text_MovingTime = String.format(VALUE_FORMAT_TIME,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
-      final long recordedTime = tourData.getTourDeviceTime_Recorded();
-      final String textRecordedTime = String.format(VALUE_FORMAT_2,
+      final String text_RecordedTime = String.format(VALUE_FORMAT_TIME,
             TOUR_TOOLTIP_LABEL_RECORDED_TIME,
             FormatManager.formatRecordedTime(recordedTime));
 
-      final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
-      final String textDistance = String.format(VALUE_FORMAT_3,
+      final String text_Distance = String.format(VALUE_FORMAT_DISTANCE,
             TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
-      final String valueText = textDistance + UI.DASH_WITH_DOUBLE_SPACE + textMovingTime + UI.DASH_WITH_DOUBLE_SPACE + textRecordedTime;
+      final String valueText = UI.EMPTY_STRING
 
-      final Point dateTimeSize = gc.textExtent(tourDateTime);
-      final Point valueSize = gc.textExtent(valueText);
+            + UI.NEW_LINE + text_TourDateTime
+            + UI.NEW_LINE
+            + UI.NEW_LINE + text_Distance
+            + UI.NEW_LINE + text_MovingTime
+            + UI.NEW_LINE + text_RecordedTime;
 
-      Point titleSize = new Point(0, 0);
+      final Point size_DateTime = gc.textExtent(text_TourDateTime);
+      final Point size_Values = gc.textExtent(valueText);
+
+      Point size_Title = new Point(0, 0);
+      String wrappedTitle = null;
+      int titleHeight = 0;
+
       if (isTourTitle) {
+
+         wrappedTitle = WordUtils.wrap(text_TourTitle, 40);
+
          gc.setFont(_boldFont);
-         titleSize = gc.textExtent(tourTitle);
+         size_Title = gc.textExtent(wrappedTitle);
+
+         titleHeight = size_Title.y;
       }
 
-      final int contentWidth = Math.max(Math.max(dateTimeSize.x, valueSize.x), titleSize.x);
-
-      final int lineHeight = dateTimeSize.y;
+      final int lineHeight = size_DateTime.y;
 
       final int marginHorizontal = 3;
       final int marginVertical = 1;
 
-      final int contentHeight = lineHeight * 2 + (isTourTitle ? lineHeight : 0);
+      final int contentWidth = Math.max(Math.max(size_DateTime.x, size_Values.x), size_Title.x);
+      final int contentHeight = 0
+            + (isTourTitle ? titleHeight : -lineHeight)
+            + size_Values.y;
 
-      final int detailHeight = contentHeight + marginVertical * 2;
       final int detailWidth = contentWidth + marginHorizontal * 2;
+      final int detailHeight = contentHeight + marginVertical * 2;
 
       final int marginAboveMouse = 10;
       final int marginBelowMouse = 25;
 
-      int devXDetail = devXMouse;
+      int devXDetail = devXMouse + 10;
       int devYDetail = devYMouse - marginAboveMouse;
 
       // ensure that the tour detail is fully visible
@@ -4116,26 +4169,28 @@ public class Map extends Canvas {
 
       gc.setClipping(clippingRect);
 
-      gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+      gc.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
       gc.fillRectangle(clippingRect);
 
-      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+      gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
 
-      final int devXText = devXDetail + marginHorizontal;
-      int devYLine = devYDetail - contentHeight - marginVertical;
+      final int devX = devXDetail + marginHorizontal;
+      int devY = devYDetail - contentHeight - marginVertical;
 
       if (isTourTitle) {
+
          gc.setFont(_boldFont);
-         gc.drawString(tourTitle, devXText, devYLine);
-         devYLine += lineHeight;
+         gc.drawText(wrappedTitle, devX, devY);
+
+         devY += titleHeight;
+
+      } else {
+
+         devY -= lineHeight;
       }
 
       gc.setFont(normalFont);
-
-      gc.drawString(tourDateTime, devXText, devYLine);
-      devYLine += lineHeight;
-
-      gc.drawString(valueText, devXText, devYLine);
+      gc.drawText(valueText, devX, devY);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -4160,7 +4215,7 @@ public class Map extends Canvas {
 //         final int devX = _offline_PreviousOfflineArea.x;
 //         final int devY = _offline_PreviousOfflineArea.y;
 //         gc.setForeground(SYS_COLOR_GRAY);
-//         gc.drawRectangle(//
+//         gc.drawRectangle(
 //               devX + 1,
 //               devY + 1,
 //               _offline_PreviousOfflineArea.width - 2,
@@ -4689,7 +4744,7 @@ public class Map extends Canvas {
                final ImageDataResources idResources = tile.getOverlayImageDataResources();
 
                // draw center part into the tile image data
-               idResources.drawTileImageData(//
+               idResources.drawTileImageData(
                      imageData9Parts,
                      devXPart,
                      devYPart,
@@ -4736,7 +4791,7 @@ public class Map extends Canvas {
                final ImageDataResources neighborIDResources = neighborTile.getOverlayImageDataResources();
 
                // draw part image into the neighbor image
-               neighborIDResources.drawNeighborImageData(//
+               neighborIDResources.drawNeighborImageData(
                      imageData9Parts,
                      devXPart,
                      devYPart,
@@ -5744,6 +5799,83 @@ public class Map extends Canvas {
    }
 
    /**
+    * Reset hovered data
+    */
+   public void resetHoveredSelectedTours() {
+
+      _hovered_SelectedTourId = Long.MIN_VALUE;
+
+      _allHoveredTourIds.clear();
+      _allDevHoveredPoints.clear();
+
+      if (_allPaintedTiles != null) {
+
+         for (final Tile[] allTileArrays : _allPaintedTiles) {
+
+            for (final Tile tile : allTileArrays) {
+
+               if (tile != null) {
+
+                  tile.allPainted_HoverRectangle.clear();
+                  tile.allPainted_HoverTourID.clear();
+               }
+            }
+         }
+      }
+   }
+
+   public void setConfig_HoveredSelectedTour(final boolean isVisible,
+                                             final RGB hoveredRGB,
+                                             final int hoveredOpacity,
+                                             final RGB hoveredAndSelectedRGB,
+                                             final int hoveredAndSelectedOpacity,
+                                             final RGB selectedRGB,
+                                             final int selectedOpacity) {
+
+// SET_FORMATTING_OFF
+
+      _isShowHoveredSelectedTour                      = isVisible;
+
+      _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
+      _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
+
+      _hoveredSelectedTour_HoveredAndSelected_Color   = new Color(hoveredAndSelectedRGB);
+      _hoveredSelectedTour_HoveredAndSelected_Opacity = UI.convertOpacity(hoveredAndSelectedOpacity);
+
+      _hoveredSelectedTour_Selected_Color             = new Color(selectedRGB);
+      _hoveredSelectedTour_Selected_Opacity           = UI.convertOpacity(selectedOpacity);
+
+// SET_FORMATTING_ON
+
+      if (isVisible == false) {
+
+         // hide hovered/selected tour
+         _hovered_SelectedTourId = Long.MIN_VALUE;
+      }
+
+      _allHoveredTourIds.clear();
+      _allDevHoveredPoints.clear();
+
+      disposeOverlayImageCache();
+
+      paint();
+   }
+
+   public void setConfig_TourDirection(final boolean isShowTourDirection,
+                                       final int markerGap,
+                                       final int lineWidth,
+                                       final float symbolSize,
+                                       final RGB tourDirection_RGB) {
+
+      _isDrawTourDirection = isShowTourDirection;
+
+      _tourDirection_MarkerGap = markerGap;
+      _tourDirection_LineWidth = lineWidth;
+      _tourDirection_SymbolSize = symbolSize;
+      _tourDirection_RGB = tourDirection_RGB;
+   }
+
+   /**
     * Set map dimming level for the current map factory, this will dimm the map images
     *
     * @param mapDimLevel
@@ -5920,7 +6052,7 @@ public class Map extends Canvas {
       wpTourRect = getWorldPixelFromGeoPositions(geoTourPositions, tourZoomLevel);
 
       // get tour center in world pixel for the max zoom level
-      wpTourCenter = new java.awt.Point(//
+      wpTourCenter = new java.awt.Point(
             wpTourRect.x + wpTourRect.width / 2,
             wpTourRect.y + wpTourRect.height / 2);
 
@@ -6197,24 +6329,6 @@ public class Map extends Canvas {
       paint();
    }
 
-   public void setShowHoveredSelectedTour(final boolean isVisible) {
-
-      if (isVisible == false) {
-
-         // hide hovered/selected tour
-         _hovered_SelectedTourId = Long.MIN_VALUE;
-      }
-
-      _isShowHoveredSelectedTour = isVisible;
-
-      _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
-
-      disposeOverlayImageCache();
-
-      paint();
-   }
-
    /**
     * Legend will be drawn into the map when the visibility is <code>true</code>
     *
@@ -6294,10 +6408,20 @@ public class Map extends Canvas {
          adjustedZoomLevel = Math.min(adjustedZoomLevel, mpMaximumZoomLevel);
       }
 
+      boolean isNewZoomLevel = false;
+
       // check if zoom level has changed
       if (oldZoomLevel == adjustedZoomLevel) {
+
          // this is disabled that a double click can set the center of the map
+
          // return;
+
+      } else {
+
+         // a new zoomlevel is set
+
+         isNewZoomLevel = true;
       }
 
       if (oldZoomLevel != adjustedZoomLevel) {
@@ -6329,7 +6453,10 @@ public class Map extends Canvas {
 
       Point2D.Double wpNewMapCenter;
 
-      if (_isZoomWithMousePosition) {
+      if (_isZoomWithMousePosition
+
+            // fixes this "issue" https://github.com/wolfgang-ch/mytourbook/issues/370
+            && isNewZoomLevel) {
 
          // set map center to the current mouse position
 
@@ -6344,7 +6471,7 @@ public class Map extends Canvas {
          // zoom behaviour until 18.5
       }
 
-      wpNewMapCenter = new Point2D.Double(//
+      wpNewMapCenter = new Point2D.Double(
             wpCurrentMapCenter.getX() * relativeWidth,
             wpCurrentMapCenter.getY() * relativeHeight);
 
@@ -6376,10 +6503,7 @@ public class Map extends Canvas {
          return;
       }
 
-      // reset hovered data
-      _hovered_SelectedTourId = Long.MIN_VALUE;
-      _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
+      resetHoveredSelectedTours();
 
       grid_UpdatePaintingStateData();
 
@@ -6540,7 +6664,7 @@ public class Map extends Canvas {
       adjustedViewport.height += _poiImageBounds.height * 2;
 
       // check if poi is visible
-      if (adjustedViewport.intersects(//
+      if (adjustedViewport.intersects(
             worldPoiPos.x - _poiImageBounds.width / 2,
             worldPoiPos.y - _poiImageBounds.height,
             _poiImageBounds.width,
@@ -6677,7 +6801,7 @@ public class Map extends Canvas {
       }
 
       /*
-       * hide hovered area, this must be done because when a tile do not contain a way point, the
+       * Hide hovered area, this must be done because when a tile do not contain a way point, the
        * hovered area can sill be displayed when another position is set with setMapCenter()
        */
       if (oldHoveredContext != null && _hoveredAreaContext == null) {
