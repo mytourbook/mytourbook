@@ -188,6 +188,8 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
+   private static final String   TOUR_TOOLTIP_LABEL_NO_GEO_TOUR                        = net.tourbook.ui.Messages.Tour_Tooltip_Label_NoGeoTour;
+
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
@@ -319,7 +321,7 @@ public class Map2View extends ViewPart implements
    private static final IDialogSettings  _state_PhotoFilter = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
    //
    //
-   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
+   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(3, 23);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
    //
@@ -1703,13 +1705,14 @@ public class Map2View extends ViewPart implements
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
+      _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
       _map.addControlListener(new ControlAdapter() {
          @Override
          public void controlResized(final ControlEvent e) {
 
             /*
-             * check if the legend size must be adjusted
+             * Check if the legend size must be adjusted
              */
             final Image legendImage = _mapLegend.getImage();
             if ((legendImage == null) || legendImage.isDisposed()) {
@@ -1721,16 +1724,17 @@ public class Map2View extends ViewPart implements
             }
 
             /*
-             * check height
+             * Check height
              */
             final Rectangle mapBounds = _map.getBounds();
             final Rectangle legendBounds = legendImage.getBounds();
 
-            if ((mapBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT + IMapColorProvider.LEGEND_TOP_MARGIN)
-                  || ((mapBounds.height > IMapColorProvider.DEFAULT_LEGEND_HEIGHT
-                        + IMapColorProvider.LEGEND_TOP_MARGIN) //
-                        && (legendBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT)) //
-            ) {
+            final int mapHeight = mapBounds.height;
+            final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
+            final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
+
+            if ((mapHeight < defaultLegendHeight + legendTopMargin)
+                  || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
 
                createLegendImage(_tourPainterConfig.getMapColorProvider());
             }
