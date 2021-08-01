@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -102,6 +102,9 @@ public class FTSearchManager {
    private static final String             SEARCH_FIELD_DOC_SOURCE_SAVED = "docSource_Saved";              //$NON-NLS-1$
    private static final String             SEARCH_FIELD_MARKER_ID        = "markerID";                     //$NON-NLS-1$
    private static final String             SEARCH_FIELD_TITLE            = "title";                        //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_LOCATION_START   = "startLocation";                //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_LOCATION_END     = "endLocation";                  //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_WEATHER          = "weather";                      //$NON-NLS-1$
    private static final String             SEARCH_FIELD_TOUR_ID          = "tourID";                       //$NON-NLS-1$
    private static final String             SEARCH_FIELD_TIME             = "time";                         //$NON-NLS-1$
    private static final String             SEARCH_FIELD_WAYPOINT_ID      = "wayPointID";                   //$NON-NLS-1$
@@ -181,6 +184,9 @@ public class FTSearchManager {
          __fieldsToLoad = new HashSet<>();
          __fieldsToLoad.add(SEARCH_FIELD_TITLE);
          __fieldsToLoad.add(SEARCH_FIELD_DESCRIPTION);
+         __fieldsToLoad.add(SEARCH_FIELD_LOCATION_START);
+         __fieldsToLoad.add(SEARCH_FIELD_LOCATION_END);
+         __fieldsToLoad.add(SEARCH_FIELD_WEATHER);
 
          __fieldNames = new ArrayList<>(__fieldsToLoad);
          __fieldCount = __fieldNames.size();
@@ -356,9 +362,12 @@ public class FTSearchManager {
    }
 
    private static Document createDoc_Tour(final long tourId,
+                                          final long time,
                                           final String title,
                                           final String description,
-                                          final long time) throws IOException {
+                                          final String startPlace,
+                                          final String endPlace,
+                                          final String weather) throws IOException {
 
       final Document doc = new Document();
 
@@ -375,6 +384,18 @@ public class FTSearchManager {
 
       if (description != null) {
          doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
+
+      if (startPlace != null) {
+         doc.add(new Field(SEARCH_FIELD_LOCATION_START, startPlace, createFieldType_Text()));
+      }
+
+      if (endPlace != null) {
+         doc.add(new Field(SEARCH_FIELD_LOCATION_END, endPlace, createFieldType_Text()));
+      }
+
+      if (weather != null) {
+         doc.add(new Field(SEARCH_FIELD_WEATHER, weather, createFieldType_Text()));
       }
 
       return doc;
@@ -436,7 +457,7 @@ public class FTSearchManager {
       return fieldType;
    }
 
-   private static void createStores_TourData(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourData(final Connection conn, final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -455,16 +476,19 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = UI.EMPTY_STRING //
-               //
-               + "SELECT" //$NON-NLS-1$
-               //
-               + " tourId," //				1 //$NON-NLS-1$
-               + " tourTitle," //			2 //$NON-NLS-1$
-               + " tourDescription," //	3 //$NON-NLS-1$
-               + " tourStartTime" //		4 //$NON-NLS-1$
-               //
-               + (" FROM " + tableName); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" //                 //$NON-NLS-1$
+
+               + " tourId," //            1  //$NON-NLS-1$
+               + " tourStartTime," //     2  //$NON-NLS-1$
+               + " tourTitle," //         3  //$NON-NLS-1$
+               + " tourDescription," //   4  //$NON-NLS-1$
+               + " tourStartPlace," //    5  //$NON-NLS-1$
+               + " tourEndPlace," //      6  //$NON-NLS-1$
+               + " weather" //            7  //$NON-NLS-1$
+
+               + " FROM " + tableName; //    //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          final ResultSet rs = stmt.executeQuery();
@@ -474,29 +498,45 @@ public class FTSearchManager {
 
          while (rs.next()) {
 
-            final long dbTourId = rs.getLong(1);
-            final String dbTitle = rs.getString(2);
-            final String dbDescription = rs.getString(3);
-            final Long dbTourStartTime = rs.getLong(4);
+// SET_FORMATTING_OFF
 
-            final Document tourDoc = createDoc_Tour(dbTourId, dbTitle, dbDescription, dbTourStartTime);
+            final long   dbTourId         = rs.getLong(1);
+            final Long   dbTourStartTime  = rs.getLong(2);
+            final String dbTitle          = rs.getString(3);
+            final String dbDescription    = rs.getString(4);
+            final String dbStartPlace     = rs.getString(5);
+            final String dbEndPlace       = rs.getString(6);
+            final String dbWeather        = rs.getString(7);
+
+// SET_FORMATTING_ON
+
+            final Document tourDoc = createDoc_Tour(dbTourId,
+                  dbTourStartTime,
+                  dbTitle,
+                  dbDescription,
+                  dbStartPlace,
+                  dbEndPlace,
+                  dbWeather);
+
             indexWriter.addDocument(tourDoc);
 
             createdDocuments++;
 
             /*
-             * Update monitor every 1/20 seconds
+             * Update monitor every 1/5 seconds
              */
             final long now = System.currentTimeMillis();
 
-            if (now > lastUpdateTime + 50) {
+            if (now > lastUpdateTime + 200) {
                lastUpdateTime = now;
                monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
             }
          }
 
       } catch (final IOException e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
 
          closeIndexWriterAndStore(indexStore, indexWriter);
@@ -507,7 +547,7 @@ public class FTSearchManager {
       }
    }
 
-   private static void createStores_TourMarker(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourMarker(final Connection conn, final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -526,17 +566,17 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = UI.EMPTY_STRING //
-               //
-               + "SELECT" //$NON-NLS-1$
-               //
-               + " markerId," //					     	1 //$NON-NLS-1$
-               + (TourDatabase.KEY_TOUR + ",") //  2 //$NON-NLS-1$
-               + " label," //                      3 //$NON-NLS-1$
-               + " description," //                4 //$NON-NLS-1$
-               + " tourTime" //                    5 //$NON-NLS-1$
-               //
-               + (" FROM " + tableName); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" //                             //$NON-NLS-1$
+
+               + " markerId," //                      1  //$NON-NLS-1$
+               + TourDatabase.KEY_TOUR + "," //       2  //$NON-NLS-1$
+               + " label," //                         3  //$NON-NLS-1$
+               + " description," //                   4  //$NON-NLS-1$
+               + " tourTime" //                       5  //$NON-NLS-1$
+
+               + " FROM " + tableName; //                //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          final ResultSet rs = stmt.executeQuery();
@@ -580,7 +620,7 @@ public class FTSearchManager {
       }
    }
 
-   private static void createStores_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -599,17 +639,17 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = UI.EMPTY_STRING //
-               //
-               + "SELECT" //$NON-NLS-1$
-               //
-               + (" " + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$ //$NON-NLS-2$
-               + (TourDatabase.KEY_TOUR + ",") //						2 //$NON-NLS-1$
-               + " name," //											3 //$NON-NLS-1$
-               + " description," //									4 //$NON-NLS-1$
-               + " time" //											5 //$NON-NLS-1$
-               //
-               + (" FROM " + tableName); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" //                                         //$NON-NLS-1$
+
+               + " " + TourDatabase.ENTITY_ID_WAY_POINT + "," //  1  //$NON-NLS-1$ //$NON-NLS-2$
+               + " " + TourDatabase.KEY_TOUR + "," //             2  //$NON-NLS-1$
+               + " name," //                                      3  //$NON-NLS-1$
+               + " description," //                               4  //$NON-NLS-1$
+               + " time" //                                       5  //$NON-NLS-1$
+
+               + " FROM " + tableName; //                            //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          final ResultSet rs = stmt.executeQuery();
@@ -631,11 +671,11 @@ public class FTSearchManager {
             createdDocuments++;
 
             /*
-             * Update monitor every 1/20 seconds
+             * Update monitor every 1/5 seconds
              */
             final long now = System.currentTimeMillis();
 
-            if (now > lastUpdateTime + 50) {
+            if (now > lastUpdateTime + 200) {
                lastUpdateTime = now;
                monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
             }
@@ -654,11 +694,54 @@ public class FTSearchManager {
    }
 
    /**
+    * Deletes the fulltext search index, this is useful when the index has new fields.
+    */
+   public static void deleteIndex() {
+
+      setupIndexReader();
+
+      FSDirectory indexStore_TourData = null;
+      FSDirectory indexStore_Marker = null;
+      FSDirectory indexStore_WayPoint = null;
+
+      IndexWriter indexWriter_TourData = null;
+      IndexWriter indexWriter_Marker = null;
+      IndexWriter indexWriter_WayPoint = null;
+
+      try {
+
+         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
+         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
+         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
+
+         indexWriter_TourData.deleteAll();
+         indexWriter_Marker.deleteAll();
+         indexWriter_WayPoint.deleteAll();
+
+      } catch (final IOException e) {
+
+         StatusUtil.showStatus(e);
+
+      } finally {
+
+         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
+      }
+
+      closeIndexReaderSuggester();
+   }
+
+   /**
     * Remove tour from ft index when tour is deleted.
     *
     * @param tourId
     */
-   public static void deleteFromIndex(final long tourId) {
+   public static void deleteTourFromIndex(final long tourId) {
 
       setupIndexReader();
 
@@ -698,7 +781,9 @@ public class FTSearchManager {
          indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
 
       } catch (final IOException e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
 
          closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
@@ -867,7 +952,7 @@ public class FTSearchManager {
 
    private static void logCreateIndex(final String indexStore, final long start) {
 
-      StatusUtil.log(String.format(LOG_CREATE_INDEX, //
+      StatusUtil.log(String.format(LOG_CREATE_INDEX,
             indexStore,
             System.currentTimeMillis() - start));
    }
@@ -910,10 +995,13 @@ public class FTSearchManager {
          }
 
          final String[] queryFields = {
-               //
+
                SEARCH_FIELD_TITLE,
                SEARCH_FIELD_DESCRIPTION,
-               //
+               SEARCH_FIELD_LOCATION_START,
+               SEARCH_FIELD_LOCATION_END,
+               SEARCH_FIELD_WEATHER,
+
          };
 
          final int maxPassages[] = new int[queryFields.length];
@@ -1104,6 +1192,18 @@ public class FTSearchManager {
             case SEARCH_FIELD_TITLE:
                resultItem.title = snippet;
                break;
+
+            case SEARCH_FIELD_LOCATION_START:
+               resultItem.locationStart = snippet;
+               break;
+
+            case SEARCH_FIELD_LOCATION_END:
+               resultItem.locationEnd = snippet;
+               break;
+
+            case SEARCH_FIELD_WEATHER:
+               resultItem.weather = snippet;
+               break;
             }
 
             if (isDocRead == false) {
@@ -1200,9 +1300,9 @@ public class FTSearchManager {
 
                      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-                        createStores_TourData(conn, monitor);
-                        createStores_TourMarker(conn, monitor);
-                        createStores_TourWayPoint(conn, monitor);
+                        createStore_TourData(conn, monitor);
+                        createStore_TourMarker(conn, monitor);
+                        createStore_TourWayPoint(conn, monitor);
 
                      } catch (final SQLException e) {
                         UI.showSQLException(e);
@@ -1231,19 +1331,15 @@ public class FTSearchManager {
 
       setupIndex();
 
-      IndexReader indexReader1 = null;
-      IndexReader indexReader2 = null;
-      IndexReader indexReader3 = null;
-
       try {
 
          final FSDirectory tourDataIndex = openStore(TourDatabase.TABLE_TOUR_DATA);
          final FSDirectory tourMarkerIndex = openStore(TourDatabase.TABLE_TOUR_MARKER);
          final FSDirectory tourWayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
 
-         indexReader1 = DirectoryReader.open(tourDataIndex);
-         indexReader2 = DirectoryReader.open(tourMarkerIndex);
-         indexReader3 = DirectoryReader.open(tourWayPoint);
+         final IndexReader indexReader1 = DirectoryReader.open(tourDataIndex);
+         final IndexReader indexReader2 = DirectoryReader.open(tourMarkerIndex);
+         final IndexReader indexReader3 = DirectoryReader.open(tourWayPoint);
 
          _indexReader = new MultiReader(indexReader1, indexReader2, indexReader3);
 
@@ -1375,9 +1471,12 @@ public class FTSearchManager {
              * Recreate tour, marker and waypoint
              */
             final Document tourDoc = createDoc_Tour(tourId,
+                  tourData.getTourStartTimeMS(),
                   tourData.getTourTitle(),
                   tourData.getTourDescription(),
-                  tourData.getTourStartTimeMS());
+                  tourData.getTourStartPlace(),
+                  tourData.getTourEndPlace(),
+                  tourData.getWeather());
 
             newDoc_TourData.add(tourDoc);
 

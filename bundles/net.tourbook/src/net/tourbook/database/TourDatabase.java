@@ -106,9 +106,10 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 44;
+   private static final int TOURBOOK_DB_VERSION = 45;
 
-//   private static final int TOURBOOK_DB_VERSION = 44; // 21.?
+//   private static final int TOURBOOK_DB_VERSION = 45; // 21.?
+//   private static final int TOURBOOK_DB_VERSION = 44; // 21.6
 //   private static final int TOURBOOK_DB_VERSION = 43; // 21.3
 //   private static final int TOURBOOK_DB_VERSION = 42; // 20.11.1
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
@@ -1292,7 +1293,7 @@ public class TourDatabase {
 
          deleteTour_WithSQL(tourId);
 
-         FTSearchManager.deleteFromIndex(tourId);
+         FTSearchManager.deleteTourFromIndex(tourId);
 
          TourManager.getInstance().removeTourFromCache(tourId);
       }
@@ -5276,9 +5277,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_042_To_043(conn, splashManager);
          }
 
-         // 43 -> 44    21.?
+         // 43 -> 44    21.6
          if (currentDbVersion == 43) {
             currentDbVersion = _dbDesignVersion_New = updateDb_043_To_044(conn, splashManager);
+         }
+
+         // 44 -> 45    21.?
+         if (currentDbVersion == 44) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_044_To_045(conn, splashManager);
          }
 
          // update db design version number
@@ -8262,7 +8268,7 @@ public class TourDatabase {
    }
 
    /**
-    * DB version 43 -> 44 ... MT version 21.?
+    * DB version 43 -> 44 ... MT version 21.6
     *
     * @param conn
     * @param splashManager
@@ -8365,6 +8371,29 @@ public class TourDatabase {
 // SET_FORMATTING_ON
       }
       stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * DB version 44 -> 45 ... MT version 21.?
+    *
+    * @param conn
+    * @param splashManager
+    * @return
+    * @throws SQLException
+    */
+   private int updateDb_044_To_045(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 45;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      // new fields are added to the tour data index
+      FTSearchManager.deleteIndex();
 
       logDbUpdate_End(newDbVersion);
 

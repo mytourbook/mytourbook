@@ -39,7 +39,13 @@ Improvements
     - Better text formatting
     - Themed foreground/background color
   - Show themed tour pauses when map is dimmed
-    
+
+* Search Tours
+  - Search also for 
+    - Start Location
+    - End Location
+    - Weather    
+    https://sourceforge.net/p/mytourbook/feature-requests/186/
 
 * Tour Photos
   - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
