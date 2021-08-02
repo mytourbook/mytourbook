@@ -1812,7 +1812,9 @@ public class TourMapPainter extends MapPainter {
          gc.fillOval(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
       }
 
-      // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+      /*
+       * Keep area to detect the hovered tour and enlarge it with a margin to easier hit it
+       */
       final Rectangle hoveredRect = new Rectangle(
             (paintedDevX - Map.EXPANDED_HOVER_SIZE2),
             (paintedDevY - Map.EXPANDED_HOVER_SIZE2),

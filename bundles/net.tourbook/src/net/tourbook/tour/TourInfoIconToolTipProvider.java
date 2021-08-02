@@ -206,7 +206,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
    @Override
    public void paint(final GC gc, final Rectangle clientArea) {
 
-      final boolean isTourAvailable = _tourData != null;
+      final boolean isTourAvailable = _tourData != null || _tourId != -1;
 
       final Image tourInfoImage =
 
@@ -259,7 +259,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
    /**
     * Set text for the tooltip which is displayed when a tour is not available
-    * 
+    *
     * @param noTourTooltip
     */
    public void setNoTourTooltip(final String noTourTooltip) {
