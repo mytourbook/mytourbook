@@ -95,27 +95,27 @@ import org.eclipse.swt.widgets.Display;
 
 public class FTSearchManager {
 
-   private static final String             LUCENE_INDEX_FOLDER_NAME      = "lucene-index";                 //$NON-NLS-1$
+   private static final String             LUCENE_INDEX_FOLDER_NAME         = "lucene-index";                 //$NON-NLS-1$
 
-   private static final String             SEARCH_FIELD_DESCRIPTION      = "description";                  //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_DOC_SOURCE_INDEX = "docSource_Index";              //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_DOC_SOURCE_SAVED = "docSource_Saved";              //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_MARKER_ID        = "markerID";                     //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_TITLE            = "title";                        //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_LOCATION_START   = "startLocation";                //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_LOCATION_END     = "endLocation";                  //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_WEATHER          = "weather";                      //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_TOUR_ID          = "tourID";                       //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_TIME             = "time";                         //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_WAYPOINT_ID      = "wayPointID";                   //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DESCRIPTION         = "description";                  //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DOC_SOURCE_INDEX    = "docSource_Index";              //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DOC_SOURCE_SAVED    = "docSource_Saved";              //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_MARKER_ID           = "markerID";                     //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TITLE               = "title";                        //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_ID             = "tourID";                       //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_LOCATION_START = "startLocation";                //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_LOCATION_END   = "endLocation";                  //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_WEATHER        = "weather";                      //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TIME                = "time";                         //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                   //$NON-NLS-1$
 
-   private static final String             LOG_CREATE_INDEX              = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
+   private static final String             LOG_CREATE_INDEX                 = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
 
-   static final int                        DOC_SOURCE_TOUR               = 1;
-   static final int                        DOC_SOURCE_TOUR_MARKER        = 2;
-   static final int                        DOC_SOURCE_WAY_POINT          = 3;
+   static final int                        DOC_SOURCE_TOUR                  = 1;
+   static final int                        DOC_SOURCE_TOUR_MARKER           = 2;
+   static final int                        DOC_SOURCE_WAY_POINT             = 3;
 
-   private static final List<LookupResult> _emptyProposal                = new ArrayList<>();
+   private static final List<LookupResult> _emptyProposal                   = new ArrayList<>();
 
    private static Lookup                   _suggester;
 
@@ -126,11 +126,14 @@ public class FTSearchManager {
    private static TopDocs                  _topDocs;
    private static String                   _topDocsSearchText;
 
-   private static boolean                  _isShowContentAll;
-   private static boolean                  _isShowContentMarker;
-   private static boolean                  _isShowContentTour;
-   private static boolean                  _isShowContentWaypoint;
-   private static boolean                  _isSortDateAscending          = false;                          // -> sort descending
+   private static boolean                  _isSearch_All;
+   private static boolean                  _isSearch_Marker;
+   private static boolean                  _isSearch_Tour;
+   private static boolean                  _isSearch_Tour_LocationStart;
+   private static boolean                  _isSearch_Tour_LocationEnd;
+   private static boolean                  _isSearch_Tour_Weather;
+   private static boolean                  _isSearch_Waypoint;
+   private static boolean                  _isSortDateAscending             = false;                          // -> sort descending
 
    private static FieldType                fieldType_Int;
    private static FieldType                fieldType_Long;
@@ -184,9 +187,9 @@ public class FTSearchManager {
          __fieldsToLoad = new HashSet<>();
          __fieldsToLoad.add(SEARCH_FIELD_TITLE);
          __fieldsToLoad.add(SEARCH_FIELD_DESCRIPTION);
-         __fieldsToLoad.add(SEARCH_FIELD_LOCATION_START);
-         __fieldsToLoad.add(SEARCH_FIELD_LOCATION_END);
-         __fieldsToLoad.add(SEARCH_FIELD_WEATHER);
+         __fieldsToLoad.add(SEARCH_FIELD_TOUR_LOCATION_START);
+         __fieldsToLoad.add(SEARCH_FIELD_TOUR_LOCATION_END);
+         __fieldsToLoad.add(SEARCH_FIELD_TOUR_WEATHER);
 
          __fieldNames = new ArrayList<>(__fieldsToLoad);
          __fieldCount = __fieldNames.size();
@@ -237,7 +240,7 @@ public class FTSearchManager {
                   continue;
                }
 
-               final BytesRef tempFieldValue = fieldVal.stringValue() != null //
+               final BytesRef tempFieldValue = fieldVal.stringValue() != null
                      ? new BytesRef(fieldVal.stringValue())
                      : fieldVal.binaryValue();
 
@@ -387,15 +390,15 @@ public class FTSearchManager {
       }
 
       if (startPlace != null) {
-         doc.add(new Field(SEARCH_FIELD_LOCATION_START, startPlace, createFieldType_Text()));
+         doc.add(new Field(SEARCH_FIELD_TOUR_LOCATION_START, startPlace, createFieldType_Text()));
       }
 
       if (endPlace != null) {
-         doc.add(new Field(SEARCH_FIELD_LOCATION_END, endPlace, createFieldType_Text()));
+         doc.add(new Field(SEARCH_FIELD_TOUR_LOCATION_END, endPlace, createFieldType_Text()));
       }
 
       if (weather != null) {
-         doc.add(new Field(SEARCH_FIELD_WEATHER, weather, createFieldType_Text()));
+         doc.add(new Field(SEARCH_FIELD_TOUR_WEATHER, weather, createFieldType_Text()));
       }
 
       return doc;
@@ -994,22 +997,46 @@ public class FTSearchManager {
             return;
          }
 
-         final String[] queryFields = {
+         final ArrayList<String> queryFields = new ArrayList<>();
 
-               SEARCH_FIELD_TITLE,
-               SEARCH_FIELD_DESCRIPTION,
-               SEARCH_FIELD_LOCATION_START,
-               SEARCH_FIELD_LOCATION_END,
-               SEARCH_FIELD_WEATHER,
+         if (_isSearch_All) {
 
-         };
+            queryFields.add(SEARCH_FIELD_TITLE);
+            queryFields.add(SEARCH_FIELD_DESCRIPTION);
+            queryFields.add(SEARCH_FIELD_TOUR_LOCATION_START);
+            queryFields.add(SEARCH_FIELD_TOUR_LOCATION_END);
+            queryFields.add(SEARCH_FIELD_TOUR_WEATHER);
 
-         final int maxPassages[] = new int[queryFields.length];
+         } else {
+
+            if (_isSearch_Tour
+                  || _isSearch_Marker
+                  || _isSearch_Waypoint) {
+
+               queryFields.add(SEARCH_FIELD_TITLE);
+               queryFields.add(SEARCH_FIELD_DESCRIPTION);
+            }
+
+            if (_isSearch_Tour_LocationStart) {
+               queryFields.add(SEARCH_FIELD_TOUR_LOCATION_START);
+            }
+            if (_isSearch_Tour_LocationEnd) {
+               queryFields.add(SEARCH_FIELD_TOUR_LOCATION_END);
+            }
+            if (_isSearch_Tour_Weather) {
+               queryFields.add(SEARCH_FIELD_TOUR_WEATHER);
+            }
+         }
+
+         final int numQueryFields = queryFields.size();
+         final String[] queryFieldsAsArray = queryFields.toArray(new String[numQueryFields]);
+         final int maxPassages[] = new int[numQueryFields];
+
          Arrays.fill(maxPassages, 1);
 
          final Analyzer analyzer = getAnalyzer();
 
-         final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
+         final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFieldsAsArray, analyzer);
          queryParser.setAllowLeadingWildcard(true);
 
          final Query textQuery = queryParser.parse(searchText);
@@ -1024,7 +1051,7 @@ public class FTSearchManager {
             final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
             final Sort sort = new Sort(sortByTime);
 
-            if (_isShowContentAll) {
+            if (_isSearch_All) {
 
                // no filtering
                _topDocs = _indexSearcher.search(textQuery, maxDoc, sort);
@@ -1033,45 +1060,7 @@ public class FTSearchManager {
 
                // filter by content
 
-               /*
-                * Query text/marker/waypoint with OR
-                */
-               final Builder orQueryBuilder = new BooleanQuery.Builder();
-
-               if (_isShowContentTour) {
-
-                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
-
-                  orQueryBuilder.add(query, Occur.SHOULD);
-               }
-
-               if (_isShowContentMarker) {
-
-                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
-
-                  orQueryBuilder.add(query, Occur.SHOULD);
-               }
-
-               if (_isShowContentWaypoint) {
-
-                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
-
-                  orQueryBuilder.add(query, Occur.SHOULD);
-               }
-
-               final BooleanQuery orQuery = orQueryBuilder.build();
-
-               final Builder andQueryBuilder = new BooleanQuery.Builder()
-
-                     // add search text
-                     .add(textQuery, Occur.MUST)
-
-                     // add tour text/marker/waypoint
-                     .add(orQuery, Occur.MUST)
-
-               ;
-
-               final BooleanQuery andQuery = andQueryBuilder.build();
+               final BooleanQuery andQuery = search_FilterByContent(textQuery);
 
                _topDocs = _indexSearcher.search(andQuery, maxDoc, sort);
             }
@@ -1108,7 +1097,7 @@ public class FTSearchManager {
          final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, getAnalyzer());
 
          final Map<String, String[]> highlights = highlighter.highlightFields(
-               queryFields,
+               queryFieldsAsArray,
                textQuery,
                docids,
                maxPassages);
@@ -1193,15 +1182,15 @@ public class FTSearchManager {
                resultItem.title = snippet;
                break;
 
-            case SEARCH_FIELD_LOCATION_START:
+            case SEARCH_FIELD_TOUR_LOCATION_START:
                resultItem.locationStart = snippet;
                break;
 
-            case SEARCH_FIELD_LOCATION_END:
+            case SEARCH_FIELD_TOUR_LOCATION_END:
                resultItem.locationEnd = snippet;
                break;
 
-            case SEARCH_FIELD_WEATHER:
+            case SEARCH_FIELD_TOUR_WEATHER:
                resultItem.weather = snippet;
                break;
             }
@@ -1248,6 +1237,54 @@ public class FTSearchManager {
       }
    }
 
+   /**
+    * Query text/marker/waypoint with OR
+    */
+   private static BooleanQuery search_FilterByContent(final Query textQuery) {
+
+      final Builder orQueryBuilder = new BooleanQuery.Builder();
+
+      if (_isSearch_Tour
+            || _isSearch_Tour_LocationStart
+            || _isSearch_Tour_LocationEnd
+            || _isSearch_Tour_Weather) {
+
+         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
+
+         orQueryBuilder.add(query, Occur.SHOULD);
+      }
+
+      if (_isSearch_Marker) {
+
+         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
+
+         orQueryBuilder.add(query, Occur.SHOULD);
+      }
+
+      if (_isSearch_Waypoint) {
+
+         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
+
+         orQueryBuilder.add(query, Occur.SHOULD);
+      }
+
+      final BooleanQuery orQuery = orQueryBuilder.build();
+
+      final Builder andQueryBuilder = new BooleanQuery.Builder()
+
+            // add search text
+            .add(textQuery, Occur.MUST)
+
+            // add tour text/marker/waypoint
+            .add(orQuery, Occur.MUST)
+
+      ;
+
+      final BooleanQuery andQuery = andQueryBuilder.build();
+
+      return andQuery;
+   }
+
    public static SearchResult searchByPosition(final String searchText, final int searchPosFrom, final int searchPosTo) {
 
       final SearchResult searchResult = new SearchResult();
@@ -1257,16 +1294,22 @@ public class FTSearchManager {
       return searchResult;
    }
 
-   static void setSearchOptions(final boolean isShowContentAll,
-                                final boolean isShowContentMarker,
-                                final boolean isShowContentTour,
-                                final boolean isShowContentWaypoint,
+   static void setSearchOptions(final boolean isSearch_All,
+                                final boolean isSearch_Marker,
+                                final boolean isSearch_Tour,
+                                final boolean isSearch_Tour_LocationStart,
+                                final boolean isSearch_Tour_LocationEnd,
+                                final boolean isSearch_Tour_Weather,
+                                final boolean isSearch_Waypoint,
                                 final boolean isSortDateAscending) {
 
-      _isShowContentAll = isShowContentAll;
-      _isShowContentMarker = isShowContentMarker;
-      _isShowContentTour = isShowContentTour;
-      _isShowContentWaypoint = isShowContentWaypoint;
+      _isSearch_All = isSearch_All;
+      _isSearch_Marker = isSearch_Marker;
+      _isSearch_Tour = isSearch_Tour;
+      _isSearch_Tour_LocationStart = isSearch_Tour_LocationStart;
+      _isSearch_Tour_LocationEnd = isSearch_Tour_LocationEnd;
+      _isSearch_Tour_Weather = isSearch_Tour_Weather;
+      _isSearch_Waypoint = isSearch_Waypoint;
 
       _isSortDateAscending = isSortDateAscending;
    }

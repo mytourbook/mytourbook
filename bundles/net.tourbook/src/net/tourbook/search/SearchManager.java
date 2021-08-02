@@ -69,45 +69,51 @@ import org.json.JSONObject;
  */
 public class SearchManager implements XHRHandler {
 
-   private static final String          SEARCH_APP_ACTION_EDIT_MARKER          = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
-   private static final String          SEARCH_APP_ACTION_EDIT_TOUR            = tourbook.search.nls.Messages.Search_App_Action_EditTour;
+   private static final String          SEARCH_APP_ACTION_EDIT_MARKER               = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
+   private static final String          SEARCH_APP_ACTION_EDIT_TOUR                 = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
-   private final static IDialogSettings _state                                 = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
+   private final static IDialogSettings _state                                      = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
 
-   private static final String          JSON_STATE_SEARCH_TEXT                 = "searchText";                                             //$NON-NLS-1$
+   private static final String          JSON_STATE_SEARCH_TEXT                      = "searchText";                                             //$NON-NLS-1$
 
-   private static final String          STATE_CURRENT_SEARCH_TEXT              = "STATE_CURRENT_SEARCH_TEXT";                              //$NON-NLS-1$
+   private static final String          STATE_CURRENT_SEARCH_TEXT                   = "STATE_CURRENT_SEARCH_TEXT";                              //$NON-NLS-1$
 
-   static final String                  STATE_IS_EASE_SEARCHING                = "STATE_IS_EASE_SEARCHING";                                //$NON-NLS-1$
-   static final boolean                 STATE_IS_EASE_SEARCHING_DEFAULT        = true;
+   static final String                  STATE_IS_EASE_SEARCHING                     = "STATE_IS_EASE_SEARCHING";                                //$NON-NLS-1$
+   static final boolean                 STATE_IS_EASE_SEARCHING_DEFAULT             = true;
 
-   static final String                  STATE_IS_SHOW_CONTENT_ALL              = "STATE_IS_SHOW_CONTENT_ALL";                              //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_CONTENT_ALL_DEFAULT      = true;
-   static final String                  STATE_IS_SHOW_CONTENT_MARKER           = "STATE_IS_SHOW_CONTENT_MARKER";                           //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_CONTENT_MARKER_DEFAULT   = true;
-   static final String                  STATE_IS_SHOW_CONTENT_TOUR             = "STATE_IS_SHOW_CONTENT_TOUR";                             //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_CONTENT_TOUR_DEFAULT     = true;
-   static final String                  STATE_IS_SHOW_CONTENT_WAYPOINT         = "STATE_IS_SHOW_CONTENT_WAYPOINT";                         //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT = true;
+   static final String                  STATE_IS_SEARCH_ALL                         = "STATE_IS_SEARCH_ALL";                                    //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_ALL_DEFAULT                 = true;
+   static final String                  STATE_IS_SEARCH_MARKER                      = "STATE_IS_SEARCH_MARKER";                                 //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_MARKER_DEFAULT              = true;
+   static final String                  STATE_IS_SEARCH_TOUR                        = "STATE_IS_SEARCH_TOUR";                                   //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_TOUR_DEFAULT                = true;
+   static final String                  STATE_IS_SEARCH_TOUR_LOCATION_START         = "STATE_IS_SEARCH_TOUR_LOCATION_START";                    //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_TOUR_LOCATION_START_DEFAULT = true;
+   static final String                  STATE_IS_SEARCH_TOUR_LOCATION_END           = "STATE_IS_SEARCH_TOUR_LOCATION_END";                      //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_TOUR_LOCATION_END_DEFAULT   = true;
+   static final String                  STATE_IS_SEARCH_TOUR_WEATHER                = "STATE_IS_SEARCH_TOUR_WEATHER";                           //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_TOUR_WEATHER_DEFAULT        = true;
+   static final String                  STATE_IS_SEARCH_WAYPOINT                    = "STATE_IS_SEARCH_WAYPOINT";                               //$NON-NLS-1$
+   static final boolean                 STATE_IS_SEARCH_WAYPOINT_DEFAULT            = true;
    //
-   static final String                  STATE_IS_SHOW_DATE                     = "STATE_IS_SHOW_DATE";                                     //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_DATE_DEFAULT             = false;
-   static final String                  STATE_IS_SHOW_TIME                     = "STATE_IS_SHOW_TIME";                                     //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_TIME_DEFAULT             = false;
-   static final String                  STATE_IS_SHOW_DESCRIPTION              = "STATE_IS_SHOW_DESCRIPTION";                              //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_DESCRIPTION_DEFAULT      = true;
-   static final String                  STATE_IS_SHOW_ITEM_NUMBER              = "STATE_IS_SHOW_ITEM_NUMBER";                              //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_ITEM_NUMBER_DEFAULT      = false;
-   static final String                  STATE_IS_SHOW_LUCENE_DOC_ID            = "STATE_IS_SHOW_LUCENE_DOC_ID";                            //$NON-NLS-1$
-   static final boolean                 STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT    = false;
+   static final String                  STATE_IS_SHOW_DATE                          = "STATE_IS_SHOW_DATE";                                     //$NON-NLS-1$
+   static final boolean                 STATE_IS_SHOW_DATE_DEFAULT                  = false;
+   static final String                  STATE_IS_SHOW_TIME                          = "STATE_IS_SHOW_TIME";                                     //$NON-NLS-1$
+   static final boolean                 STATE_IS_SHOW_TIME_DEFAULT                  = false;
+   static final String                  STATE_IS_SHOW_DESCRIPTION                   = "STATE_IS_SHOW_DESCRIPTION";                              //$NON-NLS-1$
+   static final boolean                 STATE_IS_SHOW_DESCRIPTION_DEFAULT           = true;
+   static final String                  STATE_IS_SHOW_ITEM_NUMBER                   = "STATE_IS_SHOW_ITEM_NUMBER";                              //$NON-NLS-1$
+   static final boolean                 STATE_IS_SHOW_ITEM_NUMBER_DEFAULT           = false;
+   static final String                  STATE_IS_SHOW_LUCENE_DOC_ID                 = "STATE_IS_SHOW_LUCENE_DOC_ID";                            //$NON-NLS-1$
+   static final boolean                 STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT         = false;
    //
-   static final String                  STATE_IS_SORT_DATE_ASCENDING           = "STATE_IS_SORT_DATE_ASCENDING";                           //$NON-NLS-1$
-   static final boolean                 STATE_IS_SORT_DATE_ASCENDING_DEFAULT   = false;
+   static final String                  STATE_IS_SORT_DATE_ASCENDING                = "STATE_IS_SORT_DATE_ASCENDING";                           //$NON-NLS-1$
+   static final boolean                 STATE_IS_SORT_DATE_ASCENDING_DEFAULT        = false;
 
-   private static final String          REQUEST_HEADER_RANGE                   = "Range";                                                  //$NON-NLS-1$
+   private static final String          REQUEST_HEADER_RANGE                        = "Range";                                                  //$NON-NLS-1$
 
-   private static final String          CONTENT_RANGE_ITEMS                    = "items %d-%d/%d";                                         //$NON-NLS-1$
-   private static final String          CONTENT_RANGE_ZERO                     = "0-0/0";                                                  //$NON-NLS-1$
+   private static final String          CONTENT_RANGE_ITEMS                         = "items %d-%d/%d";                                         //$NON-NLS-1$
+   private static final String          CONTENT_RANGE_ZERO                          = "0-0/0";                                                  //$NON-NLS-1$
 
    /*
     * This will handle all xhr actions, they are also defined in SearchMgr.js
@@ -141,24 +147,26 @@ public class SearchManager implements XHRHandler {
    private static final String JSON_ITEM_ID_TOUR_ID           = "itemId_TourId";      //$NON-NLS-1$
    private static final String JSON_ITEM_ID_MARKER_ID         = "itemId_MarkerId";    //$NON-NLS-1$
    //
-   //
    // search options
-   private static final String JSON_IS_SEARCH_OPTIONS_DEFAULT = "isSearchOptionsDefault"; //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_OPTIONS_DEFAULT     = "isSearchOptionsDefault";      //$NON-NLS-1$
    //
-   private static final String JSON_IS_EASE_SEARCHING         = "isEaseSearching";        //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_CONTENT_ALL       = "isShowContentAll";       //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_CONTENT_MARKER    = "isShowContentMarker";    //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_CONTENT_TOUR      = "isShowContentTour";      //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_CONTENT_WAYPOINT  = "isShowContentWaypoint";  //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_DATE              = "isShowDate";             //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_TIME              = "isShowTime";             //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_DESCRIPTION       = "isShowDescription";      //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_ITEM_NUMBER       = "isShowItemNumber";       //$NON-NLS-1$
-   private static final String JSON_IS_SHOW_LUCENE_ID         = "isShowLuceneID";         //$NON-NLS-1$
-   private static final String JSON_IS_SORT_BY_DATE_ASCENDING = "isSortByDateAscending";  //$NON-NLS-1$
+   private static final String JSON_IS_EASE_SEARCHING             = "isEaseSearching";             //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_ALL                 = "isSearch_All";                //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_MARKER              = "isSearch_Marker";             //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_WAYPOINT            = "isSearch_Waypoint";           //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_TOUR                = "isSearch_Tour";               //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_TOUR_LOCATION_START = "isSearch_Tour_LocationStart"; //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_TOUR_LOCATION_END   = "isSearch_Tour_LocationEnd";   //$NON-NLS-1$
+   private static final String JSON_IS_SEARCH_TOUR_WEATHER        = "isSearch_Tour_Weather";       //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_DATE                  = "isShowDate";                  //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_TIME                  = "isShowTime";                  //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_DESCRIPTION           = "isShowDescription";           //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_ITEM_NUMBER           = "isShowItemNumber";            //$NON-NLS-1$
+   private static final String JSON_IS_SHOW_LUCENE_ID             = "isShowLuceneID";              //$NON-NLS-1$
+   private static final String JSON_IS_SORT_BY_DATE_ASCENDING     = "isSortByDateAscending";       //$NON-NLS-1$
    //
-   private static final String SEARCH_FOLDER                  = "/tourbook/search/";      //$NON-NLS-1$
-   private static final String SEARCH_PAGE                    = "search.mthtml";          //$NON-NLS-1$
+   private static final String SEARCH_FOLDER                      = "/tourbook/search/";           //$NON-NLS-1$
+   private static final String SEARCH_PAGE                        = "search.mthtml";               //$NON-NLS-1$
    //
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
@@ -172,36 +180,39 @@ public class SearchManager implements XHRHandler {
    private static String       _iconUrl_WayPoint;
    //
    private static boolean      _isUI_EaseSearching;
-   private static boolean      _isUI_ShowContentAll;
-   private static boolean      _isUI_ShowContentMarker;
-   private static boolean      _isUI_ShowContentTour;
-   private static boolean      _isUI_ShowContentWaypoint;
-   private static boolean      _isUI_ShowDate;
-   private static boolean      _isUI_ShowTime;
-   private static boolean      _isUI_ShowDescription;
-   private static boolean      _isUI_ShowItemNumber;
-   private static boolean      _isUI_ShowLuceneDocId;
-   private static boolean      _isUI_SortDateAscending;
+   private static boolean      _isUI_Search_All;
+   private static boolean      _isUI_Search_Marker;
+   private static boolean      _isUI_Search_Tour;
+   private static boolean      _isUI_Search_Tour_LocationStart;
+   private static boolean      _isUI_Search_Tour_LocationEnd;
+   private static boolean      _isUI_Search_Tour_Weather;
+   private static boolean      _isUI_Search_Waypoint;
+   private static boolean      _isUI_Show_Date;
+   private static boolean      _isUI_Show_Time;
+   private static boolean      _isUI_Show_Description;
+   private static boolean      _isUI_Show_ItemNumber;
+   private static boolean      _isUI_Show_LuceneDocId;
+   private static boolean      _isUI_Sort_DateAscending;
    //
-   static final String         TAG_TD                         = "<td>";                   //$NON-NLS-1$
-   static final String         TAG_TD_END                     = "</td>";                  //$NON-NLS-1$
-   static final String         CSS_ITEM_CONTAINER             = "item-container";         //$NON-NLS-1$
+   static final String         TAG_TD                             = "<td>";                        //$NON-NLS-1$
+   static final String         TAG_TD_END                         = "</td>";                       //$NON-NLS-1$
+   static final String         CSS_ITEM_CONTAINER                 = "item-container";              //$NON-NLS-1$
 
-   static final String         PAGE_ABOUT_BLANK               = "about:blank";            //$NON-NLS-1$
+   static final String         PAGE_ABOUT_BLANK                   = "about:blank";                 //$NON-NLS-1$
 
-   static final String         HREF_TOKEN                     = "&";                      //$NON-NLS-1$
-   static final String         HREF_VALUE_SEP                 = "=";                      //$NON-NLS-1$
+   static final String         HREF_TOKEN                         = "&";                           //$NON-NLS-1$
+   static final String         HREF_VALUE_SEP                     = "=";                           //$NON-NLS-1$
 
-   static final String         PARAM_ACTION                   = "action";                 //$NON-NLS-1$
-   static final String         PARAM_DOC_ID                   = "docId";                  //$NON-NLS-1$
-   static final String         PARAM_MARKER_ID                = "markerId";               //$NON-NLS-1$
-   static final String         PARAM_TOUR_ID                  = "tourId";                 //$NON-NLS-1$
+   static final String         PARAM_ACTION                       = "action";                      //$NON-NLS-1$
+   static final String         PARAM_DOC_ID                       = "docId";                       //$NON-NLS-1$
+   static final String         PARAM_MARKER_ID                    = "markerId";                    //$NON-NLS-1$
+   static final String         PARAM_TOUR_ID                      = "tourId";                      //$NON-NLS-1$
 
-   static final String         ACTION_EDIT_MARKER             = "EditMarker";             //$NON-NLS-1$
-   static final String         ACTION_EDIT_TOUR               = "EditTour";               //$NON-NLS-1$
-   static final String         ACTION_SELECT_TOUR             = "SelectTour";             //$NON-NLS-1$
-   static final String         ACTION_SELECT_MARKER           = "SelectMarker";           //$NON-NLS-1$
-   static final String         ACTION_SELECT_WAY_POINT        = "SelectWayPoint";         //$NON-NLS-1$
+   static final String         ACTION_EDIT_MARKER                 = "EditMarker";                  //$NON-NLS-1$
+   static final String         ACTION_EDIT_TOUR                   = "EditTour";                    //$NON-NLS-1$
+   static final String         ACTION_SELECT_TOUR                 = "SelectTour";                  //$NON-NLS-1$
+   static final String         ACTION_SELECT_MARKER               = "SelectMarker";                //$NON-NLS-1$
+   static final String         ACTION_SELECT_WAY_POINT            = "SelectWayPoint";              //$NON-NLS-1$
 
    static final String         HREF_ACTION_EDIT_MARKER;
    static final String         HREF_ACTION_EDIT_TOUR;
@@ -597,19 +608,22 @@ public class SearchManager implements XHRHandler {
 
 // SET_FORMATTING_OFF
 
-      _state.put(STATE_IS_EASE_SEARCHING,          STATE_IS_EASE_SEARCHING_DEFAULT);
+      _state.put(STATE_IS_EASE_SEARCHING,             STATE_IS_EASE_SEARCHING_DEFAULT);
 
-      _state.put(STATE_IS_SHOW_CONTENT_ALL,        STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
-      _state.put(STATE_IS_SHOW_CONTENT_MARKER,     STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
-      _state.put(STATE_IS_SHOW_CONTENT_TOUR,       STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
-      _state.put(STATE_IS_SHOW_CONTENT_WAYPOINT,   STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+      _state.put(STATE_IS_SEARCH_ALL,                 STATE_IS_SEARCH_ALL_DEFAULT);
+      _state.put(STATE_IS_SEARCH_MARKER,              STATE_IS_SEARCH_MARKER_DEFAULT);
+      _state.put(STATE_IS_SEARCH_TOUR,                STATE_IS_SEARCH_TOUR_DEFAULT);
+      _state.put(STATE_IS_SEARCH_TOUR_LOCATION_START, STATE_IS_SEARCH_TOUR_LOCATION_START_DEFAULT);
+      _state.put(STATE_IS_SEARCH_TOUR_LOCATION_END,   STATE_IS_SEARCH_TOUR_LOCATION_END_DEFAULT);
+      _state.put(STATE_IS_SEARCH_TOUR_WEATHER,        STATE_IS_SEARCH_TOUR_WEATHER_DEFAULT);
+      _state.put(STATE_IS_SEARCH_WAYPOINT,            STATE_IS_SEARCH_WAYPOINT_DEFAULT);
 
-      _state.put(STATE_IS_SHOW_DATE,               STATE_IS_SHOW_DATE_DEFAULT);
-      _state.put(STATE_IS_SHOW_TIME,               STATE_IS_SHOW_TIME_DEFAULT);
-      _state.put(STATE_IS_SHOW_ITEM_NUMBER,        STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-      _state.put(STATE_IS_SHOW_LUCENE_DOC_ID,      STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+      _state.put(STATE_IS_SHOW_DATE,                  STATE_IS_SHOW_DATE_DEFAULT);
+      _state.put(STATE_IS_SHOW_TIME,                  STATE_IS_SHOW_TIME_DEFAULT);
+      _state.put(STATE_IS_SHOW_ITEM_NUMBER,           STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+      _state.put(STATE_IS_SHOW_LUCENE_DOC_ID,         STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
-      _state.put(STATE_IS_SORT_DATE_ASCENDING,     STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+      _state.put(STATE_IS_SORT_DATE_ASCENDING,        STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
 // SET_FORMATTING_ON
    }
@@ -635,28 +649,35 @@ public class SearchManager implements XHRHandler {
 
 // SET_FORMATTING_OFF
 
-      _isUI_EaseSearching        = Util.getStateBoolean(_state, STATE_IS_EASE_SEARCHING,        STATE_IS_EASE_SEARCHING_DEFAULT);
-      _isUI_ShowContentAll       = Util.getStateBoolean(_state, STATE_IS_SHOW_CONTENT_ALL,      STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
-      _isUI_ShowContentMarker    = Util.getStateBoolean(_state, STATE_IS_SHOW_CONTENT_MARKER,   STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
-      _isUI_ShowContentTour      = Util.getStateBoolean(_state, STATE_IS_SHOW_CONTENT_TOUR,     STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
-      _isUI_ShowContentWaypoint  = Util.getStateBoolean(_state, STATE_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
-      _isUI_ShowDate             = Util.getStateBoolean(_state, STATE_IS_SHOW_DATE,             STATE_IS_SHOW_DATE_DEFAULT);
-      _isUI_ShowTime             = Util.getStateBoolean(_state, STATE_IS_SHOW_TIME,             STATE_IS_SHOW_TIME_DEFAULT);
-      _isUI_ShowDescription      = Util.getStateBoolean(_state, STATE_IS_SHOW_DESCRIPTION,      STATE_IS_SHOW_DESCRIPTION_DEFAULT);
-      _isUI_ShowLuceneDocId      = Util.getStateBoolean(_state, STATE_IS_SHOW_LUCENE_DOC_ID,    STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-      _isUI_ShowItemNumber       = Util.getStateBoolean(_state, STATE_IS_SHOW_ITEM_NUMBER,      STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-      _isUI_SortDateAscending    = Util.getStateBoolean(_state, STATE_IS_SORT_DATE_ASCENDING,   STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+      _isUI_EaseSearching              = Util.getStateBoolean(_state, STATE_IS_EASE_SEARCHING,              STATE_IS_EASE_SEARCHING_DEFAULT);
+      _isUI_Search_All                 = Util.getStateBoolean(_state, STATE_IS_SEARCH_ALL,                  STATE_IS_SEARCH_ALL_DEFAULT);
+      _isUI_Search_Marker              = Util.getStateBoolean(_state, STATE_IS_SEARCH_MARKER,               STATE_IS_SEARCH_MARKER_DEFAULT);
+      _isUI_Search_Tour                = Util.getStateBoolean(_state, STATE_IS_SEARCH_TOUR,                 STATE_IS_SEARCH_TOUR_DEFAULT);
+      _isUI_Search_Tour_LocationStart  = Util.getStateBoolean(_state, STATE_IS_SEARCH_TOUR_LOCATION_START,  STATE_IS_SEARCH_TOUR_LOCATION_START_DEFAULT);
+      _isUI_Search_Tour_LocationEnd    = Util.getStateBoolean(_state, STATE_IS_SEARCH_TOUR_LOCATION_END,    STATE_IS_SEARCH_TOUR_LOCATION_END_DEFAULT);
+      _isUI_Search_Tour_Weather        = Util.getStateBoolean(_state, STATE_IS_SEARCH_TOUR_WEATHER,         STATE_IS_SEARCH_TOUR_WEATHER_DEFAULT);
+      _isUI_Search_Waypoint            = Util.getStateBoolean(_state, STATE_IS_SEARCH_WAYPOINT,             STATE_IS_SEARCH_WAYPOINT_DEFAULT);
+
+      _isUI_Show_Date                  = Util.getStateBoolean(_state, STATE_IS_SHOW_DATE,                   STATE_IS_SHOW_DATE_DEFAULT);
+      _isUI_Show_Time                  = Util.getStateBoolean(_state, STATE_IS_SHOW_TIME,                   STATE_IS_SHOW_TIME_DEFAULT);
+      _isUI_Show_Description           = Util.getStateBoolean(_state, STATE_IS_SHOW_DESCRIPTION,            STATE_IS_SHOW_DESCRIPTION_DEFAULT);
+      _isUI_Show_LuceneDocId           = Util.getStateBoolean(_state, STATE_IS_SHOW_LUCENE_DOC_ID,          STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+      _isUI_Show_ItemNumber            = Util.getStateBoolean(_state, STATE_IS_SHOW_ITEM_NUMBER,            STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+      _isUI_Sort_DateAscending         = Util.getStateBoolean(_state, STATE_IS_SORT_DATE_ASCENDING,         STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
 // SET_FORMATTING_ON
 
       // set sorting in the search manager
       FTSearchManager.setSearchOptions(
 
-            _isUI_ShowContentAll,
-            _isUI_ShowContentMarker,
-            _isUI_ShowContentTour,
-            _isUI_ShowContentWaypoint,
-            _isUI_SortDateAscending);
+            _isUI_Search_All,
+            _isUI_Search_Marker,
+            _isUI_Search_Tour,
+            _isUI_Search_Tour_LocationStart,
+            _isUI_Search_Tour_LocationEnd,
+            _isUI_Search_Tour_Weather,
+            _isUI_Search_Waypoint,
+            _isUI_Sort_DateAscending);
    }
 
    /**
@@ -774,7 +795,7 @@ public class SearchManager implements XHRHandler {
       }
 
       String description = resultItem.description;
-      final boolean isDescription = _isUI_ShowDescription && description != null;
+      final boolean isDescription = _isUI_Show_Description && description != null;
       if (UI.IS_SCRAMBLE_DATA) {
          description = UI.scrambleText(description);
       }
@@ -819,12 +840,12 @@ public class SearchManager implements XHRHandler {
             }
 
             // info
-            if (_isUI_ShowDate || _isUI_ShowTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
+            if (_isUI_Show_Date || _isUI_Show_Time || _isUI_Show_ItemNumber || _isUI_Show_LuceneDocId) {
 
                sb.append("<div class='item-info'>"); //$NON-NLS-1$
                sb.append("<table><tbody><tr>"); //$NON-NLS-1$
                {
-                  if (_isUI_ShowDate || _isUI_ShowTime) {
+                  if (_isUI_Show_Date || _isUI_Show_Time) {
 
                      final long tourStartTime = resultItem.tourStartTime;
                      if (tourStartTime != 0) {
@@ -833,15 +854,15 @@ public class SearchManager implements XHRHandler {
 
                         String dateTimeText = null;
 
-                        if (_isUI_ShowDate && _isUI_ShowTime) {
+                        if (_isUI_Show_Date && _isUI_Show_Time) {
 
                            dateTimeText = dt.format(TimeTools.Formatter_DateTime_MS);
 
-                        } else if (_isUI_ShowDate) {
+                        } else if (_isUI_Show_Date) {
 
                            dateTimeText = dt.format(TimeTools.Formatter_Date_M);
 
-                        } else if (_isUI_ShowTime) {
+                        } else if (_isUI_Show_Time) {
 
                            dateTimeText = dt.format(TimeTools.Formatter_Time_S);
                         }
@@ -850,14 +871,14 @@ public class SearchManager implements XHRHandler {
                      }
                   }
 
-                  if (_isUI_ShowItemNumber) {
+                  if (_isUI_Show_ItemNumber) {
                      sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
 // for debugging
 //                     sb.append(TAG_TD + tourId + TAG_TD_END);
 //                     sb.append(TAG_TD + markerId + TAG_TD_END);
                   }
 
-                  if (_isUI_ShowLuceneDocId) {
+                  if (_isUI_Show_LuceneDocId) {
                      sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END); //$NON-NLS-1$
                   }
                }
@@ -904,7 +925,7 @@ public class SearchManager implements XHRHandler {
             + url
             + " title='" + hoverMessage + "'" //                                 //$NON-NLS-1$ //$NON-NLS-2$
             + ">" //                                                             //$NON-NLS-1$
-            + "</a>"; //$NON-NLS-1$
+            + "</a>"; //                                                         //$NON-NLS-1$
    }
 
    private String getContentRange(final SearchResult searchResult, final int searchPosFrom, final int allItemSize) {
@@ -1002,20 +1023,27 @@ public class SearchManager implements XHRHandler {
 
       final JSONObject responceObj = new JSONObject();
 
-      responceObj.put(JSON_IS_EASE_SEARCHING, _isUI_EaseSearching);
+// SET_FORMATTING_OFF
 
-      responceObj.put(JSON_IS_SHOW_CONTENT_ALL, _isUI_ShowContentAll);
-      responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, _isUI_ShowContentMarker);
-      responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
-      responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, _isUI_ShowContentWaypoint);
+      responceObj.put(JSON_IS_EASE_SEARCHING,               _isUI_EaseSearching);
 
-      responceObj.put(JSON_IS_SHOW_DATE, _isUI_ShowDate);
-      responceObj.put(JSON_IS_SHOW_TIME, _isUI_ShowTime);
-      responceObj.put(JSON_IS_SHOW_DESCRIPTION, _isUI_ShowDescription);
-      responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
-      responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
+      responceObj.put(JSON_IS_SEARCH_ALL,                   _isUI_Search_All);
+      responceObj.put(JSON_IS_SEARCH_TOUR,                  _isUI_Search_Tour);
+      responceObj.put(JSON_IS_SEARCH_TOUR_LOCATION_START,   _isUI_Search_Tour_LocationStart);
+      responceObj.put(JSON_IS_SEARCH_TOUR_LOCATION_END,     _isUI_Search_Tour_LocationEnd);
+      responceObj.put(JSON_IS_SEARCH_TOUR_WEATHER,          _isUI_Search_Tour_Weather);
+      responceObj.put(JSON_IS_SEARCH_MARKER,                _isUI_Search_Marker);
+      responceObj.put(JSON_IS_SEARCH_WAYPOINT,              _isUI_Search_Waypoint);
 
-      responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, _isUI_SortDateAscending);
+      responceObj.put(JSON_IS_SHOW_DATE,                    _isUI_Show_Date);
+      responceObj.put(JSON_IS_SHOW_TIME,                    _isUI_Show_Time);
+      responceObj.put(JSON_IS_SHOW_DESCRIPTION,             _isUI_Show_Description);
+      responceObj.put(JSON_IS_SHOW_ITEM_NUMBER,             _isUI_Show_ItemNumber);
+      responceObj.put(JSON_IS_SHOW_LUCENE_ID,               _isUI_Show_LuceneDocId);
+
+      responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING,       _isUI_Sort_DateAscending);
+
+// SET_FORMATTING_ON
 
       return responceObj.toString();
    }
@@ -1320,6 +1348,8 @@ public class SearchManager implements XHRHandler {
       final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
       final JSONObject jsonSearchOptions = WEB.parseJSONObject(xhrSearchOptions);
 
+// SET_FORMATTING_OFF
+
       if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
 
          // the action 'Restore Default' is selected in the web UI
@@ -1331,45 +1361,53 @@ public class SearchManager implements XHRHandler {
          responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
 
          // create xhr response with default values
-         responceObj.put(JSON_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
+         responceObj.put(JSON_IS_EASE_SEARCHING,               STATE_IS_EASE_SEARCHING_DEFAULT);
 
-         responceObj.put(JSON_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_ALL,                   STATE_IS_SEARCH_ALL_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_MARKER,                STATE_IS_SEARCH_MARKER_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_TOUR,                  STATE_IS_SEARCH_TOUR_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_TOUR_LOCATION_START,   STATE_IS_SEARCH_TOUR_LOCATION_START_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_TOUR_LOCATION_END,     STATE_IS_SEARCH_TOUR_LOCATION_END_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_TOUR_WEATHER,          STATE_IS_SEARCH_TOUR_WEATHER_DEFAULT);
+         responceObj.put(JSON_IS_SEARCH_WAYPOINT,              STATE_IS_SEARCH_WAYPOINT_DEFAULT);
 
-         responceObj.put(JSON_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_DESCRIPTION, STATE_IS_SHOW_DESCRIPTION_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-         responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_DATE,                    STATE_IS_SHOW_DATE_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_TIME,                    STATE_IS_SHOW_TIME_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_DESCRIPTION,             STATE_IS_SHOW_DESCRIPTION_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_ITEM_NUMBER,             STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+         responceObj.put(JSON_IS_SHOW_LUCENE_ID,               STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
-         responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+         responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING,       STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
       } else {
 
          // update state
 
-         _state.put(STATE_IS_EASE_SEARCHING, jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
+         _state.put(STATE_IS_EASE_SEARCHING,                jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
 
-         _state.put(STATE_IS_SHOW_CONTENT_ALL, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
-         _state.put(STATE_IS_SHOW_CONTENT_MARKER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
-         _state.put(STATE_IS_SHOW_CONTENT_TOUR, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
-         _state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
+         _state.put(STATE_IS_SEARCH_ALL,                    jsonSearchOptions.getBoolean(JSON_IS_SEARCH_ALL));
+         _state.put(STATE_IS_SEARCH_MARKER,                 jsonSearchOptions.getBoolean(JSON_IS_SEARCH_MARKER));
+         _state.put(STATE_IS_SEARCH_TOUR,                   jsonSearchOptions.getBoolean(JSON_IS_SEARCH_TOUR));
+         _state.put(STATE_IS_SEARCH_TOUR_LOCATION_START,    jsonSearchOptions.getBoolean(JSON_IS_SEARCH_TOUR_LOCATION_START));
+         _state.put(STATE_IS_SEARCH_TOUR_LOCATION_END,      jsonSearchOptions.getBoolean(JSON_IS_SEARCH_TOUR_LOCATION_END));
+         _state.put(STATE_IS_SEARCH_TOUR_WEATHER,           jsonSearchOptions.getBoolean(JSON_IS_SEARCH_TOUR_WEATHER));
+         _state.put(STATE_IS_SEARCH_WAYPOINT,               jsonSearchOptions.getBoolean(JSON_IS_SEARCH_WAYPOINT));
 
-         _state.put(STATE_IS_SHOW_DATE, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
-         _state.put(STATE_IS_SHOW_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
-         _state.put(STATE_IS_SHOW_DESCRIPTION, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
-         _state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
-         _state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
+         _state.put(STATE_IS_SHOW_DATE,                     jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
+         _state.put(STATE_IS_SHOW_TIME,                     jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
+         _state.put(STATE_IS_SHOW_DESCRIPTION,              jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
+         _state.put(STATE_IS_SHOW_ITEM_NUMBER,              jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
+         _state.put(STATE_IS_SHOW_LUCENE_DOC_ID,            jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
 
-         _state.put(STATE_IS_SORT_DATE_ASCENDING, jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
+         _state.put(STATE_IS_SORT_DATE_ASCENDING,           jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
 
          setInternalSearchOptions();
 
          // create xhr response
          responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
       }
+
+// SET_FORMATTING_ON
 
       return responceObj.toString();
    }

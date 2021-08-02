@@ -16,25 +16,25 @@ define(
 	'dojo/text!./DialogSearchOptions.html',
 	'dojo/i18n!./nls/Messages'
 
-], function(//
-//	
-declare, //
-lang, //
-dom, //
-on, //
-xhr, //
+], function(
+
+declare, 
+lang, 
+dom, 
+on, 
+xhr, 
 
 // these widgets MUST be preloaded when used in the template
-NumberSpinner, //
-RadioButton, //
+NumberSpinner, 
+RadioButton, 
 TitlePane,
 
-BaseDialog, //
-SearchMgr, //
+BaseDialog, 
+SearchMgr, 
 
-template, //
-Messages //
-//
+template, 
+Messages 
+
 ) {
 
 	var dlgSearchOptions = declare('tourbook.search.DialogSearchOptions',
@@ -47,31 +47,31 @@ Messages //
 		messages : Messages,
 
 		constructor : function(args) {
-			this._searchApp = args.searchApp;
+			this._searchApp = args.searchApp
 		},
 
 		postCreate : function() {
 
-			var dlg = this;
+			var dlg = this
 
-			this.inherited(arguments);
+			this.inherited(arguments)
 
 			// hide dialog when mouse has leaved it
-			on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"));
+			on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"))
 
 			/*
 			 * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work.
 			 */
-			this.apChk_EaseSearching_Tooltip.label = Messages.Search_Options_Checkbox_EaseSearching_Tooltip;
+			this.apChk_EaseSearching_Tooltip.label = Messages.Search_Options_Checkbox_EaseSearching_Tooltip
 
 			this.apChk_EaseSearching_Tooltip.onShow = function() {
-				dlg.openedTooltips++;
-//				console.log("onShow: " + dlg.openedTooltips);
+				dlg.openedTooltips++
+//				console.log("onShow: " + dlg.openedTooltips)
 			};
 
 			this.apChk_EaseSearching_Tooltip.onHide = function() {
-				dlg.openedTooltips--;
-//				console.log("onHide: " + dlg.openedTooltips);
+				dlg.openedTooltips--
+//				console.log("onHide: " + dlg.openedTooltips)
 			};
 		},
 
@@ -80,14 +80,14 @@ Messages //
 		 */
 		showDialog : function showDialog(args) {
 
-			this.inherited(arguments);
+			this.inherited(arguments)
 
-			this._restoreState();
+			this._restoreState()
 		},
 
 		apActionRestoreDefaults : function apActionRestoreDefaults() {
 
-			this._setSearchOptions(//
+			this._setSearchOptions(
 			{
 				isRestoreDefaults : true
 			});
@@ -98,10 +98,10 @@ Messages //
 		 */
 		apSearchAll : function apSearchAll() {
 
-			this._enableControls();
+			this._enableControls()
 
 			// fire selection
-			this.apSelection();
+			this.apSelection()
 		},
 
 		/**
@@ -111,72 +111,90 @@ Messages //
 
 			if (this._isValid()) {
 
-				var searchOptions = //
+				var searchOptions = 
 				{
-					isEaseSearching : this.apChkEaseSearching.get('checked'),
+					isEaseSearching 					: this.apChkEaseSearching.get('checked'),
 
-					isShowContentAll : this.apChkShowContentAll.get('checked'),
-					isShowContentTour : this.apChkShowContentTour.get('checked'),
-					isShowContentMarker : this.apChkShowContentMarker.get('checked'),
-					isShowContentWaypoint : this.apChkShowContentWaypoint.get('checked'),
+					isSearch_All 						: this.apChkSearch_All.get('checked'),
 
-					isSortByDateAscending : this.apSortByDateAscending.get('checked'),
+					isSearch_Tour 						: this.apChkSearch_Tour.get('checked'),
+					isSearch_Tour_LocationStart	: this.apChkSearch_Tour_LocationStart.get('checked'),
+					isSearch_Tour_LocationEnd 		: this.apChkSearch_Tour_LocationEnd.get('checked'),
+					isSearch_Tour_Weather 			: this.apChkSearch_Tour_Weather.get('checked'),
 
-					isShowDate : this.apChkShowDate.get('checked'),
-					isShowTime : this.apChkShowTime.get('checked'),
-					isShowDescription : this.apChkShowDescription.get('checked'),
-					isShowItemNumber : this.apChkShowItemNumber.get('checked'),
-					isShowLuceneID : this.apChkShowLuceneID.get('checked')
+					isSearch_Marker 					: this.apChkSearch_Marker.get('checked'),
+					isSearch_Waypoint 				: this.apChkSearch_Waypoint.get('checked'),
+					
+					isSortByDateAscending 			: this.apSortByDateAscending.get('checked'),
+					
+					isShowDate 							: this.apChkShowDate.get('checked'),
+					isShowTime 							: this.apChkShowTime.get('checked'),
+					isShowDescription 				: this.apChkShowDescription.get('checked'),
+					isShowItemNumber 					: this.apChkShowItemNumber.get('checked'),
+					isShowLuceneID 					: this.apChkShowLuceneID.get('checked')
 				};
-
-				this._setSearchOptions(searchOptions);
+				
+				this._setSearchOptions(searchOptions)
 			}
 		},
-
+		
 		_isValid : function _isValid() {
+			
+			var 
+			statusText 							= '', 
+			isValid 								= true, 
+			
+			isSearch_All 						= this.apChkSearch_All.get('checked'), 
 
-			var //
-			statusText = '', //
-			isValid = true, //
+			isSearch_Tour 						= this.apChkSearch_Tour.get('checked'), 
+			isSearch_Tour_LocationStart	= this.apChkSearch_Tour_LocationStart.get('checked'),
+			isSearch_Tour_LocationEnd 		= this.apChkSearch_Tour_LocationEnd.get('checked'),
+			isSearch_Tour_Weather 			= this.apChkSearch_Tour_Weather.get('checked')
 
-			isShowContentAll = this.apChkShowContentAll.get('checked'), //
-			isShowContentTour = this.apChkShowContentTour.get('checked'), //
-			isShowContentMarker = this.apChkShowContentMarker.get('checked'), //
-			isShowContentWaypoint = this.apChkShowContentWaypoint.get('checked');
-
-			if (isShowContentAll) {
-
+			isSearch_Marker 					= this.apChkSearch_Marker.get('checked'), 
+			isSearch_Waypoint 				= this.apChkSearch_Waypoint.get('checked')
+			
+			if (isSearch_All) {
+				
 				// content is valid
-
+				
 			} else {
-
+				
 				// at least one content must be checked
-
-				if (isShowContentTour == false //
-					&& isShowContentMarker == false //
-					&& isShowContentWaypoint == false) {
-
-					statusText = Messages.Search_Validation_SearchFilter;
-					isValid = false;
+				
+				if (isSearch_Tour == false 
+					&& isSearch_Tour_LocationStart == false
+					&& isSearch_Tour_LocationEnd == false
+					&& isSearch_Tour_Weather == false
+					&& isSearch_Marker == false 
+					&& isSearch_Waypoint == false
+					) {
+						
+						statusText = Messages.Search_Validation_SearchFilter
+						isValid = false
+					}
 				}
-			}
+				
+				// update status
+				dom.byId('domSearchStatus').innerHTML = statusText
+				
+				// resize dialog because status text has changed and can be too long 
+				this._dialog.resize();
+				
+				return isValid;
+			},
+			
+			_enableControls : function _enableControls() {
+				
+				var isSearch_All = this.apChkSearch_All.get('checked')
+				
+				this.apChkSearch_Tour					.set('disabled', isSearch_All)
+				this.apChkSearch_Tour_LocationStart	.set('disabled', isSearch_All)
+				this.apChkSearch_Tour_LocationEnd	.set('disabled', isSearch_All)
+				this.apChkSearch_Tour_Weather			.set('disabled', isSearch_All)
 
-			// update status
-			dom.byId('domSearchStatus').innerHTML = statusText;
-
-			// resize dialog because status text has changed and can be too long 
-			this._dialog.resize();
-
-			return isValid;
-		},
-
-		_enableControls : function _enableControls() {
-
-			var isShowContentAll = this.apChkShowContentAll.get('checked');
-
-			this.apChkShowContentTour.set('disabled', isShowContentAll);
-			this.apChkShowContentMarker.set('disabled', isShowContentAll);
-			this.apChkShowContentWaypoint.set('disabled', isShowContentAll);
+				this.apChkSearch_Marker					.set('disabled', isSearch_All)
+				this.apChkSearch_Waypoint				.set('disabled', isSearch_All)
 		},
 
 		/**
@@ -186,20 +204,20 @@ Messages //
 
 			var _this = this;
 
-			var xhrQuery = {};
-			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
+			var xhrQuery = {}
+			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS
 
 			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
-				handleAs : 'json',
-				preventCache : true,
-				timeout : SearchMgr.XHR_TIMEOUT,
+				handleAs 		: 'json',
+				preventCache 	: true,
+				timeout 			: SearchMgr.XHR_TIMEOUT,
 
-				query : xhrQuery
+				query 			: xhrQuery
 
 			}).then(function(xhrData) {
 
-				_this._updateUI_FromState(_this, xhrData);
+				_this._updateUI_FromState(_this, xhrData)
 			});
 		},
 
@@ -218,11 +236,11 @@ Messages //
 
 			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
-				handleAs : 'json',
-				preventCache : true,
-				timeout : SearchMgr.XHR_TIMEOUT,
+				handleAs 		: 'json',
+				preventCache 	: true,
+				timeout 			: SearchMgr.XHR_TIMEOUT,
 
-				query : xhrQuery
+				query 			: xhrQuery
 
 			}).then(function(xhrData) {
 
@@ -240,24 +258,29 @@ Messages //
 
 		_updateUI_FromState : function _updateUI_FromState(dialog, xhrData) {
 
-			dialog.apChkEaseSearching.set('checked', xhrData.isEaseSearching);
+			dialog.apChkEaseSearching					.set('checked', xhrData.isEaseSearching)
 
-			dialog.apChkShowContentAll.set('checked', xhrData.isShowContentAll);
-			dialog.apChkShowContentTour.set('checked', xhrData.isShowContentTour);
-			dialog.apChkShowContentMarker.set('checked', xhrData.isShowContentMarker);
-			dialog.apChkShowContentWaypoint.set('checked', xhrData.isShowContentWaypoint);
+			dialog.apChkSearch_All						.set('checked', xhrData.isSearch_All)
 
-			dialog.apSortByDateAscending.set('checked', xhrData.isSortByDateAscending);
-			dialog.apSortByDateDescending.set('checked', !xhrData.isSortByDateAscending);
+			dialog.apChkSearch_Tour						.set('checked', xhrData.isSearch_Tour)
+			dialog.apChkSearch_Tour_LocationStart	.set('checked', xhrData.isSearch_Tour_LocationStart)
+			dialog.apChkSearch_Tour_LocationEnd		.set('checked', xhrData.isSearch_Tour_LocationEnd)
+			dialog.apChkSearch_Tour_Weather			.set('checked', xhrData.isSearch_Tour_Weather)
 
-			dialog.apChkShowDate.set('checked', xhrData.isShowDate);
-			dialog.apChkShowTime.set('checked', xhrData.isShowTime);
-			dialog.apChkShowDescription.set('checked', xhrData.isShowDescription);
-			dialog.apChkShowItemNumber.set('checked', xhrData.isShowItemNumber);
-			dialog.apChkShowLuceneID.set('checked', xhrData.isShowLuceneID);
+			dialog.apChkSearch_Marker					.set('checked', xhrData.isSearch_Marker)
+			dialog.apChkSearch_Waypoint				.set('checked', xhrData.isSearch_Waypoint)
 
-			dialog._enableControls();
-			dialog._isValid();
+			dialog.apSortByDateAscending				.set('checked', xhrData.isSortByDateAscending)
+			dialog.apSortByDateDescending				.set('checked', !xhrData.isSortByDateAscending)
+
+			dialog.apChkShowDate							.set('checked', xhrData.isShowDate)
+			dialog.apChkShowTime							.set('checked', xhrData.isShowTime)
+			dialog.apChkShowDescription				.set('checked', xhrData.isShowDescription)
+			dialog.apChkShowItemNumber					.set('checked', xhrData.isShowItemNumber)
+			dialog.apChkShowLuceneID					.set('checked', xhrData.isShowLuceneID)
+
+			dialog._enableControls()
+			dialog._isValid()
 		}
 
 	});
