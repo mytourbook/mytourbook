@@ -11,7 +11,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'Výsledek testu nenalezen.',
 		Search_Options_Action_RestoreDefaults              : 'Obnovit výchozí',
 		Search_Options_Checkbox_EaseSearching              : 'Použít snadné vyhledávání',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* zástupný znak vyhledávání</b><br>' + 'Když vyberete <i>Použít snadné vyhledávání</i>, zástupný znak * je přidán k vyhledávanému textu, což se děje uvnitř a není to vidět.<br><br>' + '' + '<b>Rozšířené vyhledávání</b><br>' + 'Pro vyhledávání se syntaktickým analyzátorem dotazu Lucene, je potřeba odebrat <i>Použít snadné vyhledávání</ i>.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<div class="tooltip-container">' + '<b>* zástupný znak vyhledávání</b><br>' + 'Když vyberete <i>Použít snadné vyhledávání</i>, zástupný znak * je přidán k vyhledávanému textu, což se děje uvnitř a není to vidět.<br><br>' + '' + '<b>Rozšířené vyhledávání</b><br>' + 'Pro vyhledávání se syntaktickým analyzátorem dotazu Lucene, je potřeba odebrat <i>Použít snadné vyhledávání</ i>.' + '</div>',
 		Search_Options_Checkbox_ShowContentAll             : 'Všechno',
 		Search_Options_Checkbox_ShowContentMarker          : 'Značky',
 		Search_Options_Checkbox_ShowContentTour            : 'Trasy',

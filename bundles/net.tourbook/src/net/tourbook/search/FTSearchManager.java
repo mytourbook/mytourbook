@@ -35,14 +35,18 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.ui.UI;
+import net.tourbook.web.WEB;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
@@ -80,6 +84,8 @@ import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.apache.lucene.search.suggest.analyzing.FreeTextSuggester;
+import org.apache.lucene.search.uhighlight.DefaultPassageFormatter;
+import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
@@ -89,6 +95,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -110,6 +118,8 @@ public class FTSearchManager {
    private static final String             SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                   //$NON-NLS-1$
 
    private static final String             LOG_CREATE_INDEX                 = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
+
+   private static final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
    static final int                        DOC_SOURCE_TOUR                  = 1;
    static final int                        DOC_SOURCE_TOUR_MARKER           = 2;
@@ -133,10 +143,13 @@ public class FTSearchManager {
    private static boolean                  _isSearch_Tour_LocationEnd;
    private static boolean                  _isSearch_Tour_Weather;
    private static boolean                  _isSearch_Waypoint;
-   private static boolean                  _isSortDateAscending             = false;                          // -> sort descending
+   private static boolean                  _isShow_TitleDescription;
+   private static boolean                  _isSort_DateAscending            = false;                          // -> sort descending
 
    private static FieldType                fieldType_Int;
    private static FieldType                fieldType_Long;
+
+   private static String                   _cssHighlighterColor;
 
    static {
 
@@ -149,6 +162,12 @@ public class FTSearchManager {
       fieldType_Long.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
       fieldType_Long.setDocValuesType(DocValuesType.NUMERIC);
       fieldType_Long.freeze();
+
+      final String graphMarker_ColorDevice = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE;
+
+      _cssHighlighterColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDevice));
    }
 
    /**
@@ -1048,7 +1067,7 @@ public class FTSearchManager {
             /*
              * Set sorting
              */
-            final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
+            final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSort_DateAscending == false);
             final Sort sort = new Sort(sortByTime);
 
             if (_isSearch_All) {
@@ -1095,6 +1114,17 @@ public class FTSearchManager {
          // this can occure: field 'description' was indexed without offsets, cannot highlight
 
          final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, getAnalyzer());
+         final PassageFormatter formatter = new DefaultPassageFormatter(
+
+               // highlight a hit with another color
+               "<span style='color:" + _cssHighlighterColor + ";'>",
+               "</span>",
+
+               "... ",
+
+               false);
+
+         highlighter.setFormatter(formatter);
 
          final Map<String, String[]> highlights = highlighter.highlightFields(
                queryFieldsAsArray,
@@ -1155,12 +1185,23 @@ public class FTSearchManager {
       }
 
       boolean isDocRead = false;
-      final Set<String> fieldsToLoad = new HashSet<>();
-      fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
-      fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
-      fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
-      fieldsToLoad.add(SEARCH_FIELD_WAYPOINT_ID);
-      fieldsToLoad.add(SEARCH_FIELD_TIME);
+      final Set<String> fieldsToLoadFromDocument = new HashSet<>();
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_TOUR_ID);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_MARKER_ID);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_WAYPOINT_ID);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_TIME);
+
+      if (_isSearch_Tour == false && _isShow_TitleDescription) {
+
+         /*
+          * Tour title/description is not in the snippets (it is not searched for, load these fields
+          * also from the document when it should be displayed
+          */
+
+         fieldsToLoadFromDocument.add(SEARCH_FIELD_DESCRIPTION);
+         fieldsToLoadFromDocument.add(SEARCH_FIELD_TITLE);
+      }
 
       for (final Entry<String, String[]> field : fields) {
 
@@ -1198,7 +1239,7 @@ public class FTSearchManager {
             if (isDocRead == false) {
 
                final int docId = docids[hitIndex];
-               final Document doc = indexReader.document(docId, fieldsToLoad);
+               final Document doc = indexReader.document(docId, fieldsToLoadFromDocument);
 
                resultItem.docId = docId;
                // resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
@@ -1208,6 +1249,20 @@ public class FTSearchManager {
                   final String docFieldName = indexField.name();
 
                   switch (docFieldName) {
+
+                  case SEARCH_FIELD_DESCRIPTION:
+
+                     String description = indexField.stringValue();
+                     description = WEB.convertHTML_LineBreaks(description);
+
+                     resultItem.description = description;
+
+                     break;
+
+                  case SEARCH_FIELD_TITLE:
+                     resultItem.title = indexField.stringValue();
+                     break;
+
                   case SEARCH_FIELD_DOC_SOURCE_SAVED:
                      resultItem.docSource = indexField.numericValue().intValue();
                      break;
@@ -1301,7 +1356,8 @@ public class FTSearchManager {
                                 final boolean isSearch_Tour_LocationEnd,
                                 final boolean isSearch_Tour_Weather,
                                 final boolean isSearch_Waypoint,
-                                final boolean isSortDateAscending) {
+                                final boolean isSort_DateAscending,
+                                final boolean isShow_TitleDescription) {
 
       _isSearch_All = isSearch_All;
       _isSearch_Marker = isSearch_Marker;
@@ -1311,7 +1367,9 @@ public class FTSearchManager {
       _isSearch_Tour_Weather = isSearch_Tour_Weather;
       _isSearch_Waypoint = isSearch_Waypoint;
 
-      _isSortDateAscending = isSortDateAscending;
+      _isSort_DateAscending = isSort_DateAscending;
+
+      _isShow_TitleDescription = isShow_TitleDescription;
    }
 
    /**
@@ -1348,7 +1406,8 @@ public class FTSearchManager {
                         createStore_TourWayPoint(conn, monitor);
 
                      } catch (final SQLException e) {
-                        UI.showSQLException(e);
+
+                        net.tourbook.ui.UI.showSQLException(e);
                      }
                   }
                };

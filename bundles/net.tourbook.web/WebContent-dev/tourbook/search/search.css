@@ -53,15 +53,6 @@ a
    border:                 1px solid #bbb;         /* replace blue border */
 }
 
-.mtBase .dijitTooltipContainer
-{
-   /* 
-      Limit width otherwise the viewport width is used.
-      With a width below 30em the text can overflow the container 
-    */
-   width:                  30em;               
-}
-
 .dijitButtonNode
 {
    background:             none              !important;
@@ -186,6 +177,15 @@ a
 {
    padding:                2px;
 }
+
+/*
+   Tooltip
+*/
+.tooltip-container
+{
+   width:                  30em;                /* set max width for a tooltip */ 
+}
+
 
 /*
    Search container
@@ -368,7 +368,7 @@ a.item:VISITED
 
 .item-title-no-description
 {
-   /* hide underline when only the title is available but not a description */
+   /* Hide underline when only the title is available but not a description */
    text-decoration:        none;
 }
 
@@ -378,9 +378,14 @@ a.item:VISITED
    color:                  #888;
 }
 
-.item-info td
+.item-info td,
 {
    padding-right:          20px;
+}
+
+.item-location td
+{
+   padding-right:          5px;
 }
 
 

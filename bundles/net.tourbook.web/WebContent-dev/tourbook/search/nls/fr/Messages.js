@@ -11,7 +11,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'Aucun résultat trouvé.',
 		Search_Options_Action_RestoreDefaults              : 'Restaurer les options par défaut',
 		Search_Options_Checkbox_EaseSearching              : 'Utiliser la recherche facile',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Jokers de recherche</b><br>' + 'Quand <i>Utiliser la recherche facile</i> est sélectionné, un joker * est ajouté au texte de recherche, le caractère * n\'est pas visible .<br><br>' + '' + '<b>Recherche étendue</b><br>' + 'Il peut être utile de désactiver <i>Utiliser la recherche facile</i> quand on effectue une recherche avec d\'autres options du parser Lucene.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<div class="tooltip-container">' + '<b>* Jokers de recherche</b><br>' + 'Quand <i>Utiliser la recherche facile</i> est sélectionné, un joker * est ajouté au texte de recherche, le caractère * n\'est pas visible .<br><br>' + '' + '<b>Recherche étendue</b><br>' + 'Il peut être utile de désactiver <i>Utiliser la recherche facile</i> quand on effectue une recherche avec d\'autres options du parser Lucene.' + '</div>',
 		Search_Options_Checkbox_ShowContentAll             : 'Tout',
 		Search_Options_Checkbox_ShowContentMarker          : 'Marqueurs',
 		Search_Options_Checkbox_ShowContentTour            : 'Itinéraires',

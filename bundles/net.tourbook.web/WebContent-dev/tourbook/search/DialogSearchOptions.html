@@ -40,7 +40,17 @@
 			               data-dojo-type           ="dijit/form/CheckBox" 
 			               data-dojo-attach-point   ="apChkSearch_Tour"
 			               data-dojo-attach-event   ="click:apSelection"/> 
-			            <label for="apChkSearch_Tour">${messages.Search_Options_Checkbox_ShowContentTour}</label>
+			            <label 
+			               id    ="apChkSearch_Tour_Label"
+			               for   ="apChkSearch_Tour">${messages.Search_Options_Checkbox_ShowContentTour}</label>
+                     <div 
+                        data-dojo-type           ="dijit/Tooltip" 
+                        data-dojo-attach-point   ="apChkSearch_Tour_Tooltip"
+                        data-dojo-props          ="
+                                                     connectId: ['apChkSearch_Tour_Label'],
+                                                     position:  ['below']
+                                                  "
+                     ></div>
                   </td>
                   <td>
 			            <!-- Search: Start location -->
@@ -51,7 +61,17 @@
 			               data-dojo-type          ="dijit/form/CheckBox" 
 			               data-dojo-attach-point  ="apChkSearch_Tour_LocationStart"
 			               data-dojo-attach-event  ="click:apSelection"/> 
-			            <label for="apChkSearch_Tour_LocationStart">${messages.Search_Options_Checkbox_Search_LocationStart}</label>
+			            <label 
+			               id    ="apChkSearch_Tour_LocationStart_Label"
+			               for   ="apChkSearch_Tour_LocationStart">${messages.Search_Options_Checkbox_Search_Tour_LocationStart}</label>
+                     <div 
+                        data-dojo-type           ="dijit/Tooltip" 
+                        data-dojo-attach-point   ="apChkSearch_Tour_LocationStart_Tooltip"
+                        data-dojo-props          ="
+                                                     connectId: ['apChkSearch_Tour_LocationStart_Label'],
+                                                     position:  ['below']
+                                                  "
+                     ></div>
                   </td>
                </tr>
                <tr>
@@ -63,7 +83,17 @@
 			               data-dojo-type           ="dijit/form/CheckBox" 
 			               data-dojo-attach-point   ="apChkSearch_Marker"
 			               data-dojo-attach-event   ="click:apSelection"/> 
-			            <label for="apChkSearch_Marker">${messages.Search_Options_Checkbox_ShowContentMarker}</label>
+			            <label 
+			               id    ="apChkSearch_Marker_Label"
+			               for   ="apChkSearch_Marker">${messages.Search_Options_Checkbox_ShowContentMarker}</label>
+			            <div 
+			               data-dojo-type           ="dijit/Tooltip" 
+			               data-dojo-attach-point   ="apChkSearch_Marker_Tooltip"
+			               data-dojo-props          ="
+											                    connectId: ['apChkSearch_Marker_Label'],
+											                    position:  ['below']
+											                 "
+			            ></div>
                   </td>
                   <td>
 			            <!-- Search: End location -->
@@ -73,7 +103,17 @@
 			               data-dojo-type           ="dijit/form/CheckBox" 
 			               data-dojo-attach-point   ="apChkSearch_Tour_LocationEnd"
 			               data-dojo-attach-event   ="click:apSelection"/> 
-			            <label for="apChkSearch_Tour_LocationEnd">${messages.Search_Options_Checkbox_Search_LocationEnd}</label>
+			            <label 
+			               id    ="apChkSearch_Tour_LocationEnd_Label"
+			               for   ="apChkSearch_Tour_LocationEnd">${messages.Search_Options_Checkbox_Search_Tour_LocationEnd}</label>
+                     <div 
+                        data-dojo-type           ="dijit/Tooltip" 
+                        data-dojo-attach-point   ="apChkSearch_Tour_LocationEnd_Tooltip"
+                        data-dojo-props          ="
+                                                     connectId: ['apChkSearch_Tour_LocationEnd_Label'],
+                                                     position:  ['below']
+                                                  "
+                     ></div>
                   </td>
                </tr>
                <tr>
@@ -85,7 +125,17 @@
 			               data-dojo-type           ="dijit/form/CheckBox" 
 			               data-dojo-attach-point   ="apChkSearch_Waypoint"
 			               data-dojo-attach-event   ="click:apSelection"/> 
-			            <label for="apChkSearch_Waypoint">${messages.Search_Options_Checkbox_ShowContentWaypoint}</label>
+			            <label 
+			               id    ="apChkSearch_Waypoint_Label"
+			               for   ="apChkSearch_Waypoint">${messages.Search_Options_Checkbox_ShowContentWaypoint}</label>
+			            <div 
+			               data-dojo-type           ="dijit/Tooltip" 
+			               data-dojo-attach-point   ="apChkSearch_Waypoint_Tooltip"
+			               data-dojo-props          ="
+											                    connectId: ['apChkSearch_Waypoint_Label'],
+											                    position:  ['below']
+											                 "
+			            ></div>
                   </td>
                   <td>
 			            <!-- Search: Weather -->
@@ -95,7 +145,17 @@
 			               data-dojo-type           ="dijit/form/CheckBox" 
 			               data-dojo-attach-point   ="apChkSearch_Tour_Weather"
 			               data-dojo-attach-event   ="click:apSelection"/> 
-			            <label for="apChkSearch_Tour_Weather">${messages.Search_Options_Checkbox_Search_Weather}</label>
+			            <label 
+			               id    ="apChkSearch_Tour_Weather_Label"
+			               for   ="apChkSearch_Tour_Weather">${messages.Search_Options_Checkbox_Search_Tour_Weather}</label>
+			            <div 
+			               data-dojo-type           ="dijit/Tooltip" 
+			               data-dojo-attach-point   ="apChkSearch_Tour_Weather_Tooltip"
+			               data-dojo-props          ="
+											                    connectId: ['apChkSearch_Tour_Weather_Label'],
+											                    position:  ['below']
+											                 "
+			            ></div>
                   </td>
                </tr>
             </table>         
@@ -111,14 +171,15 @@
                data-dojo-attach-point   ="apChkEaseSearching"
                data-dojo-attach-event   ="click:apSelection"/> 
             <label 
-               id="apChkEaseSearching_Label"
-               for="apChkEaseSearching">${messages.Search_Options_Checkbox_EaseSearching}</label>
+               id    ="apChkEaseSearching_Label"
+               for   ="apChkEaseSearching">${messages.Search_Options_Checkbox_EaseSearching}</label>
             <div 
                data-dojo-type           ="dijit/Tooltip" 
                data-dojo-attach-point   ="apChk_EaseSearching_Tooltip"
                data-dojo-props          ="
-                  connectId:['apChkEaseSearching_Label'],
-                  position:['below']"
+								                    connectId: ['apChkEaseSearching_Label'],
+								                    position:  ['below']
+								                 "
             ></div>
          </div>
       </div>

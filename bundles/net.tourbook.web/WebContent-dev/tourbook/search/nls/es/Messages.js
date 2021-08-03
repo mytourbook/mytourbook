@@ -11,7 +11,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'No se encontraron resultados.',
 		Search_Options_Action_RestoreDefaults              : 'Restaurar Valores Por Defecto',
 		Search_Options_Checkbox_EaseSearching              : 'Utilizar búsqueda simple',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>Buscador con expresiones regulares</b><br>' + 'Cuando la <i>Utilizar búsqueda simple</i> está seleccionada, un * es añadido automáticamente al texto buscado.<br><br>' + '' + '<b>Búsqueda extendida</b><br>' + 'Puede ser de ayuda desactivar <i>Utilizar búsqueda simple</i> cuando se utilizan las expresiones regulares para Lucene.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<div class="tooltip-container">' + '<b>Buscador con expresiones regulares</b><br>' + 'Cuando la <i>Utilizar búsqueda simple</i> está seleccionada, un * es añadido automáticamente al texto buscado.<br><br>' + '' + '<b>Búsqueda extendida</b><br>' + 'Puede ser de ayuda desactivar <i>Utilizar búsqueda simple</i> cuando se utilizan las expresiones regulares para Lucene.' + '</div>',
 		Search_Options_Checkbox_ShowContentAll             : 'Todo',
 		Search_Options_Checkbox_ShowContentMarker          : 'Marcadores',
 		Search_Options_Checkbox_ShowContentTour            : 'Recorridos',

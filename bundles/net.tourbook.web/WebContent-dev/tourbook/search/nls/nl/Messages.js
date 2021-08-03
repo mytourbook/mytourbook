@@ -11,7 +11,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'Geen resultaten gevonden.',
 		Search_Options_Action_RestoreDefaults              : 'Herstel standaardwaarden',
 		Search_Options_Checkbox_EaseSearching              : 'Gebruik gemakkelijk zoeken',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Wildcard zoeken</b><br>' + 'Wanneer <i>gemakkelijk zoeken</i> is geselecteerd, zal automatisch, intern een * toegevoegd worden aan de zoektermen.<br><br>' + '' + '<b>Uitgebreid zoeken</b><br>' + 'Als u de Lucene query parser optie gebruikt  zet u <i>gemakkelijk zoeken</i> best uit.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<div class="tooltip-container">' + '<b>* Wildcard zoeken</b><br>' + 'Wanneer <i>gemakkelijk zoeken</i> is geselecteerd, zal automatisch, intern een * toegevoegd worden aan de zoektermen.<br><br>' + '' + '<b>Uitgebreid zoeken</b><br>' + 'Als u de Lucene query parser optie gebruikt  zet u <i>gemakkelijk zoeken</i> best uit.' + '</div>',
 		Search_Options_Checkbox_ShowContentAll             : 'Alles',
 		Search_Options_Checkbox_ShowContentMarker          : 'Markeringen',
 		Search_Options_Checkbox_ShowContentTour            : 'Tochten',

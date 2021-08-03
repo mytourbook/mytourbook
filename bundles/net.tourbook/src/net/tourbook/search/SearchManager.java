@@ -194,35 +194,36 @@ public class SearchManager implements XHRHandler {
    private static boolean      _isUI_Show_LuceneDocId;
    private static boolean      _isUI_Sort_DateAscending;
    //
-   static final String         TAG_TD                             = "<td>";                        //$NON-NLS-1$
-   static final String         TAG_TD_END                         = "</td>";                       //$NON-NLS-1$
-   static final String         CSS_ITEM_CONTAINER                 = "item-container";              //$NON-NLS-1$
+   private static final String TAG_DIV_END                        = "</div>\n";                    //$NON-NLS-1$
+   private static final String TAG_TABLE_TBODY                    = "<table><tbody>";              //$NON-NLS-1$
+   private static final String TAG_TABLE_TBODY_END                = "</tbody></table>";            //$NON-NLS-1$
+   private static final String TAG_TD                             = "<td>";                        //$NON-NLS-1$
+   private static final String TAG_TD_END                         = "</td>";                       //$NON-NLS-1$
+   private static final String TAG_TR                             = "<tr>";                        //$NON-NLS-1$
+   private static final String TAG_TR_END                         = "</tr>";                       //$NON-NLS-1$
 
-   static final String         PAGE_ABOUT_BLANK                   = "about:blank";                 //$NON-NLS-1$
+   private static final String CSS_ITEM_CONTAINER                 = "item-container";              //$NON-NLS-1$
 
-   static final String         HREF_TOKEN                         = "&";                           //$NON-NLS-1$
-   static final String         HREF_VALUE_SEP                     = "=";                           //$NON-NLS-1$
+   private static final String HREF_TOKEN                         = "&";                           //$NON-NLS-1$
+   private static final String HREF_VALUE_SEP                     = "=";                           //$NON-NLS-1$
 
-   static final String         PARAM_ACTION                       = "action";                      //$NON-NLS-1$
-   static final String         PARAM_DOC_ID                       = "docId";                       //$NON-NLS-1$
-   static final String         PARAM_MARKER_ID                    = "markerId";                    //$NON-NLS-1$
-   static final String         PARAM_TOUR_ID                      = "tourId";                      //$NON-NLS-1$
+   private static final String PARAM_ACTION                       = "action";                      //$NON-NLS-1$
+   private static final String PARAM_DOC_ID                       = "docId";                       //$NON-NLS-1$
+   private static final String PARAM_MARKER_ID                    = "markerId";                    //$NON-NLS-1$
+   private static final String PARAM_TOUR_ID                      = "tourId";                      //$NON-NLS-1$
 
-   static final String         ACTION_EDIT_MARKER                 = "EditMarker";                  //$NON-NLS-1$
-   static final String         ACTION_EDIT_TOUR                   = "EditTour";                    //$NON-NLS-1$
-   static final String         ACTION_SELECT_TOUR                 = "SelectTour";                  //$NON-NLS-1$
-   static final String         ACTION_SELECT_MARKER               = "SelectMarker";                //$NON-NLS-1$
-   static final String         ACTION_SELECT_WAY_POINT            = "SelectWayPoint";              //$NON-NLS-1$
+   private static final String ACTION_EDIT_MARKER                 = "EditMarker";                  //$NON-NLS-1$
+   private static final String ACTION_EDIT_TOUR                   = "EditTour";                    //$NON-NLS-1$
+   private static final String ACTION_SELECT_TOUR                 = "SelectTour";                  //$NON-NLS-1$
+   private static final String ACTION_SELECT_MARKER               = "SelectMarker";                //$NON-NLS-1$
+   private static final String ACTION_SELECT_WAY_POINT            = "SelectWayPoint";              //$NON-NLS-1$
 
-   static final String         HREF_ACTION_EDIT_MARKER;
-   static final String         HREF_ACTION_EDIT_TOUR;
-   static final String         HREF_ACTION_SELECT_TOUR;
-   static final String         HREF_ACTION_SELECT_MARKER;
-   static final String         HREF_ACTION_SELECT_WAY_POINT;
+   private static final String HREF_ACTION_EDIT_MARKER;
+   private static final String HREF_ACTION_EDIT_TOUR;
 
-   static final String         HREF_PARAM_DOC_ID;
-   static final String         HREF_PARAM_MARKER_ID;
-   static final String         HREF_PARAM_TOUR_ID;
+   private static final String HREF_PARAM_DOC_ID;
+   private static final String HREF_PARAM_MARKER_ID;
+   private static final String HREF_PARAM_TOUR_ID;
 
    static {
 
@@ -235,9 +236,6 @@ public class SearchManager implements XHRHandler {
 
       HREF_ACTION_EDIT_MARKER = HREF_ACTION + ACTION_EDIT_MARKER;
       HREF_ACTION_EDIT_TOUR = HREF_ACTION + ACTION_EDIT_TOUR;
-      HREF_ACTION_SELECT_TOUR = HREF_ACTION + ACTION_SELECT_TOUR;
-      HREF_ACTION_SELECT_MARKER = HREF_ACTION + ACTION_SELECT_MARKER;
-      HREF_ACTION_SELECT_WAY_POINT = HREF_ACTION + ACTION_SELECT_WAY_POINT;
 
       HREF_PARAM_DOC_ID = HREF_TOKEN + PARAM_DOC_ID + HREF_VALUE_SEP;
       HREF_PARAM_MARKER_ID = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
@@ -667,7 +665,7 @@ public class SearchManager implements XHRHandler {
 
 // SET_FORMATTING_ON
 
-      // set sorting in the search manager
+      // update ftsearch manager parameters
       FTSearchManager.setSearchOptions(
 
             _isUI_Search_All,
@@ -677,7 +675,8 @@ public class SearchManager implements XHRHandler {
             _isUI_Search_Tour_LocationEnd,
             _isUI_Search_Tour_Weather,
             _isUI_Search_Waypoint,
-            _isUI_Sort_DateAscending);
+            _isUI_Sort_DateAscending,
+            _isUI_Show_Description);
    }
 
    /**
@@ -737,7 +736,6 @@ public class SearchManager implements XHRHandler {
       String hoverMessage = null;
       String hrefEditItem = null;
       String itemTitleText = null;
-//		String itemId = null;
 
       if (isTour) {
 
@@ -790,28 +788,41 @@ public class SearchManager implements XHRHandler {
          itemTitle = UI.scrambleText(itemTitle);
       }
       if (itemTitle.length() == 0) {
+
          // show new line that the icon is not overwritten
          itemTitle = "</br>"; //$NON-NLS-1$
       }
 
       String description = resultItem.description;
-      final boolean isDescription = _isUI_Show_Description && description != null;
+      final boolean isAvailable_Description = _isUI_Show_Description && description != null;
       if (UI.IS_SCRAMBLE_DATA) {
          description = UI.scrambleText(description);
       }
+
+      final String tour_LocationStart = resultItem.locationStart;
+      final String tour_LocationEnd = resultItem.locationEnd;
+      final String tour_Weather = resultItem.weather;
+
+      final boolean isAvailable_Tour_LocationStart = tour_LocationStart != null && tour_LocationStart.length() > 0;
+      final boolean isAvailable_Tour_LocationEnd = tour_LocationEnd != null && tour_LocationEnd.length() > 0;
+      final boolean isAvailable_Tour_Weather = tour_Weather != null && tour_Weather.length() > 0;
+
       final StringBuilder sb = new StringBuilder();
 
       // hovered actions
       if (hrefEditItem != null) {
 
          sb.append("<div class='action-container'>" //$NON-NLS-1$
-               + ("<table><tbody><tr>") //$NON-NLS-1$
-               + (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
-               + "</tr></tbody></table>" // //$NON-NLS-1$
-               + "</div>\n"); //$NON-NLS-1$
+               + TAG_TABLE_TBODY
+               + TAG_TR
+               + TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END
+               + TAG_TR_END
+               + TAG_TABLE_TBODY_END
+               + TAG_DIV_END);
       }
 
-      sb.append("<table><tbody><tr>"); //$NON-NLS-1$
+      sb.append(TAG_TABLE_TBODY);
+      sb.append(TAG_TR);
       {
          /*
           * Item image
@@ -825,25 +836,72 @@ public class SearchManager implements XHRHandler {
           */
          sb.append("<td style='width:100%;'>"); //$NON-NLS-1$
          {
-            // title
-            if (isDescription) {
-               sb.append("<span class='item-title'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-            } else {
-               sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+            if (_isUI_Search_Tour
+                  || _isUI_Search_Marker
+                  || _isUI_Search_Waypoint
+
+                  || _isUI_Show_Description) {
+
+               /*
+                * Title
+                */
+               if (isAvailable_Description) {
+                  sb.append("<span class='item-title'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+               } else {
+                  sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+               }
+
+               /*
+                * Description
+                */
+               if (isAvailable_Description) {
+                  sb.append("<div class='item-description'>"); //$NON-NLS-1$
+                  sb.append(description);
+                  sb.append(TAG_DIV_END);
+               }
             }
 
-            // description
-            if (isDescription) {
-               sb.append("<div class='item-description'>"); //$NON-NLS-1$
-               sb.append(description);
-               sb.append("</div>\n"); //$NON-NLS-1$
+            /*
+             * Start/end location
+             */
+            if (isAvailable_Tour_LocationStart
+                  || isAvailable_Tour_LocationEnd) {
+
+               sb.append("<div class='item-location'>"); //$NON-NLS-1$
+               sb.append(TAG_TABLE_TBODY);
+               sb.append(TAG_TR);
+               {
+                  if (isAvailable_Tour_LocationStart) {
+                     sb.append(TAG_TD + tour_LocationStart + TAG_TD_END);
+                  }
+
+                  sb.append(TAG_TD + " ... " + TAG_TD_END);
+
+                  if (isAvailable_Tour_LocationEnd) {
+                     sb.append(TAG_TD + tour_LocationEnd + TAG_TD_END);
+                  }
+               }
+               sb.append(TAG_TR_END);
+               sb.append(TAG_TABLE_TBODY_END);
+               sb.append(TAG_DIV_END);
+            }
+
+            /*
+             * Weather
+             */
+            if (isAvailable_Tour_Weather) {
+
+               sb.append("<div class='item-weather'>"); //$NON-NLS-1$
+               sb.append(tour_Weather);
+               sb.append(TAG_DIV_END);
             }
 
             // info
             if (_isUI_Show_Date || _isUI_Show_Time || _isUI_Show_ItemNumber || _isUI_Show_LuceneDocId) {
 
                sb.append("<div class='item-info'>"); //$NON-NLS-1$
-               sb.append("<table><tbody><tr>"); //$NON-NLS-1$
+               sb.append(TAG_TABLE_TBODY);
+               sb.append(TAG_TR);
                {
                   if (_isUI_Show_Date || _isUI_Show_Time) {
 
@@ -882,13 +940,15 @@ public class SearchManager implements XHRHandler {
                      sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END); //$NON-NLS-1$
                   }
                }
-               sb.append("</tr></tbody></table>"); //$NON-NLS-1$
-               sb.append("</div>\n"); //$NON-NLS-1$
+               sb.append(TAG_TR_END);
+               sb.append(TAG_TABLE_TBODY_END);
+               sb.append(TAG_DIV_END);
             }
          }
          sb.append(TAG_TD_END);
       }
-      sb.append("</tr></tbody></table>"); //$NON-NLS-1$
+      sb.append(TAG_TR_END);
+      sb.append(TAG_TABLE_TBODY_END);
 
       final ItemResponse itemResponse = new ItemResponse();
 
@@ -1178,7 +1238,7 @@ public class SearchManager implements XHRHandler {
                itemResponse = createHTML_10_Item(resultItem, itemNumber);
                sb.append(itemResponse.createdHtml);
             }
-            sb.append("</div>\n"); //$NON-NLS-1$
+            sb.append(TAG_DIV_END);
 
             /*
              * Create JSON for an item.
@@ -1212,8 +1272,7 @@ public class SearchManager implements XHRHandler {
       responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_TYPE, WEB.CONTENT_TYPE_APPLICATION_JSON);
 
       // this is very important otherwise nothing is displayed
-      responseHeaders.set(
-            WEB.RESPONSE_HEADER_CONTENT_RANGE,
+      responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_RANGE,
             getContentRange(searchResult, searchPosFrom, allItemSize));
 
       final float timeDiff = (float) (System.nanoTime() - start) / 1000000;

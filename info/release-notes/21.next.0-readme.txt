@@ -46,6 +46,7 @@ Improvements
     - End Location
     - Weather    
     https://sourceforge.net/p/mytourbook/feature-requests/186/
+  - Highlight search string with a color in the search result
 
 * Tour Photos
   - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   

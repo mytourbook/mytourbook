@@ -1,20 +1,20 @@
 define(
 [
-	'dojo/_base/declare',
-	"dojo/_base/lang",
-	'dojo/dom',
-	'dojo/on',
-	"dojo/request/xhr",
+   'dojo/_base/declare',
+   "dojo/_base/lang",
+   'dojo/dom',
+   'dojo/on',
+   "dojo/request/xhr",
 
-	'dijit/form/NumberSpinner',
-	'dijit/form/RadioButton',
-	'dijit/TitlePane',
+   'dijit/form/NumberSpinner',
+   'dijit/form/RadioButton',
+   'dijit/TitlePane',
 
-	'../widget/BaseDialog',
-	'./SearchMgr',
+   '../widget/BaseDialog',
+   './SearchMgr',
 
-	'dojo/text!./DialogSearchOptions.html',
-	'dojo/i18n!./nls/Messages'
+   'dojo/text!./DialogSearchOptions.html',
+   'dojo/i18n!./nls/Messages'
 
 ], function(
 
@@ -37,254 +37,273 @@ Messages
 
 ) {
 
-	var dlgSearchOptions = declare('tourbook.search.DialogSearchOptions',
-	[ BaseDialog
-	], {
+   var dlgSearchOptions = declare('tourbook.search.DialogSearchOptions',
+   [ BaseDialog
+   ], {
 
-		templateString : template,
+      templateString : template,
 
-		// create messages field which is needed that messages can be accessed in the template
-		messages : Messages,
+      // create messages field which is needed that messages can be accessed in the template
+      messages : Messages,
 
-		constructor : function(args) {
-			this._searchApp = args.searchApp
-		},
+      constructor : function(args) {
+         this._searchApp = args.searchApp
+      },
 
-		postCreate : function() {
+      postCreate : function() {
 
-			var dlg = this
+         var dlg = this
 
-			this.inherited(arguments)
+         this.inherited(arguments)
 
-			// hide dialog when mouse has leaved it
-			on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"))
+         // hide dialog when mouse has leaved it
+         on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"))
 
-			/*
-			 * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work.
-			 */
-			this.apChk_EaseSearching_Tooltip.label = Messages.Search_Options_Checkbox_EaseSearching_Tooltip
+         /*
+          * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work.
+          */
+         let onShowDialog = function() { dlg.openedTooltips++ }
+         let onHideDialog = function() { dlg.openedTooltips-- }
 
-			this.apChk_EaseSearching_Tooltip.onShow = function() {
-				dlg.openedTooltips++
-//				console.log("onShow: " + dlg.openedTooltips)
-			};
+         this.apChk_EaseSearching_Tooltip.label             = Messages.Search_Options_Checkbox_EaseSearching_Tooltip
+         this.apChk_EaseSearching_Tooltip.onShow            = onShowDialog
+         this.apChk_EaseSearching_Tooltip.onHide            = onHideDialog
+         
+         this.apChkSearch_Tour_Tooltip.label                = Messages.Search_Options_Checkbox_Search_Tour_Tooltip
+         this.apChkSearch_Tour_Tooltip.onShow               = onShowDialog
+         this.apChkSearch_Tour_Tooltip.onHide               = onHideDialog
+         
+         this.apChkSearch_Tour_LocationStart_Tooltip.label  = Messages.Search_Options_Checkbox_Search_Tour_LocationStart_Tooltip
+         this.apChkSearch_Tour_LocationStart_Tooltip.onShow = onShowDialog
+         this.apChkSearch_Tour_LocationStart_Tooltip.onHide = onHideDialog
 
-			this.apChk_EaseSearching_Tooltip.onHide = function() {
-				dlg.openedTooltips--
-//				console.log("onHide: " + dlg.openedTooltips)
-			};
-		},
+         this.apChkSearch_Tour_LocationEnd_Tooltip.label    = Messages.Search_Options_Checkbox_Search_Tour_LocationEnd_Tooltip
+         this.apChkSearch_Tour_LocationEnd_Tooltip.onShow   = onShowDialog
+         this.apChkSearch_Tour_LocationEnd_Tooltip.onHide   = onHideDialog
+         
+         this.apChkSearch_Tour_Weather_Tooltip.label        = Messages.Search_Options_Checkbox_Search_Tour_Weather_Tooltip
+         this.apChkSearch_Tour_Weather_Tooltip.onShow       = onShowDialog
+         this.apChkSearch_Tour_Weather_Tooltip.onHide       = onHideDialog
+         
+         this.apChkSearch_Marker_Tooltip.label              = Messages.Search_Options_Checkbox_Search_Marker_Tooltip
+         this.apChkSearch_Marker_Tooltip.onShow             = onShowDialog
+         this.apChkSearch_Marker_Tooltip.onHide             = onHideDialog
+         
+         this.apChkSearch_Waypoint_Tooltip.label            = Messages.Search_Options_Checkbox_Search_Waypoint_Tooltip
+         this.apChkSearch_Waypoint_Tooltip.onShow           = onShowDialog
+         this.apChkSearch_Waypoint_Tooltip.onHide           = onHideDialog
+      },
 
-		/**
-		 * Overwrite BaseDialog.showDialog and restore the state of the UI.
-		 */
-		showDialog : function showDialog(args) {
+      /**
+       * Overwrite BaseDialog.showDialog and restore the state of the UI.
+       */
+      showDialog : function showDialog(args) {
+ 
+         this.inherited(arguments)
 
-			this.inherited(arguments)
+         this._restoreState()
+      },
 
-			this._restoreState()
-		},
+      apActionRestoreDefaults : function apActionRestoreDefaults() {
 
-		apActionRestoreDefaults : function apActionRestoreDefaults() {
+         this._setSearchOptions(
+         {
+            isRestoreDefaults : true
+         });
+      },
 
-			this._setSearchOptions(
-			{
-				isRestoreDefaults : true
-			});
-		},
+      /**
+       * Search all checkbox
+       */
+      apSearchAll : function apSearchAll() {
 
-		/**
-		 * Search all checkbox
-		 */
-		apSearchAll : function apSearchAll() {
+         this._enableControls()
 
-			this._enableControls()
+         // fire selection
+         this.apSelection()
+      },
 
-			// fire selection
-			this.apSelection()
-		},
+      /**
+       * Selection is from an attach point.
+       */
+      apSelection : function apSelection() {
 
-		/**
-		 * Selection is from an attach point.
-		 */
-		apSelection : function apSelection() {
+         if (this._isValid()) {
 
-			if (this._isValid()) {
+            var searchOptions = 
+            {
+               isEaseSearching               : this.apChkEaseSearching.get('checked'),
 
-				var searchOptions = 
-				{
-					isEaseSearching 					: this.apChkEaseSearching.get('checked'),
+               isSearch_All                  : this.apChkSearch_All.get('checked'),
 
-					isSearch_All 						: this.apChkSearch_All.get('checked'),
+               isSearch_Tour                 : this.apChkSearch_Tour.get('checked'),
+               isSearch_Tour_LocationStart   : this.apChkSearch_Tour_LocationStart.get('checked'),
+               isSearch_Tour_LocationEnd     : this.apChkSearch_Tour_LocationEnd.get('checked'),
+               isSearch_Tour_Weather         : this.apChkSearch_Tour_Weather.get('checked'),
 
-					isSearch_Tour 						: this.apChkSearch_Tour.get('checked'),
-					isSearch_Tour_LocationStart	: this.apChkSearch_Tour_LocationStart.get('checked'),
-					isSearch_Tour_LocationEnd 		: this.apChkSearch_Tour_LocationEnd.get('checked'),
-					isSearch_Tour_Weather 			: this.apChkSearch_Tour_Weather.get('checked'),
+               isSearch_Marker               : this.apChkSearch_Marker.get('checked'),
+               isSearch_Waypoint             : this.apChkSearch_Waypoint.get('checked'),
+               
+               isSortByDateAscending         : this.apSortByDateAscending.get('checked'),
+               
+               isShowDate                    : this.apChkShowDate.get('checked'),
+               isShowTime                    : this.apChkShowTime.get('checked'),
+               isShowDescription             : this.apChkShowDescription.get('checked'),
+               isShowItemNumber              : this.apChkShowItemNumber.get('checked'),
+               isShowLuceneID                : this.apChkShowLuceneID.get('checked')
+            };
+            
+            this._setSearchOptions(searchOptions)
+         }
+      },
+      
+      _isValid : function _isValid() {
+         
+         var 
+         statusText                    = '', 
+         isValid                       = true, 
+         
+         isSearch_All                  = this.apChkSearch_All.get('checked'), 
 
-					isSearch_Marker 					: this.apChkSearch_Marker.get('checked'),
-					isSearch_Waypoint 				: this.apChkSearch_Waypoint.get('checked'),
-					
-					isSortByDateAscending 			: this.apSortByDateAscending.get('checked'),
-					
-					isShowDate 							: this.apChkShowDate.get('checked'),
-					isShowTime 							: this.apChkShowTime.get('checked'),
-					isShowDescription 				: this.apChkShowDescription.get('checked'),
-					isShowItemNumber 					: this.apChkShowItemNumber.get('checked'),
-					isShowLuceneID 					: this.apChkShowLuceneID.get('checked')
-				};
-				
-				this._setSearchOptions(searchOptions)
-			}
-		},
-		
-		_isValid : function _isValid() {
-			
-			var 
-			statusText 							= '', 
-			isValid 								= true, 
-			
-			isSearch_All 						= this.apChkSearch_All.get('checked'), 
+         isSearch_Tour                 = this.apChkSearch_Tour.get('checked'), 
+         isSearch_Tour_LocationStart   = this.apChkSearch_Tour_LocationStart.get('checked'),
+         isSearch_Tour_LocationEnd     = this.apChkSearch_Tour_LocationEnd.get('checked'),
+         isSearch_Tour_Weather         = this.apChkSearch_Tour_Weather.get('checked')
 
-			isSearch_Tour 						= this.apChkSearch_Tour.get('checked'), 
-			isSearch_Tour_LocationStart	= this.apChkSearch_Tour_LocationStart.get('checked'),
-			isSearch_Tour_LocationEnd 		= this.apChkSearch_Tour_LocationEnd.get('checked'),
-			isSearch_Tour_Weather 			= this.apChkSearch_Tour_Weather.get('checked')
+         isSearch_Marker               = this.apChkSearch_Marker.get('checked'), 
+         isSearch_Waypoint             = this.apChkSearch_Waypoint.get('checked')
+         
+         if (isSearch_All) {
+            
+            // content is valid
+            
+         } else {
+            
+            // at least one content must be checked
+            
+            if (isSearch_Tour == false 
+               && isSearch_Tour_LocationStart == false
+               && isSearch_Tour_LocationEnd == false
+               && isSearch_Tour_Weather == false
+               && isSearch_Marker == false 
+               && isSearch_Waypoint == false
+               ) {
+                  
+                  statusText = Messages.Search_Validation_SearchFilter
+                  isValid = false
+               }
+            }
+            
+            // update status
+            dom.byId('domSearchStatus').innerHTML = statusText
+            
+            // resize dialog because status text has changed and can be too long 
+            this._dialog.resize();
+            
+            return isValid;
+         },
+         
+         _enableControls : function _enableControls() {
+            
+            var isSearch_All = this.apChkSearch_All.get('checked')
+            
+            this.apChkSearch_Tour               .set('disabled', isSearch_All)
+            this.apChkSearch_Tour_LocationStart .set('disabled', isSearch_All)
+            this.apChkSearch_Tour_LocationEnd   .set('disabled', isSearch_All)
+            this.apChkSearch_Tour_Weather       .set('disabled', isSearch_All)
 
-			isSearch_Marker 					= this.apChkSearch_Marker.get('checked'), 
-			isSearch_Waypoint 				= this.apChkSearch_Waypoint.get('checked')
-			
-			if (isSearch_All) {
-				
-				// content is valid
-				
-			} else {
-				
-				// at least one content must be checked
-				
-				if (isSearch_Tour == false 
-					&& isSearch_Tour_LocationStart == false
-					&& isSearch_Tour_LocationEnd == false
-					&& isSearch_Tour_Weather == false
-					&& isSearch_Marker == false 
-					&& isSearch_Waypoint == false
-					) {
-						
-						statusText = Messages.Search_Validation_SearchFilter
-						isValid = false
-					}
-				}
-				
-				// update status
-				dom.byId('domSearchStatus').innerHTML = statusText
-				
-				// resize dialog because status text has changed and can be too long 
-				this._dialog.resize();
-				
-				return isValid;
-			},
-			
-			_enableControls : function _enableControls() {
-				
-				var isSearch_All = this.apChkSearch_All.get('checked')
-				
-				this.apChkSearch_Tour					.set('disabled', isSearch_All)
-				this.apChkSearch_Tour_LocationStart	.set('disabled', isSearch_All)
-				this.apChkSearch_Tour_LocationEnd	.set('disabled', isSearch_All)
-				this.apChkSearch_Tour_Weather			.set('disabled', isSearch_All)
+            this.apChkSearch_Marker             .set('disabled', isSearch_All)
+            this.apChkSearch_Waypoint           .set('disabled', isSearch_All)
+      },
 
-				this.apChkSearch_Marker					.set('disabled', isSearch_All)
-				this.apChkSearch_Waypoint				.set('disabled', isSearch_All)
-		},
+      /**
+       * 
+       */
+      _restoreState : function _restoreState(callBack) {
 
-		/**
-		 * 
-		 */
-		_restoreState : function _restoreState(callBack) {
+         var _this = this;
 
-			var _this = this;
+         var xhrQuery = {}
+         xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS
 
-			var xhrQuery = {}
-			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS
+         xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
-			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+            handleAs       : 'json',
+            preventCache   : true,
+            timeout        : SearchMgr.XHR_TIMEOUT,
 
-				handleAs 		: 'json',
-				preventCache 	: true,
-				timeout 			: SearchMgr.XHR_TIMEOUT,
+            query          : xhrQuery
 
-				query 			: xhrQuery
+         }).then(function(xhrData) {
 
-			}).then(function(xhrData) {
+            _this._updateUI_FromState(_this, xhrData)
+         });
+      },
 
-				_this._updateUI_FromState(_this, xhrData)
-			});
-		},
+      /**
+       * Set search options in the backend and reload current search with new search options.
+       */
+      _setSearchOptions : function _setSearchOptions(searchOptions) {
 
-		/**
-		 * Set search options in the backend and reload current search with new search options.
-		 */
-		_setSearchOptions : function _setSearchOptions(searchOptions) {
+         var _this = this;
+ 
+         var jsonSearchOptions = JSON.stringify(searchOptions);
 
-			var _this = this;
+         var xhrQuery = {};
+         xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SET_SEARCH_OPTIONS;
+         xhrQuery[SearchMgr.XHR_PARAM_SEARCH_OPTIONS] = encodeURIComponent(jsonSearchOptions);
 
-			var jsonSearchOptions = JSON.stringify(searchOptions);
+         xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
-			var xhrQuery = {};
-			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SET_SEARCH_OPTIONS;
-			xhrQuery[SearchMgr.XHR_PARAM_SEARCH_OPTIONS] = encodeURIComponent(jsonSearchOptions);
+            handleAs       : 'json',
+            preventCache   : true,
+            timeout        : SearchMgr.XHR_TIMEOUT,
 
-			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+            query          : xhrQuery
 
-				handleAs 		: 'json',
-				preventCache 	: true,
-				timeout 			: SearchMgr.XHR_TIMEOUT,
+         }).then(function(xhrData) {
 
-				query 			: xhrQuery
+            if (xhrData.isSearchOptionsDefault) {
 
-			}).then(function(xhrData) {
+               // set defaults in the UI
+               _this._updateUI_FromState(_this, xhrData);
+            }
 
-				if (xhrData.isSearchOptionsDefault) {
+            // repeat previous search
 
-					// set defaults in the UI
-					_this._updateUI_FromState(_this, xhrData);
-				}
+            _this._searchApp._searchInput.startSearch(true);
+         });
+      },
 
-				// repeat previous search
+      _updateUI_FromState : function _updateUI_FromState(dialog, xhrData) {
 
-				_this._searchApp._searchInput.startSearch(true);
-			});
-		},
+         dialog.apChkEaseSearching              .set('checked', xhrData.isEaseSearching)
 
-		_updateUI_FromState : function _updateUI_FromState(dialog, xhrData) {
+         dialog.apChkSearch_All                 .set('checked', xhrData.isSearch_All)
 
-			dialog.apChkEaseSearching					.set('checked', xhrData.isEaseSearching)
+         dialog.apChkSearch_Tour                .set('checked', xhrData.isSearch_Tour)
+         dialog.apChkSearch_Tour_LocationStart  .set('checked', xhrData.isSearch_Tour_LocationStart)
+         dialog.apChkSearch_Tour_LocationEnd    .set('checked', xhrData.isSearch_Tour_LocationEnd)
+         dialog.apChkSearch_Tour_Weather        .set('checked', xhrData.isSearch_Tour_Weather)
 
-			dialog.apChkSearch_All						.set('checked', xhrData.isSearch_All)
+         dialog.apChkSearch_Marker              .set('checked', xhrData.isSearch_Marker)
+         dialog.apChkSearch_Waypoint            .set('checked', xhrData.isSearch_Waypoint)
 
-			dialog.apChkSearch_Tour						.set('checked', xhrData.isSearch_Tour)
-			dialog.apChkSearch_Tour_LocationStart	.set('checked', xhrData.isSearch_Tour_LocationStart)
-			dialog.apChkSearch_Tour_LocationEnd		.set('checked', xhrData.isSearch_Tour_LocationEnd)
-			dialog.apChkSearch_Tour_Weather			.set('checked', xhrData.isSearch_Tour_Weather)
+         dialog.apSortByDateAscending           .set('checked', xhrData.isSortByDateAscending)
+         dialog.apSortByDateDescending          .set('checked', !xhrData.isSortByDateAscending)
 
-			dialog.apChkSearch_Marker					.set('checked', xhrData.isSearch_Marker)
-			dialog.apChkSearch_Waypoint				.set('checked', xhrData.isSearch_Waypoint)
+         dialog.apChkShowDate                   .set('checked', xhrData.isShowDate)
+         dialog.apChkShowTime                   .set('checked', xhrData.isShowTime)
+         dialog.apChkShowDescription            .set('checked', xhrData.isShowDescription)
+         dialog.apChkShowItemNumber             .set('checked', xhrData.isShowItemNumber)
+         dialog.apChkShowLuceneID               .set('checked', xhrData.isShowLuceneID)
 
-			dialog.apSortByDateAscending				.set('checked', xhrData.isSortByDateAscending)
-			dialog.apSortByDateDescending				.set('checked', !xhrData.isSortByDateAscending)
+         dialog._enableControls()
+         dialog._isValid()
+      }
 
-			dialog.apChkShowDate							.set('checked', xhrData.isShowDate)
-			dialog.apChkShowTime							.set('checked', xhrData.isShowTime)
-			dialog.apChkShowDescription				.set('checked', xhrData.isShowDescription)
-			dialog.apChkShowItemNumber					.set('checked', xhrData.isShowItemNumber)
-			dialog.apChkShowLuceneID					.set('checked', xhrData.isShowLuceneID)
+   });
 
-			dialog._enableControls()
-			dialog._isValid()
-		}
-
-	});
-
-	return dlgSearchOptions;
+   return dlgSearchOptions;
 
 });

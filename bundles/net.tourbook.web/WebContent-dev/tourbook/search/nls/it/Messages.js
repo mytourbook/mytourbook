@@ -11,7 +11,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'La ricerca non ha prodotto risultati.',
 		Search_Options_Action_RestoreDefaults              : 'Ripristina predefiniti',
 		Search_Options_Checkbox_EaseSearching              : 'Usa ricerca semplice',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Ricerca con caratteri speciali</b><br>' + 'Quando l\'opzione <i>Usa ricerca semplice</i> è selezionata, il carattere speciale * è aggiunto al fondo del testo di ricerca, anche se non è visibile all\'utente.<br><br>' + '' + '<b>Ricerca avanzata</b><br>' + 'Può essere utile disattivare l\'opzione  <i>Usa ricerca semplice</i> quando si effettua una ricerca che utilizza le opzioni del parser Lucene.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<div class="tooltip-container">' + '<b>* Ricerca con caratteri speciali</b><br>' + 'Quando l\'opzione <i>Usa ricerca semplice</i> è selezionata, il carattere speciale * è aggiunto al fondo del testo di ricerca, anche se non è visibile all\'utente.<br><br>' + '' + '<b>Ricerca avanzata</b><br>' + 'Può essere utile disattivare l\'opzione  <i>Usa ricerca semplice</i> quando si effettua una ricerca che utilizza le opzioni del parser Lucene.' + '</div>',
 		Search_Options_Checkbox_ShowContentAll             : 'Tutto',
 		Search_Options_Checkbox_ShowContentMarker          : 'Riferimenti',
 		Search_Options_Checkbox_ShowContentTour            : 'Percorsi',
