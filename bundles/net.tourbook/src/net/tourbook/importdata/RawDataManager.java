@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
@@ -142,7 +141,6 @@ public class RawDataManager {
    private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
-   private static final ReentrantLock    DATABASE_LOCK                         = new ReentrantLock();
 
    static {
 
@@ -1093,9 +1091,7 @@ public class RawDataManager {
                 * Save tour but don't fire a change event because the tour editor would set the tour
                 * to dirty
                 */
-               DATABASE_LOCK.lock();
                final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false);
-               DATABASE_LOCK.unlock();
 
                updatedTourData = savedTourData;
             }
