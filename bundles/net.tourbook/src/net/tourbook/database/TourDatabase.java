@@ -291,7 +291,7 @@ public class TourDatabase {
 
    private static final IPreferenceStore         _prefStore          = TourbookPlugin.getPrefStore();
 
-   private final static String                   _databasePath       = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
+   private static final String                   _databasePath       = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
 
    private static NetworkServerControl           _server;
 
@@ -311,18 +311,14 @@ public class TourDatabase {
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "Saving database entities");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
       _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
@@ -885,27 +881,17 @@ public class TourDatabase {
 
          // fire modify event
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
-            }
-         });
+         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
       }
 
       if (isNewTourType) {
 
          // fire modify event
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               TourbookPlugin.getPrefStore()
-                     .setValue(
-                           ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-                           Math.random());
-            }
-         });
+         Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore()
+               .setValue(
+                     ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+                     Math.random()));
       }
    }
 
@@ -1806,46 +1792,40 @@ public class TourDatabase {
        */
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.syncExec(() -> BusyIndicator.showWhile(display, () -> {
 
-            BusyIndicator.showWhile(display, new Runnable() {
-               @Override
-               public void run() {
+         try (Connection conn = getInstance().getConnection(); //
+               Statement stmt = conn.createStatement()) {
 
-                  try (Connection conn = getInstance().getConnection(); //
-                        Statement stmt = conn.createStatement()) {
+            final String sqlQuery = UI.EMPTY_STRING //
+                  + "SELECT" //$NON-NLS-1$
+                  + " DISTINCT" //$NON-NLS-1$
+                  + " " + fieldname //$NON-NLS-1$
+                  + " FROM " + db //$NON-NLS-1$
+                  + " ORDER BY " + fieldname; //$NON-NLS-1$
 
-                     final String sqlQuery = UI.EMPTY_STRING //
-                           + "SELECT" //$NON-NLS-1$
-                           + " DISTINCT" //$NON-NLS-1$
-                           + " " + fieldname //$NON-NLS-1$
-                           + " FROM " + db //$NON-NLS-1$
-                           + " ORDER BY " + fieldname; //$NON-NLS-1$
+            final ResultSet result = stmt.executeQuery(sqlQuery);
 
-                     final ResultSet result = stmt.executeQuery(sqlQuery);
+            while (result.next()) {
 
-                     while (result.next()) {
+               String dbValue = result.getString(1);
+               if (dbValue != null) {
 
-                        String dbValue = result.getString(1);
-                        if (dbValue != null) {
+                  dbValue = dbValue.trim();
 
-                           dbValue = dbValue.trim();
-
-                           if (dbValue.length() > 0) {
-                              sortedValues.add(dbValue);
-                           }
-                        }
-                     }
-
-                  } catch (final SQLException e) {
-                     UI.showSQLException(e);
+                  if (dbValue.length() > 0) {
+                     sortedValues.add(dbValue);
                   }
+               }
+            }
 
-                  /*
-                   * log existing values
-                   */
+         } catch (final SQLException e) {
+            UI.showSQLException(e);
+         }
+
+         /*
+          * log existing values
+          */
 //                  final StringBuilder sb = new StringBuilder();
 //                  for (final String text : sortedValues) {
 //                     sb.append(text);
@@ -1855,10 +1835,7 @@ public class TourDatabase {
 //                  System.out.println(sqlQuery);
 //                  System.out.println(UI.NEW_LINE);
 //                  System.out.println(sb.toString());
-               }
-            });
-         }
-      });
+      }));
 
       return sortedValues;
    }
@@ -2351,30 +2328,27 @@ public class TourDatabase {
 
       if (field != null && field.length() > maxLength) {
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().syncExec(() -> {
 
-               if (isForceTruncation) {
-                  returnValue[0] = FIELD_VALIDATION.TRUNCATE;
-                  StatusUtil.log(
-                        new Exception(
-                              NLS.bind(
-                                    "Field \"{0}\" with content \"{1}\" is truncated to {2} characters.", //$NON-NLS-1$
-                                    new Object[] { uiFieldName, field, maxLength })));
-                  return;
-               }
+            if (isForceTruncation) {
+               returnValue[0] = FIELD_VALIDATION.TRUNCATE;
+               StatusUtil.log(
+                     new Exception(
+                           NLS.bind(
+                                 "Field \"{0}\" with content \"{1}\" is truncated to {2} characters.", //$NON-NLS-1$
+                                 new Object[] { uiFieldName, field, maxLength })));
+               return;
+            }
 
-               if (MessageDialog.openConfirm(
-                     Display.getDefault().getActiveShell(),
-                     Messages.Tour_Database_Dialog_ValidateFields_Title,
-                     NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message,
-                           new Object[] { uiFieldName, field.length(), maxLength }))) {
+            if (MessageDialog.openConfirm(
+                  Display.getDefault().getActiveShell(),
+                  Messages.Tour_Database_Dialog_ValidateFields_Title,
+                  NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message,
+                        new Object[] { uiFieldName, field.length(), maxLength }))) {
 
-                  returnValue[0] = FIELD_VALIDATION.TRUNCATE;
-               } else {
-                  returnValue[0] = FIELD_VALIDATION.IS_INVALID;
-               }
+               returnValue[0] = FIELD_VALIDATION.TRUNCATE;
+            } else {
+               returnValue[0] = FIELD_VALIDATION.IS_INVALID;
             }
          });
       }
@@ -2635,6 +2609,138 @@ public class TourDatabase {
     * @return persisted {@link TourData} or <code>null</code> when saving fails
     */
    public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
+
+      /*
+       * prevent saving a tour which was deleted before
+       */
+      if (tourData.isTourDeleted) {
+         return null;
+      }
+
+      /*
+       * History tour or multiple tours cannot be saved
+       */
+      if (tourData.isHistoryTour || tourData.isMultipleTours()) {
+         return null;
+      }
+
+      /*
+       * prevent saving a tour when a person is not set, this check is for internal use that all
+       * data are valid
+       */
+      if (tourData.getTourPerson() == null) {
+         StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
+         return null;
+      }
+
+      /*
+       * check size of varcar fields
+       */
+      if (tourData.isValidForSave() == false) {
+         return null;
+      }
+
+      /*
+       * Removed cached data
+       */
+      TourManager.clearMultipleTourData();
+
+      /**
+       * ensure HR zones are computed, it requires that a person is set which is not the case when a
+       * device importer calls the method {@link TourData#computeComputedValues()}
+       */
+      tourData.getNumberOfHrZones();
+
+      final long dtSaved = TimeTools.createdNowAsYMDhms();
+
+      checkUnsavedTransientInstances(tourData);
+
+      EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+      TourData persistedEntity = null;
+
+      if (em != null) {
+
+         final EntityTransaction ts = em.getTransaction();
+
+         try {
+
+            tourData.onPrePersist();
+
+            ts.begin();
+            {
+               final TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
+               if (tourDataEntity == null) {
+
+                  // tour is not yet persisted
+
+                  tourData.setDateTimeCreated(dtSaved);
+
+                  em.persist(tourData);
+
+                  persistedEntity = tourData;
+
+               } else {
+
+                  if (isUpdateModifiedDate) {
+                     tourData.setDateTimeModified(dtSaved);
+                  }
+
+                  persistedEntity = em.merge(tourData);
+               }
+            }
+            ts.commit();
+
+         } catch (final Exception e) {
+
+            StatusUtil.showStatus(Messages.Tour_Database_TourSaveError, e);
+
+         } finally {
+            if (ts.isActive()) {
+               ts.rollback();
+            }
+            em.close();
+         }
+      }
+
+      if (persistedEntity != null) {
+
+         em = TourDatabase.getInstance().getEntityManager();
+         try {
+
+            persistedEntity = em.find(TourData.class, tourData.getTourId());
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
+         }
+
+         em.close();
+
+         TourManager.getInstance().updateTourInCache(persistedEntity);
+
+         updateCachedFields(persistedEntity);
+
+         saveTour_GeoParts(persistedEntity);
+
+         // update ft index
+         final ArrayList<TourData> allTours = new ArrayList<>();
+         allTours.add(persistedEntity);
+         FTSearchManager.updateIndex(allTours);
+      }
+
+      return persistedEntity;
+   }
+
+   /**
+    * Saves a tour using concurrency {@link #saveTour}
+    *
+    * @param tourData
+    * @param isUpdateModifiedDate
+    *           When <code>true</code> the modified date is updated. For updating computed field it
+    *           does not make sense to set the modified date.
+    * @return persisted {@link TourData} or <code>null</code> when saving fails
+    */
+   public static TourData saveTour_Concurrent(final TourData tourData, final boolean isUpdateModifiedDate) {
 
       /*
        * prevent saving a tour which was deleted before
@@ -4424,57 +4530,53 @@ public class TourDatabase {
 
       try {
 
-         final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
+         final Runnable runnable = () -> {
 
-               final SplashManager splashManager = SplashManager.getInstance();
+            final SplashManager splashManager = SplashManager.getInstance();
 
-               splashManager.setMessage(Messages.App_SplashMessage_StartingDatabase);
-               try {
+            splashManager.setMessage(Messages.App_SplashMessage_StartingDatabase);
+            try {
 
-                  sqlStartup_20_CheckServer(splashManager);
-                  sqlStartup_30_Check_DbIsCreated();
+               sqlStartup_20_CheckServer(splashManager);
+               sqlStartup_30_Check_DbIsCreated();
 
-               } catch (final Throwable e) {
+            } catch (final Throwable e) {
 
-                  StatusUtil.log(e);
-                  return;
-               }
-
-               sqlStartup_40_CheckTable(splashManager);
-
-               if (sqlStartup_50_IsDesignVersionValid(splashManager) == false) {
-                  return;
-               }
-
-               sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(splashManager);
-
-               sqlStartup_60_SetupEntityManager(splashManager);
-
-               _isDbInDataUpdate = true;
-               {
-                  if (sqlStartup_70_IsDataVersionValid(splashManager) == false) {
-                     return;
-                  }
-               }
-               _isDbInDataUpdate = false;
-
-               if (_dbDesignVersion_Old != _dbDesignVersion_New) {
-
-                  // display info for the successful update
-
-                  MessageDialog.openInformation(
-                        splashManager.getShell(),
-                        Messages.tour_database_version_info_title,
-                        NLS.bind(Messages.Tour_Database_UpdateInfo, _dbDesignVersion_Old, _dbDesignVersion_New));
-               }
-
-               splashManager.setMessage(Messages.App_SplashMessage_Finalize);
-
-               returnState[0] = true;
+               StatusUtil.log(e);
+               return;
             }
 
+            sqlStartup_40_CheckTable(splashManager);
+
+            if (sqlStartup_50_IsDesignVersionValid(splashManager) == false) {
+               return;
+            }
+
+            sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(splashManager);
+
+            sqlStartup_60_SetupEntityManager(splashManager);
+
+            _isDbInDataUpdate = true;
+            {
+               if (sqlStartup_70_IsDataVersionValid(splashManager) == false) {
+                  return;
+               }
+            }
+            _isDbInDataUpdate = false;
+
+            if (_dbDesignVersion_Old != _dbDesignVersion_New) {
+
+               // display info for the successful update
+
+               MessageDialog.openInformation(
+                     splashManager.getShell(),
+                     Messages.tour_database_version_info_title,
+                     NLS.bind(Messages.Tour_Database_UpdateInfo, _dbDesignVersion_Old, _dbDesignVersion_New));
+            }
+
+            splashManager.setMessage(Messages.App_SplashMessage_Finalize);
+
+            returnState[0] = true;
          };
 
          runnable.run();
