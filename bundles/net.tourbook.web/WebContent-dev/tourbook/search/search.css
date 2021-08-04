@@ -37,6 +37,11 @@ a
    margin-bottom:          0.5em;   
 }
 
+.disableLabel 
+{
+    pointer-events:        none;
+    opacity:               0.3;
+}
 
 .mtBase 
 {

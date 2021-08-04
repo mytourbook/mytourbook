@@ -183,16 +183,24 @@ Messages
          _enableControls : function _enableControls() {
             
             var isSearch_All = this.apChkSearch_All.get('checked')
+
+            var labelClass = isSearch_All ? 'disableLabel' : ''
             
-            this.apChkSearch_Tour               .set('disabled', isSearch_All)
-            // this.apChkSearch_Tour_Label         .set('disabled', isSearch_All)
-            this.apChkSearch_Marker             .set('disabled', isSearch_All)
-            this.apChkSearch_Waypoint           .set('disabled', isSearch_All)
-
-            this.apChkSearch_Tour_LocationStart .set('disabled', isSearch_All)
-            this.apChkSearch_Tour_LocationEnd   .set('disabled', isSearch_All)
-            this.apChkSearch_Tour_Weather       .set('disabled', isSearch_All)
-
+            this.apChkSearch_Tour                     .set('disabled', isSearch_All)
+            this.apChkSearch_Marker                   .set('disabled', isSearch_All)
+            this.apChkSearch_Waypoint                 .set('disabled', isSearch_All)
+                                                      
+            this.apChkSearch_Tour_LocationStart       .set('disabled', isSearch_All)
+            this.apChkSearch_Tour_LocationEnd         .set('disabled', isSearch_All)
+            this.apChkSearch_Tour_Weather             .set('disabled', isSearch_All)
+                                                      
+            this.apChkSearch_Tour_Label               .className = labelClass
+            this.apChkSearch_Marker_Label             .className = labelClass
+            this.apChkSearch_Waypoint_Label           .className = labelClass
+            
+            this.apChkSearch_Tour_LocationStart_Label .className = labelClass
+            this.apChkSearch_Tour_LocationEnd_Label   .className = labelClass
+            this.apChkSearch_Tour_Weather_Label       .className = labelClass
       },
 
       /**
