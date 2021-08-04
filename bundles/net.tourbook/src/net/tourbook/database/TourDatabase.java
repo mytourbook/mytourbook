@@ -200,8 +200,8 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, is needed to drop them
-   private final static String TABLE_TOUR_CATEGORY                = "TourCategory";                                         //$NON-NLS-1$
-   private final static String TABLE_TOURCATEGORY__TOURDATA       = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
+   private static final String TABLE_TOUR_CATEGORY                = "TourCategory";                                         //$NON-NLS-1$
+   private static final String TABLE_TOURCATEGORY__TOURDATA       = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
@@ -1305,7 +1305,7 @@ public class TourDatabase {
          final String sqlWhere_TourId           = " WHERE tourId=?";                         //$NON-NLS-1$
          final String sqlWhere_TourData_TourId  = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
-         final String allSql[] = {
+         final String[] allSql = {
 
             "DELETE FROM " + TABLE_TOUR_DATA                + sqlWhere_TourId,            //$NON-NLS-1$
             "DELETE FROM " + TABLE_TOUR_MARKER              + sqlWhere_TourData_TourId,   //$NON-NLS-1$
@@ -6740,7 +6740,7 @@ public class TourDatabase {
 //         //
 //         // version 23 end
 
-            final String sqlTourPhoto[] = {
+            final String[] sqlTourPhoto = {
 
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileName           VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileExt            VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -6775,7 +6775,7 @@ public class TourDatabase {
 //         //
 //         // version 23 end ---------
 
-            final String sqlTourData[] = {
+            final String[] sqlTourData = {
 
                   "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfTimeSlices       INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
                   "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfPhotos           INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
