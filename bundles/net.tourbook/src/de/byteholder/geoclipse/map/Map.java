@@ -1202,10 +1202,10 @@ public class Map extends Canvas {
       }
    }
 
-   void fireEvent_TourSelection(final ISelection selection, final boolean isFireInThisView) {
+   private void fireEvent_TourSelection(final ISelection selection, final boolean isSelectAlsoInThisView) {
 
       for (final Object selectionListener : _allTourSelectionListener.getListeners()) {
-         ((ITourSelectionListener) selectionListener).onSelection(selection, isFireInThisView);
+         ((ITourSelectionListener) selectionListener).onSelection(selection, isSelectAlsoInThisView);
       }
    }
 
@@ -1288,7 +1288,9 @@ public class Map extends Canvas {
     * @return If found, the current hovered tour, the smallest integer otherwise.
     */
    public long getHoveredTourId() {
+
       if (_allHoveredTourIds != null && _allHoveredTourIds.size() == 1) {
+
          return _allHoveredTourIds.get(0);
       }
 
@@ -2342,9 +2344,12 @@ public class Map extends Canvas {
          }
       }
 
-      final Object[] listeners = _hoveredTourListeners.getListeners();
-      final MapHoveredTourEvent event = new MapHoveredTourEvent(this.getHoveredTourId());
-      for (final Object listener : listeners) {
+      /*
+       * Fire event, there is a possible issue:
+       * Above there are return statements which do not fire this event !!!
+       */
+      final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId());
+      for (final Object listener : _hoveredTourListeners.getListeners()) {
          ((IHoveredTourListener) listener).setHoveredTourId(event);
       }
 
@@ -2737,21 +2742,9 @@ public class Map extends Canvas {
 
             } else {
 
-               if (_hovered_SelectedTourId == hoveredTour) {
+               // toggle selection -> hide tour selection
 
-                  // show only the selected tour
-
-                  final ArrayList<Long> singleTourId = new ArrayList<>();
-                  singleTourId.add(hoveredTour);
-
-                  fireEvent_TourSelection(new SelectionTourIds(singleTourId), true);
-
-               } else {
-
-                  // toggle selection -> hide tour selection
-
-                  _hovered_SelectedTourId = Long.MIN_VALUE;
-               }
+               _hovered_SelectedTourId = Long.MIN_VALUE;
             }
 
          } else {
@@ -6502,8 +6495,6 @@ public class Map extends Canvas {
          // the map has currently no map provider
          return;
       }
-
-      resetHoveredSelectedTours();
 
       grid_UpdatePaintingStateData();
 

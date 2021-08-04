@@ -64,10 +64,10 @@ public class TourFilterManager {
    private static final String LABEL_POWERTRAIN_GEAR_FRONT_SHIFT = net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
    private static final String LABEL_POWERTRAIN_GEAR_REAR_SHIFT  = net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
 
-   private static final String LABEL_CATEGORY_ALTITUDE           = net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
    private static final String LABEL_CATEGORY_BODY               = net.tourbook.ui.Messages.ColumnFactory_Category_Body;
    private static final String LABEL_CATEGORY_DATA               = net.tourbook.ui.Messages.ColumnFactory_Category_Data;
    private static final String LABEL_CATEGORY_DEVICE             = net.tourbook.ui.Messages.ColumnFactory_Category_Device;
+   private static final String LABEL_CATEGORY_ELEVATION          = net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
    private static final String LABEL_CATEGORY_MARKER             = net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
    private static final String LABEL_CATEGORY_MOTION             = net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
    private static final String LABEL_CATEGORY_PHOTO              = net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
@@ -239,7 +239,7 @@ public class TourFilterManager {
        * Get all category labels sorted by localized name
        */
       final String[] allCategories = new String[] {
-            LABEL_CATEGORY_ALTITUDE,
+            LABEL_CATEGORY_ELEVATION,
             LABEL_CATEGORY_STATE,
             LABEL_CATEGORY_BODY,
             LABEL_CATEGORY_DATA,
@@ -264,8 +264,8 @@ public class TourFilterManager {
 
       for (final String category : allCategories) {
 
-         if (category.equals(LABEL_CATEGORY_ALTITUDE)) {
-            createConfig_Altitude(allConfigs);
+         if (category.equals(LABEL_CATEGORY_ELEVATION)) {
+            createConfig_Elevation(allConfigs);
 
          } else if (category.equals(LABEL_CATEGORY_BODY)) {
             createConfig_Body(allConfigs);
@@ -352,36 +352,6 @@ public class TourFilterManager {
 
    private static ActionTourDataFilter         _actionTourFilter;
 
-   private static void createConfig_Altitude(final ArrayList<TourFilterFieldConfig> allConfigs) {
-
-      allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_ALTITUDE, TourFilterFieldId.ALTITUDE_UP));
-
-      allConfigs.add(
-            TourFilterFieldConfig
-                  .name(Messages.Tour_Filter_Field_Altitude_Ascent)
-                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
-                  .fieldId(TourFilterFieldId.ALTITUDE_UP)
-                  .pageIncrement(100)
-                  .fieldValueProvider(_fieldValueProvider_Altitude));
-
-      allConfigs.add(
-            TourFilterFieldConfig
-                  .name(Messages.Tour_Filter_Field_Altitude_Descent)
-                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
-                  .fieldId(TourFilterFieldId.ALTITUDE_DOWN)
-                  .pageIncrement(100)
-                  .minValue(Integer.MIN_VALUE)
-                  .fieldValueProvider(_fieldValueProvider_Altitude));
-
-      allConfigs.add(
-            TourFilterFieldConfig
-                  .name(Messages.Tour_Filter_Field_Altitude_Max)
-                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
-                  .fieldId(TourFilterFieldId.ALTITUDE_MAX)
-                  .pageIncrement(100)
-                  .fieldValueProvider(_fieldValueProvider_Altitude));
-   }
-
    private static void createConfig_Body(final ArrayList<TourFilterFieldConfig> allConfigs) {
 
 //      // Body
@@ -416,6 +386,36 @@ public class TourFilterManager {
 //      defineColumn_Device_Distance();
 
 //      allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_DEVICE, TourFilterFieldType.CATEGORY));
+   }
+
+   private static void createConfig_Elevation(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+      allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_ELEVATION, TourFilterFieldId.ALTITUDE_UP));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_Altitude_Ascent)
+                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
+                  .fieldId(TourFilterFieldId.ALTITUDE_UP)
+                  .pageIncrement(100)
+                  .fieldValueProvider(_fieldValueProvider_Altitude));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_Altitude_Descent)
+                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
+                  .fieldId(TourFilterFieldId.ALTITUDE_DOWN)
+                  .pageIncrement(100)
+                  .minValue(Integer.MIN_VALUE)
+                  .fieldValueProvider(_fieldValueProvider_Altitude));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_Altitude_Max)
+                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
+                  .fieldId(TourFilterFieldId.ALTITUDE_MAX)
+                  .pageIncrement(100)
+                  .fieldValueProvider(_fieldValueProvider_Altitude));
    }
 
    private static void createConfig_Motion(final ArrayList<TourFilterFieldConfig> allConfigs) {
