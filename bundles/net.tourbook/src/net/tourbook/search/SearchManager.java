@@ -72,6 +72,8 @@ public class SearchManager implements XHRHandler {
    private static final String          SEARCH_APP_ACTION_EDIT_MARKER               = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
    private static final String          SEARCH_APP_ACTION_EDIT_TOUR                 = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
+   private static final String          NL                                          = UI.NEW_LINE1;
+
    private final static IDialogSettings _state                                      = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
 
    private static final String          JSON_STATE_SEARCH_TEXT                      = "searchText";                                             //$NON-NLS-1$
@@ -194,13 +196,13 @@ public class SearchManager implements XHRHandler {
    private static boolean      _isUI_Show_LuceneDocId;
    private static boolean      _isUI_Sort_DateAscending;
    //
-   private static final String TAG_DIV_END                        = "</div>\n";                    //$NON-NLS-1$
+   private static final String TAG_DIV_END                        = "</div>" + NL;                 //$NON-NLS-1$
    private static final String TAG_TABLE_TBODY                    = "<table><tbody>";              //$NON-NLS-1$
-   private static final String TAG_TABLE_TBODY_END                = "</tbody></table>";            //$NON-NLS-1$
+   private static final String TAG_TABLE_TBODY_END                = "</tbody></table>" + NL;       //$NON-NLS-1$
    private static final String TAG_TD                             = "<td>";                        //$NON-NLS-1$
-   private static final String TAG_TD_END                         = "</td>";                       //$NON-NLS-1$
+   private static final String TAG_TD_END                         = "</td>" + NL;                  //$NON-NLS-1$
    private static final String TAG_TR                             = "<tr>";                        //$NON-NLS-1$
-   private static final String TAG_TR_END                         = "</tr>";                       //$NON-NLS-1$
+   private static final String TAG_TR_END                         = "</tr>" + NL;                  //$NON-NLS-1$
 
    private static final String CSS_ITEM_CONTAINER                 = "item-container";              //$NON-NLS-1$
 
@@ -720,7 +722,73 @@ public class SearchManager implements XHRHandler {
       _searchView.getPostSelectionProvider().setSelectionNoFireEvent(selection);
    }
 
-   private ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
+   private String createContentRange(final SearchResult searchResult, final int searchPosFrom, final int numItems) {
+
+      String contentRange;
+
+      if (searchResult == null || numItems == 0) {
+
+         contentRange = CONTENT_RANGE_ZERO;
+
+      } else {
+
+         contentRange = String.format(
+
+               // "items %d-%d/%d"
+               CONTENT_RANGE_ITEMS,
+
+               searchPosFrom,
+               searchPosFrom + numItems - 1,
+               searchResult.totalHits);
+      }
+
+      return contentRange;
+   }
+
+   /**
+    * @param allItems
+    * @param searchPosFrom
+    * @param searchResult
+    * @return
+    */
+   private void createHTML_10_SearchResults(final JSONArray allItems, final int searchPosFrom, final SearchResult searchResult) {
+
+      int itemIndex = 0;
+
+      for (final SearchResultItem resultItem : searchResult.items) {
+
+         final StringBuilder sb = new StringBuilder();
+         final int itemNumber = searchPosFrom + (++itemIndex);
+         ItemResponse itemResponse = null;
+
+         sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+         {
+            itemResponse = createHTML_20_Item(resultItem, itemNumber);
+            sb.append(itemResponse.createdHtml);
+         }
+         sb.append(TAG_DIV_END);
+
+         /*
+          * Create JSON for an item.
+          */
+         final JSONObject jsonResponse = new JSONObject();
+
+         // set unique grid row id
+         jsonResponse.put(JSON_ID, resultItem.docId);
+
+         jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
+         jsonResponse.put(JSON_ITEM_ACTION_URL_EDIT_ITEM, itemResponse.actionUrl_EditItem);
+         jsonResponse.put(JSON_ITEM_ID_TOUR_ID, itemResponse.itemId_TourId);
+         jsonResponse.put(JSON_ITEM_ID_MARKER_ID, itemResponse.itemId_MarkerId);
+         jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.item_IsMarker);
+         jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.item_IsTour);
+         jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.item_IsWayPoint);
+
+         allItems.put(jsonResponse);
+      }
+   }
+
+   private ItemResponse createHTML_20_Item(final SearchResultItem resultItem, final int itemNumber) {
 
       final int docId = resultItem.docId;
       final int docSource = resultItem.docSource;
@@ -784,24 +852,28 @@ public class SearchManager implements XHRHandler {
       }
 
       String itemTitle = itemTitleText;
+      String description = resultItem.description;
+      final boolean isAvailable_Description = _isUI_Show_Description && description != null;
+
+      String tour_LocationStart = resultItem.locationStart;
+      String tour_LocationEnd = resultItem.locationEnd;
+      String tour_Weather = resultItem.weather;
+
       if (UI.IS_SCRAMBLE_DATA) {
+
          itemTitle = UI.scrambleText(itemTitle);
+         description = UI.scrambleText(description);
+
+         tour_LocationStart = UI.scrambleText(tour_LocationStart);
+         tour_LocationEnd = UI.scrambleText(tour_LocationEnd);
+         tour_Weather = UI.scrambleText(tour_Weather);
       }
+
       if (itemTitle.length() == 0) {
 
          // show new line that the icon is not overwritten
          itemTitle = "</br>"; //$NON-NLS-1$
       }
-
-      String description = resultItem.description;
-      final boolean isAvailable_Description = _isUI_Show_Description && description != null;
-      if (UI.IS_SCRAMBLE_DATA) {
-         description = UI.scrambleText(description);
-      }
-
-      final String tour_LocationStart = resultItem.locationStart;
-      final String tour_LocationEnd = resultItem.locationEnd;
-      final String tour_Weather = resultItem.weather;
 
       final boolean isAvailable_Tour_LocationStart = tour_LocationStart != null && tour_LocationStart.length() > 0;
       final boolean isAvailable_Tour_LocationEnd = tour_LocationEnd != null && tour_LocationEnd.length() > 0;
@@ -815,7 +887,7 @@ public class SearchManager implements XHRHandler {
          sb.append("<div class='action-container'>" //$NON-NLS-1$
                + TAG_TABLE_TBODY
                + TAG_TR
-               + TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END
+               + TAG_TD + createHTML_30_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END
                + TAG_TR_END
                + TAG_TABLE_TBODY_END
                + TAG_DIV_END);
@@ -965,15 +1037,11 @@ public class SearchManager implements XHRHandler {
       return itemResponse;
    }
 
-   private String createHTML_20_Action(final String actionUrl, final String hoverMessage, final String backgroundImage) {
+   private String createHTML_30_Action(final String actionUrl, final String hoverMessage, final String backgroundImage) {
 
-      String url;
+      // an action is fired with a xhr request to the server
 
-      /*
-       * Action is fired with an xhr request to the server
-       */
-
-      url = " href='#anchor-without-scrolling'" //                               //$NON-NLS-1$
+      final String url = " href='#anchor-without-scrolling'" //                  //$NON-NLS-1$
             + " onclick=" //                                                     //$NON-NLS-1$
             + "'" //                                                             //$NON-NLS-1$
             + " tourbook.search.SearchApp.action(\"" + actionUrl + "\");" //     //$NON-NLS-1$ //$NON-NLS-2$
@@ -986,26 +1054,6 @@ public class SearchManager implements XHRHandler {
             + " title='" + hoverMessage + "'" //                                 //$NON-NLS-1$ //$NON-NLS-2$
             + ">" //                                                             //$NON-NLS-1$
             + "</a>"; //                                                         //$NON-NLS-1$
-   }
-
-   private String getContentRange(final SearchResult searchResult, final int searchPosFrom, final int allItemSize) {
-
-      String contentRange;
-
-      if (searchResult == null || allItemSize == 0) {
-
-         contentRange = CONTENT_RANGE_ZERO;
-
-      } else {
-
-         contentRange = String.format(
-               CONTENT_RANGE_ITEMS,
-               searchPosFrom,
-               (searchPosFrom + allItemSize - 1),
-               searchResult.totalHits);
-      }
-
-      return contentRange;
    }
 
    @Override
@@ -1181,24 +1229,23 @@ public class SearchManager implements XHRHandler {
 
       final Headers headers = httpExchange.getRequestHeaders();
 
-      final JSONArray allItems = new JSONArray();
-
       final String xhrSearchText = (String) params.get(XHR_PARAM_SEARCH_TEXT);
-      final String range = headers.getFirst(REQUEST_HEADER_RANGE);
+      final String xhrRange = headers.getFirst(REQUEST_HEADER_RANGE);
 
       int searchPosFrom = 0;
       int searchPosTo = 0;
 
-      if (range != null) {
+      if (xhrRange != null) {
 
-         final String[] ranges = range.substring("items=".length()).split(UI.DASH); //$NON-NLS-1$
+         final String[] ranges = xhrRange.substring("items=".length()).split(UI.DASH); //$NON-NLS-1$
 
          searchPosFrom = Integer.valueOf(ranges[0]);
          searchPosTo = Integer.valueOf(ranges[1]);
       }
 
       SearchResult searchResult = null;
-      int allItemSize = 0;
+
+      final JSONArray allItems = new JSONArray();
 
       if (xhrSearchText != null) {
 
@@ -1214,69 +1261,36 @@ public class SearchManager implements XHRHandler {
          // ensure white space is removed
          searchText = searchText.trim();
 
-         if (searchText.endsWith(UI.SYMBOL_STAR) == false && _isUI_EaseSearching) {
+         if (_isUI_EaseSearching
 
-            // Append a * otherwise nothing is found
+               // ensure that a * is not yet at the end
+               && searchText.endsWith(UI.SYMBOL_STAR) == false) {
+
+            // append a * otherwise nothing is found
             searchText += UI.SYMBOL_STAR;
          }
 
          searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo);
 
-         /*
-          * create items html
-          */
-         int itemIndex = 0;
-
-         for (final SearchResultItem resultItem : searchResult.items) {
-
-            final StringBuilder sb = new StringBuilder();
-            final int itemNumber = searchPosFrom + (++itemIndex);
-            ItemResponse itemResponse = null;
-
-            sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            {
-               itemResponse = createHTML_10_Item(resultItem, itemNumber);
-               sb.append(itemResponse.createdHtml);
-            }
-            sb.append(TAG_DIV_END);
-
-            /*
-             * Create JSON for an item.
-             */
-            final JSONObject jsonResponse = new JSONObject();
-
-            // set unique grid row id
-            jsonResponse.put(JSON_ID, resultItem.docId);
-
-            jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
-            jsonResponse.put(JSON_ITEM_ACTION_URL_EDIT_ITEM, itemResponse.actionUrl_EditItem);
-            jsonResponse.put(JSON_ITEM_ID_TOUR_ID, itemResponse.itemId_TourId);
-            jsonResponse.put(JSON_ITEM_ID_MARKER_ID, itemResponse.itemId_MarkerId);
-            jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.item_IsMarker);
-            jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.item_IsTour);
-            jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.item_IsWayPoint);
-
-            allItems.put(jsonResponse);
-         }
-
-         allItemSize = allItems.length();
-
-      } else {
-
-         // also keep empty search text
-
-//			state.put(STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
+         createHTML_10_SearchResults(allItems, searchPosFrom, searchResult);
       }
+
+      /*
+       * Set response header
+       */
+
+      // this is very important otherwise nothing is displayed
+      final String contentRange = createContentRange(searchResult, searchPosFrom, allItems.length());
 
       final Headers responseHeaders = httpExchange.getResponseHeaders();
       responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_TYPE, WEB.CONTENT_TYPE_APPLICATION_JSON);
+      responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_RANGE, contentRange);
 
-      // this is very important otherwise nothing is displayed
-      responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_RANGE,
-            getContentRange(searchResult, searchPosFrom, allItemSize));
-
-      final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+      /*
+       * Create JSON response
+       */
       String searchTime;
+      final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
       if (timeDiff < 1.0) {
          searchTime = String.format("%.2f ms", timeDiff); //$NON-NLS-1$
       } else if (timeDiff < 10.0) {
@@ -1287,9 +1301,6 @@ public class SearchManager implements XHRHandler {
 
       final long totalHits = searchResult == null ? 0 : searchResult.totalHits;
 
-      /*
-       * Create JSON response
-       */
       final JSONObject response = new JSONObject();
 
       response.put("items", allItems); //$NON-NLS-1$

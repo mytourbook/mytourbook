@@ -134,7 +134,7 @@ public class FTSearchManager {
    private static FSDirectory              _infixStore;
 
    private static TopDocs                  _topDocs;
-   private static String                   _topDocsSearchText;
+   private static String                   _topDocs_SearchText;
 
    private static boolean                  _isSearch_All;
    private static boolean                  _isSearch_Marker;
@@ -204,8 +204,10 @@ public class FTSearchManager {
          __liveDocs = (__indexReader.leaves().size() > 0) ? MultiFields.getLiveDocs(__indexReader) : null;
 
          __fieldsToLoad = new HashSet<>();
+
          __fieldsToLoad.add(SEARCH_FIELD_TITLE);
          __fieldsToLoad.add(SEARCH_FIELD_DESCRIPTION);
+
          __fieldsToLoad.add(SEARCH_FIELD_TOUR_LOCATION_START);
          __fieldsToLoad.add(SEARCH_FIELD_TOUR_LOCATION_END);
          __fieldsToLoad.add(SEARCH_FIELD_TOUR_WEATHER);
@@ -356,11 +358,37 @@ public class FTSearchManager {
       }
    }
 
-   private static Document createDoc_Marker(final long markerId,
-                                            final long tourId,
-                                            final String title,
-                                            final String description,
-                                            final long time) throws IOException {
+   private static IndexableField createField_WithIndexOptions_Int(final String fieldName, final int value) {
+
+      return new FieldWithOptions_Int(fieldName, fieldType_Int, value);
+   }
+
+   private static IndexableField createField_WithIndexOptions_Long(final String fieldName, final long value) {
+
+      return new FieldWithOptions_Long(fieldName, fieldType_Long, value);
+   }
+
+   /**
+    * This field must be created for each document otherwise the highlighter will throw the
+    * exception
+    * <p>
+    * <b>field 'description' was indexed without offsets, cannot highlight</b>
+    *
+    * @return
+    */
+   private static FieldType createFieldType_Text() {
+
+      final FieldType fieldType = new FieldType(TextField.TYPE_STORED);
+      fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+
+      return fieldType;
+   }
+
+   private static Document createLuceneDoc_Marker(final long markerId,
+                                                  final long tourId,
+                                                  final String title,
+                                                  final String description,
+                                                  final long time) throws IOException {
 
       final Document doc = new Document();
 
@@ -383,13 +411,13 @@ public class FTSearchManager {
       return doc;
    }
 
-   private static Document createDoc_Tour(final long tourId,
-                                          final long time,
-                                          final String title,
-                                          final String description,
-                                          final String startPlace,
-                                          final String endPlace,
-                                          final String weather) throws IOException {
+   private static Document createLuceneDoc_Tour(final long tourId,
+                                                final long time,
+                                                final String title,
+                                                final String description,
+                                                final String startPlace,
+                                                final String endPlace,
+                                                final String weather) throws IOException {
 
       final Document doc = new Document();
 
@@ -423,11 +451,11 @@ public class FTSearchManager {
       return doc;
    }
 
-   private static Document createDoc_WayPoint(final long dbWayPointId,
-                                              final long tourId,
-                                              final String title,
-                                              final String description,
-                                              final long time) throws IOException {
+   private static Document createLuceneDoc_WayPoint(final long dbWayPointId,
+                                                    final long tourId,
+                                                    final String title,
+                                                    final String description,
+                                                    final long time) throws IOException {
 
       final Document doc = new Document();
 
@@ -451,32 +479,6 @@ public class FTSearchManager {
       }
 
       return doc;
-   }
-
-   private static IndexableField createField_WithIndexOptions_Int(final String fieldName, final int value) {
-
-      return new FieldWithOptions_Int(fieldName, fieldType_Int, value);
-   }
-
-   private static IndexableField createField_WithIndexOptions_Long(final String fieldName, final long value) {
-
-      return new FieldWithOptions_Long(fieldName, fieldType_Long, value);
-   }
-
-   /**
-    * This field must be created for each document otherwise the highlighter will throw the
-    * exception
-    * <p>
-    * <b>field 'description' was indexed without offsets, cannot highlight</b>
-    *
-    * @return
-    */
-   private static FieldType createFieldType_Text() {
-
-      final FieldType fieldType = new FieldType(TextField.TYPE_STORED);
-      fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-
-      return fieldType;
    }
 
    private static void createStore_TourData(final Connection conn, final IProgressMonitor monitor)
@@ -532,7 +534,9 @@ public class FTSearchManager {
 
 // SET_FORMATTING_ON
 
-            final Document tourDoc = createDoc_Tour(dbTourId,
+            final Document tourDoc = createLuceneDoc_Tour(
+
+                  dbTourId,
                   dbTourStartTime,
                   dbTitle,
                   dbDescription,
@@ -614,7 +618,13 @@ public class FTSearchManager {
             final String dbDescription = rs.getString(4);
             final long dbTourTime = rs.getLong(5);
 
-            final Document markerDoc = createDoc_Marker(dbMarkerId, dbTourId, dbLabel, dbDescription, dbTourTime);
+            final Document markerDoc = createLuceneDoc_Marker(
+                  dbMarkerId,
+                  dbTourId,
+                  dbLabel,
+                  dbDescription,
+                  dbTourTime);
+
             indexWriter.addDocument(markerDoc);
 
             createdDocuments++;
@@ -666,7 +676,7 @@ public class FTSearchManager {
                + "SELECT" //                                         //$NON-NLS-1$
 
                + " " + TourDatabase.ENTITY_ID_WAY_POINT + "," //  1  //$NON-NLS-1$ //$NON-NLS-2$
-               + " " + TourDatabase.KEY_TOUR + "," //             2  //$NON-NLS-1$
+               + " " + TourDatabase.KEY_TOUR + "," //             2  //$NON-NLS-1$ //$NON-NLS-2$
                + " name," //                                      3  //$NON-NLS-1$
                + " description," //                               4  //$NON-NLS-1$
                + " time" //                                       5  //$NON-NLS-1$
@@ -687,7 +697,14 @@ public class FTSearchManager {
             final String dbDescription = rs.getString(4);
             final long dbTourTime = rs.getLong(5);
 
-            final Document wayPointDoc = createDoc_WayPoint(dbWayPointId, dbTourId, dbLabel, dbDescription, dbTourTime);
+            final Document wayPointDoc = createLuceneDoc_WayPoint(
+                  
+                  dbWayPointId,
+                  dbTourId,
+                  dbLabel,
+                  dbDescription,
+                  dbTourTime);
+
             indexWriter.addDocument(wayPointDoc);
 
             createdDocuments++;
@@ -1022,6 +1039,7 @@ public class FTSearchManager {
 
             queryFields.add(SEARCH_FIELD_TITLE);
             queryFields.add(SEARCH_FIELD_DESCRIPTION);
+
             queryFields.add(SEARCH_FIELD_TOUR_LOCATION_START);
             queryFields.add(SEARCH_FIELD_TOUR_LOCATION_END);
             queryFields.add(SEARCH_FIELD_TOUR_WEATHER);
@@ -1049,18 +1067,22 @@ public class FTSearchManager {
 
          final int numQueryFields = queryFields.size();
          final String[] queryFieldsAsArray = queryFields.toArray(new String[numQueryFields]);
-         final int maxPassages[] = new int[numQueryFields];
-
-         Arrays.fill(maxPassages, 1);
 
          final Analyzer analyzer = getAnalyzer();
 
          final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFieldsAsArray, analyzer);
          queryParser.setAllowLeadingWildcard(true);
 
-         final Query textQuery = queryParser.parse(searchText);
+         final Query searchTextQuery = queryParser.parse(searchText);
 
-         if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
+         if (_topDocs_SearchText == null
+
+               || _topDocs_SearchText.equals(searchText) == false
+
+               // debugging
+               || true
+
+         ) {
 
             // this is a new search
 
@@ -1073,18 +1095,18 @@ public class FTSearchManager {
             if (_isSearch_All) {
 
                // no filtering
-               _topDocs = _indexSearcher.search(textQuery, maxDoc, sort);
+               _topDocs = _indexSearcher.search(searchTextQuery, maxDoc, sort);
 
             } else {
 
                // filter by content
 
-               final BooleanQuery andQuery = search_FilterByContent(textQuery);
+               final BooleanQuery filterQuery = search_10_FilterByContent(searchTextQuery);
 
-               _topDocs = _indexSearcher.search(andQuery, maxDoc, sort);
+               _topDocs = _indexSearcher.search(filterQuery, maxDoc, sort);
             }
 
-            _topDocsSearchText = searchText;
+            _topDocs_SearchText = searchText;
          }
 
          searchResult.totalHits = _topDocs.totalHits;
@@ -1092,52 +1114,108 @@ public class FTSearchManager {
          /**
           * Get doc id's only for the current page.
           * <p>
-          * It is very cheap to query the doc id's but very expensive to retrieve the documents.
+          * It is very cheap to query the doc id's but very expensive to retrieve the documents !!!
           */
          final int docStartIndex = searchFrom;
          int docEndIndex = searchTo;
 
-         final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
-         final int scoreSize = scoreDocs.length;
+         final ScoreDoc[] allScoreDocs = _topDocs.scoreDocs;
+         final int scoreSize = allScoreDocs.length;
 
          if (docEndIndex >= scoreSize) {
             docEndIndex = scoreSize - 1;
          }
 
-         final int resultSize = docEndIndex - docStartIndex + 1;
-         final int docids[] = new int[resultSize];
+         final int numSearchResultItems = docEndIndex - docStartIndex + 1;
+         final int allSearchResultDocIds[] = new int[numSearchResultItems];
 
-         for (int docIndex = 0; docIndex < resultSize; docIndex++) {
-            docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
+         for (int docIndex = 0; docIndex < numSearchResultItems; docIndex++) {
+            allSearchResultDocIds[docIndex] = allScoreDocs[docStartIndex + docIndex].doc;
          }
+
+         final int maxPassages[] = new int[numQueryFields];
+         Arrays.fill(maxPassages, 1);
 
          // this can occure: field 'description' was indexed without offsets, cannot highlight
 
          final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, getAnalyzer());
-         final PassageFormatter formatter = new DefaultPassageFormatter(
 
-               // highlight a hit with another color
-               "<span style='color:" + _cssHighlighterColor + ";'>",
-               "</span>",
+         // create custom formatter for the highlighter, the default displays the highlighted text in bold
+         final PassageFormatter highlightFormatter = new DefaultPassageFormatter(
 
-               "... ",
+               // pre tag: highlight a hit with another color
+               "<span style='color:" + _cssHighlighterColor + ";'>", //$NON-NLS-1$ //$NON-NLS-2$
+
+               // post tag
+               "</span>", //$NON-NLS-1$
+
+               "... ", //$NON-NLS-1$
 
                false);
 
-         highlighter.setFormatter(formatter);
+         highlighter.setFormatter(highlightFormatter);
 
          final Map<String, String[]> highlights = highlighter.highlightFields(
                queryFieldsAsArray,
-               textQuery,
-               docids,
+               searchTextQuery,
+               allSearchResultDocIds,
                maxPassages);
 
-         search_CreateResult(highlights, _indexReader, searchResult, docids, docStartIndex);
+         search_20_CreateResult(highlights, _indexReader, searchResult, allSearchResultDocIds, docStartIndex);
 
       } catch (final Exception e) {
+
          StatusUtil.showStatus(e);
          searchResult.error = e.getMessage();
       }
+   }
+
+   /**
+    * Query text/marker/waypoint with OR
+    */
+   private static BooleanQuery search_10_FilterByContent(final Query textQuery) {
+
+      final Builder orQueryBuilder = new BooleanQuery.Builder();
+
+      if (_isSearch_Tour
+            || _isSearch_Tour_LocationStart
+            || _isSearch_Tour_LocationEnd
+            || _isSearch_Tour_Weather) {
+
+         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
+
+         orQueryBuilder.add(query, Occur.SHOULD);
+      }
+
+      if (_isSearch_Marker) {
+
+         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
+
+         orQueryBuilder.add(query, Occur.SHOULD);
+      }
+
+      if (_isSearch_Waypoint) {
+
+         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
+
+         orQueryBuilder.add(query, Occur.SHOULD);
+      }
+
+      final BooleanQuery orQuery = orQueryBuilder.build();
+
+      final Builder andQueryBuilder = new BooleanQuery.Builder()
+
+            // add search text
+            .add(textQuery, Occur.MUST)
+
+            // add tour text/marker/waypoint
+            .add(orQuery, Occur.MUST)
+
+      ;
+
+      final BooleanQuery andQuery = andQueryBuilder.build();
+
+      return andQuery;
    }
 
    /**
@@ -1151,11 +1229,11 @@ public class FTSearchManager {
     * @param docids2
     * @throws IOException
     */
-   private static void search_CreateResult(final Map<String, String[]> highlights,
-                                           final IndexReader indexReader,
-                                           final SearchResult searchResult,
-                                           final int[] docids,
-                                           final int docStartIndex) throws IOException {
+   private static void search_20_CreateResult(final Map<String, String[]> highlights,
+                                              final IndexReader indexReader,
+                                              final SearchResult searchResult,
+                                              final int[] docids,
+                                              final int docStartIndex) throws IOException {
 
       if (highlights.isEmpty()) {
          return;
@@ -1211,29 +1289,32 @@ public class FTSearchManager {
          for (int hitIndex = 0; hitIndex < snippets.length; hitIndex++) {
 
             final SearchResultItem resultItem = resultItems[hitIndex];
+
             final String snippet = snippets[hitIndex];
+            if (snippet != null) {
 
-            switch (fieldName) {
+               switch (fieldName) {
 
-            case SEARCH_FIELD_DESCRIPTION:
-               resultItem.description = snippet;
-               break;
+               case SEARCH_FIELD_DESCRIPTION:
+                  resultItem.description = snippet;
+                  break;
 
-            case SEARCH_FIELD_TITLE:
-               resultItem.title = snippet;
-               break;
+               case SEARCH_FIELD_TITLE:
+                  resultItem.title = snippet;
+                  break;
 
-            case SEARCH_FIELD_TOUR_LOCATION_START:
-               resultItem.locationStart = snippet;
-               break;
+               case SEARCH_FIELD_TOUR_LOCATION_START:
+                  resultItem.locationStart = snippet;
+                  break;
 
-            case SEARCH_FIELD_TOUR_LOCATION_END:
-               resultItem.locationEnd = snippet;
-               break;
+               case SEARCH_FIELD_TOUR_LOCATION_END:
+                  resultItem.locationEnd = snippet;
+                  break;
 
-            case SEARCH_FIELD_TOUR_WEATHER:
-               resultItem.weather = snippet;
-               break;
+               case SEARCH_FIELD_TOUR_WEATHER:
+                  resultItem.weather = snippet;
+                  break;
+               }
             }
 
             if (isDocRead == false) {
@@ -1252,15 +1333,22 @@ public class FTSearchManager {
 
                   case SEARCH_FIELD_DESCRIPTION:
 
-                     String description = indexField.stringValue();
-                     description = WEB.convertHTML_LineBreaks(description);
+                     if (resultItem.description == null) {
 
-                     resultItem.description = description;
+                        String description = indexField.stringValue();
+                        description = WEB.convertHTML_LineBreaks(description);
+
+                        resultItem.description = description;
+                     }
 
                      break;
 
                   case SEARCH_FIELD_TITLE:
-                     resultItem.title = indexField.stringValue();
+
+                     if (resultItem.title == null) {
+                        resultItem.title = indexField.stringValue();
+                     }
+
                      break;
 
                   case SEARCH_FIELD_DOC_SOURCE_SAVED:
@@ -1293,53 +1381,11 @@ public class FTSearchManager {
    }
 
    /**
-    * Query text/marker/waypoint with OR
+    * @param searchText
+    * @param searchPosFrom
+    * @param searchPosTo
+    * @return Returns {@link SearchResult}
     */
-   private static BooleanQuery search_FilterByContent(final Query textQuery) {
-
-      final Builder orQueryBuilder = new BooleanQuery.Builder();
-
-      if (_isSearch_Tour
-            || _isSearch_Tour_LocationStart
-            || _isSearch_Tour_LocationEnd
-            || _isSearch_Tour_Weather) {
-
-         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
-
-         orQueryBuilder.add(query, Occur.SHOULD);
-      }
-
-      if (_isSearch_Marker) {
-
-         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
-
-         orQueryBuilder.add(query, Occur.SHOULD);
-      }
-
-      if (_isSearch_Waypoint) {
-
-         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
-
-         orQueryBuilder.add(query, Occur.SHOULD);
-      }
-
-      final BooleanQuery orQuery = orQueryBuilder.build();
-
-      final Builder andQueryBuilder = new BooleanQuery.Builder()
-
-            // add search text
-            .add(textQuery, Occur.MUST)
-
-            // add tour text/marker/waypoint
-            .add(orQuery, Occur.MUST)
-
-      ;
-
-      final BooleanQuery andQuery = andQueryBuilder.build();
-
-      return andQuery;
-   }
-
    public static SearchResult searchByPosition(final String searchText, final int searchPosFrom, final int searchPosTo) {
 
       final SearchResult searchResult = new SearchResult();
@@ -1358,22 +1404,25 @@ public class FTSearchManager {
                                 final boolean isSearch_Waypoint,
                                 final boolean isSort_DateAscending,
                                 final boolean isShow_TitleDescription) {
+// SET_FORMATTING_OFF
 
-      _isSearch_All = isSearch_All;
-      _isSearch_Marker = isSearch_Marker;
-      _isSearch_Tour = isSearch_Tour;
-      _isSearch_Tour_LocationStart = isSearch_Tour_LocationStart;
-      _isSearch_Tour_LocationEnd = isSearch_Tour_LocationEnd;
-      _isSearch_Tour_Weather = isSearch_Tour_Weather;
-      _isSearch_Waypoint = isSearch_Waypoint;
+      _isSearch_All                 = isSearch_All;
+      _isSearch_Marker              = isSearch_Marker;
+      _isSearch_Tour                = isSearch_Tour;
+      _isSearch_Tour_LocationStart  = isSearch_Tour_LocationStart;
+      _isSearch_Tour_LocationEnd    = isSearch_Tour_LocationEnd;
+      _isSearch_Tour_Weather        = isSearch_Tour_Weather;
+      _isSearch_Waypoint            = isSearch_Waypoint;
 
-      _isSort_DateAscending = isSort_DateAscending;
+      _isSort_DateAscending         = isSort_DateAscending;
 
-      _isShow_TitleDescription = isShow_TitleDescription;
+      _isShow_TitleDescription      = isShow_TitleDescription;
+
+// SET_FORMATTING_ON
    }
 
    /**
-    * Create FT index.
+    * Create FT index
     *
     * @param conn
     * @param monitor
@@ -1572,7 +1621,7 @@ public class FTSearchManager {
             /*
              * Recreate tour, marker and waypoint
              */
-            final Document tourDoc = createDoc_Tour(tourId,
+            final Document tourDoc = createLuceneDoc_Tour(tourId,
                   tourData.getTourStartTimeMS(),
                   tourData.getTourTitle(),
                   tourData.getTourDescription(),
@@ -1584,7 +1633,7 @@ public class FTSearchManager {
 
             for (final TourMarker tourMarker : tourData.getTourMarkers()) {
 
-               final Document markerDoc = createDoc_Marker(
+               final Document markerDoc = createLuceneDoc_Marker(
                      tourMarker.getMarkerId(),
                      tourId,
                      tourMarker.getLabel(),
@@ -1596,7 +1645,7 @@ public class FTSearchManager {
 
             for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
 
-               final Document wayPointDoc = createDoc_WayPoint(
+               final Document wayPointDoc = createLuceneDoc_WayPoint(
                      wayPoint.getWayPointId(),
                      tourId,
                      wayPoint.getName(),

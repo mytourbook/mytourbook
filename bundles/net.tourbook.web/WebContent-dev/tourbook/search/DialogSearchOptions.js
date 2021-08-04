@@ -62,8 +62,8 @@ Messages
          /*
           * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work.
           */
-         let onShowDialog = function() { dlg.openedTooltips++ }
-         let onHideDialog = function() { dlg.openedTooltips-- }
+         var onShowDialog = function() { dlg.openedTooltips++ }
+         var onHideDialog = function() { dlg.openedTooltips-- }
 
          this.apChk_EaseSearching_Tooltip.label             = Messages.Search_Options_Checkbox_EaseSearching_Tooltip
          this.apChk_EaseSearching_Tooltip.onShow            = onShowDialog
@@ -245,13 +245,13 @@ Messages
        */
       _setSearchOptions : function _setSearchOptions(searchOptions) {
 
-         var _this = this;
+         var _this = this
  
-         var jsonSearchOptions = JSON.stringify(searchOptions);
+         var jsonSearchOptions = JSON.stringify(searchOptions)
 
-         var xhrQuery = {};
-         xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SET_SEARCH_OPTIONS;
-         xhrQuery[SearchMgr.XHR_PARAM_SEARCH_OPTIONS] = encodeURIComponent(jsonSearchOptions);
+         var xhrQuery = {}
+         xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SET_SEARCH_OPTIONS
+         xhrQuery[SearchMgr.XHR_PARAM_SEARCH_OPTIONS] = encodeURIComponent(jsonSearchOptions)
 
          xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
@@ -266,12 +266,12 @@ Messages
             if (xhrData.isSearchOptionsDefault) {
 
                // set defaults in the UI
-               _this._updateUI_FromState(_this, xhrData);
+               _this._updateUI_FromState(_this, xhrData)
             }
 
             // repeat previous search
 
-            _this._searchApp._searchInput.startSearch(true);
+            _this._searchApp._searchInput.startSearch(true)
          });
       },
 
@@ -304,6 +304,6 @@ Messages
 
    });
 
-   return dlgSearchOptions;
+   return dlgSearchOptions
 
 });
