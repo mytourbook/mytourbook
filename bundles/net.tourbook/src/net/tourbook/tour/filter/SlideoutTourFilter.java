@@ -237,7 +237,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                Messages.Slideout_TourFilter_Confirm_DeleteProperty_Title,
                null, // no title image
 
-               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message, filterProperty.fieldConfig.name),
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message, filterProperty.fieldConfig.getName()),
                MessageDialog.CONFIRM,
 
                0, // default index
@@ -663,6 +663,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
        */
       final SelectionListener fieldListener = widgetSelectedAdapter(
             selectionEvent -> onProperty_SelectField(selectionEvent.widget));
+
       final SelectionListener operatorListener = widgetSelectedAdapter(
             selectionEvent -> onProperty_SelectOperator(selectionEvent.widget));
 
@@ -680,16 +681,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       {
          // properties container
          _filterScrolled_Content = new Composite(_filterScrolled_Container, SWT.NONE);
-         GridDataFactory
-               .fillDefaults()//
-               //				.grab(true, true)
-               .applyTo(_filterScrolled_Content);
          _filterScrolled_Container.setContent(_filterScrolled_Content);
-         _filterScrolled_Container.addControlListener(controlResizedAdapter(
-               controlEvent -> onResizeFilterContent()));
+         _filterScrolled_Container.addControlListener(controlResizedAdapter(controlEvent -> onResizeFilterContent()));
+         GridDataFactory.fillDefaults().applyTo(_filterScrolled_Content);
 
-         GridLayoutFactory
-               .fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(5)
                .applyTo(_filterScrolled_Content);
       }
@@ -749,10 +745,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                 * Container: Field details
                 */
                final Composite fieldContainer = new Composite(_filterScrolled_Content, SWT.NONE);
-               GridDataFactory
-                     .fillDefaults()//
-                     //							.grab(true, false)
-                     .applyTo(fieldContainer);
+               GridDataFactory.fillDefaults().applyTo(fieldContainer);
                GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldContainer);
 //					fieldDetailOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
@@ -2050,7 +2043,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             // fill field combo with all available fields
             comboFilterField.removeAll();
             for (final TourFilterFieldConfig fieldConfigTemplate : TourFilterManager.FILTER_FIELD_CONFIG) {
-               comboFilterField.add(fieldConfigTemplate.name);
+               comboFilterField.add(fieldConfigTemplate.getName());
             }
 
             // fill operator combo

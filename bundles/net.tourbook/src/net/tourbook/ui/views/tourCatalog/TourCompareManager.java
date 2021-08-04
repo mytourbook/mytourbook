@@ -33,6 +33,7 @@ import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -43,6 +44,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
@@ -59,16 +61,27 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class TourCompareManager {
 
-   private static final String                                  NL                    = UI.NEW_LINE;
+   private static final String          NL                                           = UI.NEW_LINE;
 
-   private static final String                                  NUMBER_FORMAT_1F      = "%.1f";                                             //$NON-NLS-1$
+   private static final String          NUMBER_FORMAT_1F                             = "%.1f";                                       //$NON-NLS-1$
 
+   public static final int              REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES    = 0;
+   public static final int              REF_TOUR_VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES = 10;
+
+   private static final String          STATE_REFERENCE_TOUR_VIEW_LAYOUT             = "STATE_REFERENCE_TOUR_VIEW_LAYOUT";           //$NON-NLS-1$
+
+   private static final IDialogSettings _state                                       = TourbookPlugin.getState("TourCompareManager");
+
+   private static int                   _referenceTour_ViewLayout;
+
+   //
    private static ArrayList<RefTourItem>                        _allRefTourItems_FromLastCompare;
    private final static ArrayList<TVICompareResultComparedTour> _allComparedTourItems = new ArrayList<>();
 
-   private static ThreadPoolExecutor                            _compareTour_Executor;
-   private static ArrayBlockingQueue<Long>                      _compareTour_Queue    = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
-   private static CountDownLatch                                _countDownLatch;
+   //
+   private static ThreadPoolExecutor       _compareTour_Executor;
+   private static ArrayBlockingQueue<Long> _compareTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch           _countDownLatch;
 
    static {
 
@@ -653,6 +666,10 @@ public class TourCompareManager {
       return storedComparedTours;
    }
 
+   public static int getReferenceTour_ViewLayout() {
+      return _referenceTour_ViewLayout;
+   }
+
    /**
     * @param isNextTour
     *           When <code>true</code> then navigate to the next tour, when <code>false</code>
@@ -668,22 +685,25 @@ public class TourCompareManager {
       final IWorkbenchPage activePage = window.getActivePage();
 
       /*
-       * First navigate in the year statistic view
+       * Firstly navigate in the compare result view when view is available
        */
-      final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
-      if (yearStatView instanceof RefTour_YearStatistic_View) {
-         navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
+      final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+      
+      if (comparedTours instanceof TourCompareResultView) {
+
+         navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
       }
 
       /*
-       * Second navigate in the compare result view
+       * Secondly navigate in the year statistic view when view is available
        */
       if (navigatedTour == null) {
 
-         final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+         final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
 
-         if (comparedTours instanceof TourCompareResultView) {
-            navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
+         if (yearStatView instanceof RefTour_YearStatistic_View) {
+
+            navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
          }
       }
 
@@ -723,6 +743,11 @@ public class TourCompareManager {
       }
 
       return returnResult;
+   }
+
+   public static void restoreState() {
+
+      _referenceTour_ViewLayout = Util.getStateInt(_state, STATE_REFERENCE_TOUR_VIEW_LAYOUT, REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES);
    }
 
    /**
@@ -778,6 +803,16 @@ public class TourCompareManager {
 
       comparedTourItem.dbSpeed = speed;
       comparedTourItem.dbElapsedTime = tourDeviceTime_Elapsed;
+   }
+
+   public static void saveState() {
+
+      _state.put(STATE_REFERENCE_TOUR_VIEW_LAYOUT, _referenceTour_ViewLayout);
+   }
+
+   public static void setReferenceTour_ViewLayout(final int refTourViewLayout) {
+
+      _referenceTour_ViewLayout = refTourViewLayout;
    }
 
    private static void showCompareResults() {

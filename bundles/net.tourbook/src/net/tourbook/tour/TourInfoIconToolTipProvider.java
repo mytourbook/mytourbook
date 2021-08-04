@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,12 +39,29 @@ import org.eclipse.swt.widgets.Event;
 
 public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoToolTipProvider, IHoveredArea, ITourProvider {
 
-   private static final int   HOVER_AREA_POSITION_X = 2;
-   private static final int   HOVER_AREA_POSITION_Y = 2;
+   private static final int HOVER_AREA_POSITION_X = 2;
+   private static final int HOVER_AREA_POSITION_Y = 2;
 
-   private static Image       _tourInfoImage;
-   private static Image       _tourInfoImageHovered;
-   private static Rectangle   _tourInfoImageSize;
+   private static Rectangle _tourInfoImageSize;
+
+   private static Image     _tourInfoImage;
+   private static Image     _tourInfoImage_Hovered;
+   private static Image     _tourInfoImage_Disabled;
+
+   static {
+
+      final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
+
+      imageRegistry.put(Images.TourInfo, TourbookPlugin.getImageDescriptor(Images.TourInfo));
+      imageRegistry.put(Images.TourInfo_Disabled, TourbookPlugin.getImageDescriptor(Images.TourInfo_Disabled));
+      imageRegistry.put(Images.TourInfo_Hovered, TourbookPlugin.getImageDescriptor(Images.TourInfo_Hovered));
+
+      _tourInfoImage = imageRegistry.get(Images.TourInfo);
+      _tourInfoImage_Disabled = imageRegistry.get(Images.TourInfo_Disabled);
+      _tourInfoImage_Hovered = imageRegistry.get(Images.TourInfo_Hovered);
+
+      _tourInfoImageSize = _tourInfoImage.getBounds();
+   }
 
    private TourToolTip        _tourToolTip;
 
@@ -52,17 +69,16 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
     * Tour which is displayed in the tool tip
     */
    private TourData           _tourData;
-   private long               _tourId               = -1;
 
-   private final TourInfoUI   _tourInfoUI           = new TourInfoUI();
+   private long               _tourId     = -1;
 
+   private final TourInfoUI   _tourInfoUI = new TourInfoUI();
    private HoveredAreaContext _tourInfoHoveredAreaContext;
 
    /**
-    * is <code>true</code> when the mouse is hovering a hovered location
+    * Is <code>true</code> when the mouse is hovering a hovered location
     */
-   private boolean            _isHovered            = false;
-
+   private boolean            _isHovered  = false;
    private int                _xPos;
    private int                _yPos;
 
@@ -97,16 +113,6 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       if (_tourInfoImage != null) {
          return;
       }
-
-      final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
-
-      imageRegistry.put(Images.ToolTip_TourInfo, TourbookPlugin.getImageDescriptor(Images.ToolTip_TourInfo));
-      imageRegistry.put(Images.ToolTip_TourInfo_Hovered, TourbookPlugin.getImageDescriptor(Images.ToolTip_TourInfo_Hovered));
-
-      _tourInfoImage = imageRegistry.get(Images.ToolTip_TourInfo);
-      _tourInfoImageHovered = imageRegistry.get(Images.ToolTip_TourInfo_Hovered);
-
-      _tourInfoImageSize = _tourInfoImage.getBounds();
    }
 
    @Override
@@ -115,6 +121,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       Composite ui;
 
       if (_tourId != -1) {
+
          // first get data from the tour id when it is set
          _tourData = TourManager.getInstance().getTourData(_tourId);
       }
@@ -172,7 +179,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
    @Override
    public Image getHoveredImage() {
-      return _tourInfoImageHovered;
+      return _tourInfoImage_Hovered;
    }
 
    @Override
@@ -199,7 +206,17 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
    @Override
    public void paint(final GC gc, final Rectangle clientArea) {
 
-      final Image tourInfoImage = _isHovered ? _tourInfoImageHovered : _tourInfoImage;
+      final boolean isTourAvailable = _tourData != null || _tourId != -1;
+
+      final Image tourInfoImage =
+
+            isTourAvailable
+
+                  ? _isHovered
+                        ? _tourInfoImage_Hovered
+                        : _tourInfoImage
+
+                  : _tourInfoImage_Disabled;
 
       // paint static image
       gc.drawImage(tourInfoImage, _xPos, _yPos);
@@ -238,6 +255,16 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       _isHovered = hoveredContext != null;
 
       return _isHovered;
+   }
+
+   /**
+    * Set text for the tooltip which is displayed when a tour is not available
+    *
+    * @param noTourTooltip
+    */
+   public void setNoTourTooltip(final String noTourTooltip) {
+
+      _tourInfoUI.setNoTourTooltip(noTourTooltip);
    }
 
    /**

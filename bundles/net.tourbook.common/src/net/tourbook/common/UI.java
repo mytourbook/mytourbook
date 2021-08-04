@@ -272,6 +272,12 @@ public class UI {
    public static final int     DEFAULT_FIELD_WIDTH            = 40;
 
    /**
+    * The opacity can be set in SWT from 0...255 but no user want's so many steps. In the UI the
+    * user can select this max opacity value which will be converted into 255 when appied.
+    */
+   public static final int     MAX_OPACITY                    = 10;
+
+   /**
     * Convert Joule in Calorie
     * <p>
     * 1 cal = 4.1868 J<br>
@@ -522,7 +528,7 @@ public class UI {
    private static StringBuilder        _formatterSB               = new StringBuilder();
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
-   private static FontMetrics          _fontMetrics;
+   private static FontMetrics          _dialogFont_Metrics;
 
 // SET_FORMATTING_OFF
 
@@ -931,7 +937,28 @@ public class UI {
          return dlus * 4;
       }
 
-      return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
+      return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Convert opacity value into 0...255 where 255 corresponds with {@link #MAX_OPACITY}
+    * <p>
+    * The tooltip should display
+    *
+    * <pre>
+    * 0 = transparent ... max = opaque
+    * </pre>
+    *
+    * that {@link #MAX_OPACITY} could be adjusted or customized by the user.
+    *
+    * @param opacity
+    * @return
+    */
+   public static int convertOpacity(final float opacity) {
+
+      final float opacityConverted = opacity / MAX_OPACITY * 0xff;
+
+      return (int) Math.min(0xff, opacityConverted);
    }
 
    /**
@@ -1461,6 +1488,14 @@ public class UI {
       final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
+   }
+
+   public static FontMetrics getDialogFontMetrics() {
+
+      // ensure that font metrics are setup
+      setupUI_FontMetrics();
+
+      return _dialogFont_Metrics;
    }
 
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
@@ -2304,26 +2339,22 @@ public class UI {
 
    private static boolean setupUI_FontMetrics() {
 
-      if (_fontMetrics != null) {
+      if (_dialogFont_Metrics != null) {
          return true;
       }
 
       // Compute and keep a font metric
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
-
-      if (activeShell == null) {
-
-         // this can occure when called too early
-         return false;
-      }
-
-      final GC gc = new GC(activeShell);
+      final Display display = Display.getDefault();
+      final Shell shell = new Shell(display);
+      final GC gc = new GC(shell);
       {
          gc.setFont(JFaceResources.getDialogFont());
-         _fontMetrics = gc.getFontMetrics();
+
+         _dialogFont_Metrics = gc.getFontMetrics();
       }
       gc.dispose();
+      shell.dispose();
 
       return true;
    }
