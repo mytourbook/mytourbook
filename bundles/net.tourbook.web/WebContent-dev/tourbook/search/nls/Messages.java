@@ -21,7 +21,6 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "tourbook.search.nls.messages";             //$NON-NLS-1$
 
-
    public static String        Search_App_Action_EditMarker;
    public static String        Search_App_Action_EditTour;
    public static String        Search_App_Action_SearchOptions_Tooltip;
@@ -35,35 +34,39 @@ public class Messages extends NLS {
    public static String        Search_Options_Action_RestoreDefaults;
    public static String        Search_Options_Checkbox_EaseSearching;
    public static String        Search_Options_Checkbox_EaseSearching_Tooltip;
-   public static String        Search_Options_Checkbox_ShowContentAll;
-   public static String        Search_Options_Checkbox_ShowContentTour;
-   public static String        Search_Options_Checkbox_ShowContentMarker;
-   public static String        Search_Options_Checkbox_ShowContentWaypoint;
-   public static String        Search_Options_Checkbox_ShowDate;
-   public static String        Search_Options_Checkbox_ShowTime;
-   public static String        Search_Options_Checkbox_ShowDescription;
-   public static String        Search_Options_Checkbox_ShowItemNumber;
-   public static String        Search_Options_Checkbox_ShowLuceneDocId;
+
+   public static String        Search_Options_Checkbox_Search_All;
+   public static String        Search_Options_Checkbox_Search_Marker;
    public static String        Search_Options_Checkbox_Search_Marker_Tooltip;
    public static String        Search_Options_Checkbox_Search_Tour_LocationEnd;
    public static String        Search_Options_Checkbox_Search_Tour_LocationEnd_Tooltip;
    public static String        Search_Options_Checkbox_Search_Tour_LocationStart;
    public static String        Search_Options_Checkbox_Search_Tour_LocationStart_Tooltip;
+   public static String        Search_Options_Checkbox_Search_Tour;
    public static String        Search_Options_Checkbox_Search_Tour_Tooltip;
    public static String        Search_Options_Checkbox_Search_Tour_Weather;
    public static String        Search_Options_Checkbox_Search_Tour_Weather_Tooltip;
+   public static String        Search_Options_Checkbox_Search_Waypoint;
    public static String        Search_Options_Checkbox_Search_Waypoint_Tooltip;
+
+   public static String        Search_Options_Checkbox_Show_Date;
+   public static String        Search_Options_Checkbox_Show_Time;
+   public static String        Search_Options_Checkbox_Show_Description;
+   public static String        Search_Options_Checkbox_Show_ItemNumber;
+   public static String        Search_Options_Checkbox_Show_LuceneDocId;
+
    public static String        Search_Options_Dialog_Header;
    public static String        Search_Options_Group_Content;
    public static String        Search_Options_Group_Sorting;
    public static String        Search_Options_Group_Result;
-   public static String        Search_Options_Label_SortAscending;
-   public static String        Search_Options_Radio_SortAscending;
-   public static String        Search_Options_Radio_SortDescending;
+   public static String        Search_Options_Label_Sort_ByDate;
+   public static String        Search_Options_Radio_Sort_ByDate_Ascending;
+   public static String        Search_Options_Radio_Sort_ByDate_Descending;
 
    public static String        Search_Validation_SearchFilter;
 
    static {
+
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
    }

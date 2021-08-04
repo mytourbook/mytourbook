@@ -56,44 +56,21 @@ Messages
 
          this.inherited(arguments)
 
-         // hide dialog when mouse has leaved it
-         on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"))
-
          /*
-          * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work.
+          * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work
           */
-         var onShowDialog = function() { dlg.openedTooltips++ }
-         var onHideDialog = function() { dlg.openedTooltips-- }
 
          this.apChk_EaseSearching_Tooltip.label             = Messages.Search_Options_Checkbox_EaseSearching_Tooltip
-         this.apChk_EaseSearching_Tooltip.onShow            = onShowDialog
-         this.apChk_EaseSearching_Tooltip.onHide            = onHideDialog
-         
-         this.apChkSearch_Tour_Tooltip.label                = Messages.Search_Options_Checkbox_Search_Tour_Tooltip
-         this.apChkSearch_Tour_Tooltip.onShow               = onShowDialog
-         this.apChkSearch_Tour_Tooltip.onHide               = onHideDialog
-         
-         this.apChkSearch_Tour_LocationStart_Tooltip.label  = Messages.Search_Options_Checkbox_Search_Tour_LocationStart_Tooltip
-         this.apChkSearch_Tour_LocationStart_Tooltip.onShow = onShowDialog
-         this.apChkSearch_Tour_LocationStart_Tooltip.onHide = onHideDialog
 
+         this.apChkSearch_Tour_Tooltip.label                = Messages.Search_Options_Checkbox_Search_Tour_Tooltip
+         this.apChkSearch_Tour_LocationStart_Tooltip.label  = Messages.Search_Options_Checkbox_Search_Tour_LocationStart_Tooltip
          this.apChkSearch_Tour_LocationEnd_Tooltip.label    = Messages.Search_Options_Checkbox_Search_Tour_LocationEnd_Tooltip
-         this.apChkSearch_Tour_LocationEnd_Tooltip.onShow   = onShowDialog
-         this.apChkSearch_Tour_LocationEnd_Tooltip.onHide   = onHideDialog
-         
          this.apChkSearch_Tour_Weather_Tooltip.label        = Messages.Search_Options_Checkbox_Search_Tour_Weather_Tooltip
-         this.apChkSearch_Tour_Weather_Tooltip.onShow       = onShowDialog
-         this.apChkSearch_Tour_Weather_Tooltip.onHide       = onHideDialog
          
          this.apChkSearch_Marker_Tooltip.label              = Messages.Search_Options_Checkbox_Search_Marker_Tooltip
-         this.apChkSearch_Marker_Tooltip.onShow             = onShowDialog
-         this.apChkSearch_Marker_Tooltip.onHide             = onHideDialog
-         
          this.apChkSearch_Waypoint_Tooltip.label            = Messages.Search_Options_Checkbox_Search_Waypoint_Tooltip
-         this.apChkSearch_Waypoint_Tooltip.onShow           = onShowDialog
-         this.apChkSearch_Waypoint_Tooltip.onHide           = onHideDialog
       },
-
+      
       /**
        * Overwrite BaseDialog.showDialog and restore the state of the UI.
        */
@@ -208,12 +185,14 @@ Messages
             var isSearch_All = this.apChkSearch_All.get('checked')
             
             this.apChkSearch_Tour               .set('disabled', isSearch_All)
+            // this.apChkSearch_Tour_Label         .set('disabled', isSearch_All)
+            this.apChkSearch_Marker             .set('disabled', isSearch_All)
+            this.apChkSearch_Waypoint           .set('disabled', isSearch_All)
+
             this.apChkSearch_Tour_LocationStart .set('disabled', isSearch_All)
             this.apChkSearch_Tour_LocationEnd   .set('disabled', isSearch_All)
             this.apChkSearch_Tour_Weather       .set('disabled', isSearch_All)
 
-            this.apChkSearch_Marker             .set('disabled', isSearch_All)
-            this.apChkSearch_Waypoint           .set('disabled', isSearch_All)
       },
 
       /**

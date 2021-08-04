@@ -378,7 +378,7 @@ a.item:VISITED
    color:                  #888;
 }
 
-.item-info td,
+.item-info td
 {
    padding-right:          20px;
 }

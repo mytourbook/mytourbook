@@ -36,33 +36,35 @@ public class MessagesUsed {
       used = Messages.Search_Grid_Label_NoDataMessage;
 
       used = Messages.Search_Options_Action_RestoreDefaults;
+
       used = Messages.Search_Options_Checkbox_EaseSearching;
       used = Messages.Search_Options_Checkbox_EaseSearching_Tooltip;
-      used = Messages.Search_Options_Checkbox_ShowContentAll;
-      used = Messages.Search_Options_Checkbox_ShowContentMarker;
-      used = Messages.Search_Options_Checkbox_ShowContentTour;
-      used = Messages.Search_Options_Checkbox_ShowContentWaypoint;
-      used = Messages.Search_Options_Checkbox_ShowDate;
-      used = Messages.Search_Options_Checkbox_ShowTime;
-      used = Messages.Search_Options_Checkbox_ShowDescription;
-      used = Messages.Search_Options_Checkbox_ShowItemNumber;
-      used = Messages.Search_Options_Checkbox_ShowLuceneDocId;
+      used = Messages.Search_Options_Checkbox_Search_All;
+      used = Messages.Search_Options_Checkbox_Search_Marker;
       used = Messages.Search_Options_Checkbox_Search_Marker_Tooltip;
+      used = Messages.Search_Options_Checkbox_Search_Tour;
+      used = Messages.Search_Options_Checkbox_Search_Tour_Tooltip;
       used = Messages.Search_Options_Checkbox_Search_Tour_LocationEnd;
       used = Messages.Search_Options_Checkbox_Search_Tour_LocationEnd_Tooltip;
       used = Messages.Search_Options_Checkbox_Search_Tour_LocationStart;
       used = Messages.Search_Options_Checkbox_Search_Tour_LocationStart_Tooltip;
-      used = Messages.Search_Options_Checkbox_Search_Tour_Tooltip;
       used = Messages.Search_Options_Checkbox_Search_Tour_Weather;
       used = Messages.Search_Options_Checkbox_Search_Tour_Weather_Tooltip;
+      used = Messages.Search_Options_Checkbox_Search_Waypoint;
       used = Messages.Search_Options_Checkbox_Search_Waypoint_Tooltip;
+      used = Messages.Search_Options_Checkbox_Show_Date;
+      used = Messages.Search_Options_Checkbox_Show_Time;
+      used = Messages.Search_Options_Checkbox_Show_Description;
+      used = Messages.Search_Options_Checkbox_Show_ItemNumber;
+      used = Messages.Search_Options_Checkbox_Show_LuceneDocId;
+
       used = Messages.Search_Options_Dialog_Header;
       used = Messages.Search_Options_Group_Content;
       used = Messages.Search_Options_Group_Result;
       used = Messages.Search_Options_Group_Sorting;
-      used = Messages.Search_Options_Label_SortAscending;
-      used = Messages.Search_Options_Radio_SortAscending;
-      used = Messages.Search_Options_Radio_SortDescending;
+      used = Messages.Search_Options_Label_Sort_ByDate;
+      used = Messages.Search_Options_Radio_Sort_ByDate_Ascending;
+      used = Messages.Search_Options_Radio_Sort_ByDate_Descending;
 
       used = Messages.Search_Validation_SearchFilter;
    }

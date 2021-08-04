@@ -35,14 +35,7 @@ Dialog
 
       _dialog : null,
 
-      /**
-       * Counter how many tooltips are opened, this dialog will not be closed when >0.
-       */
-      openedTooltips : 0,
-
       createDialog : function createDialog(args) {
-
-         this.openedTooltips = 0;
 
          if (this._dialog == null) {
 
@@ -56,6 +49,7 @@ Dialog
                 * Overwrite _position in dijit._DialogBase to pin the dialog to the layoutParent node.
                 */
                _position : function _position() {
+                  
                   // summary:
                   //      Position the dialog in the viewport.  If no relative offset
                   //      in the viewport has been determined (by dragging, for instance),
@@ -68,17 +62,17 @@ Dialog
 
                      if (!domClass.contains(this.ownerDocumentBody, "dojoMove")) { // don't do anything if called during auto-scroll
 
-                        var domDialog = this.domNode, //
+                        var domDialog = this.domNode, 
 
-                        viewport = winUtils.getBox(this.ownerDocument), //
+                        viewport = winUtils.getBox(this.ownerDocument), 
 
-                        dialogBounds = domGeometry.position(domDialog), //
-                        parentBounds = domGeometry.position(layoutParent.domNode);
+                        dialogBounds = domGeometry.position(domDialog), 
+                        parentBounds = domGeometry.position(layoutParent.domNode),
 
-                        l = Math.floor(viewport.w - dialogBounds.w - 1), //
-                        t = Math.floor(parentBounds.y + parentBounds.h);
+                        l = Math.floor(viewport.w - dialogBounds.w - 1), 
+                        t = Math.floor(parentBounds.y + parentBounds.h)
 
-                        domStyle.set(domDialog, //
+                        domStyle.set(domDialog, 
                         {
                            left : l + "px",
                            top : t + "px"
@@ -89,44 +83,27 @@ Dialog
 
                      // do the original _position implementation
 
-                     this.inherited(arguments);
+                     this.inherited(arguments)
                   }
                }
 
-            }, args));
+            }, args))
          }
 
-         return this._dialog;
+         return this._dialog
       },
 
       showDialog : function showDialog(args) {
 
-         this.createDialog(args);
+         this.createDialog(args)
 
-         this._dialog.show();
-      },
-
-      hideDialog : function(event) {
-
-         if (this._dialog != null) {
-
-//            console.log("this.openedTooltips: " + this.openedTooltips);
-
-            /*
-             * THIS IS ABSOLUTELY NOT WORKING PROPERLY, but sometimes, therefore it is enabled, with the close button
-             * the dialog can be hidden in all cases.
-             */
-            if (this.openedTooltips > 0) {
-               return;
-            }
-
-            this._dialog.hide();
-         }
+         this._dialog.show()
       },
 
       destroyDialog : function() {
+
          if (this._dialog != null) {
-            this._dialog.destroy();
+            this._dialog.destroy()
          }
       }
 
