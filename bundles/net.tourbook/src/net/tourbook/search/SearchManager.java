@@ -755,7 +755,7 @@ public class SearchManager implements XHRHandler {
 
       int itemIndex = 0;
 
-      for (final SearchResultItem resultItem : searchResult.items) {
+      for (final SearchResultItem resultItem : searchResult.allItems) {
 
          final StringBuilder sb = new StringBuilder();
          final int itemNumber = searchPosFrom + (++itemIndex);

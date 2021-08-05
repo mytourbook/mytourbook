@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class SearchResult {
 
-   final ArrayList<SearchResultItem> items = new ArrayList<>();
+   final ArrayList<SearchResultItem> allItems = new ArrayList<>();
 
    long                              totalHits;
 
