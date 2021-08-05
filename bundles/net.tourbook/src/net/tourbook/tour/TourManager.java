@@ -2483,7 +2483,8 @@ public class TourManager {
     * @return Returns the persisted {@link TourData}
     */
    public static TourData saveModifiedTour(final TourData tourData) {
-      return saveModifiedTour(tourData, true);
+
+      return saveModifiedTour(tourData, true, false);
    }
 
    /**
@@ -2492,12 +2493,12 @@ public class TourManager {
     *           When <code>true</code>, a notification is fired when the data are saved
     * @return Returns the saved {@link TourData} or <code>null</code> when saving fails
     */
-   public static TourData saveModifiedTour(final TourData tourData, final boolean isFireNotification) {
+   public static TourData saveModifiedTour(final TourData tourData, final boolean isFireNotification, final boolean isConcurrent) {
 
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
       modifiedTours.add(tourData);
 
-      final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, isFireNotification);
+      final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, isFireNotification, isConcurrent);
 
       if (savedTourData.isEmpty()) {
          return null;
@@ -2518,7 +2519,8 @@ public class TourManager {
     * @return Returns a list with all persisted {@link TourData}
     */
    public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
-      return saveModifiedTours(modifiedTours, true);
+
+      return saveModifiedTours(modifiedTours, true, false);
    }
 
    /**
@@ -2535,7 +2537,8 @@ public class TourManager {
     * @return a list with all persisted {@link TourData}
     */
    private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
-                                                        final boolean canFireNotification) {
+                                                        final boolean canFireNotification,
+                                                        final boolean isConcurrent) {
 
       // reset multiple tour data cache
       _joined_TourData = null;
@@ -2554,7 +2557,7 @@ public class TourManager {
 
          // no progress when only 1 tour is saved
 
-         saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, modifiedTours.get(0));
+         saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, modifiedTours.get(0), isConcurrent);
 
       } else {
 
@@ -2578,7 +2581,7 @@ public class TourManager {
                                  ++saveCounter,
                                  tourSize));
 
-                     saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData);
+                     saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData, isConcurrent);
 
                      monitor.worked(1);
                   }
@@ -2609,7 +2612,8 @@ public class TourManager {
    private static void saveModifiedTours_OneTour(final ArrayList<TourData> savedTours,
                                                  final TourData[] tourDataEditorSavedTour,
                                                  final boolean[] doFireChangeEvent,
-                                                 final TourData tourData) {
+                                                 final TourData tourData,
+                                                 final boolean isConcurrent) {
       boolean doSaveTour = false;
       TourData savedTour = null;
 
@@ -2679,7 +2683,9 @@ public class TourManager {
       if (doSaveTour) {
 
          // save the tour
-         savedTour = TourDatabase.saveTour(tourData, true);
+         savedTour = isConcurrent
+               ? TourDatabase.saveTour_Concurrent(tourData, true)
+               : TourDatabase.saveTour(tourData, true);
 
          doFireChangeEvent[0] = true;
       }

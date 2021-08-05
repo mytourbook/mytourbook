@@ -88,7 +88,7 @@ public class ActionCreateRefTour extends Action {
       tourData.getTourReferences().add(newTourReference);
 
       // save tour
-      final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
+      final TourData savedTourData = TourManager.saveModifiedTour(tourData, false, false);
 
       // show reference tour perspective and select the ref tour
       Display.getDefault().asyncExec(() -> {

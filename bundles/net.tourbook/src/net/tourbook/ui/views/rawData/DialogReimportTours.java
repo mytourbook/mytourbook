@@ -287,7 +287,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                         oldTourData,
                         reimportedFile,
                         skipToursWithFileNotFound,
-                        reImportStatus[0]);
+                        reImportStatus[0],
+                        false);
 
                   if (handleFileLocationDialog_UserCancellation(reImportStatus[0], skipToursWithFileNotFound)) {
                      break;
@@ -412,7 +413,7 @@ public class DialogReimportTours extends TitleAreaDialog {
          final RawDataManager rawDataManager = new RawDataManager();
          rawDataManager.setImportId();
          rawDataManager.setImportCanceled(false);
-         rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, true, reImportStatus);
+         rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, true, reImportStatus, true);
 
          monitor.worked(1);
 
@@ -881,7 +882,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                      oldTourData,
                      reimportedFile,
                      skipToursWithFileNotFound,
-                     reImportStatus);
+                     reImportStatus,
+                     false);
 
                return true;
             }

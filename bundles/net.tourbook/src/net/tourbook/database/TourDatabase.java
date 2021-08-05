@@ -45,7 +45,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -299,6 +301,8 @@ public class TourDatabase {
    private static volatile ComboPooledDataSource _pooledDataSource;
 
    private static int                            _dbVersionOnStartup = -1;
+   private static ThreadPoolExecutor             _dbSaveExecutor;
+   private static ArrayBlockingQueue<TourData>   _dbSaveQueue        = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static ThreadPoolExecutor             _dbUpdateExecutor;
    private static ArrayBlockingQueue<Long>       _dbUpdateQueue      = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
 
@@ -311,7 +315,19 @@ public class TourDatabase {
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
-      final ThreadFactory threadFactory = runnable -> {
+      final ThreadFactory saveThreadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Saving database tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _dbSaveExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, saveThreadFactory);
+
+      final ThreadFactory updateThreadFactory = runnable -> {
 
          final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
 
@@ -321,7 +337,7 @@ public class TourDatabase {
          return thread;
       };
 
-      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, updateThreadFactory);
    }
    private static final Object DB_LOCK = new Object();
 
@@ -2742,122 +2758,172 @@ public class TourDatabase {
     */
    public static TourData saveTour_Concurrent(final TourData tourData, final boolean isUpdateModifiedDate) {
 
-      /*
-       * prevent saving a tour which was deleted before
-       */
-      if (tourData.isTourDeleted) {
-         return null;
+      // put tour ID (queue item) into the queue AND wait when it is full
+
+      try {
+
+         _dbSaveQueue.put(tourData);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
-      /*
-       * History tour or multiple tours cannot be saved
-       */
-      if (tourData.isHistoryTour || tourData.isMultipleTours()) {
-         return null;
-      }
+      final Future<TourData> future = _dbSaveExecutor.submit(() -> {
 
-      /*
-       * prevent saving a tour when a person is not set, this check is for internal use that all
-       * data are valid
-       */
-      if (tourData.getTourPerson() == null) {
-         StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
-         return null;
-      }
+         // get last added item
+         final TourData queueItem_Tour = _dbSaveQueue.poll();
 
-      /*
-       * check size of varcar fields
-       */
-      if (tourData.isValidForSave() == false) {
-         return null;
-      }
+         if (queueItem_Tour == null) {
+            return null;
+         }
 
-      /*
-       * Removed cached data
-       */
-      TourManager.clearMultipleTourData();
-
-      /**
-       * ensure HR zones are computed, it requires that a person is set which is not the case when a
-       * device importer calls the method {@link TourData#computeComputedValues()}
-       */
-      tourData.getNumberOfHrZones();
-
-      final long dtSaved = TimeTools.createdNowAsYMDhms();
-
-      checkUnsavedTransientInstances(tourData);
-
-      EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      TourData persistedEntity = null;
-
-      if (em != null) {
-
-         final EntityTransaction ts = em.getTransaction();
+         EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
 
          try {
 
-            tourData.onPrePersist();
+            /*
+             * prevent saving a tour which was deleted before
+             */
+            if (tourData.isTourDeleted) {
+               return null;
+            }
 
-            ts.begin();
-            {
-               final TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
-               if (tourDataEntity == null) {
+            /*
+             * History tour or multiple tours cannot be saved
+             */
+            if (tourData.isHistoryTour || tourData.isMultipleTours()) {
+               return null;
+            }
 
-                  // tour is not yet persisted
+            /*
+             * prevent saving a tour when a person is not set, this check is for internal use
+             * that
+             * all
+             * data are valid
+             */
+            if (tourData.getTourPerson() == null) {
+               StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
+               return null;
+            }
 
-                  tourData.setDateTimeCreated(dtSaved);
+            /*
+             * check size of varcar fields
+             */
+            if (tourData.isValidForSave() == false) {
+               return null;
+            }
 
-                  em.persist(tourData);
+            /*
+             * Removed cached data
+             */
+            TourManager.clearMultipleTourData();
 
-                  persistedEntity = tourData;
+            /**
+             * ensure HR zones are computed, it requires that a person is set which is not the
+             * case
+             * when a
+             * device importer calls the method {@link TourData#computeComputedValues()}
+             */
+            tourData.getNumberOfHrZones();
 
-               } else {
+            final long dtSaved = TimeTools.createdNowAsYMDhms();
 
-                  if (isUpdateModifiedDate) {
-                     tourData.setDateTimeModified(dtSaved);
+            checkUnsavedTransientInstances(tourData);
+
+            TourData persistedEntity = null;
+
+            if (entityManager != null) {
+
+               final EntityTransaction ts = entityManager.getTransaction();
+
+               try {
+
+                  tourData.onPrePersist();
+
+                  ts.begin();
+                  {
+                     final TourData tourDataEntity = entityManager.find(TourData.class, tourData.getTourId());
+                     if (tourDataEntity == null) {
+
+                        // tour is not yet persisted
+
+                        tourData.setDateTimeCreated(dtSaved);
+
+                        entityManager.persist(tourData);
+
+                        persistedEntity = tourData;
+
+                     } else {
+
+                        if (isUpdateModifiedDate) {
+                           tourData.setDateTimeModified(dtSaved);
+                        }
+
+                        persistedEntity = entityManager.merge(tourData);
+                     }
                   }
+                  ts.commit();
 
-                  persistedEntity = em.merge(tourData);
+               } catch (final Exception e) {
+
+                  StatusUtil.showStatus(Messages.Tour_Database_TourSaveError, e);
+
+               } finally {
+                  if (ts.isActive()) {
+                     ts.rollback();
+                  }
+                  entityManager.close();
                }
             }
-            ts.commit();
 
-         } catch (final Exception e) {
+            if (persistedEntity != null) {
 
-            StatusUtil.showStatus(Messages.Tour_Database_TourSaveError, e);
+               entityManager = TourDatabase.getInstance().getEntityManager();
+               try {
+
+                  persistedEntity = entityManager.find(TourData.class, tourData.getTourId());
+
+               } catch (final Exception e) {
+                  StatusUtil.log(e);
+               }
+
+               entityManager.close();
+
+               TourManager.getInstance().updateTourInCache(persistedEntity);
+
+               // update ft index
+               final ArrayList<TourData> allTours = new ArrayList<>();
+               allTours.add(persistedEntity);
+               FTSearchManager.updateIndex(allTours);
+            }
+
+            return persistedEntity;
 
          } finally {
-            if (ts.isActive()) {
-               ts.rollback();
-            }
-            em.close();
+
+            entityManager.close();
          }
+      });
+
+      // The new tour save method should first save all tours concurrently and
+      //then do the post methods, e.g. updateCachedFields
+
+      while (!future.isDone()) {}
+
+      TourData persistedEntity = null;
+      try {
+         persistedEntity = future.get();
+      } catch (InterruptedException | ExecutionException e) {
+         e.printStackTrace();
       }
 
       if (persistedEntity != null) {
 
-         em = TourDatabase.getInstance().getEntityManager();
-         try {
-
-            persistedEntity = em.find(TourData.class, tourData.getTourId());
-
-         } catch (final Exception e) {
-            StatusUtil.log(e);
-         }
-
-         em.close();
-
-         TourManager.getInstance().updateTourInCache(persistedEntity);
-
          updateCachedFields(persistedEntity);
 
          saveTour_GeoParts(persistedEntity);
-
-         // update ft index
-         final ArrayList<TourData> allTours = new ArrayList<>();
-         allTours.add(persistedEntity);
-         FTSearchManager.updateIndex(allTours);
       }
 
       return persistedEntity;

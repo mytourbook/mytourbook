@@ -960,7 +960,8 @@ public class RawDataManager {
 
    private boolean actionReimportTour_30(final List<TourValueType> tourValueTypes,
                                          final File reimportedFile,
-                                         final TourData oldTourData) {
+                                         final TourData oldTourData,
+                                         final boolean isConcurrent) {
 
       boolean isTourReImported = false;
 
@@ -1091,7 +1092,7 @@ public class RawDataManager {
                 * Save tour but don't fire a change event because the tour editor would set the tour
                 * to dirty
                 */
-               final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false);
+               final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false, isConcurrent);
 
                updatedTourData = savedTourData;
             }
@@ -1700,7 +1701,7 @@ public class RawDataManager {
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);
       }
-      TourManager.saveModifiedTour(tourData, false);
+      TourManager.saveModifiedTour(tourData, false, false);
 
       TourLogManager.showLogView();
       TourLogManager.addSubLog(TourLogState.IMPORT_OK,
@@ -2198,7 +2199,8 @@ public class RawDataManager {
                             final TourData tourData,
                             final File[] reimportedFile,
                             final boolean skipToursWithFileNotFound,
-                            final ReImportStatus reImportStatus) {
+                            final ReImportStatus reImportStatus,
+                            final boolean isConcurrent) {
 
       boolean isReImported = false;
 
@@ -2230,7 +2232,7 @@ public class RawDataManager {
 
          // this case occurs when a file contains multiple tours
 
-         if (actionReimportTour_30(tourValueTypes, reimportedFile[0], tourData)) {
+         if (actionReimportTour_30(tourValueTypes, reimportedFile[0], tourData, isConcurrent)) {
             isReImported = true;
             isTourReImportedFromSameFile = true;
          }
@@ -2272,7 +2274,7 @@ public class RawDataManager {
 
          // import file is available
 
-         if (actionReimportTour_30(tourValueTypes, reimportedFile[0], tourData)) {
+         if (actionReimportTour_30(tourValueTypes, reimportedFile[0], tourData, isConcurrent)) {
             isReImported = true;
          }
       }
