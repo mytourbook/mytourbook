@@ -2684,7 +2684,7 @@ public class TourManager {
 
          // save the tour
          savedTour = isConcurrent
-               ? TourDatabase.saveTour_Concurrent(tourData, true)
+               ? TourDatabase.saveTour(tourData, true) //TourDatabase.saveTour_Concurrent(tourData, true)
                : TourDatabase.saveTour(tourData, true);
 
          doFireChangeEvent[0] = true;

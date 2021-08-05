@@ -2624,7 +2624,7 @@ public class TourDatabase {
     *           does not make sense to set the modified date.
     * @return persisted {@link TourData} or <code>null</code> when saving fails
     */
-   public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
+   public static synchronized TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
 
       /*
        * prevent saving a tour which was deleted before
@@ -2734,7 +2734,7 @@ public class TourDatabase {
 
          TourManager.getInstance().updateTourInCache(persistedEntity);
 
-         updateCachedFields(persistedEntity);
+         // updateCachedFields(persistedEntity);
 
          saveTour_GeoParts(persistedEntity);
 
@@ -2756,7 +2756,7 @@ public class TourDatabase {
     *           does not make sense to set the modified date.
     * @return persisted {@link TourData} or <code>null</code> when saving fails
     */
-   public static TourData saveTour_Concurrent(final TourData tourData, final boolean isUpdateModifiedDate) {
+   public static TourData saveTour_Concurrenttoto(final TourData tourData, final boolean isUpdateModifiedDate) {
 
       // put tour ID (queue item) into the queue AND wait when it is full
 
@@ -2903,7 +2903,9 @@ public class TourDatabase {
 
          } finally {
 
-            entityManager.close();
+            if (entityManager.isOpen()) {
+               entityManager.close();
+            }
          }
       });
 
@@ -2929,7 +2931,7 @@ public class TourDatabase {
       return persistedEntity;
    }
 
-   private static void saveTour_GeoParts(final TourData tourData) {
+   private static synchronized void saveTour_GeoParts(final TourData tourData) {
 
 //      final long startTime = System.nanoTime();
 
@@ -3061,7 +3063,7 @@ public class TourDatabase {
       _activeTourTypes = new ArrayList<>();
    }
 
-   private static void updateCachedFields(final TourData tourData) {
+   private static synchronized void updateCachedFields(final TourData tourData) {
 
       // cache tour title
       final TreeSet<String> allTitles = getAllTourTitles();

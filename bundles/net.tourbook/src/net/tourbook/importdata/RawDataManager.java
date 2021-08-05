@@ -1143,7 +1143,7 @@ public class RawDataManager {
                                           final File reImportedFile,
                                           final TourData oldTourData) {
 
-      TourLogManager.showLogView();
+      // makes the concurrent import stuck TourLogManager.showLogView();
 
       final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
       String message = null;

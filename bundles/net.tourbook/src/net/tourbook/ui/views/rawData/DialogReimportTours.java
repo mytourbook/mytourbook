@@ -239,6 +239,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                final TourData oldTourData = TourManager.getTour(tourId);
                if (oldTourData == null) {
+                  _countDownLatch.countDown();
                   continue;
                }
 
@@ -295,7 +296,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
                }
             }
-
+            _dbUpdateExecutor.shutdown();
          }
       };
 
@@ -371,7 +372,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
 
-         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setPriority(Thread.MAX_PRIORITY);
          thread.setDaemon(true);
 
          return thread;
