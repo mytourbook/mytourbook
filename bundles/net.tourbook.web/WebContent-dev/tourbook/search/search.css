@@ -94,9 +94,41 @@ a
 {
    border-top:             0px   !important;
 }
+
 .dijitDialogTitleBar
 {
    background:             #$BODY__BACKGROUND_COLOR$ !important;
+}
+
+.xdijitDialogCloseIcon, 
+.xdijitDialogCloseIconHover 
+{
+   display:                inline-block      !important;
+   position:               absolute          !important;
+
+   top:                    5px               !important;
+   right:                  10px              !important;
+   width:                  20px              !important;
+   height:                 20px              !important;
+   line-height:            18px              !important;
+
+   border-radius:          0                 !important;
+   text-decoration:        none              !important;
+   
+   xbackground:             #$DIJIT_DIALOG_CLOSE_ICON$    !important;
+   xbackground:             #777              !important;
+   
+   color:                  #FFF              !important;
+   text-align:             center            !important;
+   vertical-align:         middle            !important;
+   overflow:               hidden            !important;
+   transition:             0                 !important;
+}
+
+.xdijitDialogCloseIconHover 
+{
+   xbackground:             #$DIJIT_DIALOG_CLOSE_ICON_HOVER$    !important;
+   xbackground:             #ccc    !important;
 }
 
 .dijitTitlePaneTitle

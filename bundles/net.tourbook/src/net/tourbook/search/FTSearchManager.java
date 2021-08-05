@@ -69,6 +69,7 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.Builder;
@@ -133,7 +134,6 @@ public class FTSearchManager {
    private static FSDirectory                   _infixStore;
 
    private static TopDocs                       _topDocs;
-   private static String                        _topDocs_SearchText;
 
    private static final DefaultPassageFormatter _highlightFormatter;
 
@@ -320,6 +320,13 @@ public class FTSearchManager {
       }
    }
 
+   private static class QueryResult {
+
+      public Query    query;
+
+      public String[] allQueryFields;
+   }
+
    public static void closeIndexReaderSuggester() {
 
       if (_suggester instanceof AnalyzingInfixSuggester) {
@@ -407,7 +414,9 @@ public class FTSearchManager {
 
       final Document doc = new Document();
 
+      // create a field to identify a tour marker
       doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER));
+
       doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
 
       doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR_MARKER));
@@ -436,7 +445,9 @@ public class FTSearchManager {
 
       final Document doc = new Document();
 
+      // create a field to identify a tour
       doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR));
+
       doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
 
       doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR));
@@ -474,7 +485,9 @@ public class FTSearchManager {
 
       final Document doc = new Document();
 
+      // create a field to identify a waypoint
       doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT));
+
       doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
 
       doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_WAY_POINT));
@@ -514,6 +527,31 @@ public class FTSearchManager {
       Arrays.fill(allMaxPassages, 1);
 
       return allMaxPassages;
+   }
+
+   private static MultiFieldQueryParser createMultiFieldQueryParser(final Analyzer analyzer,
+                                                                    final String[] allQueryFields) {
+
+      final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(allQueryFields, analyzer);
+
+      queryParser.setAllowLeadingWildcard(true);
+
+      return queryParser;
+   }
+
+   private static Query createQuery_Tour() {
+
+      return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
+   }
+
+   private static Query createQuery_TourMarker() {
+
+      return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
+   }
+
+   private static Query createQuery_Waypoint() {
+
+      return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
    }
 
    private static void createStore_TourData(final Connection conn, final IProgressMonitor monitor)
@@ -687,7 +725,7 @@ public class FTSearchManager {
       }
    }
 
-   private static void createStore_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourWaypoint(final Connection conn, final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -1069,6 +1107,7 @@ public class FTSearchManager {
          }
 
          final Analyzer analyzer = getAnalyzer();
+         QueryResult queryResult;
 
          /*
           * Set sorting
@@ -1076,75 +1115,20 @@ public class FTSearchManager {
          final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSort_DateAscending == false);
          final Sort ftSorting = new Sort(sortByTime);
 
-         final ArrayList<String> allQueryFieldsAsList = new ArrayList<>();
-
          if (_isSearch_All) {
 
-            allQueryFieldsAsList.add(SEARCH_FIELD_TITLE);
-            allQueryFieldsAsList.add(SEARCH_FIELD_DESCRIPTION);
+            // no filtering
 
-            allQueryFieldsAsList.add(SEARCH_FIELD_TOUR_LOCATION_START);
-            allQueryFieldsAsList.add(SEARCH_FIELD_TOUR_LOCATION_END);
-            allQueryFieldsAsList.add(SEARCH_FIELD_TOUR_WEATHER);
+            queryResult = search_10_Search_All(searchText, analyzer);
 
          } else {
 
             // search in selected fields/indices
 
-            if (_isSearch_Tour
-                  || _isSearch_Marker
-                  || _isSearch_Waypoint) {
-
-               allQueryFieldsAsList.add(SEARCH_FIELD_TITLE);
-               allQueryFieldsAsList.add(SEARCH_FIELD_DESCRIPTION);
-            }
-
-            if (_isSearch_Tour_LocationStart) {
-               allQueryFieldsAsList.add(SEARCH_FIELD_TOUR_LOCATION_START);
-            }
-            if (_isSearch_Tour_LocationEnd) {
-               allQueryFieldsAsList.add(SEARCH_FIELD_TOUR_LOCATION_END);
-            }
-            if (_isSearch_Tour_Weather) {
-               allQueryFieldsAsList.add(SEARCH_FIELD_TOUR_WEATHER);
-            }
+            queryResult = search_20_Search_Parts(searchText, analyzer);
          }
 
-         final int numQueryFields = allQueryFieldsAsList.size();
-         final String[] allQueryFields = allQueryFieldsAsList.toArray(new String[numQueryFields]);
-
-         final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(allQueryFields, analyzer);
-         queryParser.setAllowLeadingWildcard(true);
-
-         final Query searchTextQuery = queryParser.parse(searchText);
-
-         if (_topDocs_SearchText == null
-
-               || _topDocs_SearchText.equals(searchText) == false
-
-               // debugging
-               || true
-
-         ) {
-
-            // this is a new search
-
-            if (_isSearch_All) {
-
-               // no filtering
-               _topDocs = _indexSearcher.search(searchTextQuery, maxDoc, ftSorting);
-
-            } else {
-
-               // filter by content
-
-               final BooleanQuery filterQuery = search_10_FilterByContent(searchTextQuery);
-
-               _topDocs = _indexSearcher.search(filterQuery, maxDoc, ftSorting);
-            }
-
-            _topDocs_SearchText = searchText;
-         }
+         _topDocs = _indexSearcher.search(queryResult.query, maxDoc, ftSorting);
 
          searchResult.totalHits = _topDocs.totalHits;
 
@@ -1177,15 +1161,15 @@ public class FTSearchManager {
           * <p>
           * This occurred: field 'description' was indexed without offsets -> cannot highlight
           */
-         final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, getAnalyzer());
+         final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, analyzer);
 
          highlighter.setFormatter(_highlightFormatter);
 
          final Map<String, String[]> highlightedSearchResults = highlighter.highlightFields(
-               allQueryFields,
-               searchTextQuery,
+               queryResult.allQueryFields,
+               queryResult.query,
                allDocIds,
-               createMaxPassages(numQueryFields));
+               createMaxPassages(queryResult.allQueryFields.length));
 
          search_90_CreateResult(
                highlightedSearchResults,
@@ -1197,62 +1181,169 @@ public class FTSearchManager {
       } catch (final Exception e) {
 
          StatusUtil.showStatus(e);
+
          searchResult.error = e.getMessage();
       }
    }
 
    /**
-    * Query text/marker/waypoint with OR
+    * Create a {@link Query} for all fields
+    *
+    * @param searchText
+    * @param analyzer
+    * @return
+    * @throws ParseException
     */
-   private static BooleanQuery search_10_FilterByContent(final Query textQuery) {
+   private static QueryResult search_10_Search_All(final String searchText, final Analyzer analyzer) throws ParseException {
 
-      final Builder orQueryBuilder = new BooleanQuery.Builder();
+      final String[] allQueryFields = {
 
-      if (_isSearch_Tour
-            || _isSearch_Tour_LocationStart
-            || _isSearch_Tour_LocationEnd
-            || _isSearch_Tour_Weather) {
+            SEARCH_FIELD_TITLE,
+            SEARCH_FIELD_DESCRIPTION,
 
-         // search in tour ft index
+            SEARCH_FIELD_TOUR_LOCATION_START,
+            SEARCH_FIELD_TOUR_LOCATION_END,
+            SEARCH_FIELD_TOUR_WEATHER
+      };
 
-         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
+      final Query query = createMultiFieldQueryParser(analyzer, allQueryFields).parse(searchText);
 
-         orQueryBuilder.add(query, Occur.SHOULD);
+      // create return values
+      final QueryResult queryResult = new QueryResult();
+
+      queryResult.allQueryFields = allQueryFields;
+      queryResult.query = query;
+
+      return queryResult;
+   }
+
+   /**
+    * Query text/marker/waypoint with OR
+    *
+    * @param analyzer
+    * @throws ParseException
+    */
+   private static QueryResult search_20_Search_Parts(final String searchText, final Analyzer analyzer) throws ParseException {
+
+      Builder tourQueryBuilder = null;
+      Builder markerQueryBuilder = null;
+      Builder waypointQueryBuilder = null;
+
+      final ArrayList<String> allTourQueryFields = new ArrayList<>();
+      final ArrayList<String> allMarkerQueryFields = new ArrayList<>();
+      final ArrayList<String> allWaypointQueryFields = new ArrayList<>();
+
+      if (_isSearch_Tour) {
+
+         // search in tour: title/description
+
+         allTourQueryFields.add(SEARCH_FIELD_TITLE);
+         allTourQueryFields.add(SEARCH_FIELD_DESCRIPTION);
+      }
+
+      if (_isSearch_Tour_LocationStart) {
+
+         allTourQueryFields.add(SEARCH_FIELD_TOUR_LOCATION_START);
+      }
+
+      if (_isSearch_Tour_LocationEnd) {
+
+         allTourQueryFields.add(SEARCH_FIELD_TOUR_LOCATION_END);
+      }
+
+      if (_isSearch_Tour_Weather) {
+
+         allTourQueryFields.add(SEARCH_FIELD_TOUR_WEATHER);
       }
 
       if (_isSearch_Marker) {
 
-         // search in marker ft index
+         // search in marker: title/description
 
-         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
-
-         orQueryBuilder.add(query, Occur.SHOULD);
+         allMarkerQueryFields.add(SEARCH_FIELD_TITLE);
+         allMarkerQueryFields.add(SEARCH_FIELD_DESCRIPTION);
       }
 
       if (_isSearch_Waypoint) {
 
-         // search in waypoint ft index
+         // search in waypoint: title/description
 
-         final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
-
-         orQueryBuilder.add(query, Occur.SHOULD);
+         allWaypointQueryFields.add(SEARCH_FIELD_TITLE);
+         allWaypointQueryFields.add(SEARCH_FIELD_DESCRIPTION);
       }
 
-      final BooleanQuery orQuery = orQueryBuilder.build();
+      if (allTourQueryFields.size() > 0) {
 
-      final Builder andQueryBuilder = new BooleanQuery.Builder()
+         // search in tours
 
-            // add search text
-            .add(textQuery, Occur.MUST)
+         final String[] allQueryFields = allTourQueryFields.toArray(String[]::new);
 
-            // add tour text/marker/waypoint
-            .add(orQuery, Occur.MUST)
+         final MultiFieldQueryParser field_QueryParser = createMultiFieldQueryParser(analyzer, allQueryFields);
+         final Query query_Fields = field_QueryParser.parse(searchText);
 
-      ;
+         tourQueryBuilder = new BooleanQuery.Builder();
+         tourQueryBuilder.add(createQuery_Tour(), Occur.MUST);
+         tourQueryBuilder.add(query_Fields, Occur.MUST);
+      }
 
-      final BooleanQuery andQuery = andQueryBuilder.build();
+      if (allMarkerQueryFields.size() > 0) {
 
-      return andQuery;
+         // search in tour markers
+
+         final String[] allQueryFields = allMarkerQueryFields.toArray(String[]::new);
+
+         final MultiFieldQueryParser field_QueryParser = createMultiFieldQueryParser(analyzer, allQueryFields);
+         final Query query_Fields = field_QueryParser.parse(searchText);
+
+         markerQueryBuilder = new BooleanQuery.Builder();
+         markerQueryBuilder.add(createQuery_TourMarker(), Occur.MUST);
+         markerQueryBuilder.add(query_Fields, Occur.MUST);
+      }
+
+      if (allWaypointQueryFields.size() > 0) {
+
+         // search in waypoints
+
+         final String[] allQueryFields = allWaypointQueryFields.toArray(String[]::new);
+
+         final MultiFieldQueryParser field_QueryParser = createMultiFieldQueryParser(analyzer, allQueryFields);
+         final Query query_Fields = field_QueryParser.parse(searchText);
+
+         waypointQueryBuilder = new BooleanQuery.Builder();
+         waypointQueryBuilder.add(createQuery_Waypoint(), Occur.MUST);
+         waypointQueryBuilder.add(query_Fields, Occur.MUST);
+      }
+
+      /*
+       * Create return values
+       */
+      final Builder allQueryBuilder = new BooleanQuery.Builder();
+
+      if (tourQueryBuilder != null) {
+         allQueryBuilder.add(tourQueryBuilder.build(), Occur.SHOULD);
+      }
+
+      if (markerQueryBuilder != null) {
+         allQueryBuilder.add(markerQueryBuilder.build(), Occur.SHOULD);
+      }
+
+      if (waypointQueryBuilder != null) {
+         allQueryBuilder.add(waypointQueryBuilder.build(), Occur.SHOULD);
+      }
+
+      final HashSet<String> setWithAllQueryFields = new HashSet<>();
+      setWithAllQueryFields.addAll(allTourQueryFields);
+      setWithAllQueryFields.addAll(allMarkerQueryFields);
+      setWithAllQueryFields.addAll(allWaypointQueryFields);
+
+      final QueryResult queryResult = new QueryResult();
+
+      queryResult.allQueryFields = setWithAllQueryFields.toArray(String[]::new);
+      queryResult.query = allQueryBuilder.build();
+
+      TourLogManager.logInfo("Search Tours: " + queryResult.query);
+
+      return queryResult;
    }
 
    /**
@@ -1492,7 +1583,7 @@ public class FTSearchManager {
 
                         createStore_TourData(conn, monitor);
                         createStore_TourMarker(conn, monitor);
-                        createStore_TourWayPoint(conn, monitor);
+                        createStore_TourWaypoint(conn, monitor);
 
                      } catch (final SQLException e) {
 

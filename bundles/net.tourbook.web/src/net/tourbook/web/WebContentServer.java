@@ -640,6 +640,9 @@ public class WebContentServer {
       _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+      _cssReplacementValues.put("DIJIT_DIALOG_CLOSE_ICON",                 UI.IS_DARK_THEME ? "777" : "ccc");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DIJIT_DIALOG_CLOSE_ICON_HOVER",           UI.IS_DARK_THEME ? "ccc" : "777");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 // SET_FORMATTING_ON
 
    }

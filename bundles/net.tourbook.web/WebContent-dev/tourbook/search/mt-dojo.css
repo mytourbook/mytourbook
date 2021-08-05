@@ -6,8 +6,9 @@
 @import url(../../dgrid/css/skins/tundra.css);
 
 
-.iconOptions         {  background-image: url("/$MT-ICON$/options$CSS_TAG__IS_THEMED$.png");         }
-.iconPhotoTooltip    {  background-image: url("/$MT-ICON$/photo-tooltip.png");   }
-.iconSearch          {  background-image: url("/$MT-ICON$/search$CSS_TAG__IS_THEMED$.png");          }
-.iconTourChart       {  background-image: url("/$MT-ICON$/tour-chart.png");      }
-.iconTourMarker      {  background-image: url("/$MT-ICON$/tour-marker.png");     }
+.iconOptions         {  background-image: url("/$MT-ICON$/options$CSS_TAG__IS_THEMED$.png");    }
+.iconPhotoTooltip    {  background-image: url("/$MT-ICON$/photo-tooltip.png");                  }
+.iconSearch          {  background-image: url("/$MT-ICON$/search$CSS_TAG__IS_THEMED$.png");     }
+.iconTourChart       {  background-image: url("/$MT-ICON$/tour-chart.png");                     }
+.iconTourMarker      {  background-image: url("/$MT-ICON$/tour-marker.png");                    }
+
