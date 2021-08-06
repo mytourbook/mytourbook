@@ -128,10 +128,10 @@ a
    margin-left:            -5px;
 }
 
-/* Background color for the search view when search dialog is opened */
+/* Background color for the search view when the search dialog is opened */
 .dijitDialogUnderlay 
 {
-   background:             #000              !important;
+   background:             #888              !important;
    opacity:                0.2               !important;
 }
 
