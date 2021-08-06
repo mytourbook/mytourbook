@@ -38,7 +38,18 @@ Improvements
     - Better text formatting
     - Themed foreground/background color
   - Show themed tour pauses when map is dimmed
-    
+
+* Search Tours                         https://sourceforge.net/p/mytourbook/feature-requests/186/
+  - Search also for these fields:   
+    - Tour start location
+    - Tour end location
+    - Tour weather    
+  - Highlight search string with a color in the search result, the tour marker color from the chart is used 
+  - Search options dialog
+    - Added new search fields
+    - Replaced ugly close icon 
+    - Disabled autoclosing of this dialog because sometimes it closed too early
+    - A few UI tweaks
 
 * Tour Photos
   - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
