@@ -63,35 +63,44 @@ public class WebContentServer {
    private static boolean LOG_HEADER = false;
 
    // logs: xhr
-   public static boolean       LOG_XHR                     = false;
+   public static boolean       LOG_XHR                      = false;
 
-   private static boolean      IS_LOGGING                  = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
+   private static boolean      IS_LOGGING                   = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 
-   private static final String MTHTML_CUSTOM_JS            = "CUSTOM_JS";                                 //$NON-NLS-1$
-   private static final String MTHTML_DOJO_SEARCH          = "DOJO_SEARCH";                               //$NON-NLS-1$
-   private static final String MTHTML_LOCALE               = "LOCALE";                                    //$NON-NLS-1$
+   private static final String MTHTML_CUSTOM_JS             = "CUSTOM_JS";                                 //$NON-NLS-1$
+   private static final String MTHTML_DOJO_SEARCH           = "DOJO_SEARCH";                               //$NON-NLS-1$
+   private static final String MTHTML_LOCALE                = "LOCALE";                                    //$NON-NLS-1$
 
-   private static final String MTHTML_MESSAGE_LOADING      = "MESSAGE_LOADING";                           //$NON-NLS-1$
-   private static final String MTHTML_MESSAGE_SEARCH_TITLE = "MESSAGE_SEARCH_TITLE";                      //$NON-NLS-1$
+   private static final String MTHTML_MESSAGE_LOADING       = "MESSAGE_LOADING";                           //$NON-NLS-1$
+   private static final String MTHTML_MESSAGE_SEARCH_TITLE  = "MESSAGE_SEARCH_TITLE";                      //$NON-NLS-1$
 
-   private static final String SEARCH_CSS                  = "search.css";                                //$NON-NLS-1$
+   private static final String SEARCH_CSS                   = "search.css";                                //$NON-NLS-1$
 
-   private static final String ROOT_FILE_PATH_NAME         = "/";                                         //$NON-NLS-1$
-   private static final String URI_INNER_PROTOCOL_FILE     = "/file:";                                    //$NON-NLS-1$
-   private static final String REQUEST_PATH_TOURBOOK       = "/tourbook";                                 //$NON-NLS-1$
+   private static final String ROOT_FILE_PATH_NAME          = "/";                                         //$NON-NLS-1$
+   private static final String URI_INNER_PROTOCOL_FILE      = "/file:";                                    //$NON-NLS-1$
+   private static final String REQUEST_PATH_TOURBOOK        = "/tourbook";                                 //$NON-NLS-1$
 
-   private static final String XHR_HEADER_KEY              = "X-requested-with";                          //$NON-NLS-1$
-   private static final String XHR_HEADER_VALUE            = "XMLHttpRequest";                            //$NON-NLS-1$
+   private static final String XHR_HEADER_KEY               = "X-requested-with";                          //$NON-NLS-1$
+   private static final String XHR_HEADER_VALUE             = "XMLHttpRequest";                            //$NON-NLS-1$
 
-   private static final String ICON_RESOURCE_REQUEST       = "/$MT-ICON$/";                               //$NON-NLS-1$
-   private static final String CSS_TAG__IS_THEMED          = "$CSS_TAG__IS_THEMED$";                      //$NON-NLS-1$
+   private static final String ICON_RESOURCE_REQUEST        = "/$MT-ICON$/";                               //$NON-NLS-1$
 
-   private static final String DOJO_ROOT                   = "/dojo/";                                    //$NON-NLS-1$
-   private static final String DOJO_DIJIT                  = "/dijit/";                                   //$NON-NLS-1$
-   private static final String DOJO_DGRID                  = "/dgrid/";                                   //$NON-NLS-1$
-   private static final String DOJO_DSTORE                 = "/dstore/";                                  //$NON-NLS-1$
-   private static final String DOJO_PUT_SELECTOR           = "/put-selector/";                            //$NON-NLS-1$
-   private static final String DOJO_XSTYLE                 = "/xstyle/";                                  //$NON-NLS-1$
+   /**
+    * A § character is used as identifier, otherwise when using a $ character it would fail as it
+    * tries to replace it in the output stream. The § character must be kept in the filepath until
+    * it is resolved in the webserver -> Complicated stuff with all these replacements but it is
+    * very flexible :-)
+    */
+   private static final String ICON_RESOURCE_REQUEST_COMMON = "/§MT-ICON-COMMON§/";                        //$NON-NLS-1$
+
+   private static final String CSS_TAG__IS_THEMED           = "$CSS_TAG__IS_THEMED$";                      //$NON-NLS-1$
+
+   private static final String DOJO_ROOT                    = "/dojo/";                                    //$NON-NLS-1$
+   private static final String DOJO_DIJIT                   = "/dijit/";                                   //$NON-NLS-1$
+   private static final String DOJO_DGRID                   = "/dgrid/";                                   //$NON-NLS-1$
+   private static final String DOJO_DSTORE                  = "/dstore/";                                  //$NON-NLS-1$
+   private static final String DOJO_PUT_SELECTOR            = "/put-selector/";                            //$NON-NLS-1$
+   private static final String DOJO_XSTYLE                  = "/xstyle/";                                  //$NON-NLS-1$
 
    public static final String  SERVER_URL;
 
@@ -269,17 +278,23 @@ public class WebContentServer {
          final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
 
          final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
+         final boolean isIconCommonRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST_COMMON);
+
+         final int iconRequestLength = isIconCommonRequest
+               ? ICON_RESOURCE_REQUEST_COMMON.length()
+               : ICON_RESOURCE_REQUEST.length();
 
          boolean isDojoRequest = false;
 
          if (WEB.IS_DEBUG
+
                && (requestUriPath.startsWith(DOJO_ROOT)
                      || requestUriPath.startsWith(DOJO_DIJIT)
                      || requestUriPath.startsWith(DOJO_DGRID)
                      || requestUriPath.startsWith(DOJO_DSTORE)
-                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
+                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR)
+                     || requestUriPath.startsWith(DOJO_XSTYLE))) {
 
-         ) {
             isDojoRequest = true;
             requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
          }
@@ -288,9 +303,11 @@ public class WebContentServer {
           * Log request
           */
          if (isDojoRequest) {
+
             if (LOG_DOJO) {
                log.append(requestUriPath);
             }
+
          } else if (isXHR) {
 
             if (LOG_XHR) {
@@ -311,22 +328,23 @@ public class WebContentServer {
          /*
           * Handle request
           */
-         if (isIconRequest) {
+         if (isIconRequest || isIconCommonRequest) {
 
-            String iconFilename = requestUriPath.substring(
-                  ICON_RESOURCE_REQUEST.length(),
-                  requestUriPath.length());
+            // remove icon marker
+            String iconFilename = requestUriPath.substring(iconRequestLength, requestUriPath.length());
 
             // replace themed marker
             if (iconFilename.contains(CSS_TAG__IS_THEMED)) {
 
-               iconFilename = iconFilename.replace(CSS_TAG__IS_THEMED,
-                     UI.IS_DARK_THEME
-                           ? ThemeUtil.DARK_THEME_POSTFIX
-                           : UI.EMPTY_STRING);
+               final CharSequence themePostfix = UI.IS_DARK_THEME
+
+                     ? ThemeUtil.DARK_THEME_POSTFIX
+                     : UI.EMPTY_STRING;
+
+               iconFilename = iconFilename.replace(CSS_TAG__IS_THEMED, themePostfix);
             }
 
-            handle_Icon(httpExchange, iconFilename, log);
+            handle_Icon(httpExchange, iconFilename, log, isIconCommonRequest);
 
          } else if (isXHR) {
 
@@ -483,11 +501,13 @@ public class WebContentServer {
 
             // replace values in search.css file
 
-//            // for debugging - START
+// for debugging - START
+
 //            _cssReplacementValues.clear();
 //            _cssReplacementValues = null;
 //            setupCssReplacements();
-//            // for debugging - END
+
+// for debugging - END
 
             replacingOutputStream = new ReplacingOutputStream(outputStream, _cssReplacementValues);
 
@@ -518,14 +538,20 @@ public class WebContentServer {
       }
    }
 
-   private static void handle_Icon(final HttpExchange httpExchange, final String iconFilename, final StringBuilder log) {
+   private static void handle_Icon(final HttpExchange httpExchange,
+                                   final String iconFilename,
+                                   final StringBuilder log,
+                                   final boolean isIconCommonRequest) {
 
       try {
 
          if (_iconRequestHandler == null) {
+
             StatusUtil.logError("IconRequestHandler is not set for " + iconFilename); //$NON-NLS-1$
+
          } else {
-            _iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log);
+
+            _iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log, isIconCommonRequest);
          }
 
       } catch (final Exception e) {
@@ -600,6 +626,7 @@ public class WebContentServer {
    }
 
    public static void setIconRequestHandler(final IconRequestHandler iconRequestHandler) {
+
       _iconRequestHandler = iconRequestHandler;
    }
 
@@ -640,9 +667,9 @@ public class WebContentServer {
       _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("DIJIT_DIALOG_CLOSE_ICON",                 UI.IS_DARK_THEME ? "777" : "ccc");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      _cssReplacementValues.put("DIJIT_DIALOG_CLOSE_ICON_HOVER",           UI.IS_DARK_THEME ? "ccc" : "777");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+      _cssReplacementValues.put("CSS_TAG__IS_THEMED",                      UI.IS_DARK_THEME
+                                                                              ? ThemeUtil.DARK_THEME_POSTFIX
+                                                                              : UI.EMPTY_STRING);
 // SET_FORMATTING_ON
 
    }
