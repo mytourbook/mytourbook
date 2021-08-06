@@ -297,6 +297,10 @@ public class DialogReimportTours extends TitleAreaDialog {
                }
             }
             _dbUpdateExecutor.shutdown();
+            if (isReimportConcurrent) {
+               // wait until all comparisons are performed
+               _countDownLatch.await();
+            }
          }
       };
 
@@ -305,10 +309,7 @@ public class DialogReimportTours extends TitleAreaDialog {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell())
                .run(true, true, importRunnable);
 
-         if (isReimportConcurrent) {
-            // wait until all comparisons are performed
-            _countDownLatch.await();
-         }
+
 
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(//
@@ -407,9 +408,13 @@ public class DialogReimportTours extends TitleAreaDialog {
          Long queueItem_TourId;
          queueItem_TourId = _dbUpdateQueue.poll();
 
-         if (queueItem_TourId == null) {
+         if (queueItem_TourId == null || monitor.isCanceled()) {
+            System.out.println("CANCELLED");
+            _countDownLatch.countDown();
             return;
          }
+
+         System.out.println("LETS GO");
 
          final RawDataManager rawDataManager = new RawDataManager();
          rawDataManager.setImportId();
