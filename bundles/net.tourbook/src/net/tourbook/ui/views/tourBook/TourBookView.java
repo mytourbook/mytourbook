@@ -3206,6 +3206,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _parent.getDisplay().asyncExec(() -> {
 
+         if (_parent.isDisposed()) {
+            return;
+         }
+
          _tourViewer_NatTable.setFocus();
 
          // sort rows ascending
