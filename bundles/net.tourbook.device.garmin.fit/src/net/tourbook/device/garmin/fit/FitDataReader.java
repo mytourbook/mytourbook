@@ -64,8 +64,6 @@ public class FitDataReader extends TourbookDevice {
    private static final String SYS_PROP__LOG_FIT_DATA = "logFitData";                                      //$NON-NLS-1$
    private static boolean      _isLogging_FitData     = System.getProperty(SYS_PROP__LOG_FIT_DATA) != null;
 
-   private int                 _logCounter;
-
    static {
 
       if (_isLogging_FitData) {
@@ -75,6 +73,8 @@ public class FitDataReader extends TourbookDevice {
                "Fit data are logged"); //$NON-NLS-1$
       }
    }
+
+   private int     _logCounter;
    private boolean _isVersionLogged;
 
    @Override
@@ -362,36 +362,53 @@ public class FitDataReader extends TourbookDevice {
 //
 //               // Device
 //
-//               || fieldName.equals("absolute_pressure") //                              966 Pa           //$NON-NLS-1$
-//               || fieldName.equals("ant_network") //                                                     //$NON-NLS-1$
+//               || fieldName.equals("device_info") //                                                     //$NON-NLS-1$
+//               || fieldName.equals("device_index") //                                                    //$NON-NLS-1$
+//               || fieldName.equals("device_type") //                                                     //$NON-NLS-1$
+//               || fieldName.equals("manufacturer") //                                                    //$NON-NLS-1$
+//               || fieldName.equals("serial_number") //                                                   //$NON-NLS-1$
+//               || fieldName.equals("product") //                                                         //$NON-NLS-1$
+//               || fieldName.equals("product_name") //                          Wahoo Fitness             //$NON-NLS-1$
+//               || fieldName.equals("source_type") //                                                     //$NON-NLS-1$
+//               || fieldName.equals("favero_product") //                                                  //$NON-NLS-1$
+//               || fieldName.equals("garmin_product") //                                                  //$NON-NLS-1$
+//               || fieldName.equals("software_version") //                                                //$NON-NLS-1$
+//               || fieldName.equals("hardware_version") //                                                //$NON-NLS-1$
+//
+//               //   battery_status
+//               //
+//               //         1  new
+//               //         2  good
+//               //         3  ok
+//               //         4  low
+//               //         5  critical
+//               //         7  unknown
+//
+//               || fieldName.equals("battery_status") //                                                  //$NON-NLS-1$
+//               || fieldName.equals("battery_voltage") //                                                 //$NON-NLS-1$
+//               || fieldName.equals("sensor_position") //                                                 //$NON-NLS-1$
+//               || fieldName.equals("descriptor") //                                  Android             //$NON-NLS-1$
+//               || fieldName.equals("antplus_device_type") //                         Android             //$NON-NLS-1$
+//               || fieldName.equals("ant_device_type") //                             Android             //$NON-NLS-1$
 //               || fieldName.equals("ant_device_number") //                                               //$NON-NLS-1$
+//               || fieldName.equals("ant_network") //                                                     //$NON-NLS-1$
 //               || fieldName.equals("ant_transmission_type") //                                           //$NON-NLS-1$
+//               || fieldName.equals("cum_operating_time") //                                              //$NON-NLS-1$
+//
+//               // OTHER fields
+//
+//               || fieldName.equals("activity_tracker_enabled") //                          1             //$NON-NLS-1$
+//               || fieldName.equals("absolute_pressure") //                              966 Pa           //$NON-NLS-1$
 //               || fieldName.equals("auto_activity_detect") //                              1             //$NON-NLS-1$
 //               || fieldName.equals("autosync_min_steps") //                             2000 steps       //$NON-NLS-1$
 //               || fieldName.equals("autosync_min_time") //                               240 minutes     //$NON-NLS-1$
 //               || fieldName.equals("backlight_mode") //                                    3             //$NON-NLS-1$
-//               || fieldName.equals("battery_status") //                                                  //$NON-NLS-1$
-//               || fieldName.equals("battery_voltage") //                                                 //$NON-NLS-1$
-//               || fieldName.equals("cum_operating_time") //                                              //$NON-NLS-1$
-//               || fieldName.equals("device_index") //                                                    //$NON-NLS-1$
-//               || fieldName.equals("device_type") //                                                     //$NON-NLS-1$
-//               || fieldName.equals("descriptor") //                                  Android             //$NON-NLS-1$
 //               || fieldName.equals("display_orientation") //                                             //$NON-NLS-1$
+//               || fieldName.equals("friendly_name") //                                                   //$NON-NLS-1$
 //               || fieldName.equals("mounting_side") //                                     1             //$NON-NLS-1$
+//               || fieldName.equals("move_alert_enabled") //                                0             //$NON-NLS-1$
 //               || fieldName.equals("time_mode") //                                         1             //$NON-NLS-1$
 //               || fieldName.equals("wkt_name") //                               Cardio Class             //$NON-NLS-1$
-//
-//               || fieldName.equals("friendly_name") //                                                   //$NON-NLS-1$
-//               || fieldName.equals("hardware_version") //                                                //$NON-NLS-1$
-//               || fieldName.equals("manufacturer") //                                                    //$NON-NLS-1$
-//               || fieldName.equals("product") //                                                         //$NON-NLS-1$
-//               || fieldName.equals("product_name") //                          Wahoo Fitness             //$NON-NLS-1$
-//               || fieldName.equals("serial_number") //                                                   //$NON-NLS-1$
-//               || fieldName.equals("software_version") //                                                //$NON-NLS-1$
-//               || fieldName.equals("source_type") //                                                     //$NON-NLS-1$
-//
-//               || fieldName.equals("activity_tracker_enabled") //                          1             //$NON-NLS-1$
-//               || fieldName.equals("move_alert_enabled") //                                0             //$NON-NLS-1$
 //
 //               // FIT fields
 //
@@ -435,18 +452,18 @@ public class FitDataReader extends TourbookDevice {
 
          System.out.println(String.format(UI.EMPTY_STRING
 
-               + "[%s]" //       Java class name //$NON-NLS-1$
+               + "[%s]" //       Java class name      //$NON-NLS-1$
 
-               + " %-7s" //      #           //$NON-NLS-1$
+               + " %-7s" //      #                    //$NON-NLS-1$
 
-               + " %-42s %-10d  %-10s  " //  time        //$NON-NLS-1$
+               + " %-42s %-10d  %-10s  " //  time     //$NON-NLS-1$
 
-               + " %5d" //       Num         //$NON-NLS-1$
-               + " %40s" //      Name        //$NON-NLS-1$
-               + " %20s" //      Value       //$NON-NLS-1$
-               + " %-12s" //     Units       //$NON-NLS-1$
+               + " %5d" //       Num                  //$NON-NLS-1$
+               + " %40s" //      Name                 //$NON-NLS-1$
+               + " %20s" //      Value                //$NON-NLS-1$
+               + " %-12s" //     Units                //$NON-NLS-1$
 
-//             + " %s" //        RawValue    //$NON-NLS-1$
+//             + " %s" //        RawValue             //$NON-NLS-1$
 
                + UI.EMPTY_STRING,
 
