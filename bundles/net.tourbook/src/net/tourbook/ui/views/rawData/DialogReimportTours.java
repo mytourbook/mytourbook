@@ -243,20 +243,14 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                if (isReimportConcurrent) {
 
-                  monitor.subTask(NLS.bind(
-                        Messages.Import_Data_Dialog_Reimport_SubTask,
-                        new Object[] { _dbUpdateExecutor.getCompletedTaskCount(), numberOfTours }));
-
                   if (monitor.isCanceled()) {
 
-                     // count down all, that the compare task can finish and display the compare result
-                     System.out.println("CANCELLED RECEIVED");
-
+                     // count down all, so that the compare task can finish and display the compare result
                      long numCounts = _countDownLatch.getCount();
                      while (numCounts-- > 0) {
 
-                        System.out.println(numCounts);
                         _countDownLatch.countDown();
+                        monitor.worked(1);
                      }
 
                      return;
@@ -264,7 +258,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   reimportTour_Concurrent(
                         tourId,
-                        monitor,
                         tourValueTypes,
                         oldTourData,
                         reimportedFile,
@@ -294,10 +287,16 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
                }
             }
+
             _dbUpdateExecutor.shutdown();
             if (isReimportConcurrent) {
+
                // wait until all comparisons are performed
-               _countDownLatch.await();
+               while (_countDownLatch.getCount() > 0) {
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { numberOfTours - _countDownLatch.getCount(), numberOfTours }));
+               }
             }
          }
       };
@@ -382,7 +381,6 @@ public class DialogReimportTours extends TitleAreaDialog {
    }
 
    private static void reimportTour_Concurrent(final Long tourId,
-                                               final IProgressMonitor monitor,
                                                final List<TourValueType> tourValueTypes,
                                                final TourData oldTourData,
                                                final File[] reimportedFile,
@@ -400,10 +398,9 @@ public class DialogReimportTours extends TitleAreaDialog {
       final Runnable executorTask = () -> {
 
          // get last added item
-         Long queueItem_TourId;
-         queueItem_TourId = _dbUpdateQueue.poll();
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
 
-         if (queueItem_TourId == null || monitor.isCanceled()) {
+         if (queueItem_TourId == null) {
 
             _countDownLatch.countDown();
             return;
@@ -413,8 +410,6 @@ public class DialogReimportTours extends TitleAreaDialog {
          rawDataManager.setImportId();
          rawDataManager.setImportCanceled(false);
          rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, true, reImportStatus, true);
-
-         monitor.worked(1);
 
          _countDownLatch.countDown();
       };
