@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -232,7 +232,7 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                   tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
 
                   TourLogManager.subLog_Info(NLS.bind(LOG_SET_TIMEZONE_014_TOUR_START_ADJUSTED, tourDateTime));
-
+                  
                   break;
 
                default:
@@ -250,26 +250,29 @@ public class DialogSetTimeZone_Wizard extends Wizard {
             // update the UI
             if (savedTours.size() > 0) {
 
-               Display.getDefault().asyncExec(() -> {
+               Display.getDefault().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
 
-                  Util.clearSelection();
+                     Util.clearSelection();
 
-                  /*
-                   * Ensure the tour data editor contains the correct tour data
-                   */
-                  TourData tourDataInEditor = null;
+                     /*
+                      * Ensure the tour data editor contains the correct tour data
+                      */
+                     TourData tourDataInEditor = null;
 
-                  final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-                  if (tourDataEditor != null) {
-                     tourDataInEditor = tourDataEditor.getTourData();
+                     final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+                     if (tourDataEditor != null) {
+                        tourDataInEditor = tourDataEditor.getTourData();
+                     }
+
+                     final TourEvent tourEvent = new TourEvent(savedTours);
+                     tourEvent.tourDataEditorSavedTour = tourDataInEditor;
+                     TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+
+                     // do a reselection of the selected tours to fire the multi tour data selection
+                     _tourProvider.toursAreModified(savedTours);
                   }
-
-                  final TourEvent tourEvent = new TourEvent(savedTours);
-                  tourEvent.tourDataEditorSavedTour = tourDataInEditor;
-                  TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
-
-                  // do a reselection of the selected tours to fire the multi tour data selection
-                  _tourProvider.toursAreModified(savedTours);
                });
             }
          }
