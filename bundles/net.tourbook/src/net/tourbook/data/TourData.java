@@ -845,14 +845,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Basic(optional = false)
    private SerieData                   serieData;
 
+   // ############################################# ASSOCIATED ENTITIES #############################################
+
    /**
     * Photos for this tour
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
-
-   // ############################################# ASSOCIATED ENTITIES #############################################
 
    /**
     * Tour marker
@@ -883,6 +883,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
    private Set<TourTag>                tourTags                            = new HashSet<>();
+
+   /**
+    * Device sensor values
+    */
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
 
 //   /**
 //    * SharedMarker
@@ -1706,7 +1713,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private long[]           pausedTime_End;
 
-   // SET_FORMATTING_ON
+// SET_FORMATTING_ON
 
    public TourData() {}
 
