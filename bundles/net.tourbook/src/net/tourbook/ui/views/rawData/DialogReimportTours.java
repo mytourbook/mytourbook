@@ -158,8 +158,6 @@ public class DialogReimportTours extends TitleAreaDialog {
    private DateTime  _dtTourDate_Until;
    private Group     _groupTours;
 
-   //private List<Future<?>> _futureTasks;
-
    /**
     * @param parentShell
     */
@@ -309,8 +307,6 @@ public class DialogReimportTours extends TitleAreaDialog {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell())
                .run(true, true, importRunnable);
 
-
-
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(//
                TourLogState.DEFAULT,
@@ -383,7 +379,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       _dbUpdateExecutor.prestartAllCoreThreads();
 
       _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
-      //  _futureTasks = new ArrayList<>();
    }
 
    private static void reimportTour_Concurrent(final Long tourId,
@@ -409,12 +404,10 @@ public class DialogReimportTours extends TitleAreaDialog {
          queueItem_TourId = _dbUpdateQueue.poll();
 
          if (queueItem_TourId == null || monitor.isCanceled()) {
-            System.out.println("CANCELLED");
+
             _countDownLatch.countDown();
             return;
          }
-
-         System.out.println("LETS GO");
 
          final RawDataManager rawDataManager = new RawDataManager();
          rawDataManager.setImportId();
@@ -427,8 +420,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       };
 
       _dbUpdateExecutor.submit(executorTask);
-
-      // _futureTasks.add(_dbUpdateExecutor.submit(executorTask));
    }
 
    @Override
