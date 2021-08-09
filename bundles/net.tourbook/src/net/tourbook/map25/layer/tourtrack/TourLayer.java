@@ -398,7 +398,7 @@ public class TourLayer extends Layer {
          _tex = new TextureItem(_bitmapArrow);
 
          //width must not to tiny, otherwise no place that arrow can be painted
-         final float faterOutlineWidth = Math.max(trackConfig.outlineWidth, 5f);
+         final float faterOutlineWidth = Math.max(trackConfig.outlineWidth * 2, 5f);
 
          final LineStyle style = LineStyle.builder()
                .stippleColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
