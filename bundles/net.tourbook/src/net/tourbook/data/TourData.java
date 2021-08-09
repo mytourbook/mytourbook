@@ -9720,7 +9720,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       computePhotoTimeAdjustment();
 
-      TourManager.saveModifiedTour(this, true, false);
+      TourManager.saveModifiedTour(this, true);
    }
 
    /**

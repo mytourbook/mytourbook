@@ -276,7 +276,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
                if (isSaveTourData) {
 
-                  final TourData savedTourData = TourManager.saveModifiedTour(tourData, false, false);
+                  final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
 
                   if (savedTourData != null) {
 

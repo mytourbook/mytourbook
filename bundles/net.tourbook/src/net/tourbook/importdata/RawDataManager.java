@@ -1092,7 +1092,7 @@ public class RawDataManager {
                 * Save tour but don't fire a change event because the tour editor would set the tour
                 * to dirty
                 */
-               final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false, isConcurrent);
+               final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false);
 
                updatedTourData = savedTourData;
             }
@@ -1701,7 +1701,7 @@ public class RawDataManager {
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);
       }
-      TourManager.saveModifiedTour(tourData, false, false);
+      TourManager.saveModifiedTour(tourData, false);
 
       TourLogManager.showLogView();
       TourLogManager.addSubLog(TourLogState.IMPORT_OK,

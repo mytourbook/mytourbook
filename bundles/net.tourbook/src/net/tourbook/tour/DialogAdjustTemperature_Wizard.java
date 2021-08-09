@@ -166,7 +166,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
                   // tour is modified, save it
 
-                  final TourData savedTourData = TourManager.saveModifiedTour(tourData, false, false);
+                  final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
 
                   if (savedTourData != null) {
                      savedTours.add(savedTourData);

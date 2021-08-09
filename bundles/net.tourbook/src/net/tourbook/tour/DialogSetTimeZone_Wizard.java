@@ -240,7 +240,7 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                   continue;
                }
 
-               final TourData savedTourData = TourManager.saveModifiedTour(tourData, false, false);
+               final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
 
                if (savedTourData != null) {
                   savedTours.add(savedTourData);
