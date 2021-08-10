@@ -14,9 +14,6 @@ TODO's
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
                  
 
-* Tour modification (Frederic) 
-                  - Use multi-threading (ThreadPoolExecutor)
-
 Issues
 ======
 
@@ -26,7 +23,9 @@ Issues
 New
 ===
 
-*
+* Tour re-import (Frederic) 
+  - Using multi-threading to speed up the re-import process when having selected a lot of tours (Note: This requires to skip tours for which the file location isn't found)
+
 
 
 Improvements
@@ -119,4 +118,4 @@ System
 ======
 
 * Eclipse 2021-?
-* FIT SDK 21.53
+* FIT SDK 21.60
