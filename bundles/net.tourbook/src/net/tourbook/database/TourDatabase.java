@@ -176,7 +176,7 @@ public class TourDatabase {
    private static final String TABLE_DB_VERSION_DATA                      = "DB_VERSION_DATA";                                       //$NON-NLS-1$
 
    public static final String  TABLE_DEVICE_SENSOR                        = "DeviceSensor";                                          //$NON-NLS-1$
-   public static final String  TABLE_DEVICE_SENSOR_VALUES                 = "DeviceSensorValues";                                    //$NON-NLS-1$
+   public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
@@ -3283,14 +3283,14 @@ public class TourDatabase {
    }
 
    /**
-    * Create table {@link #TABLE_DEVICE_SENSOR_VALUES}
+    * Create table {@link #TABLE_DEVICE_SENSOR_VALUE}
     *
     * @param stmt
     * @throws SQLException
     */
    private void createTable_DeviceSensorValues(final Statement stmt) throws SQLException {
 
-      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR_VALUES + "   (                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR_VALUE + "   (                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR_VALUE, true)
 
@@ -3310,8 +3310,8 @@ public class TourDatabase {
       );
 
       SQL.CreateIndex(stmt,
-            TABLE_DEVICE_SENSOR_VALUES,
-            TABLE_DEVICE_SENSOR_VALUES + "_TourStartTime",
+            TABLE_DEVICE_SENSOR_VALUE,
+            TABLE_DEVICE_SENSOR_VALUE + "_TourStartTime",
             "TourStartTime"); //$NON-NLS-1$
    }
 
@@ -8495,7 +8495,7 @@ public class TourDatabase {
             createTable_DeviceSensor(stmt);
          }
 
-         if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUES) == false) {
+         if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUE) == false) {
             createTable_DeviceSensorValues(stmt);
          }
       }

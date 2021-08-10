@@ -108,7 +108,7 @@ public class DeviceSensorValue {
    @Override
    public String toString() {
 
-      return "DeviceSensorValues" + NL //                //$NON-NLS-1$
+      return "DeviceSensorValue" + NL //                //$NON-NLS-1$
 
             + "[" + NL //                                //$NON-NLS-1$
 
