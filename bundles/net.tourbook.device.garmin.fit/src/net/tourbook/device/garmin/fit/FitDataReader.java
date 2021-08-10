@@ -450,7 +450,7 @@ public class FitDataReader extends TourbookDevice {
 
          final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
-         System.out.println(String.format(UI.EMPTY_STRING
+         final String logMessage = String.format(UI.EMPTY_STRING
 
                + "[%s]" //       Java class name      //$NON-NLS-1$
 
@@ -483,7 +483,23 @@ public class FitDataReader extends TourbookDevice {
 
 //             field.getRawValue().getClass().getCanonicalName()
 
-         ));
+         );
+
+         System.out.println(logMessage);
+
+         final String logText =
+
+               "[FitDataReader] 183782  ";
+
+//              [FitDataReader] 183782  1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0                0                                  unknown                 4036
+
+//              [FitDataReader] 31684   1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0                0                                  unknown                 4146
+
+         if (logMessage.startsWith(logText)) {
+
+            int a = 0;
+            a++;
+         }
       }
 
       for (final DeveloperField field : mesg.getDeveloperFields()) {
