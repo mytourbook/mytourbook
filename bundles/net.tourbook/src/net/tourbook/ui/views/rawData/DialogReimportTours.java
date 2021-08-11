@@ -148,6 +148,97 @@ public class DialogReimportTours extends TitleAreaDialog {
       _tourViewer = tourViewer;
    }
 
+   private static boolean handleFileLocationDialog_UserCancellation(final ReImportStatus reImportStatus,
+                                                                    final boolean skipToursWithFileNotFound) {
+
+      final boolean[] isUserAsked_ToCancelReImport = { false };
+
+      if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog() &&
+            isUserAsked_ToCancelReImport[0] == false &&
+            skipToursWithFileNotFound == false) {
+
+         // user has canceled the re-import -> ask if the whole re-import should be canceled
+
+         final boolean[] isCancelReimport = { false };
+
+         final Display display = Display.getDefault();
+
+         display.syncExec(() -> {
+
+            if (MessageDialog.openQuestion(display.getActiveShell(),
+                  Messages.Import_Data_Dialog_IsCancelReImport_Title,
+                  Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+
+               isCancelReimport[0] = true;
+
+            } else {
+
+               isUserAsked_ToCancelReImport[0] = true;
+            }
+         });
+
+         return isCancelReimport[0];
+      }
+
+      return false;
+   }
+
+   private static void initializeThreadPoolExecutor() {
+
+      _threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MAX_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, _threadFactory);
+      _dbUpdateExecutor.prestartAllCoreThreads();
+
+      _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   }
+
+   private static void reimportTour_Concurrent(final Long tourId,
+                                               final List<TourValueType> tourValueTypes,
+                                               final TourData oldTourData,
+                                               final File[] reimportedFile,
+                                               final ReImportStatus reImportStatus) {
+      try {
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      final Runnable executorTask = () -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+
+            _countDownLatch.countDown();
+            return;
+         }
+
+         final RawDataManager rawDataManager = new RawDataManager();
+         rawDataManager.setImportId();
+         rawDataManager.setImportCanceled(false);
+         rawDataManager.reimportTour(tourValueTypes, oldTourData, reimportedFile, true, reImportStatus, true);
+
+         _countDownLatch.countDown();
+      };
+
+      _dbUpdateExecutor.submit(executorTask);
+   }
+
+>>>>>>> refs/remotes/Wolfgang/FJBDev
    @Override
    public boolean close() {
 
