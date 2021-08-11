@@ -38,7 +38,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -49,10 +48,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -247,12 +244,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .applyTo(_shellContainer);
 //      _shellContainer.setForeground(_fgColor);
 //      _shellContainer.setBackground(_bgColor);
-      _shellContainer.addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent e) {
-            onPaintShellContainer(e);
-         }
-      });
+      _shellContainer.addPaintListener(this::onPaintShellContainer);
       {
          _ttContainer = new Composite(_shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()
@@ -600,12 +592,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
                .indent(3, 0)
                .applyTo(linkUrl);
 
-         linkUrl.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               onSelectUrl(event.text);
-            }
-         });
+         linkUrl.addListener(SWT.Selection, event -> onSelectUrl(event.text));
 
          String linkText;
 
@@ -949,9 +936,9 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       markerLayer.setTooltipLabel(_hoveredLabel);
    }
 
-   private void onPaintShellContainer(final PaintEvent event) {
+   private void onPaintShellContainer(final PaintEvent paintEvent) {
 
-      final GC gc = event.gc;
+      final GC gc = paintEvent.gc;
       final Point shellSize = _shellContainer.getSize();
 
       // draw border
