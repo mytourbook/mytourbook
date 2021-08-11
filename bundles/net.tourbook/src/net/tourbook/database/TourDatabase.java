@@ -45,9 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -2625,7 +2623,7 @@ public class TourDatabase {
     *           does not make sense to set the modified date.
     * @return persisted {@link TourData} or <code>null</code> when saving fails
     */
-   public static synchronized TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
+   public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
 
       /*
        * prevent saving a tour which was deleted before
@@ -2735,7 +2733,7 @@ public class TourDatabase {
 
          TourManager.getInstance().updateTourInCache(persistedEntity);
 
-         // updateCachedFields(persistedEntity);
+         updateCachedFields(persistedEntity);
 
          saveTour_GeoParts(persistedEntity);
 
@@ -2748,191 +2746,7 @@ public class TourDatabase {
       return persistedEntity;
    }
 
-   /**
-    * Saves a tour using concurrency {@link #saveTour}
-    *
-    * @param tourData
-    * @param isUpdateModifiedDate
-    *           When <code>true</code> the modified date is updated. For updating computed field it
-    *           does not make sense to set the modified date.
-    * @return persisted {@link TourData} or <code>null</code> when saving fails
-    */
-   public static TourData saveTour_Concurrenttoto(final TourData tourData, final boolean isUpdateModifiedDate) {
-
-      // put tour ID (queue item) into the queue AND wait when it is full
-
-      try {
-
-         _dbSaveQueue.put(tourData);
-
-      } catch (final InterruptedException e) {
-
-         StatusUtil.log(e);
-         Thread.currentThread().interrupt();
-      }
-
-      final Future<TourData> future = _dbSaveExecutor.submit(() -> {
-
-         // get last added item
-         final TourData queueItem_Tour = _dbSaveQueue.poll();
-
-         if (queueItem_Tour == null) {
-            return null;
-         }
-
-         EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
-
-         try {
-
-            /*
-             * prevent saving a tour which was deleted before
-             */
-            if (tourData.isTourDeleted) {
-               return null;
-            }
-
-            /*
-             * History tour or multiple tours cannot be saved
-             */
-            if (tourData.isHistoryTour || tourData.isMultipleTours()) {
-               return null;
-            }
-
-            /*
-             * prevent saving a tour when a person is not set, this check is for internal use
-             * that
-             * all
-             * data are valid
-             */
-            if (tourData.getTourPerson() == null) {
-               StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
-               return null;
-            }
-
-            /*
-             * check size of varcar fields
-             */
-            if (tourData.isValidForSave() == false) {
-               return null;
-            }
-
-            /*
-             * Removed cached data
-             */
-            TourManager.clearMultipleTourData();
-
-            /**
-             * ensure HR zones are computed, it requires that a person is set which is not the
-             * case
-             * when a
-             * device importer calls the method {@link TourData#computeComputedValues()}
-             */
-            tourData.getNumberOfHrZones();
-
-            final long dtSaved = TimeTools.createdNowAsYMDhms();
-
-            checkUnsavedTransientInstances(tourData);
-
-            TourData persistedEntity = null;
-
-            if (entityManager != null) {
-
-               final EntityTransaction ts = entityManager.getTransaction();
-
-               try {
-
-                  tourData.onPrePersist();
-
-                  ts.begin();
-                  {
-                     final TourData tourDataEntity = entityManager.find(TourData.class, tourData.getTourId());
-                     if (tourDataEntity == null) {
-
-                        // tour is not yet persisted
-
-                        tourData.setDateTimeCreated(dtSaved);
-
-                        entityManager.persist(tourData);
-
-                        persistedEntity = tourData;
-
-                     } else {
-
-                        if (isUpdateModifiedDate) {
-                           tourData.setDateTimeModified(dtSaved);
-                        }
-
-                        persistedEntity = entityManager.merge(tourData);
-                     }
-                  }
-                  ts.commit();
-
-               } catch (final Exception e) {
-
-                  StatusUtil.showStatus(Messages.Tour_Database_TourSaveError, e);
-
-               } finally {
-                  if (ts.isActive()) {
-                     ts.rollback();
-                  }
-                  entityManager.close();
-               }
-            }
-
-            if (persistedEntity != null) {
-
-               entityManager = TourDatabase.getInstance().getEntityManager();
-               try {
-
-                  persistedEntity = entityManager.find(TourData.class, tourData.getTourId());
-
-               } catch (final Exception e) {
-                  StatusUtil.log(e);
-               }
-
-               entityManager.close();
-
-               TourManager.getInstance().updateTourInCache(persistedEntity);
-
-               // update ft index
-               final ArrayList<TourData> allTours = new ArrayList<>();
-               allTours.add(persistedEntity);
-               FTSearchManager.updateIndex(allTours);
-            }
-
-            return persistedEntity;
-
-         } finally {
-
-            if (entityManager.isOpen()) {
-               entityManager.close();
-            }
-         }
-      });
-
-      // The new tour save method should first save all tours concurrently and
-      //then do the post methods, e.g. updateCachedFields
-
-      while (!future.isDone()) {}
-
-      TourData persistedEntity = null;
-      try {
-         persistedEntity = future.get();
-      } catch (InterruptedException | ExecutionException e) {
-         e.printStackTrace();
-      }
-
-      if (persistedEntity != null) {
-
-         updateCachedFields(persistedEntity);
-
-         saveTour_GeoParts(persistedEntity);
-      }
-
-      return persistedEntity;
-   }
-
-   private static synchronized void saveTour_GeoParts(final TourData tourData) {
+   private static void saveTour_GeoParts(final TourData tourData) {
 
 //      final long startTime = System.nanoTime();
 
@@ -3064,7 +2878,7 @@ public class TourDatabase {
       _activeTourTypes = new ArrayList<>();
    }
 
-   private static synchronized void updateCachedFields(final TourData tourData) {
+   private static void updateCachedFields(final TourData tourData) {
 
       // cache tour title
       final TreeSet<String> allTitles = getAllTourTitles();
