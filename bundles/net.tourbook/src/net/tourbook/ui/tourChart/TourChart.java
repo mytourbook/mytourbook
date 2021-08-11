@@ -330,6 +330,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private TourToolTip                   _tourInfoIconTooltip;
    private TourInfoIconToolTipProvider   _tourInfoIconTooltipProvider;
    private ChartMarkerToolTip            _tourMarkerTooltip;
+   private ChartPauseToolTip             _tourPauseTooltip;
    private TourSegmenterTooltip          _tourSegmenterTooltip;
    private ChartTitleToolTip             _tourTitleTooltip;
    private ValuePoint_ToolTip_UI         _valuePointTooltip;
@@ -853,9 +854,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       _photoTooltip = new ChartPhotoToolTip(this, _state);
       _tourMarkerTooltip = new ChartMarkerToolTip(this);
+      _tourPauseTooltip = new ChartPauseToolTip(this);
 
-      // show delayed that it is not flickering when moving the mouse fast
+      // show delayed so that it is not flickering when moving the mouse fast
       _tourMarkerTooltip.setFadeInDelayTime(50);
+      _tourPauseTooltip.setFadeInDelayTime(50);
 
       setHoveredValueTooltipListener(new HoveredValueTooltipListener());
       setLineSelectionPainter(this);
