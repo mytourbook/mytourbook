@@ -99,18 +99,19 @@ public class DialogReimportTours extends TitleAreaDialog {
    private PixelConverter               _pc;
 
    //
-   private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(
-         CommonImages.Lock_Closed).createImage();
-   private Image _imageLockOpen   = CommonActivator.getThemedImageDescriptor(
-         CommonImages.Lock_Open).createImage();
+   private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
+   private Image _imageLockOpen   = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Open).createImage();
+   //
 
    /*
     * UI controls
     */
    private Composite _parent;
+
    private Button    _btnDeselectAll;
    private Button    _btnUnlockAllToursSelection;
    private Button    _btnUnlockBetweenDatesSelection;
+
    private Button    _chkData_AllTimeSlices;
    private Button    _chkData_Cadence;
    private Button    _chkData_Calories;
@@ -123,12 +124,11 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_RunningDynamics;
    private Button    _chkSkip_Tours_With_ImportFile_NotFound;
    private Button    _chkData_Swimming;
-
    private Button    _chkData_Temperature;
    private Button    _chkData_Training;
    private Button    _chkData_TourMarkers;
-
    private Button    _chkData_TourTimerPauses;
+
    private Button    _rdoReimport_Tours_All;
 
    private Button    _rdoReimport_Tours_BetweenDates;
@@ -136,6 +136,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _rdoReimport_Tours_Selected;
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
+
    private Group     _groupTours;
 
    /**

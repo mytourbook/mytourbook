@@ -996,7 +996,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
                // save imported file names
-               final Set<String> importedFiles = _rawDataMgr.getImportedFiles();
+               final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
                _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
                if (!RawDataManager.isReimportingActive() &&
@@ -4800,7 +4800,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             runEasyImport_006_RetrieveWeatherData(importLauncher, importedTours);
          }
 
-         List<TourData> importedAndSavedTours;
+         ArrayList<TourData> importedAndSavedTours;
 
          /*
           * 99. Save imported tours
@@ -4821,7 +4821,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            final List<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
+            final ArrayList<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
 
             runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
@@ -5029,8 +5029,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     *           are not touched, this feature is used to move device files to the backup folder.
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
-                                                  final List<TourData> allTourData,
-                                                  final List<String> invalidFiles,
+                                                  final ArrayList<TourData> allTourData,
+                                                  final ArrayList<String> invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always then tour files are deleted
@@ -5186,7 +5186,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isRemoveToursWhenClosed) {
          stateImportedFiles = new String[] {};
       } else {
-         final Set<String> importedFiles = _rawDataMgr.getImportedFiles();
+         final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
          stateImportedFiles = importedFiles.toArray(new String[importedFiles.size()]);
       }
       _state.put(STATE_IMPORTED_FILENAMES, stateImportedFiles);
