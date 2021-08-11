@@ -101,7 +101,6 @@ public class DialogReimportTours extends TitleAreaDialog {
    //
    private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
    private Image _imageLockOpen   = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Open).createImage();
-   //
 
    /*
     * UI controls
@@ -130,10 +129,9 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_TourTimerPauses;
 
    private Button    _rdoReimport_Tours_All;
-
    private Button    _rdoReimport_Tours_BetweenDates;
-
    private Button    _rdoReimport_Tours_Selected;
+
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
 
@@ -652,6 +650,8 @@ public class DialogReimportTours extends TitleAreaDialog {
          fireTourModifyEvent();
 
       } else {
+
+         // re-import SELECTED tours
 
          RawDataManager.getInstance().actionReimportSelectedTours(tourValueTypes, _tourViewer, skipToursWithFileNotFound);
       }
