@@ -312,7 +312,7 @@ public class TourDatabase {
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
-      final ThreadFactory updateThreadFactory = runnable -> {
+      final ThreadFactory threadFactory = runnable -> {
 
          final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
 
@@ -322,7 +322,7 @@ public class TourDatabase {
          return thread;
       };
 
-      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, updateThreadFactory);
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
    }
    private static final Object DB_LOCK = new Object();
 
