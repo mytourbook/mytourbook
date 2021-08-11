@@ -18,7 +18,16 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.graphics.RGB;
+
 public class ChartPauseConfig {
+
+   public RGB                    markerColorDefault_Light;
+   public RGB                    markerColorDefault_Dark;
+   public RGB                    markerColorDevice_Light;
+   public RGB                    markerColorDevice_Dark;
+   public RGB                    markerColorHidden_Light;
+   public RGB                    markerColorHidden_Dark;
 
    public final List<ChartLabel> chartLabels = new ArrayList<>();
 }

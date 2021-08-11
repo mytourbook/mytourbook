@@ -17,6 +17,7 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
@@ -32,9 +33,16 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private int              LABEL_OFFSET;
+   private int              MARKER_HOVER_SIZE;
+   private int              MARKER_POINT_SIZE;
    private int              PAUSE_POINT_SIZE;
 
+   private TourChart        _tourChart;
    private ChartPauseConfig _chartPauseConfig;
+
+   private long             _hoveredEventTime;
+
+   private ChartLabel       _hoveredLabel;
 
    private int              _devXPause;
    private int              _devYPause;
@@ -204,8 +212,89 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
       //Nothing to do
       System.out.println("TOTO");
+
    }
 
+
+   private ChartLabel retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
+
+      /*
+       * Check sign images first, they have a higher priority
+       */
+      for (final ChartLabel chartLabel : _chartPauseConfig.chartLabels) {
+
+         final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
+         if (imageBounds != null) {
+
+            final int devXImage = imageBounds.x;
+            final int devYImage = imageBounds.y;
+            final int imageWidth = imageBounds.width;
+            final int imageHeight = imageBounds.height;
+
+            if (devXMouse > devXImage
+                  && devXMouse < devXImage + imageWidth
+                  && devYMouse > devYImage
+                  && devYMouse < devYImage + imageHeight) {
+
+               // marker sign image is hit
+               return chartLabel;
+            }
+         }
+      }
+
+      for (final ChartLabel chartLabel : _chartPauseConfig.chartLabels) {
+
+         /*
+          * Check sign label
+          */
+         final Rectangle paintedLabel = chartLabel.paintedLabel;
+         if (paintedLabel != null) {
+
+            final int devXLabel = paintedLabel.x;
+            final int devYLabel = paintedLabel.y;
+
+            if (devXMouse > devXLabel - MARKER_HOVER_SIZE
+                  && devXMouse < devXLabel + paintedLabel.width + MARKER_HOVER_SIZE
+                  && devYMouse > devYLabel - MARKER_HOVER_SIZE
+                  && devYMouse < devYLabel + paintedLabel.height + MARKER_HOVER_SIZE) {
+
+               // horizontal label is hit
+               return chartLabel;
+            }
+         }
+
+         /*
+          * Check marker point
+          */
+         final int devXMarker = chartLabel.devXMarker;
+         final int devYMarker = chartLabel.devYMarker;
+
+         if (devXMouse > devXMarker - MARKER_HOVER_SIZE
+               && devXMouse < devXMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE
+               && devYMouse > devYMarker - MARKER_HOVER_SIZE
+               && devYMouse < devYMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE) {
+
+            // marker point is hit
+            return chartLabel;
+         }
+      }
+
+      return null;
+   }
+
+   public ChartLabel retrieveHoveredPause(final ChartMouseEvent mouseEvent) {
+
+      if (mouseEvent.eventTime == _hoveredEventTime) {
+         return _hoveredLabel;
+      }
+
+      _hoveredEventTime = mouseEvent.eventTime;
+
+      // marker is dirty -> retrieve again
+      _hoveredLabel = retrieveHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
+
+      return _hoveredLabel;
+   }
    public void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
       _chartPauseConfig = chartPauseConfig;
    }

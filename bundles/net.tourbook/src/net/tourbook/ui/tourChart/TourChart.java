@@ -3126,6 +3126,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return tourMarker;
    }
 
+   private TourMarker getHoveredTourPause() {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
    public TourMarker getLastHoveredTourMarker() {
 
       return _lastHoveredTourMarker;
@@ -3432,42 +3437,42 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
       }
 
-//      if (_layerPause != null) {
-//
-//         final ChartPause hoveredPause = _layerPause.retrieveHoveredPause(mouseEvent);
-//
-//         final boolean isPauseHovered = hoveredPause != null;
-//         if (isPauseHovered) {
-//
-//            // set worked that no other actions are done in this event
-//            mouseEvent.isWorked = isLabelHovered;
-//            mouseEvent.cursor = ChartCursor.Arrow;
-//         }
-//
-//         // check if the selected marker is hovered
-//         final TourMarker hoveredMarker = getHoveredTourPause();
-//         if (_selectedTourMarker != null && hoveredPause == null || (hoveredMarker != _selectedTourMarker)) {
-//
-//            _selectedTourMarker = null;
-//
-//            // redraw chart
-//            setChartOverlayDirty();
-//         }
-//
-//         // ensure that a selected tour marker is drawn in the overlay
-//         if (_selectedTourMarker != null) {
-//
-//            // redraw chart
-//            setChartOverlayDirty();
-//         }
-//
-//         if (_tourChartConfiguration.isShowTourPauses) {
-//
-//            // marker tooltip is displayed
-//
-//            _tourMarkerTooltip.open(hoveredLabel);
-//         }
-//      }
+      if (_layerPause != null) {
+
+         final ChartLabel hoveredLabel = _layerPause.retrieveHoveredPause(mouseEvent);
+
+         final boolean isPauseHovered = hoveredLabel != null;
+         if (isPauseHovered) {
+
+            // set worked that no other actions are done in this event
+            mouseEvent.isWorked = isPauseHovered;
+            mouseEvent.cursor = ChartCursor.Arrow;
+         }
+
+         // check if the selected marker is hovered
+         final TourMarker hoveredPause = getHoveredTourPause();
+         if (_selectedTourMarker != null && hoveredPause == null || (hoveredPause != _selectedTourMarker)) {
+
+            _selectedTourMarker = null;
+
+            // redraw chart
+            setChartOverlayDirty();
+         }
+
+         // ensure that a selected tour marker is drawn in the overlay
+         if (_selectedTourMarker != null) {
+
+            // redraw chart
+            setChartOverlayDirty();
+         }
+
+         if (_tourChartConfiguration.isShowTourPauses) {
+
+            // marker tooltip is displayed
+
+            // _tourPauseTooltip.open(hoveredLabel);
+         }
+      }
    }
 
    private void onMarker_MouseUp(final ChartMouseEvent mouseEvent) {
