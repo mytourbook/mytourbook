@@ -300,8 +300,6 @@ public class TourDatabase {
    private static volatile ComboPooledDataSource _pooledDataSource;
 
    private static int                            _dbVersionOnStartup = -1;
-   private static ThreadPoolExecutor             _dbSaveExecutor;
-   private static ArrayBlockingQueue<TourData>   _dbSaveQueue        = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static ThreadPoolExecutor             _dbUpdateExecutor;
    private static ArrayBlockingQueue<Long>       _dbUpdateQueue      = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
 
@@ -313,18 +311,6 @@ public class TourDatabase {
 // set derby debug properties, is helpful when debugging
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
-
-      final ThreadFactory saveThreadFactory = runnable -> {
-
-         final Thread thread = new Thread(runnable, "Saving database tours");//$NON-NLS-1$
-
-         thread.setPriority(Thread.MIN_PRIORITY);
-         thread.setDaemon(true);
-
-         return thread;
-      };
-
-      _dbSaveExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, saveThreadFactory);
 
       final ThreadFactory updateThreadFactory = runnable -> {
 
