@@ -108,7 +108,7 @@ public class ConconiView extends ViewPart {
 // SET_FORMATTING_ON
 
    private final IPreferenceStore  _prefStore              = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _commonPrefStore        = CommonActivator.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common       = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                  = TourbookPlugin.getState(ID);
 
    private IPartListener2          _partListener;
@@ -338,15 +338,26 @@ public class ConconiView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE_LIGHT);
-      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
-      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final String prefColorLine = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final String prefColorText = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      // get colors from common pref store
+      final RGB rgbGradient_Bright = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final RGB rgbGradient_Dark = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
+      final RGB rgbTextColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorText);
 
       final double[][] powerSerie = new double[validDataLength][];
       final double[][] pulseSerie = new double[validDataLength][];
-      final RGB[] rgbLine = new RGB[validDataLength];
-      final RGB[] rgbDark = new RGB[validDataLength];
-      final RGB[] rgbBright = new RGB[validDataLength];
+
+      final RGB[] allRgbLine = new RGB[validDataLength];
+      final RGB[] allRgbGradient_Dark = new RGB[validDataLength];
+      final RGB[] allRgbGradient_Bright = new RGB[validDataLength];
 
       final TourData[] validTours = validTourList.toArray(new TourData[validTourList.size()]);
       int markedIndex = 0;
@@ -426,15 +437,15 @@ public class ConconiView extends ViewPart {
                // get index of marked tour
                markedIndex = tourIndex;
 
-               rgbLine[tourIndex] = rgbPrefLine;
-               rgbDark[tourIndex] = rgbPrefDark;
-               rgbBright[tourIndex] = rgbPrefBright;
+               allRgbLine[tourIndex] = rgbLineColor;
+               allRgbGradient_Dark[tourIndex] = rgbGradient_Dark;
+               allRgbGradient_Bright[tourIndex] = rgbGradient_Bright;
 
             } else {
 
-               rgbLine[tourIndex] = DEFAULT_RGB;
-               rgbDark[tourIndex] = DEFAULT_RGB;
-               rgbBright[tourIndex] = DEFAULT_RGB;
+               allRgbLine[tourIndex] = DEFAULT_RGB;
+               allRgbGradient_Dark[tourIndex] = DEFAULT_RGB;
+               allRgbGradient_Bright[tourIndex] = DEFAULT_RGB;
             }
          }
       }
@@ -445,21 +456,21 @@ public class ConconiView extends ViewPart {
        */
       final double[] markedPowerSerie = powerSerie[markedIndex];
       final double[] markedPulseSerie = pulseSerie[markedIndex];
-      final RGB markedRgbLine = rgbLine[markedIndex];
-      final RGB markedRgbDark = rgbDark[markedIndex];
-      final RGB markedRgbBright = rgbBright[markedIndex];
+      final RGB markedRgbLine = allRgbLine[markedIndex];
+      final RGB markedRgbDark = allRgbGradient_Dark[markedIndex];
+      final RGB markedRgbBright = allRgbGradient_Bright[markedIndex];
 
       powerSerie[markedIndex] = powerSerie[lastTourIndex];
       pulseSerie[markedIndex] = pulseSerie[lastTourIndex];
-      rgbLine[markedIndex] = rgbLine[lastTourIndex];
-      rgbDark[markedIndex] = rgbDark[lastTourIndex];
-      rgbBright[markedIndex] = rgbBright[lastTourIndex];
+      allRgbLine[markedIndex] = allRgbLine[lastTourIndex];
+      allRgbGradient_Dark[markedIndex] = allRgbGradient_Dark[lastTourIndex];
+      allRgbGradient_Bright[markedIndex] = allRgbGradient_Bright[lastTourIndex];
 
       powerSerie[lastTourIndex] = markedPowerSerie;
       pulseSerie[lastTourIndex] = markedPulseSerie;
-      rgbLine[lastTourIndex] = markedRgbLine;
-      rgbDark[lastTourIndex] = markedRgbDark;
-      rgbBright[lastTourIndex] = markedRgbBright;
+      allRgbLine[lastTourIndex] = markedRgbLine;
+      allRgbGradient_Dark[lastTourIndex] = markedRgbDark;
+      allRgbGradient_Bright[lastTourIndex] = markedRgbBright;
 
       /*
        * power
@@ -479,10 +490,11 @@ public class ConconiView extends ViewPart {
       _yDataPulse = new ChartDataYSerie(ChartType.XY_SCATTER, pulseSerieFloat);
       _yDataPulse.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
       _yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-      _yDataPulse.setDefaultRGB(rgbPrefLine);
-      _yDataPulse.setRgbLine(rgbLine);
-      _yDataPulse.setRgbGradient_Dark(rgbDark);
-      _yDataPulse.setRgbGradient_Bright(rgbBright);
+      _yDataPulse.setRgbBar_Gradient_Dark(allRgbGradient_Dark);
+      _yDataPulse.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
+      _yDataPulse.setRgbBar_Line(allRgbLine);
+      
+      _yDataPulse.setRgbGraph_Text(rgbTextColor);
 
 // check x-data visible min value
       //adjust min/max values that the chart do not stick to a border

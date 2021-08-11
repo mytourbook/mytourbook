@@ -25,8 +25,8 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -34,6 +34,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -88,7 +89,7 @@ public class ChartComponentAxis extends Canvas {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
+   ChartComponentAxis(final Chart chart, final Composite parent) {
 
       super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
@@ -102,40 +103,18 @@ public class ChartComponentAxis extends Canvas {
 
       addPaintListener(paintEvent -> onPaint(paintEvent.gc));
 
-      addMouseListener(new MouseAdapter() {
-         @Override
-         public void mouseDoubleClick(final MouseEvent e) {
-            _componentGraph.onMouseDoubleClick(e);
-         }
-
-         @Override
-         public void mouseDown(final MouseEvent e) {
-            onMouseDown();
-         }
-
-      });
+      addMouseListener(MouseListener.mouseDoubleClickAdapter(
+            mouseEvent -> _componentGraph.onMouseDoubleClick(mouseEvent)));
+      addMouseListener(MouseListener.mouseDownAdapter(
+            mouseEvent -> onMouseDown()));
 
       addMouseMoveListener(this::onMouseMove);
 
-      addMouseTrackListener(new MouseTrackListener() {
+      addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(this::onMouseEnter));
 
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            onMouseEnter(e);
-         }
+      addMouseTrackListener(MouseTrackListener.mouseExitAdapter(this::onMouseExit));
 
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            onMouseExit(e);
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
-
-      addControlListener(controlResizedAdapter(controlEvent -> {
-         _clientArea = getClientArea();
-      }));
+      addControlListener(controlResizedAdapter(controlEvent -> _clientArea = getClientArea()));
 
       addListener(SWT.MouseWheel, this::onMouseWheel);
    }
@@ -384,20 +363,21 @@ public class ChartComponentAxis extends Canvas {
 //					labelExtend = gc.textExtent(yTitle);
 //				}
 
-            final int xPos = labelExtend.y / 2;
-            final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
+            int xPos = labelExtend.y / 2;
+            int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
-            final Color fgColor = new Color(yData.getRgbText()[0]);
-            gc.setForeground(fgColor);
+            gc.setForeground(new Color(yData.getRgbGraph_Text()));
 
             final Transform tr = new Transform(_display);
             {
+               xPos = DPIUtil.autoScaleUp(xPos);
+               yPos = DPIUtil.autoScaleUp(yPos);
+
                tr.translate(xPos, yPos);
                tr.rotate(-90f);
 
                gc.setTransform(tr);
                gc.drawText(yTitle, 0, 0, true);
-
                gc.setTransform(null);
             }
             tr.dispose();

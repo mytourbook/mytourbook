@@ -20,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
@@ -252,27 +251,19 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /*
     * UI controls
     */
-   private Composite                   _parent;
-   private Composite                   _viewerContainer;
+   private Composite _parent;
+   private Composite _viewerContainer;
 
-   private PageBook                    _pageBook;
-   private Composite                   _pageContent;
-   private Composite                   _pageMultipleTours;
-   private Composite                   _pageNoData;
+   private PageBook  _pageBook;
+   private Composite _pageContent;
+   private Composite _pageMultipleTours;
+   private Composite _pageNoData;
 
-   private Label                       _lblCompareStatus;
-   private Label                       _lblNumTours;
-   private Label                       _lblNumGeoGrids;
-   private Label                       _lblNumSlices;
-   private Label                       _lblTitle;
-
-   private final Function<Long, Float> _minDiffValueToRelative =
-
-         minDiffValue -> {
-                                                                        final float relative = (float) minDiffValue / _maxMinDiff * 100;
-
-                                                                        return relative;
-                                                                     };
+   private Label     _lblCompareStatus;
+   private Label     _lblNumTours;
+   private Label     _lblNumGeoGrids;
+   private Label     _lblNumSlices;
+   private Label     _lblTitle;
 
    private class ActionAppTourFilter extends Action {
 
@@ -1020,9 +1011,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // this code may be compact and fast but I don't understand it
 
-         final ArrayList<GeoPartComparerItem> filteredComparedTours = new ArrayList<>(geoPartItem.comparedTours.stream()
-               .filter(c -> isMinDiffValueWithinFilter(c.minDiffValue))
-               .collect(Collectors.toList()));
+         final ArrayList<GeoPartComparerItem> filteredComparedTours = new ArrayList<>(
+
+               geoPartItem.comparedTours
+                     .stream()
+                     .filter(comparerItem -> isMinDiffValueWithinFilter(comparerItem.minDiffValue))
+                     .collect(Collectors.toList())
+
+         );
 
          _comparedTours = filteredComparedTours;
       }
@@ -1996,8 +1992,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private boolean isMinDiffValueWithinFilter(final long minDiffValue) {
 
-      return _minDiffValueToRelative.apply(minDiffValue) >= 0 &&
-            _minDiffValueToRelative.apply(minDiffValue) < _geoRelativeDifferencesFilter;
+      final float relativeDiff = (float) minDiffValue / _maxMinDiff * 100;
+
+      return relativeDiff >= 0 && relativeDiff < _geoRelativeDifferencesFilter;
    }
 
    private void onAction_AppFilter(final boolean isSelected) {

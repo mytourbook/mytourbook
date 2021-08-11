@@ -1,135 +1,112 @@
 define(
 [
-	'dojo/_base/declare',
-	"dojo/dom-class",
-	"dojo/dom-geometry",
-	"dojo/dom-style",
-	"dojo/window",
+   'dojo/_base/declare',
+   "dojo/dom-class",
+   "dojo/dom-geometry",
+   "dojo/dom-style",
+   "dojo/window",
 
-	'dijit/_TemplatedMixin',
-	'dijit/_WidgetBase',
-	'dijit/_WidgetsInTemplateMixin',
-	'dijit/Dialog'
+   'dijit/_TemplatedMixin',
+   'dijit/_WidgetBase',
+   'dijit/_WidgetsInTemplateMixin',
+   'dijit/Dialog'
 
-], function(//
-//
-declare, //
-domClass, //
-domGeometry, //
-domStyle, //
-winUtils, //
+], function(
 
-_TemplatedMixin, //
-_WidgetBase, //
-_WidgetsInTemplateMixin, //
-Dialog //
-//
+declare, 
+domClass, 
+domGeometry, 
+domStyle, 
+winUtils, 
+
+_TemplatedMixin, 
+_WidgetBase, 
+_WidgetsInTemplateMixin, 
+Dialog 
+
 ) {
 
-	return declare('tourbook.widget.BaseDialog',
-	[
-		_WidgetBase, // super class
-		_TemplatedMixin,
-		_WidgetsInTemplateMixin
-	], {
+   return declare('tourbook.widget.BaseDialog',
+   [
+      _WidgetBase, // super class
+      _TemplatedMixin,
+      _WidgetsInTemplateMixin
+   ], {
 
-		_dialog : null,
+      _dialog : null,
 
-		/**
-		 * Counter how many tooltips are opened, this dialog will not be closed when >0.
-		 */
-		openedTooltips : 0,
+      createDialog : function createDialog(args) {
 
-		createDialog : function createDialog(args) {
+         if (this._dialog == null) {
 
-			this.openedTooltips = 0;
+            var layoutParent = args.layoutParent;
 
-			if (this._dialog == null) {
+            this._dialog = new Dialog(dojo.mixin({
 
-				var layoutParent = args.layoutParent;
+               content : this,
 
-				this._dialog = new Dialog(dojo.mixin({
+               /**
+                * Overwrite _position in dijit._DialogBase to pin the dialog to the layoutParent node.
+                */
+               _position : function _position() {
+                  
+                  // summary:
+                  //      Position the dialog in the viewport.  If no relative offset
+                  //      in the viewport has been determined (by dragging, for instance),
+                  //      center the dialog.  Otherwise, use the Dialog's stored relative offset,
+                  //      adjusted by the viewport's scroll.
 
-					content : this,
+                  if (layoutParent) {
 
-					/**
-					 * Overwrite _position in dijit._DialogBase to pin the dialog to the layoutParent node.
-					 */
-					_position : function _position() {
-						// summary:
-						//		Position the dialog in the viewport.  If no relative offset
-						//		in the viewport has been determined (by dragging, for instance),
-						//		center the dialog.  Otherwise, use the Dialog's stored relative offset,
-						//		adjusted by the viewport's scroll.
+                     // pin this dialog to the bottom of the layoutParent
 
-						if (layoutParent) {
+                     if (!domClass.contains(this.ownerDocumentBody, "dojoMove")) { // don't do anything if called during auto-scroll
 
-							// pin this dialog to the bottom of the layoutParent
+                        var domDialog = this.domNode, 
 
-							if (!domClass.contains(this.ownerDocumentBody, "dojoMove")) { // don't do anything if called during auto-scroll
+                        viewport = winUtils.getBox(this.ownerDocument), 
 
-								var domDialog = this.domNode, //
+                        dialogBounds = domGeometry.position(domDialog), 
+                        parentBounds = domGeometry.position(layoutParent.domNode),
 
-								viewport = winUtils.getBox(this.ownerDocument), //
+                        l = Math.floor(viewport.w - dialogBounds.w - 1), 
+                        t = Math.floor(parentBounds.y + parentBounds.h)
 
-								dialogBounds = domGeometry.position(domDialog), //
-								parentBounds = domGeometry.position(layoutParent.domNode);
+                        domStyle.set(domDialog, 
+                        {
+                           left : l + "px",
+                           top : t + "px"
+                        });
+                     }
 
-								l = Math.floor(viewport.w - dialogBounds.w - 1), //
-								t = Math.floor(parentBounds.y + parentBounds.h);
+                  } else {
 
-								domStyle.set(domDialog, //
-								{
-									left : l + "px",
-									top : t + "px"
-								});
-							}
+                     // do the original _position implementation
 
-						} else {
+                     this.inherited(arguments)
+                  }
+               }
 
-							// do the original _position implementation
+            }, args))
+         }
 
-							this.inherited(arguments);
-						}
-					}
+         return this._dialog
+      },
 
-				}, args));
-			}
+      showDialog : function showDialog(args) {
 
-			return this._dialog;
-		},
+         this.createDialog(args)
 
-		showDialog : function showDialog(args) {
+         this._dialog.show()
+      },
 
-			this.createDialog(args);
+      destroyDialog : function() {
 
-			this._dialog.show();
-		},
+         if (this._dialog != null) {
+            this._dialog.destroy()
+         }
+      }
 
-		hideDialog : function(event) {
-
-			if (this._dialog != null) {
-
-//				console.log("this.openedTooltips: " + this.openedTooltips);
-
-				/*
-				 * THIS IS ABSOLUTELY NOT WORKING PROPERLY, but sometimes, therefore it is enabled, with the close button
-				 * the dialog can be hidden in all cases.
-				 */
-				if (this.openedTooltips > 0) {
-					return;
-				}
-
-				this._dialog.hide();
-			}
-		},
-
-		destroyDialog : function() {
-			if (this._dialog != null) {
-				this._dialog.destroy();
-			}
-		}
-
-	});
+   });
 
 });

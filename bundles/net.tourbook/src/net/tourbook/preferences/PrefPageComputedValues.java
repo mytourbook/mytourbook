@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.NumberFormat;
@@ -49,10 +51,8 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -111,7 +111,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    }
 
    private boolean                  _isUpdateUI;
-   private SelectionAdapter         _selectionListener;
+   private SelectionListener        _selectionListener;
    private MouseWheelListener       _spinnerMouseWheelListener;
 
    /**
@@ -309,13 +309,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // combo: break method
          _comboBreakMethod = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboBreakMethod.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateUIShowSelectedBreakTimeMethod();
-               onModifyBreakTime();
-            }
-         });
+         _comboBreakMethod.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> {
+
+                  updateUIShowSelectedBreakTimeMethod();
+                  onModifyComputedValuePreference();
+               }));
 
          // fill combo
          for (final BreakTimeMethod breakMethod : BreakTimeTool.BREAK_TIME_METHODS) {
@@ -365,16 +364,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          GridLayoutFactory.fillDefaults().applyTo(btnContainer);
          {
             // button: compute computed values
-            final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-            GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputValues);
-            btnComputValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
-            btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
-            btnComputValues.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeBreakTimeValues();
-               }
-            });
+            final Button btnComputeValues = new Button(btnContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputeValues);
+            btnComputeValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
+            btnComputeValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
+            btnComputeValues.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onComputeBreakTimeValues()));
          }
       }
 
@@ -717,12 +712,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             final Link linkDP = new Link(dpContainer, SWT.NONE);
             linkDP.setText(Messages.Compute_TourValue_ElevationGain_Link_DBTolerance);
             linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
-            linkDP.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
-               }
-            });
+            linkDP.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM)));
 
             // spinner: minimum altitude
             _spinnerDPTolerance = new Spinner(dpContainer, SWT.BORDER);
@@ -772,18 +763,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          GridLayoutFactory.fillDefaults().applyTo(btnContainer);
          {
             // button: compute computed values
-            final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-            btnComputValues.setText(Messages.compute_tourValueElevation_button_computeValues);
-            btnComputValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
-            btnComputValues.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeElevationGainValues();
-               }
-            });
+            final Button btnComputeValues = new Button(btnContainer, SWT.NONE);
+            btnComputeValues.setText(Messages.compute_tourValueElevation_button_computeValues);
+            btnComputeValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
+            btnComputeValues.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onComputeElevationGainValues()));
             GridDataFactory.fillDefaults()
                   .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
-                  .applyTo(btnComputValues);
+                  .applyTo(btnComputeValues);
          }
       }
       return container;
@@ -808,15 +795,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _spinnerCadenceDelimiter.setMinimum(0);
          _spinnerCadenceDelimiter.setMaximum(200);
          _spinnerCadenceDelimiter.addSelectionListener(_selectionListener);
-         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onModifyCadenceZonesDelimiter();
+         _spinnerCadenceDelimiter.addMouseWheelListener(mouseEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            onModifyComputedValuePreference();
          });
 
          // label: unit
@@ -840,12 +824,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       final Button buttonComputeTimes = new Button(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
       buttonComputeTimes.setText(Messages.Compute_CadenceZonesTimes_ComputeAllTours);
-      buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onComputeCadenceZonesTimeValues();
-         }
-      });
+      buttonComputeTimes.addSelectionListener(widgetSelectedAdapter(
+            selectionEvent -> onComputeCadenceZonesTimeValues()));
 
       return container;
    }
@@ -913,25 +893,21 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       _initialUnitHashCode = UI.UNIT_HASH_CODE;
 
-      _selectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyBreakTime();
-         }
-      };
+      _selectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
 
-      _spinnerMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            if (_isUpdateUI) {
-               return;
-            }
-            Util.adjustSpinnerValueOnMouseScroll(event);
-            onModifyBreakTime();
+               if (_isUpdateUI) {
+                  return;
+               }
+               onModifyComputedValuePreference();
+            });
+
+      _spinnerMouseWheelListener = mouseEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModifyComputedValuePreference();
       };
    }
 
@@ -1173,17 +1149,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       fireTourModifyEvent();
    }
 
-   private void onModifyBreakTime() {
-
-      saveState();
-
-      TourManager.getInstance().removeAllToursFromCache();
-
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
-   }
-
-   private void onModifyCadenceZonesDelimiter() {
+   private void onModifyComputedValuePreference() {
 
       saveState();
 
@@ -1195,6 +1161,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    @Override
    public boolean performCancel() {
+
       saveUIState();
       return super.performCancel();
    }
@@ -1275,7 +1242,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _isUpdateUI = false;
 
          // keep state and fire event
-         onModifyBreakTime();
+         onModifyComputedValuePreference();
 
       } else if (selectedTab == TAB_FOLDER_PACE_SPEED) {
 

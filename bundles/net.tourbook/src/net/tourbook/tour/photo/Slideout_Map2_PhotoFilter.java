@@ -245,11 +245,6 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
    }
 
    @Override
-   protected void onDispose() {
-
-   }
-
-   @Override
    protected void onFocus() {
 
       _comboRatingStarOperators.setFocus();

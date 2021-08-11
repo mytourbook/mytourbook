@@ -873,8 +873,8 @@ public class NatTable_DataLoader {
       /*
        * TOUR
        */
-      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "tourStartPlace";                              //$NON-NLS-1$
-      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "tourEndPlace";                                //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "COALESCE(tourStartPlace, '')";                //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "COALESCE(tourEndPlace, '')";                  //$NON-NLS-1$
       case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;

@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
@@ -24,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -63,9 +69,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -244,10 +247,7 @@ public class UI {
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean IS_DARK_THEME;
-
-   // this is the old field before using IS_DARK_THEME
-   private static boolean      _isDarkThemeSelected;
+   public static boolean       IS_DARK_THEME;
 
    /**
     * On Linux an async selection event is fired since e4
@@ -270,6 +270,12 @@ public class UI {
     */
    public static final int     DEFAULT_DESCRIPTION_WIDTH      = 350;
    public static final int     DEFAULT_FIELD_WIDTH            = 40;
+
+   /**
+    * The opacity can be set in SWT from 0...255 but no user want's so many steps. In the UI the
+    * user can select this max opacity value which will be converted into 255 when appied.
+    */
+   public static final int     MAX_OPACITY                    = 10;
 
    /**
     * Convert Joule in Calorie
@@ -522,7 +528,7 @@ public class UI {
    private static StringBuilder        _formatterSB               = new StringBuilder();
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
-   private static FontMetrics          _fontMetrics;
+   private static FontMetrics          _dialogFont_Metrics;
 
 // SET_FORMATTING_OFF
 
@@ -755,35 +761,37 @@ public class UI {
     */
    public static void addSashColorHandler(final Sash sash) {
 
-      sash.addMouseTrackListener(new MouseTrackListener() {
+      final Display display = Display.getCurrent();
 
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+      final Color mouseEnterColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultForegroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+
+      final Color mouseExitColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultBackgroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+      final Color mouseDragColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultForegroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+
+      sash.addMouseTrackListener(mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
+      sash.addMouseTrackListener(mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
+
+      // set color when sash is initially displayed
+      sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
+
+      sash.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+         // hide background when sash is dragged
+
+         if (selectionEvent.detail == SWT.DRAG) {
+            sash.setBackground(null);
+         } else {
+            sash.setBackground(mouseDragColor);
          }
 
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
-
-      sash.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-
-            // hide background when sash is dragged
-
-            if (e.detail == SWT.DRAG) {
-               sash.setBackground(null);
-            } else {
-               sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-            }
-         }
-      });
+      }));
    }
 
    public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
@@ -929,7 +937,28 @@ public class UI {
          return dlus * 4;
       }
 
-      return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
+      return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Convert opacity value into 0...255 where 255 corresponds with {@link #MAX_OPACITY}
+    * <p>
+    * The tooltip should display
+    *
+    * <pre>
+    * 0 = transparent ... max = opaque
+    * </pre>
+    *
+    * that {@link #MAX_OPACITY} could be adjusted or customized by the user.
+    *
+    * @param opacity
+    * @return
+    */
+   public static int convertOpacity(final float opacity) {
+
+      final float opacityConverted = opacity / MAX_OPACITY * 0xff;
+
+      return (int) Math.min(0xff, opacityConverted);
    }
 
    /**
@@ -1461,6 +1490,14 @@ public class UI {
       return directionIndex;
    }
 
+   public static FontMetrics getDialogFontMetrics() {
+
+      // ensure that font metrics are setup
+      setupUI_FontMetrics();
+
+      return _dialogFont_Metrics;
+   }
+
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;
@@ -1618,7 +1655,7 @@ public class UI {
     * @return <code>true</code> when a dark theme is selected in the UI
     */
    public static boolean isDarkTheme() {
-      return _isDarkThemeSelected;
+      return IS_DARK_THEME;
    }
 
    public static boolean isLinuxAsyncEvent(final Widget widget) {
@@ -2251,8 +2288,6 @@ public class UI {
 
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
 
-      _isDarkThemeSelected = isDarkThemeSelected;
-
       IS_DARK_THEME = isDarkThemeSelected;
    }
 
@@ -2304,26 +2339,22 @@ public class UI {
 
    private static boolean setupUI_FontMetrics() {
 
-      if (_fontMetrics != null) {
+      if (_dialogFont_Metrics != null) {
          return true;
       }
 
       // Compute and keep a font metric
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
-
-      if (activeShell == null) {
-
-         // this can occure when called too early
-         return false;
-      }
-
-      final GC gc = new GC(activeShell);
+      final Display display = Display.getDefault();
+      final Shell shell = new Shell(display);
+      final GC gc = new GC(shell);
       {
          gc.setFont(JFaceResources.getDialogFont());
-         _fontMetrics = gc.getFontMetrics();
+
+         _dialogFont_Metrics = gc.getFontMetrics();
       }
       gc.dispose();
+      shell.dispose();
 
       return true;
    }

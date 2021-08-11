@@ -4,23 +4,18 @@
 TODO's
 ======
 
-* Tour Chart   - Select color for 2nd graph line instead of compliment color
-               - Set default graphs in the graph slideout, sorting still needs the pref page
+* Tour Chart      - Select color for 2nd graph line instead of compliment color
+                  - Set default graphs in the graph slideout, sorting still needs the pref page
 
-* Tour Search  - Test Edge browser if the tour selection in the result list is working with the mouse
-               - Implement workaround: Select tour with an action in the context menu
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
-* Compare Tours by Elevation
-               - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
-
-* Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                 Need to check how to apply it to all projects, must maybe be done with the already existing ant script
-
-               - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                 mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                 
 
 * Tour modification (Frederic) 
-               - Use multi-threading (ThreadPoolExecutor)
+                  - Use multi-threading (ThreadPoolExecutor)
 
 Issues
 ======
@@ -37,18 +32,78 @@ New
 Improvements
 ============
 
-* 
+* 2D Map
+  - Show tour direction as marker in the tour track
+  - Customize colors for hovered/selected tour
+  - Hovered/selected tour tooltip 
+    - Better text formatting
+    - Themed foreground/background color
+  - Show themed tour pauses when map is dimmed
+
+* Search Tours                         https://sourceforge.net/p/mytourbook/feature-requests/186/
+  - Search also for these fields:   
+    - Tour start location
+    - Tour end location
+    - Tour weather    
+  - Highlight search string with a color in the search result, the tour marker color from the chart is used 
+  - Search options dialog
+    - Added new search fields
+    - Replaced ugly close icon 
+    - Disabled autoclosing of this dialog because sometimes it closed too early
+    - A few UI tweaks
+
+* Tour Photos
+  - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is selected in the "Photos" view   
+    https://sourceforge.net/p/mytourbook/feature-requests/194/
+  
+* Compare Tours by Elevation
+  - Reference tour view
+    - Show compared tours with year categories or without year categories
+    - New shortcut action in context menu to compare reference tours with all tours
+    - A newly create reference tour is selected in this view and perspective
+  - Compare result view
+    - Compare tours concurrently -> much less waiting time
+    - Use fast app tour filters (person, tour type, tour, photo...)
+    - Tour compare results can be filtered by: all/saved/not saved
+    - Automatically expand reference tour in compare result view after a comparison is done
+    - New shortcut action in context menu to compare reference tour(s) with all tours
+    - Tour comparison can be restarted with other parameters, e.g. different years, other tour filters
+  - Year statistic view
+    - Show reference tour title
+    - Show year statistic view in "Compare Result" perspective
+    - Update year statistic view when compare result is assigned/removed
+
+* Repair Close Button in All Views
+  - It can happen that the close button in the view tab disappear. This repair feature is performed when MyTourbook is closing.
+    This is an experimental feature and can be activated with the command line parameter -DsetAllViewsClosable 
+
+* Fitlog/FitlogEx Import (Frederic)
+  - The timezone is used only when available, otherwise it's determined with the GPS position
+
 
 Changes  
 =======
 
-* 
+* 2D Map
+  - Move option "Show hovered/selected tour" from "2D Map Options" into "Track Options"
     
 
 Bugfix
 ======
 
-* 
+* 4k Display
+  - Fixed positions for the vertical x-Axis units and vertical tour chart markers
+  - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
+
+* Tour cadence zones times (Frederic)
+  - Cadence zone times computation should use either the recorded time or moving
+    time per the computed values preference 
+    
+* Tour chart
+  - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
+
+* 2D Map
+  - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
 
 Translation    
 ===========

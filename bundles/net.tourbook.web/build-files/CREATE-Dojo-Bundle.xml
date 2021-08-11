@@ -100,7 +100,12 @@
    	
       <gzip src="${path-dojoBuildRelease}/dojo/dojo.js"                    destfile="${path-WebContent-Rel}/dojo/dojo.js.jgz"/>
       <gzip src="${path-dojoBuildRelease}/tourbook/search/SearchApp.js"    destfile="${WebContentRelTourbook}/search/SearchApp.js.jgz"/>
+   	
+      <gzip src="${path-dojoBuildRelease}/tourbook/search/mt-dojo.css"     destfile="${WebContentRelTourbook}/search/mt-dojo.css.jgz"/>
+   	
+   	<!-- The dark theme has to manipulate the css file
       <gzip src="${path-dojoBuildRelease}/tourbook/search/search.css"      destfile="${WebContentRelTourbook}/search/search.css.jgz"/>
+   	-->
 
    </target>
 
@@ -130,7 +135,12 @@
             <!-- NLS will be copied in the next task other js are compressed -->
             <exclude name="**/*.js"/>
 
-            <exclude name="**/search.css"/> <!-- this file is in the build layer -->
+         	<!-- this file is compressed -->
+            <exclude name="**/mt-dojo.css"/> 
+         	
+         	<!-- 
+               <exclude name="**/search.css"/> 
+         	this file is in the build layer -->
 
          </fileset>
       </copy>

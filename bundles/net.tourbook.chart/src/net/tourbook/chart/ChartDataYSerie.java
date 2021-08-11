@@ -222,9 +222,11 @@ public class ChartDataYSerie extends ChartDataSerie {
     * @return Returns the valueColors.
     */
    public int[][] getColorsIndex() {
+
       if (_colorIndex == null || _colorIndex.length == 0 || _colorIndex[0] == null || _colorIndex[0].length == 0) {
          setAllValueColors(0);
       }
+
       return _colorIndex;
    }
 
@@ -417,8 +419,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    /**
     * <p>
-    * true: the direction is from bottom to top by increasing number <br>
-    * false: the direction is from top to bottom by increasing number
+    * <code>true</code>: the direction is from bottom to top by increasing number <br>
+    * <code>false</code>: the direction is from top to bottom by increasing number
     */
    public boolean isYAxisDirection() {
       return _yAxisDirection;
@@ -626,7 +628,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
          case ChartDataYSerie.BAR_LAYOUT_STACKED:
 
-            final float serieMax[] = new float[valueSeries[0].length];
+            final float[] serieMax = new float[valueSeries[0].length];
 
             // get the max value for the data which are stacked on each
             // other
@@ -689,7 +691,7 @@ public class ChartDataYSerie extends ChartDataSerie {
             for (final float value : valueSerie) {
 
                if (value != value) {
-                  // ignore Nan
+                  // ignore NaN
                   continue;
                }
 

@@ -1186,7 +1186,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       // use slideout AFTER the toolbar is created/updated/filled, this creates it
       _activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
-      _slideoutStatisticOptions.setupGrid(//
+      _slideoutStatisticOptions.setupGrid(
             _activeStatistic.getGridPrefPrefix(),
             _activeStatistic.getEnabledGridOptions());
    }

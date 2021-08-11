@@ -531,12 +531,12 @@ public class Messages extends NLS {
    public static String        App_Action_Cancel;
    public static String        App_Action_Close_ToolTip;
    public static String        App_Action_CollapseAll;
-   public static String        App_Action_CollapseAll_Tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
    public static String        App_Action_Delete;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
+   public static String        App_Action_DeleteProperty;
    public static String        App_Action_DeleteTourMarker;
    public static String        App_Action_DeselectAll;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -916,6 +916,18 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_delete_markers_title;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
+
+   public static String        Elevation_Compare_Action_AppTourFilter_Tooltip;
+   public static String        Elevation_Compare_Action_CompareAllTours;
+   public static String        Elevation_Compare_Action_IsNotUsingAppFilter_Tooltip;
+   public static String        Elevation_Compare_Action_IsUsingAppFilter_Tooltip;
+   public static String        Elevation_Compare_Action_Layout_WithoutYearCategories_Tooltip;
+   public static String        Elevation_Compare_Action_Layout_WithYearCategories_Tooltip;
+   public static String        Elevation_Compare_Action_RemoveReferenceTours;
+   public static String        Elevation_Compare_Action_ReRunComparison_Tooltip;
+   public static String        Elevation_Compare_Action_TourCompareFilter_Tooltip;
+   public static String        Elevation_Compare_Monitor_SubTask;
+   public static String        Elevation_Compare_Monitor_Task;
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
@@ -1569,7 +1581,6 @@ public class Messages extends NLS {
    public static String        pref_general_restart_app_title;
 
    public static String        pref_map_layout_BorderWidth;
-   public static String        pref_map_layout_dim_color;
    public static String        pref_map_layout_PaintBorder;
    public static String        pref_map_layout_symbol;
    public static String        pref_map_layout_symbol_dot;
@@ -2007,28 +2018,43 @@ public class Messages extends NLS {
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_Title;
 
-   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
-   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
-   public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String Slideout_Map_Options_Checkbox_DimMap;
    public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
    public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
+   public static String Slideout_Map_Options_Checkbox_ShowTourDirection;
+   public static String Slideout_Map_Options_Checkbox_ShowTourDirection_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;
    public static String Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ToggleKeyboardPanning;
    public static String Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
+   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
+   public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
+   public static String Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String Slideout_Map_Options_Group_TourTrack;
+   public static String Slideout_Map_Options_Label_HoveredAndSelectedColor;
+   public static String Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
+   public static String Slideout_Map_Options_Label_HoveredColor;
+   public static String Slideout_Map_Options_Label_HoveredColor_Tooltip;
+   public static String Slideout_Map_Options_Label_SelectedColor;
+   public static String Slideout_Map_Options_Label_SelectedColor_Tooltip;
    public static String Slideout_Map_Options_Label_SliderLocation_Color;
    public static String Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
    public static String Slideout_Map_Options_Label_SliderLocation_Size;
    public static String Slideout_Map_Options_Label_SliderPath_Color;
    public static String Slideout_Map_Options_Label_SliderPath_Color_Tooltip;
+   public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
+   public static String Slideout_Map_Options_Label_TourDirection_DistanceBetweenMarkers;
+   public static String Slideout_Map_Options_Label_TourDirection_LineWidth;
+   public static String Slideout_Map_Options_Label_TourDirection_SymbolColor;
+   public static String Slideout_Map_Options_Label_TourDirection_SymbolSize;
+   public static String Slideout_Map_Options_Spinner_DimValue_Tooltip;
 
    public static String Slideout_Map_PhotoOptions_Label_Title;
 
@@ -2071,7 +2097,11 @@ public class Messages extends NLS {
    public static String Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip;
    public static String Slideout_TourBookOptions_Label_Title;
 
+   public static String Slideout_TourChartGraph_Checkbox_DefaultWhenOpened_Tooltip;
    public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
+   public static String Slideout_TourChartGraph_Label_DefaultWhenOpened;
+   public static String Slideout_TourChartGraph_Label_ShowActionInToolbar;
+   public static String Slideout_TourChartGraph_Label_ShowGraph;
    public static String Slideout_TourChartGraph_Label_Title;
 
    public static String Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
@@ -2317,6 +2347,7 @@ public class Messages extends NLS {
    public static String Tour_Action_ShowBreaktimeValues;
    public static String Tour_Action_ShowTourPauses;
    public static String Tour_Action_ShowTourPauses_Tooltip;
+   public static String Tour_Action_ShowValuePointValue;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
    public static String Tour_Action_TourInfo_Tooltip;
@@ -2405,6 +2436,8 @@ public class Messages extends NLS {
    public static String Tour_Database_UpdateDone;
    public static String Tour_Database_UpdateInfo;
 
+   public static String Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
+   public static String Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
    public static String Tour_Editor_Decorator_TimeZone_Tooltip;
    public static String Tour_Editor_Dialog_DeleteSwimTimeSlices_Message;
    public static String Tour_Editor_Dialog_DeleteSwimTimeSlices_Title;
@@ -2785,24 +2818,17 @@ public class Messages extends NLS {
    public static String tourCatalog_view_label_year_chart_title;
    public static String tourCatalog_view_label_year_not_selected;
 
-   public static String tourCatalog_wizard_Action_deselect_all;
-   public static String tourCatalog_wizard_Action_select_all;
-   public static String tourCatalog_wizard_Action_select_all_tours;
    public static String tourCatalog_wizard_Column_altitude_up_tooltip;
    public static String tourCatalog_wizard_Column_distance_tooltip;
    public static String tourCatalog_wizard_Column_h;
    public static String tourCatalog_wizard_Column_h_tooltip;
    public static String tourCatalog_wizard_Column_tour;
-   public static String tourCatalog_wizard_Error_select_reference_tours;
    public static String tourCatalog_wizard_Error_tour_must_be_selected;
-   public static String tourCatalog_wizard_Group_chart_title;
    public static String tourCatalog_wizard_Group_selected_tour;
    public static String tourCatalog_wizard_Group_selected_tour_2;
    public static String tourCatalog_wizard_Label_a_tour_is_not_selected;
    public static String tourCatalog_wizard_Label_page_message;
-   public static String tourCatalog_wizard_Msg_select_reference_tour;
    public static String tourCatalog_wizard_Page_compared_tours_title;
-   public static String tourCatalog_wizard_Page_reference_tour_title;
    public static String tourCatalog_wizard_Wizard_title;
 
    public static String TourCatalog_View_Action_NavigateNextTour;

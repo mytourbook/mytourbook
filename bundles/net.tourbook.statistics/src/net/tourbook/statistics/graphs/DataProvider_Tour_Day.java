@@ -40,7 +40,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
@@ -264,11 +263,6 @@ public class DataProvider_Tour_Day extends DataProvider {
          _durationTime = durationTime;
 
          setupYearNumbers();
-
-         int colorOffset = 0;
-         if (tourTypeFilter.showUndefinedTourTypes()) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
 
          boolean isDurationTime_Break = false;
          boolean isDurationTime_Elapsed = false;
@@ -530,7 +524,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                   for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
                      if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-                        colorIndex = colorOffset + typeIndex;
+                        colorIndex = typeIndex;
                         break;
                      }
                   }

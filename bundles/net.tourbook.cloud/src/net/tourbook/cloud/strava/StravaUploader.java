@@ -310,15 +310,14 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private String mapTourType(final TourData manualTour) {
 
-      final String tourTypeName = manualTour.getTourType() != null ? manualTour.getTourType().getName() : UI.EMPTY_STRING;
+      final String tourTypeName = manualTour.getTourType() != null
+            ? manualTour.getTourType().getName()
+            : UI.EMPTY_STRING;
 
-      for (final String stravaActivityType : StravaActivityTypes) {
-         if (tourTypeName.equalsIgnoreCase(stravaActivityType)) {
-            return stravaActivityType;
-         }
-      }
-
-      return StravaActivityTypes.get(0);
+      return StravaActivityTypes.stream().filter(
+            stravaActivityType -> tourTypeName.toLowerCase().startsWith(stravaActivityType.toLowerCase()))
+            .findFirst()
+            .orElse(StravaActivityTypes.get(0));
    }
 
    private void processManualTour(final IProgressMonitor monitor, final List<TourData> manualTours, final TourData tourData) {

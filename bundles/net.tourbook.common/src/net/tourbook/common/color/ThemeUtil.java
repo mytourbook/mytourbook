@@ -34,15 +34,24 @@ import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
 
+   public static final String  DEFAULT_BACKGROUND_LIGHT_THEME = "fff";                                             //$NON-NLS-1$
+   public static final String  DEFAULT_FOREGROUND_LIGHT_THEME = "333";                                             //$NON-NLS-1$
+
+   public static final String  DEFAULT_FOREGROUND_DARK_THEME  = "ddd";                                             //$NON-NLS-1$
+   public static final String  DEFAULT_BACKGROUND_DARK_THEME  = "333";                                             //$NON-NLS-1$
+
+   private static final Color  THEMED_COLOR_ERROR             = new Color(255, 88, 88);
+   private static final Color  SYSTEM_COLOR_RED               = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+
    /**
     * Currently only .png files are supported for themed images !!!
     */
-   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";  //$NON-NLS-1$
+   private static final String IMAGE_NAME_EXTENSION_PNG       = ".png";                                            //$NON-NLS-1$
 
    /**
     * All images for the dark theme should have this postfix before the file extension
     */
-   private static final String DARK_THEME_POSTFIX       = "-dark"; //$NON-NLS-1$
+   public static final String  DARK_THEME_POSTFIX             = "-dark";                                           //$NON-NLS-1$
 
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
@@ -142,6 +151,16 @@ public class ThemeUtil {
    }
 
    /**
+    * @return Returns themed color for displaying errors
+    */
+   public static Color getColor_Error() {
+
+      return UI.IS_DARK_THEME
+            ? THEMED_COLOR_ERROR
+            : SYSTEM_COLOR_RED;
+   }
+
+   /**
     * @return The tour chart do not show a dark background color when displayed in a dialog, it
     *         shows the background color from the shell.
     *         <p>
@@ -200,6 +219,20 @@ public class ThemeUtil {
     */
    public static Color getDefaultForegroundColor_TableHeader() {
       return _defaultForegroundColor_TableHeader;
+   }
+
+   public static String getThemedCss_DefaultBackground() {
+
+      return UI.IS_DARK_THEME
+            ? ThemeUtil.DEFAULT_BACKGROUND_DARK_THEME
+            : ThemeUtil.DEFAULT_BACKGROUND_LIGHT_THEME;
+   }
+
+   public static String getThemedCss_DefaultForeground() {
+
+      return UI.IS_DARK_THEME
+            ? ThemeUtil.DEFAULT_FOREGROUND_DARK_THEME
+            : ThemeUtil.DEFAULT_FOREGROUND_LIGHT_THEME;
    }
 
    /**

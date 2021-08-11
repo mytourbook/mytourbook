@@ -441,15 +441,24 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
       _containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
    }
 
-   public void setSelection(ISelection selection) {
+   public void setSelection(final ISelection selection) {
 
       if (_selectionConverter != null) {
 
          /*
-          * convert default selection into a selection from the selection type provider, it mainly
+          * Convert default selection into a selection from the selection converter, it mainly
           * converts into another type, that the new type is fired instead of the old
           */
-         selection = _selectionConverter.convertSelection(selection);
+
+// Disabled as it seems this selection is fired only the first time -> very strange,
+// however the app is working as expected, when a photo is selected, then "Photos + Tours" is updated
+// and "Tour Photos" display the photo
+//
+//         selection = _selectionConverter.convertSelection(selection);
+
+         // The selection converter is used again to ensure, that the link view is opened.
+         // This may be also the reason why the selection converter exists -> complicated
+         _selectionConverter.convertSelection(selection);
       }
 
       fireSelection(selection);

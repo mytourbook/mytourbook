@@ -91,8 +91,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
        * create segments for each year
        */
       final int monthCounter = tourMonthData.elevationUp_High[0].length;
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statSelectedYear - _statNumberOfYears + 1;
@@ -217,8 +217,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -241,8 +240,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -264,8 +262,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       yData.setValueDivisor(1000);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -286,8 +283,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       _yData_DurationTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
       _yData_DurationTime.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(_yData_DurationTime, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(_yData_DurationTime, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(_yData_DurationTime, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColorIndex(_yData_DurationTime, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(_yData_DurationTime);
@@ -308,8 +304,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -333,8 +328,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -405,17 +399,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
    private void setChartProviders(final ChartDataModel chartModel) {
 
       // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider,
-                                     final Composite parent,
-                                     final int hoveredBar_Serie_VerticalIndex,
-                                     final int hoveredBar_Value_HorizontalIndex) {
-
-            StatisticMonth.this.createToolTipUI(toolTipProvider, parent, hoveredBar_Serie_VerticalIndex, hoveredBar_Value_HorizontalIndex);
-         }
-      });
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
+            (IChartInfoProvider) StatisticMonth.this::createToolTipUI);
    }
 
    @Override
@@ -490,8 +475,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
       // update title segment config AFTER defaults are set above
       final ChartTitleSegmentConfig ctsConfig = _chart.getChartTitleSegmentConfig();
-      ctsConfig.isShowSegmentSeparator = _prefStore.getBoolean(//
-            ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR);
+      ctsConfig.isShowSegmentSeparator = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR);
 
       // show the fDataModel in the chart
       _chart.updateChart(chartDataModel, true);

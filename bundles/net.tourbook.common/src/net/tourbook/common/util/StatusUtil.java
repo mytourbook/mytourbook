@@ -7,7 +7,6 @@
  * Contributors:
  * IBM Corporation - initial API and implementation
  *******************************************************************************/
-
 package net.tourbook.common.util;
 
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 /*
- * this class is copied from org.eclipse.ui.internal.misc.StatusUtil and modified
+ * This class is copied from org.eclipse.ui.internal.misc.StatusUtil and modified
  */
 
 /**
@@ -77,19 +76,19 @@ public class StatusUtil {
 
    /**
     * Utility method for handling status.
-    * 
+    *
     * @param severity
     */
    public static void handleStatus(final String message, final Throwable e, final int style, final int severity) {
-      StatusManager.getManager()
-            .handle(
-                  newStatus(CommonActivator.PLUGIN_ID, message, e, severity),
-                  style | StatusManager.LOG);
+
+      StatusManager.getManager().handle(
+            newStatus(CommonActivator.PLUGIN_ID, message, e, severity),
+            style | StatusManager.LOG);
    }
 
    /**
     * Log message into the status log
-    * 
+    *
     * @param message
     * @param exception
     */
@@ -99,7 +98,7 @@ public class StatusUtil {
 
    /**
     * Log exception into the status log
-    * 
+    *
     * @param message
     * @param exception
     */
@@ -117,7 +116,7 @@ public class StatusUtil {
 
    /**
     * Log error into the log
-    * 
+    *
     * @param exception
     */
    public static void log(final Throwable exception) {

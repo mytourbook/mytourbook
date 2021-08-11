@@ -21,13 +21,13 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-class ActionDeleteTimeSlicesRemoveTime extends Action {
+class ActionDeleteTimeSlices_KeepTime extends Action {
 
    private final TourDataEditorView fTourPropertiesView;
 
-   public ActionDeleteTimeSlicesRemoveTime(final TourDataEditorView tourPropertiesView) {
+   public ActionDeleteTimeSlices_KeepTime(final TourDataEditorView tourPropertiesView) {
 
-      super(Messages.action_tour_editor_delete_time_slices_remove_time, AS_PUSH_BUTTON);
+      super(Messages.action_tour_editor_delete_time_slices_keep_time, AS_PUSH_BUTTON);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
@@ -37,6 +37,6 @@ class ActionDeleteTimeSlicesRemoveTime extends Action {
 
    @Override
    public void run() {
-      fTourPropertiesView.actionDeleteTimeSlices(true);
+      fTourPropertiesView.actionDeleteTimeSlices(false, false);
    }
 }

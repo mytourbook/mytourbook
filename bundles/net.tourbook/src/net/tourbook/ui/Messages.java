@@ -522,6 +522,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_MaxPulse;
    public static String        Tour_Tooltip_Label_MaxSpeed;
    public static String        Tour_Tooltip_Label_MovingTime;
+   public static String        Tour_Tooltip_Label_NoGeoTour;
    public static String        Tour_Tooltip_Label_NoTour;
    public static String        Tour_Tooltip_Label_ElapsedTime;
    public static String        Tour_Tooltip_Label_PausedTime;

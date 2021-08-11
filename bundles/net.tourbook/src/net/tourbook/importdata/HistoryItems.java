@@ -30,6 +30,7 @@ import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -599,7 +600,7 @@ class HistoryItems {
          if (_buttonBrowse != null) {
             _buttonBrowse.setEnabled(true);
          }
-         _linkFolderInfo.setForeground(null);
+         _linkFolderInfo.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
 
       } else {
 
@@ -641,7 +642,7 @@ class HistoryItems {
 
          _linkFolderInfo.setText(folderInfoMessage.toString());
 
-         _linkFolderInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         _linkFolderInfo.setForeground(ThemeUtil.getColor_Error());
       }
    }
 }
