@@ -288,8 +288,9 @@ public class DialogReimportTours extends TitleAreaDialog {
                }
             }
 
-            _dbUpdateExecutor.shutdown();
             if (isReimportConcurrent) {
+
+               _dbUpdateExecutor.shutdown();
 
                // wait until all comparisons are performed
                while (_countDownLatch.getCount() > 0) {
