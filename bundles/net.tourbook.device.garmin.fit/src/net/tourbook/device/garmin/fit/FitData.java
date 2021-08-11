@@ -102,10 +102,10 @@ public class FitData {
                   final Map<Long, TourData> alreadyImportedTours,
                   final Map<Long, TourData> newlyImportedTours) {
 
-      this._fitDataReader = fitDataReader;
-      this._importFilePathName = importFilePath;
-      this._alreadyImportedTours = alreadyImportedTours;
-      this._newlyImportedTours = newlyImportedTours;
+      _fitDataReader = fitDataReader;
+      _importFilePathName = importFilePath;
+      _alreadyImportedTours = alreadyImportedTours;
+      _newlyImportedTours = newlyImportedTours;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;

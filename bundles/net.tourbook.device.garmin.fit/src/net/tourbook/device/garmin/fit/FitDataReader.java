@@ -436,7 +436,25 @@ public class FitDataReader extends TourbookDevice {
       return isSkipped;
    }
 
-   private void onMessage_Mesg(final Mesg mesg) {
+   private void onMessage_ForNotDocumentedMesg(final Mesg mesg, final FitData fitData) {
+
+      final int mesgNum = mesg.getNum();
+
+      switch (mesgNum) {
+      case 104:
+         // Device Battery (not documented)
+         break;
+
+      case 147:
+         // Registered Device Sensor (not documented)
+         break;
+
+      default:
+         break;
+      }
+   }
+
+   private void onMessage_MesgForLogging(final Mesg mesg) {
 
       long garminTimestamp = 0;
 
@@ -504,9 +522,7 @@ public class FitDataReader extends TourbookDevice {
          }
       }
 
-      for (
-
-      final Field field : mesg.getFields()) {
+      for (final Field field : mesg.getFields()) {
 
          final String fieldName = field.getName();
 
@@ -623,11 +639,11 @@ public class FitDataReader extends TourbookDevice {
                javaTime / 1000, //                       java time in s
                Long.toString(garminTimestamp), //        garmin timestamp
 
-               field.getNum(), //            Num
-               fieldName, //                 Name
+               field.getNum(), //                        Num
+               fieldName, //                             Name
 
-               field.getValue(), //          Value
-               field.getUnits() //        Units
+               field.getValue(), //                      Value
+               field.getUnits() //                       Units
 
 //             field.getRawValue().getClass().getCanonicalName()
 
@@ -655,7 +671,6 @@ public class FitDataReader extends TourbookDevice {
                newlyImportedTours);
 
          // setup all fit listeners
-
          fitBroadcaster.addListener(new MesgListener_Activity(fitData));
          fitBroadcaster.addListener(new MesgListener_BikeProfile(fitData));
          fitBroadcaster.addListener(new MesgListener_DeviceInfo(fitData));
@@ -669,6 +684,7 @@ public class FitDataReader extends TourbookDevice {
          fitBroadcaster.addListener(new MesgListener_Record(fitData));
          fitBroadcaster.addListener(new MesgListener_Session(fitData));
          fitBroadcaster.addListener(new MesgListener_Sport(fitData));
+         fitBroadcaster.addListener((MesgListener) mesg -> onMessage_ForNotDocumentedMesg(mesg, fitData));
 
          if (_isLogging_FitData) {
 
@@ -680,10 +696,11 @@ public class FitDataReader extends TourbookDevice {
             System.out.println();
 
 // SET_FORMATTING_OFF
-//            System.out.println("         1         2         3         4         5         6         7         8         9         0         1         2         3");
-//            System.out.println("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+//          System.out.println("         1         2         3         4         5         6         7         8         9         0         1         2         3");
+//          System.out.println("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
 // SET_FORMATTING_ON
 
+            // show log header
             System.out.println(String.format(UI.EMPTY_STRING
 
                   + "%-16s" //   Java        //$NON-NLS-1$
@@ -708,8 +725,8 @@ public class FitDataReader extends TourbookDevice {
 
             _logCounter = 0;
 
-            // add debug logger
-            fitBroadcaster.addListener((MesgListener) this::onMessage_Mesg);
+            // add debug logger which is listening to all events
+            fitBroadcaster.addListener((MesgListener) this::onMessage_MesgForLogging);
          }
 
          fitBroadcaster.run(fileInputStream);
