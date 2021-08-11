@@ -2483,7 +2483,6 @@ public class TourManager {
     * @return Returns the persisted {@link TourData}
     */
    public static TourData saveModifiedTour(final TourData tourData) {
-
       return saveModifiedTour(tourData, true);
    }
 
@@ -2519,7 +2518,6 @@ public class TourManager {
     * @return Returns a list with all persisted {@link TourData}
     */
    public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
-
       return saveModifiedTours(modifiedTours, true);
    }
 
