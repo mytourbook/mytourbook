@@ -136,7 +136,7 @@ public class CRPDataReader extends TourbookDevice {
             if (line.equals("***")) { //$NON-NLS-1$
                break;
             }
-            trackPoints.add(line.toString());
+            trackPoints.add(line);
          }
 
          // skip line

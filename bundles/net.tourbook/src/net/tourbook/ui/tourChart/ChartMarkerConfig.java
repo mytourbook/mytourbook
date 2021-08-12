@@ -53,5 +53,4 @@ public class ChartMarkerConfig {
    public RGB                          markerColorHidden_Dark;
 
    public final List<ChartLabelMarker> chartLabelMarkers = new ArrayList<>();
-
 }

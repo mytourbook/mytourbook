@@ -657,7 +657,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
          }
 
          if (markerText == null) {
-            // set lap number as label when label is not definded in the polar data
+            // set lap number as label when label is not defined in the polar data
             markerText = Integer.toString(lapCounter);
          }
 

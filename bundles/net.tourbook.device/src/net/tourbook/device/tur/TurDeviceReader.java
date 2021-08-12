@@ -58,52 +58,52 @@ public class TurDeviceReader extends TourbookDevice {
       /*
        * check if the first 4 bytes are set to AFRO
        */
-      if (byteIndex == 0 & newByte == 'H') {
+      if (byteIndex == 0 && newByte == 'H') {
          return true;
       }
-      if (byteIndex == 1 & newByte == 'A') {
+      if (byteIndex == 1 && newByte == 'A') {
          return true;
       }
-      if (byteIndex == 2 & newByte == 'C') {
+      if (byteIndex == 2 && newByte == 'C') {
          return true;
       }
-      if (byteIndex == 3 & newByte == 't') {
+      if (byteIndex == 3 && newByte == 't') {
          return true;
       }
-      if (byteIndex == 4 & newByte == 'r') {
+      if (byteIndex == 4 && newByte == 'r') {
          return true;
       }
-      if (byteIndex == 5 & newByte == 'o') {
+      if (byteIndex == 5 && newByte == 'o') {
          return true;
       }
-      if (byteIndex == 6 & newByte == 'n') {
+      if (byteIndex == 6 && newByte == 'n') {
          return true;
       }
-      if (byteIndex == 7 & newByte == 'i') {
+      if (byteIndex == 7 && newByte == 'i') {
          return true;
       }
-      if (byteIndex == 8 & newByte == 'c') {
+      if (byteIndex == 8 && newByte == 'c') {
          return true;
       }
-      if (byteIndex == 9 & newByte == ' ') {
+      if (byteIndex == 9 && newByte == ' ') {
          return true;
       }
-      if (byteIndex == 10 & newByte == '-') {
+      if (byteIndex == 10 && newByte == '-') {
          return true;
       }
-      if (byteIndex == 11 & newByte == ' ') {
+      if (byteIndex == 11 && newByte == ' ') {
          return true;
       }
-      if (byteIndex == 12 & newByte == 'T') {
+      if (byteIndex == 12 && newByte == 'T') {
          return true;
       }
-      if (byteIndex == 13 & newByte == 'o') {
+      if (byteIndex == 13 && newByte == 'o') {
          return true;
       }
-      if (byteIndex == 14 & newByte == 'u') {
+      if (byteIndex == 14 && newByte == 'u') {
          return true;
       }
-      if (byteIndex == 15 & newByte == 'r') {
+      if (byteIndex == 15 && newByte == 'r') {
          return true;
       }
 
