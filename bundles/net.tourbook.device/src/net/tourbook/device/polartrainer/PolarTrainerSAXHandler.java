@@ -36,7 +36,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.osgi.util.NLS;
 import org.xml.sax.Attributes;
@@ -581,7 +581,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
             serieIndex = timeSerie.length - 1;
          }
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
          tourMarker.setLabel(Integer.toString(lapCounter));
          tourMarker.setSerieIndex(serieIndex);

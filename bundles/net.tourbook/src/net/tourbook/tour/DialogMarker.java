@@ -40,7 +40,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -1195,7 +1195,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                cell.setText(_nf3.format(markerDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
             }
 
-            if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+            if (tourMarker.getType() == ChartLabelMarker.MARKER_TYPE_DEVICE) {
                cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
             }
          }
@@ -1558,7 +1558,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          return;
       }
 
-      _selectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_DEFAULT);
+      _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_DEFAULT);
    }
 
    private void saveState() {
@@ -1657,7 +1657,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          if (isTourMarker) {
 
             // make the marker more visible by setting another type
-            _selectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_TYPE_EDIT);
+            _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_TYPE_EDIT);
          }
 
          _chkVisibility.setSelection(isTourMarker ? _selectedTourMarker.isMarkerVisible() : false);

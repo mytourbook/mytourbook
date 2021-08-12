@@ -27,7 +27,7 @@ import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
@@ -85,7 +85,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
       final double[] longitudeSerie = tourData.longitudeSerie;
 
       // create a new marker
-      final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
+      final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
       tourMarker.setSerieIndex(closestLatLongIndex);
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
       tourMarker.setLabel(Messages.Default_Label_NewTourMarker);

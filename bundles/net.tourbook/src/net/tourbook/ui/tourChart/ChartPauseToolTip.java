@@ -933,7 +933,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
        * When in tooltip, the hovered label state is not displayed, keep it displayed
        */
       final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
-      markerLayer.setTooltipLabel(_hoveredLabel);
+      //markerLayer.setTooltipLabel(_hoveredLabel);
    }
 
    private void onPaintShellContainer(final PaintEvent paintEvent) {

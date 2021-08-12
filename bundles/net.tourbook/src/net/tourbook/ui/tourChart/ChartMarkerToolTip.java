@@ -111,7 +111,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
    private TourChart                       _tourChart;
    private TourData                        _tourData;
 
-   private ChartLabel                      _hoveredLabel;
+   private ChartLabelMarker                _hoveredLabel;
    private TourMarker                      _hoveredTourMarker;
 
    /**
@@ -970,7 +970,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       hideNow();
    }
 
-   void open(final ChartLabel hoveredLabel) {
+   void open(final ChartLabelMarker hoveredLabel) {
 
       boolean isKeepOpened = false;
 

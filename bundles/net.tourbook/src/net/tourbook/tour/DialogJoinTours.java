@@ -41,7 +41,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jface.action.MenuManager;
@@ -1226,7 +1226,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
                final int joinMarkerIndex = joinedTourStartIndex + tourMarkerIndex;
 
-               final TourMarker tourMarker = new TourMarker(_joinedTourData, ChartLabel.MARKER_TYPE_CUSTOM);
+               final TourMarker tourMarker = new TourMarker(_joinedTourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
 
                tourMarker.setSerieIndex(joinMarkerIndex);
                tourMarker.setLabel(markerLabel);

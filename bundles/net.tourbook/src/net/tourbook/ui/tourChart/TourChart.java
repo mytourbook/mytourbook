@@ -1827,26 +1827,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
 
-            final ChartLabel chartLabel = createLayer_Marker_ChartLabel(//
+            final ChartLabelMarker chartLabel = createLayer_Marker_ChartLabel(//
                   tourMarker,
                   xAxisSerie,
                   xAxisSerieIndex,
                   tourMarker.getLabelPosition());
 
-            cmc.chartLabels.add(chartLabel);
+            cmc.chartLabelMarkers.add(chartLabel);
          }
 
       } else {
 
          for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
 
-            final ChartLabel chartLabel = createLayer_Marker_ChartLabel(
+            final ChartLabelMarker chartLabelMarker = createLayer_Marker_ChartLabel(
                   tourMarker,
                   xAxisSerie,
                   tourMarker.getSerieIndex(),
                   tourMarker.getLabelPosition());
 
-            cmc.chartLabels.add(chartLabel);
+            cmc.chartLabelMarkers.add(chartLabelMarker);
          }
       }
    }
@@ -1858,14 +1858,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param labelPosition
     * @return
     */
-   private ChartLabel createLayer_Marker_ChartLabel(final TourMarker tourMarker,
+   private ChartLabelMarker createLayer_Marker_ChartLabel(final TourMarker tourMarker,
                                                     final double[] xAxisSerie,
                                                     final int xAxisSerieIndex,
                                                     final int labelPosition) {
 
-      final ChartLabel chartLabel = new ChartLabel();
+      final ChartLabelMarker chartLabelMarker = new ChartLabelMarker();
 
-      chartLabel.data = tourMarker;
+      chartLabelMarker.data = tourMarker;
 
       // create marker label
       String markerLabel = tourMarker.getLabel();
@@ -1876,26 +1876,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
       }
 
-      chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
-      chartLabel.serieIndex = xAxisSerieIndex;
+      chartLabelMarker.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabelMarker.serieIndex = xAxisSerieIndex;
 
-      chartLabel.markerLabel = markerLabel;
-      chartLabel.isDescription = isDescription;
-      chartLabel.visualPosition = labelPosition;
-      chartLabel.type = tourMarker.getType();
-      chartLabel.visualType = tourMarker.getVisibleType();
+      chartLabelMarker.markerLabel = markerLabel;
+      chartLabelMarker.isDescription = isDescription;
+      chartLabelMarker.visualPosition = labelPosition;
+      chartLabelMarker.type = tourMarker.getType();
+      chartLabelMarker.visualType = tourMarker.getVisibleType();
 
-      chartLabel.labelXOffset = tourMarker.getLabelXOffset();
-      chartLabel.labelYOffset = tourMarker.getLabelYOffset();
+      chartLabelMarker.labelXOffset = tourMarker.getLabelXOffset();
+      chartLabelMarker.labelYOffset = tourMarker.getLabelYOffset();
 
-      chartLabel.isVisible = tourMarker.isMarkerVisible();
+      chartLabelMarker.isVisible = tourMarker.isMarkerVisible();
 
 //      final TourSign tourSign = tourMarker.getTourSign();
 //      if (tourSign != null) {
 //         chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
 //      }
 
-      return chartLabel;
+      return chartLabelMarker;
    }
 
    private void createLayer_NightSections() {
@@ -3405,7 +3405,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       if (_layerMarker != null) {
 
-         final ChartLabel hoveredLabel = _layerMarker.retrieveHoveredLabel(mouseEvent);
+         final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(mouseEvent);
 
          final boolean isLabelHovered = hoveredLabel != null;
          if (isLabelHovered) {

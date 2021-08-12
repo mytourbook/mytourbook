@@ -42,7 +42,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
    private Section m_section = Section.SECTION_NONE;
@@ -555,7 +555,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields.length < 4) {
                   break;
                }
-               final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+               final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
                final int markerIndex = Integer.parseInt(fields[1]);
                tourMarker.setSerieIndex(markerIndex);
                tourMarker.setLabel(fields[0].substring(1, fields[0].length()));

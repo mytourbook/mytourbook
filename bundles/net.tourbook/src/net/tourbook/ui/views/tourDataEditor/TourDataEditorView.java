@@ -104,7 +104,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionExtractTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.ActionSplitTour;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -5747,7 +5747,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                cell.setText(tourMarker.getLabel());
 
-               if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+               if (tourMarker.getType() == ChartLabelMarker.MARKER_TYPE_DEVICE) {
                   cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
                }
 

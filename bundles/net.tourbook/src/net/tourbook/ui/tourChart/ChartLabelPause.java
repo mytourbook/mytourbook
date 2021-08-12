@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,37 +18,47 @@
  */
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.swt.graphics.Rectangle;
 
-public class ChartLabel {
+public class ChartLabelPause {
 
-   public boolean   isVisible;
-   public boolean   isDescription;
-
-   /**
-    * x-position in graph units
-    */
-   public double    graphX;
+   public boolean isVisible;
+   public boolean isDescription;
 
    /**
     * x-position in graph units
     */
-   public double    graphXEnd;
+   public double  graphX;
+
+   /**
+    * x-position in graph units
+    */
+   public double  graphXEnd;
 
    /**
     * index in the data serie
     */
-   public int       serieIndex;
+   public int     serieIndex;
+
+   public String  pauseDuration = UI.EMPTY_STRING;
 
    /**
     * visual position in the chart
     */
-   public int       visualPosition;
+   public int     visualPosition;
 
-   public int       labelXOffset;
+   public int     labelXOffset;
 
-   public int       labelYOffset;
-   public int       visualType;
+   public int     labelYOffset;
+   public int     visualType;
+
+   /*
+    * Painted label positions
+    */
+   public int       devXPause;
+   public int       devYPause;
 
    /**
     * Painted position.
@@ -75,7 +85,7 @@ public class ChartLabel {
    public int devYTop;
    public int devGraphWidth;
 
-   ChartLabel() {}
+   ChartLabelPause() {}
 
    @Override
    public String toString() {

@@ -35,7 +35,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 /**
  * @author stm
@@ -363,7 +363,7 @@ public class TurDeviceReader extends TourbookDevice {
       // create new markers
       for (int i = 0; i < markerCount; i++) {
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
          // the correct absolute time will be set later
          tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)), Long.MIN_VALUE);

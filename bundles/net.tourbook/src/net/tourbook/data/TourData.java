@@ -103,7 +103,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
@@ -5248,7 +5248,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                      // time and position is the same
 
-                     final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+                     final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_CUSTOM);
 
                      tourMarker.setSerieIndex(serieIndex);
                      tourMarker.setTime(relativeTime, wpTime);
@@ -6687,7 +6687,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                                  final float distanceAbsolute) {
 
       // create a new marker
-      final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
+      final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
       /*
        * ??? timeData.marker was added until version 14.9 but I have no idea why this was added ???

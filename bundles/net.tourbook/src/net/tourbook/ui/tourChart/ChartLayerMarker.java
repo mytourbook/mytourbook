@@ -55,8 +55,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
    private int               _devYMarker;
    private long              _hoveredEventTime;
 
-   private ChartLabel        _hoveredLabel;
-   private ChartLabel        _tooltipLabel;
+   private ChartLabelMarker  _hoveredLabel;
+   private ChartLabelMarker  _tooltipLabel;
 
    public class LoadImageCallback implements ILoadCallBack {
 
@@ -243,7 +243,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       /*
        * Draw marker point and label
        */
-      for (final ChartLabel chartLabel : _chartMarkerConfig.chartLabels) {
+      for (final ChartLabelMarker chartLabel : _chartMarkerConfig.chartLabelMarkers) {
 
          // check if a marker should be displayed
          if (chartLabel.isVisible == false) {
@@ -260,7 +260,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
             continue;
          }
 
-         final boolean isEditColor = chartLabel.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT;
+         final boolean isEditColor = chartLabel.visualType != ChartLabelMarker.VISIBLE_TYPE_DEFAULT;
          final boolean isTextBgTransparent = isEditColor == false;
          Color markerColor;
 
@@ -565,7 +565,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
       final TourMarker selectedTourMarker = _tourChart.getSelectedTourMarker();
 
-      ChartLabel selectedLabel = null;
+      ChartLabelMarker selectedLabel = null;
       if (selectedTourMarker != null) {
          selectedLabel = getChartLabel(selectedTourMarker);
       }
@@ -582,7 +582,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          return;
       }
 
-      ChartLabel hoveredLabel = _hoveredLabel;
+      ChartLabelMarker hoveredLabel = _hoveredLabel;
 
       if (hoveredLabel == null) {
          hoveredLabel = _tooltipLabel;
@@ -628,14 +628,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       gc.setClipping((Rectangle) null);
    }
 
-   private void drawOverlay_Label(final ChartLabel chartLabel,
+   private void drawOverlay_Label(final ChartLabelMarker chartLabelMarker,
                                   final GC gc,
                                   final Color colorDefault,
                                   final Color colorDevice,
                                   final Color colorHidden,
                                   final boolean isSelected) {
 
-      if (chartLabel == null) {
+      if (chartLabelMarker == null) {
          return;
       }
 
@@ -650,9 +650,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          final Color selectedColorBg = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
          gc.setBackground(selectedColorBg);
 
-      } else if (chartLabel.isDeviceMarker()) {
+      } else if (chartLabelMarker.isDeviceMarker()) {
          gc.setBackground(colorDevice);
-      } else if (chartLabel.isVisible) {
+      } else if (chartLabelMarker.isVisible) {
          gc.setBackground(colorDefault);
       } else {
          gc.setBackground(colorHidden);
@@ -664,7 +664,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
        */
       final Region region = new Region(gc.getDevice());
 
-      final Rectangle paintedLabel = chartLabel.paintedLabel;
+      final Rectangle paintedLabel = chartLabelMarker.paintedLabel;
       if (paintedLabel != null) {
 
          final int devLabelX = paintedLabel.x - MARKER_HOVER_SIZE;
@@ -675,8 +675,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
       }
 
-      final int devMarkerX = chartLabel.devXMarker - MARKER_HOVER_SIZE;
-      final int devMarkerY = chartLabel.devYMarker - MARKER_HOVER_SIZE;
+      final int devMarkerX = chartLabelMarker.devXMarker - MARKER_HOVER_SIZE;
+      final int devMarkerY = chartLabelMarker.devYMarker - MARKER_HOVER_SIZE;
       final int devMarkerSize = MARKER_POINT_SIZE + 2 * MARKER_HOVER_SIZE;
 
       region.add(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
@@ -692,9 +692,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       gc.setClipping((Region) null);
    }
 
-   private ChartLabel getChartLabel(final TourMarker tourMarker) {
+   private ChartLabelMarker getChartLabel(final TourMarker tourMarker) {
 
-      for (final ChartLabel chartLabel : _chartMarkerConfig.chartLabels) {
+      for (final ChartLabelMarker chartLabel : _chartMarkerConfig.chartLabelMarkers) {
 
          final Object chartLabelData = chartLabel.data;
 
@@ -731,7 +731,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
     * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
     *         is not hovered.
     */
-   ChartLabel retrieveHoveredLabel(final ChartMouseEvent mouseEvent) {
+   ChartLabelMarker retrieveHoveredLabel(final ChartMouseEvent mouseEvent) {
 
       if (mouseEvent.eventTime == _hoveredEventTime) {
          return _hoveredLabel;
@@ -745,14 +745,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       return _hoveredLabel;
    }
 
-   private ChartLabel retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
+   private ChartLabelMarker retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
 
       /*
        * Check sign images first, they have a higher priority
        */
-      for (final ChartLabel chartLabel : _chartMarkerConfig.chartLabels) {
+      for (final ChartLabelMarker chartLabelMarker : _chartMarkerConfig.chartLabelMarkers) {
 
-         final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
+         final Rectangle imageBounds = chartLabelMarker.devMarkerSignImageBounds;
          if (imageBounds != null) {
 
             final int devXImage = imageBounds.x;
@@ -766,17 +766,17 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                   && devYMouse < devYImage + imageHeight) {
 
                // marker sign image is hit
-               return chartLabel;
+               return chartLabelMarker;
             }
          }
       }
 
-      for (final ChartLabel chartLabel : _chartMarkerConfig.chartLabels) {
+      for (final ChartLabelMarker chartLabelMarker : _chartMarkerConfig.chartLabelMarkers) {
 
          /*
           * Check sign label
           */
-         final Rectangle paintedLabel = chartLabel.paintedLabel;
+         final Rectangle paintedLabel = chartLabelMarker.paintedLabel;
          if (paintedLabel != null) {
 
             final int devXLabel = paintedLabel.x;
@@ -788,15 +788,15 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                   && devYMouse < devYLabel + paintedLabel.height + MARKER_HOVER_SIZE) {
 
                // horizontal label is hit
-               return chartLabel;
+               return chartLabelMarker;
             }
          }
 
          /*
           * Check marker point
           */
-         final int devXMarker = chartLabel.devXMarker;
-         final int devYMarker = chartLabel.devYMarker;
+         final int devXMarker = chartLabelMarker.devXMarker;
+         final int devYMarker = chartLabelMarker.devYMarker;
 
          if (devXMouse > devXMarker - MARKER_HOVER_SIZE
                && devXMouse < devXMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE
@@ -804,7 +804,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                && devYMouse < devYMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE) {
 
             // marker point is hit
-            return chartLabel;
+            return chartLabelMarker;
          }
       }
 
@@ -816,7 +816,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       _chartMarkerConfig = chartMarkerConfig;
    }
 
-   public void setTooltipLabel(final ChartLabel tooltipLabel) {
+   public void setTooltipLabel(final ChartLabelMarker tooltipLabel) {
 
       if (_tooltipLabel == tooltipLabel) {
          return;

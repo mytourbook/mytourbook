@@ -33,8 +33,7 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private int              LABEL_OFFSET;
-   private int              MARKER_HOVER_SIZE;
-   private int              MARKER_POINT_SIZE;
+   private int              PAUSE_HOVER_SIZE;
    private int              PAUSE_POINT_SIZE;
 
    private TourChart        _tourChart;
@@ -82,7 +81,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final long devVirtualGraphWidth = drawingData.devVirtualGraphWidth;
       final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
       final boolean isGraphZoomed = devVirtualGraphWidth != devVisibleChartWidth;
-      LABEL_OFFSET = PAUSE_POINT_SIZE = pc.convertVerticalDLUsToPixels(2);
+      LABEL_OFFSET = PAUSE_POINT_SIZE = PAUSE_HOVER_SIZE = pc.convertVerticalDLUsToPixels(2);
       final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
       final float graphYBottom = drawingData.getGraphYBottom();
       final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
@@ -152,6 +151,9 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             _devXPause = (int) (devVirtualGraphWidth - labelWidth - devVirtualGraphImageOffset - 2);
          }
 
+         chartLabel.devXPause = _devXPause;
+         chartLabel.devYPause = _devYPause;
+
          // force label to be not below the bottom
          if (_devYPause + labelHeight > devYBottom) {
             _devYPause = devYBottom - labelHeight;
@@ -216,7 +218,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    }
 
 
-   private ChartLabel retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
+   private ChartLabel retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
 
       /*
        * Check sign images first, they have a higher priority
@@ -253,10 +255,10 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             final int devXLabel = paintedLabel.x;
             final int devYLabel = paintedLabel.y;
 
-            if (devXMouse > devXLabel - MARKER_HOVER_SIZE
-                  && devXMouse < devXLabel + paintedLabel.width + MARKER_HOVER_SIZE
-                  && devYMouse > devYLabel - MARKER_HOVER_SIZE
-                  && devYMouse < devYLabel + paintedLabel.height + MARKER_HOVER_SIZE) {
+            if (devXMouse > devXLabel - PAUSE_HOVER_SIZE
+                  && devXMouse < devXLabel + paintedLabel.width + PAUSE_HOVER_SIZE
+                  && devYMouse > devYLabel - PAUSE_HOVER_SIZE
+                  && devYMouse < devYLabel + paintedLabel.height + PAUSE_HOVER_SIZE) {
 
                // horizontal label is hit
                return chartLabel;
@@ -266,13 +268,13 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          /*
           * Check marker point
           */
-         final int devXMarker = chartLabel.devXMarker;
-         final int devYMarker = chartLabel.devYMarker;
+         final int devXMarker = chartLabel.devXPause;
+         final int devYMarker = chartLabel.devYPause;
 
-         if (devXMouse > devXMarker - MARKER_HOVER_SIZE
-               && devXMouse < devXMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE
-               && devYMouse > devYMarker - MARKER_HOVER_SIZE
-               && devYMouse < devYMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE) {
+         if (devXMouse > devXMarker - PAUSE_HOVER_SIZE
+               && devXMouse < devXMarker + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE
+               && devYMouse > devYMarker - PAUSE_HOVER_SIZE
+               && devYMouse < devYMarker + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE) {
 
             // marker point is hit
             return chartLabel;
@@ -290,8 +292,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       _hoveredEventTime = mouseEvent.eventTime;
 
-      // marker is dirty -> retrieve again
-      _hoveredLabel = retrieveHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
+      _hoveredLabel = retrieveHoveredLabel(mouseEvent.devXMouse, mouseEvent.devYMouse);
 
       return _hoveredLabel;
    }

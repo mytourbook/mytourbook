@@ -29,7 +29,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class CRPDataReader extends TourbookDevice {
 
@@ -308,7 +308,7 @@ public class CRPDataReader extends TourbookDevice {
                timeData.marker = 1;
 
                // create a new marker
-               final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+               final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
                tourMarker.setLabel(comment);
                tourMarker.setTime(tourTime, Long.MIN_VALUE);
                tourMarker.setDistance(timeData.distance);
