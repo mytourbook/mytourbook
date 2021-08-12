@@ -17,70 +17,15 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.common.UI;
 
-import org.eclipse.swt.graphics.Rectangle;
-
 public class ChartLabelPause extends ChartLabel {
 
-   public boolean isVisible;
-   public boolean isDescription;
-
-   /**
-    * x-position in graph units
-    */
-   public double  graphX;
-
-   /**
-    * x-position in graph units
-    */
-   public double  graphXEnd;
-
-   /**
-    * index in the data serie
-    */
-   public int     serieIndex;
-
-   public String  pauseDuration = UI.EMPTY_STRING;
-
-   /**
-    * visual position in the chart
-    */
-   public int     visualPosition;
-
-   public int     labelXOffset;
-
-   public int     labelYOffset;
-   public int     visualType;
+   public String pauseDuration = UI.EMPTY_STRING;
 
    /*
     * Painted label positions
     */
-   public int       devXPause;
-   public int       devYPause;
-
-   /**
-    * Painted position.
-    */
-   public Rectangle paintedLabel;
-
-   public int       devHoverSize;
-
-   /**
-    * Is <code>true</code> when the label is drawn vertically.
-    */
-   public boolean   devIsVertical;
-
-   /**
-    * Contains custom data, can be used to keep references to the model.
-    */
-   public Object    data;
-
-   /*
-    * Graph margins
-    */
-   public int devYBottom;
-
-   public int devYTop;
-   public int devGraphWidth;
+   public int devXPause;
+   public int devYPause;
 
    ChartLabelPause() {}
 
@@ -89,6 +34,7 @@ public class ChartLabelPause extends ChartLabel {
       return "ChartLabel [" // //$NON-NLS-1$
 //				+ ("serieIndex=" + serieIndex + ", ")
 //				+ ("graphX=" + graphX + ", ")
+            + ("pauseDuration=" + pauseDuration) //$NON-NLS-1$
             + "]"; //$NON-NLS-1$
    }
 

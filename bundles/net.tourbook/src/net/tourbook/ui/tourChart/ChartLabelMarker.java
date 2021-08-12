@@ -35,30 +35,8 @@ public class ChartLabelMarker extends ChartLabel {
 
    public static final int VISIBLE_TYPE_TYPE_NEW  = 10;
    public static final int VISIBLE_TYPE_TYPE_EDIT = 20;
-   public boolean          isVisible;
-
-   public boolean          isDescription;
-   /**
-    * x-position in graph units
-    */
-   public double           graphX;
-
-   /**
-    * x-position in graph units
-    */
-   public double           graphXEnd;
-
-   /**
-    * index in the data serie
-    */
-   public int              serieIndex;
 
    public String           markerLabel            = UI.EMPTY_STRING;
-
-   /**
-    * visual position in the chart
-    */
-   public int              visualPosition;
 
    /**
     * marker type, this can be <code>TourMarker.MARKER_TYPE_DEVICE</code> or
@@ -66,11 +44,6 @@ public class ChartLabelMarker extends ChartLabel {
     */
    public int              type;
 
-   public int              labelXOffset;
-
-   public int              labelYOffset;
-
-   public int              visualType;
    public Photo            markerSignPhoto;
 
    /*
@@ -80,37 +53,12 @@ public class ChartLabelMarker extends ChartLabel {
 
    public int       devYMarker;
 
-   /**
-    * Painted position.
-    */
-   public Rectangle paintedLabel;
-
-   public int       devHoverSize;
-
    public int       devMarkerPointSize;
 
    /**
     * Bounds where the marker sign image is painted.
     */
    public Rectangle devMarkerSignImageBounds;
-   /**
-    * Is <code>true</code> when the label is drawn vertically.
-    */
-   public boolean   devIsVertical;
-
-   /**
-    * Contains custom data, can be used to keep references to the model.
-    */
-   public Object    data;
-
-   /*
-    * Graph margins
-    */
-   public int devYBottom;
-
-   public int devYTop;
-
-   public int devGraphWidth;
 
    ChartLabelMarker() {}
 

@@ -217,7 +217,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    }
 
-
    private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
 
       for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
@@ -272,6 +271,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       return _hoveredLabel;
    }
+
    public void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
       _chartPauseConfig = chartPauseConfig;
    }
