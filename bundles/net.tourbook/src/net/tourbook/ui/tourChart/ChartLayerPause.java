@@ -65,7 +65,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       _devXPause -= labelWidth / 2;
       _devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
    }
-
    /**
     * This paints the pause(s) for the current graph configuration.
     */
@@ -215,6 +214,10 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       //Nothing to do
       System.out.println("TOTO");
 
+   }
+
+   public ChartLabel getHoveredLabel() {
+      return _hoveredLabel;
    }
 
    private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {

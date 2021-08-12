@@ -21,9 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -49,7 +47,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -106,14 +103,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    private TourData                        _tourData;
 
    private ChartLabelPause                 _hoveredLabel;
-   private TourMarker                      _hoveredTourMarker;
 
    /**
     * When <code>true</code> the actions are displayed, e.g. to open the marker dialog.
     */
    private boolean                         _isShowActions;
 
-   private ChartMarkerConfig               _cmc;
+   private ChartPauseConfig                _chartPauseConfig;
 
    private ActionOpenMarkerDialogInTooltip _actionOpenMarkerDialog;
 
@@ -179,7 +175,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
        * not when nothing is hovered. This ensures that the tooltip has a valid state.
        */
       _hoveredLabel = null;
-      _hoveredTourMarker = null;
    }
 
    @Override
@@ -196,7 +191,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       // setup action for the current tour marker
       _actionOpenMarkerDialog.setEnabled(isSingleTour);
-      _actionOpenMarkerDialog.setTourMarker(_hoveredTourMarker);
    }
 
    @Override
@@ -254,51 +248,14 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 //         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 //         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
-            createUI_20_TopContainer();
-            createUI_40_Description(_ttContainer);
             createUI_70_Values(_ttContainer);
-            createUI_80_Link();
          }
       }
 
       return _shellContainer;
    }
 
-   private void createUI_20_TopContainer() {
 
-      final String ttTitle = _hoveredTourMarker.getLabel();
-
-      if (ttTitle.length() == 0 && _isShowActions == false) {
-
-         // nothing is displayed
-         return;
-      }
-
-      final Composite topContainer = new Composite(_ttContainer, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(topContainer);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(topContainer);
-//         topContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
-         /*
-          * Name
-          */
-         final Label lblName = new Label(topContainer, SWT.NONE);
-         GridDataFactory.fillDefaults()
-               .grab(true, false)
-               .align(SWT.FILL, SWT.CENTER)
-               .indent(3, 0)
-               .applyTo(lblName);
-
-         lblName.setFont(_boldFont);
-         lblName.setForeground(_titleColor);
-         lblName.setText(ttTitle);
-
-         /*
-          * Actions
-          */
-         createUI_30_Actions(topContainer);
-      }
-   }
 
    private void createUI_30_Actions(final Composite parent) {
 
@@ -323,47 +280,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       }
    }
 
-   /**
-    * Description
-    *
-    * @param parent
-    */
-   private void createUI_40_Description(final Composite parent) {
-
-      final String markerDescription = _hoveredTourMarker.getDescription();
-      if (markerDescription.length() > 0) {
-
-         final Text txtDescription = new Text(parent, _textStyle);
-         GridDataFactory.fillDefaults()
-//               .indent(-3, 0)
-               .applyTo(txtDescription);
-         txtDescription.setText(markerDescription);
-
-         setTextControlSize(parent, txtDescription, markerDescription);
-      }
-   }
-
    private void createUI_70_Values(final Composite parent) {
-
-      final boolean isShowElevation = _cmc.isShowTooltipData_Elevation;
-      final boolean isShowElevation_Diff = _cmc.isShowTooltipData_ElevationGainDifference;
-      final boolean isShowDistance = _cmc.isShowTooltipData_Distance;
-      final boolean isShowDistance_Diff = _cmc.isShowTooltipData_DistanceDifference;
-      final boolean isShowDuration = _cmc.isShowTooltipData_Duration;
-      final boolean isShowDuration_Diff = _cmc.isShowTooltipData_DurationDifference;
-
-      int valueIndex;
-      if (_tourData.isMultipleTours()) {
-         valueIndex = _hoveredTourMarker.getMultiTourSerieIndex();
-      } else {
-         valueIndex = _hoveredTourMarker.getSerieIndex();
-      }
-
-      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
-      TourMarker previousTourMarker = null;
-      if (index > 0) {
-         previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);
-      }
 
       final Composite container = new Composite(parent, SWT.NONE);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -377,181 +294,17 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .applyTo(container);
 
       {
-         /*
-          * Elevation
-          */
-         if (isShowElevation || isShowElevation_Diff) {
 
             UI.createLabel(container, GRAPH_LABEL_ALTITUDE);
 
-            if (isShowElevation) {
-               final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
-               if (isAvailableAltitude) {
-
-                  final float value = _tourData.getAltitudeSmoothedSerie(false)[valueIndex];
 
                   createUI_72_ValueField(
                         container,
-                        FormatManager.formatElevation(value),
+                        _hoveredLabel.pauseDuration,
                         UI.UNIT_LABEL_ELEVATION);
-               } else {
-                  UI.createSpacer_Horizontal(container, 2);
-               }
-            } else {
-               UI.createSpacer_Horizontal(container, 2);
-            }
 
-            if (isShowElevation_Diff) {
 
-               final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
-               final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex, _hoveredTourMarker.getSerieIndex());
 
-               if (elevationGainLoss != null) {
-
-                  final float value = elevationGainLoss.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
-
-                  createUI_72_ValueField(
-                        container,
-                        FormatManager.formatElevation(value),
-                        UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION);
-               } else {
-                  UI.createSpacer_Horizontal(container, 2);
-               }
-            } else {
-               UI.createSpacer_Horizontal(container, 2);
-            }
-         }
-
-         /*
-          * Distance
-          */
-         if (isShowDistance || isShowDistance_Diff) {
-
-            UI.createLabel(container, GRAPH_LABEL_DISTANCE);
-
-            if (isShowDistance) {
-
-               float distance = Float.MIN_VALUE;
-
-               if (_cmc.isShowAbsoluteValues) {
-
-                  // absolute distance
-
-                  if (_tourData.distanceSerie != null) {
-                     distance = _tourData.distanceSerie[valueIndex];
-                  }
-
-               } else {
-
-                  // relative distance
-
-                  final float markerDistance = _hoveredTourMarker.getDistance();
-                  if (markerDistance != 1) {
-                     distance = markerDistance;
-                  }
-               }
-
-               if (distance != Float.MIN_VALUE) {
-
-                  final double value = distance / 1000 / UI.UNIT_VALUE_DISTANCE;
-
-                  createUI_72_ValueField(
-                        container,
-                        FormatManager.formatDistance(value),
-                        UI.UNIT_LABEL_DISTANCE);
-               } else {
-                  UI.createSpacer_Horizontal(container, 2);
-               }
-            } else {
-               UI.createSpacer_Horizontal(container, 2);
-            }
-
-            if (isShowDistance_Diff) {
-
-               float distance = _hoveredTourMarker.getDistance();
-
-               if (previousTourMarker != null) {
-                  distance -= previousTourMarker.getDistance();
-               }
-
-               if (distance != Float.MIN_VALUE) {
-
-                  final double value = distance / 1000 / UI.UNIT_VALUE_DISTANCE;
-
-                  createUI_72_ValueField(
-                        container,
-                        FormatManager.formatDistance(value),
-                        UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_DISTANCE);
-               } else {
-                  UI.createSpacer_Horizontal(container, 2);
-               }
-            } else {
-               UI.createSpacer_Horizontal(container, 2);
-            }
-         }
-
-         /*
-          * Duration
-          */
-         if (isShowDuration || isShowDuration_Diff) {
-
-            UI.createLabel(container, GRAPH_LABEL_TIME);
-
-            if (isShowDuration) {
-
-               int timeValue = Integer.MIN_VALUE;
-
-               if (_cmc.isShowAbsoluteValues) {
-
-                  // absolute time
-
-                  if (_tourData.timeSerie != null) {
-                     timeValue = _tourData.timeSerie[valueIndex];
-                  }
-
-               } else {
-
-                  // relative time
-
-                  timeValue = _hoveredTourMarker.getTime();
-               }
-
-               if (timeValue != Integer.MIN_VALUE) {
-
-                  createUI_72_ValueField(
-                        container,
-                        FormatManager.formatElapsedTime(timeValue),
-                        UI.UNIT_LABEL_TIME);
-               } else {
-                  UI.createSpacer_Horizontal(container, 2);
-               }
-
-            } else {
-               UI.createSpacer_Horizontal(container, 2);
-            }
-
-            if (isShowDuration_Diff) {
-
-               int timeValue = _hoveredTourMarker.getTime();
-
-               if (previousTourMarker != null) {
-                  timeValue -= previousTourMarker.getTime();
-               }
-
-               if (timeValue != Integer.MIN_VALUE) {
-
-                  createUI_72_ValueField(
-                        container,
-                        FormatManager.formatElapsedTime(timeValue),
-                        UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_TIME);
-               } else {
-                  UI.createSpacer_Horizontal(container, 2);
-               }
-
-            } else {
-               UI.createSpacer_Horizontal(container, 2);
-            }
-         }
       }
    }
 
@@ -575,47 +328,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       label.setText(unit);
    }
 
-   /**
-    * Url
-    */
-   private void createUI_80_Link() {
 
-      final String urlText = _hoveredTourMarker.getUrlText();
-      final String urlAddress = _hoveredTourMarker.getUrlAddress();
-      final boolean isText = urlText.length() > 0;
-      final boolean isAddress = urlAddress.length() > 0;
-
-      if (isText || isAddress) {
-
-         final Link linkUrl = new Link(_ttContainer, SWT.NONE);
-         GridDataFactory.fillDefaults()
-               .indent(3, 0)
-               .applyTo(linkUrl);
-
-         linkUrl.addListener(SWT.Selection, event -> onSelectUrl(event.text));
-
-         String linkText;
-
-         if (isAddress == false) {
-
-            // only text is in the link -> this is not a internet address but create a link of it
-
-            linkText = "<a href=\"" + urlText + "\">" + urlText + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-         } else if (isText == false) {
-
-            linkText = "<a href=\"" + urlAddress + "\">" + urlAddress + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-         } else {
-
-            linkText = "<a href=\"" + urlAddress + "\">" + urlText + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-         }
-
-         linkUrl.setText(linkText);
-
-         setUrlWidth(linkUrl);
-      }
-   }
 
    /**
     * This is copied from {@link ChartLayerMarker#drawOverlay()}.
@@ -629,8 +342,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       Rectangle rectHovered = new Rectangle(_hoveredLabel.devXPause, _hoveredLabel.devYPause, 1, 1);
 
-      // add marker rect
-      if (_cmc.isShowMarkerPoint) {
 
          int devMarkerPointSize = 1;
          if (devMarkerPointSize < 1) {
@@ -643,10 +354,10 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
          rectHovered = rectHovered.union(rectMarker);
-      }
+
 
       // add label rect
-      if (_cmc.isShowMarkerLabel && _hoveredLabel.paintedLabel != null) {
+      if (_hoveredLabel.paintedLabel != null) {
 
          final Rectangle paintedLabel = _hoveredLabel.paintedLabel;
          final int devLabelWidthRaw = paintedLabel.width;
@@ -722,8 +433,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          devHoveredY = devYTop;
       }
 
-      switch (_cmc.markerTooltipPosition) {
-      case TOOLTIP_POSITION_LEFT:
+
 
          ttPosX = devHoveredX - tipWidth - 1;
 
@@ -733,56 +443,9 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
          }
 
-         break;
 
-      case TOOLTIP_POSITION_RIGHT:
 
-         ttPosX = devHoveredX + devHoveredWidth + 1;
 
-         if (isVertical) {
-            ttPosY = devHoveredY;
-         } else {
-            ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
-         }
-
-         break;
-
-      case TOOLTIP_POSITION_ABOVE:
-
-         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
-         ttPosY = devHoveredY - tipHeight - 1;
-
-         break;
-
-      case TOOLTIP_POSITION_CHART_TOP:
-
-         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
-         ttPosY = devYTop - tipHeight;
-
-         break;
-      case TOOLTIP_POSITION_CHART_BOTTOM:
-
-         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
-         ttPosY = devYBottom;
-
-         break;
-
-      // case TOOLTIP_POSITION_BELOW:
-      default:
-
-         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
-         ttPosY = devHoveredY + devHoveredHeight + 1;
-
-         if (_hoveredLabel.visualPosition == TourMarker.LABEL_POS_VERTICAL_TOP_CHART) {
-
-            /*
-             * y position is wrong, adjust it but this do NOT cover all possible positions, but some
-             */
-            ttPosY -= devHoverSize;
-         }
-
-         break;
-      }
 
       // ckeck if tooltip is left to the chart border
       if (ttPosX + tipWidth < 0) {
@@ -837,58 +500,30 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          if (ttLocation.x < displayX) {
 
-            switch (_cmc.markerTooltipPosition) {
 
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
-               ttLocation.x = displayX;
-               break;
-
-            case TOOLTIP_POSITION_LEFT:
                ttLocation.x = ttLocation.x + tipWidth + devHoveredWidth + 2;
-               break;
-            }
+
          }
 
          if (rightBottomBounds.x > displayX + displayWidth) {
 
-            switch (_cmc.markerTooltipPosition) {
 
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
-               ttLocation.x = displayWidth - tipWidth;
-               break;
-
-            case TOOLTIP_POSITION_RIGHT:
                ttLocation.x = ttLocation.x - tipWidth - devHoveredWidth - 2;
-               break;
-            }
+
          }
 
          if (ttLocation.y < displayY) {
 
-            switch (_cmc.markerTooltipPosition) {
 
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
                ttLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
-               break;
-            }
+
          }
 
          if (rightBottomBounds.y > displayY + displayHeight) {
 
-            switch (_cmc.markerTooltipPosition) {
 
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
                ttLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
-               break;
-            }
+
          }
       }
 
@@ -987,12 +622,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          _hoveredLabel = hoveredLabel;
          //_hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
 
+         System.out.println("HOVEREDPAUSE");
          showToolTip();
       }
    }
 
-   void setChartMarkerConfig(final ChartMarkerConfig cmc) {
-      _cmc = cmc;
+   void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
+      _chartPauseConfig = chartPauseConfig;
    }
 
    private void setColors(final Composite container) {

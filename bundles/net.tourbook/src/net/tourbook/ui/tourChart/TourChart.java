@@ -361,6 +361,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private boolean                       _isSegmentTitleHovered;
    private ChartTitleSegment             _chartTitleSegment;
    private TourMarker                    _lastHoveredTourMarker;
+   private TourMarker                    _lastHoveredTourPause;
    //
    /**
     * Hide tour segments when tour chart is displayed in dialogs.
@@ -731,13 +732,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       @Override
-      public void mouseDoubleClick(final ChartMouseEvent event) {
-         onMarker_MouseDoubleClick(event);
+      public void mouseDoubleClick(final ChartMouseEvent chartMouseEvent) {
+         onMarker_MouseDoubleClick(chartMouseEvent);
       }
 
       @Override
-      public void mouseDown(final ChartMouseEvent event) {
-         onMarker_MouseDown(event);
+      public void mouseDown(final ChartMouseEvent chartMouseEvent) {
+         onMarker_MouseDown(chartMouseEvent);
       }
 
       @Override
@@ -746,14 +747,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       @Override
-      public void mouseMove(final ChartMouseEvent event) {
-         onMarker_MouseMove(event);
+      public void mouseMove(final ChartMouseEvent chartMouseEvent) {
+         onMarker_MouseMove(chartMouseEvent);
+         onPause_MouseMove(chartMouseEvent);
       }
 
       @Override
-      public void mouseUp(final ChartMouseEvent event) {
-         onMarker_MouseUp(event);
+      public void mouseUp(final ChartMouseEvent chartMouseEvent) {
+         onMarker_MouseUp(chartMouseEvent);
       }
+
    }
 
    private class MousePhotoListener extends MouseAdapter {
@@ -1859,9 +1862,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @return
     */
    private ChartLabelMarker createLayer_Marker_ChartLabel(final TourMarker tourMarker,
-                                                    final double[] xAxisSerie,
-                                                    final int xAxisSerieIndex,
-                                                    final int labelPosition) {
+                                                          final double[] xAxisSerie,
+                                                          final int xAxisSerieIndex,
+                                                          final int labelPosition) {
 
       final ChartLabelMarker chartLabelMarker = new ChartLabelMarker();
 
@@ -2044,8 +2047,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @return
     */
    private ChartLabelPause createLayer_Pause_ChartLabel(final String pauseDuration,
-                                                   final double[] xAxisSerie,
-                                                   final int xAxisSerieIndex) {
+                                                        final double[] xAxisSerie,
+                                                        final int xAxisSerieIndex) {
 
       final ChartLabelPause chartLabelPause = new ChartLabelPause();
 
@@ -3129,14 +3132,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return tourMarker;
    }
 
-   private TourMarker getHoveredTourPause() {
-      // TODO Auto-generated method stub
-      return null;
+   private ChartLabel getHoveredTourPause() {
+
+      if (_layerPause == null) {
+         return null;
+      }
+
+      return _layerPause.getHoveredLabel();
    }
 
    public TourMarker getLastHoveredTourMarker() {
 
       return _lastHoveredTourMarker;
+   }
+
+   public TourMarker getLastHoveredTourPause() {
+
+      return _lastHoveredTourPause;
    }
 
    ChartLayerMarker getLayerTourMarker() {
@@ -3401,18 +3413,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setChartOverlayDirty();
    }
 
-   private void onMarker_MouseMove(final ChartMouseEvent mouseEvent) {
+   private void onMarker_MouseMove(final ChartMouseEvent chartMouseEvent) {
 
       if (_layerMarker != null) {
 
-         final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(mouseEvent);
+         final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(chartMouseEvent);
 
          final boolean isLabelHovered = hoveredLabel != null;
          if (isLabelHovered) {
 
             // set worked that no other actions are done in this event
-            mouseEvent.isWorked = isLabelHovered;
-            mouseEvent.cursor = ChartCursor.Arrow;
+            chartMouseEvent.isWorked = isLabelHovered;
+            chartMouseEvent.cursor = ChartCursor.Arrow;
          }
 
          // check if the selected marker is hovered
@@ -3440,42 +3452,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
       }
 
-      if (_layerPause != null) {
-
-         final ChartLabelPause hoveredLabel = _layerPause.retrieveHoveredPause(mouseEvent);
-
-         final boolean isPauseHovered = hoveredLabel != null;
-         if (isPauseHovered) {
-
-            // set worked that no other actions are done in this event
-            mouseEvent.isWorked = isPauseHovered;
-            mouseEvent.cursor = ChartCursor.Arrow;
-         }
-
-         // check if the selected marker is hovered
-         final TourMarker hoveredPause = getHoveredTourPause();
-         if (_selectedTourMarker != null && hoveredPause == null || (hoveredPause != _selectedTourMarker)) {
-
-            _selectedTourMarker = null;
-
-            // redraw chart
-            setChartOverlayDirty();
-         }
-
-         // ensure that a selected tour marker is drawn in the overlay
-         if (_selectedTourMarker != null) {
-
-            // redraw chart
-            setChartOverlayDirty();
-         }
-
-         if (_tourChartConfiguration.isShowTourPauses) {
-
-            // marker tooltip is displayed
-
-            // _tourPauseTooltip.open(hoveredLabel);
-         }
-      }
    }
 
    private void onMarker_MouseUp(final ChartMouseEvent mouseEvent) {
@@ -3505,6 +3481,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             fireTourMarkerSelection(hoveredTourMarker);
          }
          _firedTourMarker = null;
+      }
+   }
+
+   private void onPause_MouseMove(final ChartMouseEvent chartMouseEvent) {
+
+      if (_layerPause == null) {
+         return;
+      }
+
+      final ChartLabelPause hoveredLabel = _layerPause.retrieveHoveredPause(chartMouseEvent);
+      final boolean isPauseHovered = hoveredLabel != null;
+      if (isPauseHovered) {
+
+         // set worked that no other actions are done in this event
+         chartMouseEvent.isWorked = isPauseHovered;
+         chartMouseEvent.cursor = ChartCursor.Arrow;
+      }
+      // check if the selected marker is hovered
+      final ChartLabel hoveredPause = getHoveredTourPause();
+
+      if (_tourChartConfiguration.isShowTourPauses && isPauseHovered) {
+
+         // marker tooltip is displayed
+
+         _tourPauseTooltip.open(hoveredLabel);
       }
    }
 
@@ -5690,7 +5691,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        * Tour marker
        */
- _actionTourMarker.setSelected(_tourChartConfiguration.isShowTourMarker);
+      _actionTourMarker.setSelected(_tourChartConfiguration.isShowTourMarker);
       _actionTourMarker.setEnabled(true);
 
       /*
