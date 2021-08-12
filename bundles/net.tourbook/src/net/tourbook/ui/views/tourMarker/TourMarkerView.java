@@ -68,13 +68,9 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -92,7 +88,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -306,76 +301,69 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-            if (part == TourMarkerView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (workbenchPart == TourMarkerView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (_isInUpdate || part == TourMarkerView.this) {
+         if (_isInUpdate || workbenchPart == TourMarkerView.this) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else {
+
+            if (_tourData == null) {
                return;
             }
 
-            if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               onSelectionChanged((ISelection) eventData);
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
 
-            } else {
+                  // update modified tour
 
-               if (_tourData == null) {
-                  return;
-               }
+                  final long viewTourId = _tourData.getTourId();
 
-               if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+                  for (final TourData tourData : modifiedTours) {
+                     if (tourData.getTourId() == viewTourId) {
 
-                  final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-                  if (modifiedTours != null) {
+                        // get modified tour
+                        _tourData = tourData;
+                        _isMultipleTours = tourData.isMultipleTours();
 
-                     // update modified tour
+                        updateUI_MarkerViewer();
 
-                     final long viewTourId = _tourData.getTourId();
+                        // removed old tour data from the selection provider
+                        _postSelectionProvider.clearSelection();
 
-                     for (final TourData tourData : modifiedTours) {
-                        if (tourData.getTourId() == viewTourId) {
-
-                           // get modified tour
-                           _tourData = tourData;
-                           _isMultipleTours = tourData.isMultipleTours();
-
-                           updateUI_MarkerViewer();
-
-                           // removed old tour data from the selection provider
-                           _postSelectionProvider.clearSelection();
-
-                           // nothing more to do, the view contains only one tour
-                           return;
-                        }
+                        // nothing more to do, the view contains only one tour
+                        return;
                      }
                   }
-
-               } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-                  onTourEvent_TourMarker(eventData);
-
-               } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-                  clearView();
                }
+
+            } else if (tourEventId == TourEventId.MARKER_SELECTION) {
+
+               onTourEvent_TourMarker(eventData);
+
+            } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+               clearView();
             }
          }
       };
@@ -536,27 +524,20 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
       _markerViewer.setComparator(new MarkerViewerProfileComparator());
 
-      _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_TourMarker((StructuredSelection) event.getSelection());
+      _markerViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_TourMarker((StructuredSelection) selectionChangedEvent
+            .getSelection()));
+
+      _markerViewer.addDoubleClickListener(doubleClickEvent -> {
+
+         if (isTourSavedInDb() == false) {
+            return;
          }
-      });
 
-      _markerViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-
-            if (isTourSavedInDb() == false) {
-               return;
-            }
-
-            // edit selected marker
-            final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-            if (selection.size() > 0) {
-               _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
-               _actionEditTourMarkers.run();
-            }
+         // edit selected marker
+         final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+         if (selection.size() > 0) {
+            _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
+            _actionEditTourMarkers.run();
          }
       });
 
