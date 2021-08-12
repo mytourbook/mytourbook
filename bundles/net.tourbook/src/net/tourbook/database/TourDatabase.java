@@ -205,8 +205,8 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, they are needed to drop them
-   private final static String TABLE_TOUR_CATEGORY                = "TourCategory";                                         //$NON-NLS-1$
-   private final static String TABLE_TOURCATEGORY__TOURDATA       = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
+   private static final String TABLE_TOUR_CATEGORY                = "TourCategory";                                         //$NON-NLS-1$
+   private static final String TABLE_TOURCATEGORY__TOURDATA       = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
@@ -299,7 +299,7 @@ public class TourDatabase {
 
    private static final IPreferenceStore         _prefStore          = TourbookPlugin.getPrefStore();
 
-   private final static String                   _databasePath       = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
+   private static final String                   _databasePath       = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
 
    private static NetworkServerControl           _server;
 
@@ -319,18 +319,14 @@ public class TourDatabase {
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "Saving database entities");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
       _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
@@ -920,27 +916,17 @@ public class TourDatabase {
 
          // fire modify event
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
-            }
-         });
+         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
       }
 
       if (isNewTourType) {
 
          // fire modify event
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               TourbookPlugin.getPrefStore()
-                     .setValue(
-                           ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-                           Math.random());
-            }
-         });
+         Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore()
+               .setValue(
+                     ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+                     Math.random()));
       }
    }
 
@@ -1354,7 +1340,7 @@ public class TourDatabase {
          final String sqlWhere_TourId           = " WHERE tourId=?";                         //$NON-NLS-1$
          final String sqlWhere_TourData_TourId  = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
-         final String allSql[] = {
+         final String[] allSql = {
 
             "DELETE FROM " + TABLE_TOUR_DATA                + sqlWhere_TourId,            //$NON-NLS-1$
             "DELETE FROM " + TABLE_TOUR_MARKER              + sqlWhere_TourData_TourId,   //$NON-NLS-1$
@@ -1841,46 +1827,40 @@ public class TourDatabase {
        */
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.syncExec(() -> BusyIndicator.showWhile(display, () -> {
 
-            BusyIndicator.showWhile(display, new Runnable() {
-               @Override
-               public void run() {
+         try (Connection conn = getInstance().getConnection(); //
+               Statement stmt = conn.createStatement()) {
 
-                  try (Connection conn = getInstance().getConnection(); //
-                        Statement stmt = conn.createStatement()) {
+            final String sqlQuery = UI.EMPTY_STRING //
+                  + "SELECT" //$NON-NLS-1$
+                  + " DISTINCT" //$NON-NLS-1$
+                  + " " + fieldname //$NON-NLS-1$
+                  + " FROM " + db //$NON-NLS-1$
+                  + " ORDER BY " + fieldname; //$NON-NLS-1$
 
-                     final String sqlQuery = UI.EMPTY_STRING //
-                           + "SELECT" //$NON-NLS-1$
-                           + " DISTINCT" //$NON-NLS-1$
-                           + " " + fieldname //$NON-NLS-1$
-                           + " FROM " + db //$NON-NLS-1$
-                           + " ORDER BY " + fieldname; //$NON-NLS-1$
+            final ResultSet result = stmt.executeQuery(sqlQuery);
 
-                     final ResultSet result = stmt.executeQuery(sqlQuery);
+            while (result.next()) {
 
-                     while (result.next()) {
+               String dbValue = result.getString(1);
+               if (dbValue != null) {
 
-                        String dbValue = result.getString(1);
-                        if (dbValue != null) {
+                  dbValue = dbValue.trim();
 
-                           dbValue = dbValue.trim();
-
-                           if (dbValue.length() > 0) {
-                              sortedValues.add(dbValue);
-                           }
-                        }
-                     }
-
-                  } catch (final SQLException e) {
-                     UI.showSQLException(e);
+                  if (dbValue.length() > 0) {
+                     sortedValues.add(dbValue);
                   }
+               }
+            }
 
-                  /*
-                   * log existing values
-                   */
+         } catch (final SQLException e) {
+            UI.showSQLException(e);
+         }
+
+         /*
+          * log existing values
+          */
 //                  final StringBuilder sb = new StringBuilder();
 //                  for (final String text : sortedValues) {
 //                     sb.append(text);
@@ -1890,10 +1870,7 @@ public class TourDatabase {
 //                  System.out.println(sqlQuery);
 //                  System.out.println(UI.NEW_LINE);
 //                  System.out.println(sb.toString());
-               }
-            });
-         }
-      });
+      }));
 
       return sortedValues;
    }
@@ -2386,30 +2363,27 @@ public class TourDatabase {
 
       if (field != null && field.length() > maxLength) {
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().syncExec(() -> {
 
-               if (isForceTruncation) {
-                  returnValue[0] = FIELD_VALIDATION.TRUNCATE;
-                  StatusUtil.log(
-                        new Exception(
-                              NLS.bind(
-                                    "Field \"{0}\" with content \"{1}\" is truncated to {2} characters.", //$NON-NLS-1$
-                                    new Object[] { uiFieldName, field, maxLength })));
-                  return;
-               }
+            if (isForceTruncation) {
+               returnValue[0] = FIELD_VALIDATION.TRUNCATE;
+               StatusUtil.log(
+                     new Exception(
+                           NLS.bind(
+                                 "Field \"{0}\" with content \"{1}\" is truncated to {2} characters.", //$NON-NLS-1$
+                                 new Object[] { uiFieldName, field, maxLength })));
+               return;
+            }
 
-               if (MessageDialog.openConfirm(
-                     Display.getDefault().getActiveShell(),
-                     Messages.Tour_Database_Dialog_ValidateFields_Title,
-                     NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message,
-                           new Object[] { uiFieldName, field.length(), maxLength }))) {
+            if (MessageDialog.openConfirm(
+                  Display.getDefault().getActiveShell(),
+                  Messages.Tour_Database_Dialog_ValidateFields_Title,
+                  NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message,
+                        new Object[] { uiFieldName, field.length(), maxLength }))) {
 
-                  returnValue[0] = FIELD_VALIDATION.TRUNCATE;
-               } else {
-                  returnValue[0] = FIELD_VALIDATION.IS_INVALID;
-               }
+               returnValue[0] = FIELD_VALIDATION.TRUNCATE;
+            } else {
+               returnValue[0] = FIELD_VALIDATION.IS_INVALID;
             }
          });
       }
@@ -4516,57 +4490,53 @@ public class TourDatabase {
 
       try {
 
-         final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
+         final Runnable runnable = () -> {
 
-               final SplashManager splashManager = SplashManager.getInstance();
+            final SplashManager splashManager = SplashManager.getInstance();
 
-               splashManager.setMessage(Messages.App_SplashMessage_StartingDatabase);
-               try {
+            splashManager.setMessage(Messages.App_SplashMessage_StartingDatabase);
+            try {
 
-                  sqlStartup_20_CheckServer(splashManager);
-                  sqlStartup_30_Check_DbIsCreated();
+               sqlStartup_20_CheckServer(splashManager);
+               sqlStartup_30_Check_DbIsCreated();
 
-               } catch (final Throwable e) {
+            } catch (final Throwable e) {
 
-                  StatusUtil.log(e);
-                  return;
-               }
-
-               sqlStartup_40_CheckTable(splashManager);
-
-               if (sqlStartup_50_IsDesignVersionValid(splashManager) == false) {
-                  return;
-               }
-
-               sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(splashManager);
-
-               sqlStartup_60_SetupEntityManager(splashManager);
-
-               _isDbInDataUpdate = true;
-               {
-                  if (sqlStartup_70_IsDataVersionValid(splashManager) == false) {
-                     return;
-                  }
-               }
-               _isDbInDataUpdate = false;
-
-               if (_dbDesignVersion_Old != _dbDesignVersion_New) {
-
-                  // display info for the successful update
-
-                  MessageDialog.openInformation(
-                        splashManager.getShell(),
-                        Messages.tour_database_version_info_title,
-                        NLS.bind(Messages.Tour_Database_UpdateInfo, _dbDesignVersion_Old, _dbDesignVersion_New));
-               }
-
-               splashManager.setMessage(Messages.App_SplashMessage_Finalize);
-
-               returnState[0] = true;
+               StatusUtil.log(e);
+               return;
             }
 
+            sqlStartup_40_CheckTable(splashManager);
+
+            if (sqlStartup_50_IsDesignVersionValid(splashManager) == false) {
+               return;
+            }
+
+            sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(splashManager);
+
+            sqlStartup_60_SetupEntityManager(splashManager);
+
+            _isDbInDataUpdate = true;
+            {
+               if (sqlStartup_70_IsDataVersionValid(splashManager) == false) {
+                  return;
+               }
+            }
+            _isDbInDataUpdate = false;
+
+            if (_dbDesignVersion_Old != _dbDesignVersion_New) {
+
+               // display info for the successful update
+
+               MessageDialog.openInformation(
+                     splashManager.getShell(),
+                     Messages.tour_database_version_info_title,
+                     NLS.bind(Messages.Tour_Database_UpdateInfo, _dbDesignVersion_Old, _dbDesignVersion_New));
+            }
+
+            splashManager.setMessage(Messages.App_SplashMessage_Finalize);
+
+            returnState[0] = true;
          };
 
          runnable.run();
@@ -6737,7 +6707,7 @@ public class TourDatabase {
 //         //
 //         // version 23 end
 
-            final String sqlTourPhoto[] = {
+            final String[] sqlTourPhoto = {
 
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileName           VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileExt            VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -6772,7 +6742,7 @@ public class TourDatabase {
 //         //
 //         // version 23 end ---------
 
-            final String sqlTourData[] = {
+            final String[] sqlTourData = {
 
                   "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfTimeSlices       INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
                   "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfPhotos           INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
