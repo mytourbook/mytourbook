@@ -15,12 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -28,37 +30,27 @@ import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.web.WEB;
 
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String  GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String  GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String  GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String  GRAPH_LABEL_TIME    = net.tourbook.common.Messages.Graph_Label_Time;
 
-   private static final int     DEFAULT_TEXT_WIDTH   = 50;
-   private static final int     DEFAULT_TEXT_HEIGHT  = 20;
+   private static final int     DEFAULT_TEXT_WIDTH  = 50;
+   private static final int     DEFAULT_TEXT_HEIGHT = 20;
 
    /**
     * Visual position for marker tooltip, they must correspond to the position id
@@ -113,24 +105,10 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
    private ActionOpenMarkerDialogInTooltip _actionOpenMarkerDialog;
 
-//   private final NumberFormat            _nf1NoGroup                  = NumberFormat.getNumberInstance();
-//   private final NumberFormat            _nf3NoGroup                  = NumberFormat.getNumberInstance();
-//   {
-//      _nf1NoGroup.setMinimumFractionDigits(1);
-//      _nf1NoGroup.setMaximumFractionDigits(1);
-//      _nf1NoGroup.setGroupingUsed(false);
-//
-//      _nf3NoGroup.setMinimumFractionDigits(3);
-//      _nf3NoGroup.setMaximumFractionDigits(3);
-//      _nf3NoGroup.setGroupingUsed(false);
-//   }
-
    /*
     * UI resources
     */
-   private Font       _boldFont;
    private Color      _fgBorder;
-   private Color      _titleColor;
    private ColorCache _colorCache;
 
    /*
@@ -255,31 +233,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       return _shellContainer;
    }
 
-
-
-   private void createUI_30_Actions(final Composite parent) {
-
-      if (_isShowActions) {
-
-         /*
-          * Action toolbar
-          */
-         final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-         GridDataFactory.fillDefaults().applyTo(toolbar);
-
-         final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-         tbm.add(_actionOpenMarkerDialog);
-
-         tbm.update(true);
-
-      } else {
-
-         // create dummy to keep the layout
-         new Label(parent, SWT.NONE);
-      }
-   }
-
    private void createUI_70_Values(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -289,46 +242,47 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .indent(3, 0)
             .applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(5)
-            .spacing(5, 1)
+            .numColumns(2)
             .applyTo(container);
-
       {
 
-            UI.createLabel(container, GRAPH_LABEL_ALTITUDE);
+         UI.createLabel(container, "Start time");//GRAPH_LABEL_TIME);
 
+         createUI_72_ValueField(
+               container,
+               _hoveredLabel.getPausedTime_Start(),
+               _hoveredLabel.getTimeZoneId());
 
-                  createUI_72_ValueField(
-                        container,
-                        _hoveredLabel.pauseDuration,
-                        UI.UNIT_LABEL_ELEVATION);
-
-
+         UI.createLabel(container, "End time");//GRAPH_LABEL_TIME);
+         createUI_72_ValueField(
+               container,
+               _hoveredLabel.getPausedTime_End(),
+               _hoveredLabel.getTimeZoneId());
 
       }
    }
 
    private void createUI_72_ValueField(final Composite parent,
-                                       final String valueText,
-                                       final String unit) {
-
-      Label label;
+                                       final long value,
+                                       final String dbTimeZoneId) {
 
       // Value
-      label = new Label(parent, SWT.TRAIL);
+      final Label label = new Label(parent, SWT.TRAIL);
       GridDataFactory.fillDefaults()
             .align(SWT.END, SWT.FILL)
             .indent(10, 0)
             .applyTo(label);
 
-      label.setText(valueText);
+      final ZonedDateTime tourZonedDateTime = TimeTools.createTourDateTime(value, dbTimeZoneId).tourZonedDateTime;
 
-      // Unit
-      label = new Label(parent, SWT.NONE);
-      label.setText(unit);
+      final String format_hh_mm_ss = UI.format_yyyymmdd_hhmmss(tourZonedDateTime.getYear(),
+            tourZonedDateTime.getMonthValue(),
+            tourZonedDateTime.getDayOfMonth(),
+            tourZonedDateTime.getHour(),
+            tourZonedDateTime.getMinute(),
+            tourZonedDateTime.getSecond());
+      label.setText(format_hh_mm_ss);
    }
-
-
 
    /**
     * This is copied from {@link ChartLayerMarker#drawOverlay()}.
@@ -342,19 +296,17 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       Rectangle rectHovered = new Rectangle(_hoveredLabel.devXPause, _hoveredLabel.devYPause, 1, 1);
 
+      int devMarkerPointSize = 1;
+      if (devMarkerPointSize < 1) {
+         devMarkerPointSize = 1;
+      }
 
-         int devMarkerPointSize = 1;
-         if (devMarkerPointSize < 1) {
-            devMarkerPointSize = 1;
-         }
+      final int devMarkerX = _hoveredLabel.devXPause - hoverSize;
+      final int devMarkerY = _hoveredLabel.devYPause - hoverSize;
+      final int devMarkerSize = devMarkerPointSize + 2 * hoverSize;
 
-         final int devMarkerX = _hoveredLabel.devXPause - hoverSize;
-         final int devMarkerY = _hoveredLabel.devYPause - hoverSize;
-         final int devMarkerSize = devMarkerPointSize + 2 * hoverSize;
-
-         final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
-         rectHovered = rectHovered.union(rectMarker);
-
+      final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+      rectHovered = rectHovered.union(rectMarker);
 
       // add label rect
       if (_hoveredLabel.paintedLabel != null) {
@@ -433,19 +385,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          devHoveredY = devYTop;
       }
 
+      ttPosX = devHoveredX - tipWidth - 1;
 
-
-         ttPosX = devHoveredX - tipWidth - 1;
-
-         if (isVertical) {
-            ttPosY = devHoveredY;
-         } else {
-            ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
-         }
-
-
-
-
+      if (isVertical) {
+         ttPosY = devHoveredY;
+      } else {
+         ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
+      }
 
       // ckeck if tooltip is left to the chart border
       if (ttPosX + tipWidth < 0) {
@@ -500,29 +446,25 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          if (ttLocation.x < displayX) {
 
-
-               ttLocation.x = ttLocation.x + tipWidth + devHoveredWidth + 2;
+            ttLocation.x = ttLocation.x + tipWidth + devHoveredWidth + 2;
 
          }
 
          if (rightBottomBounds.x > displayX + displayWidth) {
 
-
-               ttLocation.x = ttLocation.x - tipWidth - devHoveredWidth - 2;
+            ttLocation.x = ttLocation.x - tipWidth - devHoveredWidth - 2;
 
          }
 
          if (ttLocation.y < displayY) {
 
-
-               ttLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
+            ttLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
 
          }
 
          if (rightBottomBounds.y > displayY + displayHeight) {
 
-
-               ttLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
+            ttLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
 
          }
       }
@@ -539,9 +481,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       _defaultTextHeight = _pc.convertHeightInCharsToPixels(DEFAULT_TEXT_HEIGHT);
 
       _colorCache = new ColorCache();
-      _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
       _fgBorder = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
-      _titleColor = _colorCache.getColor(new RGB(0x50, 0x50, 0x50));
    }
 
    @Override
@@ -659,68 +599,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    void setIsShowMarkerActions(final boolean isShowMarkerActions) {
 
       _isShowActions = isShowMarkerActions;
-   }
-
-   private void setTextControlSize(final Composite parent, final Text txtControl, final String text) {
-
-      Point defaultSize = txtControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-      // check default width
-      if (defaultSize.x > _defaultTextWidth) {
-
-         // check default height
-         defaultSize = txtControl.computeSize(_defaultTextWidth, SWT.DEFAULT);
-         if (defaultSize.y > _defaultTextHeight) {
-
-            setTextControlSize_RecreateWithVScroll(parent, txtControl, text, _defaultTextWidth);
-
-         } else {
-
-            // limit width
-            final GridData gd = (GridData) txtControl.getLayoutData();
-            gd.widthHint = _defaultTextWidth;
-         }
-
-      } else if (defaultSize.y > _defaultTextHeight) {
-
-         setTextControlSize_RecreateWithVScroll(parent, txtControl, text, SWT.DEFAULT);
-      }
-   }
-
-   /**
-    * Recreate text control with vertical scrollbar and limited height.
-    *
-    * @param parent
-    * @param txtControl
-    * @param text
-    * @param widthHint
-    */
-   private void setTextControlSize_RecreateWithVScroll(final Composite parent,
-                                                       Text txtControl,
-                                                       final String text,
-                                                       final int widthHint) {
-
-      txtControl.dispose();
-
-      txtControl = new Text(parent, _textStyle | SWT.V_SCROLL);
-      GridDataFactory.fillDefaults()
-            .hint(widthHint, _defaultTextHeight)
-            .applyTo(txtControl);
-
-      txtControl.setText(text);
-   }
-
-   private void setUrlWidth(final Control control) {
-
-      final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-      // check default width
-      if (defaultSize.x > _defaultTextWidth) {
-
-         // limit width
-         final GridData gd = (GridData) control.getLayoutData();
-         gd.widthHint = _defaultTextWidth;
-      }
    }
 
 }

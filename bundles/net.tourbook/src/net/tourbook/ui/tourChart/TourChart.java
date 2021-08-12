@@ -2040,13 +2040,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   /**
-    * @param pauseDuration
-    * @param xAxisSerie
-    * @param xAxisSerieIndex
-    * @return
-    */
-   private ChartLabelPause createLayer_Pause_ChartLabel(final String pauseDuration,
+   private ChartLabelPause createLayer_Pause_ChartLabel(final long pausedTime_Start,
+                                                        final long pausedTime_End,
+                                                        final String timeZoneId,
                                                         final double[] xAxisSerie,
                                                         final int xAxisSerieIndex) {
 
@@ -2055,7 +2051,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       chartLabelPause.graphX = xAxisSerie[xAxisSerieIndex];
       chartLabelPause.serieIndex = xAxisSerieIndex;
 
-      chartLabelPause.pauseDuration = pauseDuration;
+      //todo fb will that work for multiple tours that have different time zones ???
+      chartLabelPause.setPausedTime_Start(pausedTime_Start);
+      chartLabelPause.setPausedTime_End(pausedTime_End);
+      chartLabelPause.setTimeZoneId(timeZoneId);
 
       return chartLabelPause;
    }
@@ -2111,7 +2110,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int numberOfPauses = 0;
          long tourStartTime = 0;
          final List<List<Long>> allTourPauses = _tourData.multiTourPauses;
-         String pauseDurationText;
          int currentTourPauseIndex = 0;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
@@ -2123,9 +2121,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
-
-               final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
-               pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
@@ -2142,8 +2137,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                }
 
                if (tourSerieIndex < xAxisSerie.length) {
+
                   final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
-                        pauseDurationText,
+                        pausedTime_Start,
+                        pausedTime_End,
+                        _tourData.getTimeZoneId(),
                         xAxisSerie,
                         tourSerieIndex);
 
@@ -2164,14 +2162,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          final long[] pausedTime_End = _tourData.getPausedTime_End();
 
-         String pauseDurationText;
          int serieIndex = 0;
          final int[] timeSerie = _tourData.timeSerie;
          final long tourStartTime = _tourData.getTourStartTimeMS();
          for (int index = 0; index < pausedTime_Start.length; ++index) {
-
-            final long pauseDuration = Math.round((pausedTime_End[index] - pausedTime_Start[index]) / 1000f);
-            pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
 
             for (; serieIndex < timeSerie.length && serieIndex < xAxisSerie.length; ++serieIndex) {
 
@@ -2187,7 +2181,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             }
 
             final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
-                  pauseDurationText,
+                  pausedTime_Start[index],
+                  pausedTime_End[index],
+                  _tourData.getTimeZoneId(),
                   xAxisSerie,
                   serieIndex);
 

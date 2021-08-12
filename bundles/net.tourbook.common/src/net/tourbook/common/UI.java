@@ -1275,7 +1275,7 @@ public class UI {
     * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
     *
     * @param time
-    *           ini seconds
+    *           in seconds
     * @return
     */
    public static String format_hh_mm_ss(final long time) {

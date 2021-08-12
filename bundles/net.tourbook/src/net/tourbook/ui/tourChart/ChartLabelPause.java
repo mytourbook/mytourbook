@@ -19,7 +19,10 @@ import net.tourbook.common.UI;
 
 public class ChartLabelPause extends ChartLabel {
 
-   public String pauseDuration = UI.EMPTY_STRING;
+   private long   _pausedTime_Start;
+   private long   _pausedTime_End;
+
+   private String timeZoneId;
 
    /*
     * Painted label positions
@@ -29,12 +32,40 @@ public class ChartLabelPause extends ChartLabel {
 
    ChartLabelPause() {}
 
+   public long getPausedTime_End() {
+      return _pausedTime_End;
+   }
+
+   public long getPausedTime_Start() {
+      return _pausedTime_Start;
+   }
+
+   public String getPauseDuration() {
+      return UI.format_hh_mm_ss(Math.round((_pausedTime_End - _pausedTime_Start) / 1000f));
+   }
+
+   public String getTimeZoneId() {
+      return timeZoneId;
+   }
+
+   public void setPausedTime_End(final long pausedTime_End) {
+      _pausedTime_End = pausedTime_End;
+   }
+
+   public void setPausedTime_Start(final long pausedTime_Start) {
+      _pausedTime_Start = pausedTime_Start;
+   }
+
+   public void setTimeZoneId(final String timeZoneId) {
+      this.timeZoneId = timeZoneId;
+   }
+
    @Override
    public String toString() {
       return "ChartLabel [" // //$NON-NLS-1$
 //				+ ("serieIndex=" + serieIndex + ", ")
 //				+ ("graphX=" + graphX + ", ")
-            + ("pauseDuration=" + pauseDuration) //$NON-NLS-1$
+            + ("pauseDuration=" + getPauseDuration()) //$NON-NLS-1$
             + "]"; //$NON-NLS-1$
    }
 

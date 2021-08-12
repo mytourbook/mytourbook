@@ -102,7 +102,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          _devXPause = (int) (virtualXPos - devVirtualGraphImageOffset);
          _devYPause = devYBottom - devYGraph;
 
-         final Point labelExtend = gc.textExtent(chartLabelPause.pauseDuration);
+         final Point labelExtend = gc.textExtent(chartLabelPause.getPauseDuration());
 
          /*
           * Get pause point top/left position
@@ -163,7 +163,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             _devYPause = devYTop;
          }
 
-         final String pauseDurationText = chartLabelPause.pauseDuration;
+         final String pauseDurationText = chartLabelPause.getPauseDuration();
          final Point textExtent = gc.textExtent(pauseDurationText);
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
