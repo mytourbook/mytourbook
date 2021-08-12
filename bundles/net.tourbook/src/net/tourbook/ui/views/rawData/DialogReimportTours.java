@@ -46,6 +46,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -120,7 +121,6 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_TimeSlice_Cadence;
    private Button    _chkData_Tour_Calories;
    private Button    _chkData_TimeSlice_Elevation;
-   private Button    _chkData_EntireTour;
    private Button    _chkData_TimeSlice_Gear;
    private Button    _chkData_Tour_ImportFileLocation;
    private Button    _chkData_TimeSlice_PowerAndPulse;
@@ -133,6 +133,8 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_Tour_Markers;
    private Button    _chkData_TimeSlice_TourTimerPauses;
 
+   private Button    _rdoData_EntireTour;
+   private Button    _rdoData_PartOfATour;
    private Button    _rdoReimport_Tours_All;
    private Button    _rdoReimport_Tours_BetweenDates;
    private Button    _rdoReimport_Tours_Selected;
@@ -308,192 +310,39 @@ public class DialogReimportTours extends TitleAreaDialog {
     */
    private void createUI_20_Data(final Composite parent) {
 
-      final int verticalDistance = _pc.convertVerticalDLUsToPixels(4);
-
       final GridDataFactory gridDataTour = GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
             .span(2, 1);
 
-      final GridDataFactory gridDataTour_MoreVSpace = GridDataFactory.fillDefaults()
-            .align(SWT.BEGINNING, SWT.CENTER)
-            .span(2, 1)
-            .indent(0, verticalDistance);
-
-      final GridDataFactory gridDataItem = GridDataFactory.fillDefaults()
-            .align(SWT.BEGINNING, SWT.CENTER);
-
-      final GridDataFactory gridDataItem_FirstColumn = GridDataFactory.fillDefaults()
-            .align(SWT.BEGINNING, SWT.CENTER)
-            .indent(16, 0);
-
       /*
-       * group: data
+       * Group: data
        */
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Dialog_ReimportTours_Group_Data);
       group.setToolTipText(Messages.Dialog_ReimportTours_Group_Data_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
          {
             /*
-             * Checkbox: Entire Tour
+             * Radio: Entire Tour
              */
-            _chkData_EntireTour = new Button(group, SWT.CHECK);
-            _chkData_EntireTour.setText(Messages.Dialog_ReimportTours_Checkbox_EntireTour);
-            _chkData_EntireTour.addSelectionListener(_defaultListener);
-            gridDataTour.applyTo(_chkData_EntireTour);
+            _rdoData_EntireTour = new Button(group, SWT.RADIO);
+            _rdoData_EntireTour.setText(Messages.Dialog_ReimportTours_Checkbox_EntireTour);
+            _rdoData_EntireTour.addSelectionListener(_defaultListener);
+            gridDataTour.applyTo(_rdoData_EntireTour);
          }
          {
             /*
-             * Checkbox: All time slices
+             * Radio: Part of a tour
              */
-            _chkData_AllTimeSlices = new Button(group, SWT.CHECK);
-            _chkData_AllTimeSlices.setText(Messages.Dialog_ReimportTours_Checkbox_TimeSlices);
-            _chkData_AllTimeSlices.addSelectionListener(_defaultListener);
-            gridDataTour_MoreVSpace.applyTo(_chkData_AllTimeSlices);
+            _rdoData_PartOfATour = new Button(group, SWT.RADIO);
+            _rdoData_PartOfATour.setText(Messages.Dialog_ReimportTours_Radio_TourPart);
+            _rdoData_PartOfATour.addSelectionListener(_defaultListener);
+            gridDataTour.applyTo(_rdoData_PartOfATour);
          }
 
-         // row 1
-         {
-            /*
-             * Battery
-             */
-            _chkData_TimeSlice_Battery = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Battery.setText(Messages.Dialog_ModifyTours_Checkbox_BatteryValues);
-            _chkData_TimeSlice_Battery.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_Battery);
-         }
-         {
-            /*
-             * Cadence
-             */
-            _chkData_TimeSlice_Cadence = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Cadence.setText(Messages.Dialog_ModifyTours_Checkbox_CadenceValues);
-            _chkData_TimeSlice_Cadence.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_Cadence);
-         }
-         {
-            /*
-             * Swimming
-             */
-            _chkData_TimeSlice_Swimming = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Swimming.setText(Messages.Dialog_ModifyTours_Checkbox_SwimmingValues);
-            _chkData_TimeSlice_Swimming.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TimeSlice_Swimming);
-         }
-
-         // row 2
-         {
-            /*
-             * Calories
-             */
-            _chkData_Tour_Calories = new Button(group, SWT.CHECK);
-            _chkData_Tour_Calories.setText(Messages.Dialog_ModifyTours_Checkbox_Calories);
-            _chkData_Tour_Calories.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Tour_Calories);
-         }
-         {
-            /*
-             * Temperature
-             */
-            _chkData_TimeSlice_Temperature = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
-            _chkData_TimeSlice_Temperature.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TimeSlice_Temperature);
-         }
-
-         // row 3
-         {
-            /*
-             * Elevation
-             */
-            _chkData_TimeSlice_Elevation = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Elevation.setText(Messages.Dialog_ModifyTours_Checkbox_ElevationValues);
-            _chkData_TimeSlice_Elevation.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_Elevation);
-         }
-         {
-            /*
-             * Timer pauses
-             */
-            _chkData_TimeSlice_TourTimerPauses = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_TourTimerPauses.setText(Messages.Dialog_ModifyTours_Checkbox_TourTimerPauses);
-            _chkData_TimeSlice_TourTimerPauses.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TimeSlice_TourTimerPauses);
-         }
-
-         // row 4
-         {
-            /*
-             * Gear
-             */
-            _chkData_TimeSlice_Gear = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
-            _chkData_TimeSlice_Gear.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_Gear);
-         }
-         {
-            /*
-             * Training
-             */
-            _chkData_TimeSlice_Training = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_Training.setText(Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
-            _chkData_TimeSlice_Training.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TimeSlice_Training);
-         }
-
-         // row 5
-         {
-            /*
-             * Power And Pulse
-             */
-            _chkData_TimeSlice_PowerAndPulse = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
-            _chkData_TimeSlice_PowerAndPulse.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_PowerAndPulse);
-         }
-         {
-            /*
-             * Tour markers
-             */
-            _chkData_Tour_Markers = new Button(group, SWT.CHECK);
-            _chkData_Tour_Markers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
-            _chkData_Tour_Markers.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Tour_Markers);
-         }
-
-         // row 6
-         {
-            /*
-             * Power And Speed
-             */
-            _chkData_TimeSlice_PowerAndSpeed = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
-            _chkData_TimeSlice_PowerAndSpeed.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_PowerAndSpeed);
-         }
-         {
-            /*
-             * Import file location
-             */
-            _chkData_Tour_ImportFileLocation = new Button(group, SWT.CHECK);
-            _chkData_Tour_ImportFileLocation.setText(Messages.Dialog_ReimportTours_Checkbox_ImportFileLocation);
-            _chkData_Tour_ImportFileLocation.setToolTipText(Messages.Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip);
-            _chkData_Tour_ImportFileLocation.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Tour_ImportFileLocation);
-         }
-
-         // row 7
-         {
-            /*
-             * Running Dynamics
-             */
-            _chkData_TimeSlice_RunningDynamics = new Button(group, SWT.CHECK);
-            _chkData_TimeSlice_RunningDynamics.setText(Messages.Dialog_ModifyTours_Checkbox_RunningDynamicsValues);
-            _chkData_TimeSlice_RunningDynamics.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TimeSlice_RunningDynamics);
-         }
+         createUI_30_PartOfATour(group);
 
          {
             /*
@@ -507,37 +356,191 @@ public class DialogReimportTours extends TitleAreaDialog {
                   onDeselectAll_DataItems();
                }
             });
+
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
                   .grab(true, false)
-                  .indent(0, verticalDistance).applyTo(_btnDeselectAll);
+                  .indent(0, _pc.convertVerticalDLUsToPixels(4)).applyTo(_btnDeselectAll);
+         }
+      }
+   }
+
+   private void createUI_30_PartOfATour(final Group parent) {
+
+      final GridDataFactory gridDataItem = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
+
+      final Composite containerTour = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .indent(16, 8)
+            .applyTo(containerTour);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(3)
+            .spacing(32, LayoutConstants.getSpacing().y)
+            .applyTo(containerTour);
+      {
+         {
+            /*
+             * Calories
+             */
+            _chkData_Tour_Calories = new Button(containerTour, SWT.CHECK);
+            _chkData_Tour_Calories.setText(Messages.Dialog_ModifyTours_Checkbox_Calories);
+            _chkData_Tour_Calories.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Tour_Calories);
+         }
+         {
+            /*
+             * Import file location
+             */
+            _chkData_Tour_ImportFileLocation = new Button(containerTour, SWT.CHECK);
+            _chkData_Tour_ImportFileLocation.setText(Messages.Dialog_ReimportTours_Checkbox_ImportFileLocation);
+            _chkData_Tour_ImportFileLocation.setToolTipText(Messages.Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip);
+            _chkData_Tour_ImportFileLocation.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Tour_ImportFileLocation);
+         }
+         {
+            /*
+             * Tour markers
+             */
+            _chkData_Tour_Markers = new Button(containerTour, SWT.CHECK);
+            _chkData_Tour_Markers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
+            _chkData_Tour_Markers.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Tour_Markers);
          }
       }
 
-      // set tab ordering, cool feature but all controls MUST have the same parent !!!
-      group.setTabList(new Control[] {
+      {
+         /*
+          * Checkbox: All time slices
+          */
+         _chkData_AllTimeSlices = new Button(parent, SWT.CHECK);
+         _chkData_AllTimeSlices.setText(Messages.Dialog_ReimportTours_Checkbox_TimeSlices);
+         _chkData_AllTimeSlices.addSelectionListener(_defaultListener);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .indent(16, 8)
+               .applyTo(_chkData_AllTimeSlices);
+      }
 
-            _chkData_EntireTour,
-            _chkData_AllTimeSlices,
+      final Composite containerTimeSlices = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .indent(32, 8)
+            .applyTo(containerTimeSlices);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTimeSlices);
+      {
 
-            _chkData_Tour_Calories,
-            _chkData_Tour_Markers,
-            _chkData_Tour_ImportFileLocation,
+         // row 1
+         {
+            /*
+             * Battery
+             */
+            _chkData_TimeSlice_Battery = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Battery.setText(Messages.Dialog_ModifyTours_Checkbox_BatteryValues);
+            _chkData_TimeSlice_Battery.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Battery);
+         }
+         {
+            /*
+             * Running Dynamics
+             */
+            _chkData_TimeSlice_RunningDynamics = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_RunningDynamics.setText(Messages.Dialog_ModifyTours_Checkbox_RunningDynamicsValues);
+            _chkData_TimeSlice_RunningDynamics.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_RunningDynamics);
+         }
 
-            _chkData_TimeSlice_Battery,
-            _chkData_TimeSlice_Cadence,
-            _chkData_TimeSlice_Elevation,
-            _chkData_TimeSlice_Gear,
-            _chkData_TimeSlice_PowerAndPulse,
-            _chkData_TimeSlice_PowerAndSpeed,
-            _chkData_TimeSlice_RunningDynamics,
-            _chkData_TimeSlice_Swimming,
-            _chkData_TimeSlice_Temperature,
-            _chkData_TimeSlice_TourTimerPauses,
-            _chkData_TimeSlice_Training,
+         // row 2
+         {
+            /*
+             * Cadence
+             */
+            _chkData_TimeSlice_Cadence = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Cadence.setText(Messages.Dialog_ModifyTours_Checkbox_CadenceValues);
+            _chkData_TimeSlice_Cadence.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Cadence);
+         }
+         {
+            /*
+             * Swimming
+             */
+            _chkData_TimeSlice_Swimming = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Swimming.setText(Messages.Dialog_ModifyTours_Checkbox_SwimmingValues);
+            _chkData_TimeSlice_Swimming.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Swimming);
+         }
 
-            _btnDeselectAll
-      });
+         // row 3
+         {
+            /*
+             * Elevation
+             */
+            _chkData_TimeSlice_Elevation = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Elevation.setText(Messages.Dialog_ModifyTours_Checkbox_ElevationValues);
+            _chkData_TimeSlice_Elevation.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Elevation);
+         }
+         {
+            /*
+             * Temperature
+             */
+            _chkData_TimeSlice_Temperature = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
+            _chkData_TimeSlice_Temperature.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Temperature);
+         }
+
+         // row 4
+         {
+            /*
+             * Gear
+             */
+            _chkData_TimeSlice_Gear = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
+            _chkData_TimeSlice_Gear.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Gear);
+         }
+         {
+            /*
+             * Timer pauses
+             */
+            _chkData_TimeSlice_TourTimerPauses = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_TourTimerPauses.setText(Messages.Dialog_ModifyTours_Checkbox_TourTimerPauses);
+            _chkData_TimeSlice_TourTimerPauses.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_TourTimerPauses);
+         }
+
+         // row 5
+         {
+            /*
+             * Power And Pulse
+             */
+            _chkData_TimeSlice_PowerAndPulse = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
+            _chkData_TimeSlice_PowerAndPulse.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_PowerAndPulse);
+         }
+         {
+            /*
+             * Training
+             */
+            _chkData_TimeSlice_Training = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_Training.setText(Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
+            _chkData_TimeSlice_Training.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_Training);
+         }
+
+         // row 6
+         {
+            /*
+             * Power And Speed
+             */
+            _chkData_TimeSlice_PowerAndSpeed = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
+            _chkData_TimeSlice_PowerAndSpeed.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_PowerAndSpeed);
+         }
+      }
    }
 
    /**
@@ -674,20 +677,19 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       final boolean isValid = isDataValid();
 
-      final boolean isReimport_EntireTour = _chkData_EntireTour.getSelection();
-      final boolean isReimport_AllTimeSlices = _chkData_AllTimeSlices.getSelection();
-      final boolean isToursBetweenDates = _rdoReimport_Tours_BetweenDates.getSelection();
+      final boolean isPartOfATourSelected = _rdoData_PartOfATour.getSelection();
+      final boolean isAllTimeSlicesSelected = _chkData_AllTimeSlices.getSelection();
+      final boolean isTourBetweenDates = _rdoReimport_Tours_BetweenDates.getSelection();
 
-      final boolean isTourSelected = _rdoReimport_Tours_All.getSelection() ||
+      final boolean isTimeSlice = isPartOfATourSelected && isAllTimeSlicesSelected == false;
+
+      final boolean isTourSelected = false ||
+
+            _rdoReimport_Tours_All.getSelection() ||
             _rdoReimport_Tours_Selected.getSelection() ||
-            isToursBetweenDates;
+            isTourBetweenDates;
 
-      final boolean isDataSelected = _chkData_EntireTour.getSelection() ||
-            _chkData_AllTimeSlices.getSelection() ||
-
-            _chkData_Tour_Calories.getSelection() ||
-            _chkData_Tour_ImportFileLocation.getSelection() ||
-            _chkData_Tour_Markers.getSelection() ||
+      final boolean isTimeSliceSelected = false ||
 
             _chkData_TimeSlice_Battery.getSelection() ||
             _chkData_TimeSlice_Cadence.getSelection() ||
@@ -701,13 +703,25 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkData_TimeSlice_Training.getSelection() ||
             _chkData_TimeSlice_TourTimerPauses.getSelection();
 
-      final boolean isTimeSlice = !isReimport_EntireTour && !isReimport_AllTimeSlices;
+      final boolean isTourDataSelected = false ||
 
-      _chkData_AllTimeSlices.setEnabled(!isReimport_EntireTour);
+            _chkData_Tour_Calories.getSelection() ||
+            _chkData_Tour_ImportFileLocation.getSelection() ||
+            _chkData_Tour_Markers.getSelection();
 
-      _chkData_Tour_ImportFileLocation.setEnabled(!isReimport_EntireTour);
-      _chkData_Tour_Markers.setEnabled(!isReimport_EntireTour);
-      _chkData_Tour_Calories.setEnabled(!isReimport_EntireTour);
+      final boolean isDataSelected = false ||
+
+            _rdoData_EntireTour.getSelection() ||
+            _chkData_AllTimeSlices.getSelection() ||
+
+            isTourDataSelected ||
+            isTimeSliceSelected;
+
+      _chkData_AllTimeSlices.setEnabled(isPartOfATourSelected);
+
+      _chkData_Tour_ImportFileLocation.setEnabled(isPartOfATourSelected);
+      _chkData_Tour_Markers.setEnabled(isPartOfATourSelected);
+      _chkData_Tour_Calories.setEnabled(isPartOfATourSelected);
 
       _chkData_TimeSlice_Battery.setEnabled(isTimeSlice);
       _chkData_TimeSlice_Cadence.setEnabled(isTimeSlice);
@@ -721,8 +735,11 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_TimeSlice_TourTimerPauses.setEnabled(isTimeSlice);
       _chkData_TimeSlice_Training.setEnabled(isTimeSlice);
 
-      _dtTourDate_From.setEnabled(isToursBetweenDates);
-      _dtTourDate_Until.setEnabled(isToursBetweenDates);
+      _dtTourDate_From.setEnabled(isTourBetweenDates);
+      _dtTourDate_Until.setEnabled(isTourBetweenDates);
+
+      _btnDeselectAll.setEnabled(isPartOfATourSelected
+            && (isTimeSliceSelected || isTourDataSelected || isAllTimeSlicesSelected));
 
       // OK button
       getButton(IDialogConstants.OK_ID).setEnabled(isTourSelected && isDataSelected && isValid);
@@ -803,7 +820,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          final List<TourValueType> tourValueTypes = new ArrayList<>();
 
-         if (_chkData_EntireTour.getSelection()) {
+         if (_rdoData_EntireTour.getSelection()) {
 
             tourValueTypes.add(TourValueType.ENTIRE_TOUR);
 
@@ -847,7 +864,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       _chkData_AllTimeSlices.setSelection(false);
       _chkData_TimeSlice_Elevation.setSelection(false);
-      _chkData_EntireTour.setSelection(false);
 
       _chkData_Tour_Calories.setSelection(false);
       _chkData_Tour_ImportFileLocation.setSelection(false);
@@ -930,7 +946,8 @@ public class DialogReimportTours extends TitleAreaDialog {
       // Data to re-import
       final boolean isReimportEntireTour = _state.getBoolean(STATE_IS_IMPORT_ENTIRE_TOUR);
       _chkData_AllTimeSlices              .setSelection(_state.getBoolean(STATE_IS_IMPORT_ALL_TIME_SLICES));
-      _chkData_EntireTour                 .setSelection(isReimportEntireTour);
+      _rdoData_EntireTour                 .setSelection(isReimportEntireTour);
+      _rdoData_PartOfATour                .setSelection(isReimportEntireTour == false);
 
       _chkData_Tour_Calories              .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__CALORIES));
       _chkData_Tour_ImportFileLocation    .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__FILE_LOCATION));
@@ -965,13 +982,13 @@ public class DialogReimportTours extends TitleAreaDialog {
       Util.setStateDate(_state, STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL,  _dtTourDate_Until);
 
       // Data to re-import
-      _state.put(STATE_IS_IMPORT_ALL_TIME_SLICES,              _chkData_AllTimeSlices.getSelection());
-      _state.put(STATE_IS_IMPORT_ENTIRE_TOUR,                  _chkData_EntireTour.getSelection());
+      _state.put(STATE_IS_IMPORT_ENTIRE_TOUR,                  _rdoData_EntireTour.getSelection());
 
       _state.put(STATE_IS_IMPORT_TOUR__CALORIES,               _chkData_Tour_Calories.getSelection());
       _state.put(STATE_IS_IMPORT_TOUR__FILE_LOCATION,          _chkData_Tour_ImportFileLocation.getSelection());
-      _state.put(STATE_IS_IMPORT_TOUR__MARKERS,                 _chkData_Tour_Markers.getSelection());
+      _state.put(STATE_IS_IMPORT_TOUR__MARKERS,                _chkData_Tour_Markers.getSelection());
 
+      _state.put(STATE_IS_IMPORT_ALL_TIME_SLICES,              _chkData_AllTimeSlices.getSelection());
       _state.put(STATE_IS_IMPORT_TIME_SLICE__BATTERY,          _chkData_TimeSlice_Battery.getSelection());
       _state.put(STATE_IS_IMPORT_TIME_SLICE__CADENCE,          _chkData_TimeSlice_Cadence.getSelection());
       _state.put(STATE_IS_IMPORT_TIME_SLICE__ELEVATION,        _chkData_TimeSlice_Elevation.getSelection());

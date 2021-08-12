@@ -407,6 +407,7 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
    public static String        Dialog_ReimportTours_Group_Data;
    public static String        Dialog_ReimportTours_Group_Data_Tooltip;
+   public static String        Dialog_ReimportTours_Radio_TourPart;
 
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
