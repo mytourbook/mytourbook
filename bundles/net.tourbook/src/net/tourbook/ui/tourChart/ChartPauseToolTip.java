@@ -47,6 +47,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
+   //todo fb display a gray area hwen hovering just like the markers
+   // make sure it works with multiple tours
+
    private static final String  GRAPH_LABEL_TIME    = net.tourbook.common.Messages.Graph_Label_Time;
 
    private static final int     DEFAULT_TEXT_WIDTH  = 50;
