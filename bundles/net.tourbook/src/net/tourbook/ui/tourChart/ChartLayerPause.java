@@ -41,7 +41,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private long             _hoveredEventTime;
 
-   private ChartLabel       _hoveredLabel;
+   private ChartLabelPause  _hoveredLabel;
 
    private int              _devXPause;
    private int              _devYPause;
@@ -94,16 +94,16 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       /*
        * Draw pause point and label
        */
-      for (final ChartLabel chartLabel : _chartPauseConfig.chartLabels) {
+      for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
 
-         final float yValue = yValues[chartLabel.serieIndex];
+         final float yValue = yValues[chartLabelPause.serieIndex];
          final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
-         final double virtualXPos = chartLabel.graphX * scaleX;
+         final double virtualXPos = chartLabelPause.graphX * scaleX;
          _devXPause = (int) (virtualXPos - devVirtualGraphImageOffset);
          _devYPause = devYBottom - devYGraph;
 
-         final Point labelExtend = gc.textExtent(chartLabel.pauseDuration);
+         final Point labelExtend = gc.textExtent(chartLabelPause.pauseDuration);
 
          /*
           * Get pause point top/left position
@@ -131,8 +131,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          adjustLabelPosition(labelWidth, labelHeight);
 
          // add an additional offset which is defined for all pauses in the pause properties slideout
-         _devXPause += chartLabel.labelXOffset;
-         _devYPause -= chartLabel.labelYOffset;
+         _devXPause += chartLabelPause.labelXOffset;
+         _devYPause -= chartLabelPause.labelYOffset;
 
          /*
           * label is horizontal
@@ -151,8 +151,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             _devXPause = (int) (devVirtualGraphWidth - labelWidth - devVirtualGraphImageOffset - 2);
          }
 
-         chartLabel.devXPause = _devXPause;
-         chartLabel.devYPause = _devYPause;
+         chartLabelPause.devXPause = _devXPause;
+         chartLabelPause.devYPause = _devYPause;
 
          // force label to be not below the bottom
          if (_devYPause + labelHeight > devYBottom) {
@@ -164,7 +164,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             _devYPause = devYTop;
          }
 
-         final String pauseDurationText = chartLabel.pauseDuration;
+         final String pauseDurationText = chartLabelPause.pauseDuration;
          final Point textExtent = gc.textExtent(pauseDurationText);
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
@@ -218,38 +218,14 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    }
 
 
-   private ChartLabel retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
+   private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
 
-      /*
-       * Check sign images first, they have a higher priority
-       */
-      for (final ChartLabel chartLabel : _chartPauseConfig.chartLabels) {
-
-         final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
-         if (imageBounds != null) {
-
-            final int devXImage = imageBounds.x;
-            final int devYImage = imageBounds.y;
-            final int imageWidth = imageBounds.width;
-            final int imageHeight = imageBounds.height;
-
-            if (devXMouse > devXImage
-                  && devXMouse < devXImage + imageWidth
-                  && devYMouse > devYImage
-                  && devYMouse < devYImage + imageHeight) {
-
-               // marker sign image is hit
-               return chartLabel;
-            }
-         }
-      }
-
-      for (final ChartLabel chartLabel : _chartPauseConfig.chartLabels) {
+      for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
 
          /*
           * Check sign label
           */
-         final Rectangle paintedLabel = chartLabel.paintedLabel;
+         final Rectangle paintedLabel = chartLabelPause.paintedLabel;
          if (paintedLabel != null) {
 
             final int devXLabel = paintedLabel.x;
@@ -261,15 +237,15 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
                   && devYMouse < devYLabel + paintedLabel.height + PAUSE_HOVER_SIZE) {
 
                // horizontal label is hit
-               return chartLabel;
+               return chartLabelPause;
             }
          }
 
          /*
           * Check marker point
           */
-         final int devXMarker = chartLabel.devXPause;
-         final int devYMarker = chartLabel.devYPause;
+         final int devXMarker = chartLabelPause.devXPause;
+         final int devYMarker = chartLabelPause.devYPause;
 
          if (devXMouse > devXMarker - PAUSE_HOVER_SIZE
                && devXMouse < devXMarker + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE
@@ -277,14 +253,14 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
                && devYMouse < devYMarker + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE) {
 
             // marker point is hit
-            return chartLabel;
+            return chartLabelPause;
          }
       }
 
       return null;
    }
 
-   public ChartLabel retrieveHoveredPause(final ChartMouseEvent mouseEvent) {
+   public ChartLabelPause retrieveHoveredPause(final ChartMouseEvent mouseEvent) {
 
       if (mouseEvent.eventTime == _hoveredEventTime) {
          return _hoveredLabel;

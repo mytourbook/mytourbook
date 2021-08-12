@@ -2043,18 +2043,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param xAxisSerieIndex
     * @return
     */
-   private ChartLabel createLayer_Pause_ChartLabel(final String pauseDuration,
+   private ChartLabelPause createLayer_Pause_ChartLabel(final String pauseDuration,
                                                    final double[] xAxisSerie,
                                                    final int xAxisSerieIndex) {
 
-      final ChartLabel chartLabel = new ChartLabel();
+      final ChartLabelPause chartLabelPause = new ChartLabelPause();
 
-      chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
-      chartLabel.serieIndex = xAxisSerieIndex;
+      chartLabelPause.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabelPause.serieIndex = xAxisSerieIndex;
 
-      chartLabel.pauseDuration = pauseDuration;
+      chartLabelPause.pauseDuration = pauseDuration;
 
-      return chartLabel;
+      return chartLabelPause;
    }
 
    /**
@@ -2139,12 +2139,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                }
 
                if (tourSerieIndex < xAxisSerie.length) {
-                  final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
+                  final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                         pauseDurationText,
                         xAxisSerie,
                         tourSerieIndex);
 
-                  chartPauseConfig.chartLabels.add(chartLabel);
+                  chartPauseConfig.chartLabelPauses.add(chartLabelPause);
                }
 
                ++currentTourPauseIndex;
@@ -2183,12 +2183,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                continue;
             }
 
-            final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
+            final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                   pauseDurationText,
                   xAxisSerie,
                   serieIndex);
 
-            chartPauseConfig.chartLabels.add(chartLabel);
+            chartPauseConfig.chartLabelPauses.add(chartLabelPause);
          }
       }
    }
@@ -3442,7 +3442,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       if (_layerPause != null) {
 
-         final ChartLabel hoveredLabel = _layerPause.retrieveHoveredPause(mouseEvent);
+         final ChartLabelPause hoveredLabel = _layerPause.retrieveHoveredPause(mouseEvent);
 
          final boolean isPauseHovered = hoveredLabel != null;
          if (isPauseHovered) {

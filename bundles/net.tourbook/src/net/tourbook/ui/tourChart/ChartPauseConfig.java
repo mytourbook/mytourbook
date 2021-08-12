@@ -22,12 +22,12 @@ import org.eclipse.swt.graphics.RGB;
 
 public class ChartPauseConfig {
 
-   public RGB                    markerColorDefault_Light;
-   public RGB                    markerColorDefault_Dark;
-   public RGB                    markerColorDevice_Light;
-   public RGB                    markerColorDevice_Dark;
-   public RGB                    markerColorHidden_Light;
-   public RGB                    markerColorHidden_Dark;
+   public RGB                         markerColorDefault_Light;
+   public RGB                         markerColorDefault_Dark;
+   public RGB                         markerColorDevice_Light;
+   public RGB                         markerColorDevice_Dark;
+   public RGB                         markerColorHidden_Light;
+   public RGB                         markerColorHidden_Dark;
 
-   public final List<ChartLabel> chartLabels = new ArrayList<>();
+   public final List<ChartLabelPause> chartLabelPauses = new ArrayList<>();
 }

@@ -105,7 +105,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    private TourChart                       _tourChart;
    private TourData                        _tourData;
 
-   private ChartLabel                      _hoveredLabel;
+   private ChartLabelPause                 _hoveredLabel;
    private TourMarker                      _hoveredTourMarker;
 
    /**
@@ -626,20 +626,19 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    private Rectangle getHoveredRect() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
-      final int devMarkerPointSizeRaw = _hoveredLabel.devMarkerPointSize;
 
-      Rectangle rectHovered = new Rectangle(_hoveredLabel.devXMarker, _hoveredLabel.devYMarker, 1, 1);
+      Rectangle rectHovered = new Rectangle(_hoveredLabel.devXPause, _hoveredLabel.devYPause, 1, 1);
 
       // add marker rect
-      if (_cmc.isShowMarkerPoint && devMarkerPointSizeRaw > 0) {
+      if (_cmc.isShowMarkerPoint) {
 
-         int devMarkerPointSize = devMarkerPointSizeRaw;
+         int devMarkerPointSize = 1;
          if (devMarkerPointSize < 1) {
             devMarkerPointSize = 1;
          }
 
-         final int devMarkerX = _hoveredLabel.devXMarker - hoverSize;
-         final int devMarkerY = _hoveredLabel.devYMarker - hoverSize;
+         final int devMarkerX = _hoveredLabel.devXPause - hoverSize;
+         final int devMarkerY = _hoveredLabel.devYPause - hoverSize;
          final int devMarkerSize = devMarkerPointSize + 2 * hoverSize;
 
          final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
@@ -954,7 +953,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       hideNow();
    }
 
-   void open(final ChartLabel hoveredLabel) {
+   void open(final ChartLabelPause hoveredLabel) {
 
       boolean isKeepOpened = false;
 
@@ -986,7 +985,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          // another marker is hovered, show tooltip
 
          _hoveredLabel = hoveredLabel;
-         _hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
+         //_hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
 
          showToolTip();
       }
