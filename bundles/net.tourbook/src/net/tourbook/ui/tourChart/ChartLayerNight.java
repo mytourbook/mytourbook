@@ -73,7 +73,7 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
       final double scaleX = graphDrawingData.getScaleX();
       final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
       final int devYBottom = graphDrawingData.getDevYBottom();
-      for (final ChartLabel chartLabel : _chartNightConfig.chartLabels) {
+      for (final ChartLabel chartLabel : _chartNightConfig.chartLabelNightSections) {
 
          final double virtualXPos = chartLabel.graphX * scaleX;
          final int devXNightSectionStart = (int) (virtualXPos - devVirtualGraphImageOffset);

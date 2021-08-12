@@ -1238,13 +1238,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                                final int xAxisSerieIndex,
                                                final int xAxisEndSerieIndex) {
 
-      final ChartLabel chartLabel = new ChartLabel();
+      final ChartLabelNight chartLabelNight = new ChartLabelNight();
 
-      chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
-      chartLabel.graphXEnd = xAxisSerie[xAxisEndSerieIndex];
-      chartLabel.serieIndex = xAxisSerieIndex;
+      chartLabelNight.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabelNight.graphXEnd = xAxisSerie[xAxisEndSerieIndex];
+      chartLabelNight.serieIndex = xAxisSerieIndex;
 
-      chartNightConfig.chartLabels.add(chartLabel);
+      chartNightConfig.chartLabelNightSections.add(chartLabelNight);
    }
 
    /**

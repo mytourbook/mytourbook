@@ -13,16 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/*
- * Administrator 10.08.2005
- */
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.common.UI;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-public class ChartLabelPause {
+public class ChartLabelPause extends ChartLabel {
 
    public boolean isVisible;
    public boolean isDescription;

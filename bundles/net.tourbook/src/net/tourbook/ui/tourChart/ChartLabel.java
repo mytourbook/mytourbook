@@ -20,7 +20,7 @@ package net.tourbook.ui.tourChart;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-public class ChartLabel {
+public abstract class ChartLabel {
 
    public boolean   isVisible;
    public boolean   isDescription;

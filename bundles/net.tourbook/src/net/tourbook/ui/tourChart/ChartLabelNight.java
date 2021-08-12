@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.util.ArrayList;
-import java.util.List;
+public class ChartLabelNight extends ChartLabel {
 
-public class ChartNightConfig {
-
-   public final List<ChartLabelNight> chartLabelNightSections = new ArrayList<>();
 }
