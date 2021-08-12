@@ -792,12 +792,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private boolean               hasGeoData;
 
+   // ############################################# BATTERY #############################################
+
+   /**
+    * Battery start/end values are used for the statistic views,
+    *
+    * -1 indicate that the value is not yet set
+    */
+   private short                 battery_Percentage_Start      = -1;
+   private short                 battery_Percentage_End        = -1;
+
     /*
      * The geo bound values are in microdegrees (degrees * 10^6).
      */
 
-//   private int                 latitudeMinE6;                        // db-version 35
-//   private int                 latitudeMaxE6;                        // db-version 35
+//   private int                 latitudeMinE6;                      // db-version 35
+//   private int                 latitudeMaxE6;                      // db-version 35
 //   private int                 longitudeMinE6;                     // db-version 35
 //   private int                 longitudeMaxE6;                     // db-version 35
 
@@ -1635,6 +1645,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public int[]         swim_Time;
+
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
@@ -1644,6 +1655,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private float[]      _swim_LengthType_UI;
+
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
@@ -1652,6 +1664,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private float[]      _swim_Strokes_UI;
+
    /**
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
@@ -1661,6 +1674,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private float[]      _swim_StrokeStyle_UI;
+
    /**
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
@@ -1704,14 +1718,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * A timer pause is a device event triggered by the user.
     */
    @Transient
-   private long[]           pausedTime_Start;
+   private long[]       pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
     * A timer pause is a device event triggered by the user.
     */
    @Transient
-   private long[]           pausedTime_End;
+   private long[]       pausedTime_End;
+
+   /**
+    * Containing the battery time in seconds, relative to the tour start time
+    *
+    * @since after 21.6
+    */
+   @Transient
+   private int[]         battery_Time;
+
+   /**
+    * Containing the battery percentage value
+    *
+    * @since after 21.6
+    */
+   @Transient
+   private short[]       battery_Percentage;
+
 
 // SET_FORMATTING_ON
 
@@ -7079,6 +7110,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return avgTemperature;
    }
 
+   public short[] getBattery_Percentage() {
+      return battery_Percentage;
+   }
+
+   public short getBattery_Percentage_End() {
+      return battery_Percentage_End;
+   }
+
+   public short getBattery_Percentage_Start() {
+      return battery_Percentage_Start;
+   }
+
+   /**
+    * @return Returns battery time in seconds, relative to the tour start time
+    */
+   public int[] getBattery_Time() {
+      return battery_Time;
+   }
+
    /**
     * @return Returns the body fat.
     */
@@ -9577,6 +9627,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // currently only surfing data can be made visible/hidden
       visibleDataPointSerie      = serieData.visiblePoints_Surfing;
 
+      // battery
+      battery_Percentage         = serieData.battery_Percentage;
+      battery_Time               = serieData.battery_Time;
+
 // SET_FORMATTING_ON
    }
 
@@ -9617,11 +9671,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.powerSerie20 = powerSerie;
       }
 
-      serieData.latitudeE6      = convertDataSeries_ToE6(latitudeSerie);
-      serieData.longitudeE6     = convertDataSeries_ToE6(longitudeSerie);
+      serieData.latitudeE6          = convertDataSeries_ToE6(latitudeSerie);
+      serieData.longitudeE6         = convertDataSeries_ToE6(longitudeSerie);
 
-
-      serieData.gears         = gearSerie;
+      serieData.gears               = gearSerie;
 
       serieData.pulseTimes          = pulseTime_Milliseconds;
       serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
@@ -9645,7 +9698,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.cadenceSerie20 = null;
       }
 
+      // surfing
       serieData.visiblePoints_Surfing        = visiblePoints_ForSurfing;
+
+      // battery
+      serieData.battery_Percentage           = battery_Percentage;
+      serieData.battery_Time                 = battery_Time;
 
 // SET_FORMATTING_ON
 
@@ -9752,6 +9810,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setAvgTemperature(final float avgTemperature) {
       this.avgTemperature = avgTemperature;
+   }
+
+   public void setBattery_Percentage(final short[] battery_Percentage) {
+      this.battery_Percentage = battery_Percentage;
+   }
+
+   public void setBattery_Percentage_End(final short battery_Percentage_End) {
+      this.battery_Percentage_End = battery_Percentage_End;
+   }
+
+   public void setBattery_Percentage_Start(final short battery_Percentage_Start) {
+      this.battery_Percentage_Start = battery_Percentage_Start;
+   }
+
+   public void setBattery_Time(final int[] battery_Time) {
+      this.battery_Time = battery_Time;
    }
 
    /**

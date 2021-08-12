@@ -3682,11 +3682,18 @@ public class TourDatabase {
 
             // version 42 start  -  20.11.1
 
-            + " tourDeviceTime_Recorded                       BIGINT,                     " + NL //$NON-NLS-1$
-            + " tourDeviceTime_Paused                         BIGINT,                     " + NL //$NON-NLS-1$
-            + " bodyFat                                       FLOAT,                      " + NL //$NON-NLS-1$
+            + " tourDeviceTime_Recorded               BIGINT,                            " + NL //$NON-NLS-1$
+            + " tourDeviceTime_Paused                 BIGINT,                            " + NL //$NON-NLS-1$
+            + " bodyFat                               FLOAT,                             " + NL //$NON-NLS-1$
 
             // version 42 end
+
+            // version 45 start  -  after 21.6
+
+            + " Battery_Percentage_Start              SMALLINT DEFAULT 0,                " + NL //$NON-NLS-1$
+            + " Battery_Percentage_End                SMALLINT DEFAULT 0,                " + NL //$NON-NLS-1$
+
+            // version 45 end
 
             //            // version 35 start  -  18.?
             //
@@ -8468,6 +8475,10 @@ public class TourDatabase {
          if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUE) == false) {
             createTable_DeviceSensorValues(stmt);
          }
+
+         // add new fields
+         SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start", DEFAULT_IGNORED); //$NON-NLS-1$
+         SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_End", DEFAULT_IGNORED); //$NON-NLS-1$
       }
       stmt.close();
 

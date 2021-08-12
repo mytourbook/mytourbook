@@ -90,6 +90,9 @@ public class FitData {
    private List<Long>                    _pausedTime_Start      = new ArrayList<>();
    private final List<Long>              _pausedTime_End        = new ArrayList<>();
 
+   private final List<Long>              _allBatteryTime        = new ArrayList<>();
+   private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
+
    private TimeData                      _current_TimeData;
    private TimeData                      _lastAdded_TimeData;
    private TimeData                      _previous_TimeData;
@@ -271,9 +274,10 @@ public class FitData {
          _tourData.computeComputedValues();
          _tourData.computeAltimeterGradientSerie();
 
-         // In the case where the power was retrieved from a developer field,
-         // the fit file didn't contain the average power and we need
-         // to compute it ourselves.
+         /*
+          * In the case where the power was retrieved from a developer field, the fit file didn't
+          * contain the average power and we need to compute it ourselves.
+          */
          if (isComputeAveragePower) {
             final float[] powerSerie = _tourData.getPowerSerie();
             if (powerSerie != null) {
@@ -282,6 +286,7 @@ public class FitData {
          }
 
          finalizeTour_Elevation(_tourData);
+         finalizeTour_Battery(_tourData);
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData, _allGearData);
@@ -289,8 +294,38 @@ public class FitData {
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
-         finalizeTour_Type();
+         finalizeTour_Type(_tourData);
       }
+   }
+
+   private void finalizeTour_Battery(final TourData tourData) {
+
+      final int numBatteryItems = _allBatteryTime.size();
+
+      if (numBatteryItems == 0) {
+         return;
+      }
+
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int[] allBatteryTime = new int[numBatteryItems];
+      final short[] allBatteryPercentage = new short[numBatteryItems];
+
+      for (int serieIndex = 0; serieIndex < numBatteryItems; serieIndex++) {
+
+         // convert absolute time --> relative time
+         final long absoluteTime = _allBatteryTime.get(serieIndex);
+         final int relativeTime = (int) (absoluteTime - tourStartTime);
+
+         allBatteryPercentage[serieIndex] = _allBatteryPercentage.get(serieIndex);
+         allBatteryTime[serieIndex] = relativeTime;
+      }
+
+      tourData.setBattery_Time(allBatteryTime);
+      tourData.setBattery_Percentage(allBatteryPercentage);
+
+      tourData.setBattery_Percentage_Start(allBatteryPercentage[0]);
+      tourData.setBattery_Percentage_End(allBatteryPercentage[numBatteryItems - 1]);
    }
 
    /**
@@ -497,7 +532,7 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-   private void finalizeTour_Type() {
+   private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
       if (_isFitImportTourType) {
@@ -506,20 +541,20 @@ public class FitData {
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
 
-            applyTour_Type(_tourData, _sportName);
+            applyTour_Type(tourData, _sportName);
             break;
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
 
-            applyTour_Type(_tourData, _profileName);
+            applyTour_Type(tourData, _profileName);
             break;
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
 
             if (!UI.EMPTY_STRING.equals(_profileName)) {
-               applyTour_Type(_tourData, _profileName);
+               applyTour_Type(tourData, _profileName);
             } else {
-               applyTour_Type(_tourData, _sportName);
+               applyTour_Type(tourData, _sportName);
             }
             break;
 
@@ -532,7 +567,7 @@ public class FitData {
                spacerText = UI.DASH_WITH_SPACE;
             }
 
-            applyTour_Type(_tourData, _sportName + spacerText + _profileName);
+            applyTour_Type(tourData, _sportName + spacerText + _profileName);
             break;
          }
       }
@@ -540,6 +575,14 @@ public class FitData {
 
    public List<TimeData> getAllTimeData() {
       return _allTimeData;
+   }
+
+   public List<Short> getBattery_Percentage() {
+      return _allBatteryPercentage;
+   }
+
+   public List<Long> getBattery_Time() {
+      return _allBatteryTime;
    }
 
    public TimeData getCurrent_TimeData() {

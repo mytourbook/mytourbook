@@ -436,25 +436,65 @@ public class FitDataReader extends TourbookDevice {
       return isSkipped;
    }
 
-   private void onMessage_ForNotDocumentedMesg(final Mesg mesg, final FitData fitData) {
+   /**
+    * <pre>
+    *
+    *    Java            #       Timestamp                                                  Num      Name      Value Units
+    *
+    *    Message  104   Device Battery (not documented)  Fields: 5
+    *    [FitDataReader] 0       1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0   253   unknown  961412304
+    *    [FitDataReader] 1       1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     0   unknown       4168
+    *    [FitDataReader] 2       1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     1   unknown       -112
+    *    [FitDataReader] 3       1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     2   unknown         88
+    *    [FitDataReader] 4       1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     3   unknown         49
+    *
+    *    ...
+    *
+    *    Message  104   Device Battery (not documented)  Fields: 5
+    *    [FitDataReader] 270     1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0   253   unknown  961428506
+    *    [FitDataReader] 271     1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     0   unknown       3955
+    *    [FitDataReader] 272     1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     1   unknown       -105
+    *    [FitDataReader] 273     1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     2   unknown         69
+    *    [FitDataReader] 274     1989-12-31T01:00+01:00[Europe/Berlin]      631065600   0     3   unknown         50
+    * </pre>
+    *
+    * @param mesg
+    * @param fitData
+    */
+   private void onMesg_104_DeviceBattery(final Mesg mesg, final FitData fitData) {
 
-      final int mesgNum = mesg.getNum();
+      /*
+       * Get time
+       */
+      final Field fieldTime = mesg.getField(253);
+      if (fieldTime != null) {
 
-      switch (mesgNum) {
-      case 104:
-         // Device Battery (not documented)
-         break;
+         final Object fieldValue = fieldTime.getValue();
 
-      case 147:
-         // Registered Device Sensor (not documented)
-         break;
+         if (fieldValue instanceof Long) {
 
-      default:
-         break;
+            final Long garminTimestamp = (Long) fieldValue;
+            final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+
+            fitData.getBattery_Time().add(javaTime);
+         }
+      }
+
+      /*
+       * Get battery percentage
+       */
+      final Field fieldPercentage = mesg.getField(2);
+      if (fieldPercentage != null) {
+
+         final Object fieldValue = fieldPercentage.getValue();
+
+         if (fieldValue instanceof Short) {
+            fitData.getBattery_Percentage().add((Short) fieldValue);
+         }
       }
    }
 
-   private void onMessage_MesgForLogging(final Mesg mesg) {
+   private void onMesg_ForDebugLogging(final Mesg mesg) {
 
       long garminTimestamp = 0;
 
@@ -497,11 +537,11 @@ public class FitDataReader extends TourbookDevice {
 
             switch (mesgNum) {
             case 104:
-               messageName = "Device Battery (not documented)";
+               messageName = "Device Battery (not documented)"; //$NON-NLS-1$
                break;
 
             case 147:
-               messageName = "Registered Device Sensor (not documented)";
+               messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
                break;
 
             default:
@@ -514,7 +554,7 @@ public class FitDataReader extends TourbookDevice {
          final boolean isLogMessageHeader = true;
          if (isLogMessageHeader) {
 
-            System.out.println(String.format("Message  %3d   %s  Fields: %d",
+            System.out.println(String.format("Message  %3d   %s  Fields: %d", //$NON-NLS-1$
 
                   mesgNum,
                   messageName,
@@ -651,6 +691,24 @@ public class FitDataReader extends TourbookDevice {
       }
    }
 
+   private void onMesg_ForNotDocumentedMesg(final Mesg mesg, final FitData fitData) {
+
+      final int mesgNum = mesg.getNum();
+
+      switch (mesgNum) {
+      case 104:
+         onMesg_104_DeviceBattery(mesg, fitData);
+         break;
+
+      case 147:
+         // Registered Device Sensor (not documented)
+         break;
+
+      default:
+         break;
+      }
+   }
+
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
@@ -684,7 +742,7 @@ public class FitDataReader extends TourbookDevice {
          fitBroadcaster.addListener(new MesgListener_Record(fitData));
          fitBroadcaster.addListener(new MesgListener_Session(fitData));
          fitBroadcaster.addListener(new MesgListener_Sport(fitData));
-         fitBroadcaster.addListener((MesgListener) mesg -> onMessage_ForNotDocumentedMesg(mesg, fitData));
+         fitBroadcaster.addListener((MesgListener) mesg -> onMesg_ForNotDocumentedMesg(mesg, fitData));
 
          if (_isLogging_FitData) {
 
@@ -708,7 +766,7 @@ public class FitDataReader extends TourbookDevice {
                   + "%-70s" //   Timestamp   //$NON-NLS-1$
                   + "%-5s" //    Num         //$NON-NLS-1$
                   + "%39s" //    Name        //$NON-NLS-1$
-                  + "%20s" //    Value       //$NON-NLS-1$
+                  + "%21s" //    Value       //$NON-NLS-1$
                   + " %s", //    Units       //$NON-NLS-1$
 
                   "Java", //                 //$NON-NLS-1$
@@ -726,7 +784,7 @@ public class FitDataReader extends TourbookDevice {
             _logCounter = 0;
 
             // add debug logger which is listening to all events
-            fitBroadcaster.addListener((MesgListener) this::onMessage_MesgForLogging);
+            fitBroadcaster.addListener((MesgListener) this::onMesg_ForDebugLogging);
          }
 
          fitBroadcaster.run(fileInputStream);
