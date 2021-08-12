@@ -23,10 +23,6 @@ Issues
 New
 ===
 
-* Tour re-import (Frederic) 
-  - Using multi-threading to speed up the re-import process when having selected a lot of tours (Note: This requires to skip tours for which the file location isn't found)
-
-
 
 Improvements
 ============

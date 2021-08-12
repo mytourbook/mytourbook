@@ -134,7 +134,7 @@ public class TourLogView extends ViewPart {
       }
 
       // Run always async that the flow is not blocked.
-      Display.getDefault().asyncExec(() -> {
+      Display.getDefault().syncExec(() -> {
 
          String jsText = UI.replaceJS_BackSlash(tourLog.message);
          jsText = UI.replaceJS_Apostrophe(jsText);
