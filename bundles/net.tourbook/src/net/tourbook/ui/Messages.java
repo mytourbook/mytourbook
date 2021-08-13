@@ -213,6 +213,18 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_CollateEvent_Label;
    public static String        ColumnFactory_CollateEvent_Tooltip;
+   public static String ColumnFactory_Device_BatterySoC_End_Header;
+
+   public static String ColumnFactory_Device_BatterySoC_End_Header_Tooltip;
+
+   public static String ColumnFactory_Device_BatterySoC_End_Label;
+
+   public static String ColumnFactory_Device_BatterySoC_Start_Header;
+
+   public static String ColumnFactory_Device_BatterySoC_Start_Header_Tooltip;
+
+   public static String ColumnFactory_Device_BatterySoC_Start_Label;
+
    public static String        ColumnFactory_Diff_Header;
    public static String        ColumnFactory_DistanceDelta_Label;
    public static String        ColumnFactory_DistanceDelta_Tooltip;

@@ -679,17 +679,20 @@ public class TourDatabase {
       }
 
       /**
+       * Combine tableName and columnName to the indexName
+       *
        * @param stmt
        * @param tableName
-       * @param indexAndColumnName
+       * @param columnName
        * @throws SQLException
        */
-      private static void CreateIndex(final Statement stmt,
-                                      final String tableName,
-                                      final String indexName,
-                                      final String columnName) throws SQLException {
+      private static void CreateIndex_Combined(final Statement stmt,
+                                               final String tableName,
+                                               final String columnName) throws SQLException {
 
-         if (isIndexAvailable(stmt.getConnection(), tableName, indexName)) {
+         final String combinedIndexName = tableName + "__" + columnName;
+
+         if (isIndexAvailable(stmt.getConnection(), tableName, combinedIndexName)) {
 
             // index already exist -> nothing to do
 
@@ -698,9 +701,9 @@ public class TourDatabase {
 
          final String sql = UI.EMPTY_STRING
 
-               + "CREATE INDEX " + indexName //       //$NON-NLS-1$
-               + " ON " + tableName //                //$NON-NLS-1$
-               + " (" + columnName + ")"; //          //$NON-NLS-1$ //$NON-NLS-2$
+               + "CREATE INDEX " + combinedIndexName //     //$NON-NLS-1$
+               + " ON " + tableName //                      //$NON-NLS-1$
+               + " (" + columnName + ")"; //                //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
       }
@@ -3283,10 +3286,7 @@ public class TourDatabase {
             + ")" //                                                                          //$NON-NLS-1$
       );
 
-      SQL.CreateIndex(stmt,
-            TABLE_DEVICE_SENSOR_VALUE,
-            TABLE_DEVICE_SENSOR_VALUE + "_TourStartTime",
-            "TourStartTime"); //$NON-NLS-1$
+      SQL.CreateIndex_Combined(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
    }
 
    /**
@@ -3726,6 +3726,8 @@ public class TourDatabase {
       createIndex_TourData_033(stmt);
 //    createIndex_TourData_035(stmt);
       createIndex_TourData_037(stmt);
+
+      SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
    }
 
    /**
@@ -8479,6 +8481,8 @@ public class TourDatabase {
          // add new fields
          SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start", DEFAULT_IGNORED); //$NON-NLS-1$
          SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_End", DEFAULT_IGNORED); //$NON-NLS-1$
+
+         SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
       }
       stmt.close();
 

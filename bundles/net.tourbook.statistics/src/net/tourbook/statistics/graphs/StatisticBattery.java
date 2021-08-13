@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
@@ -36,19 +35,14 @@ import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistic.StatisticContext;
-import net.tourbook.statistic.StatisticView;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.IBarSelectionProvider;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.statistics.StatisticTourToolTip;
 import net.tourbook.statistics.TourChartContextProvider;
-import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourInfoUI;
@@ -68,89 +62,41 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPart;
 
 public class StatisticBattery extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
-   private TourStatisticData_Day       _statisticData_Training;
-   private DataProvider_Tour_Day       _tourDay_DataProvider    = new DataProvider_Tour_Day();
+   private TourStatisticData_Battery   _batteryData;
+   private DataProvider_Battery        _batteryDataProvider     = new DataProvider_Battery();
 
-   private TourTypeFilter              _activeTourTypeFilter;
    private TourPerson                  _activePerson;
-
-   private long                        _selectedTourId          = -1;
-
+   private TourTypeFilter              _activeTourTypeFiler;
    private int                         _currentYear;
    private int                         _numberOfYears;
-   private boolean                     _isForceReloadData;
 
    private Chart                       _chart;
+
    private StatisticContext            _statContext;
 
-   private final MinMaxKeeper_YData    _minMaxKeeper            = new MinMaxKeeper_YData();
-
-   private ChartDataYSerie             _yData_Duration;
-   private ChartDataYSerie             _yData_TrainingPerformance;
-
-   private boolean                     _isSynchScaleEnabled;
-
-   private ITourEventListener          _tourPropertyListener;
    private StatisticTourToolTip        _tourToolTip;
-
    private TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
 
+   private final MinMaxKeeper_YData    _minMaxKeeper            = new MinMaxKeeper_YData();
+   private boolean                     _ifIsSynchScaleEnabled;
+
+   private Long                        _selectedTourId          = null;
+
    private final TourInfoUI            _tourInfoUI              = new TourInfoUI();
-
-   private void addTourPropertyListener() {
-
-      _tourPropertyListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part,
-                                 final TourEventId propertyId,
-                                 final Object propertyData) {
-
-            if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
-
-               // check if a tour was modified
-               final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
-               if (modifiedTours != null) {
-
-                  for (final TourData modifiedTourData : modifiedTours) {
-
-                     final long modifiedTourId = modifiedTourData.getTourId();
-
-                     final long[] tourIds = _statisticData_Training.allTourIds;
-                     for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
-
-                        final long tourId = tourIds[tourIdIndex];
-
-                        if (tourId == modifiedTourId) {
-
-                           // set new tour title
-                           _statisticData_Training.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
-
-                           break;
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      };
-
-      TourManager.getInstance().addTourEventListener(_tourPropertyListener);
-   }
 
    /**
     * create segments for the chart
     */
-   ChartStatisticSegments createChartSegments(final TourStatisticData_Day tourTimeData) {
+   private ChartStatisticSegments createChartSegments(final TourStatisticData_Battery batteryData) {
 
       final double[] segmentStart = new double[_numberOfYears];
       final double[] segmentEnd = new double[_numberOfYears];
       final String[] segmentTitle = new String[_numberOfYears];
 
-      final int[] allYearDays = tourTimeData.allYearDays;
+      final int[] allYearDays = batteryData.allYear_NumDays;
       final int oldestYear = _currentYear - _numberOfYears + 1;
       int yearDaysSum = 0;
 
@@ -171,9 +117,9 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       chartSegments.segmentEndValue = segmentEnd;
       chartSegments.segmentTitle = segmentTitle;
 
-      chartSegments.years = tourTimeData.allYearNumbers;
-      chartSegments.yearDays = tourTimeData.allYearDays;
-      chartSegments.allValues = tourTimeData.allDaysInAllYears;
+      chartSegments.years = batteryData.allYear_Numbers;
+      chartSegments.yearDays = batteryData.allYear_NumDays;
+      chartSegments.allValues = batteryData.numDaysInAllYears;
 
       return chartSegments;
    }
@@ -181,9 +127,10 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
    @Override
    public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
-      // create statistic chart
+      // chart widget page
       _chart = new Chart(parent, SWT.FLAT);
       _chart.setShowZoomActions(true);
+      _chart.setDrawBarChartAtBottom(false);
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
       // set tour info icon into the left axis
@@ -202,22 +149,20 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
       _chart.addBarSelectionListener(new IBarSelectionListener() {
          @Override
-         public void selectionChanged(final int serieIndex, final int valueIndex) {
-            if (_statisticData_Training.allTypeIds.length > 0) {
+         public void selectionChanged(final int serieIndex, int valueIndex) {
 
-               _selectedTourId = _statisticData_Training.allTourIds[valueIndex];
+            final long[] tourIds = _batteryData.allTourIds;
+
+            if (tourIds != null && tourIds.length > 0) {
+
+               if (valueIndex >= tourIds.length) {
+                  valueIndex = tourIds.length - 1;
+               }
+
+               _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-               if (StatisticView.isInUpdateUI()) {
-
-                  /*
-                   * Do not fire an event when this is running already in an update event. This
-                   * occurs when a tour is modified (marker) in the tourbook view and the stat view
-                   * is opened !!!
-                   */
-
-                  return;
-               }
+               _batteryDataProvider.setSelectedTourId(_selectedTourId);
 
                // don't fire an event when preferences are updated
                if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
@@ -239,11 +184,16 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       _chart.addDoubleClickListener(new IBarSelectionListener() {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
+            final long[] tourIds = _batteryData.allTourIds;
+            if (tourIds.length > 0) {
 
-            _selectedTourId = _statisticData_Training.allTourIds[valueIndex];
-            _tourInfoToolTipProvider.setTourId(_selectedTourId);
+               _selectedTourId = tourIds[valueIndex];
+               _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-            ActionEditQuick.doAction(StatisticBattery.this);
+               _batteryDataProvider.setSelectedTourId(_selectedTourId);
+
+               ActionEditQuick.doAction(StatisticBattery.this);
+            }
          }
       });
 
@@ -261,7 +211,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
                   if (barChartSelection.serieIndex != -1) {
 
-                     _selectedTourId = _statisticData_Training.allTourIds[barChartSelection.valueIndex];
+                     _selectedTourId = _batteryData.allTourIds[barChartSelection.valueIndex];
                      _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
                      ActionEditQuick.doAction(StatisticBattery.this);
@@ -271,7 +221,6 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
          }
       });
 
-      addTourPropertyListener();
    }
 
    /**
@@ -287,7 +236,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
                                 final int serieIndex,
                                 int valueIndex) {
 
-      final int[] tourDOYValues = _statisticData_Training.getDoyValues();
+      final int[] tourDOYValues = _batteryData.allTourDOYs;
 
       if (valueIndex >= tourDOYValues.length) {
          valueIndex -= tourDOYValues.length;
@@ -297,7 +246,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
          return;
       }
 
-      final long tourId = _statisticData_Training.allTourIds[valueIndex];
+      final long tourId = _batteryData.allTourIds[valueIndex];
 
       TourData _tourData = null;
       if (tourId != -1) {
@@ -329,63 +278,6 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       });
    }
 
-   /**
-    * create data for the x-axis
-    */
-   void createXData_Day(final ChartDataModel chartModel) {
-
-      final ChartDataXSerie xData = new ChartDataXSerie(_statisticData_Training.getDoyValuesDouble());
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
-//      xData.setVisibleMaxValue(fCurrentYear);
-      xData.setChartSegments(createChartSegments(_statisticData_Training));
-
-      chartModel.setXData(xData);
-   }
-
-   /**
-    * Altitude
-    */
-   void createYData_Altitude(final ChartDataModel chartModel, final ChartType chartType) {
-
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            chartType,
-            _statisticData_Training.allElevationUp_Low,
-            _statisticData_Training.allElevationUp_High);
-
-      yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _statisticData_Training.allTypeColorIndices });
-
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-
-      chartModel.addYData(yData);
-   }
-
-   @Override
-   public void dispose() {
-
-      TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
-
-      super.dispose();
-   }
-
-   /**
-    */
-   ChartDataModel getChartDataModel() {
-
-      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
-
-      createXData_Day(chartDataModel);
-
-      createYData_Altitude(chartDataModel, ChartType.BAR);
-
-      return chartDataModel;
-   }
-
    @Override
    public int getEnabledGridOptions() {
 
@@ -396,12 +288,12 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
    @Override
    protected String getGridPrefPrefix() {
-      return GRID_TRAINING_BAR;
+      return GRID_TOUR_TIME;
    }
 
    @Override
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
-      return _tourDay_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
+      return _batteryDataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override
@@ -417,7 +309,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
-      if (_selectedTourId == -1) {
+      if (_selectedTourId == null) {
          return null;
       }
 
@@ -431,21 +323,16 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
    @Override
    public void preferencesHasChanged() {
 
-      updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
-   }
-
-   void resetMinMaxKeeper() {
-
-      _minMaxKeeper.resetMinMax();
+      updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, _numberOfYears));
    }
 
    @Override
-   public void restoreState(final IDialogSettings state) {
+   public void restoreState(final IDialogSettings viewState) {
 
-      final String stateTourId = state.get(STATE_SELECTED_TOUR_ID);
-      if (stateTourId != null) {
+      final String mementoTourId = viewState.get(STATE_SELECTED_TOUR_ID);
+      if (mementoTourId != null) {
          try {
-            final long tourId = Long.parseLong(stateTourId);
+            final long tourId = Long.parseLong(mementoTourId);
             selectTour(tourId);
          } catch (final Exception e) {
             // ignore
@@ -454,150 +341,120 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
    }
 
    @Override
-   public void saveState(final IDialogSettings state) {
+   public void saveState(final IDialogSettings viewState) {
 
       if (_chart == null || _chart.isDisposed()) {
          return;
       }
 
       final ISelection selection = _chart.getSelection();
-      if (_statisticData_Training != null && selection instanceof SelectionBarChart) {
+      if (_batteryData != null
+            && _batteryData.allTourIds != null
+            && _batteryData.allTourIds.length > 0
+            && selection instanceof SelectionBarChart) {
 
-         final int valueIndex = ((SelectionBarChart) selection).valueIndex;
+         final Long selectedTourId = _batteryData.allTourIds[((SelectionBarChart) selection).valueIndex];
 
-         // check array bounds
-         if (valueIndex < _statisticData_Training.allTourIds.length) {
-            state.put(STATE_SELECTED_TOUR_ID, Long.toString(_statisticData_Training.allTourIds[valueIndex]));
-         }
+         viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
       }
    }
 
    @Override
    public boolean selectTour(final Long tourId) {
 
-      final long[] tourIds = _statisticData_Training.allTourIds;
-      final boolean[] selectedItems = new boolean[tourIds.length];
+      final long[] tourIds = _batteryData.allTourIds;
+
+      if (tourIds.length == 0) {
+         _selectedTourId = null;
+         _tourInfoToolTipProvider.setTourId(-1);
+
+         return false;
+      }
+
+      final boolean[] selectedTours = new boolean[tourIds.length];
+
       boolean isSelected = false;
 
       // find the tour which has the same tourId as the selected tour
       for (int tourIndex = 0; tourIndex < tourIds.length; tourIndex++) {
-         final boolean isTourSelected = tourIds[tourIndex] == tourId ? true : false;
-         if (isTourSelected) {
+         if ((tourIds[tourIndex] == tourId)) {
+            selectedTours[tourIndex] = true;
             isSelected = true;
+
             _selectedTourId = tourId;
             _tourInfoToolTipProvider.setTourId(_selectedTourId);
+
+            break;
          }
-         selectedItems[tourIndex] = isTourSelected;
       }
 
       if (isSelected == false) {
          // select first tour
-//         selectedItems[0] = true;
+         selectedTours[0] = true;
+         _selectedTourId = tourIds[0];
+         _tourInfoToolTipProvider.setTourId(_selectedTourId);
       }
 
-      _chart.setSelectedBars(selectedItems);
+      _chart.setSelectedBars(selectedTours);
 
       return isSelected;
    }
 
    private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
-      // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+      final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
             StatisticBattery.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
-      });
+      };
+
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
       // set the menu context provider
       chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_chart, this));
    }
 
-   public void setIsForceReloadData(final boolean isForceReloadData) {
-      _isForceReloadData = isForceReloadData;
-   }
-
    @Override
    public void setSynchScale(final boolean isSynchScaleEnabled) {
 
-      _isSynchScaleEnabled = isSynchScaleEnabled;
-
       if (!isSynchScaleEnabled) {
-         // reset when sync is set to be disabled
-         resetMinMaxKeeper();
+
+         // reset when it's disabled
+
+         _minMaxKeeper.resetMinMax();
       }
+
+      _ifIsSynchScaleEnabled = isSynchScaleEnabled;
    }
 
-   @Override
-   public void updateStatistic(final StatisticContext statContext) {
+   private void updateChart(final long selectedTourId) {
 
-      _statContext = statContext;
+      final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
-      _activePerson = statContext.appPerson;
-      _activeTourTypeFilter = statContext.appTourTypeFilter;
-      _currentYear = statContext.statSelectedYear;
-      _numberOfYears = statContext.statNumberOfYears;
+      // set the x-axis
+      final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(_batteryData.allTourDOYs));
+      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
+      xData.setVisibleMaxValue(_currentYear);
+      xData.setChartSegments(createChartSegments(_batteryData));
+      chartModel.setXData(xData);
 
-      /*
-       * get currently selected tour id
-       */
-      long selectedTourId = -1;
-      final ISelection selection = _chart.getSelection();
-      if (selection instanceof SelectionBarChart) {
-         final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+      // set the bar low/high data
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.BAR,
+            Util.convertShortToFloat(_batteryData.allBatteryPercentage_End), //
+            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start) //
+      );
+      yData.setYTitle(Messages.LABEL_GRAPH_BATTERY);
+      yData.setUnitLabel(UI.SYMBOL_PERCENTAGE);
+      yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
 
-         if (barChartSelection.serieIndex != -1) {
+      yData.setColorIndex(new int[][] { _batteryData.allTypeColorIndices });
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 
-            int selectedValueIndex = barChartSelection.valueIndex;
-            final long[] tourIds = _statisticData_Training.allTourIds;
-
-            if (tourIds.length > 0) {
-
-               if (selectedValueIndex >= tourIds.length) {
-                  selectedValueIndex = tourIds.length - 1;
-               }
-
-               selectedTourId = tourIds[selectedValueIndex];
-            }
-         }
-      }
-
-      boolean isAvgValue = false;
-
-      DurationTime durationTime = DurationTime.MOVING;
-
-      // ensure the data are computed with the correct graph context, otherwise it do not work depending what was previously selected
-      _isForceReloadData = true;
-
-      durationTime = (DurationTime) Util.getEnumValue(
-            _prefStore.getString(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME),
-            DurationTime.MOVING);
-
-      isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
-
-      _tourDay_DataProvider.setGraphContext(isAvgValue, false);
-
-      _statisticData_Training = _tourDay_DataProvider.getDayData(
-            statContext.appPerson,
-            statContext.appTourTypeFilter,
-            statContext.statSelectedYear,
-            statContext.statNumberOfYears,
-            isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData || _isDuration_ReloadData,
-            durationTime);
-
-      _isDuration_ReloadData = false;
-
-      // reset min/max values
-      if (_isSynchScaleEnabled == false && (statContext.isRefreshData || _isForceReloadData)) {
-         resetMinMaxKeeper();
-      }
-
-      // reset force loading state as it is done now
-      _isForceReloadData = false;
-
-      final ChartDataModel chartModel = getChartDataModel();
+      chartModel.addYData(yData);
 
       /*
        * set graph minimum width, this is the number of days in the year
@@ -607,20 +464,8 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
       setChartProviders(_chart, chartModel);
 
-      if (_isSynchScaleEnabled) {
+      if (_ifIsSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);
-      }
-
-      // title MUST be set after the data model is created
-      if (isAvgValue && _yData_TrainingPerformance != null) {
-
-         // show avg sign in the title
-         _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE + UI.SPACE + UI.SYMBOL_AVERAGE);
-      }
-
-      // show selected time duration
-      if (_yData_Duration != null) {
-         setGraphLabel_Duration(_yData_Duration, durationTime);
       }
 
       StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
@@ -633,7 +478,56 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
    }
 
    @Override
+   public void updateStatistic(final StatisticContext statContext) {
+
+      _statContext = statContext;
+
+      _activePerson = statContext.appPerson;
+      _activeTourTypeFiler = statContext.appTourTypeFilter;
+      _currentYear = statContext.statSelectedYear;
+      _numberOfYears = statContext.statNumberOfYears;
+
+      /*
+       * get currently selected tour id
+       */
+      long selectedTourId = -1;
+      final ISelection selection = _chart.getSelection();
+      if (selection instanceof SelectionBarChart) {
+         final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+
+         if (barChartSelection.serieIndex != -1 && _batteryData != null) {
+
+            int selectedValueIndex = barChartSelection.valueIndex;
+            final long[] tourIds = _batteryData.allTourIds;
+
+            if (tourIds.length > 0) {
+               if (selectedValueIndex >= tourIds.length) {
+                  selectedValueIndex = tourIds.length - 1;
+               }
+
+               selectedTourId = tourIds[selectedValueIndex];
+            }
+         }
+      }
+
+      _batteryData = _batteryDataProvider.getTourTimeData(
+            statContext.appPerson,
+            statContext.appTourTypeFilter,
+            statContext.statSelectedYear,
+            statContext.statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData);
+
+      // reset min/max values
+      if (_ifIsSynchScaleEnabled == false && statContext.isRefreshData) {
+         _minMaxKeeper.resetMinMax();
+      }
+
+      updateChart(selectedTourId);
+   }
+
+   @Override
    public void updateToolBar() {
       _chart.fillToolbar(true);
    }
+
 }

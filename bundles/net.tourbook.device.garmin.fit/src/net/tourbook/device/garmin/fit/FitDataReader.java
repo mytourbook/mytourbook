@@ -463,33 +463,24 @@ public class FitDataReader extends TourbookDevice {
     */
    private void onMesg_104_DeviceBattery(final Mesg mesg, final FitData fitData) {
 
-      /*
-       * Get time
-       */
       final Field fieldTime = mesg.getField(253);
-      if (fieldTime != null) {
+      final Field fieldPercentage = mesg.getField(2);
 
-         final Object fieldValue = fieldTime.getValue();
+      // ensure both fields are available otherwise the data are out of sync
+      if (fieldTime != null && fieldPercentage != null) {
 
-         if (fieldValue instanceof Long) {
+         final Object fieldValue_Time = fieldTime.getValue();
+         final Object fieldValue_Percentage = fieldPercentage.getValue();
 
-            final Long garminTimestamp = (Long) fieldValue;
+         if (fieldValue_Time instanceof Long && fieldValue_Percentage instanceof Short) {
+
+            final Long garminTimestamp = (Long) fieldValue_Time;
+            final Short fieldValue_Percentage_Integer = (Short) fieldValue_Percentage;
+
             final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
             fitData.getBattery_Time().add(javaTime);
-         }
-      }
-
-      /*
-       * Get battery percentage
-       */
-      final Field fieldPercentage = mesg.getField(2);
-      if (fieldPercentage != null) {
-
-         final Object fieldValue = fieldPercentage.getValue();
-
-         if (fieldValue instanceof Short) {
-            fitData.getBattery_Percentage().add((Short) fieldValue);
+            fitData.getBattery_Percentage().add(fieldValue_Percentage_Integer.shortValue());
          }
       }
    }

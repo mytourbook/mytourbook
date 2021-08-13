@@ -219,6 +219,8 @@ public class TourBook_ColumnFactory {
       // Device
       defineColumn_Device_Name();
       defineColumn_Device_Distance();
+      defineColumn_Device_BatteryPercentage_Start();
+      defineColumn_Device_BatteryPercentage_End();
 
       // Data
       defineColumn_Data_DPTolerance();
@@ -749,6 +751,88 @@ public class TourBook_ColumnFactory {
    }
 
    /**
+    * Column: Device - Battery % end
+    */
+   private void defineColumn_Device_BatteryPercentage_End() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DEVICE_BATTERY_SOC_END.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short value = ((TVITourBookItem) element).colBatterySoC_End;
+            if (value == -1) {
+               return UI.EMPTY_STRING;
+            } else {
+               return colDef_NatTable.printValue_0(value);
+            }
+
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DEVICE_BATTERY_SOC_END.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final long value = ((TVITourBookItem) element).colBatterySoC_End;
+
+            if (value == -1) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               colDef_Tree.printValue_0(cell, value);
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Device - Battery % start
+    */
+   private void defineColumn_Device_BatteryPercentage_Start() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DEVICE_BATTERY_SOC_START.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short value = ((TVITourBookItem) element).colBatterySoC_Start;
+
+            if (value == -1) {
+               return UI.EMPTY_STRING;
+            } else {
+               return colDef_NatTable.printValue_0(value);
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DEVICE_BATTERY_SOC_START.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final long value = ((TVITourBookItem) element).colBatterySoC_Start;
+
+            if (value == -1) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               colDef_Tree.printValue_0(cell, value);
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Device - Device distance
     */
    private void defineColumn_Device_Distance() {
@@ -796,7 +880,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final String dbValue = ((TVITourBookItem) element).col_DeviceName;
+            final String dbValue = ((TVITourBookItem) element).colDeviceName;
 
             if (dbValue == null) {
                return UI.EMPTY_STRING;
@@ -812,7 +896,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final String dbValue = ((TVITourBookItem) element).col_DeviceName;
+            final String dbValue = ((TVITourBookItem) element).colDeviceName;
 
             if (dbValue == null) {
                cell.setText(UI.EMPTY_STRING);
