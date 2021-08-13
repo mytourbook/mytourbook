@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -226,6 +226,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          statistic_LastYear = lastYear;
          statistic_NumberOfYears = numberOfYears;
+         final String yearList = getYearList(lastYear, numberOfYears);
 
          setupYearNumbers();
 
@@ -235,6 +236,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
 
          sql = UI.EMPTY_STRING
 
@@ -263,14 +265,15 @@ public class DataProvider_Tour_Time extends DataProvider {
                + "   TourType_typeId," + NL //                                   15 //$NON-NLS-1$
                + "   jTdataTtag.TourTag_tagId" + NL //                           16 //$NON-NLS-1$
 
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //           //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
 
                // get/filter tag id's
                + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //    //$NON-NLS-1$
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                  //$NON-NLS-1$
 
-               + " WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
+               + "WHERE"
+               + "   StartYear IN (" + yearList + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
+               + "   " + sqlAppFilter.getWhereClause() //                           //$NON-NLS-1$
 
                + " ORDER BY TourStartTime"; //                                      //$NON-NLS-1$
 
@@ -317,7 +320,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(15);
+            final Object dbTagId = result.getObject(16);
 
             if (dbTourId == lastTourId) {
 
@@ -377,8 +380,11 @@ public class DataProvider_Tour_Time extends DataProvider {
                allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
                allTourStartWeek.add(dbTourStartWeek);
 
+               // start date/time
                allTourStartDateTime.add(zonedStartDateTime);
                allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
+
+               // start/end time only
                allTourStartTime.add(startDayTime);
                allTourEndTime.add((startDayTime + dbRecordedTime));
 
