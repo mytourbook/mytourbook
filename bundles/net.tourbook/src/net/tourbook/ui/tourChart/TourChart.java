@@ -3490,7 +3490,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final boolean isPauseHovered = hoveredLabel != null;
       if (isPauseHovered) {
 
-         // set worked that no other actions are done in this event
+         // set isWorked to true so that no other actions are done in this event
          chartMouseEvent.isWorked = isPauseHovered;
          chartMouseEvent.cursor = ChartCursor.Arrow;
       }
