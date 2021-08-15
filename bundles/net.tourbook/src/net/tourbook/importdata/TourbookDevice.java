@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -247,6 +247,14 @@ public abstract class TourbookDevice implements IRawDataReader {
     * @return
     */
    public abstract int getStartSequenceSize();
+
+   /**
+    * @return Returns <code>true</code> when the import from this device can be run concurrent,
+    *         otherwise <code>false</code>
+    */
+   public boolean canRunConcurrent() {
+      return false;
+   }
 
    /**
     * Check if the file is a valid device xml file.

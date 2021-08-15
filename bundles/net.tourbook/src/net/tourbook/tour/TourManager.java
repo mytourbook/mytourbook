@@ -48,6 +48,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
@@ -81,6 +82,9 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
+import net.tourbook.ui.views.collateTours.CollatedToursView;
+import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherData;
@@ -1714,6 +1718,26 @@ public class TourManager {
       final String lastTour = multipleTourTitles[multipleTourTitles.length - 1];
 
       return firstTour + UI.DASH_WITH_SPACE + lastTour;
+   }
+
+   public static Object[] getTourViewerSelectedTourIds(final ITourViewer3 tourViewer) {
+
+      Object[] selectedItems = null;
+
+      if (tourViewer instanceof TourBookView) {
+
+         selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
+
+      } else if (tourViewer instanceof CollatedToursView) {
+
+         selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
+
+      } else if (tourViewer instanceof RawDataView) {
+
+         selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
+      }
+
+      return selectedItems;
    }
 
    /**

@@ -307,6 +307,9 @@ public class TourDatabase {
    private static volatile ComboPooledDataSource _pooledDataSource;
 
    private static int                            _dbVersionOnStartup = -1;
+
+   private static ThreadPoolExecutor             _dbSaveExecutor;
+   private static ArrayBlockingQueue<TourData>   _dbSaveQueue        = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static ThreadPoolExecutor             _dbUpdateExecutor;
    private static ArrayBlockingQueue<Long>       _dbUpdateQueue      = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
 
@@ -319,7 +322,19 @@ public class TourDatabase {
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
-      final ThreadFactory threadFactory = runnable -> {
+      final ThreadFactory saveThreadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Saving database tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _dbSaveExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, saveThreadFactory);
+
+      final ThreadFactory updateThreadFactory = runnable -> {
 
          final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
 
@@ -329,7 +344,7 @@ public class TourDatabase {
          return thread;
       };
 
-      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, updateThreadFactory);
    }
    private static final Object DB_LOCK = new Object();
 
@@ -987,14 +1002,15 @@ public class TourDatabase {
     * @return
     */
    /**
-    * @param runner
+    * @param computeValuesRunner
     *           {@link IComputeTourValues} interface to compute values for one tour
     * @param tourIds
     *           Tour ID's which should be computed, when <code>null</code>, ALL tours will be
     *           computed.
     * @return
     */
-   public static boolean computeAnyValues_ForAllTours(final IComputeTourValues runner, final ArrayList<Long> tourIds) {
+   public static boolean computeAnyValues_ForAllTours(final IComputeTourValues computeValuesRunner,
+                                                      final ArrayList<Long> tourIds) {
 
       final int[] tourCounter = new int[] { 0 };
       final int[] tourListSize = new int[] { 0 };
@@ -1007,26 +1023,26 @@ public class TourDatabase {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            ArrayList<Long> tourList;
+            ArrayList<Long> allTourIds;
             if (tourIds == null) {
-               tourList = getAllTourIds();
+               allTourIds = getAllTourIds();
             } else {
-               tourList = tourIds;
+               allTourIds = tourIds;
             }
-            tourListSize[0] = tourList.size();
+            tourListSize[0] = allTourIds.size();
 
             long lastUIUpdateTime = 0;
 
-            monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, tourList.size());
+            monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, allTourIds.size());
 
             // loop over all tours and compute values
-            for (final Long tourId : tourList) {
+            for (final Long tourId : allTourIds) {
 
                final TourData dbTourData = getTourFromDb(tourId);
                TourData savedTourData = null;
 
                if (dbTourData != null) {
-                  if (runner.computeTourValues(dbTourData)) {
+                  if (computeValuesRunner.computeTourValues(dbTourData)) {
 
                      // ensure that all computed values are set
                      dbTourData.computeComputedValues();
@@ -1040,7 +1056,7 @@ public class TourDatabase {
                /*
                 * This must be called in every iteration because it can compute values ! ! !
                 */
-               final String runnerSubTaskText = runner.getSubTaskText(savedTourData);
+               final String runnerSubTaskText = computeValuesRunner.getSubTaskText(savedTourData);
 
                final long currentTime = System.currentTimeMillis();
                if (currentTime > lastUIUpdateTime + 200) {
@@ -1095,7 +1111,7 @@ public class TourDatabase {
                tourCounter[0],
                tourListSize[0]));
 
-         final String runnerResultText = runner.getResultText();
+         final String runnerResultText = computeValuesRunner.getResultText();
          if (runnerResultText != null) {
             sb.append(UI.NEW_LINE2);
             sb.append(runnerResultText);
@@ -1112,17 +1128,17 @@ public class TourDatabase {
 
    private static void computeAnyValues_ForAllTours(final SplashManager splashManager) {
 
-      final ArrayList<Long> tourList = getAllTourIds();
+      final ArrayList<Long> allTourIds = getAllTourIds();
 
       // loop: all tours, compute computed fields and save the tour
       int tourCounter = 1;
-      for (final Long tourId : tourList) {
+      for (final Long tourId : allTourIds) {
 
          if (splashManager != null) {
             splashManager.setMessage(
                   NLS.bind(
-                        Messages.Tour_Database_update_tour, //
-                        new Object[] { tourCounter++, tourList.size() }));
+                        Messages.Tour_Database_update_tour,
+                        new Object[] { tourCounter++, allTourIds.size() }));
          }
 
          final TourData tourData = getTourFromDb(tourId);
@@ -5611,7 +5627,7 @@ public class TourDatabase {
          return;
       }
 
-      TourDatabase.computeAnyValues_ForAllTours(splashManager);
+      computeAnyValues_ForAllTours(splashManager);
       TourManager.getInstance().removeAllToursFromCache();
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);

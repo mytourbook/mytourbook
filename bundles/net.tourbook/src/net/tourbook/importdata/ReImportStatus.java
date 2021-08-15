@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,12 @@ package net.tourbook.importdata;
  */
 public class ReImportStatus {
 
-   boolean isReImported;
+   public boolean isReImported;
 
    /**
     * Is <code>true</code> when the invalid import file location is canceled by the user.
     */
-   boolean isCanceled_ByUser_TheFileLocationDialog;
+   public boolean isCanceled_ByUser_TheFileLocationDialog;
 
    boolean isCanceled_Auto_ImportFilePathIsEmpty;
 

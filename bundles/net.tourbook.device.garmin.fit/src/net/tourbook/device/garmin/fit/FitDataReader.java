@@ -108,6 +108,11 @@ public class FitDataReader extends TourbookDevice {
       return 0;
    }
 
+   @Override
+   public boolean canRunConcurrent() {
+      return true;
+   }
+
    private boolean isFieldSkipped(final String fieldName) {
 
       final boolean isSkipped = false

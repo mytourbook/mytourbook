@@ -43,6 +43,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -997,8 +998,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
                // save imported file names
-               final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-               _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
+               final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+
+               _state.put(STATE_IMPORTED_FILENAMES, importedFiles.keySet().toArray(String[]::new));
 
                if (!RawDataManager.isReimportingActive() &&
                      !RawDataManager.isDeleteValuesActive()) {
@@ -4667,7 +4669,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // restore: is checksum validation
       final boolean isValidation = _state.getBoolean(STATE_IS_CHECKSUM_VALIDATION);
-      _rawDataMgr.setIsChecksumValidation(isValidation);
+      _rawDataMgr.setIsHAC4_5_ChecksumValidation(isValidation);
 
       updateToolTipState();
 
@@ -4766,6 +4768,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
       final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
 
+      final boolean isIgnoreInvalidFile = RawDataManager.isIgnoreInvalidFile();
+
       try {
 
          // stop all other actions when canceled
@@ -4823,7 +4827,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            final ArrayList<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
+            final String[] invalidFilesSet = _rawDataMgr.getInvalidFilesList().keySet().toArray(String[]::new);
+
+            final String[] invalidFiles = isIgnoreInvalidFile
+                  ? invalidFilesSet
+                  : null;
 
             runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
@@ -4858,7 +4866,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
-      if (RawDataManager.isIgnoreInvalidFile()) {
+      if (isIgnoreInvalidFile) {
          _rawDataMgr.clearInvalidFilesList();
       }
    }
@@ -5032,7 +5040,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
                                                   final ArrayList<TourData> allTourData,
-                                                  final ArrayList<String> invalidFiles,
+                                                  final String[] invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always then tour files are deleted
@@ -5075,7 +5083,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             int saveCounter = 0;
 
             int selectionSize = allTourData.size();
-            selectionSize += invalidFiles != null ? invalidFiles.size() : 0;
+            selectionSize += invalidFiles != null ? invalidFiles.length : 0;
 
             monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
 
@@ -5188,8 +5196,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isRemoveToursWhenClosed) {
          stateImportedFiles = new String[] {};
       } else {
-         final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-         stateImportedFiles = importedFiles.toArray(new String[importedFiles.size()]);
+         final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+         stateImportedFiles = importedFiles.keySet().toArray(String[]::new);
+
       }
       _state.put(STATE_IMPORTED_FILENAMES, stateImportedFiles);
       _state.put(STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED, isRemoveToursWhenClosed);
