@@ -1,200 +1,323 @@
 <div id="${id}" style="white-space: nowrap;">
-	
-	<div class="dijitDialogPaneContentArea">
-	
-		<div id="domSearchStatus" style="padding-bottom:0.2em;"></div>
-	
-	
-		<!-- Group: Content -->
-		
-		<div 
-			data-dojo-type="dijit/TitlePane" 
-			data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Content}'">
-			
-			<!-- Show All (tour, marker, waypoint)-->
-			
-			<div>
-				<input 
-					type="checkbox" 
-					id="apChkShowContentAll"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkShowContentAll"
-					data-dojo-attach-event="click:apSearchAll"/> 
-				<label for="apChkShowContentAll">${messages.Search_Options_Checkbox_ShowContentAll}</label>
-			</div>
-			
-			<div class="fieldVertSpaceTop" style="padding-left:1em;">
-			
-				<!-- Show tours -->
-				<input 
-					type="checkbox" 
-					id="apChkShowContentTour"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkShowContentTour"
-					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowContentTour">${messages.Search_Options_Checkbox_ShowContentTour}</label>
+   
+   <div class="dijitDialogPaneContentArea">
+   
+      <!-- Group: Content -->
+      
+      <div 
+         data-dojo-type="dijit/TitlePane" 
+         data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Content}'">
+         
+         <!-- Show All (tour, marker, waypoint)-->
+         
+         <div>
+            <input 
+               type                     ="checkbox" 
+               id                       ="apChkSearch_All"
+               data-dojo-type           ="dijit/form/CheckBox" 
+               data-dojo-attach-point   ="apChkSearch_All"
+               data-dojo-attach-event   ="click:apSearchAll"/> 
+            <label for="apChkSearch_All">${messages.Search_Options_Checkbox_Search_All}</label>
+         </div>
+         
+         <div  style ="padding-left:1em;">
+         
+            <table 
+               style = "
+                        border-collapse:  separate;
+                        border-spacing:   10px 5px;
+                       "
+            >
+               <tr>
+                  <td>
+                     <!-- Search: Tours -->
+                     <input 
+                        type                    ="checkbox" 
+                        id                      ="apChkSearch_Tour"
+                        data-dojo-type          ="dijit/form/CheckBox" 
+                        data-dojo-attach-point  ="apChkSearch_Tour"
+                        data-dojo-attach-event  ="click:apSelection"/> 
+                     <label 
+                        id                      ="apChkSearch_Tour_Label"
+                        data-dojo-attach-point  ="apChkSearch_Tour_Label"
+                        for                     ="apChkSearch_Tour"
+                        >${messages.Search_Options_Checkbox_Search_Tour}</label>
+                     <div 
+                        data-dojo-type          ="dijit/Tooltip" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_Tooltip"
+                        data-dojo-props         ="
+                                                   connectId: ['apChkSearch_Tour_Label'],
+                                                   position:  ['below']
+                                                "
+                     ></div>
+                  </td>
+                  <td>
+                     <!-- Search: Start location -->
+                     <input 
+                        type                    ="checkbox" 
+                        id                      ="apChkSearch_Tour_LocationStart"
+                        class                   ="fieldVertSpaceTop"
+                        data-dojo-type          ="dijit/form/CheckBox" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_LocationStart"
+                        data-dojo-attach-event  ="click:apSelection"/> 
+                     <label 
+                        id                      ="apChkSearch_Tour_LocationStart_Label"
+                        data-dojo-attach-point  ="apChkSearch_Tour_LocationStart_Label"
+                        for                     ="apChkSearch_Tour_LocationStart"
+                        >${messages.Search_Options_Checkbox_Search_Tour_LocationStart}</label>
+                     <div 
+                        data-dojo-type          ="dijit/Tooltip" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_LocationStart_Tooltip"
+                        data-dojo-props         ="
+                                                   connectId: ['apChkSearch_Tour_LocationStart_Label'],
+                                                   position:  ['below']
+                                                "
+                     ></div>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <!-- Search: Markers -->
+                     <input 
+                        type                    ="checkbox" 
+                        id                      ="apChkSearch_Marker"
+                        data-dojo-type          ="dijit/form/CheckBox" 
+                        data-dojo-attach-point  ="apChkSearch_Marker"
+                        data-dojo-attach-event  ="click:apSelection"/> 
+                     <label 
+                        id                      ="apChkSearch_Marker_Label"
+                        data-dojo-attach-point  ="apChkSearch_Marker_Label"
+                        for                     ="apChkSearch_Marker"
+                        >${messages.Search_Options_Checkbox_Search_Marker}</label>
+                     <div 
+                        data-dojo-type          ="dijit/Tooltip" 
+                        data-dojo-attach-point  ="apChkSearch_Marker_Tooltip"
+                        data-dojo-props         ="
+                                                    connectId: ['apChkSearch_Marker_Label'],
+                                                    position:  ['below']
+                                                "
+                     ></div>
+                  </td>
+                  <td>
+                     <!-- Search: End location -->
+                     <input 
+                        type                    ="checkbox" 
+                        id                      ="apChkSearch_Tour_LocationEnd"
+                        data-dojo-type          ="dijit/form/CheckBox" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_LocationEnd"
+                        data-dojo-attach-event  ="click:apSelection"/> 
+                     <label 
+                        id                      ="apChkSearch_Tour_LocationEnd_Label"
+                        data-dojo-attach-point  ="apChkSearch_Tour_LocationEnd_Label"
+                        for                     ="apChkSearch_Tour_LocationEnd"
+                        >${messages.Search_Options_Checkbox_Search_Tour_LocationEnd}</label>
+                     <div 
+                        data-dojo-type          ="dijit/Tooltip" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_LocationEnd_Tooltip"
+                        data-dojo-props         ="
+                                                  connectId: ['apChkSearch_Tour_LocationEnd_Label'],
+                                                    position:  ['below']
+                                                "
+                     ></div>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <!-- Search: Waypoints -->
+                     <input 
+                        type                    ="checkbox" 
+                        id                      ="apChkSearch_Waypoint"
+                        data-dojo-type          ="dijit/form/CheckBox" 
+                        data-dojo-attach-point  ="apChkSearch_Waypoint"
+                        data-dojo-attach-event  ="click:apSelection"/> 
+                     <label 
+                        id                      ="apChkSearch_Waypoint_Label"
+                        data-dojo-attach-point  ="apChkSearch_Waypoint_Label"
+                        for                     ="apChkSearch_Waypoint"
+                        >${messages.Search_Options_Checkbox_Search_Waypoint}</label>
+                     <div 
+                        data-dojo-type          ="dijit/Tooltip" 
+                        data-dojo-attach-point  ="apChkSearch_Waypoint_Tooltip"
+                        data-dojo-props         ="
+                                                    connectId: ['apChkSearch_Waypoint_Label'],
+                                                    position:  ['below']
+                                                "
+                     ></div>
+                  </td>
+                  <td>
+                     <!-- Search: Weather -->
+                     <input 
+                        type                    ="checkbox" 
+                        id                      ="apChkSearch_Tour_Weather"
+                        data-dojo-type          ="dijit/form/CheckBox" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_Weather"
+                        data-dojo-attach-event  ="click:apSelection"/> 
+                     <label 
+                        id                      ="apChkSearch_Tour_Weather_Label"
+                        data-dojo-attach-point  ="apChkSearch_Tour_Weather_Label"
+                        for                     ="apChkSearch_Tour_Weather"
+                        >${messages.Search_Options_Checkbox_Search_Tour_Weather}</label>
+                     <div 
+                        data-dojo-type          ="dijit/Tooltip" 
+                        data-dojo-attach-point  ="apChkSearch_Tour_Weather_Tooltip"
+                        data-dojo-props         ="
+                                                    connectId: ['apChkSearch_Tour_Weather_Label'],
+                                                    position:  ['below']
+                                                "
+                     ></div>
+                  </td>
+               </tr>
+            </table>         
+            
+         </div>
+         
 
-
-				<!-- Show marker -->
-				<input 
-					type="checkbox" 
-					id="apChkShowContentMarker"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkShowContentMarker"
-					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowContentMarker">${messages.Search_Options_Checkbox_ShowContentMarker}</label>
-
-				<!-- Show waypoints -->
-				<input 
-					type="checkbox" 
-					id="apChkShowContentWaypoint"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkShowContentWaypoint"
-					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowContentWaypoint">${messages.Search_Options_Checkbox_ShowContentWaypoint}</label>
-				
-			</div>
-			
-			<!-- Do ease searching -->
-			<div class="fieldVertSpaceTop">
-				<input 
-					type="checkbox" 
-					id="apChkEaseSearching"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkEaseSearching"
-					data-dojo-attach-event="click:apSelection"/> 
-				<label 
-					id="apChkEaseSearching_Label"
-					for="apChkEaseSearching">${messages.Search_Options_Checkbox_EaseSearching}</label>
-				<div 
-					data-dojo-type="dijit/Tooltip" 
-					data-dojo-attach-point="apChk_EaseSearching_Tooltip"
-					data-dojo-props="
-						connectId:['apChkEaseSearching_Label'],
-						position:['below']"></div>
-			</div>
-		</div>
-		
-		<br>
-		
-		
-		<!-- Group: Sorting -->
-		
-		<div 
-			data-dojo-type="dijit/TitlePane" 
-			data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Sorting}'">
-			
-			<table>
-			
-				<!-- Sort by date -->
-				<tr>
-					<td style="padding-right:2em;">
-						${messages.Search_Options_Label_SortAscending}					
-					</td>
-					<td>
-					
-						<!-- sort ascending -->
-						<input 
-							type="radio" 
-					    	name="sorting" 
-							id="apSortByDateAscending"
-							data-dojo-type="dijit/form/RadioButton"
-							data-dojo-attach-point="apSortByDateAscending"
-							data-dojo-attach-event="change:apSelection"/>
-						<label for="apSortByDateAscending">${messages.Search_Options_Radio_SortAscending}</label>
-					
-						<!-- sort descending -->
-						<input 
-							type="radio" 
-					    	name="sorting" 
-							id="apSortByDateDescending"
-							data-dojo-type="dijit/form/RadioButton"
-							data-dojo-attach-point="apSortByDateDescending"
-							data-dojo-attach-event="change:apSelection"/>
-						<label for="apSortByDateDescending">${messages.Search_Options_Radio_SortDescending}</label>
-					</td>
-				</tr>
-			</table>
-		</div>
-		
-		<br>
-		
-		
-		<!-- Group: Result -->
-		
-		<div 
-			data-dojo-type	="dijit/TitlePane" 
-			data-dojo-props	="toggleable:false, title: '${messages.Search_Options_Group_Result}'">
-			
-			<!-- Show description -->
-			<div>
-				<input 
-					type					="checkbox" 
-					id						="apChkShowDescription"
-					data-dojo-attach-point	="apChkShowDescription"
-					data-dojo-type			="dijit/form/CheckBox" 
-					data-dojo-attach-event	="click:apSelection"/> 
-				<label for="apChkShowDescription">${messages.Search_Options_Checkbox_ShowDescription}</label>
-				<br>
-			</div>
-			
-			<!-- Show date -->
-			<div class="fieldVertSpaceTop">
-				<input 
-					type					="checkbox" 
-					id						="apChkShowDate"
-					data-dojo-attach-point	="apChkShowDate"
-					data-dojo-type			="dijit/form/CheckBox" 
-					data-dojo-attach-event	="click:apSelection"/> 
-				<label for="apChkShowDate">${messages.Search_Options_Checkbox_ShowDate}</label>
-				<br>
-			</div>
-			
-			<!-- Show time -->
-			<div class="fieldVertSpaceTop">
-				<input 
-					type					="checkbox" 
-					id						="apChkShowTime"
-					data-dojo-attach-point	="apChkShowTime"
-					data-dojo-type			="dijit/form/CheckBox" 
-					data-dojo-attach-event	="click:apSelection"/> 
-				<label for="apChkShowTime">${messages.Search_Options_Checkbox_ShowTime}</label>
-				<br>
-			</div>
-			
-			<!-- Show item number -->
-			<div class="fieldVertSpaceTop">
-				<input 
-					type					="checkbox" 
-					id						="apChkShowItemNumber"
-					data-dojo-attach-point	="apChkShowItemNumber"
-					data-dojo-type			="dijit/form/CheckBox" 
-					data-dojo-attach-event	="click:apSelection"/> 
-				<label for="apChkShowItemNumber">${messages.Search_Options_Checkbox_ShowItemNumber}</label>
-			</div>
-			
-			<!-- Show Lucene doc ID -->
-			<div class="fieldVertSpaceTop">
-				<input 
-					type					="checkbox" 
-					id						="apChkShowLuceneID"
-					data-dojo-attach-point	="apChkShowLuceneID"
-					data-dojo-type			="dijit/form/CheckBox" 
-					data-dojo-attach-event	="click:apSelection"/> 
-				<label for="apChkShowLuceneID">${messages.Search_Options_Checkbox_ShowLuceneDocId}</label>
-			</div>
-		</div>
-		
-		<br>
-		
-		<!-- Actions -->
-		<div style="text-align:right;">
-			<span 
-				id						="apActionDefaults"
-				data-dojo-attach-point	="apActionDefaults"
-				data-dojo-type			="dijit/form/Button"
-				data-dojo-attach-event	="click:apActionRestoreDefaults"
-				>${messages.Search_Options_Action_RestoreDefaults}</span> 
-		</div>
-	</div>
+         <!-- Validation message -->
+         <div id="domSearchStatus" style="padding-bottom:0.2em;"></div>
+   
+   
+         <!-- Do ease searching -->
+         <div class="fieldVertSpaceTop">
+            <input 
+               type                     ="checkbox" 
+               id                       ="apChkEaseSearching"
+               data-dojo-type           ="dijit/form/CheckBox" 
+               data-dojo-attach-point   ="apChkEaseSearching"
+               data-dojo-attach-event   ="click:apSelection"/> 
+            <label 
+               id    ="apChkEaseSearching_Label"
+               for   ="apChkEaseSearching">${messages.Search_Options_Checkbox_EaseSearching}</label>
+            <div 
+               data-dojo-type           ="dijit/Tooltip" 
+               data-dojo-attach-point   ="apChk_EaseSearching_Tooltip"
+               data-dojo-props          ="
+                                            connectId: ['apChkEaseSearching_Label'],
+                                            position:  ['below']
+                                         "
+            ></div>
+         </div>
+      </div>
+      
+      <br>
+      
+      
+      <!-- Group: Sorting -->
+      
+      <div 
+         data-dojo-type="dijit/TitlePane" 
+         data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Sorting}'">
+         
+         <table>
+         
+            <!-- Sort by date -->
+            <tr>
+               <td style="padding-right:2em;">
+                  ${messages.Search_Options_Label_Sort_ByDate}               
+               </td>
+               <td>
+               
+                  <!-- sort ascending -->
+                  <input 
+                     type                      ="radio" 
+                     name                      ="sorting" 
+                     id                        ="apSortByDateAscending"
+                     data-dojo-type            ="dijit/form/RadioButton"
+                     data-dojo-attach-point    ="apSortByDateAscending"
+                     data-dojo-attach-event    ="change:apSelection"/>
+                  <label for="apSortByDateAscending">${messages.Search_Options_Radio_Sort_ByDate_Ascending}</label>
+               
+                  <!-- sort descending -->
+                  <input 
+                     type                      ="radio" 
+                     name                      ="sorting" 
+                     id                        ="apSortByDateDescending"
+                     data-dojo-type            ="dijit/form/RadioButton"
+                     data-dojo-attach-point    ="apSortByDateDescending"
+                     data-dojo-attach-event    ="change:apSelection"/>
+                  <label for="apSortByDateDescending">${messages.Search_Options_Radio_Sort_ByDate_Descending}</label>
+               </td>
+            </tr>
+         </table>
+      </div>
+      
+      <br>
+      
+      
+      <!-- Group: Result -->
+      
+      <div 
+         data-dojo-type    ="dijit/TitlePane" 
+         data-dojo-props   ="toggleable:false, title: '${messages.Search_Options_Group_Result}'">
+         
+         <!-- Show description -->
+         <div>
+            <input 
+               type                    ="checkbox" 
+               id                      ="apChkShowDescription"
+               data-dojo-attach-point  ="apChkShowDescription"
+               data-dojo-type          ="dijit/form/CheckBox" 
+               data-dojo-attach-event  ="click:apSelection"/> 
+            <label for="apChkShowDescription">${messages.Search_Options_Checkbox_Show_Description}</label>
+            <br>
+         </div>
+         
+         <!-- Show date -->
+         <div class="fieldVertSpaceTop">
+            <input 
+               type                    ="checkbox" 
+               id                      ="apChkShowDate"
+               data-dojo-attach-point  ="apChkShowDate"
+               data-dojo-type          ="dijit/form/CheckBox" 
+               data-dojo-attach-event  ="click:apSelection"/> 
+            <label for="apChkShowDate">${messages.Search_Options_Checkbox_Show_Date}</label>
+            <br>
+         </div>
+         
+         <!-- Show time -->
+         <div class="fieldVertSpaceTop">
+            <input 
+               type                    ="checkbox" 
+               id                      ="apChkShowTime"
+               data-dojo-attach-point  ="apChkShowTime"
+               data-dojo-type          ="dijit/form/CheckBox" 
+               data-dojo-attach-event  ="click:apSelection"/> 
+            <label for="apChkShowTime">${messages.Search_Options_Checkbox_Show_Time}</label>
+            <br>
+         </div>
+         
+         <!-- Show item number -->
+         <div class="fieldVertSpaceTop">
+            <input 
+               type                    ="checkbox" 
+               id                      ="apChkShowItemNumber"
+               data-dojo-attach-point  ="apChkShowItemNumber"
+               data-dojo-type          ="dijit/form/CheckBox" 
+               data-dojo-attach-event  ="click:apSelection"/> 
+            <label for="apChkShowItemNumber">${messages.Search_Options_Checkbox_Show_ItemNumber}</label>
+         </div>
+         
+         <!-- Show Lucene doc ID -->
+         <div class="fieldVertSpaceTop">
+            <input 
+               type                    ="checkbox" 
+               id                      ="apChkShowLuceneID"
+               data-dojo-attach-point  ="apChkShowLuceneID"
+               data-dojo-type          ="dijit/form/CheckBox" 
+               data-dojo-attach-event  ="click:apSelection"/> 
+            <label for="apChkShowLuceneID">${messages.Search_Options_Checkbox_Show_LuceneDocId}</label>
+         </div>
+      </div>
+      
+      <br>
+      
+      <!-- Actions -->
+      <div style="text-align:right;">
+         <span 
+            id                         ="apActionDefaults"
+            data-dojo-attach-point     ="apActionDefaults"
+            data-dojo-type             ="dijit/form/Button"
+            data-dojo-attach-event     ="click:apActionRestoreDefaults"
+            >${messages.Search_Options_Action_RestoreDefaults}</span> 
+      </div>
+   </div>
 </div>

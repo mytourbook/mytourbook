@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,26 +34,27 @@ import org.apache.tools.ant.Task;
  */
 public class I18ToDojo extends Task {
 
-   private static final String UTF_8              = "UTF-8";                                                        //$NON-NLS-1$
+   private static final String EMPTY_STRING       = "";                                                           //$NON-NLS-1$
+   private static final String NL                 = "\n";                                                         //$NON-NLS-1$
+   private static final String UTF_8              = "UTF-8";                                                      //$NON-NLS-1$
 
-   private String              FILE_CREATE_HEADER = "// created with " + I18ToDojo.class.getCanonicalName() + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+   private String              FILE_CREATE_HEADER = "// created with " + I18ToDojo.class.getCanonicalName() + NL; //$NON-NLS-1$
 
    /**
-    * Java properties file.
+    * Java properties file
     */
    private String              _javaProperties;
    private String              _javaPropFileName;
    private String              _javaPropFileExt;
 
    /**
-    * Created Javascript dojo file.
+    * Created Javascript dojo file
     */
    private String              _dojoProperties;
 
    private String              _i18dir;
 
    private String              _rootLanguage;
-
    private String[]            _otherLanguages;
 
    @Override
@@ -67,6 +68,7 @@ public class I18ToDojo extends Task {
     * Load properties from a properties file.
     *
     * @param javaProperties
+    *
     * @return Returns properties from the properties file.
     */
    private Properties loadJavaProperties(final String javaProperties) {
@@ -94,13 +96,10 @@ public class I18ToDojo extends Task {
    public void setDojoProperties(final String properties) {
 
       _dojoProperties = properties;
-
-//		final String[] fileParts = properties.split("\\.");
-//		_dojoPropFileName = fileParts[0];
-//		_dojoPropFileExt = fileParts[1];
    }
 
    public void setI18dir(final String i18dir) {
+
       _i18dir = i18dir;
    }
 
@@ -133,8 +132,8 @@ public class I18ToDojo extends Task {
 
       for (final String language : _otherLanguages) {
 
-//			/net.tourbook.web/WebContent-dev/tourbook/search/nls/messages_de.properties
-//			/net.tourbook.web/WebContent-dev/tourbook/search/nls/de/Messages.js
+//         /net.tourbook.web/WebContent-dev/tourbook/search/nls/messages_de.properties
+//         /net.tourbook.web/WebContent-dev/tourbook/search/nls/de/Messages.js
 
          final String dojoI18Folder = _i18dir + "/" + language; //$NON-NLS-1$
 
@@ -149,9 +148,8 @@ public class I18ToDojo extends Task {
             continue;
          }
 
-         System.out.println("	from: " + javaI18PropFilePath); //$NON-NLS-1$
-         System.out.println("	to:   " + dojoI18PropFilePath); //$NON-NLS-1$
-         // TODO remove SYSTEM.OUT.PRINTLN
+         System.out.println("   from: " + javaI18PropFilePath); //$NON-NLS-1$
+         System.out.println("     --> " + dojoI18PropFilePath); //$NON-NLS-1$
 
          // create dojo file
          try (BufferedWriter writer = new BufferedWriter(
@@ -174,18 +172,20 @@ public class I18ToDojo extends Task {
 
    private void writeDojo_I18_10_Header(final BufferedWriter writer) throws IOException {
 
-      final String header = "" // //$NON-NLS-1$
-            + FILE_CREATE_HEADER//
-            + "define(//							\n"// //$NON-NLS-1$
-            + "{									\n"; //$NON-NLS-1$
+      final String header = EMPTY_STRING
+
+            + FILE_CREATE_HEADER
+            + "define(                     " + NL // //$NON-NLS-1$
+            + "{                           " + NL; //$NON-NLS-1$
 
       writer.append(header);
    }
 
    private void writeDojo_I18_20_Footer(final BufferedWriter writer) throws IOException {
 
-      final String footer = ""// //$NON-NLS-1$
-            + "});		\n"; //$NON-NLS-1$
+      final String footer = EMPTY_STRING
+
+            + "});      " + NL; //$NON-NLS-1$
 
       writer.append(footer);
    }
@@ -193,6 +193,7 @@ public class I18ToDojo extends Task {
    /**
     * @param writer
     * @param javaProperties
+    *
     * @throws IOException
     */
    private void writeDojo_Messages(final BufferedWriter writer, final String javaProperties) throws IOException {
@@ -225,18 +226,19 @@ public class I18ToDojo extends Task {
             final String value = (String) keyValue;
 
             // convert js string delimiter ' -> \'
-            final String jsValue = value.replace("\'", "\\\'").replace("\n", "' + '"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            final String jsValue = value.replace("\'", "\\\'").replace("" + NL, "' + '"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-            final StringBuilder message = new StringBuilder();
-            message.append(String.format("		%-50s : '%s'", key, jsValue)); //$NON-NLS-1$
+            final StringBuilder sb = new StringBuilder();
+
+            sb.append(String.format("      %-60s : '%s'", key, jsValue)); //$NON-NLS-1$
 
             if (keyIndex == lastKey) {
-               message.append("\n"); //$NON-NLS-1$
+               sb.append(NL); //$NON-NLS-1$
             } else {
-               message.append(",\n"); //$NON-NLS-1$
+               sb.append("," + NL); //$NON-NLS-1$
             }
 
-            writer.append(message.toString());
+            writer.append(sb.toString());
          }
       }
    }
@@ -246,10 +248,9 @@ public class I18ToDojo extends Task {
       final String javaPropFilePath = _i18dir + "/" + _javaProperties; //$NON-NLS-1$
       final String dojoPropFilePath = _i18dir + "/" + _dojoProperties; //$NON-NLS-1$
 
-      System.out.println("i18 convert"); //$NON-NLS-1$
-      System.out.println("	from: " + javaPropFilePath); //$NON-NLS-1$
-      System.out.println("	to:   " + dojoPropFilePath); //$NON-NLS-1$
-      // TODO remove SYSTEM.OUT.PRINTLN
+      System.out.println("i18 root convert"); //$NON-NLS-1$
+      System.out.println("   from: " + javaPropFilePath); //$NON-NLS-1$
+      System.out.println("     --> " + dojoPropFilePath); //$NON-NLS-1$
 
       try (BufferedWriter writer = new BufferedWriter(
             new OutputStreamWriter(
@@ -267,47 +268,51 @@ public class I18ToDojo extends Task {
 
    private void writeDojo_Root_10_Header(final BufferedWriter writer) throws IOException {
 
-      final String header = "" //$NON-NLS-1$
-            + "define(//							\n" //$NON-NLS-1$
-            + "{									\n" //$NON-NLS-1$
-            + ("	// 'root' is default language (" + _rootLanguage + ")	\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + "										\n" //$NON-NLS-1$
-            + "	root : 								\n" //$NON-NLS-1$
-            + "	{									\n"; //$NON-NLS-1$
+      final String header = EMPTY_STRING
+
+            + "define(                                   " + NL //$NON-NLS-1$
+            + "{                                         " + NL //$NON-NLS-1$
+            + "   // 'root' is default language (" + _rootLanguage + ")   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "                                          " + NL //$NON-NLS-1$
+            + "   root :                                 " + NL //$NON-NLS-1$
+            + "   {                                      " + NL //$NON-NLS-1$
+      ;
 
       writer.write(header);
    }
 
    private void writeDojo_Root_20_Footer(final BufferedWriter writer) throws IOException {
 
-      final String footer = "" //$NON-NLS-1$
-            + "	},		\n" //$NON-NLS-1$
-            + "			\n" //$NON-NLS-1$
-            + ("	// list of available languages, default (" + _rootLanguage + ") is defined in 'root'\n") //$NON-NLS-1$ //$NON-NLS-2$
+      final String footer = EMPTY_STRING
+
+            + "   },                                     " + NL //$NON-NLS-1$
+            + "                                          " + NL //$NON-NLS-1$
+            + "   // list of available languages, default (" + _rootLanguage + ") is defined in 'root'" + NL //$NON-NLS-1$ //$NON-NLS-2$
             + writeDojo_Root_22_Languages().toString()
-            + "});		\n"; //$NON-NLS-1$
+            + "})                                        " + NL; //$NON-NLS-1$
 
       writer.write(footer);
    }
 
    private StringBuilder writeDojo_Root_22_Languages() {
 
-      final StringBuilder languages = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
+
       final int lastLanguage = _otherLanguages.length - 1;
 
       for (int languageIndex = 0; languageIndex < _otherLanguages.length; languageIndex++) {
 
          final String language = _otherLanguages[languageIndex];
 
-         languages.append("\t" + language.trim() + " : true"); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append("\t" + language.trim() + " : true"); //$NON-NLS-1$ //$NON-NLS-2$
 
          if (languageIndex == lastLanguage) {
-            languages.append("\n"); //$NON-NLS-1$
+            sb.append(NL);
          } else {
-            languages.append(",\n"); //$NON-NLS-1$
+            sb.append("," + NL); //$NON-NLS-1$
          }
       }
 
-      return languages;
+      return sb;
    }
 }
