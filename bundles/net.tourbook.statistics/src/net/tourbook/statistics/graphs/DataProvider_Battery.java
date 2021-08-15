@@ -57,133 +57,103 @@ public class DataProvider_Battery extends DataProvider {
 
       final StringBuilder sb = new StringBuilder();
 
-//      final String headerLine1 = UI.EMPTY_STRING
-//
-//            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead1() : UI.EMPTY_STRING)
-//
-//            + STAT_VALUE_DATE_YEAR.getHead1()
-//            + STAT_VALUE_DATE_MONTH.getHead1()
-//            + STAT_VALUE_DATE_DAY.getHead1()
-//            + STAT_VALUE_DATE_WEEK.getHead1()
-//
-//            + STAT_VALUE_TOUR_TYPE.getHead1()
-//
-//            + STAT_VALUE_TIME_DEVICE_ELAPSED.getHead1()
-//            + STAT_VALUE_TIME_DEVICE_RECORDED.getHead1()
-//            + STAT_VALUE_TIME_DEVICE_PAUSED.getHead1()
-//            + STAT_VALUE_TIME_COMPUTED_MOVING.getHead1()
-//            + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
-//
-//            + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
-//            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
-//
-//      ;
-//
-//      final String headerLine2 = UI.EMPTY_STRING
-//
-//            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead2() : UI.EMPTY_STRING)
-//
-//            + STAT_VALUE_DATE_YEAR.getHead2()
-//            + STAT_VALUE_DATE_MONTH.getHead2()
-//            + STAT_VALUE_DATE_DAY.getHead2()
-//            + STAT_VALUE_DATE_WEEK.getHead2()
-//
-//            + STAT_VALUE_TOUR_TYPE.getHead2()
-//
-//            + STAT_VALUE_TIME_DEVICE_ELAPSED.getHead2()
-//            + STAT_VALUE_TIME_DEVICE_RECORDED.getHead2()
-//            + STAT_VALUE_TIME_DEVICE_PAUSED.getHead2()
-//            + STAT_VALUE_TIME_COMPUTED_MOVING.getHead2()
-//            + STAT_VALUE_TIME_COMPUTED_BREAK.getHead2()
-//
-//            + STAT_VALUE_MOTION_DISTANCE.getHead2()
-//            + STAT_VALUE_ELEVATION_UP.getHead2()
-//
-//      ;
-//
-//      final String valueFormatting = UI.EMPTY_STRING
-//
-//            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getValueFormatting() : "%s") //$NON-NLS-1$
-//
-//            + STAT_VALUE_DATE_YEAR.getValueFormatting()
-//            + STAT_VALUE_DATE_MONTH.getValueFormatting()
-//            + STAT_VALUE_DATE_DAY.getValueFormatting()
-//            + STAT_VALUE_DATE_WEEK.getValueFormatting()
-//
-//            + STAT_VALUE_TOUR_TYPE.getValueFormatting()
-//
-//            + STAT_VALUE_TIME_DEVICE_ELAPSED.getValueFormatting()
-//            + STAT_VALUE_TIME_DEVICE_RECORDED.getValueFormatting()
-//            + STAT_VALUE_TIME_DEVICE_PAUSED.getValueFormatting()
-//            + STAT_VALUE_TIME_COMPUTED_MOVING.getValueFormatting()
-//            + STAT_VALUE_TIME_COMPUTED_BREAK.getValueFormatting()
-//
-//            + STAT_VALUE_MOTION_DISTANCE.getValueFormatting()
-//            + STAT_VALUE_ELEVATION_UP.getValueFormatting()
-//
-//      ;
-//
-//      sb.append(headerLine1 + NL);
-//      sb.append(headerLine2 + NL);
-//
-//      final int numDataItems = _batteryData.allTourDistances.length;
-//
-//      // set initial value
-//      int prevMonth = numDataItems > 0 ? _batteryData.allTourMonths[0] : 0;
-//
-//      int sequenceNumber = 0;
-//
-//      for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
-//
-//         final int month = _batteryData.allTourMonths[dataIndex];
-//
-//         // group by month
-//         if (month != prevMonth) {
-//            prevMonth = month;
-//            sb.append(NL);
-//         }
-//
-//         final int elapsedTime = _batteryData.allTourDeviceTime_Elapsed[dataIndex];
-//         final int movingTime = _batteryData.allTourComputedTime_Moving[dataIndex];
-//         final int breakTime = elapsedTime - movingTime;
-//
-//         Object sequenceNumberValue = UI.EMPTY_STRING;
-//         if (isShowSequenceNumbers) {
-//            sequenceNumberValue = ++sequenceNumber;
-//         }
-//
-//         sb.append(String.format(valueFormatting,
-//
-//               sequenceNumberValue,
-//
-//               _batteryData.allTourYears[dataIndex],
-//               month,
-//               _batteryData.allTourDays[dataIndex],
-//               _batteryData.allWeeks[dataIndex],
-//
-//               TourDatabase.getTourTypeName(_batteryData.allTypeIds[dataIndex]),
-//
-//               elapsedTime,
-//               _batteryData.allTourDeviceTime_Recorded[dataIndex],
-//               _batteryData.allTourDeviceTime_Paused[dataIndex],
-//               movingTime,
-//               breakTime,
-//
-//               _batteryData.allTourDistances[dataIndex] / 1000,
-//               _batteryData.allTourElevations[dataIndex]
-//
-//         ));
-//
-//         sb.append(NL);
-//      }
-//
-//      // cache values
-//      statistic_RawStatisticValues = sb.toString();
-//      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
-//
-//      return statistic_RawStatisticValues;
+      final String headerLine1 = UI.EMPTY_STRING
 
-      return null;
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead1() : UI.EMPTY_STRING)
+
+            + STAT_VALUE_DATE_YEAR.getHead1()
+            + STAT_VALUE_DATE_MONTH.getHead1()
+            + STAT_VALUE_DATE_DAY.getHead1()
+            + STAT_VALUE_DATE_WEEK.getHead1()
+
+            + STAT_VALUE_TOUR_TYPE.getHead1()
+
+            + STAT_VALUE_BATTERY_SOC_START.getHead1()
+            + STAT_VALUE_BATTERY_SOC_END.getHead1()
+
+      ;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead2() : UI.EMPTY_STRING)
+
+            + STAT_VALUE_DATE_YEAR.getHead2()
+            + STAT_VALUE_DATE_MONTH.getHead2()
+            + STAT_VALUE_DATE_DAY.getHead2()
+            + STAT_VALUE_DATE_WEEK.getHead2()
+
+            + STAT_VALUE_TOUR_TYPE.getHead2()
+
+            + STAT_VALUE_BATTERY_SOC_START.getHead2()
+            + STAT_VALUE_BATTERY_SOC_END.getHead2()
+
+      ;
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getValueFormatting() : "%s") //$NON-NLS-1$
+
+            + STAT_VALUE_DATE_YEAR.getValueFormatting()
+            + STAT_VALUE_DATE_MONTH.getValueFormatting()
+            + STAT_VALUE_DATE_DAY.getValueFormatting()
+            + STAT_VALUE_DATE_WEEK.getValueFormatting()
+
+            + STAT_VALUE_TOUR_TYPE.getValueFormatting()
+
+            + STAT_VALUE_BATTERY_SOC_START.getValueFormatting()
+            + STAT_VALUE_BATTERY_SOC_END.getValueFormatting()
+
+      ;
+
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
+
+      final int numDataItems = _batteryData.allTourIds.length;
+
+      // set initial value
+      int prevMonth = numDataItems > 0 ? _batteryData.allTourMonths[0] : 0;
+
+      int sequenceNumber = 0;
+
+      for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
+
+         final int month = _batteryData.allTourMonths[dataIndex];
+
+         // group by month
+         if (month != prevMonth) {
+            prevMonth = month;
+            sb.append(NL);
+         }
+
+         Object sequenceNumberValue = UI.EMPTY_STRING;
+         if (isShowSequenceNumbers) {
+            sequenceNumberValue = ++sequenceNumber;
+         }
+
+         sb.append(String.format(valueFormatting,
+
+               sequenceNumberValue,
+
+               _batteryData.allTourYears[dataIndex],
+               month,
+               _batteryData.allTourDays[dataIndex],
+               _batteryData.allWeeks[dataIndex],
+
+               TourDatabase.getTourTypeName(_batteryData.allTypeIds[dataIndex]),
+
+               _batteryData.allBatteryPercentage_Start[dataIndex],
+               _batteryData.allBatteryPercentage_End[dataIndex]
+
+         ));
+
+         sb.append(NL);
+      }
+
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
+
+      return statistic_RawStatisticValues;
    }
 
    public Long getSelectedTourId() {
@@ -238,7 +208,7 @@ public class DataProvider_Battery extends DataProvider {
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
-         final String yearList = getYearList(lastYear, numYears);
+         final String sqlYears = getYearList(lastYear, numYears);
 
          sql = UI.EMPTY_STRING
 
@@ -251,13 +221,14 @@ public class DataProvider_Battery extends DataProvider {
                + "   StartWeek," + NL //                                         4  //$NON-NLS-1$
                + "   TourStartTime," + NL //                                     5  //$NON-NLS-1$
                + "   TimeZoneId," + NL //                                        6  //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //                            7  //$NON-NLS-1$
 
-               + "   TourType_typeId," + NL //                                   7  //$NON-NLS-1$
+               + "   TourType_typeId," + NL //                                   8  //$NON-NLS-1$
 
-               + "   Battery_Percentage_Start," + NL //                          8  //$NON-NLS-1$
-               + "   Battery_Percentage_End," + NL //                            9  //$NON-NLS-1$
+               + "   Battery_Percentage_Start," + NL //                          9  //$NON-NLS-1$
+               + "   Battery_Percentage_End," + NL //                            10 //$NON-NLS-1$
 
-               + "   jTdataTtag.TourTag_tagId" + NL //                           10 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId" + NL //                           11 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
 
@@ -270,7 +241,7 @@ public class DataProvider_Battery extends DataProvider {
                // ignore tours without battery values
                + "   Battery_Percentage_Start > -1 AND " + NL //                    //$NON-NLS-1$
 
-               + "   StartYear IN (" + yearList + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
+               + "   StartYear IN (" + sqlYears + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
                + sqlAppFilter.getWhereClause() + NL //
 
                + "ORDER BY TourStartTime" + NL //                                   //$NON-NLS-1$
@@ -296,6 +267,7 @@ public class DataProvider_Battery extends DataProvider {
 
          final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
 
+//         final float lastBatteryPerformance = 0;
          long lastTourId = -1;
          ArrayList<Long> tagIds = null;
 
@@ -310,7 +282,7 @@ public class DataProvider_Battery extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(10);
+            final Object dbTagId = result.getObject(11);
 
             if (dbTourId == lastTourId) {
 
@@ -333,11 +305,12 @@ public class DataProvider_Battery extends DataProvider {
                final int dbTourStartWeek              = result.getInt(4);
                final long dbStartTimeMilli            = result.getLong(5);
                final String dbTimeZoneId              = result.getString(6);
+//               final int dbElapsedTime                = result.getInt(7);
 
-               final Object dbTourTypeIdObject        = result.getObject(7);
+               final Object dbTourTypeIdObject        = result.getObject(8);
 
-               final short dbBatteryPercentage_Start  = result.getShort(8);
-               final short dbBatteryPercentage_End    = result.getShort(9);
+               final short dbBatteryPercentage_Start  = result.getShort(9);
+               final short dbBatteryPercentage_End    = result.getShort(10);
 
 // SET_FORMATTING_ON
 
@@ -363,6 +336,18 @@ public class DataProvider_Battery extends DataProvider {
                allBatteryPercentage_Start.add(dbBatteryPercentage_Start);
                allBatteryPercentage_End.add(dbBatteryPercentage_End);
 
+//               final int batteryDiff = dbBatteryPercentage_Start - dbBatteryPercentage_End;
+//               final float batteryPerformance = batteryDiff < 20
+//
+//                     // ignore values which are too small because these values have a higher error
+//                     ? lastBatteryPerformance
+//
+//                     : dbElapsedTime / batteryDiff;
+//
+//               lastBatteryPerformance = batteryPerformance;
+//
+//               allBatteryPercentage_Start.add((short) batteryPerformance);
+
                if (dbTagId instanceof Long) {
                   tagIds = new ArrayList<>();
                   tagIds.add((Long) dbTagId);
@@ -374,26 +359,26 @@ public class DataProvider_Battery extends DataProvider {
                 * Convert type id to the type index in the tour type array, this is also the
                 * color index for the tour type
                 */
-//               int colorIndex = 0;
+               int colorIndex = 0;
                long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
                if (dbTourTypeIdObject instanceof Long) {
 
                   dbTypeId = (Long) dbTourTypeIdObject;
 
-//                  for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-//                     if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-//                        colorIndex = typeIndex;
-//                        break;
-//                     }
-//                  }
+                  for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
+                     if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
+                        colorIndex = typeIndex;
+                        break;
+                     }
+                  }
                }
 
                // paint graph with tour type color
-               // allTypeColorIndex.add(colorIndex);
+               allTypeColorIndex.add(colorIndex);
 
                // paint graph with 1st tour type color
-               allTypeColorIndex.add(0);
+//             allTypeColorIndex.add(0);
 
                allTypeIds.add(dbTypeId);
             }

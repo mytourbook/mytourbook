@@ -461,7 +461,32 @@ public class FitDataReader extends TourbookDevice {
     * @param mesg
     * @param fitData
     */
-   private void onMesg_104_DeviceBattery(final Mesg mesg, final FitData fitData) {
+   @SuppressWarnings("unused")
+   private void onMesg_104_DeviceBattery_0(final Mesg mesg, final FitData fitData) {
+
+      final Field fieldTime = mesg.getField(253);
+      final Field field_0 = mesg.getField(0);
+
+      // ensure both fields are available otherwise the data are out of sync
+      if (fieldTime != null && field_0 != null) {
+
+         final Object fieldValue_Time = fieldTime.getValue();
+         final Object fieldValue_0 = field_0.getValue();
+
+         if (fieldValue_Time instanceof Long && fieldValue_0 instanceof Integer) {
+
+            final Long garminTimestamp = (Long) fieldValue_Time;
+            final Integer batteryPercentage = (Integer) fieldValue_0;
+
+            final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+
+            fitData.getBattery_Time().add(javaTime);
+            fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
+         }
+      }
+   }
+
+   private void onMesg_104_DeviceBattery_2(final Mesg mesg, final FitData fitData) {
 
       final Field fieldTime = mesg.getField(253);
       final Field fieldPercentage = mesg.getField(2);
@@ -475,12 +500,12 @@ public class FitDataReader extends TourbookDevice {
          if (fieldValue_Time instanceof Long && fieldValue_Percentage instanceof Short) {
 
             final Long garminTimestamp = (Long) fieldValue_Time;
-            final Short fieldValue_Percentage_Integer = (Short) fieldValue_Percentage;
+            final Short batteryPercentage = (Short) fieldValue_Percentage;
 
             final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
 
             fitData.getBattery_Time().add(javaTime);
-            fitData.getBattery_Percentage().add(fieldValue_Percentage_Integer.shortValue());
+            fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
          }
       }
    }
@@ -688,7 +713,7 @@ public class FitDataReader extends TourbookDevice {
 
       switch (mesgNum) {
       case 104:
-         onMesg_104_DeviceBattery(mesg, fitData);
+         onMesg_104_DeviceBattery_2(mesg, fitData);
          break;
 
       case 147:

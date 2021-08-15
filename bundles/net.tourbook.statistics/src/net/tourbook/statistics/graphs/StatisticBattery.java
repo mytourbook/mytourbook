@@ -446,6 +446,11 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
             Util.convertShortToFloat(_batteryData.allBatteryPercentage_End), //
             Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start) //
       );
+//      final ChartDataYSerie yData = new ChartDataYSerie(
+//            ChartType.LINE,
+//            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start),
+//            true //
+//      );
       yData.setYTitle(Messages.LABEL_GRAPH_BATTERY);
       yData.setUnitLabel(UI.SYMBOL_PERCENTAGE);
       yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);

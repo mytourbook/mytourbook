@@ -43,6 +43,8 @@ public class Messages extends NLS {
 
    public static String        Statistic_Label_Invers;
 
+   public static String        Statistic_Value_BatterySoC_End;
+   public static String        Statistic_Value_BatterySoC_Start;
    public static String        Statistic_Value_Date_Day_Header1;
    public static String        Statistic_Value_Date_FirstDay_Header1;
    public static String        Statistic_Value_Date_FirstDay_Header2;
