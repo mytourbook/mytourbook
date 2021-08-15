@@ -39,6 +39,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -4020,7 +4021,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    @Override
    public Set<Long> getSelectedTourIDs() {
-      final Set<Long> tourIds = new HashSet<>();
+
+      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
       for (final Object viewItem : selectedTours) {

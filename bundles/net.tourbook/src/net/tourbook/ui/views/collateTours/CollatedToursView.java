@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -1883,7 +1884,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
        */
 //      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-
       /*
        * fill view toolbar
        */
@@ -1982,7 +1982,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    @Override
    public Set<Long> getSelectedTourIDs() {
 
-      final Set<Long> tourIds = new HashSet<>();
+      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 

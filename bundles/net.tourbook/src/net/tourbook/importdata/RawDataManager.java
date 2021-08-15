@@ -1965,13 +1965,20 @@ public class RawDataManager {
    private Object[] getTourViewerSelectedTourIds(final ITourViewer3 tourViewer) {
 
       Object[] selectedItems = null;
+
       if (tourViewer instanceof TourBookView) {
+
          selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
+
       } else if (tourViewer instanceof CollatedToursView) {
+
          selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
+
       } else if (tourViewer instanceof RawDataView) {
+
          selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
       }
+
       return selectedItems;
    }
 
