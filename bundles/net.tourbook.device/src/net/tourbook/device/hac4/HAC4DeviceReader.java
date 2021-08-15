@@ -696,8 +696,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
          if (isChecksumValidation == false && isValid == false) {
 
-            System.out
-                  .println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
+            System.out.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
 
             /*
              * ignore validation
