@@ -1428,7 +1428,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
 //    // Buildings or S3DB  Block I
       _layer_S3DB_Building = new S3DBLayer(mMap, _layer_BaseMap, true); //this is working with subtheme  switching, but no online buildings anymore
-      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, false); // building is not working with online maps, so deactvated also the shadow
+      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true); // building is not working with online maps, so deactvated also the shadow
 
       if (_isOfflineMap) {
 //			// S3DB
@@ -1437,14 +1437,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_S3DB_Building.setColored(true);
          debugPrint(" map25: " + "################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$ //$NON-NLS-2$
          //_layer_BaseMap.setTheme(_mf_IRenderTheme); //again??
-         //layers.remove(_layer_Building);
+         layers.remove(_layer_Building);
          layers.add(_layer_S3DB_Building);
       } else {
          // building
 
          _layer_Building.setEnabled(true);
          debugPrint(" map25: " + "################ setupMap_Layers:Building Layer "); //$NON-NLS-1$ //$NON-NLS-2$
-         //layers.remove(_layer_S3DB_Building);
+         layers.remove(_layer_S3DB_Building);
          layers.add(_layer_Building);
       }
 

@@ -74,7 +74,6 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
@@ -765,17 +764,15 @@ public class TourMapPainter extends MapPainter {
       getTourPainterSettings();
 
       // create pref listener
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            final String property = event.getProperty();
+      _prefChangeListener = propertyChangeEvent -> {
 
-            // test if the color or statistic data have changed
-            if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-                  || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
+         final String property = propertyChangeEvent.getProperty();
 
-               getTourPainterSettings();
-            }
+         // test if the color or statistic data have changed
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+               || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
+
+            getTourPainterSettings();
          }
       };
 
@@ -996,6 +993,7 @@ public class TourMapPainter extends MapPainter {
                      tourData,
                      latitudeSerie,
                      longitudeSerie)) {
+
                   ++staticMarkerCounter;
                }
 
@@ -1018,19 +1016,6 @@ public class TourMapPainter extends MapPainter {
                }
 
                isContentInTile = isContentInTile || staticPauseCounter > 0;
-            }
-
-            if (_tourPaintConfig.isShowTourPauses) {
-
-               isContentInTile = doPaint_Pauses(
-                     gcTile,
-                     map,
-                     tile,
-                     parts,
-                     isContentInTile,
-                     tourData,
-                     latitudeSerie,
-                     longitudeSerie);
             }
 
             if (_tourPaintConfig.isShowWayPoints) {

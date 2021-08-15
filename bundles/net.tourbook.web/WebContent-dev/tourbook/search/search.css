@@ -37,6 +37,11 @@ a
    margin-bottom:          0.5em;   
 }
 
+.disableLabel 
+{
+    pointer-events:        none;
+    opacity:               0.3;
+}
 
 .mtBase 
 {
@@ -51,15 +56,6 @@ a
 .mtDialog .dijitDialog
 {
    border:                 1px solid #bbb;         /* replace blue border */
-}
-
-.mtBase .dijitTooltipContainer
-{
-   /* 
-      Limit width otherwise the viewport width is used.
-      With a width below 30em the text can overflow the container 
-    */
-   width:                  30em;               
 }
 
 .dijitButtonNode
@@ -98,9 +94,24 @@ a
 {
    border-top:             0px   !important;
 }
+
 .dijitDialogTitleBar
 {
    background:             #$BODY__BACKGROUND_COLOR$ !important;
+}
+
+.dijitDialogCloseIcon, 
+.dijitDialogCloseIconHover 
+{
+   width:                  16px              !important;
+   height:                 16px              !important;
+   border:                 0px;
+   background:             url("/§MT-ICON-COMMON§/app-close$CSS_TAG__IS_THEMED$.png")     !important;
+}
+
+.dijitDialogCloseIconHover 
+{
+   border:                 1px solid #c1c1c1;
 }
 
 .dijitTitlePaneTitle
@@ -117,10 +128,11 @@ a
    margin-left:            -5px;
 }
 
-/* Background color for the search view when search dialog is opened */
-.dijitDialogUnderlayWrapper
+/* Background color for the search view when the search dialog is opened */
+.dijitDialogUnderlay 
 {
-   xbackground-color:       rgba(0, 0, 0, 0.3) !important;
+   background:             #888              !important;
+   opacity:                0.2               !important;
 }
 
 .dijitTooltipContainer
@@ -186,6 +198,15 @@ a
 {
    padding:                2px;
 }
+
+/*
+   Tooltip
+*/
+.tooltip-container
+{
+   width:                  30em;                /* set max width for a tooltip */ 
+}
+
 
 /*
    Search container
@@ -368,7 +389,7 @@ a.item:VISITED
 
 .item-title-no-description
 {
-   /* hide underline when only the title is available but not a description */
+   /* Hide underline when only the title is available but not a description */
    text-decoration:        none;
 }
 
@@ -381,6 +402,11 @@ a.item:VISITED
 .item-info td
 {
    padding-right:          20px;
+}
+
+.item-location td
+{
+   padding-right:          5px;
 }
 
 

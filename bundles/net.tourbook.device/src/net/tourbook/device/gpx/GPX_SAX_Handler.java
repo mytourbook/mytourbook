@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -396,13 +396,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
    }
 
    private void displayError(final ParseException e) {
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            final String message = e.getMessage();
-            MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-            System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-         }
+      Display.getDefault().syncExec(() -> {
+         final String message = e.getMessage();
+         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
+         System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
       });
    }
 
@@ -1155,7 +1152,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       final Set<TourTag> tourTags = new HashSet<>();
 
       final Collection<TourTag> dbTags = TourDatabase.getAllTourTags().values();
-      final ArrayList<TourTag> tempTags = RawDataManager.getInstance().getTempTourTags();
+      final List<TourTag> tempTags = RawDataManager.getInstance().getTempTourTags();
 
       for (final String tagName : _allImportedTagNames) {
 
@@ -1185,7 +1182,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       TourType tourType = TourDatabase.findTourType(_tourTypeName, TourDatabase.getAllTourTypes());
 
-      final ArrayList<TourType> tempTourTypes = RawDataManager.getInstance().getTempTourTypes();
+      final List<TourType> tempTourTypes = RawDataManager.getInstance().getTempTourTypes();
 
       if (tourType == null) {
          tourType = TourDatabase.findTourType(_tourTypeName, tempTourTypes);
@@ -1474,21 +1471,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       if (needsSort) {
          /* sort the _timeDataList */
-         Collections.sort(_timeDataList, new Comparator<TimeData>() {
-            @Override
-            public int compare(final TimeData td1, final TimeData td2) {
-               if (td1.absoluteTime < td2.absoluteTime) {
-                  return -1;
-               }
-               if (td1.absoluteTime > td2.absoluteTime) {
-                  return 1;
-               }
-
-               return 0;
+         Collections.sort(_timeDataList, (timeData1, timeData2) -> {
+            if (timeData1.absoluteTime < timeData2.absoluteTime) {
+               return -1;
             }
+            if (timeData1.absoluteTime > timeData2.absoluteTime) {
+               return 1;
+            }
+
+            return 0;
          });
       }
-
    }
 
    /**
