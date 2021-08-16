@@ -184,6 +184,8 @@ public class TourChartConfiguration {
 
    public int                     markerTooltipPosition   = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
 
+   public int                     pauseTooltipPosition    = ChartPauseToolTip.DEFAULT_TOOLTIP_POSITION;
+
    public boolean                 isShowMarkerPoint;
    public boolean                 isShowSignImage;
    public boolean                 isGraphOverlapped;
@@ -347,6 +349,7 @@ public class TourChartConfiguration {
        */
       isShowTourPauses              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
       isShowPauseTooltip            = _prefStore.getBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP);
+      pauseTooltipPosition          = _prefStore.getInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION);
 
       /*
        * Tour info

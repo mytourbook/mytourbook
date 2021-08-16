@@ -58,21 +58,21 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    private static final int     DEFAULT_TEXT_HEIGHT = 20;
 
    /**
-    * Visual position for marker tooltip, they must correspond to the position id
+    * Visual position for the pause tooltip, they must correspond to the position id
     * TOOLTIP_POSITION_*.
     */
-   public static final String[] TOOLTIP_POSITIONS;
+   protected static final String[] TOOLTIP_POSITIONS;
 
    static {
 
       TOOLTIP_POSITIONS = new String[] {
 
-            Messages.Tour_Marker_TooltipPosition_Left, //            0
-            Messages.Tour_Marker_TooltipPosition_Right, //           1
-            Messages.Tour_Marker_TooltipPosition_Top, //             2
-            Messages.Tour_Marker_TooltipPosition_Bottom, //          3
-            Messages.Tour_Marker_TooltipPosition_ChartTop, //        4
-            Messages.Tour_Marker_TooltipPosition_ChartBottom, //     5
+            Messages.Tour_Pause_TooltipPosition_Left, //            0
+            Messages.Tour_Pause_TooltipPosition_Right, //           1
+            Messages.Tour_Pause_TooltipPosition_Top, //             2
+            Messages.Tour_Pause_TooltipPosition_Bottom, //          3
+            Messages.Tour_Pause_TooltipPosition_ChartTop, //        4
+            Messages.Tour_Pause_TooltipPosition_ChartBottom, //     5
       };
    }
 
@@ -390,12 +390,66 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          devHoveredY = devYTop;
       }
 
-      ttPosX = devHoveredX - tipWidth - 1;
+      switch (_chartPauseConfig.pauseTooltipPosition) {
+      case TOOLTIP_POSITION_LEFT:
 
-      if (isVertical) {
-         ttPosY = devHoveredY;
-      } else {
-         ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
+         ttPosX = devHoveredX - tipWidth - 1;
+
+         if (isVertical) {
+            ttPosY = devHoveredY;
+         } else {
+            ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
+         }
+
+         break;
+
+      case TOOLTIP_POSITION_RIGHT:
+
+         ttPosX = devHoveredX + devHoveredWidth + 1;
+
+         if (isVertical) {
+            ttPosY = devHoveredY;
+         } else {
+            ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
+         }
+
+         break;
+
+      case TOOLTIP_POSITION_ABOVE:
+
+         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
+         ttPosY = devHoveredY - tipHeight - 1;
+
+         break;
+
+      case TOOLTIP_POSITION_CHART_TOP:
+
+         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
+         ttPosY = devYTop - tipHeight;
+
+         break;
+      case TOOLTIP_POSITION_CHART_BOTTOM:
+
+         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
+         ttPosY = devYBottom;
+
+         break;
+
+      // case TOOLTIP_POSITION_BELOW:
+      default:
+
+         ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
+         ttPosY = devHoveredY + devHoveredHeight + 1;
+
+         if (_hoveredLabel.visualPosition == TourMarker.LABEL_POS_VERTICAL_TOP_CHART) {
+
+            /*
+             * y position is wrong, adjust it but this do NOT cover all possible positions, but some
+             */
+            ttPosY -= devHoverSize;
+         }
+
+         break;
       }
 
       // ckeck if tooltip is left to the chart border

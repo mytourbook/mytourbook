@@ -2081,6 +2081,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final ChartPauseConfig chartPauseConfig = new ChartPauseConfig();
 
       chartPauseConfig.isShowPauseTooltip = _tourChartConfiguration.isShowPauseTooltip;
+      chartPauseConfig.pauseTooltipPosition = _tourChartConfiguration.pauseTooltipPosition;
 
       if (_layerPause == null) {
 

@@ -133,6 +133,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
       final Composite ui = createUI(parent);
 
+      fillUI();
       restoreState();
 
       return ui;
@@ -218,9 +219,17 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       }
    }
 
+   private void fillUI() {
+
+      for (final String position : ChartPauseToolTip.TOOLTIP_POSITIONS) {
+         _comboTooltipPosition.add(position);
+      }
+   }
+
    private void onChangeUI() {
 
       final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
+      final int tooltipPosition = _comboTooltipPosition.getSelectionIndex();
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
 
@@ -230,6 +239,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
 
       tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
+      tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
 
       // update chart with new settings
       _tourChart.updateUI_PausesLayer();
@@ -243,6 +253,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
        */
       _chkShowPauseTooltip.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP));
 
+      _comboTooltipPosition.select(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION));
+
       onChangeUI();
    }
 
@@ -251,6 +263,12 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
 
       _chkShowPauseTooltip.setSelection(tourChartConfiguration.isShowPauseTooltip);
+
+      final int pauseTooltipPosition = tourChartConfiguration.pauseTooltipPosition < 0
+            ? ChartPauseToolTip.DEFAULT_TOOLTIP_POSITION
+            : tourChartConfiguration.pauseTooltipPosition;
+
+      _comboTooltipPosition.select(pauseTooltipPosition);
    }
 
 }
