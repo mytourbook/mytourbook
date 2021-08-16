@@ -33,24 +33,46 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Tour chart marker properties slideout.
+ * Tour chart pauses properties slideout.
  */
 public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    private SelectionListener      _defaultSelectionListener;
+   private FocusListener          _keepOpenListener;
 
    {
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent focusEvent) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent focusEvent) {
+            setIsAnotherDialogOpened(false);
+         }
+      };
    }
 
    private ActionOpenPrefDialog  _actionPrefDialog;
@@ -62,6 +84,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    private TourChart _tourChart;
 
    private Button    _chkShowPauseTooltip;
+
+   private Combo     _comboTooltipPosition;
 
    public SlideoutTourChartPauses(final Control ownerControl,
                                   final ToolBar toolBar,
@@ -121,9 +145,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults()
-               .numColumns(2)
-               .applyTo(container);
+         GridLayoutFactory.fillDefaults().applyTo(container);
          {
             createUI_10_Title(container);
             createUI_12_Actions(container);
@@ -165,10 +187,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    private void createUI_20_Controls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .span(2, 1)
-            .applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
@@ -176,11 +195,25 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
              * Show pause tooltip
              */
             _chkShowPauseTooltip = new Button(container, SWT.CHECK);
-            _chkShowPauseTooltip.setText(Messages.Slideout_ChartPauseOptions_Checkbox_IsShowPauseTooltip);
+            _chkShowPauseTooltip.setText(Messages.Slideout_ChartPausesOptions_Checkbox_IsShowPauseTooltip);
             _chkShowPauseTooltip.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkShowPauseTooltip);
+         }
+         {
+            /*
+             * Combo: tooltip position
+             */
+            _comboTooltipPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboTooltipPosition.setVisibleItemCount(20);
+            _comboTooltipPosition.setToolTipText(Messages.Slideout_ChartPausesOptions_Combo_TooltipPosition_Tooltip);
+            _comboTooltipPosition.addSelectionListener(_defaultSelectionListener);
+            _comboTooltipPosition.addFocusListener(_keepOpenListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_comboTooltipPosition);
          }
       }
    }
