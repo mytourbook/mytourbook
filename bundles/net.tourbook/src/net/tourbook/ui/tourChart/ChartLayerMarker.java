@@ -68,19 +68,15 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          }
 
          // run in UI thread
-         Display.getDefault().syncExec(new Runnable() {
+         Display.getDefault().syncExec(() -> {
 
-            @Override
-            public void run() {
-
-               // ensure chart is still displayed
-               if (_tourChart.getShell().isDisposed()) {
-                  return;
-               }
-
-               // paint image
-               _tourChart.redrawLayer();
+            // ensure chart is still displayed
+            if (_tourChart.getShell().isDisposed()) {
+               return;
             }
+
+            // paint image
+            _tourChart.redrawLayer();
          });
       }
    }
