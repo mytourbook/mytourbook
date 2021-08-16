@@ -29,5 +29,7 @@ public class ChartPauseConfig {
    public RGB                         markerColorHidden_Light;
    public RGB                         markerColorHidden_Dark;
 
+   public boolean                     isShowPauseTooltip;
+
    public final List<ChartLabelPause> chartLabelPauses = new ArrayList<>();
 }

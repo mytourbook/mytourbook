@@ -2080,6 +2080,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartPauseConfig chartPauseConfig = new ChartPauseConfig();
 
+      chartPauseConfig.isShowPauseTooltip = _tourChartConfiguration.isShowPauseTooltip;
+
       if (_layerPause == null) {
 
          // setup pause layer, a layer is created only once
@@ -3497,7 +3499,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // check if the selected marker is hovered
       final ChartLabel hoveredPause = getHoveredTourPause();
 
-      if (_tourChartConfiguration.isShowTourPauses && isPauseHovered) {
+      if (_tourChartConfiguration.isShowPauseTooltip && isPauseHovered) {
 
          // marker tooltip is displayed
 
@@ -5974,6 +5976,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // update marker layer
       updateCustomLayers();
+   }
+
+   void updateUI_PausesLayer() {
+
+      updateUI_PausesLayer(true);
    }
 
    /**

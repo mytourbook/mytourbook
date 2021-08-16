@@ -1914,6 +1914,8 @@ public class Messages extends NLS {
    public static String Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
    public static String Slideout_ChartMarkerOptions_Label_Title;
 
+   public static String Slideout_ChartPauseOptions_Checkbox_IsShowPauseTooltip;
+
    public static String Slideout_ConconiOptions_Label_Title;
 
    public static String Slideout_GeoCompareOptions_Group_MapOptions;

@@ -205,6 +205,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       //tour pauses
       store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE,      true);
+      store.setDefault(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP,      true);
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,       new RGB(0x60, 0x60, 0x60));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK,  new RGB(0xd0, 0xd0, 0xd0));

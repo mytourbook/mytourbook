@@ -51,7 +51,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
    {
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
-
    }
 
    private ActionOpenPrefDialog  _actionPrefDialog;
@@ -62,7 +61,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
     */
    private TourChart _tourChart;
 
-   private Button    _chkShowInfoTitle;
+   private Button    _chkShowPauseTooltip;
 
    public SlideoutTourChartPauses(final Control ownerControl,
                                   final ToolBar toolBar,
@@ -106,13 +105,11 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
-      initUI(parent);
       createActions();
 
       final Composite ui = createUI(parent);
 
       restoreState();
-      enableControls();
 
       return ui;
    }
@@ -127,7 +124,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
          GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
             createUI_12_Actions(container);
@@ -177,34 +173,33 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       {
          {
             /*
-             * Show tour title
+             * Show pause tooltip
              */
-            _chkShowInfoTitle = new Button(container, SWT.CHECK);
-            _chkShowInfoTitle.setText("Show pause time start and end");
-            _chkShowInfoTitle.addSelectionListener(_defaultSelectionListener);
+            _chkShowPauseTooltip = new Button(container, SWT.CHECK);
+            _chkShowPauseTooltip.setText(Messages.Slideout_ChartPauseOptions_Checkbox_IsShowPauseTooltip);
+            _chkShowPauseTooltip.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
-                  .applyTo(_chkShowInfoTitle);
+                  .applyTo(_chkShowPauseTooltip);
          }
       }
    }
 
-   private void enableControls() {
-
-   }
-
-   private void initUI(final Composite parent) {
-
-   }
-
    private void onChangeUI() {
 
-      saveState();
+      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
+
+      /*
+       * Update chart config
+       */
+      final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
+
+      tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
 
       // update chart with new settings
-      _tourChart.updateUI_TourTitleInfo();
-
-      enableControls();
+      _tourChart.updateUI_PausesLayer();
    }
 
    @Override
@@ -213,26 +208,16 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       /*
        * Update UI with defaults from pref store
        */
-      _chkShowInfoTitle.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE));
+      _chkShowPauseTooltip.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP));
 
       onChangeUI();
    }
 
    private void restoreState() {
 
-      final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+      final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
 
-      _chkShowInfoTitle.setSelection(tcc.isShowInfoTitle);
-   }
-
-   private void saveState() {
-
-      final boolean isShowInfoTitle = _chkShowInfoTitle.getSelection();
-
-      /*
-       * Update pref store
-       */
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE, isShowInfoTitle);
+      _chkShowPauseTooltip.setSelection(tourChartConfiguration.isShowPauseTooltip);
    }
 
 }
