@@ -2145,6 +2145,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _tourWorldPosition.clear();
    }
 
+   /**
+    * This clone() method is cloning only a part of the tour, e.g. {@link #serieData} is not cloned
+    */
    @Override
    public Object clone() throws CloneNotSupportedException {
 

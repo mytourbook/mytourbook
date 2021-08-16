@@ -428,10 +428,15 @@ public class EasyImportManager {
       RawDataView.THREAD_WATCHER_LOCK.unlock();
 
       for (final OSFile deviceFile : availableFiles) {
+
          if (dbFileNames.contains(deviceFile.getFileName()) == false) {
+
             if (!RawDataManager.isIgnoreInvalidFile()) {
+
                notImportedFiles.add(deviceFile);
+
             } else {// RawDataManager.isIgnoreInvalidFile() == true
+
                if (!RawDataManager.doesInvalidFileExist(deviceFile.getFileName())) {
                   notImportedFiles.add(deviceFile);
                }
@@ -890,7 +895,7 @@ public class EasyImportManager {
          }
 
          // folder is valid, run the backup
-         final boolean isCanceled = runImport_01_Backup();
+         final boolean isCanceled = runImport_10_Backup();
          if (isCanceled) {
             return importState;
          }
@@ -921,21 +926,24 @@ public class EasyImportManager {
          return importState;
       }
 
+      final RawDataManager rawDataManager = RawDataManager.getInstance();
+
       /*
        * 02. Import files
        */
-      final ImportRunState importRunState = RawDataManager.getInstance()
-            .runImport(
-                  notImportedFiles,
-                  true,
-                  importConfig.fileGlobPattern);
+      final ImportRunState importRunState = rawDataManager.runImport(
+            notImportedFiles,
+            true,
+            importConfig.fileGlobPattern);
 
       importState.isImportCanceled = importRunState.isImportCanceled;
 
       /*
-       * Update tour data.
+       * Update tour data
        */
-      runImport_UpdateTourData(importLauncher, importState);
+      final Map<Long, TourData> importedTours = rawDataManager.getImportedTours();
+
+      runImport_20_UpdateTourData(importLauncher, importState, importedTours);
 
       return importState;
    }
@@ -943,7 +951,7 @@ public class EasyImportManager {
    /**
     * @return Returns <code>true</code> when the backup is canceled.
     */
-   private boolean runImport_01_Backup() {
+   private boolean runImport_10_Backup() {
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -985,7 +993,8 @@ public class EasyImportManager {
 //					Thread.sleep(800);
 
                monitor.worked(1);
-               monitor.subTask(NLS.bind(Messages.Import_Data_Monitor_Backup_SubTask, //
+               monitor.subTask(NLS.bind(
+                     Messages.Import_Data_Monitor_Backup_SubTask,
                      new Object[] { ++copied, numBackupFiles, backupFileName }));
 
                try {
@@ -1015,11 +1024,12 @@ public class EasyImportManager {
       return isCanceled[0];
    }
 
-   private void runImport_UpdateTourData(final ImportLauncher importLauncher, final ImportDeviceState importState) {
-
-      final Map<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
+   private void runImport_20_UpdateTourData(final ImportLauncher importLauncher,
+                                            final ImportDeviceState importState,
+                                            final Map<Long, TourData> importedTours) {
 
       if (importedTours.isEmpty()) {
+
          // nothing is imported
          return;
       }

@@ -145,13 +145,16 @@ public class DataTransferWizard extends Wizard {
 
       // import received files
       for (final File inFile : _receivedFiles) {
-         rawDataManager.importRawData(
-               inFile,
-               _dataTransferWizardPage._pathEditor.getStringValue(),
-               _importDevice.buildNewFileNames,
-               fileCollision,
-               true,
-               false);
+
+         rawDataManager.importTour(
+
+               inFile, //                                                  importFile
+               _dataTransferWizardPage._pathEditor.getStringValue(), //    destinationPath
+               fileCollision, //                                           fileCollision
+               _importDevice.isBuildNewFileNames, //                       isBuildNewFileNames
+               true, //                                                    isTourDisplayedInImportView
+               false //                                                    isReimport
+         );
       }
 
       rawDataManager.updateTourData_InImportView_FromDb(null);

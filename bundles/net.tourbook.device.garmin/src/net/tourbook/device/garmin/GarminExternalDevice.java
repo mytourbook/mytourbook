@@ -72,7 +72,7 @@ public class GarminExternalDevice extends ExternalDevice {
    private boolean    _isCancelImport;
 
    public GarminExternalDevice() {
-      buildNewFileNames = false;
+      isBuildNewFileNames = false;
       VelocityService.init();
    }
 

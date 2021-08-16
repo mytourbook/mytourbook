@@ -4514,7 +4514,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true, true);
+            final boolean isImported = _rawDataMgr.importTour(
+
+                  file, //    importFile
+                  null, //    destinationPath
+                  null, //    fileCollision
+                  false, //   isBuildNewFileNames
+                  true, //    isTourDisplayedInImportView
+                  true //     isReimport
+
+            );
 
             if (isImported) {
                TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
@@ -4817,7 +4826,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          } else {
 
-            importedAndSavedTours = _rawDataMgr.getImportedTourList();
+            importedAndSavedTours = _rawDataMgr.getImportedTours_AsList();
          }
 
          /*
