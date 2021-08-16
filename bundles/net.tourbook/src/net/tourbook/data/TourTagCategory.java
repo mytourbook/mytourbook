@@ -61,7 +61,7 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
    private final Set<TourTag>         tourTags         = new HashSet<>();
 
    @ManyToMany(fetch = FetchType.LAZY)
-   @JoinTable(//
+   @JoinTable(
          joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
          inverseJoinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID2", referencedColumnName = "TagCategoryId")//
    )

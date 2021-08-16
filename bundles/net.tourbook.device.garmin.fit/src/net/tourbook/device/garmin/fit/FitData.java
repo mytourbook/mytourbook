@@ -28,6 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
@@ -49,61 +50,65 @@ import org.eclipse.swt.widgets.Display;
  */
 public class FitData {
 
-   private static final Integer   DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
+   private static final Integer          DEFAULT_MESSAGE_INDEX  = Integer.valueOf(0);
 
-   private IPreferenceStore       _prefStore            = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore              _prefStore             = Activator.getDefault().getPreferenceStore();
 
-   private boolean                _isIgnoreLastMarker;
-   private boolean                _isSetLastMarker;
-   private boolean                _isFitImportTourType;
-   private String                 _fitImportTourTypeMode;
-   private int                    _lastMarkerTimeSlices;
+   private boolean                       _isIgnoreLastMarker;
+   private boolean                       _isSetLastMarker;
+   private boolean                       _isFitImportTourType;
+   private String                        _fitImportTourTypeMode;
+   private int                           _lastMarkerTimeSlices;
 
-   public boolean                 isComputeAveragePower;
+   public boolean                        isComputeAveragePower;
 
-   private FitDataReader          _fitDataReader;
-   private String                 _importFilePathName;
+   private FitDataReader                 _fitDataReader;
+   private String                        _importFilePathName;
 
-   private Map<Long, TourData>    _alreadyImportedTours;
-   private Map<Long, TourData>    _newlyImportedTours;
+   private Map<Long, TourData>           _alreadyImportedTours;
+   private Map<Long, TourData>           _newlyImportedTours;
 
-   private TourData               _tourData             = new TourData();
+   private TourData                      _tourData              = new TourData();
 
-   private String                 _deviceId;
-   private String                 _manufacturer;
-   private String                 _garminProduct;
-   private String                 _softwareVersion;
+   private String                        _deviceId;
+   private String                        _manufacturer;
+   private String                        _garminProduct;
+   private String                        _softwareVersion;
 
-   private String                 _sessionIndex;
-   private ZonedDateTime          _sessionStartTime;
+   private String                        _sessionIndex;
+   private ZonedDateTime                 _sessionStartTime;
 
-   private String                 _sportName            = UI.EMPTY_STRING;
-   private String                 _profileName          = UI.EMPTY_STRING;
+   private String                        _sportName             = UI.EMPTY_STRING;
+   private String                        _profileName           = UI.EMPTY_STRING;
 
-   private final List<TimeData>   _allTimeData          = new ArrayList<>();
+   private final List<TimeData>          _allTimeData           = new ArrayList<>();
 
-   private final List<GearData>   _allGearData          = new ArrayList<>();
-   private final List<SwimData>   _allSwimData          = new ArrayList<>();
-   private final List<TourMarker> _allTourMarker        = new ArrayList<>();
-   private List<Long>             _pausedTime_Start     = new ArrayList<>();
-   private final List<Long>       _pausedTime_End       = new ArrayList<>();
+   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
+   private final List<GearData>          _allGearData           = new ArrayList<>();
+   private final List<SwimData>          _allSwimData           = new ArrayList<>();
+   private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
+   private List<Long>                    _pausedTime_Start      = new ArrayList<>();
+   private final List<Long>              _pausedTime_End        = new ArrayList<>();
 
-   private TimeData               _current_TimeData;
-   private TimeData               _lastAdded_TimeData;
-   private TimeData               _previous_TimeData;
+   private final List<Long>              _allBatteryTime        = new ArrayList<>();
+   private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
 
-   private TourMarker             _current_TourMarker;
-   private long                   _timeDiffMS;
+   private TimeData                      _current_TimeData;
+   private TimeData                      _lastAdded_TimeData;
+   private TimeData                      _previous_TimeData;
+
+   private TourMarker                    _current_TourMarker;
+   private long                          _timeDiffMS;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
                   final Map<Long, TourData> newlyImportedTours) {
 
-      this._fitDataReader = fitDataReader;
-      this._importFilePathName = importFilePath;
-      this._alreadyImportedTours = alreadyImportedTours;
-      this._newlyImportedTours = newlyImportedTours;
+      _fitDataReader = fitDataReader;
+      _importFilePathName = importFilePath;
+      _alreadyImportedTours = alreadyImportedTours;
+      _newlyImportedTours = newlyImportedTours;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
@@ -269,9 +274,10 @@ public class FitData {
          _tourData.computeComputedValues();
          _tourData.computeAltimeterGradientSerie();
 
-         // In the case where the power was retrieved from a developer field,
-         // the fit file didn't contain the average power and we need
-         // to compute it ourselves.
+         /*
+          * In the case where the power was retrieved from a developer field, the fit file didn't
+          * contain the average power and we need to compute it ourselves.
+          */
          if (isComputeAveragePower) {
             final float[] powerSerie = _tourData.getPowerSerie();
             if (powerSerie != null) {
@@ -280,6 +286,7 @@ public class FitData {
          }
 
          finalizeTour_Elevation(_tourData);
+         finalizeTour_Battery(_tourData);
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData, _allGearData);
@@ -287,8 +294,38 @@ public class FitData {
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
-         finalizeTour_Type();
+         finalizeTour_Type(_tourData);
       }
+   }
+
+   private void finalizeTour_Battery(final TourData tourData) {
+
+      final int numBatteryItems = _allBatteryTime.size();
+
+      if (numBatteryItems == 0) {
+         return;
+      }
+
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int[] allBatteryTime = new int[numBatteryItems];
+      final short[] allBatteryPercentage = new short[numBatteryItems];
+
+      for (int serieIndex = 0; serieIndex < numBatteryItems; serieIndex++) {
+
+         // convert absolute time --> relative time
+         final long absoluteTime = _allBatteryTime.get(serieIndex);
+         final int relativeTime = (int) (absoluteTime - tourStartTime);
+
+         allBatteryPercentage[serieIndex] = _allBatteryPercentage.get(serieIndex);
+         allBatteryTime[serieIndex] = relativeTime;
+      }
+
+      tourData.setBattery_Time(allBatteryTime);
+      tourData.setBattery_Percentage(allBatteryPercentage);
+
+      tourData.setBattery_Percentage_Start(allBatteryPercentage[0]);
+      tourData.setBattery_Percentage_End(allBatteryPercentage[numBatteryItems - 1]);
    }
 
    /**
@@ -495,7 +532,7 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-   private void finalizeTour_Type() {
+   private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
       if (_isFitImportTourType) {
@@ -504,20 +541,20 @@ public class FitData {
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
 
-            applyTour_Type(_tourData, _sportName);
+            applyTour_Type(tourData, _sportName);
             break;
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
 
-            applyTour_Type(_tourData, _profileName);
+            applyTour_Type(tourData, _profileName);
             break;
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
 
             if (!UI.EMPTY_STRING.equals(_profileName)) {
-               applyTour_Type(_tourData, _profileName);
+               applyTour_Type(tourData, _profileName);
             } else {
-               applyTour_Type(_tourData, _sportName);
+               applyTour_Type(tourData, _sportName);
             }
             break;
 
@@ -530,7 +567,7 @@ public class FitData {
                spacerText = UI.DASH_WITH_SPACE;
             }
 
-            applyTour_Type(_tourData, _sportName + spacerText + _profileName);
+            applyTour_Type(tourData, _sportName + spacerText + _profileName);
             break;
          }
       }
@@ -538,6 +575,14 @@ public class FitData {
 
    public List<TimeData> getAllTimeData() {
       return _allTimeData;
+   }
+
+   public List<Short> getBattery_Percentage() {
+      return _allBatteryPercentage;
+   }
+
+   public List<Long> getBattery_Time() {
+      return _allBatteryTime;
    }
 
    public TimeData getCurrent_TimeData() {
@@ -572,6 +617,10 @@ public class FitData {
       }
 
       return deviceName.toString();
+   }
+
+   public List<DeviceSensorValue> getDeviceSensorValues() {
+      return _allDeviceSensorValues;
    }
 
    public List<GearData> getGearData() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,8 @@ public abstract class TourbookStatistic {
    /*
     * Grid prefixes
     */
+   protected static final String    GRID_BATTERY           = "GRID_BATTERY__";              //$NON-NLS-1$
+
    protected static final String    GRID_DAY_ALTITUDE      = "GRID_DAY_ALTITUDE__";         //$NON-NLS-1$
    protected static final String    GRID_DAY_DISTANCE      = "GRID_DAY_DISTANCE__";         //$NON-NLS-1$
    protected static final String    GRID_DAY_SUMMARY       = "GRID_DAY_SUMMARY__";          //$NON-NLS-1$
@@ -267,6 +269,17 @@ public abstract class TourbookStatistic {
     */
    public abstract String getRawStatisticValues(boolean isShowSequenceNumbers);
 
+   protected RGB getRgbGraph_Text_4_Time() {
+
+      final String prefColorName_Time = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
+
+      final String prefColorTextThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      return PreferenceConverter.getColor(_prefStore_Common, prefColorName_Time + prefColorTextThemed);
+   }
+
    /**
     * @return When a tour can be selected in the statistic, this will return the tour Id of the
     *         selected tour or <code>null</code> otherwise.
@@ -419,16 +432,5 @@ public abstract class TourbookStatistic {
     * manager is used, this method should put the actions into the toolbar manager
     */
    public abstract void updateToolBar();
-
-   protected RGB getRgbGraph_Text_4_Time() {
-   
-      final String prefColorName_Time = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
-   
-      final String prefColorTextThemed = UI.IS_DARK_THEME
-            ? GraphColorManager.PREF_COLOR_TEXT_DARK
-            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
-   
-      return PreferenceConverter.getColor(_prefStore_Common, prefColorName_Time + prefColorTextThemed);
-   }
 
 }

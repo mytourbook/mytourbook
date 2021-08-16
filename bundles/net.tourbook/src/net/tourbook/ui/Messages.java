@@ -213,6 +213,18 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_CollateEvent_Label;
    public static String        ColumnFactory_CollateEvent_Tooltip;
+   public static String        ColumnFactory_Device_BatterySoC_End_Header;
+
+   public static String        ColumnFactory_Device_BatterySoC_End_Header_Tooltip;
+
+   public static String        ColumnFactory_Device_BatterySoC_End_Label;
+
+   public static String        ColumnFactory_Device_BatterySoC_Start_Header;
+
+   public static String        ColumnFactory_Device_BatterySoC_Start_Header_Tooltip;
+
+   public static String        ColumnFactory_Device_BatterySoC_Start_Label;
+
    public static String        ColumnFactory_Diff_Header;
    public static String        ColumnFactory_DistanceDelta_Label;
    public static String        ColumnFactory_DistanceDelta_Tooltip;
@@ -506,6 +518,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AvgPower;
    public static String        Tour_Tooltip_Label_AvgPulse;
    public static String        Tour_Tooltip_Label_AvgSpeed;
+   public static String        Tour_Tooltip_Label_Battery;
    public static String        Tour_Tooltip_Label_BodyWeight;
    public static String        Tour_Tooltip_Label_BreakTime;
    public static String        Tour_Tooltip_Label_Calories;
