@@ -52,6 +52,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    private int              _devXPause;
    private int              _devYPause;
 
+   final IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
+
    public ChartLayerPause() {
       //Nothing to do
    }
@@ -217,8 +219,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
     */
    @Override
    public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
-      //Nothing to do
-      System.out.println("TOTO");
 
       final ChartLabelPause hoveredLabel = _hoveredLabel;
 
@@ -227,7 +227,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       }
 
       // the label is hovered
-      final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
       drawOverlay_Label(hoveredLabel,
             gc,

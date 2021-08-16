@@ -15,6 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-public class ChartLabelNight extends ChartLabel {
+public class ChartLabelNightSection extends ChartLabel {
 
 }
