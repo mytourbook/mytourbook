@@ -50,6 +50,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    //todo fb display a gray area hwen hovering just like the markers
    // make sure it works with multiple tours
 
+   // when multiple tour, display the yyyy-mm-dd before the hour
+
    private static final String  GRAPH_LABEL_TIME    = net.tourbook.common.Messages.Graph_Label_Time;
 
    private static final int     DEFAULT_TEXT_WIDTH  = 50;

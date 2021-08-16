@@ -16,19 +16,25 @@
 
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.common.UI;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 
 public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
@@ -214,6 +220,82 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       //Nothing to do
       System.out.println("TOTO");
 
+      final ChartLabelPause hoveredLabel = _hoveredLabel;
+
+      if (hoveredLabel == null) {
+         return;
+      }
+
+      // the label is hovered
+      final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+
+      drawOverlay_Label(hoveredLabel,
+            gc,
+            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
+            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
+            false);
+
+   }
+
+   private void drawOverlay_Label(final ChartLabelPause chartLabelMarker,
+                                  final GC gc,
+                                  final Color colorDefault,
+                                  final Color colorHidden,
+                                  final boolean isSelected) {
+
+      if (chartLabelMarker == null) {
+         return;
+      }
+
+      if (isSelected) {
+         gc.setAlpha(0x60);
+      } else {
+         gc.setAlpha(0x30);
+      }
+
+      if (isSelected) {
+
+         final Color selectedColorBg = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
+         gc.setBackground(selectedColorBg);
+
+      } else if (chartLabelMarker.isVisible) {
+         gc.setBackground(colorDefault);
+      } else {
+         gc.setBackground(colorHidden);
+      }
+
+      /*
+       * Rectangles can be merged into a union with regions, took me some time to find this solution
+       * :-)
+       */
+      final Region region = new Region(gc.getDevice());
+
+      final Rectangle paintedLabel = chartLabelMarker.paintedLabel;
+      if (paintedLabel != null) {
+
+         final int devLabelX = paintedLabel.x - PAUSE_HOVER_SIZE;
+         final int devLabelY = paintedLabel.y - PAUSE_HOVER_SIZE;
+         final int devLabelWidth = paintedLabel.width + 2 * PAUSE_HOVER_SIZE;
+         final int devLabelHeight = paintedLabel.height + 2 * PAUSE_HOVER_SIZE;
+
+         region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
+      }
+
+      final int devMarkerX = chartLabelMarker.devXPause - PAUSE_HOVER_SIZE;
+      final int devMarkerY = chartLabelMarker.devYPause - PAUSE_HOVER_SIZE;
+      final int devMarkerSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
+
+      region.add(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+
+      // get whole chart rect
+      final Rectangle clientRect = gc.getClipping();
+
+      gc.setClipping(region);
+      {
+         gc.fillRectangle(clientRect);
+      }
+      region.dispose();
+      gc.setClipping((Region) null);
    }
 
    public ChartLabel getHoveredLabel() {
