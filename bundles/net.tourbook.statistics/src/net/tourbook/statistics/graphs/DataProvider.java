@@ -17,6 +17,7 @@ package net.tourbook.statistics.graphs;
 
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -121,6 +122,12 @@ public abstract class DataProvider {
    static final StatisticValue STAT_VALUE_TOUR_NUMBER_OF_TOURS = new StatisticValue(Messages.Statistic_Value_Tour_NumberOfTours_Header1,      null,   UNIT_NUMBER,   VALUE_FORMAT_6_0F,   6);
    static final StatisticValue STAT_VALUE_TOUR_TITLE           = new StatisticValue(Messages.Statistic_Value_Tour_Title_Header1,              null,   null,          VALUE_FORMAT_S,      TourData.DB_LENGTH_TOUR_TITLE).withLeftAlign().withNoPadding();   // do not truncate text, it is displayed at the end
    static final StatisticValue STAT_VALUE_TOUR_TYPE            = new StatisticValue(Messages.Statistic_Value_Tour_TourType_Header1,           null,   null,          VALUE_FORMAT_20_20S, 20)                           .withLeftAlign();                   // truncate 20+ characters to force column layout
+
+   /*
+    * Battery
+    */
+   static final StatisticValue STAT_VALUE_BATTERY_SOC_START    = new StatisticValue(Messages.Statistic_Value_BatterySoC_Start,                null,   UI.SYMBOL_PERCENTAGE,    VALUE_FORMAT_3D,   3);
+   static final StatisticValue STAT_VALUE_BATTERY_SOC_END      = new StatisticValue(Messages.Statistic_Value_BatterySoC_End,                  null,   UI.SYMBOL_PERCENTAGE,    VALUE_FORMAT_3D,   3);
 
 // SET_FORMATTING_ON
 

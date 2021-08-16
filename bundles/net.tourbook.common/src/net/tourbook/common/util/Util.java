@@ -452,6 +452,25 @@ public class Util {
       return sb.toString();
    }
 
+   public static float[] convertShortToFloat(final short[] values) {
+
+      if (values == null) {
+         return null;
+      }
+
+      if (values.length == 0) {
+         return new float[0];
+      }
+
+      final float[] floatValues = new float[values.length];
+
+      for (int valueIndex = 0; valueIndex < values.length; valueIndex++) {
+         floatValues[valueIndex] = values[valueIndex];
+      }
+
+      return floatValues;
+   }
+
    /**
     * Converts a comma-seaparated string into a list of strings.
     *

@@ -1434,7 +1434,7 @@ public class CSVExport {
 
       { // HEADER_DEVICE_NAME
 
-         final String dbValue = tviItem.col_DeviceName;
+         final String dbValue = tviItem.colDeviceName;
          if (dbValue != null) {
             sb.append(dbValue);
          }
