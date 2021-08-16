@@ -745,7 +745,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             final ReImportStatus reImportStatus = new ReImportStatus();
             final boolean[] isUserAsked_ToCancelReImport = { false };
 
-            final File[] reimportedFile = new File[1];
+            final File[] previousReimportedFile = new File[1];
             final int numTours = allSelectedTourIds.length;
             int numDeleted = 0;
 
@@ -772,7 +772,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                rawDataManager.reimportTour(tourValueTypes,
                      oldTourData,
-                     reimportedFile,
+                     previousReimportedFile,
                      skipToursWithFileNotFound,
                      reImportStatus);
 

@@ -66,7 +66,7 @@ public class FitData {
    private String                        _importFilePathName;
 
    private Map<Long, TourData>           _alreadyImportedTours;
-   private Map<Long, TourData>           _newlyImportedTours;
+   private Map<Long, TourData>           _multipleTours_FromOneImportFile;
 
    private TourData                      _tourData              = new TourData();
 
@@ -103,19 +103,18 @@ public class FitData {
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
-                  final Map<Long, TourData> newlyImportedTours) {
+                  final Map<Long, TourData> multipleTours_FromOneImportFile) {
 
       _fitDataReader = fitDataReader;
       _importFilePathName = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
-      _newlyImportedTours = newlyImportedTours;
+      _multipleTours_FromOneImportFile = multipleTours_FromOneImportFile;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
       _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
       _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-
    }
 
    /**
@@ -268,7 +267,7 @@ public class FitData {
       if (_alreadyImportedTours.containsKey(tourId) == false) {
 
          // add new tour to the map
-         _newlyImportedTours.put(tourId, _tourData);
+         _multipleTours_FromOneImportFile.put(tourId, _tourData);
 
          // create additional data
          _tourData.computeComputedValues();

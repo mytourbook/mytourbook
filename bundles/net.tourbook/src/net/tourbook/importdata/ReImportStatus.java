@@ -15,19 +15,38 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import net.tourbook.common.UI;
+
 /**
  * Keeps the different states which can occur when a re-import is performed.
  */
 public class ReImportStatus {
 
-   public boolean isReImported;
+   private static final char NL = UI.NEW_LINE;
+
+   public boolean            isReImported;
 
    /**
     * Is <code>true</code> when the invalid import file location is canceled by the user.
     */
-   public boolean isCanceled_ByUser_TheFileLocationDialog;
+   public boolean            isCanceled_ByUser_TheFileLocationDialog;
 
-   boolean isCanceled_Auto_ImportFilePathIsEmpty;
+   boolean                   isCanceled_Auto_ImportFilePathIsEmpty;
 
-   boolean isCanceled_Auto_TheFileLocationDialog;
+   boolean                   isCanceled_Auto_TheFileLocationDialog;
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "ReImportStatus [" + NL
+
+            + "isReImported   =" + isReImported + NL
+            + "isCanceled_ByUser_TheFileLocationDialog   =" + isCanceled_ByUser_TheFileLocationDialog + NL
+            + "isCanceled_Auto_ImportFilePathIsEmpty     =" + isCanceled_Auto_ImportFilePathIsEmpty + NL
+            + "isCanceled_Auto_TheFileLocationDialog     =" + isCanceled_Auto_TheFileLocationDialog + NL
+
+            + "]";
+   }
 }

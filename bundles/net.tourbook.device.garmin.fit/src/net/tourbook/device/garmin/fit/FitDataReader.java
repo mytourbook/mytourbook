@@ -84,6 +84,11 @@ public class FitDataReader extends TourbookDevice {
    }
 
    @Override
+   public boolean canRunConcurrent() {
+      return true;
+   }
+
+   @Override
    public boolean checkStartSequence(final int byteIndex, final int newByte) {
       return false;
    }
@@ -106,11 +111,6 @@ public class FitDataReader extends TourbookDevice {
    @Override
    public int getTransferDataSize() {
       return 0;
-   }
-
-   @Override
-   public boolean canRunConcurrent() {
-      return true;
    }
 
    private boolean isFieldSkipped(final String fieldName) {
@@ -734,7 +734,7 @@ public class FitDataReader extends TourbookDevice {
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
+                                    final Map<Long, TourData> multipleTours_FromOneImportFile,
                                     final boolean isReimport) {
 
       boolean returnValue = false;
@@ -747,7 +747,7 @@ public class FitDataReader extends TourbookDevice {
                this,
                importFilePath,
                alreadyImportedTours,
-               newlyImportedTours);
+               multipleTours_FromOneImportFile);
 
          // setup all fit listeners
          fitBroadcaster.addListener(new MesgListener_Activity(fitData));
