@@ -65,6 +65,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       _devXPause -= labelWidth / 2;
       _devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
    }
+
    /**
     * This paints the pause(s) for the current graph configuration.
     */
@@ -129,10 +130,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
          adjustLabelPosition(labelWidth, labelHeight);
 
-         // add an additional offset which is defined for all pauses in the pause properties slideout
-         _devXPause += chartLabelPause.labelXOffset;
-         _devYPause -= chartLabelPause.labelYOffset;
-
          /*
           * label is horizontal
           */
@@ -181,6 +178,9 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
                _devYPause,
                textWidth + borderWidth2,
                textHeightWithBorder);
+
+         // keep painted positions to identify and paint the hovered positions
+         chartLabelPause.paintedLabel = textRect;
 
          final Rectangle validRect = overlapChecker.getValidRect(
                textRect,
