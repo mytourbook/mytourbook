@@ -150,35 +150,20 @@ public class RawDataManager {
       };
    }
 
-   private static RawDataManager                    _instance                   = null;
-
-   /**
-    * Contains files which could not be imported, the key is the OS filepath name.
-    * <p>
-    * Only the KeySet is used
-    */
-   private static ConcurrentHashMap<String, Object> _allInvalidFiles            = new ConcurrentHashMap<>();
-
-   /**
-    * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
-    * <p>
-    * Only the KeySet is used
-    */
-   private static ConcurrentHashMap<IPath, Object>  _allPreviousReimportFolders = new ConcurrentHashMap<>();
-   private static IPath                             _previousReimportFolder;
+   private static RawDataManager                  _instance = null;
 
    /**
     * Is <code>true</code> when currently a re-importing is running
     */
-   private static boolean                           _isReimportingActive;
+   private static boolean                         _isReimportingActive;
 
    /**
     * Is <code>true</code> when deleting values from tour(s) is happening
     */
-   private static boolean                           _isDeleteValuesActive;
+   private static boolean                         _isDeleteValuesActive;
 
-   private static List<TourbookDevice>              _allDevices_BySortPriority;
-   private static HashMap<String, TourbookDevice>   _allDevices_ByExtension;
+   private static List<TourbookDevice>            _allDevices_BySortPriority;
+   private static HashMap<String, TourbookDevice> _allDevices_ByExtension;
 
    static {
 
@@ -186,9 +171,25 @@ public class RawDataManager {
    }
 
    /**
+    * Contains files which could not be imported, the key is the OS filepath name.
+    * <p>
+    * Only the KeySet is used
+    */
+   private static final ConcurrentHashMap<String, Object> _allInvalidFiles              = new ConcurrentHashMap<>();
+
+   /**
+    * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
+    * <p>
+    * Only the KeySet is used
+    */
+   private static final ConcurrentHashMap<IPath, Object>  _allPreviousReimportFolders   = new ConcurrentHashMap<>();
+
+   private static volatile IPath                          _previousReimportFolder;
+
+   /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private static final ConcurrentHashMap<Long, TourData> _allImportedTours = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<Long, TourData> _allImportedTours             = new ConcurrentHashMap<>();
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
@@ -565,10 +566,12 @@ public class RawDataManager {
    }
 
    public static void setIsDeleteValuesActive(final boolean isDeleteValuesActive) {
+
       _isDeleteValuesActive = isDeleteValuesActive;
    }
 
    public static void setIsReimportingActive(final boolean isReimportingActive) {
+
       _isReimportingActive = isReimportingActive;
    }
 
@@ -1645,22 +1648,19 @@ public class RawDataManager {
    /**
     * Re-imports a tour and specifically the data specified.
     *
-    * @param tourValueTypes
-    *           A list of tour values to be re-imported
     * @param oldTourData
     *           The tour to re-import
-    * @param previousReimportedFile
-    *           Indicates whether the tour to re-import is part of a multi-activity tour
-    * @param skipToursWithFileNotFound
+    * @param tourValueTypes
+    *           A list of tour values to be re-imported
+    * @param isSkipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     * @param reImportStatus
-    * @return
-    *         Returns <code>true</code> if the tour has been re-imported, <code>false</code>
-    *         otherwise
+    * @param previousReimportedFile
+    *           Indicates whether the tour to re-import is part of a multi-activity tour
     */
-   public void reimportTour(final List<TourValueType> tourValueTypes,
-                            final TourData oldTourData,
-                            final boolean skipToursWithFileNotFound,
+   public void reimportTour(final TourData oldTourData,
+                            final List<TourValueType> tourValueTypes,
+                            final boolean isSkipToursWithFileNotFound,
                             final ReImportStatus reImportStatus) {
 
       if (oldTourData.isManualTour()) {
@@ -1683,7 +1683,7 @@ public class RawDataManager {
 
       boolean isReImported = false;
 
-      final File currentTourImportFile = reimportTour_10_GetImportFile(oldTourData, skipToursWithFileNotFound, reImportStatus);
+      final File currentTourImportFile = reimportTour_10_GetImportFile(oldTourData, isSkipToursWithFileNotFound, reImportStatus);
 
       if (currentTourImportFile == null) {
 
@@ -1737,6 +1737,10 @@ public class RawDataManager {
                                               final boolean isSkipToursWithFileNotFound,
                                               final ReImportStatus reImportStatus) {
 
+      final String[] reimportFilePathName = { null };
+
+      boolean isFilePathAvailable = false;
+
       // get import file name which is kept in the tour
       final String savedImportFilePathName = tourData.getImportFilePathName();
 
@@ -1751,46 +1755,50 @@ public class RawDataManager {
 
             return null;
          }
+
+      } else {
+
+         final File savedImportFile = new File(savedImportFilePathName);
+         if (savedImportFile.exists()) {
+
+            reimportFilePathName[0] = savedImportFilePathName;
+
+            isFilePathAvailable = true;
+         }
       }
 
-      final String[] reimportFilePathName = { null };
+      if (isFilePathAvailable == false) {
 
-      Display.getDefault().syncExec(() -> {
+         // request file path only when necessary otherwise it would block concurrency
 
-         final Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+         Display.getDefault().syncExec(() -> {
 
-         if (savedImportFilePathName == null) {
+            final Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-            // import filepath is not available, in older versions the file path name is not saved in the tour
+            if (savedImportFilePathName == null) {
 
-            final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
+               // import filepath is not available, in older versions the file path name is not saved in the tour
 
-            final boolean okPressed = MessageDialog.openConfirm(
-                  activeShell,
-                  NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-                  NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
-                        tourDateTimeShort,
-                        tourDateTimeShort));
+               final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-            // The user doesn't want to look for a new file path for the current tour
-            if (!okPressed) {
+               final boolean okPressed = MessageDialog.openConfirm(
+                     activeShell,
+                     NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
+                     NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
+                           tourDateTimeShort,
+                           tourDateTimeShort));
 
-               reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
+               // The user doesn't want to look for a new file path for the current tour
+               if (!okPressed) {
 
-               return;
-            }
+                  reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
 
-         } else {
-
-            // import filepath is available
-
-            // check import file
-            final File importFile = new File(savedImportFilePathName);
-            if (importFile.exists()) {
-
-               reimportFilePathName[0] = savedImportFilePathName;
+                  return;
+               }
 
             } else {
+
+               // import filepath is available
 
                for (final IPath previousReimportFolder : _allPreviousReimportFolders.keySet()) {
 
@@ -1836,43 +1844,43 @@ public class RawDataManager {
                   }
                }
             }
-         }
 
-         if (reimportFilePathName[0] == null) {
+            if (reimportFilePathName[0] == null) {
 
-            // ask user for the import file location
+               // ask user for the import file location
 
-            // create dialog title
-            final String tourDateTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_ML);
-            final String deviceName = tourData.getDeviceName();
-            final String dataFormat = deviceName == null ? UI.EMPTY_STRING : deviceName;
-            final String fileName = savedImportFilePathName == null ? UI.EMPTY_STRING : savedImportFilePathName;
-            final String dialogTitle = String.format(Messages.Import_Data_Dialog_ReimportFile_Title,
-                  tourDateTime,
-                  fileName,
-                  dataFormat);
+               // create dialog title
+               final String tourDateTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_ML);
+               final String deviceName = tourData.getDeviceName();
+               final String dataFormat = deviceName == null ? UI.EMPTY_STRING : deviceName;
+               final String fileName = savedImportFilePathName == null ? UI.EMPTY_STRING : savedImportFilePathName;
+               final String dialogTitle = String.format(Messages.Import_Data_Dialog_ReimportFile_Title,
+                     tourDateTime,
+                     fileName,
+                     dataFormat);
 
-            final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
-            dialog.setText(dialogTitle);
+               final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
+               dialog.setText(dialogTitle);
 
-            if (savedImportFilePathName != null) {
+               if (savedImportFilePathName != null) {
 
-               // select file location from the tour
+                  // select file location from the tour
 
-               final IPath importFilePath = new org.eclipse.core.runtime.Path(savedImportFilePathName);
-               final String importFileName = importFilePath.lastSegment();
+                  final IPath importFilePath = new org.eclipse.core.runtime.Path(savedImportFilePathName);
+                  final String importFileName = importFilePath.lastSegment();
 
-               dialog.setFileName(importFileName);
-               dialog.setFilterPath(savedImportFilePathName);
+                  dialog.setFileName(importFileName);
+                  dialog.setFilterPath(savedImportFilePathName);
 
-            } else if (_previousReimportFolder != null) {
+               } else if (_previousReimportFolder != null) {
 
-               dialog.setFilterPath(_previousReimportFolder.toOSString());
+                  dialog.setFilterPath(_previousReimportFolder.toOSString());
+               }
+
+               reimportFilePathName[0] = dialog.open();
             }
-
-            reimportFilePathName[0] = dialog.open();
-         }
-      });
+         });
+      }
 
       if (reimportFilePathName[0] == null) {
 
@@ -1912,12 +1920,12 @@ public class RawDataManager {
 
       if (importTour(
 
-            reimportedFile, //   importFile
-            null, //             destinationPath
-            null, //             fileCollision
-            false, //            isBuildNewFileNames
-            false, //            isTourDisplayedInImportView
-            true, //             isReimport
+            reimportedFile, //               importFile
+            null, //                         destinationPath
+            null, //                         fileCollision
+            false, //                        isBuildNewFileNames
+            false, //                        isTourDisplayedInImportView
+            true, //                         isReimport
             allImportedToursFromOneFile //
       )) {
 
@@ -1957,7 +1965,7 @@ public class RawDataManager {
                 * Save tour but don't fire a change event because the tour editor would set the tour
                 * to dirty
                 */
-               final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false);
+               final TourData savedTourData = TourManager.saveModifiedTour_Concurrent(updatedTourData);
 
                updatedTourData = savedTourData;
             }
@@ -2542,12 +2550,12 @@ public class RawDataManager {
 
                if (importTour(
 
-                     importFile, // importFile
-                     null, //       destinationPath
-                     null, //       fileCollision
-                     false, //      isBuildNewFileNames
-                     true, //       isTourDisplayedInImportView
-                     false, //      isReimport
+                     importFile, //                   importFile
+                     null, //                         destinationPath
+                     null, //                         fileCollision
+                     false, //                        isBuildNewFileNames
+                     true, //                         isTourDisplayedInImportView
+                     false, //                        isReimport
                      allImportedToursFromOneFile //
                )) {
 

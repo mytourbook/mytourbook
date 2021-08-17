@@ -32,6 +32,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -262,58 +269,78 @@ public class TourManager {
 
    private static final StringBuilder                    _sbFormatter                      = new StringBuilder();
    private static final Formatter                        _formatter                        = new Formatter(_sbFormatter);
+   //
+   private static final ListenerList<ITourEventListener> _tourEventListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITourSaveListener>  _tourSaveListeners                = new ListenerList<>(ListenerList.IDENTITY);
 
+   public static final String                            cadenceZonesTimes_StatementUpdate = UI.EMPTY_STRING
+
+         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    // //$NON-NLS-1$
+
+         + " SET"                                                                                                                      // //$NON-NLS-1$
+
+         + " cadenceZone_SlowTime=?, "                                                                                                 // //$NON-NLS-1$
+         + " cadenceZone_FastTime=?, "                                                                                                 // //$NON-NLS-1$
+         + " cadenceZones_DelimiterValue=? "                                                                                           // //$NON-NLS-1$
+
+         + " WHERE tourId=?";                                                                                                          // //$NON-NLS-1$
+
+   //
    /**
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
     * not opened
     */
-   private static TourDataEditorView                     _tourDataEditorInstance;
+   private static TourDataEditorView       _tourDataEditorInstance;
    //
-   private static LabelProviderMMSS                      _labelProviderMMSS                = new LabelProviderMMSS();
-   private static LabelProviderInt                       _labelProviderInt                 = new LabelProviderInt();
+   private static LabelProviderMMSS        _labelProviderMMSS = new LabelProviderMMSS();
+   private static LabelProviderInt         _labelProviderInt  = new LabelProviderInt();
    //
-   private static TourData                               _joined_TourData;
-   private static int                                    _joined_TourIds_Hash;
-   private static List<TourData>                         _allLoaded_TourData;
-   private static int                                    _allLoaded_TourData_Hash;
-   private static long                                   _allLoaded_TourData_Key;
-   private static int                                    _allLoaded_TourIds_Hash;
+   private static TourData                 _joined_TourData;
+   private static int                      _joined_TourIds_Hash;
+   private static List<TourData>           _allLoaded_TourData;
+   private static int                      _allLoaded_TourData_Hash;
+   private static long                     _allLoaded_TourData_Key;
+   private static int                      _allLoaded_TourIds_Hash;
    //
-   private static final ListenerList<ITourEventListener> _tourEventListeners               = new ListenerList<>(ListenerList.IDENTITY);
-   private static final ListenerList<ITourSaveListener>  _tourSaveListeners                = new ListenerList<>(ListenerList.IDENTITY);
-   public static final String                            cadenceZonesTimes_StatementUpdate = UI.EMPTY_STRING
+   private static ThreadPoolExecutor       _dbSaveExecutor;
+   private static ArrayBlockingQueue<Long> _dbSaveQueue       = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   //
+   static {
 
-         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    //   //$NON-NLS-1$
+      final ThreadFactory saveThreadFactory = runnable -> {
 
-         + " SET"                                                                                                                      //                                     //$NON-NLS-1$
+         final Thread thread = new Thread(runnable, "Saving database tours");//$NON-NLS-1$
 
-         + " cadenceZone_SlowTime=?, "                                                                                                 //                //$NON-NLS-1$
-         + " cadenceZone_FastTime=?, "                                                                                                 //                 //$NON-NLS-1$
-         + " cadenceZones_DelimiterValue=? "                                                                                           //          //$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-         + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
+         return thread;
+      };
+
+      _dbSaveExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, saveThreadFactory);
+   }
    //
-   private ComputeChartValue                             _computeAvg_Altimeter;
-   private ComputeChartValue                             _computeAvg_Altitude;
-   private ComputeChartValue                             _computeAvg_Cadence;
-   private ComputeChartValue                             _computeAvg_Gradient;
-   private ComputeChartValue                             _computeAvg_Pace;
-   private ComputeChartValue                             _computeAvg_Power;
-   private ComputeChartValue                             _computeAvg_Pulse;
-   private ComputeChartValue                             _computeAvg_Speed;
+   private ComputeChartValue   _computeAvg_Altimeter;
+   private ComputeChartValue   _computeAvg_Altitude;
+   private ComputeChartValue   _computeAvg_Cadence;
+   private ComputeChartValue   _computeAvg_Gradient;
+   private ComputeChartValue   _computeAvg_Pace;
+   private ComputeChartValue   _computeAvg_Power;
+   private ComputeChartValue   _computeAvg_Pulse;
+   private ComputeChartValue   _computeAvg_Speed;
    //
-   private ComputeChartValue                             _computeAvg_RunDyn_StanceTime;
-   private ComputeChartValue                             _computeAvg_RunDyn_StanceTimeBalance;
-   private ComputeChartValue                             _computeAvg_RunDyn_StepLength;
-   private ComputeChartValue                             _computeAvg_RunDyn_VerticalOscillation;
-   private ComputeChartValue                             _computeAvg_RunDyn_VerticalRatio;
+   private ComputeChartValue   _computeAvg_RunDyn_StanceTime;
+   private ComputeChartValue   _computeAvg_RunDyn_StanceTimeBalance;
+   private ComputeChartValue   _computeAvg_RunDyn_StepLength;
+   private ComputeChartValue   _computeAvg_RunDyn_VerticalOscillation;
+   private ComputeChartValue   _computeAvg_RunDyn_VerticalRatio;
    //
-   private final TourDataCache                           _tourDataCache;
+   private final TourDataCache _tourDataCache;
 
    /**
     * tour chart which shows the selected tour
     */
-   private TourChart                                     _activeTourChart;
+   private TourChart           _activeTourChart;
 
    public static class LabelProviderInt implements IValueLabelProvider {
 
@@ -2528,6 +2555,83 @@ public class TourManager {
       } else {
          return savedTourData.get(0);
       }
+   }
+
+   public static TourData saveModifiedTour_Concurrent(final TourData tourData) {
+
+      // put tour ID (queue item) into the queue AND wait when it is full
+
+      try {
+
+         _dbSaveQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbSaveExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbSaveQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = em.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            // ignore tours which having no geo data
+            if (tourData.altitudeSerie == null) {
+               return;
+            }
+
+            tourData.updateDatabaseDesign_042_to_043();
+
+            boolean isSaved = false;
+
+            final EntityTransaction ts = em.getTransaction();
+            try {
+
+               ts.begin();
+               {
+                  em.merge(tourData);
+               }
+               ts.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (ts.isActive()) {
+                  ts.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (isSaved == false) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            em.close();
+         }
+      });
    }
 
    /**
