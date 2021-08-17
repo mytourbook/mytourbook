@@ -47,7 +47,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    private long             _hoveredEventTime;
 
    private ChartLabelPause  _hoveredLabel;
-   private ChartLabelMarker _tooltipLabel;
+   private ChartLabelPause  _tooltipLabel;
 
    private int              _devXPause;
    private int              _devYPause;
@@ -236,6 +236,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       // the label is hovered
 
+      //TODO FB
       drawOverlay_Label(hoveredLabel,
             gc,
             new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
@@ -244,13 +245,13 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    }
 
-   private void drawOverlay_Label(final ChartLabelPause chartLabelMarker,
+   private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
                                   final GC gc,
                                   final Color colorDefault,
                                   final Color colorHidden,
                                   final boolean isSelected) {
 
-      if (chartLabelMarker == null) {
+      if (chartLabelPause == null) {
          return;
       }
 
@@ -260,16 +261,16 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          gc.setAlpha(0x30);
       }
 
+      Color backgroundColor = colorHidden;
       if (isSelected) {
 
-         final Color selectedColorBg = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
-         gc.setBackground(selectedColorBg);
+         backgroundColor = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
+      } else if (chartLabelPause.isVisible) {
 
-      } else if (chartLabelMarker.isVisible) {
-         gc.setBackground(colorDefault);
-      } else {
-         gc.setBackground(colorHidden);
+         backgroundColor = colorDefault;
       }
+
+      gc.setBackground(backgroundColor);
 
       /*
        * Rectangles can be merged into a union with regions, took me some time to find this solution
@@ -277,7 +278,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
        */
       final Region region = new Region(gc.getDevice());
 
-      final Rectangle paintedLabel = chartLabelMarker.paintedLabel;
+      final Rectangle paintedLabel = chartLabelPause.paintedLabel;
       if (paintedLabel != null) {
 
          final int devLabelX = paintedLabel.x - PAUSE_HOVER_SIZE;
@@ -288,11 +289,11 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
       }
 
-      final int devMarkerX = chartLabelMarker.devXPause - PAUSE_HOVER_SIZE;
-      final int devMarkerY = chartLabelMarker.devYPause - PAUSE_HOVER_SIZE;
-      final int devMarkerSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
+      final int devPauseX = chartLabelPause.devXPause - PAUSE_HOVER_SIZE;
+      final int devPauseY = chartLabelPause.devYPause - PAUSE_HOVER_SIZE;
+      final int devPauseSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
 
-      region.add(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+      region.add(devPauseX, devPauseY, devPauseSize, devPauseSize);
 
       // get whole chart rect
       final Rectangle clientRect = gc.getClipping();
@@ -329,23 +330,24 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          }
 
          /*
-          * Check marker point
+          * Check pause point
           */
-         final int devXMarker = chartLabelPause.devXPause;
-         final int devYMarker = chartLabelPause.devYPause;
+         final int devXPause = chartLabelPause.devXPause;
+         final int devYPause = chartLabelPause.devYPause;
 
-         if (devXMouse > devXMarker - PAUSE_HOVER_SIZE
-               && devXMouse < devXMarker + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE
-               && devYMouse > devYMarker - PAUSE_HOVER_SIZE
-               && devYMouse < devYMarker + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE) {
+         if (devXMouse > devXPause - PAUSE_HOVER_SIZE
+               && devXMouse < devXPause + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE
+               && devYMouse > devYPause - PAUSE_HOVER_SIZE
+               && devYMouse < devYPause + PAUSE_POINT_SIZE + PAUSE_HOVER_SIZE) {
 
-            // marker point is hit
+            // pause point is hit
             return chartLabelPause;
          }
       }
 
       return null;
    }
+
    public ChartLabelPause retrieveHoveredPause(final ChartMouseEvent mouseEvent) {
 
       if (mouseEvent.eventTime == _hoveredEventTime) {
@@ -363,7 +365,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       _chartPauseConfig = chartPauseConfig;
    }
 
-   public void setTooltipLabel(final ChartLabelMarker tooltipLabel) {
+   public void setTooltipLabel(final ChartLabelPause tooltipLabel) {
 
       if (_tooltipLabel == tooltipLabel) {
          return;

@@ -242,7 +242,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
 
       // update chart with new settings
-      _tourChart.updateUI_PausesLayer();
+      _tourChart.updateUI_PausesLayer(true);
    }
 
    @Override
