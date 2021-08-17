@@ -46,8 +46,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    //todo fb display a gray area hwen hovering just like the markers
    // make sure it works with multiple tours
 
-   // when multiple tour, display the yyyy-mm-dd before the hour
-
    /**
     * Visual position for the pause tooltip, they must correspond to the position id
     * TOOLTIP_POSITION_*.
@@ -495,8 +493,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       /*
        * When exit tooltip, hide hovered label
        */
-      final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
-      markerLayer.setTooltipLabel(null);
+      final ChartLayerPause markerPause = _tourChart.getLayerTourPause();
+      markerPause.setTooltipLabel(null);
    }
 
    @Override

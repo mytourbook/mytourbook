@@ -3148,6 +3148,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return _layerMarker;
    }
 
+   ChartLayerPause getLayerTourPause() {
+
+      return _layerPause;
+   }
+
    /**
     * Copied from {@link org.eclipse.ui.internal.e4.compatibility.ActionBars}
     *

@@ -47,11 +47,14 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    private long             _hoveredEventTime;
 
    private ChartLabelPause  _hoveredLabel;
+   private ChartLabelMarker _tooltipLabel;
 
    private int              _devXPause;
    private int              _devYPause;
 
    final IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
+
+   private TourChart        _tourChart;
 
    public ChartLayerPause() {
       //Nothing to do
@@ -206,6 +209,12 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             // draw label
             gc.drawText(pauseDurationText, validRect.x, validRect.y, true);
          }
+
+         // keep painted positions to identify and paint hovered positions
+         chartLabelPause.devHoverSize = PAUSE_HOVER_SIZE;
+         chartLabelPause.devYBottom = devYBottom;
+         chartLabelPause.devYTop = devYTop;
+         chartLabelPause.devGraphWidth = devVisibleChartWidth;
       }
 
       gc.setClipping((Rectangle) null);
@@ -337,7 +346,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       return null;
    }
-
    public ChartLabelPause retrieveHoveredPause(final ChartMouseEvent mouseEvent) {
 
       if (mouseEvent.eventTime == _hoveredEventTime) {
@@ -353,5 +361,16 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    public void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
       _chartPauseConfig = chartPauseConfig;
+   }
+
+   public void setTooltipLabel(final ChartLabelMarker tooltipLabel) {
+
+      if (_tooltipLabel == tooltipLabel) {
+         return;
+      }
+
+      _tooltipLabel = tooltipLabel;
+
+      _tourChart.setChartOverlayDirty();
    }
 }

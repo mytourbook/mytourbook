@@ -232,12 +232,12 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       final int tooltipPosition = _comboTooltipPosition.getSelectionIndex();
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION, tooltipPosition);
 
       /*
        * Update chart config
        */
       final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
-
       tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
       tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
 
@@ -248,11 +248,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    @Override
    public void resetToDefaults() {
 
-      /*
-       * Update UI with defaults from pref store
-       */
       _chkShowPauseTooltip.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP));
-
       _comboTooltipPosition.select(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION));
 
       onChangeUI();
