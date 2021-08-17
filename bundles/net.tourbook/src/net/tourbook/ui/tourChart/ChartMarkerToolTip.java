@@ -788,7 +788,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          break;
       }
 
-      // ckeck if tooltip is left to the chart border
+      // check if tooltip is left to the chart border
       if (ttPosX + tipWidth < 0) {
 
          // set tooltip to the graph left border

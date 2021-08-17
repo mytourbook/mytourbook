@@ -22,12 +22,12 @@ import org.eclipse.swt.graphics.RGB;
 
 public class ChartPauseConfig {
 
-   public RGB                         markerColorDefault_Light;
-   public RGB                         markerColorDefault_Dark;
-   public RGB                         markerColorDevice_Light;
-   public RGB                         markerColorDevice_Dark;
-   public RGB                         markerColorHidden_Light;
-   public RGB                         markerColorHidden_Dark;
+   public RGB                         pauseColorDefault_Light;
+   public RGB                         pauseColorDefault_Dark;
+   public RGB                         pauseColorDevice_Light;
+   public RGB                         pauseColorDevice_Dark;
+   public RGB                         pauseColorHidden_Light;
+   public RGB                         pauseColorHidden_Dark;
 
    public boolean                     isShowPauseTooltip;
    public int                         pauseTooltipPosition;

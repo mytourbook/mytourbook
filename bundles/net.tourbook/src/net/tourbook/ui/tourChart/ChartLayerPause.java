@@ -42,7 +42,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    private int              PAUSE_HOVER_SIZE;
    private int              PAUSE_POINT_SIZE;
 
-   private TourChart        _tourChart;
    private ChartPauseConfig _chartPauseConfig;
 
    private long             _hoveredEventTime;

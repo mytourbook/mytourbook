@@ -172,12 +172,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       setColors(container);
 
-      // compute width for all controls and equalize column width for the different sections
-//      _ttContainer.layout(true, true);
-//      UI.setEqualizeColumWidths(_firstColumnControls, 10);
-
-//      _ttContainer.layout(true, true);
-
       return container;
    }
 
@@ -191,13 +185,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
        */
       _shellContainer = new Composite(shell, SWT.NONE);
       GridLayoutFactory.fillDefaults()
-//            .spacing(0, 0)
-//            .numColumns(2)
-            // set margin to draw the border
             .extendedMargins(1, 1, 1, 1)
             .applyTo(_shellContainer);
-//      _shellContainer.setForeground(_fgColor);
-//      _shellContainer.setBackground(_bgColor);
       _shellContainer.addPaintListener(this::onPaintShellContainer);
       {
          _ttContainer = new Composite(_shellContainer, SWT.NONE);
@@ -205,8 +194,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
                .extendedMargins(2, 5, 2, 5)
                .numColumns(1)
                .applyTo(_ttContainer);
-//         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-//         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
             createUI_70_Values(_ttContainer);
          }
@@ -218,7 +205,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    private void createUI_70_Values(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .indent(3, 0)
@@ -347,11 +333,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       int ttPosY;
 
       if (devHoveredY < devYTop) {
+
          // remove hovered size
          devHoveredY = devYTop;
       }
 
       switch (_chartPauseConfig.pauseTooltipPosition) {
+
       case TOOLTIP_POSITION_LEFT:
 
          ttPosX = devHoveredX - tipWidth - 1;
@@ -413,7 +401,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          break;
       }
 
-      // ckeck if tooltip is left to the chart border
+      // check if tooltip is left to the chart border
       if (ttPosX + tipWidth < 0) {
 
          // set tooltip to the graph left border
