@@ -46,6 +46,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    //todo fb display a gray area hwen hovering just like the markers
    // make sure it works with multiple tours
 
+   //Bug when the pauses layer is hidden, the pause tooltip is not displayed anymore
+
    /**
     * Visual position for the pause tooltip, they must correspond to the position id
     * TOOLTIP_POSITION_*.
@@ -157,58 +159,50 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          _ttContainer = new Composite(_shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()
                .extendedMargins(2, 5, 2, 5)
-               .numColumns(1)
                .applyTo(_ttContainer);
          {
-            createUI_70_Values(_ttContainer);
+            createUI_10_Values(_ttContainer);
          }
       }
 
       return _shellContainer;
    }
 
-   private void createUI_70_Values(final Composite parent) {
+   private void createUI_10_Values(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .indent(3, 0)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults()
-            .numColumns(2)
-            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-
          UI.createLabel(container, "Start time");//GRAPH_LABEL_TIME);
-         createUI_72_ValueField(
+         createUI_12_TimeField(
                container,
                _hoveredLabel.getPausedTime_Start(),
                _hoveredLabel.getTimeZoneId());
 
          UI.createLabel(container, "End time");//GRAPH_LABEL_TIME);
-         createUI_72_ValueField(
+         createUI_12_TimeField(
                container,
                _hoveredLabel.getPausedTime_End(),
                _hoveredLabel.getTimeZoneId());
-
       }
    }
 
-   private void createUI_72_ValueField(final Composite parent,
-                                       final long value,
-                                       final String dbTimeZoneId) {
+   private void createUI_12_TimeField(final Composite parent,
+                                      final long value,
+                                      final String dbTimeZoneId) {
 
       // Value
-      final Label label = new Label(parent, SWT.TRAIL);
-      GridDataFactory.fillDefaults()
-            .align(SWT.END, SWT.FILL)
-            .indent(10, 0)
-            .applyTo(label);
+      final Label label = new Label(parent, SWT.NONE);
 
       final ZonedDateTime tourZonedDateTime = TimeTools.createTourDateTime(value, dbTimeZoneId).tourZonedDateTime;
 
       if (_tourData.isMultipleTours()) {
 
+         //todo get the timezoneid from the current tour
          final String format_yyyymmdd_hhmmss = UI.format_yyyymmdd_hhmmss(tourZonedDateTime.getYear(),
                tourZonedDateTime.getMonthValue(),
                tourZonedDateTime.getDayOfMonth(),
@@ -224,6 +218,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       }
    }
 
+   //TODO FB
    /**
     * This is copied from {@link ChartLayerMarker#drawOverlay()}.
     * <p>

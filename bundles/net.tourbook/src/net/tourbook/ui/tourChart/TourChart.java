@@ -5979,7 +5979,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       _tourChartConfiguration.isShowTourPauses = isShowTourPauses;
 
-      updateUI_PausesLayer(true);
+      updateUI_PausesLayer(isShowTourPauses);
 
       // update actions
       _actionTourChartPauses.setSelected(isShowTourPauses);
