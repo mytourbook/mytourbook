@@ -59,18 +59,18 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String  GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String  GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String  GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String     GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String     GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
+   private static final String     GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
 
-   private static final int     DEFAULT_TEXT_WIDTH   = 50;
-   private static final int     DEFAULT_TEXT_HEIGHT  = 20;
+   private static final int        DEFAULT_TEXT_WIDTH   = 50;
+   private static final int        DEFAULT_TEXT_HEIGHT  = 20;
 
    /**
     * Visual position for marker tooltip, they must correspond to the position id
     * TOOLTIP_POSITION_*.
     */
-   public static final String[] TOOLTIP_POSITIONS;
+   protected static final String[] TOOLTIP_POSITIONS;
 
    static {
 

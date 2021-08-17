@@ -2094,6 +2094,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       _layerPause.setChartPauseConfig(chartPauseConfig);
+      _tourPauseTooltip.setChartPauseConfig(chartPauseConfig);
 
       // get the x-axis data serie
       final double[] xAxisSerie = getXAxisDataSerie();
