@@ -1916,6 +1916,7 @@ public class Messages extends NLS {
 
    public static String Slideout_ChartPausesOptions_Checkbox_IsShowPauseTooltip;
    public static String Slideout_ChartPausesOptions_Combo_TooltipPosition_Tooltip;
+   public static String Slideout_ChartPauseOptions_Label_Title;
 
    public static String Slideout_ConconiOptions_Label_Title;
 

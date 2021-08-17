@@ -296,10 +296,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       gc.setClipping((Region) null);
    }
 
-   public ChartLabel getHoveredLabel() {
-      return _hoveredLabel;
-   }
-
    private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
 
       for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {

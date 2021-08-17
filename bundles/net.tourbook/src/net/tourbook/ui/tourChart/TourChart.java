@@ -748,6 +748,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       @Override
       public void mouseMove(final ChartMouseEvent chartMouseEvent) {
+
          onMarker_MouseMove(chartMouseEvent);
          onPause_MouseMove(chartMouseEvent);
       }
@@ -3132,15 +3133,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return tourMarker;
    }
 
-   private ChartLabel getHoveredTourPause() {
-
-      if (_layerPause == null) {
-         return null;
-      }
-
-      return _layerPause.getHoveredLabel();
-   }
-
    public TourMarker getLastHoveredTourMarker() {
 
       return _lastHoveredTourMarker;
@@ -3491,17 +3483,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       final ChartLabelPause hoveredLabel = _layerPause.retrieveHoveredPause(chartMouseEvent);
-      final boolean isPauseHovered = hoveredLabel != null;
-      if (isPauseHovered) {
-
-         // set isWorked to true so that no other actions are done in this event
-         chartMouseEvent.isWorked = isPauseHovered;
-         chartMouseEvent.cursor = ChartCursor.Arrow;
+      if (hoveredLabel == null) {
+         return;
       }
-      // check if the selected marker is hovered
-      final ChartLabel hoveredPause = getHoveredTourPause();
 
-      if (_tourChartConfiguration.isShowPauseTooltip && isPauseHovered) {
+      // set isWorked to true so that no other actions are done in this event
+      chartMouseEvent.isWorked = true;
+      chartMouseEvent.cursor = ChartCursor.Arrow;
+
+      if (_tourChartConfiguration.isShowPauseTooltip) {
 
          // marker tooltip is displayed
 

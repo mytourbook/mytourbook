@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -25,8 +27,6 @@ import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,12 +36,12 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourChartPauses extends ContributionItem implements IOpeningDialog {
 
-   private String                _dialogId = getClass().getCanonicalName();
+   private String                  _dialogId = getClass().getCanonicalName();
 
-   private TourChart             _tourChart;
+   private TourChart               _tourChart;
 
-   private ToolBar               _toolBar;
-   private ToolItem              _actionToolItem;
+   private ToolBar                 _toolBar;
+   private ToolItem                _actionToolItem;
 
    private SlideoutTourChartPauses _slideoutTourChartPause;
 
@@ -77,12 +77,7 @@ public class ActionTourChartPauses extends ContributionItem implements IOpeningD
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
          _actionToolItem.setDisabledImage(_imageDisabled);
-         _actionToolItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction();
-            }
-         });
+         _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction()));
 
          toolbar.addMouseMoveListener(mouseEvent -> {
 
@@ -112,25 +107,18 @@ public class ActionTourChartPauses extends ContributionItem implements IOpeningD
 
       updateUI();
 
-      final boolean isTourInfoVisible = _actionToolItem.getSelection();
+      final boolean areTourPausesVisible = _actionToolItem.getSelection();
 
-      if (isTourInfoVisible) {
+      if (areTourPausesVisible) {
 
-         final Rectangle itemBounds = _actionToolItem.getBounds();
-
-         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-         itemBounds.x = itemDisplayPosition.x;
-         itemBounds.y = itemDisplayPosition.y;
-
-         openSlideout(itemBounds, false);
+         openSlideout(true);
 
       } else {
 
          _slideoutTourChartPause.close();
       }
 
-      _tourChart.actionShowTourInfo(isTourInfoVisible);
+      _tourChart.actionShowTourPauses(areTourPausesVisible);
    }
 
    private void onMouseMove(final ToolItem item) {
@@ -142,26 +130,23 @@ public class ActionTourChartPauses extends ContributionItem implements IOpeningD
 
       if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
 
-         // marker is not displayed
-
+         // pauses are not displayed
          return;
       }
 
-      final boolean isToolItemHovered = item == _actionToolItem;
+      openSlideout(true);
+   }
 
-      Rectangle itemBounds = null;
+   private void openSlideout(final boolean isOpenDelayed) {
 
-      if (isToolItemHovered) {
+      final Rectangle itemBounds = _actionToolItem.getBounds();
 
-         itemBounds = item.getBounds();
+      final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
 
-         itemBounds.x = itemDisplayPosition.x;
-         itemBounds.y = itemDisplayPosition.y;
-      }
-
-      openSlideout(itemBounds, true);
+      openSlideout(itemBounds, isOpenDelayed);
    }
 
    private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
@@ -186,7 +171,7 @@ public class ActionTourChartPauses extends ContributionItem implements IOpeningD
    public void setSelected(final boolean isSelected) {
 
       if (_actionToolItem == null) {
-         // this happened
+         // this happened before
          return;
       }
 
@@ -199,7 +184,7 @@ public class ActionTourChartPauses extends ContributionItem implements IOpeningD
 
       if (_actionToolItem.getSelection()) {
 
-         // hide tooltip because the tour info options slideout is displayed
+         // hide tooltip because the tour pause options slideout is displayed
 
          _actionToolItem.setToolTipText(UI.EMPTY_STRING);
 

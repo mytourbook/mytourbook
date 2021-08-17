@@ -20,13 +20,11 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartComponentGraph;
-import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -69,50 +67,32 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       };
    }
 
-   private static final int                TOOLTIP_POSITION_LEFT         = 0;
-   private static final int                TOOLTIP_POSITION_RIGHT        = 1;
-   private static final int                TOOLTIP_POSITION_ABOVE        = 2;
-   private static final int                TOOLTIP_POSITION_BELOW        = 3;
-   private static final int                TOOLTIP_POSITION_CHART_TOP    = 4;
-   private static final int                TOOLTIP_POSITION_CHART_BOTTOM = 5;
+   private static final int TOOLTIP_POSITION_LEFT         = 0;
+   private static final int TOOLTIP_POSITION_RIGHT        = 1;
+   private static final int TOOLTIP_POSITION_ABOVE        = 2;
+   private static final int TOOLTIP_POSITION_BELOW        = 3;
+   private static final int TOOLTIP_POSITION_CHART_TOP    = 4;
+   private static final int TOOLTIP_POSITION_CHART_BOTTOM = 5;
 
-   public static final int                 DEFAULT_TOOLTIP_POSITION      = TOOLTIP_POSITION_BELOW;
+   public static final int  DEFAULT_TOOLTIP_POSITION      = TOOLTIP_POSITION_BELOW;
 
-   private TourChart                       _tourChart;
-   private TourData                        _tourData;
+   private TourChart        _tourChart;
+   private TourData         _tourData;
 
-   private ChartLabelPause                 _hoveredLabel;
+   private ChartLabelPause  _hoveredLabel;
 
-   private ChartPauseConfig                _chartPauseConfig;
-
-   private ActionOpenMarkerDialogInTooltip _actionOpenMarkerDialog;
+   private ChartPauseConfig _chartPauseConfig;
 
    /*
     * UI resources
     */
-   private Color      _fgBorder;
-   private ColorCache _colorCache;
+   private Color _fgBorder;
 
    /*
     * UI controls
     */
    private Composite _shellContainer;
    private Composite _ttContainer;
-
-   private class ActionOpenMarkerDialogInTooltip extends ActionOpenMarkerDialog {
-
-      public ActionOpenMarkerDialogInTooltip() {
-         super(ChartPauseToolTip.this, true);
-      }
-
-      @Override
-      public void run() {
-
-         hideNow();
-
-         super.run();
-      }
-   }
 
    public ChartPauseToolTip(final TourChart tourChart) {
 
@@ -143,16 +123,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       return _hoveredLabel != null;
    }
 
-   private void createActions() {
-
-      final boolean isSingleTour = _tourData.isMultipleTours() == false;
-
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialogInTooltip();
-
-      // setup action for the current tour marker
-      _actionOpenMarkerDialog.setEnabled(isSingleTour);
-   }
-
    @Override
    protected Composite createToolTipContentArea(final Composite shell) {
 
@@ -163,10 +133,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       if (_hoveredLabel == null) {
          return null;
       }
-
       _tourData = _tourChart.getTourData();
-
-      createActions();
 
       final Composite container = createUI(shell);
 
@@ -215,7 +182,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       {
 
          UI.createLabel(container, "Start time");//GRAPH_LABEL_TIME);
-
          createUI_72_ValueField(
                container,
                _hoveredLabel.getPausedTime_Start(),
@@ -243,13 +209,21 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       final ZonedDateTime tourZonedDateTime = TimeTools.createTourDateTime(value, dbTimeZoneId).tourZonedDateTime;
 
-      final String format_hh_mm_ss = UI.format_yyyymmdd_hhmmss(tourZonedDateTime.getYear(),
-            tourZonedDateTime.getMonthValue(),
-            tourZonedDateTime.getDayOfMonth(),
-            tourZonedDateTime.getHour(),
-            tourZonedDateTime.getMinute(),
-            tourZonedDateTime.getSecond());
-      label.setText(format_hh_mm_ss);
+      if (_tourData.isMultipleTours()) {
+
+         final String format_yyyymmdd_hhmmss = UI.format_yyyymmdd_hhmmss(tourZonedDateTime.getYear(),
+               tourZonedDateTime.getMonthValue(),
+               tourZonedDateTime.getDayOfMonth(),
+               tourZonedDateTime.getHour(),
+               tourZonedDateTime.getMinute(),
+               tourZonedDateTime.getSecond());
+         label.setText(format_yyyymmdd_hhmmss);
+      } else {
+
+         final String format_hh_mm_ss = UI.format_hh_mm_ss(
+               tourZonedDateTime.getHour() * 3600 + tourZonedDateTime.getMinute() * 60 + tourZonedDateTime.getSecond());
+         label.setText(format_hh_mm_ss);
+      }
    }
 
    /**
@@ -428,71 +402,92 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       // check display bounds
       final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
-//      final Point dispPos = chartComponentGraph.toDisplay(ttPosX, ttPosY);
-
-//      if (dispPos.x < 0) {
-//
-//         // tooltip is outside of the display, set tooltip to the right of the tour marker
-//         ttPosX = devHoveredRight + 1;
-//      }
 
       final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
-      final Point ttLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
+      final Point tooltipLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
 
       /*
        * Fixup display bounds
        */
-      final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, ttLocation);
-      final Point rightBottomBounds = new Point(tipSize.x + ttLocation.x, tipSize.y + ttLocation.y);
+      final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
+      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
 
-      if (!(displayBounds.contains(ttLocation) && displayBounds.contains(rightBottomBounds))) {
+      if (!(displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds))) {
 
          final int displayX = displayBounds.x;
          final int displayY = displayBounds.y;
          final int displayWidth = displayBounds.width;
          final int displayHeight = displayBounds.height;
 
-         if (ttLocation.x < displayX) {
+         if (tooltipLocation.x < displayX) {
 
-            ttLocation.x = ttLocation.x + tipWidth + devHoveredWidth + 2;
+            switch (_chartPauseConfig.pauseTooltipPosition) {
 
+            case TOOLTIP_POSITION_BELOW:
+            case TOOLTIP_POSITION_ABOVE:
+            case TOOLTIP_POSITION_CHART_TOP:
+            case TOOLTIP_POSITION_CHART_BOTTOM:
+               tooltipLocation.x = displayX;
+               break;
+
+            case TOOLTIP_POSITION_LEFT:
+               tooltipLocation.x = tooltipLocation.x + tipWidth + devHoveredWidth + 2;
+               break;
+            }
          }
 
          if (rightBottomBounds.x > displayX + displayWidth) {
 
-            ttLocation.x = ttLocation.x - tipWidth - devHoveredWidth - 2;
+            switch (_chartPauseConfig.pauseTooltipPosition) {
 
+            case TOOLTIP_POSITION_BELOW:
+            case TOOLTIP_POSITION_ABOVE:
+            case TOOLTIP_POSITION_CHART_TOP:
+            case TOOLTIP_POSITION_CHART_BOTTOM:
+               tooltipLocation.x = displayWidth - tipWidth;
+               break;
+
+            case TOOLTIP_POSITION_RIGHT:
+               tooltipLocation.x = tooltipLocation.x - tipWidth - devHoveredWidth - 2;
+               break;
+            }
          }
 
-         if (ttLocation.y < displayY) {
+         if (tooltipLocation.y < displayY) {
 
-            ttLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
+            switch (_chartPauseConfig.pauseTooltipPosition) {
 
+            case TOOLTIP_POSITION_ABOVE:
+            case TOOLTIP_POSITION_CHART_TOP:
+               tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
+               break;
+            }
          }
 
          if (rightBottomBounds.y > displayY + displayHeight) {
 
-            ttLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
+            switch (_chartPauseConfig.pauseTooltipPosition) {
 
+            case TOOLTIP_POSITION_BELOW:
+            case TOOLTIP_POSITION_CHART_BOTTOM:
+               tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
+               break;
+            }
          }
       }
 
-      return ttLocation;
+      return tooltipLocation;
    }
 
    private void initUI(final Composite parent) {
 
       final Display display = parent.getDisplay();
 
-      _colorCache = new ColorCache();
       _fgBorder = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
    }
 
    @Override
-   protected void onDispose() {
-
-      _colorCache.dispose();
-   }
+   protected void onDispose() {}
 
    @Override
    protected void onMouseExitToolTip(final MouseEvent mouseEvent) {
@@ -510,7 +505,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       /*
        * When in tooltip, the hovered label state is not displayed, keep it displayed
        */
-      final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
+      //  final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
       //markerLayer.setTooltipLabel(_hoveredLabel);
    }
 
@@ -545,15 +540,15 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          return;
       }
 
-      if (hoveredLabel == null /* || hoveredLabel.paintedLabel == null */) {
+      if (hoveredLabel == null) {
 
-         // a marker is not hovered or is hidden, hide tooltip
+         // a pause is not hovered or is hidden, hide tooltip
 
          hide();
 
       } else {
 
-         // another marker is hovered, show tooltip
+         // another pause is hovered, show tooltip
 
          _hoveredLabel = hoveredLabel;
          //_hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
@@ -564,6 +559,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    }
 
    void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
+
       _chartPauseConfig = chartPauseConfig;
    }
 
