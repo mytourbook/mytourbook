@@ -19,7 +19,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.UI;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -618,7 +617,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          TourLogManager.showLogView();
 
-         final File[] reimportedFile = new File[1];
          final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
             @Override
@@ -628,7 +626,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                rawDataManager.reimportTour(tourValueTypes,
                      oldTourData,
-                     reimportedFile,
                      skipToursWithFileNotFound,
                      reImportStatus);
 
@@ -700,8 +697,8 @@ public class DialogReimportTours extends TitleAreaDialog {
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void doReimport_SelectedTours(final List<TourValueType> tourValueTypes,
-                                            final ITourViewer3 tourViewer,
-                                            final boolean skipToursWithFileNotFound) {
+                                         final ITourViewer3 tourViewer,
+                                         final boolean skipToursWithFileNotFound) {
 
       final long start = System.currentTimeMillis();
 
@@ -745,7 +742,6 @@ public class DialogReimportTours extends TitleAreaDialog {
             final ReImportStatus reImportStatus = new ReImportStatus();
             final boolean[] isUserAsked_ToCancelReImport = { false };
 
-            final File[] previousReimportedFile = new File[1];
             final int numTours = allSelectedTourIds.length;
             int numDeleted = 0;
 
@@ -772,7 +768,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                rawDataManager.reimportTour(tourValueTypes,
                      oldTourData,
-                     previousReimportedFile,
                      skipToursWithFileNotFound,
                      reImportStatus);
 

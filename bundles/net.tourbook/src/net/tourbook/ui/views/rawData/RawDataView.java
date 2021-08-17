@@ -4514,6 +4514,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final File file = new File(fileName);
          if (file.exists()) {
 
+            final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
+
             final boolean isImported = _rawDataMgr.importTour(
 
                   file, //    importFile
@@ -4521,8 +4523,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   null, //    fileCollision
                   false, //   isBuildNewFileNames
                   true, //    isTourDisplayedInImportView
-                  true //     isReimport
-
+                  true, //    isReimport
+                  allImportedToursFromOneFile //
             );
 
             if (isImported) {

@@ -734,7 +734,7 @@ public class FitDataReader extends TourbookDevice {
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> multipleTours_FromOneImportFile,
+                                    final Map<Long, TourData> newlyImportedTours,
                                     final boolean isReimport) {
 
       boolean returnValue = false;
@@ -747,7 +747,7 @@ public class FitDataReader extends TourbookDevice {
                this,
                importFilePath,
                alreadyImportedTours,
-               multipleTours_FromOneImportFile);
+               newlyImportedTours);
 
          // setup all fit listeners
          fitBroadcaster.addListener(new MesgListener_Activity(fitData));

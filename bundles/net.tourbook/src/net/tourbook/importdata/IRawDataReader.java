@@ -40,7 +40,7 @@ public interface IRawDataReader {
     *           Contains all tours which are already imported and displayed in the import view.
     *           Tour id is the hash map key. Newly imported tour should not be added to this map,
     *           they are added after this method is returned, they must be put into the parameter
-    *           <i>importedTours</i> map.
+    *           <i>newlyImportedTours</i> map.
     *           <p>
     *           This map can be used to check if a tour is already imported and displayed in the
     *           import view.
