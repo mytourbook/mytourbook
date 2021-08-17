@@ -28,11 +28,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -51,11 +49,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    // make sure it works with multiple tours
 
    // when multiple tour, display the yyyy-mm-dd before the hour
-
-   private static final String  GRAPH_LABEL_TIME    = net.tourbook.common.Messages.Graph_Label_Time;
-
-   private static final int     DEFAULT_TEXT_WIDTH  = 50;
-   private static final int     DEFAULT_TEXT_HEIGHT = 20;
 
    /**
     * Visual position for the pause tooltip, they must correspond to the position id
@@ -85,26 +78,10 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
    public static final int                 DEFAULT_TOOLTIP_POSITION      = TOOLTIP_POSITION_BELOW;
 
-   private static final int                _textStyle                    = SWT.WRAP               //
-         | SWT.MULTI
-         | SWT.READ_ONLY
-//                                                               | SWT.BORDER
-   ;
-
-   private PixelConverter                  _pc;
-
-   private int                             _defaultTextWidth;
-   private int                             _defaultTextHeight;
-
    private TourChart                       _tourChart;
    private TourData                        _tourData;
 
    private ChartLabelPause                 _hoveredLabel;
-
-   /**
-    * When <code>true</code> the actions are displayed, e.g. to open the marker dialog.
-    */
-   private boolean                         _isShowActions;
 
    private ChartPauseConfig                _chartPauseConfig;
 
@@ -335,22 +312,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       return rectHovered;
    }
 
-   /**
-    * @param hoveredLabel
-    * @return Returns a {@link TourMarker} when a chart label (marker) is hovered or
-    *         <code>null</code> when a marker is not hovered.
-    */
-   private TourMarker getHoveredTourMarker(final ChartLabel hoveredLabel) {
-
-      TourMarker tourMarker = null;
-
-      if (hoveredLabel.data instanceof TourMarker) {
-         tourMarker = (TourMarker) hoveredLabel.data;
-      }
-
-      return tourMarker;
-   }
-
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
@@ -535,10 +496,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       final Display display = parent.getDisplay();
 
-      _pc = new PixelConverter(parent);
-      _defaultTextWidth = _pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH);
-      _defaultTextHeight = _pc.convertHeightInCharsToPixels(DEFAULT_TEXT_HEIGHT);
-
       _colorCache = new ColorCache();
       _fgBorder = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
    }
@@ -577,14 +534,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       // draw border
       gc.setForeground(_fgBorder);
       gc.drawRectangle(0, 0, shellSize.x - 1, shellSize.y - 1);
-   }
-
-   private void onSelectUrl(final String address) {
-
-      WEB.openUrl(address);
-
-      // close tooltip when a link is selected
-      hideNow();
    }
 
    void open(final ChartLabelPause hoveredLabel) {
@@ -653,11 +602,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       UI.setColorForAllChildren(container,
             foregroundColor,
             backgroundColor);
-   }
-
-   void setIsShowMarkerActions(final boolean isShowMarkerActions) {
-
-      _isShowActions = isShowMarkerActions;
    }
 
 }
