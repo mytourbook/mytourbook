@@ -938,11 +938,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *
     * @param isChecked
     */
-   public void actionShowTourPauses(final boolean arePausesVisible) {
+   public void actionShowTourPauses(final boolean isShowTourPauses) {
 
-      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, arePausesVisible);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, isShowTourPauses);
 
-      updateUI_Pauses(arePausesVisible);
+      updateUI_Pauses(isShowTourPauses);
    }
 
    public void actionShowTourPhotos() {
