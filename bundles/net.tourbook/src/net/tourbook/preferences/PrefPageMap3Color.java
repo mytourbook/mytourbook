@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -59,15 +61,10 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -76,10 +73,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -169,12 +163,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
    private ToolBar   _toolBar;
 
    {
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
-         }
-      };
+      _defaultMouseWheelListener = UI::adjustSpinnerValueOnMouseScroll;
    }
 
    /**
@@ -380,7 +369,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
          {
             _colorProfileViewer.collapseAll();
 
-            _colorProfileViewer.setExpandedElements(new Object[] { expandedColorDefinition });
+            _colorProfileViewer.setExpandedElements(expandedColorDefinition);
             _colorProfileViewer.setSelection(new StructuredSelection(activeColorProvider));
 
             _colorProfileViewer.getTree().setFocus();
@@ -535,14 +524,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is critical
        * for performance that these methods be as efficient as possible.
        */
-      final Listener paintListener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      final Listener paintListener = event -> {
 
-            if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
 
-               onViewerPaint(event);
-            }
+            onViewerPaint(event);
          }
       };
       tree.addListener(SWT.MeasureItem, paintListener);
@@ -565,19 +551,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
       _colorProfileViewer.setUseHashlookup(true);
 
-      _colorProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onViewerSelectColor();
-         }
-      });
+      _colorProfileViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
 
-      _colorProfileViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onViewerDoubleClick();
-         }
-      });
+      _colorProfileViewer.addDoubleClickListener(doubleClickEvent -> onViewerDoubleClick());
 
       _colorProfileViewer.setCheckStateProvider(new ICheckStateProvider() {
 
@@ -592,13 +568,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
          }
       });
 
-      _colorProfileViewer.addCheckStateListener(new ICheckStateListener() {
-
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
-            onViewerCheckStateChange(event);
-         }
-      });
+      _colorProfileViewer.addCheckStateListener(this::onViewerCheckStateChange);
 
       createUI_24_ContextMenu();
 
@@ -629,12 +599,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
              */
             _btnNewProfile = new Button(container, SWT.NONE);
             _btnNewProfile.setText(APP_ACTION_NEW);
-            _btnNewProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  actionAddProfile();
-               }
-            });
+            _btnNewProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionAddProfile()));
             setButtonLayoutData(_btnNewProfile);
          }
 
@@ -644,12 +609,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
              */
             _btnEditProfile = new Button(container, SWT.NONE);
             _btnEditProfile.setText(APP_ACTION_EDIT);
-            _btnEditProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  actionEditProfile();
-               }
-            });
+            _btnEditProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionEditProfile()));
             setButtonLayoutData(_btnEditProfile);
          }
 
@@ -659,12 +619,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
              */
             _btnDuplicateProfile = new Button(container, SWT.NONE);
             _btnDuplicateProfile.setText(APP_ACTION_DUPLICATE);
-            _btnDuplicateProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  actionDuplicateProfile();
-               }
-            });
+            _btnDuplicateProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionDuplicateProfile()));
             setButtonLayoutData(_btnDuplicateProfile);
          }
 
@@ -674,12 +629,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
              */
             _btnRemoveProfile = new Button(container, SWT.NONE);
             _btnRemoveProfile.setText(APP_ACTION_REMOVE);
-            _btnRemoveProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  actionRemoveProfile();
-               }
-            });
+            _btnRemoveProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionRemoveProfile()));
             setButtonLayoutData(_btnRemoveProfile);
          }
 
@@ -689,12 +639,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
              */
             final Button btnAdjustColumns = new Button(container, SWT.NONE);
             btnAdjustColumns.setText(APP_ACTION_COLUMNS);
-            btnAdjustColumns.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _columnManager.openColumnDialog();
-               }
-            });
+            btnAdjustColumns.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _columnManager.openColumnDialog()));
             setButtonLayoutData(btnAdjustColumns);
             final GridData gd = (GridData) btnAdjustColumns.getLayoutData();
             gd.verticalIndent = 20;
@@ -721,12 +666,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
             _chkShowColorSelector.setText(Messages.Pref_Map3Color_Checkbox_ShowDropDownColorSelector);
             _chkShowColorSelector
                   .setToolTipText(Messages.Pref_Map3Color_Checkbox_ShowDropDownColorSelector_Tooltip);
-            _chkShowColorSelector.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls();
-               }
-            });
+            _chkShowColorSelector.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
          }
 
          final Composite rowContainer = new Composite(container, SWT.NONE);
@@ -1271,7 +1211,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
          } else {
 
-            // a color provider cannot be unchecked, to be unckecked, another color provider must be checked
+            // a color provider cannot be unchecked, to be unchecked, another color provider must be checked
 
             _colorProfileViewer.setChecked(colorProvider, true);
          }
