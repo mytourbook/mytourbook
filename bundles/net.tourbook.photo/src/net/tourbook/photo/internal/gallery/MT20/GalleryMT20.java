@@ -484,7 +484,7 @@ public abstract class GalleryMT20 extends Canvas {
       final ScrollBar verticalBar = getVerticalBar();
       if (verticalBar != null) {
 
-         verticalBar.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onScrollVertical(selectionEvent)));
+         verticalBar.addSelectionListener(widgetSelectedAdapter(this::onScrollVertical));
       }
 
       // Horizontal bar
