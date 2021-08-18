@@ -63,8 +63,6 @@ public class Messages extends NLS {
    public static String        Column_Profile_Dialog_Title;
    public static String        Column_Profile_Name_Default;
 
-   public static String        ColumnFactory_TimeZoneDifference_Tooltip;
-
    public static String        ColumnModifyDialog_Button_default;
    public static String        ColumnModifyDialog_Button_Default2_Tooltip;
    public static String        ColumnModifyDialog_Button_DefaultWidth;
@@ -341,124 +339,6 @@ public class Messages extends NLS {
    public static String        Time_Tools_DST_North;
    public static String        Time_Tools_DST_South;
 
-   public static String        Tour_Tooltip_Action_EditFormatPreferences;
-
-   public static String        Tour_Tooltip_Format_DateWeekTime;
-
-   public static String        Tour_Tooltip_Format_HistoryDateTime;
-
-   public static String        Tour_Tooltip_Format_Pace;
-
-   public static String        Tour_Tooltip_Format_WindDirectionUnit;
-
-   public static String        Tour_Tooltip_Format_WindSpeedUnit;
-
-   public static String        Tour_Tooltip_Label_AltitudeDown;
-
-   public static String        Tour_Tooltip_Label_AltitudeUp;
-
-   public static String        Tour_Tooltip_Label_AvgCadence;
-
-   public static String        Tour_Tooltip_Label_AvgElevationChange;
-
-   public static String        Tour_Tooltip_Label_AvgPace;
-
-   public static String        Tour_Tooltip_Label_AvgPower;
-
-   public static String        Tour_Tooltip_Label_AvgPulse;
-
-   public static String        Tour_Tooltip_Label_AvgSpeed;
-
-   public static String        Tour_Tooltip_Label_Battery;
-
-   public static String        Tour_Tooltip_Label_BodyWeight;
-
-   public static String        Tour_Tooltip_Label_BreakTime;
-
-   public static String        Tour_Tooltip_Label_Calories;
-
-   public static String        Tour_Tooltip_Label_Clouds;
-
-   public static String        Tour_Tooltip_Label_DateTimeCreated;
-
-   public static String        Tour_Tooltip_Label_DateTimeModified;
-
-   public static String        Tour_Tooltip_Label_DefaultTitle;
-
-   public static String        Tour_Tooltip_Label_Description;
-
-   public static String        Tour_Tooltip_Label_Distance;
-
-   public static String        Tour_Tooltip_Label_ElapsedTime;
-
-   public static String        Tour_Tooltip_Label_GearShifts;
-
-   public static String        Tour_Tooltip_Label_Hour;
-
-   public static String        Tour_Tooltip_Label_MaxAltitude;
-
-   public static String        Tour_Tooltip_Label_MaxPace;
-
-   public static String        Tour_Tooltip_Label_MaxPulse;
-
-   public static String        Tour_Tooltip_Label_MaxSpeed;
-
-   public static String        Tour_Tooltip_Label_MovingTime;
-
-   public static String        Tour_Tooltip_Label_NoTour;
-
-   public static String        Tour_Tooltip_Label_PausedTime;
-
-   public static String        Tour_Tooltip_Label_RecordedTime;
-
-   public static String        Tour_Tooltip_Label_RestPulse;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StanceTime_Avg;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StanceTime_Max;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StanceTime_Min;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Avg;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Max;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StanceTimeBalance_Min;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StepLength_Avg;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StepLength_Max;
-
-   public static String        Tour_Tooltip_Label_RunDyn_StepLength_Min;
-
-   public static String        Tour_Tooltip_Label_RunDyn_VerticalOscillation_Avg;
-
-   public static String        Tour_Tooltip_Label_RunDyn_VerticalOscillation_Max;
-
-   public static String        Tour_Tooltip_Label_RunDyn_VerticalOscillation_Min;
-
-   public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Avg;
-
-   public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Max;
-
-   public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
-
-   public static String        Tour_Tooltip_Label_Tags;
-
-   public static String        Tour_Tooltip_Label_Temperature;
-
-   public static String        Tour_Tooltip_Label_TimeZone;
-
-   public static String        Tour_Tooltip_Label_TimeZoneDifference;
-
-   public static String        Tour_Tooltip_Label_TourType;
-
-   public static String        Tour_Tooltip_Label_Weather;
-
-   public static String        Tour_Tooltip_Label_WindDirection;
-
-   public static String        Tour_Tooltip_Label_WindSpeed;
-
    public static String        Value_Formatter_Number_1_0;
    public static String        Value_Formatter_Number_1_1;
    public static String        Value_Formatter_Number_1_2;
@@ -468,14 +348,6 @@ public class Messages extends NLS {
    public static String        Value_Formatter_Time_HH_MM;
    public static String        Value_Formatter_Time_HH_MM_SS;
    public static String        Value_Formatter_Time_SSS;
-
-   public static String        Value_Unit_Cadence;
-
-   public static String        Value_Unit_Cadence_Spm;
-
-   public static String        Value_Unit_KCalories;
-
-   public static String        Value_Unit_Pulse;
 
    static {
       // initialize resource bundle
