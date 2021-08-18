@@ -43,11 +43,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -292,10 +293,11 @@ public class TourDatabase {
    /*
     * Cached distinct fields
     */
-   private static TreeSet<String>                _dbTourTitles;
-   private static TreeSet<String>                _dbTourStartPlace;
-   private static TreeSet<String>                _dbTourEndPlace;
-   private static TreeSet<String>                _dbTourMarkerNames;
+   private static ConcurrentSkipListSet<String>  _dbTourTitles;
+   private static ConcurrentSkipListSet<String>  _dbTourStartPlace;
+   private static ConcurrentSkipListSet<String>  _dbTourEndPlace;
+   private static ConcurrentSkipListSet<String>  _dbTourMarkerNames;
+   private static final ReentrantLock            CACHE_LOCK          = new ReentrantLock();
 
    private static final IPreferenceStore         _prefStore          = TourbookPlugin.getPrefStore();
 
@@ -1610,47 +1612,6 @@ public class TourDatabase {
       return tourIds;
    }
 
-   public static TreeSet<String> getAllTourMarkerNames() {
-
-      if (_dbTourMarkerNames == null) {
-         _dbTourMarkerNames = getDistinctValues(TourDatabase.TABLE_TOUR_MARKER, "label"); //$NON-NLS-1$
-      }
-
-      return _dbTourMarkerNames;
-   }
-
-   /**
-    * Getting all tour place ends from the database sorted by alphabet and without any double
-    * entries.
-    *
-    * @author Stefan F.
-    * @return places as string array.
-    */
-   public static TreeSet<String> getAllTourPlaceEnds() {
-
-      if (_dbTourEndPlace == null) {
-         _dbTourEndPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourEndPlace"); //$NON-NLS-1$
-      }
-
-      return _dbTourEndPlace;
-   }
-
-   /**
-    * Getting all tour start places from the database sorted by alphabet and without any double
-    * entries.
-    *
-    * @author Stefan F.
-    * @return titles as string array.
-    */
-   public static TreeSet<String> getAllTourPlaceStarts() {
-
-      if (_dbTourStartPlace == null) {
-         _dbTourStartPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourStartPlace"); //$NON-NLS-1$
-      }
-
-      return _dbTourStartPlace;
-   }
-
    /**
     * This method is synchronized to conform to FindBugs
     *
@@ -1740,21 +1701,6 @@ public class TourDatabase {
    }
 
    /**
-    * Getting all tour titles from the database sorted by alphabet and without any double entries.
-    *
-    * @author Stefan F.
-    * @return titles as string array.
-    */
-   public static TreeSet<String> getAllTourTitles() {
-
-      if (_dbTourTitles == null) {
-         _dbTourTitles = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourTitle"); //$NON-NLS-1$
-      }
-
-      return _dbTourTitles;
-   }
-
-   /**
     * @return Returns the backend of all tour types which are stored in the database sorted by name.
     */
    @SuppressWarnings("unchecked")
@@ -1797,6 +1743,115 @@ public class TourDatabase {
       return _dbTourTypes;
    }
 
+   public static ConcurrentSkipListSet<String> getCachedFields_AllTourMarkerNames() {
+
+      if (_dbTourMarkerNames == null) {
+
+         CACHE_LOCK.lock();
+         try {
+
+            // recheck again, another thread could have it created
+            if (_dbTourMarkerNames == null) {
+
+               _dbTourMarkerNames = getDistinctValues(TourDatabase.TABLE_TOUR_MARKER, "label"); //$NON-NLS-1$
+            }
+
+         } finally {
+
+            CACHE_LOCK.unlock();
+         }
+      }
+
+      return _dbTourMarkerNames;
+   }
+
+   /**
+    * Getting all tour place ends from the database sorted by alphabet and without any double
+    * entries.
+    *
+    * @author Stefan F.
+    * @return places as string array.
+    */
+   public static ConcurrentSkipListSet<String> getCachedFields_AllTourPlaceEnds() {
+
+      if (_dbTourEndPlace == null) {
+
+         CACHE_LOCK.lock();
+         try {
+
+            // recheck again, another thread could have it created
+            if (_dbTourEndPlace == null) {
+
+               _dbTourEndPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourEndPlace"); //$NON-NLS-1$
+            }
+
+         } finally {
+
+            CACHE_LOCK.unlock();
+         }
+      }
+
+      return _dbTourEndPlace;
+   }
+
+   /**
+    * Getting all tour start places from the database sorted by alphabet and without any double
+    * entries.
+    *
+    * @author Stefan F.
+    * @return titles as string array.
+    */
+   public static ConcurrentSkipListSet<String> getCachedFields_AllTourPlaceStarts() {
+
+      if (_dbTourStartPlace == null) {
+
+         CACHE_LOCK.lock();
+         try {
+
+            // recheck again, another thread could have it created
+            if (_dbTourStartPlace == null) {
+
+               _dbTourStartPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourStartPlace"); //$NON-NLS-1$
+            }
+
+         } finally {
+
+            CACHE_LOCK.unlock();
+         }
+      }
+
+      return _dbTourStartPlace;
+   }
+
+   /**
+    * Getting all tour titles from the database sorted by alphabet and without any double entries.
+    *
+    * @author Stefan F.
+    * @return titles as string array.
+    */
+   public static ConcurrentSkipListSet<String> getCachedFields_AllTourTitles() {
+
+      if (_dbTourTitles == null) {
+
+         CACHE_LOCK.lock();
+         try {
+
+            // recheck again, another thread could have it created
+            if (_dbTourTitles == null) {
+
+               _dbTourTitles = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourTitle"); //$NON-NLS-1$
+            }
+
+         } finally {
+
+            CACHE_LOCK.unlock();
+         }
+
+      }
+
+      return _dbTourTitles;
+   }
+
    public static String getDatabasePath() {
       return _databasePath;
    }
@@ -1817,13 +1872,14 @@ public class TourDatabase {
     *           tourTitle"
     * @return places as string array.
     */
-   private static TreeSet<String> getDistinctValues(final String db, final String fieldname) {
+   private static ConcurrentSkipListSet<String> getDistinctValues(final String db, final String fieldname) {
 
-      final TreeSet<String> sortedValues = new TreeSet<>(new Comparator<String>() {
+      final ConcurrentSkipListSet<String> sortedValues = new ConcurrentSkipListSet<>(new Comparator<String>() {
          @Override
-         public int compare(final String s1, final String s2) {
+         public int compare(final String text1, final String text2) {
+
             // sort without case
-            return s1.compareToIgnoreCase(s2);
+            return text1.compareToIgnoreCase(text2);
          }
       });
 
@@ -1834,15 +1890,16 @@ public class TourDatabase {
 
       display.syncExec(() -> BusyIndicator.showWhile(display, () -> {
 
-         try (Connection conn = getInstance().getConnection(); //
+         try (Connection conn = getInstance().getConnection();
                Statement stmt = conn.createStatement()) {
 
-            final String sqlQuery = UI.EMPTY_STRING //
-                  + "SELECT" //$NON-NLS-1$
-                  + " DISTINCT" //$NON-NLS-1$
-                  + " " + fieldname //$NON-NLS-1$
-                  + " FROM " + db //$NON-NLS-1$
-                  + " ORDER BY " + fieldname; //$NON-NLS-1$
+            final String sqlQuery = UI.EMPTY_STRING
+
+                  + "SELECT" + NL //                     //$NON-NLS-1$
+                  + " DISTINCT " + fieldname + NL //     //$NON-NLS-1$
+                  + " FROM " + db + NL //                //$NON-NLS-1$
+                  + " ORDER BY " + fieldname + NL //     //$NON-NLS-1$
+            ;
 
             final ResultSet result = stmt.executeQuery(sqlQuery);
 
@@ -2650,50 +2707,9 @@ public class TourDatabase {
     */
    public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
 
-      /*
-       * prevent saving a tour which was deleted before
-       */
-      if (tourData.isTourDeleted) {
+      if (saveTour_PreSaveActions(tourData) == false) {
          return null;
       }
-
-      /*
-       * History tour or multiple tours cannot be saved
-       */
-      if (tourData.isHistoryTour || tourData.isMultipleTours()) {
-         return null;
-      }
-
-      /*
-       * prevent saving a tour when a person is not set, this check is for internal use that all
-       * data are valid
-       */
-      if (tourData.getTourPerson() == null) {
-         StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
-         return null;
-      }
-
-      /*
-       * check size of varcar fields
-       */
-      if (tourData.isValidForSave() == false) {
-         return null;
-      }
-
-      /*
-       * Removed cached data
-       */
-      TourManager.clearMultipleTourData();
-
-      /**
-       * ensure HR zones are computed, it requires that a person is set which is not the case when a
-       * device importer calls the method {@link TourData#computeComputedValues()}
-       */
-      tourData.getNumberOfHrZones();
-
-      final long dtSaved = TimeTools.createdNowAsYMDhms();
-
-      checkUnsavedTransientInstances(tourData);
 
       EntityManager em = TourDatabase.getInstance().getEntityManager();
 
@@ -2709,6 +2725,8 @@ public class TourDatabase {
 
             ts.begin();
             {
+               final long dtSaved = TimeTools.createdNowAsYMDhms();
+
                final TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
                if (tourDataEntity == null) {
 
@@ -2756,16 +2774,75 @@ public class TourDatabase {
 
          em.close();
 
-         TourManager.getInstance().updateTourInCache(persistedEntity);
+         saveTour_PostSaveActions(persistedEntity);
+      }
 
-         updateCachedFields(persistedEntity);
+      return persistedEntity;
+   }
 
-         saveTour_GeoParts(persistedEntity);
+   /**
+    * <p>
+    * !!! {@link #checkUnsavedTransientInstances(TourData)} may cause troubles with concurrency,
+    * when new tour types or tags are created !!!
+    *
+    * @param tourData
+    * @return
+    */
+   public static TourData saveTour_Concurrent(final TourData tourData, final boolean isUpdateModifiedDate) {
 
-         // update ft index
-         final ArrayList<TourData> allTours = new ArrayList<>();
-         allTours.add(persistedEntity);
-         FTSearchManager.updateIndex(allTours);
+      if (saveTour_PreSaveActions(tourData) == false) {
+         return null;
+      }
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+      TourData persistedEntity = null;
+
+      if (em != null) {
+
+         final EntityTransaction ts = em.getTransaction();
+
+         try {
+
+            tourData.onPrePersist();
+
+            ts.begin();
+            {
+               // get tour data by tour id
+               final TourData dbTourData = em.find(TourData.class, tourData.getTourId());
+               if (dbTourData == null) {
+
+                  // this should not happen
+
+               } else {
+
+                  if (isUpdateModifiedDate) {
+                     tourData.setDateTimeModified(TimeTools.createdNowAsYMDhms());
+                  }
+
+                  persistedEntity = em.merge(tourData);
+               }
+            }
+            ts.commit();
+
+         } catch (final Exception e) {
+
+            StatusUtil.showStatus(e);
+
+         } finally {
+
+            if (ts.isActive()) {
+               ts.rollback();
+            }
+
+            em.close();
+         }
+
+         // do post save actions for only ONE tour
+         saveTour_PostSaveActions_Concurrent_1_ForOneTour(persistedEntity);
+
+         // !!! This method MUST be called, AFTER all tours are saved !!!
+//       saveTour_PostSaveActions_Concurrent_2_ForAllTours(allTourIds);
       }
 
       return persistedEntity;
@@ -2850,6 +2927,98 @@ public class TourDatabase {
 //      );
    }
 
+   private static void saveTour_PostSaveActions(final TourData persistedEntity) {
+
+      TourManager.getInstance().updateTourInCache(persistedEntity);
+
+      updateCachedFields(persistedEntity);
+
+      saveTour_GeoParts(persistedEntity);
+
+      // update ft index
+      final long[] allTourIds = new long[] { persistedEntity.getTourId() };
+      FTSearchManager.updateIndex(allTourIds);
+   }
+
+   /**
+    * Perform concurrent actions after a tour are saved
+    *
+    * @param persistedEntity
+    */
+   private static void saveTour_PostSaveActions_Concurrent_1_ForOneTour(final TourData persistedEntity) {
+
+      TourManager.getInstance().updateTourInCache(persistedEntity);
+
+      updateCachedFields(persistedEntity);
+
+      saveTour_GeoParts(persistedEntity);
+   }
+
+   /**
+    * Perform concurrent actions after multiple tours are saved
+    *
+    * @param allTourIds
+    */
+   public static void saveTour_PostSaveActions_Concurrent_2_ForAllTours(final long[] allTourIds) {
+
+      // do this expensive action only once for all tours
+      FTSearchManager.updateIndex(allTourIds);
+   }
+
+   /**
+    * Validates a tour before it is saved
+    *
+    * @param tourData
+    * @return Returns <code>true</code> when validation is OK, otherwise <code>false</code>
+    */
+   private static boolean saveTour_PreSaveActions(final TourData tourData) {
+
+      /*
+       * Prevent saving a tour which was deleted before
+       */
+      if (tourData.isTourDeleted) {
+         return false;
+      }
+
+      /*
+       * History tour or multiple tours cannot be saved
+       */
+      if (tourData.isHistoryTour || tourData.isMultipleTours()) {
+         return false;
+      }
+
+      /*
+       * Prevent saving a tour when a person is not set, this check is for internal use that all
+       * data are valid
+       */
+      if (tourData.getTourPerson() == null) {
+         StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
+         return false;
+      }
+
+      /*
+       * Check size of VARCAR sql fields
+       */
+      if (tourData.isValidForSave() == false) {
+         return false;
+      }
+
+      /*
+       * Removed cached data
+       */
+      TourManager.clearMultipleTourData();
+
+      /**
+       * Ensure HR zones are computed, it requires that a person is set which is not the case when a
+       * device importer calls the method {@link TourData#computeComputedValues()}
+       */
+      tourData.getNumberOfHrZones();
+
+      checkUnsavedTransientInstances(tourData);
+
+      return true;
+   }
+
    public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
 
       switch (tourTypeFilter.getFilterType()) {
@@ -2905,29 +3074,30 @@ public class TourDatabase {
 
    private static void updateCachedFields(final TourData tourData) {
 
+      final ConcurrentSkipListSet<String> allTitles = getCachedFields_AllTourTitles();
+      final ConcurrentSkipListSet<String> allPlaceStarts = getCachedFields_AllTourPlaceStarts();
+      final ConcurrentSkipListSet<String> allPlaceEnds = getCachedFields_AllTourPlaceEnds();
+      final ConcurrentSkipListSet<String> allMarkerNames = getCachedFields_AllTourMarkerNames();
+
       // cache tour title
-      final TreeSet<String> allTitles = getAllTourTitles();
       final String tourTitle = tourData.getTourTitle();
       if (tourTitle.length() > 0) {
          allTitles.add(tourTitle);
       }
 
       // cache tour start place
-      final TreeSet<String> allPlaceStarts = getAllTourPlaceStarts();
       final String tourStartPlace = tourData.getTourStartPlace();
       if (tourStartPlace.length() > 0) {
          allPlaceStarts.add(tourStartPlace);
       }
 
       // cache tour end place
-      final TreeSet<String> allPlaceEnds = getAllTourPlaceEnds();
       final String tourEndPlace = tourData.getTourEndPlace();
       if (tourEndPlace.length() > 0) {
          allPlaceEnds.add(tourEndPlace);
       }
 
       // cache tour marker names
-      final TreeSet<String> allMarkerNames = getAllTourMarkerNames();
       final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
       for (final TourMarker tourMarker : allTourMarker) {
          final String label = tourMarker.getLabel();

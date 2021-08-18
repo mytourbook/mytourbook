@@ -53,6 +53,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourEventId;
@@ -1655,13 +1656,13 @@ public class RawDataManager {
     * @param isSkipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     * @param reImportStatus
-    * @param previousReimportedFile
-    *           Indicates whether the tour to re-import is part of a multi-activity tour
+    * @return Returns <code>true</code> when <code>oldTourData</code> was reimported, otherwise
+    *         <code>false</code>
     */
-   public void reimportTour(final TourData oldTourData,
-                            final List<TourValueType> tourValueTypes,
-                            final boolean isSkipToursWithFileNotFound,
-                            final ReImportStatus reImportStatus) {
+   public boolean reimportTour(final TourData oldTourData,
+                               final List<TourValueType> tourValueTypes,
+                               final boolean isSkipToursWithFileNotFound,
+                               final ReImportStatus reImportStatus) {
 
       if (oldTourData.isManualTour()) {
 
@@ -1678,7 +1679,7 @@ public class RawDataManager {
 
          reImportStatus.isReImported = false;
 
-         return;
+         return false;
       }
 
       boolean isReImported = false;
@@ -1724,6 +1725,8 @@ public class RawDataManager {
       }
 
       reImportStatus.isReImported = isReImported;
+
+      return isReImported;
    }
 
    /**
@@ -1965,7 +1968,7 @@ public class RawDataManager {
                 * Save tour but don't fire a change event because the tour editor would set the tour
                 * to dirty
                 */
-               final TourData savedTourData = TourManager.saveModifiedTour_Concurrent(updatedTourData);
+               final TourData savedTourData = TourDatabase.saveTour_Concurrent(updatedTourData, true);
 
                updatedTourData = savedTourData;
             }

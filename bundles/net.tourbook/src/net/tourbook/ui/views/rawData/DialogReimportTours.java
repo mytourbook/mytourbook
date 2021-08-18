@@ -19,16 +19,25 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.UI;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeTourValues;
@@ -102,17 +111,36 @@ public class DialogReimportTours extends TitleAreaDialog {
    private static final int    VERTICAL_SECTION_MARGIN                      = 10;
 
    //
-   private static final IDialogSettings _state = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
+   private static final IDialogSettings    _state          = TourbookPlugin.getState("DialogReimportTours");     //$NON-NLS-1$
 
-   private final ITourViewer3           _tourViewer;
+   private static ThreadPoolExecutor       _reimport_Executor;
+   private static ArrayBlockingQueue<Long> _reimport_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch           _reimport_CountDownLatch;
 
-   private SelectionAdapter             _defaultListener;
+   static {
 
-   private PixelConverter               _pc;
+      final ThreadFactory threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Re-importing tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _reimport_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+   }
+
+   private final ITourViewer3 _tourViewer;
+
+   private SelectionAdapter   _defaultListener;
+
+   private PixelConverter     _pc;
 
    //
-   private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
-   private Image _imageLockOpen   = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Open).createImage();
+   private Image _imageLock_Closed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
+   private Image _imageLock_Open   = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Open).createImage();
 
    /*
     * UI controls
@@ -287,7 +315,7 @@ public class DialogReimportTours extends TitleAreaDialog {
          {
             _btnUnlockAllToursSelection = new Button(_groupTours, SWT.PUSH);
             _btnUnlockAllToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-            _btnUnlockAllToursSelection.setImage(_imageLockClosed);
+            _btnUnlockAllToursSelection.setImage(_imageLock_Closed);
             _btnUnlockAllToursSelection.addSelectionListener(
                   widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_AllTours()));
          }
@@ -311,7 +339,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             }
             _btnUnlockBetweenDatesSelection = new Button(_groupTours, SWT.PUSH);
             _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-            _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
+            _btnUnlockBetweenDatesSelection.setImage(_imageLock_Closed);
             _btnUnlockBetweenDatesSelection.addSelectionListener(
                   widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_BetweenDates()));
          }
@@ -595,7 +623,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } else {
 
-         doReimport_20_SelectedTours(
+         doReimport_50_SelectedTours(
 
                tourValueTypes,
                _tourViewer,
@@ -711,7 +739,7 @@ public class DialogReimportTours extends TitleAreaDialog {
     * @param isSkipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
-   private void doReimport_20_SelectedTours(final List<TourValueType> tourValueTypes,
+   private void doReimport_50_SelectedTours(final List<TourValueType> tourValueTypes,
                                             final ITourViewer3 tourViewer,
                                             final boolean isSkipToursWithFileNotFound) {
 
@@ -723,71 +751,105 @@ public class DialogReimportTours extends TitleAreaDialog {
          return;
       }
 
+      final Display display = Display.getDefault();
+      final Shell activeShell = display.getActiveShell();
+
       // get selected tour IDs
 
       final Object[] allSelectedItems = TourManager.getTourViewerSelectedTourIds(tourViewer);
 
       if (allSelectedItems == null || allSelectedItems.length == 0) {
 
-         MessageDialog.openInformation(Display.getDefault().getActiveShell(),
+         MessageDialog.openInformation(activeShell,
                Messages.Dialog_ReimportTours_Dialog_Title,
                Messages.Dialog_ModifyTours_Dialog_ToursAreNotSelected);
 
          return;
       }
 
+      final int numTours = allSelectedItems.length;
+
       /*
-       * Convert selection to Long array
+       * Convert selection to long array
        */
-      final Long[] allSelectedTourIds = new Long[allSelectedItems.length];
+      final long[] allSelectedTourIds = new long[numTours];
       for (int i = 0; i < allSelectedItems.length; i++) {
-         allSelectedTourIds[i] = (Long) allSelectedItems[i];
+         allSelectedTourIds[i] = (long) allSelectedItems[i];
       }
 
       rawDataManager.setImportId();
       rawDataManager.setImportCanceled(false);
 
-      final IRunnableWithProgress reImportRunnable = new IRunnableWithProgress() {
+      final TLongArrayList allReimportedTourIds = new TLongArrayList();
 
-         Display display = Display.getDefault();
+      /*
+       * Cleanup everything which could cause caching problems
+       */
+      TourManager.getInstance().clearTourDataCache();
+
+      // ensure the tour editor do not show anything
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+      /*
+       * Setup concurrency
+       */
+      _reimport_CountDownLatch = new CountDownLatch(numTours);
+      _reimport_Queue.clear();
+
+      final IRunnableWithProgress reImportRunnable = new IRunnableWithProgress() {
 
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
+            final long startTime = System.currentTimeMillis();
+            long lastUpdateTime = startTime;
+
             final ReImportStatus reImportStatus = new ReImportStatus();
             final boolean[] isUserAsked_ToCancelReImport = { false };
 
-            final int numTours = allSelectedTourIds.length;
-            int numDeleted = 0;
+            final AtomicInteger numWorked = new AtomicInteger();
 
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numTours);
 
             // loop: all selected tours in the viewer
-            for (final Long tourId : allSelectedTourIds) {
+            for (final long tourId : allSelectedTourIds) {
 
                if (monitor.isCanceled()) {
-                  // stop re-importing but process re-imported tours
+
+                  // count down all, that the re-import task can finish but process re-imported tours
+
+                  long numCounts = _reimport_CountDownLatch.getCount();
+                  while (numCounts-- > 0) {
+                     _reimport_CountDownLatch.countDown();
+                  }
+
                   break;
                }
 
-               monitor.worked(1);
-               monitor.subTask(NLS.bind(
-                     Messages.Import_Data_Dialog_Reimport_SubTask,
-                     new Object[] { ++numDeleted, numTours }));
+               final long currentTime = System.currentTimeMillis();
+               final long timeDiff = currentTime - lastUpdateTime;
 
-               final TourData oldTourData = TourManager.getTour(tourId);
+               // reduce logging
+               if (timeDiff > 200) {
 
-               if (oldTourData == null) {
-                  continue;
+                  lastUpdateTime = currentTime;
+
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { numWorked.get(), numTours }));
                }
 
-               rawDataManager.reimportTour(
-                     oldTourData,
+               doReimport_52_RunConcurrent(
+                     tourId,
                      tourValueTypes,
+                     allReimportedTourIds,
                      isSkipToursWithFileNotFound,
+                     monitor,
+                     numWorked,
                      reImportStatus);
 
-               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog && isUserAsked_ToCancelReImport[0] == false
+               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog
+                     && isUserAsked_ToCancelReImport[0] == false
                      && isSkipToursWithFileNotFound == false) {
 
                   // user has canceled the re-import -> ask if the whole re-import should be canceled
@@ -796,7 +858,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   display.syncExec(() -> {
 
-                     if (MessageDialog.openQuestion(display.getActiveShell(),
+                     if (MessageDialog.openQuestion(activeShell,
                            Messages.Import_Data_Dialog_IsCancelReImport_Title,
                            Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
 
@@ -814,6 +876,9 @@ public class DialogReimportTours extends TitleAreaDialog {
                }
             }
 
+            // wait until all re-imports are performed
+            _reimport_CountDownLatch.await();
+
             if (reImportStatus.isReImported) {
 
                rawDataManager.updateTourData_InImportView_FromDb(monitor);
@@ -826,7 +891,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       try {
 
-         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, reImportRunnable);
+         new ProgressMonitorDialog(activeShell).run(true, true, reImportRunnable);
 
       } catch (final Exception e) {
 
@@ -835,12 +900,66 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } finally {
 
+         // do post save actions for all re-imported tours, simalar to
+         // net.tourbook.database.TourDatabase.saveTour_PostSaveActions(TourData)
+
+         TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(allReimportedTourIds.toArray());
+
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(
                TourLogState.DEFAULT,
                String.format(RawDataManager.LOG_REIMPORT_END, time));
-
       }
+   }
+
+   private void doReimport_52_RunConcurrent(final long tourId,
+                                            final List<TourValueType> tourValueTypes,
+                                            final TLongArrayList allReimportedTourIds,
+                                            final boolean isSkipToursWithFileNotFound,
+                                            final IProgressMonitor monitor,
+                                            final AtomicInteger numWorked,
+                                            final ReImportStatus reImportStatus) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _reimport_Queue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _reimport_Executor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _reimport_Queue.poll();
+
+         if (queueItem_TourId != null) {
+
+            final TourData oldTourData = TourManager.getTour(queueItem_TourId);
+
+            if (oldTourData != null) {
+
+               final boolean isReimported = RawDataManager.getInstance().reimportTour(
+                     oldTourData,
+                     tourValueTypes,
+                     isSkipToursWithFileNotFound,
+                     reImportStatus);
+
+               if (isReimported) {
+                  allReimportedTourIds.add(oldTourData.getTourId());
+               }
+            }
+         }
+
+         monitor.worked(1);
+         numWorked.incrementAndGet();
+
+         _reimport_CountDownLatch.countDown();
+      });
    }
 
    private void enableControls() {
@@ -951,8 +1070,8 @@ public class DialogReimportTours extends TitleAreaDialog {
       };
 
       _parent.addDisposeListener(disposeEvent -> {
-         _imageLockClosed.dispose();
-         _imageLockOpen.dispose();
+         _imageLock_Closed.dispose();
+         _imageLock_Open.dispose();
       });
    }
 
@@ -1065,8 +1184,8 @@ public class DialogReimportTours extends TitleAreaDialog {
             : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
 
       _btnUnlockAllToursSelection.setImage(isEnabled
-            ? _imageLockOpen
-            : _imageLockClosed);
+            ? _imageLock_Open
+            : _imageLock_Closed);
 
       if (!isEnabled) {
          _rdoReimport_Tours_All.setSelection(false);
@@ -1090,8 +1209,8 @@ public class DialogReimportTours extends TitleAreaDialog {
             ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
             : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
       _btnUnlockBetweenDatesSelection.setImage(isEnabled
-            ? _imageLockOpen
-            : _imageLockClosed);
+            ? _imageLock_Open
+            : _imageLock_Closed);
 
       if (!isEnabled) {
          _rdoReimport_Tours_BetweenDates.setSelection(false);
@@ -1101,9 +1220,9 @@ public class DialogReimportTours extends TitleAreaDialog {
       updateUI_LockUnlockButtons();
    }
 
-// SET_FORMATTING_OFF
-
    private void restoreState() {
+
+// SET_FORMATTING_OFF
 
       // Tours to re-import
       _rdoReimport_Tours_All              .setSelection(_state.getBoolean(STATE_REIMPORT_TOURS_ALL));
@@ -1139,9 +1258,13 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkSkip_Tours_With_ImportFile_NotFound.setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
 
       enableControls();
+
+// SET_FORMATTING_ON
    }
 
    private void saveState() {
+
+// SET_FORMATTING_OFF
 
       // Tours to re-import
       _state.put(STATE_REIMPORT_TOURS_ALL,                     _rdoReimport_Tours_All.getSelection());
@@ -1173,9 +1296,9 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       // Skip tours for which the import file is not found
       _state.put(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND, _chkSkip_Tours_With_ImportFile_NotFound.getSelection());
-   }
 
 // SET_FORMATTING_ON
+   }
 
    /**
     * The relayout is needed because when setting a text for a button to "Lock" or "Unlock" an the

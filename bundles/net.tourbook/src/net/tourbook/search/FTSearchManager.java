@@ -46,6 +46,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -1706,9 +1707,9 @@ public class FTSearchManager {
     * tours and their markers/waypoints are deleted and recreated, however it is fast enought for a
     * few thousand items otherwise it would be more complex.
     *
-    * @param modifiedTours
+    * @param allTourIds
     */
-   public static void updateIndex(final ArrayList<TourData> modifiedTours) {
+   public static void updateIndex(final long[] allTourIds) {
 
       setupIndexReader();
 
@@ -1738,9 +1739,9 @@ public class FTSearchManager {
          indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
          indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
 
-         for (final TourData tourData : modifiedTours) {
+         for (final Long tourId : allTourIds) {
 
-            final long tourId = tourData.getTourId();
+            final TourData tourData = TourManager.getTour(tourId);
 
             /*
              * Delete existing tour, marker and waypoint
@@ -1804,7 +1805,9 @@ public class FTSearchManager {
          }
 
       } catch (final IOException e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
 
          closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
