@@ -40,12 +40,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DaumErgoBikeDataReader extends TourbookDevice {
 
-   private static final String DAUM_ERGO_BIKE_CSV_ID =
+   private static final String           DAUM_ERGO_BIKE_CSV_ID =
          "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;Training Type;Training Value;Pulse Time 1;2;3;4;5;6"; //$NON-NLS-1$
 
-   private static final String CSV_STRING_TOKEN      = ";";                                                                                                                        //$NON-NLS-1$
+   private static final String           CSV_STRING_TOKEN      = ";";                                                                                                              //$NON-NLS-1$
 
-   private DecimalFormat       _decimalFormat        = (DecimalFormat) DecimalFormat.getInstance();
+   private static final IPreferenceStore _prefStore            = TourbookPlugin.getPrefStore();
 
    public DaumErgoBikeDataReader() {
       // plugin constructor
@@ -81,10 +81,10 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
       return -1;
    }
 
-   private float parseFloat(final String stringValue) {
+   private float parseFloat(final String stringValue, final DecimalFormat decimalFormat) {
 
       try {
-         return _decimalFormat.parse(stringValue).floatValue();
+         return decimalFormat.parse(stringValue).floatValue();
       } catch (final ParseException e) {
          StatusUtil.log(e);
       }
@@ -98,31 +98,26 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
                                     final boolean isReimport) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//	public boolean processDeviceData(	final String importFilePath,
-//										final DeviceData deviceData,
-//										final HashMap<Long, TourData> tourDataMap) {
 
-      final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+      // must be local because of concurrency
+      DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
 
-      if (prefStore.getBoolean(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT)) {
+      if (_prefStore.getBoolean(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT)) {
 
          /*
           * use customized number format
           */
          try {
 
-            final DecimalFormatSymbols dfs = _decimalFormat.getDecimalFormatSymbols();
+            final DecimalFormatSymbols dfs = decimalFormat.getDecimalFormatSymbols();
 
-            final String groupSep = prefStore.getString(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR);
-            final String decimalSep = prefStore.getString(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR);
+            final String groupSep = _prefStore.getString(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR);
+            final String decimalSep = _prefStore.getString(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR);
 
             dfs.setGroupingSeparator(groupSep.charAt(0));
             dfs.setDecimalSeparator(decimalSep.charAt(0));
 
-            _decimalFormat.setDecimalFormatSymbols(dfs);
+            decimalFormat.setDecimalFormatSymbols(dfs);
 
          } catch (final Exception e) {
             e.printStackTrace();
@@ -131,7 +126,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
          // use default number format
 
-         _decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
+         decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
       }
 
       boolean returnValue = false;
@@ -214,26 +209,26 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
             tokenizer = new StringTokenizer(tokenLine, CSV_STRING_TOKEN);
 
-            time = (short) Integer.parseInt(tokenizer.nextToken()); // 				1  Elapsed Time (s)
-            distance = (int) (parseFloat(tokenizer.nextToken()) * 1000); // 		2  Distance (m)
-            kJoule = parseFloat(tokenizer.nextToken()); // 							3  Phys. kJoule
-            tokenizer.nextToken(); // 												4  Slope (%)
-            tokenizer.nextToken(); // 												5  NM
-            final float cadence = parseFloat(tokenizer.nextToken()); // 			6  RPM
-            final float speed = parseFloat(tokenizer.nextToken()); // 				7  Speed (km/h)
-            final int power = Integer.parseInt(tokenizer.nextToken()); //			8  Watt
-            tokenizer.nextToken(); // 												9  Gear
-            tokenizer.nextToken(); // 												10 Device Active
-            final int pulse = Integer.parseInt(tokenizer.nextToken()); // 			11 Pulse;
-            tokenizer.nextToken(); // 												12 Pulse Type;
-            tokenizer.nextToken(); // 												13 Training Type;
-            tokenizer.nextToken(); // 												14 Training Value;
-            final int pulseTime1 = Integer.parseInt(tokenizer.nextToken()); // 		15 Pulse Time 1;
-            final int pulseTime2 = Integer.parseInt(tokenizer.nextToken()); // 		16 2;
-            final int pulseTime3 = Integer.parseInt(tokenizer.nextToken()); // 		17 3;
-            final int pulseTime4 = Integer.parseInt(tokenizer.nextToken()); // 		18 4;
-            final int pulseTime5 = Integer.parseInt(tokenizer.nextToken()); // 		19 5;
-            final int pulseTime6 = Integer.parseInt(tokenizer.nextToken()); // 		20 6
+            time = (short) Integer.parseInt(tokenizer.nextToken()); //                       1  Elapsed Time (s)
+            distance = (int) (parseFloat(tokenizer.nextToken(), decimalFormat) * 1000); //   2  Distance (m)
+            kJoule = parseFloat(tokenizer.nextToken(), decimalFormat); //                    3  Phys. kJoule
+            tokenizer.nextToken(); //                                                        4  Slope (%)
+            tokenizer.nextToken(); //                                                        5  NM
+            final float cadence = parseFloat(tokenizer.nextToken(), decimalFormat); //       6  RPM
+            final float speed = parseFloat(tokenizer.nextToken(), decimalFormat); //         7  Speed (km/h)
+            final int power = Integer.parseInt(tokenizer.nextToken()); //                    8  Watt
+            tokenizer.nextToken(); //                                                        9  Gear
+            tokenizer.nextToken(); //                                                        10 Device Active
+            final int pulse = Integer.parseInt(tokenizer.nextToken()); //                    11 Pulse;
+            tokenizer.nextToken(); //                                                        12 Pulse Type;
+            tokenizer.nextToken(); //                                                        13 Training Type;
+            tokenizer.nextToken(); //                                                        14 Training Value;
+            final int pulseTime1 = Integer.parseInt(tokenizer.nextToken()); //               15 Pulse Time 1;
+            final int pulseTime2 = Integer.parseInt(tokenizer.nextToken()); //               16 2;
+            final int pulseTime3 = Integer.parseInt(tokenizer.nextToken()); //               17 3;
+            final int pulseTime4 = Integer.parseInt(tokenizer.nextToken()); //               18 4;
+            final int pulseTime5 = Integer.parseInt(tokenizer.nextToken()); //               19 5;
+            final int pulseTime6 = Integer.parseInt(tokenizer.nextToken()); //               20 6
 
             timeDataList.add(timeData = new TimeData());
 

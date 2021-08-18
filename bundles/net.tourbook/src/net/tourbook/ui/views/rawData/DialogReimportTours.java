@@ -75,7 +75,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
@@ -215,6 +214,15 @@ public class DialogReimportTours extends TitleAreaDialog {
       });
    }
 
+   private void countDownLatch() {
+
+      long numCounts = _reimport_CountDownLatch.getCount();
+
+      while (numCounts-- > 0) {
+         _reimport_CountDownLatch.countDown();
+      }
+   }
+
    @Override
    public void create() {
 
@@ -267,14 +275,6 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkSkip_Tours_With_ImportFile_NotFound = new Button(container, SWT.CHECK);
             _chkSkip_Tours_With_ImportFile_NotFound.setText(Messages.Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound);
             GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(_chkSkip_Tours_With_ImportFile_NotFound);
-
-            /*
-             * Label informing the user that if the checkbox is not selected, it
-             * will take significantly more time
-             */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Dialog_ReimportTours_Label_DegradedPerformance);
-            GridDataFactory.fillDefaults().applyTo(label);
          }
       }
    }
@@ -818,10 +818,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   // count down all, that the re-import task can finish but process re-imported tours
 
-                  long numCounts = _reimport_CountDownLatch.getCount();
-                  while (numCounts-- > 0) {
-                     _reimport_CountDownLatch.countDown();
-                  }
+                  countDownLatch();
 
                   break;
                }
@@ -871,6 +868,9 @@ public class DialogReimportTours extends TitleAreaDialog {
                   });
 
                   if (isCancelReimport[0]) {
+
+                     countDownLatch();
+
                      break;
                   }
                }

@@ -2941,7 +2941,7 @@ public class TourDatabase {
    }
 
    /**
-    * Perform concurrent actions after a tour are saved
+    * Perform concurrent actions after a tour is saved
     *
     * @param persistedEntity
     */
