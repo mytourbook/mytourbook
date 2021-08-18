@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import net.tourbook.Images;
@@ -532,13 +533,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             /*
              * adjust target altitude from source altitude
              */
-            final float[] newTargetAltitudeSerie = new float[serieLength];
-
-            for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-               newTargetAltitudeSerie[serieIndex] = newSourceAltitudeSerie[serieIndex];
-            }
-
-            _sourceTour.dataSerieAdjustedAlti = newTargetAltitudeSerie;
+            _sourceTour.dataSerieAdjustedAlti = Arrays.copyOf(newSourceAltitudeSerie, serieLength);
          }
       }
 
@@ -884,7 +879,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       mergeButton.setText(btnText);
       mergeButton.setToolTipText(btnTooltip);
 
-      mergeButton.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectMergeGraph(selectionEvent)));
+      mergeButton.addSelectionListener(widgetSelectedAdapter(this::onSelectMergeGraph));
 
       if (isEnabled) {
          final Image image = TourbookPlugin.getImageDescriptor(imageEnabled).createImage();
