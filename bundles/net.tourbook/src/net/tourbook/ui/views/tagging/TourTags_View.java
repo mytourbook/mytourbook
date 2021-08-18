@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
@@ -89,8 +90,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -793,13 +792,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       tree.addSelectionListener(widgetSelectedAdapter(this::onTagTree_Selection));
 
-      tree.addKeyListener(new KeyAdapter() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-            _tagViewerItem_IsKeyPressed = true;
-         }
-      });
+      tree.addKeyListener(keyPressedAdapter(keyEvent -> _tagViewerItem_IsKeyPressed = true));
 
       /*
        * Create tag viewer
