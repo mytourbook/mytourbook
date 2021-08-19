@@ -82,6 +82,9 @@ Improvements
 * Fitlog/FitlogEx Import (Frederic)
   - The timezone is used only when available, otherwise it's determined with the GPS position
 
+* Statistics (Frederic)
+  - Adding the ability to save the Y-axis min/max values for the athlete's body weight and body fat graphs
+
 
 Changes  
 =======
