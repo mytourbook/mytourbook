@@ -333,7 +333,7 @@ public class TimeTools {
       return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
    }
 
-   public static ZonedDateTime determineSunRiseTimes(final ZonedDateTime zonedDateTime,
+   public static ZonedDateTime determineSunriseTimes(final ZonedDateTime zonedDateTime,
                                                      final double latitude,
                                                      final double longitude) {
 
