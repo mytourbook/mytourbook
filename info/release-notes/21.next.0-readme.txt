@@ -88,7 +88,11 @@ Changes
 
 * 2D Map
   - Move option "Show hovered/selected tour" from "2D Map Options" into "Track Options"
-    
+
+* 2.5D Map
+  - direction arrows modified so they looking like the arrows in 2D Map
+  - fater trackline, when direction arrows are enabled
+  - enabled building extrusion also for mapilion map  
 
 Bugfix
 ======
