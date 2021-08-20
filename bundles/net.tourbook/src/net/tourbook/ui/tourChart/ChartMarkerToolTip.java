@@ -70,7 +70,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
     * Visual position for marker tooltip, they must correspond to the position id
     * TOOLTIP_POSITION_*.
     */
-   public static final String[] TOOLTIP_POSITIONS;
+   protected static final String[] TOOLTIP_POSITIONS;
 
    static {
 

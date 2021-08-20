@@ -455,7 +455,7 @@ public class TimeTools {
       final ZonedDateTime zdt = ZonedDateTime.now();
       final int tzOffset = zdt.getOffset().getTotalSeconds();
 
-      final Period period = new Period(tzOffset * 1000);
+      final Period period = new Period(tzOffset * 1000L);
 
       return period.toString(DURATION_FORMATTER);
    }

@@ -149,7 +149,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          final int yearDays = allYearDays[yearIndex];
 
          segmentStart[yearIndex] = yearDaysSum;
-         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1.0;
          segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
 
          yearDaysSum += yearDays;
@@ -279,7 +279,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          valueIndex -= tourDOYValues.length;
       }
 
-      if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
+      if (valueIndex >= tourDOYValues.length) {
          return;
       }
 
@@ -316,7 +316,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    void createXDataDay(final ChartDataModel chartModel) {
 
       final ChartDataXSerie xData = new ChartDataXSerie(_statisticData_Day.getDoyValuesDouble());
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_DAY);
 //      xData.setVisibleMaxValue(fCurrentYear);
       xData.setChartSegments(createChartSegments(_statisticData_Day));
 
@@ -478,7 +478,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
       yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-      yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);

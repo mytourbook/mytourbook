@@ -374,12 +374,12 @@ public abstract class GalleryMT20 extends Canvas {
 
          @Override
          public void focusGained(final FocusEvent event) {
-            onFocusGained(event);
+            onFocusGained();
          }
 
          @Override
          public void focusLost(final FocusEvent event) {
-            onFocusLost(event);
+            onFocusLost();
          }
       });
    }
@@ -614,7 +614,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       // Notify listeners if necessary.
       if (isNotifyListeners) {
-         notifySelectionListeners(null, -1, false);
+         notifySelectionListeners(null, false);
       }
    }
 
@@ -1306,10 +1306,9 @@ public abstract class GalleryMT20 extends Canvas {
     * nothing is selected
     *
     * @param item
-    * @param index
     * @param isDefault
     */
-   private void notifySelectionListeners(final GalleryMT20Item item, final int index, final boolean isDefault) {
+   private void notifySelectionListeners(final GalleryMT20Item item, final boolean isDefault) {
 
       final Event e = new Event();
       e.widget = this;
@@ -1381,14 +1380,14 @@ public abstract class GalleryMT20 extends Canvas {
       _fullScreenImageViewer.close();
    }
 
-   private void onFocusGained(final FocusEvent event) {
+   private void onFocusGained() {
 
       _isFocusActive = true;
 
       redrawGallery();
    }
 
-   private void onFocusLost(final FocusEvent event) {
+   private void onFocusLost() {
 
       _isFocusActive = false;
 
@@ -1789,7 +1788,7 @@ public abstract class GalleryMT20 extends Canvas {
          selectionAdd(virtualIndex);
       }
 
-      notifySelectionListeners(getInitializedItem(virtualLast), virtualLast, false);
+      notifySelectionListeners(getInitializedItem(virtualLast), false);
 
       redrawGallery();
    }
@@ -2279,7 +2278,7 @@ public abstract class GalleryMT20 extends Canvas {
          selectionAdd(itemIndex);
       }
 
-      notifySelectionListeners(getInitializedItem(0), 0, false);
+      notifySelectionListeners(getInitializedItem(0), false);
 
       redrawGallery();
    }
@@ -2465,7 +2464,6 @@ public abstract class GalleryMT20 extends Canvas {
       // Notify listeners if necessary.
       if (isNotifyListeners) {
 
-         final int index = -1;
          GalleryMT20Item notifiedItem = null;
 
          if (itemIndex != -1 && isSelected) {
@@ -2482,7 +2480,7 @@ public abstract class GalleryMT20 extends Canvas {
 //				index = getItemIndex(notifiedItem);
 //			}
 
-         notifySelectionListeners(notifiedItem, index, false);
+         notifySelectionListeners(notifiedItem, false);
       }
    }
 
@@ -2517,7 +2515,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       showItem(itemEndIndex);
 
-      notifySelectionListeners(_lastSelectedItem, itemEndIndex, false);
+      notifySelectionListeners(_lastSelectedItem, false);
    }
 
    /**
@@ -3169,7 +3167,6 @@ public abstract class GalleryMT20 extends Canvas {
             if (contentWidth <= clientAreaWidth) {
 
                _contentVirtualWidth = contentWidth;
-               _contentVirtualWidthScrollbar = _contentVirtualWidth;
                _contentVirtualWidthScrollbar = _contentVirtualWidth;
 
             } else {
