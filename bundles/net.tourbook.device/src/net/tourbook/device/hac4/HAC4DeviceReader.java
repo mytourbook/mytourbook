@@ -55,6 +55,7 @@ public class HAC4DeviceReader extends TourbookDevice {
    private static final int   HAC4_DATA_SIZE       = 81930;
 
    private class StartBlock {
+
       public short month;
       public short day;
       public short hour;

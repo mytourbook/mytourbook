@@ -42,7 +42,9 @@ import org.xml.sax.SAXParseException;
 
 public class GPXDeviceDataReader extends TourbookDevice {
 
-   private static final String XML_GPX_TAG = "<gpx"; //$NON-NLS-1$
+   private static final char   NL          = UI.NEW_LINE;
+
+   private static final String XML_GPX_TAG = "<gpx";     //$NON-NLS-1$
 
    public GPXDeviceDataReader() {
       // plugin constructor
@@ -70,13 +72,13 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          // write "<?xml ..." to be well conformed
          xmlWriter.write(XML_HEADER);
-         xmlWriter.write(UI.NEW_LINE);
+         xmlWriter.write(NL);
 
          // copy all lines
          String line;
          while ((line = fileReader.readLine()) != null) {
             xmlWriter.write(line);
-            xmlWriter.write(UI.NEW_LINE);
+            xmlWriter.write(NL);
          }
 
       } catch (final Exception e1) {
@@ -192,13 +194,13 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          final StringBuilder sb = new StringBuilder()//
                .append("XML error when parsing file:\n") //$NON-NLS-1$
-               .append(UI.NEW_LINE)
+               .append(NL)
                .append(importFilePath)
-               .append(UI.NEW_LINE)
-               .append(UI.NEW_LINE)
+               .append(NL)
+               .append(NL)
                .append(e.getLocalizedMessage())
-               .append(UI.NEW_LINE)
-               .append(UI.NEW_LINE)
+               .append(NL)
+               .append(NL)
                .append("Line: ") //$NON-NLS-1$
                .append(e.getLineNumber())
                .append("\tColumn: ") //$NON-NLS-1$

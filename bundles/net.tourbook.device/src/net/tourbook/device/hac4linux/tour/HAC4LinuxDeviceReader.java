@@ -46,7 +46,6 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
-   private Section m_section = Section.SECTION_NONE;
 
    /*
     * (non-Javadoc) The file to be parsed includes several sections with different information in
@@ -54,7 +53,20 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * reflected in one of the states to be found below
     */
    private enum Section {
-      SECTION_NONE, SECTION_FILE, SECTION_INFO, SECTION_NOTES, SECTION_FRIENDS, SECTION_PERSON, SECTION_STATISTICS, SECTION_SETTINGS, SECTION_POLAREXTS, SECTION_COACH, SECTION_TOURDATA, SECTION_MARKS
+
+      SECTION_NONE, //
+
+      SECTION_COACH, //
+      SECTION_FILE, //
+      SECTION_FRIENDS, //
+      SECTION_INFO, //
+      SECTION_MARKS, //
+      SECTION_NOTES, //
+      SECTION_PERSON, //
+      SECTION_POLAREXTS, //
+      SECTION_SETTINGS, //
+      SECTION_STATISTICS, //
+      SECTION_TOURDATA, //
    }
 
    /**
@@ -288,7 +300,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
       BufferedReader fileHac4LinuxData = null;
 
       final TourType defaultTourType = getTourType();
-      m_section = Section.SECTION_NONE;
+      Section section = Section.SECTION_NONE;
 
       try {
          if (validateRawData(importFilePath) == false) {
@@ -317,13 +329,13 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                continue;
             }
             if (line.charAt(0) == '[') {
-               switchSection(line.trim());
+               section = switchSection(line.trim());
                continue;
             }
 
             final String[] fields;
             int index = -1;
-            switch (m_section) {
+            switch (section) {
             case SECTION_FILE:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
@@ -647,53 +659,54 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * (non-Javadoc) Switching the machine to another state depending on the section of the file
     * currently read.
     */
-   private void switchSection(final String line) {
+   private Section switchSection(final String line) {
+
       if (line.equals("[FILE]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_FILE;
-         return;
-      }
-      if (line.equals("[INFORMATION]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_INFO;
-         return;
-      }
-      if (line.equals("[NOTES]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_NOTES;
-         return;
-      }
-      if (line.equals("[FRIENDS]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_FRIENDS;
-         return;
-      }
-      if (line.equals("[PERSON]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_PERSON;
-         return;
-      }
-      if (line.equals("[STATISTICS]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_STATISTICS;
-         return;
-      }
-      if (line.equals("[SETTINGS]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_SETTINGS;
-         return;
-      }
-      if (line.equals("[POLAR-EXTENSION]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_POLAREXTS;
-         return;
-      }
-      if (line.equals("[COACH-PARAMETER]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_COACH;
-         return;
-      }
-      if (line.equals("[TOUR-DATA]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_TOURDATA;
-         return;
-      }
-      if (line.equals("[MARKING-DATA]")) { //$NON-NLS-1$
-         m_section = Section.SECTION_MARKS;
-         return;
+         return Section.SECTION_FILE;
       }
 
-      m_section = Section.SECTION_NONE;
+      if (line.equals("[INFORMATION]")) { //$NON-NLS-1$
+         return Section.SECTION_INFO;
+      }
+
+      if (line.equals("[NOTES]")) { //$NON-NLS-1$
+         return Section.SECTION_NOTES;
+      }
+
+      if (line.equals("[FRIENDS]")) { //$NON-NLS-1$
+         return Section.SECTION_FRIENDS;
+      }
+
+      if (line.equals("[PERSON]")) { //$NON-NLS-1$
+         return Section.SECTION_PERSON;
+      }
+
+      if (line.equals("[STATISTICS]")) { //$NON-NLS-1$
+         return Section.SECTION_STATISTICS;
+      }
+
+      if (line.equals("[SETTINGS]")) { //$NON-NLS-1$
+         return Section.SECTION_SETTINGS;
+      }
+
+      if (line.equals("[POLAR-EXTENSION]")) { //$NON-NLS-1$
+         return Section.SECTION_POLAREXTS;
+      }
+
+      if (line.equals("[COACH-PARAMETER]")) { //$NON-NLS-1$
+         return Section.SECTION_COACH;
+      }
+
+      if (line.equals("[TOUR-DATA]")) { //$NON-NLS-1$
+         return Section.SECTION_TOURDATA;
+      }
+
+      if (line.equals("[MARKING-DATA]")) { //$NON-NLS-1$
+         return Section.SECTION_MARKS;
+      }
+
+      return Section.SECTION_NONE;
+
    }
 
    /*

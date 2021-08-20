@@ -54,9 +54,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
    private static final int  OFFSET_TOUR_DATA_START = 0x0140;
    private static final int  OFFSET_TOUR_DATA_END   = 0x10000;
 
-   private GregorianCalendar fFileDate;
-
    private class StartBlock {
+
       public int month;
       public int day;
       public int hour;
@@ -271,6 +270,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
       final HAC4ProDeviceData hac4ProDeviceData = new HAC4ProDeviceData();
 
+      GregorianCalendar fileDate = new GregorianCalendar();
+
       try {
          final File fileRaw = new File(importFilePath);
          file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
@@ -288,10 +289,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
           * get the year, because the year is not saved in the raw data file, the modified year
           * of the file is used
           */
-         fFileDate = new GregorianCalendar();
-         fFileDate.setTime(new Date(lastModified));
+         fileDate = new GregorianCalendar();
+         fileDate.setTime(new Date(lastModified));
 
-         int tourYear = fFileDate.get(Calendar.YEAR);
+         int tourYear = fileDate.get(Calendar.YEAR);
          int lastTourMonth = -1;
 
          // read device data
@@ -600,9 +601,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
          // fImportFileName = fileName;
 
-         deviceData.transferYear = (short) fFileDate.get(Calendar.YEAR);
-         deviceData.transferMonth = (short) (fFileDate.get(Calendar.MONTH) + 1);
-         deviceData.transferDay = (short) fFileDate.get(Calendar.DAY_OF_MONTH);
+         deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
+         deviceData.transferMonth = (short) (fileDate.get(Calendar.MONTH) + 1);
+         deviceData.transferDay = (short) fileDate.get(Calendar.DAY_OF_MONTH);
       }
 
       return returnValue;

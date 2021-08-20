@@ -56,9 +56,9 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
 
-//	// A CDATA section starts with "<![CDATA[" and ends with "]]>"
-//	private static final String				CDATA_START					= "<![CDATA[";								//$NON-NLS-1$
-//	private static final String				CDATA_END					= "]]>";									//$NON-NLS-1$
+//   // A CDATA section starts with "<![CDATA[" and ends with "]]>"
+//   private static final String CDATA_START               = "<![CDATA[";                       //$NON-NLS-1$
+//   private static final String CDATA_END                  = "]]>";                            //$NON-NLS-1$
 
    private static final String ATTR_GPX_VERSION          = "version";                           //$NON-NLS-1$
    private static final String ATTR_GPX_VERSION_1_0      = "1.0";                               //$NON-NLS-1$
@@ -70,7 +70,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String GH600                     = "code.google.com/p/GH615";           //$NON-NLS-1$
 
    // namespace for extensions used by Garmin
-//	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
+//   private static final String            NAME_SPACE_TPEXT      = "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";   //$NON-NLS-1$
 
    private static final int GPX_VERSION_1_0 = 10;
    private static final int GPX_VERSION_1_1 = 11;
@@ -161,86 +161,81 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    // tour
 
-//	<mt:tourType>
-//		<mt:id>34</mt:id>
-//		<mt:name>Rennvelo 2</mt:name>
-//	</mt:tourType>
-//	<mt:tags>
-//		<mt:tag>
-//			<mt:id>20</mt:id>
-//			<mt:name>Panne</mt:name>
-//		</mt:tag>
-//	</mt:tags>
+//   <mt:tourType>
+//      <mt:id>34</mt:id>
+//      <mt:name>Rennvelo 2</mt:name>
+//   </mt:tourType>
+//   <mt:tags>
+//      <mt:tag>
+//         <mt:id>20</mt:id>
+//         <mt:name>Panne</mt:name>
+//      </mt:tag>
+//   </mt:tags>
 
-   private static final String TAG_MT_TOUR_DESCRIPTION         = "mt:tourDescription";      //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_TITLE               = "mt:tourTitle";            //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_START_PLACE         = "mt:tourStartPlace";       //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_END_PLACE           = "mt:tourEndPlace";         //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_DESCRIPTION         = "mt:tourDescription";          //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_TITLE               = "mt:tourTitle";                //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_START_PLACE         = "mt:tourStartPlace";           //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_END_PLACE           = "mt:tourEndPlace";             //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_START_TIME          = "mt:tourStartTime";        //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_MOVING_TIME         = "mt:tourComputedTime_Moving";      //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_ELAPSED_TIME        = "mt:tourDeviceTime_Elapsed";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_START_TIME          = "mt:tourStartTime";            //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";              //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_MOVING_TIME         = "mt:tourComputedTime_Moving";  //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_ELAPSED_TIME        = "mt:tourDeviceTime_Elapsed";   //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";  //$NON-NLS-1$
    private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourDeviceTime_Paused";    //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";            //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DISTANCE            = "mt:tourDistance";         //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";                //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";              //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_DISTANCE            = "mt:tourDistance";             //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_CALORIES            = "mt:calories";             //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_REST_PULSE          = "mt:restPulse";            //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_CALORIES            = "mt:calories";                 //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_REST_PULSE          = "mt:restPulse";                //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_BODY_WEIGHT        = "mt:BodyWeight";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_BODY_FAT        = "mt:BodyFat";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_CONCONI_DEFLECTION  = "mt:conconiDeflection";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DP_TOLERANCE        = "mt:dpTolerance";          //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_BODY_WEIGHT         = "mt:BodyWeight";               //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_BODY_FAT            = "mt:BodyFat";                  //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_CONCONI_DEFLECTION  = "mt:conconiDeflection";        //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_DP_TOLERANCE        = "mt:dpTolerance";              //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_TEMPERATURE         = "mt:temperature";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER             = "mt:weather";              //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_CLOUDS      = "mt:weatherClouds";        //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_WIND_DIR    = "mt:weatherWindDirection"; //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_WIND_SPEED  = "mt:weatherWindSpeed";     //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_TEMPERATURE         = "mt:temperature";              //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER             = "mt:weather";                  //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER_CLOUDS      = "mt:weatherClouds";            //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER_WIND_DIR    = "mt:weatherWindDirection";     //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER_WIND_SPEED  = "mt:weatherWindSpeed";         //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_TAG                 = "mt:tag";                  //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_TYPE                = "mt:tourType";             //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_SUB_NAME            = "mt:name";                 //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_TAG                 = "mt:tag";                      //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_TYPE                = "mt:tourType";                 //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_SUB_NAME            = "mt:name";                     //$NON-NLS-1$
 
-   private static final String ATTR_LATITUDE                   = "lat";                     //$NON-NLS-1$
-   private static final String ATTR_LONGITUDE                  = "lon";                     //$NON-NLS-1$
+   private static final String ATTR_LATITUDE                   = "lat";                         //$NON-NLS-1$
+   private static final String ATTR_LONGITUDE                  = "lon";                         //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
-   private static final SimpleDateFormat GPX_TIME_FORMAT;
-   private static final SimpleDateFormat GPX_TIME_FORMAT_SSSZ;
-   private static final SimpleDateFormat GPX_TIME_FORMAT_RFC822;
-   private static final long             DEFAULT_DATE_TIME;
+   private static final IPreferenceStore _prefStore             = Activator.getDefault().getPreferenceStore();
 
-   static {
+   private final SimpleDateFormat        GPX_TIME_FORMAT        = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");     //$NON-NLS-1$;
+   private final SimpleDateFormat        GPX_TIME_FORMAT_SSSZ   = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$;
+   private final SimpleDateFormat        GPX_TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");       //$NON-NLS-1$
 
-      GPX_TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); //$NON-NLS-1$
-      GPX_TIME_FORMAT_SSSZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
-      GPX_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+   private final long                    DEFAULT_DATE_TIME      = ZonedDateTime
 
-      DEFAULT_DATE_TIME = ZonedDateTime
-            .of(2000, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
-            .toInstant()
-            .toEpochMilli();
-   }
+         .of(2000, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+         .toInstant()
+         .toEpochMilli();
 
-   private IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
+   // To work around a Polar Websync export bug...
+   private boolean _gpxHasLocalTime;
 
-   private int              _gpxVersion = -1;
-   private boolean          _gpxHasLocalTime;                                         // To work around a Polar Websync export bug...
+   private int     _gpxVersion = -1;
 
-   private boolean          _isInMetaData;
-   private boolean          _isInTrk;
-   private boolean          _isInTrkName;
-   private boolean          _isInTrkDesc;
-   private boolean          _isInTrkPt;
+   private boolean _isInMetaData;
+   private boolean _isInTrk;
+   private boolean _isInTrkName;
+   private boolean _isInTrkDesc;
+   private boolean _isInTrkPt;
 
-   private boolean          _isInTime;
-   private boolean          _isInEle;
+   private boolean _isInTime;
+   private boolean _isInEle;
 
    // gpx extensions
    private boolean _isInCadence;
@@ -263,7 +258,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private boolean _isInMT_Wpt;
 
    /*
-    * wap points
+    * Way points
     */
    private boolean                       _isInWpt;
    private boolean                       _isInWpt_Ele;
@@ -422,19 +417,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
           * Remove annoying marker when only 1 tour is imported
           */
 
-//			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+//         final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
 //
-//			if (tourMarkers.size() > 0) {
+//         if (tourMarkers.size() > 0) {
 //
-//				// this happened
+//            // this happened
 //
-//				// sort by serie index
-//				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
-//				Collections.sort(sortedMarkers);
+//            // sort by serie index
+//            final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+//            Collections.sort(sortedMarkers);
 //
-//				final TourMarker firstMarker = sortedMarkers.get(0);
-//				tourMarkers.remove(firstMarker);
-//			}
+//            final TourMarker firstMarker = sortedMarkers.get(0);
+//            tourMarkers.remove(firstMarker);
+//         }
 
       } else {
 
@@ -452,7 +447,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    @Override
    public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-//		System.out.println("</" + name + ">");
+//      System.out.println("</" + name + ">");
 
       if (_isError) {
          return;
@@ -462,20 +457,20 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          final String charData = _characters.toString();
 
-//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//					+ ("\tcharData: " + charData));
-//			// TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//               + ("\tcharData: " + charData));
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
-//			if (charData.startsWith(CDATA_START)) {
+//         if (charData.startsWith(CDATA_START)) {
 //
-//				if (charData.endsWith(CDATA_END)) {
+//            if (charData.endsWith(CDATA_END)) {
 //
-//					final int start = CDATA_START.length();
-//					final int end = charData.length() - CDATA_END.length();
+//               final int start = CDATA_START.length();
+//               final int end = charData.length() - CDATA_END.length();
 //
-//					charData = charData.substring(start, end);
-//				}
-//			}
+//               charData = charData.substring(start, end);
+//            }
+//         }
 
          if (_isInTrk) {
 
@@ -1041,7 +1036,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       if (_timeDataList.isEmpty()) {
          // there is not data
 // disabled to imports tour without tracks
-//			return;
+//         return;
       }
 
       // insert Laps into _timeDataList
@@ -1500,7 +1495,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
          throws SAXException {
 
-//		System.out.print("<" + name + ">");
+//      System.out.print("<" + name + ">");
 
       if (_isError) {
          return;
