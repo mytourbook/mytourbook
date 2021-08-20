@@ -805,7 +805,6 @@ public class DialogReimportTours extends TitleAreaDialog {
             long lastUpdateTime = startTime;
 
             final ReImportStatus reImportStatus = new ReImportStatus();
-            final boolean[] isUserAsked_ToCancelReImport = { false };
 
             final AtomicInteger numWorked = new AtomicInteger();
 
@@ -814,7 +813,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             // loop: all selected tours in the viewer
             for (final long tourId : allSelectedTourIds) {
 
-               if (monitor.isCanceled()) {
+               if (monitor.isCanceled() || reImportStatus.isCanceled_WholeReimport.get()) {
 
                   // count down all, that the re-import task can finish but process re-imported tours
 
@@ -844,42 +843,12 @@ public class DialogReimportTours extends TitleAreaDialog {
                      monitor,
                      numWorked,
                      reImportStatus);
-
-               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog
-                     && isUserAsked_ToCancelReImport[0] == false
-                     && isSkipToursWithFileNotFound == false) {
-
-                  // user has canceled the re-import -> ask if the whole re-import should be canceled
-
-                  final boolean[] isCancelReimport = { false };
-
-                  display.syncExec(() -> {
-
-                     if (MessageDialog.openQuestion(activeShell,
-                           Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                           Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
-
-                        isCancelReimport[0] = true;
-
-                     } else {
-
-                        isUserAsked_ToCancelReImport[0] = true;
-                     }
-                  });
-
-                  if (isCancelReimport[0]) {
-
-                     countDownLatch();
-
-                     break;
-                  }
-               }
             }
 
             // wait until all re-imports are performed
             _reimport_CountDownLatch.await();
 
-            if (reImportStatus.isReImported) {
+            if (reImportStatus.isAnyTourReImported.get()) {
 
                rawDataManager.updateTourData_InImportView_FromDb(monitor);
 

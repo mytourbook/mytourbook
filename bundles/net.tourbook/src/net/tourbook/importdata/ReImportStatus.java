@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.tourbook.common.UI;
 
 /**
@@ -22,18 +24,25 @@ import net.tourbook.common.UI;
  */
 public class ReImportStatus {
 
-   private static final char NL = UI.NEW_LINE;
+   private static final char  NL                       = UI.NEW_LINE;
 
-   public boolean            isReImported;
+   /**
+    * Is <code>true</code> when at least one tour was reimported
+    */
+   public final AtomicBoolean isAnyTourReImported      = new AtomicBoolean(false);
+
+   public final AtomicBoolean isCanceled_WholeReimport = new AtomicBoolean(false);
+
+   boolean                    isUserAsked_ToCancelWholeReImport;
 
    /**
     * Is <code>true</code> when the invalid import file location is canceled by the user.
     */
-   public boolean            isCanceled_ByUser_TheFileLocationDialog;
+   public boolean             isCanceled_ByUser_TheFileLocationDialog;
 
-   boolean                   isCanceled_Auto_ImportFilePathIsEmpty;
+   boolean                    isCanceled_Auto_ImportFilePathIsEmpty;
 
-   boolean                   isCanceled_Auto_TheFileLocationDialog;
+   boolean                    isCanceled_Auto_TheFileLocationDialog;
 
    @Override
    public String toString() {
@@ -42,7 +51,10 @@ public class ReImportStatus {
 
             + "ReImportStatus [" + NL
 
-            + "isReImported   =" + isReImported + NL
+            + "isAnyReImported                           =" + isAnyTourReImported + NL
+            + "isCanceled_WholeReimport                  =" + isCanceled_WholeReimport + NL
+            + "isUserAsked_ToCancelReImport              =" + isUserAsked_ToCancelWholeReImport + NL
+
             + "isCanceled_ByUser_TheFileLocationDialog   =" + isCanceled_ByUser_TheFileLocationDialog + NL
             + "isCanceled_Auto_ImportFilePathIsEmpty     =" + isCanceled_Auto_ImportFilePathIsEmpty + NL
             + "isCanceled_Auto_TheFileLocationDialog     =" + isCanceled_Auto_TheFileLocationDialog + NL

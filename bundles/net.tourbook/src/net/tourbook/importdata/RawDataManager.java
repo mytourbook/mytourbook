@@ -1677,14 +1677,15 @@ public class RawDataManager {
                      LOG_REIMPORT_MANUAL_TOUR,
                      oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
 
-         reImportStatus.isReImported = false;
-
          return false;
       }
 
       boolean isReImported = false;
 
-      final File currentTourImportFile = reimportTour_10_GetImportFile(oldTourData, isSkipToursWithFileNotFound, reImportStatus);
+      final File currentTourImportFile = reimportTour_10_GetImportFile(
+            oldTourData,
+            isSkipToursWithFileNotFound,
+            reImportStatus);
 
       if (currentTourImportFile == null) {
 
@@ -1724,7 +1725,9 @@ public class RawDataManager {
          );
       }
 
-      reImportStatus.isReImported = isReImported;
+      if (isReImported) {
+         reImportStatus.isAnyTourReImported.set(true);
+      }
 
       return isReImported;
    }
@@ -1774,69 +1777,66 @@ public class RawDataManager {
 
          // request file path only when necessary otherwise it would block concurrency
 
+         reimportTour_12_RequestFileFromUser(
+               tourData,
+               isSkipToursWithFileNotFound,
+               reImportStatus,
+               savedImportFilePathName,
+               reimportFilePathName);
+      }
+
+      if (reimportFilePathName[0] == null) {
+
+         // user has canceled the file dialog
+
+         return null;
+
+      } else {
+
+         /*
+          * Keep selected file path which is used to re-import the following tours from the same
+          * folder
+          * that the user do not have to reselect again and again.
+          */
+         final IPath currentReimportFolder = new org.eclipse.core.runtime.Path(reimportFilePathName[0]).removeLastSegments(1);
+
+         _previousReimportFolder = currentReimportFolder;
+         _allPreviousReimportFolders.put(currentReimportFolder, new Object());
+
+         return new File(reimportFilePathName[0]);
+      }
+   }
+
+   private void reimportTour_12_RequestFileFromUser(final TourData tourData,
+                                                    final boolean isSkipToursWithFileNotFound,
+                                                    final ReImportStatus reImportStatus,
+                                                    final String savedImportFilePathName,
+                                                    final String[] outReimportFilePathName) {
+
+      synchronized (this) {
+
+         if (reImportStatus.isCanceled_WholeReimport.get()) {
+            return;
+         }
+
          Display.getDefault().syncExec(() -> {
 
-            final Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            final Shell activeShell = Display.getDefault().getActiveShell();
 
-            if (savedImportFilePathName == null) {
+            try {
 
-               // import filepath is not available, in older versions the file path name is not saved in the tour
+               if (savedImportFilePathName == null) {
 
-               final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
+                  // import filepath is not available, in older versions the file path name is not saved in the tour
 
-               final boolean okPressed = MessageDialog.openConfirm(
-                     activeShell,
-                     NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-                     NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
-                           tourDateTimeShort,
-                           tourDateTimeShort));
+                  final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-               // The user doesn't want to look for a new file path for the current tour
-               if (!okPressed) {
-
-                  reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
-
-                  return;
-               }
-
-            } else {
-
-               // import filepath is available
-
-               for (final IPath previousReimportFolder : _allPreviousReimportFolders.keySet()) {
-
-                  /*
-                   * Try to use a folder from a previously re-imported tour
-                   */
-
-                  final String oldImportFileName = new org.eclipse.core.runtime.Path(savedImportFilePathName).lastSegment();
-                  final IPath newImportFilePath = previousReimportFolder.append(oldImportFileName);
-
-                  final String newImportFilePathName = newImportFilePath.toOSString();
-                  final File newImportFile = new File(newImportFilePathName);
-                  if (newImportFile.exists()) {
-
-                     // re-import file exists in the same folder
-                     reimportFilePathName[0] = newImportFilePathName;
-                  }
-               }
-
-               if (reimportFilePathName[0] == null) {
-
-                  //The user doesn't want to look for a new file path for the current tour.
-                  if (isSkipToursWithFileNotFound) {
-
-                     reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
-
-                     return;
-                  }
-
-                  final boolean okPressed = MessageDialog.openQuestion(
+                  final boolean okPressed = MessageDialog.openConfirm(
                         activeShell,
-                        Messages.Dialog_ReimportData_Title,
-                        NLS.bind(
-                              Messages.Import_Data_Dialog_GetAlternativePath_Message,
-                              savedImportFilePathName));
+                        NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
+                        NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
+                              tourDateTimeShort,
+                              tourDateTimeShort));
 
                   // The user doesn't want to look for a new file path for the current tour
                   if (!okPressed) {
@@ -1845,62 +1845,111 @@ public class RawDataManager {
 
                      return;
                   }
+
+               } else {
+
+                  // import filepath is available
+
+                  for (final IPath previousReimportFolder : _allPreviousReimportFolders.keySet()) {
+
+                     /*
+                      * Try to use a folder from a previously re-imported tour
+                      */
+
+                     final String oldImportFileName = new org.eclipse.core.runtime.Path(savedImportFilePathName).lastSegment();
+                     final IPath newImportFilePath = previousReimportFolder.append(oldImportFileName);
+
+                     final String newImportFilePathName = newImportFilePath.toOSString();
+                     final File newImportFile = new File(newImportFilePathName);
+                     if (newImportFile.exists()) {
+
+                        // re-import file exists in the same folder
+                        outReimportFilePathName[0] = newImportFilePathName;
+                     }
+                  }
+
+                  if (outReimportFilePathName[0] == null) {
+
+                     //The user doesn't want to look for a new file path for the current tour.
+                     if (isSkipToursWithFileNotFound) {
+
+                        reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
+
+                        return;
+                     }
+
+                     final boolean okPressed = MessageDialog.openQuestion(
+                           activeShell,
+                           Messages.Dialog_ReimportData_Title,
+                           NLS.bind(
+                                 Messages.Import_Data_Dialog_GetAlternativePath_Message,
+                                 savedImportFilePathName));
+
+                     // The user doesn't want to look for a new file path for the current tour
+                     if (!okPressed) {
+
+                        reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
+
+                        return;
+                     }
+                  }
                }
-            }
 
-            if (reimportFilePathName[0] == null) {
+               if (outReimportFilePathName[0] == null) {
 
-               // ask user for the import file location
+                  // ask user for the import file location
 
-               // create dialog title
-               final String tourDateTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_ML);
-               final String deviceName = tourData.getDeviceName();
-               final String dataFormat = deviceName == null ? UI.EMPTY_STRING : deviceName;
-               final String fileName = savedImportFilePathName == null ? UI.EMPTY_STRING : savedImportFilePathName;
-               final String dialogTitle = String.format(Messages.Import_Data_Dialog_ReimportFile_Title,
-                     tourDateTime,
-                     fileName,
-                     dataFormat);
+                  // create dialog title
+                  final String tourDateTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_ML);
+                  final String deviceName = tourData.getDeviceName();
+                  final String dataFormat = deviceName == null ? UI.EMPTY_STRING : deviceName;
+                  final String fileName = savedImportFilePathName == null ? UI.EMPTY_STRING : savedImportFilePathName;
+                  final String dialogTitle = String.format(Messages.Import_Data_Dialog_ReimportFile_Title,
+                        tourDateTime,
+                        fileName,
+                        dataFormat);
 
-               final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
-               dialog.setText(dialogTitle);
+                  final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
+                  dialog.setText(dialogTitle);
 
-               if (savedImportFilePathName != null) {
+                  if (savedImportFilePathName != null) {
 
-                  // select file location from the tour
+                     // select file location from the tour
 
-                  final IPath importFilePath = new org.eclipse.core.runtime.Path(savedImportFilePathName);
-                  final String importFileName = importFilePath.lastSegment();
+                     final IPath importFilePath = new org.eclipse.core.runtime.Path(savedImportFilePathName);
+                     final String importFileName = importFilePath.lastSegment();
 
-                  dialog.setFileName(importFileName);
-                  dialog.setFilterPath(savedImportFilePathName);
+                     dialog.setFileName(importFileName);
+                     dialog.setFilterPath(savedImportFilePathName);
 
-               } else if (_previousReimportFolder != null) {
+                  } else if (_previousReimportFolder != null) {
 
-                  dialog.setFilterPath(_previousReimportFolder.toOSString());
+                     dialog.setFilterPath(_previousReimportFolder.toOSString());
+                  }
+
+                  outReimportFilePathName[0] = dialog.open();
                }
 
-               reimportFilePathName[0] = dialog.open();
+            } finally {
+
+               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog
+                     && reImportStatus.isUserAsked_ToCancelWholeReImport == false) {
+
+                  if (MessageDialog.openQuestion(activeShell,
+                        Messages.Import_Data_Dialog_IsCancelReImport_Title,
+                        Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+
+                     reImportStatus.isCanceled_WholeReimport.set(true);
+
+                  } else {
+
+                     reImportStatus.isUserAsked_ToCancelWholeReImport = true;
+                  }
+               }
             }
          });
-      }
 
-      if (reimportFilePathName[0] == null) {
-
-         // user has canceled the file dialog
-         return null;
-      }
-
-      /*
-       * Keep selected file path which is used to re-import the following tours from the same folder
-       * that the user do not have to reselect again and again.
-       */
-      final IPath currentReimportFolder = new org.eclipse.core.runtime.Path(reimportFilePathName[0]).removeLastSegments(1);
-
-      _previousReimportFolder = currentReimportFolder;
-      _allPreviousReimportFolders.put(currentReimportFolder, new Object());
-
-      return new File(reimportFilePathName[0]);
+      } // synchronized
    }
 
    private boolean reimportTour_20(final List<TourValueType> tourValueTypes,
