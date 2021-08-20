@@ -145,6 +145,7 @@ public class DataTransferWizard extends Wizard {
       }
 
       final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
+      final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates();
 
       // import received files
       for (final File inFile : _receivedFiles) {
@@ -158,7 +159,7 @@ public class DataTransferWizard extends Wizard {
                fileCollision, //                                           fileCollision
                _importDevice.isBuildNewFileNames, //                       isBuildNewFileNames
                true, //                                                    isTourDisplayedInImportView
-               false, //                                                    isReimport
+               processDeviceDataStates,
                allImportedToursFromOneFile);
       }
 

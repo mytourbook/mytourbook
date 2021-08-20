@@ -29,6 +29,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -111,7 +112,7 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+                                    final ProcessDeviceDataStates processDeviceDataStates) {
 
       if (!isValidCyclo105File(importFilePath)) {
          return false;

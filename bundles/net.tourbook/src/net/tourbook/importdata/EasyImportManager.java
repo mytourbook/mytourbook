@@ -934,7 +934,8 @@ public class EasyImportManager {
       final ImportRunState importRunState = rawDataManager.runImport(
             notImportedFiles,
             true,
-            importConfig.fileGlobPattern);
+            importConfig.fileGlobPattern,
+            new ProcessDeviceDataStates());
 
       importState.isImportCanceled = importRunState.isImportCanceled;
 

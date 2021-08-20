@@ -672,7 +672,7 @@ public class RawDataManager {
          TourLogManager.showLogView();
       }
 
-      runImport(osFiles, false, null);
+      runImport(osFiles, false, null, new ProcessDeviceDataStates());
    }
 
    /**
@@ -1275,7 +1275,7 @@ public class RawDataManager {
     *           When <code>true</code>, the newly imported tours are displayed in the import view,
     *           otherwise they are imported into {@link #_multipleTours_FromLastImportFile} but
     *           not displayed in the import view.
-    * @param isReimport
+    * @param processDeviceDataStates
     * @param allImportedToursFromOneFile
     * @return Returns <code>true</code> when the import was successfully
     */
@@ -1284,7 +1284,7 @@ public class RawDataManager {
                              final FileCollisionBehavior fileCollision,
                              final boolean isBuildNewFileNames,
                              final boolean isTourDisplayedInImportView,
-                             final boolean isReimport,
+                             final ProcessDeviceDataStates processDeviceDataStates,
                              final Map<Long, TourData> allImportedToursFromOneFile) {
 
       final String importFilePathName = importFile.getAbsolutePath();
@@ -1367,7 +1367,7 @@ public class RawDataManager {
                      fileCollision,
                      isBuildNewFileNames,
                      isTourDisplayedInImportView,
-                     isReimport,
+                     processDeviceDataStates,
                      allImportedToursFromOneFile);
 
                if (lastImportedFileName[0] != null) {
@@ -1404,7 +1404,7 @@ public class RawDataManager {
                      fileCollision,
                      isBuildNewFileNames,
                      isTourDisplayedInImportView,
-                     isReimport,
+                     processDeviceDataStates,
                      allImportedToursFromOneFile);
 
                if (lastImportedFileName[0] != null) {
@@ -1465,7 +1465,7 @@ public class RawDataManager {
                                 FileCollisionBehavior fileCollision,
                                 final boolean isBuildNewFileName,
                                 final boolean isTourDisplayedInImportView,
-                                final boolean isReimport,
+                                final ProcessDeviceDataStates processDeviceDataStates,
                                 final Map<Long, TourData> allNewlyImportedToursFromOneFile) {
 
       if (fileCollision == null) {
@@ -1512,7 +1512,7 @@ public class RawDataManager {
                   _deviceData,
                   _allImportedTours,
                   allNewlyImportedToursFromOneFile,
-                  isReimport);
+                  processDeviceDataStates);
 
          } catch (final Exception e) {
             TourLogManager.logEx(e);
@@ -1656,13 +1656,15 @@ public class RawDataManager {
     * @param isSkipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     * @param reImportStatus
+    * @param processDeviceDataStates
     * @return Returns <code>true</code> when <code>oldTourData</code> was reimported, otherwise
     *         <code>false</code>
     */
    public boolean reimportTour(final TourData oldTourData,
                                final List<TourValueType> tourValueTypes,
                                final boolean isSkipToursWithFileNotFound,
-                               final ReImportStatus reImportStatus) {
+                               final ReImportStatus reImportStatus,
+                               final ProcessDeviceDataStates processDeviceDataStates) {
 
       if (oldTourData.isManualTour()) {
 
@@ -1720,7 +1722,8 @@ public class RawDataManager {
 
                tourValueTypes,
                currentTourImportFile,
-               oldTourData
+               oldTourData,
+               processDeviceDataStates
 
          );
       }
@@ -1954,7 +1957,8 @@ public class RawDataManager {
 
    private boolean reimportTour_20(final List<TourValueType> tourValueTypes,
                                    final File reimportedFile,
-                                   final TourData oldTourData) {
+                                   final TourData oldTourData,
+                                   final ProcessDeviceDataStates processDeviceDataStates) {
 
       boolean isTourReImported = false;
 
@@ -1977,7 +1981,7 @@ public class RawDataManager {
             null, //                         fileCollision
             false, //                        isBuildNewFileNames
             false, //                        isTourDisplayedInImportView
-            true, //                         isReimport
+            processDeviceDataStates,
             allImportedToursFromOneFile //
       )) {
 
@@ -2487,7 +2491,8 @@ public class RawDataManager {
 
    public ImportRunState runImport(final ArrayList<OSFile> importFiles,
                                    final boolean isEasyImport,
-                                   final String fileGlobPattern) {
+                                   final String fileGlobPattern,
+                                   final ProcessDeviceDataStates processDeviceDataStates) {
 
       final ImportRunState importRunState = new ImportRunState();
 
@@ -2607,7 +2612,7 @@ public class RawDataManager {
                      null, //                         fileCollision
                      false, //                        isBuildNewFileNames
                      true, //                         isTourDisplayedInImportView
-                     false, //                        isReimport
+                     processDeviceDataStates,
                      allImportedToursFromOneFile //
                )) {
 

@@ -49,6 +49,7 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Sport;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -81,11 +82,6 @@ public class FitDataReader extends TourbookDevice {
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
       return null;
-   }
-
-   @Override
-   public boolean canRunConcurrent() {
-      return true;
    }
 
    @Override
@@ -735,7 +731,7 @@ public class FitDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+                                    final ProcessDeviceDataStates processDeviceDataStates) {
 
       boolean returnValue = false;
 

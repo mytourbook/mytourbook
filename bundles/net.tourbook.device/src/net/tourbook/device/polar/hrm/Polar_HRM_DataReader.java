@@ -33,6 +33,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -1598,7 +1599,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+                                    final ProcessDeviceDataStates processDeviceDataStates) {
 
       _importFilePath = importFilePath;
       _deviceData = deviceData;

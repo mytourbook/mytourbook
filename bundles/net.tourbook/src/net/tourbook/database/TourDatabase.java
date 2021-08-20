@@ -1677,10 +1677,10 @@ public class TourDatabase {
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
 
-            final Query emQuery = em.createQuery(
-                  UI.EMPTY_STRING
-                        + "SELECT tourTag" //$NON-NLS-1$
-                        + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //$NON-NLS-1$ //$NON-NLS-2$
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT tourTag" //                                             //$NON-NLS-1$
+                  + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //   //$NON-NLS-1$ //$NON-NLS-2$
 
             _allTourTags = new HashMap<>();
 

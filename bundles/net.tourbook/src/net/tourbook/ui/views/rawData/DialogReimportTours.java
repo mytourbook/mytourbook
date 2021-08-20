@@ -42,6 +42,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
@@ -669,6 +670,10 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       TourLogManager.showLogView();
 
+      final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+            .setIsReimport(true)
+            .setIsRunningConcurrently(true);
+
       final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
          @Override
@@ -680,7 +685,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                   oldTourData,
                   tourValueTypes,
                   isSkipToursWithFileNotFound,
-                  reImportStatus);
+                  reImportStatus,
+                  processDeviceDataStates);
 
             return true;
          }
@@ -805,6 +811,9 @@ public class DialogReimportTours extends TitleAreaDialog {
             long lastUpdateTime = startTime;
 
             final ReImportStatus reImportStatus = new ReImportStatus();
+            final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+                  .setIsReimport(true)
+                  .setIsRunningConcurrently(true);
 
             final AtomicInteger numWorked = new AtomicInteger();
 
@@ -842,7 +851,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                      isSkipToursWithFileNotFound,
                      monitor,
                      numWorked,
-                     reImportStatus);
+                     reImportStatus,
+                     processDeviceDataStates);
             }
 
             // wait until all re-imports are performed
@@ -887,7 +897,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                                             final boolean isSkipToursWithFileNotFound,
                                             final IProgressMonitor monitor,
                                             final AtomicInteger numWorked,
-                                            final ReImportStatus reImportStatus) {
+                                            final ReImportStatus reImportStatus,
+                                            final ProcessDeviceDataStates processDeviceDataStates) {
 
       try {
 
@@ -916,7 +927,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                      oldTourData,
                      tourValueTypes,
                      isSkipToursWithFileNotFound,
-                     reImportStatus);
+                     reImportStatus,
+                     processDeviceDataStates);
 
                if (isReimported) {
                   allReimportedTourIds.add(oldTourData.getTourId());

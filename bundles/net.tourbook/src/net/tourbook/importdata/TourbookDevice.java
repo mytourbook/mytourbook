@@ -249,14 +249,6 @@ public abstract class TourbookDevice implements IRawDataReader {
    public abstract int getStartSequenceSize();
 
    /**
-    * @return Returns <code>true</code> when the import from this device can be run concurrent,
-    *         otherwise <code>false</code>
-    */
-   public boolean canRunConcurrent() {
-      return false;
-   }
-
-   /**
     * Check if the file is a valid device xml file.
     *
     * @param importFilePath

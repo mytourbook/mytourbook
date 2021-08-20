@@ -21,6 +21,7 @@ import java.util.HashMap;
 import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto2DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ProcessDeviceDataStates;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class Suunto2Tester {
       final String filePath = IMPORT_FILE_PATH + "log-F783095113000500-2013-05-18T11_00_38-0"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".xml").toAbsolutePath().toString(); //$NON-NLS-1$
-		deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
+      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, new ProcessDeviceDataStates());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

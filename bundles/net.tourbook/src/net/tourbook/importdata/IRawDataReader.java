@@ -46,8 +46,8 @@ public interface IRawDataReader {
     *           import view.
     * @param newlyImportedTours
     *           Contains all tours which are imported by this method.
-    * @param isReimport
-    *           True if this tour is re-imported, false otherwise
+    * @param processDeviceDataStates
+    *           Different IN/OUT states
     * @return Returns <code>true</code> when the import was successful, the parameters
     *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
     */
@@ -55,7 +55,7 @@ public interface IRawDataReader {
                                     DeviceData deviceData,
                                     Map<Long, TourData> alreadyImportedTours,
                                     Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport);
+                                    final ProcessDeviceDataStates processDeviceDataStates);
 
    /**
     * Validate data format
