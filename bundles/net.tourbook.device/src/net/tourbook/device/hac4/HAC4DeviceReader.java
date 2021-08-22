@@ -192,7 +192,7 @@ public class HAC4DeviceReader extends TourbookDevice {
          hac4DeviceData.readFromFile(fileRawData);
 
          /*
-          * because the tour year is not available we calculate it from the transfer year, this
+          * Because the tour year is not available we calculate it from the transfer year, this
           * might be not correct but there is no other way to get the year
           */
          short tourYear = hac4DeviceData.transferYear;

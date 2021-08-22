@@ -43,21 +43,20 @@ import org.eclipse.osgi.util.NLS;
 
 public class HAC5DeviceDataReader extends TourbookDevice {
 
-   private static final int  HAC5_HARDWARE_ID       = 0x03;
+   private static final int HAC5_HARDWARE_ID       = 0x03;
 
    /**
     * position in the file which skips the header (AFRO..) and the raw data begins
     */
-   public static final int   OFFSET_RAWDATA         = 6;
+   public static final int  OFFSET_RAWDATA         = 6;
 
-   private static final int  OFFSET_TOUR_DATA_START = 0x0800;
-   private static final int  OFFSET_TOUR_DATA_END   = 0x10000;
+   private static final int OFFSET_TOUR_DATA_START = 0x0800;
+   private static final int OFFSET_TOUR_DATA_END   = 0x10000;
 
-   private static final int  RECORD_LENGTH          = 0x10;
-
-   private GregorianCalendar _fileDate;
+   private static final int RECORD_LENGTH          = 0x10;
 
    private class StartBlock {
+
       public int month;
       public int day;
       public int hour;
@@ -206,20 +205,23 @@ public class HAC5DeviceDataReader extends TourbookDevice {
       int firstTourDay = 1;
       int firstTourMonth = 1;
 
+      GregorianCalendar fileDate = null;
+
       try {
+
          final File fileRaw = new File(importFilePath);
          file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
          final long lastModified = fileRaw.lastModified();
 
          /*
-          * get the year, because the year is not saved in the raw data file, the modified year
+          * Get the year, because the year is not saved in the raw data file, the modified year
           * of the file is used
           */
-         _fileDate = new GregorianCalendar();
-         _fileDate.setTime(new Date(lastModified));
+         fileDate = new GregorianCalendar();
+         fileDate.setTime(new Date(lastModified));
 
-         int tourYear = _fileDate.get(Calendar.YEAR);
+         int tourYear = fileDate.get(Calendar.YEAR);
          if (importYear != RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED) {
             tourYear = importYear;
          }
@@ -546,7 +548,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
       }
 
       if (returnValue) {
-         deviceData.transferYear = (short) _fileDate.get(Calendar.YEAR);
+
+         deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
          deviceData.transferMonth = (short) firstTourMonth;
          deviceData.transferDay = (short) firstTourDay;
       }

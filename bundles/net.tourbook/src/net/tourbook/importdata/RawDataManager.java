@@ -1286,7 +1286,9 @@ public class RawDataManager {
                   new Object[] {
                         TourManager.getTourDateTimeShort(dbTourData),
                         importedFilePathName,
-                        dbFilePathName
+                        dbFilePathName == null
+                              ? Messages.App_Label_NotAvailable
+                              : dbFilePathName
                   });
 
             final String[] allOptions = new String[] {
@@ -2986,7 +2988,8 @@ public class RawDataManager {
                   final String importedFilePathName = importedTourData.getImportFilePathName();
                   final String dbFilePathName = dbTourData.getImportFilePathName();
 
-                  if (importedFilePathName.equalsIgnoreCase(dbFilePathName) == false) {
+                  if (importedFilePathName != null
+                        && importedFilePathName.equalsIgnoreCase(dbFilePathName) == false) {
 
                      // saved file path name is different when compared with the imported file path name
 
@@ -2998,6 +3001,10 @@ public class RawDataManager {
                      case REPLACE_IMPORT_FILENAME_IN_ALL_SAVED_TOUR:
 
                         replacedTourData.setImportFilePath(importedFilePathName);
+
+                        // also update device name/version
+                        replacedTourData.setDeviceName(importedTourData.getDeviceName());
+                        replacedTourData.setDeviceFirmwareVersion(importedTourData.getDeviceFirmwareVersion());
 
                         replacedTourData = TourManager.saveModifiedTour(dbTourData, false);
 

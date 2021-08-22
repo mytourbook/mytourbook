@@ -35,7 +35,7 @@ Improvements
 ============
 
 * Tour Import
-  - Ask the user to replace the import filename in the saved tour when the import filename is different
+  - Ask the user to replace the import filename in the saved tour when the import filename is different or empty
 
 * 2D Map
   - Show tour direction as marker in the tour track
