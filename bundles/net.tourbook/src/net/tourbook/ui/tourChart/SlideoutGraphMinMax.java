@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -35,10 +37,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -82,31 +82,23 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private SelectionAdapter       _defaultSelectionListener;
+   private SelectionListener      _defaultSelectionListener;
    private MouseWheelListener     _defaultMouseWheelListener;
 
    {
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
    }
 
-   private PixelConverter _pc;
+   private PixelConverter        _pc;
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
-   private int            _columnSpacing;
+   private int                   _columnSpacing;
 
    /*
     * UI controls
@@ -412,7 +404,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private void createUI_52_MinMax_Enable(final Composite container) {
 
-      // ckeckbox: enable min/max
+      // checkbox: enable min/max
       _chkEnableMinMax = new Button(container, SWT.CHECK);
       GridDataFactory.fillDefaults()
             .span(7, 1)
@@ -705,7 +697,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private Button createUI_Checkbox(final Composite parent) {
 
-      // ckeckbox
+      // checkbox
       final Button checkbox = new Button(parent, SWT.CHECK);
       GridDataFactory.fillDefaults()
             .indent(_columnSpacing, 0)

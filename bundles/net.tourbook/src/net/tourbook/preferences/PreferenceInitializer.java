@@ -135,6 +135,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE, true);
 
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
+
       /*
        * Graph preferences
        */

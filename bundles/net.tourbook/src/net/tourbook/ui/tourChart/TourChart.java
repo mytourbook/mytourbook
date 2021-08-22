@@ -1995,7 +1995,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          //If the current time is in the next day, we need to recalculate the sunrise/sunset times for this new day.
          if (currentDay == 0 || currentZonedDateTime.getDayOfMonth() != currentDay) {
 
-            sunriseTimes = TimeTools.determineSunRiseTimes(currentZonedDateTime, latitudeSerie[index], longitudeSerie[index]);
+            sunriseTimes = TimeTools.determineSunriseTimes(currentZonedDateTime, latitudeSerie[index], longitudeSerie[index]);
             sunsetTimes = TimeTools.determineSunsetTimes(currentZonedDateTime, latitudeSerie[index], longitudeSerie[index]);
 
             currentDay = currentZonedDateTime.getDayOfMonth();
