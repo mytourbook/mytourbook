@@ -90,10 +90,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE, true);
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_YEAR_SEPARATOR, true);
-      store.setDefault(ITourbookPreferences.STAT_DAY_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_DAY_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
-      store.setDefault(ITourbookPreferences.STAT_DAY_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_DAY_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
 
       store.setDefault(ITourbookPreferences.STAT_WEEK_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_WEEK_DURATION_TIME, DurationTime.MOVING.name());
@@ -104,10 +100,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
 
       store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, DurationTime.MOVING.name());
@@ -118,10 +110,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
 
       store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, DurationTime.MOVING.name());
@@ -132,10 +120,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
 
       store.setDefault(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
@@ -150,6 +134,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE, true);
+
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
 
       /*
        * Graph preferences

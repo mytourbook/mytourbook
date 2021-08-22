@@ -76,10 +76,6 @@ public interface ITourbookPreferences {
    public static final String STAT_DAY_IS_SHOW_DISTANCE                        = "STAT_DAY_IS_SHOW_DISTANCE";                        //$NON-NLS-1$
    public static final String STAT_DAY_IS_SHOW_DURATION                        = "STAT_DAY_IS_SHOW_DURATION";                        //$NON-NLS-1$
    public static final String STAT_DAY_IS_SHOW_YEAR_SEPARATOR                  = "STAT_DAY_IS_SHOW_YEAR_SEPARATOR";                  //$NON-NLS-1$
-   public static final String STAT_DAY_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE      = "STAT_DAY_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE";      //$NON-NLS-1$
-   public static final String STAT_DAY_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE      = "STAT_DAY_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE";      //$NON-NLS-1$
-   public static final String STAT_DAY_BODYFAT_YAXIS_MIN_VISIBLE_VALUE         = "STAT_DAY_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";         //$NON-NLS-1$
-   public static final String STAT_DAY_BODYFAT_YAXIS_MAX_VISIBLE_VALUE         = "STAT_DAY_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";         //$NON-NLS-1$
 
    public static final String STAT_WEEK_DURATION_TIME                          = "STAT_WEEK_DURATION_TIME";                          //$NON-NLS-1$
    public static final String STAT_WEEK_CHART_TYPE                             = "STAT_WEEK_CHART_TYPE";                             //$NON-NLS-1$
@@ -90,10 +86,6 @@ public interface ITourbookPreferences {
    public static final String STAT_WEEK_IS_SHOW_YEAR_SEPARATOR                 = "STAT_WEEK_IS_SHOW_YEAR_SEPARATOR";                 //$NON-NLS-1$
    public static final String STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES      = "STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES";      //$NON-NLS-1$
    public static final String STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES         = "STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES";         //$NON-NLS-1$
-   public static final String STAT_WEEK_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE     = "STAT_WEEK_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE";     //$NON-NLS-1$
-   public static final String STAT_WEEK_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE     = "STAT_WEEK_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE";     //$NON-NLS-1$
-   public static final String STAT_WEEK_BODYFAT_YAXIS_MIN_VISIBLE_VALUE        = "STAT_WEEK_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";        //$NON-NLS-1$
-   public static final String STAT_WEEK_BODYFAT_YAXIS_MAX_VISIBLE_VALUE        = "STAT_WEEK_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";        //$NON-NLS-1$
 
    public static final String STAT_MONTH_DURATION_TIME                         = "STAT_MONTH_DURATION_TIME";                         //$NON-NLS-1$
    public static final String STAT_MONTH_CHART_TYPE                            = "STAT_MONTH_CHART_TYPE";                            //$NON-NLS-1$
@@ -104,10 +96,6 @@ public interface ITourbookPreferences {
    public static final String STAT_MONTH_IS_SHOW_YEAR_SEPARATOR                = "STAT_MONTH_IS_SHOW_YEAR_SEPARATOR";                //$NON-NLS-1$
    public static final String STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES     = "STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES";     //$NON-NLS-1$
    public static final String STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES        = "STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES";        //$NON-NLS-1$
-   public static final String STAT_MONTH_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE    = "STAT_MONTH_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE";    //$NON-NLS-1$
-   public static final String STAT_MONTH_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE    = "STAT_MONTH_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE";    //$NON-NLS-1$
-   public static final String STAT_MONTH_BODYFAT_YAXIS_MIN_VISIBLE_VALUE       = "STAT_MONTH_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";       //$NON-NLS-1$
-   public static final String STAT_MONTH_BODYFAT_YAXIS_MAX_VISIBLE_VALUE       = "STAT_MONTH_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";       //$NON-NLS-1$
 
    public static final String STAT_YEAR_DURATION_TIME                          = "STAT_YEAR_DURATION_TIME";                          //$NON-NLS-1$
    public static final String STAT_YEAR_CHART_TYPE                             = "STAT_YEAR_CHART_TYPE";                             //$NON-NLS-1$
@@ -118,10 +106,6 @@ public interface ITourbookPreferences {
    public static final String STAT_YEAR_IS_SHOW_YEAR_SEPARATOR                 = "STAT_YEAR_IS_SHOW_YEAR_SEPARATOR";                 //$NON-NLS-1$
    public static final String STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES      = "STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES";      //$NON-NLS-1$
    public static final String STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES         = "STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES";         //$NON-NLS-1$
-   public static final String STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE     = "STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE";     //$NON-NLS-1$
-   public static final String STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE     = "STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE";     //$NON-NLS-1$
-   public static final String STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE        = "STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";        //$NON-NLS-1$
-   public static final String STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE        = "STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";        //$NON-NLS-1$
 
    public static final String STAT_FREQUENCY_DURATION_TIME                     = "STAT_FREQUENCY_DURATION_TIME";                     //$NON-NLS-1$
    public static final String STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES = "STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES"; //$NON-NLS-1$
@@ -151,6 +135,14 @@ public interface ITourbookPreferences {
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC      = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC";      //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE           = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE";           //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE"; //$NON-NLS-1$
+
+   /*
+    * Statistic: Athlete's data
+    */
+   public static final String STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE = "STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE = "STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE    = "STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";    //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE    = "STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";    //$NON-NLS-1$
 
    /*
     * Graphs

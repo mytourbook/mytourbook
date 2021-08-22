@@ -204,8 +204,8 @@ public abstract class StatisticYear extends TourbookStatistic {
          visibleMaxValue = _athleteBodyFat_YData.getVisibleMaxValue();
       } else {
 
-         visibleMinValue = _prefStore.getDouble(ITourbookPreferences.STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
-         visibleMaxValue = _prefStore.getDouble(ITourbookPreferences.STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE);
+         visibleMinValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
+         visibleMaxValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE);
       }
 
       _athleteBodyFat_YData = new ChartDataYSerie(
@@ -245,8 +245,8 @@ public abstract class StatisticYear extends TourbookStatistic {
          visibleMaxValue = _athleteBodyWeight_YData.getVisibleMaxValue();
       } else {
 
-         visibleMinValue = _prefStore.getDouble(ITourbookPreferences.STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
-         visibleMaxValue = _prefStore.getDouble(ITourbookPreferences.STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
+         visibleMinValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
+         visibleMaxValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
       }
 
       _athleteBodyWeight_YData = new ChartDataYSerie(
@@ -397,16 +397,16 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       if (_athleteBodyWeight_YData != null) {
 
-         _prefStore.setValue(ITourbookPreferences.STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE,
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE,
                _athleteBodyWeight_YData.getVisibleMinValue() / UI.UNIT_VALUE_WEIGHT);
-         _prefStore.setValue(ITourbookPreferences.STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE,
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE,
                _athleteBodyWeight_YData.getVisibleMaxValue() / UI.UNIT_VALUE_WEIGHT);
       }
 
       if (_athleteBodyFat_YData != null) {
 
-         _prefStore.setValue(ITourbookPreferences.STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, _athleteBodyFat_YData.getVisibleMinValue());
-         _prefStore.setValue(ITourbookPreferences.STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, _athleteBodyFat_YData.getVisibleMaxValue());
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, _athleteBodyFat_YData.getVisibleMinValue());
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, _athleteBodyFat_YData.getVisibleMaxValue());
       }
    }
 
