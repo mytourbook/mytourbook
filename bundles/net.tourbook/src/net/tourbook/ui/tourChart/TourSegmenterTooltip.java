@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -561,7 +561,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
       ttPosY = -tipHeight + 1;
 
-      // ckeck if tooltip is left to the chart border
+      // check if tooltip is left to the chart border
       if (ttPosX /* + tipWidth */ < 0) {
 
          // set tooltip to the graph left border

@@ -137,6 +137,14 @@ public interface ITourbookPreferences {
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE"; //$NON-NLS-1$
 
    /*
+    * Statistic: Athlete's data
+    */
+   public static final String STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE = "STAT_YEAR_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE = "STAT_YEAR_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE    = "STAT_YEAR_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";    //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE    = "STAT_YEAR_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";    //$NON-NLS-1$
+
+   /*
     * Graphs
     */
    /** All graphs in the visible sequence */
