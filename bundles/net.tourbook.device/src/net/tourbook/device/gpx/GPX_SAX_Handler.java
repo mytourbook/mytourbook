@@ -211,17 +211,34 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 // SET_FORMATTING_ON
 
-   private static final IPreferenceStore _prefStore             = Activator.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
 
-   private final SimpleDateFormat        GPX_TIME_FORMAT        = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");     //$NON-NLS-1$;
-   private final SimpleDateFormat        GPX_TIME_FORMAT_SSSZ   = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$;
-   private final SimpleDateFormat        GPX_TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");       //$NON-NLS-1$
+   private final long                    DEFAULT_DATE_TIME;
 
-   private final long                    DEFAULT_DATE_TIME      = ZonedDateTime
+   private final SimpleDateFormat        TIME_FORMAT;
+   private final SimpleDateFormat        TIME_FORMAT_SSSZ;
+   private final SimpleDateFormat        TIME_FORMAT_RFC822;
+   {
+      DEFAULT_DATE_TIME = ZonedDateTime
 
-         .of(2000, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
-         .toInstant()
-         .toEpochMilli();
+            .of(2000, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+            .toInstant()
+            .toEpochMilli();
+
+// SET_FORMATTING_OFF
+      
+      final String DateTimePattern = "yyyy-MM-dd'T'HH:mm:ss"; //$NON-NLS-1$
+
+      TIME_FORMAT          = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_SSSZ     = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_RFC822   = new SimpleDateFormat(DateTimePattern + "Z"); //$NON-NLS-1$
+
+      TIME_FORMAT          .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      TIME_FORMAT_SSSZ     .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      TIME_FORMAT_RFC822   .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      
+// SET_FORMATTING_ON
+   }
 
    // To work around a Polar Websync export bug...
    private boolean _gpxHasLocalTime;
@@ -312,12 +329,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
     * Is <code>true</code> when tour contained mt: custom tags.
     */
    private boolean                       _isMTData;
-
-   {
-      GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-      GPX_TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-      GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-   }
 
    private class GPXDataLap {
 
@@ -717,13 +728,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
                _timeSlice.absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
             } catch (final Exception e0) {
                try {
-                  _timeSlice.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
+                  _timeSlice.absoluteTime = TIME_FORMAT.parse(charData).getTime();
                } catch (final ParseException e1) {
                   try {
-                     _timeSlice.absoluteTime = GPX_TIME_FORMAT_SSSZ.parse(charData).getTime();
+                     _timeSlice.absoluteTime = TIME_FORMAT_SSSZ.parse(charData).getTime();
                   } catch (final ParseException e2) {
                      try {
-                        _timeSlice.absoluteTime = GPX_TIME_FORMAT_RFC822.parse(charData).getTime();
+                        _timeSlice.absoluteTime = TIME_FORMAT_RFC822.parse(charData).getTime();
                      } catch (final ParseException e3) {
 
                         _isError = true;
@@ -855,13 +866,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
                _gpxDataLap.absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
             } catch (final Exception e0) {
                try {
-                  _gpxDataLap.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
+                  _gpxDataLap.absoluteTime = TIME_FORMAT.parse(charData).getTime();
                } catch (final ParseException e1) {
                   try {
-                     _gpxDataLap.absoluteTime = GPX_TIME_FORMAT_SSSZ.parse(charData).getTime();
+                     _gpxDataLap.absoluteTime = TIME_FORMAT_SSSZ.parse(charData).getTime();
                   } catch (final ParseException e2) {
                      try {
-                        _gpxDataLap.absoluteTime = GPX_TIME_FORMAT_RFC822.parse(charData).getTime();
+                        _gpxDataLap.absoluteTime = TIME_FORMAT_RFC822.parse(charData).getTime();
                      } catch (final ParseException e3) {
 
                         _isError = true;
@@ -905,13 +916,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
             _wayPoint.setTime(ZonedDateTime.parse(charData).toInstant().toEpochMilli());
          } catch (final Exception e0) {
             try {
-               _wayPoint.setTime(GPX_TIME_FORMAT.parse(charData).getTime());
+               _wayPoint.setTime(TIME_FORMAT.parse(charData).getTime());
             } catch (final ParseException e1) {
                try {
-                  _wayPoint.setTime(GPX_TIME_FORMAT_SSSZ.parse(charData).getTime());
+                  _wayPoint.setTime(TIME_FORMAT_SSSZ.parse(charData).getTime());
                } catch (final ParseException e2) {
                   try {
-                     _wayPoint.setTime(GPX_TIME_FORMAT_RFC822.parse(charData).getTime());
+                     _wayPoint.setTime(TIME_FORMAT_RFC822.parse(charData).getTime());
                   } catch (final ParseException e3) {
 
                      _isError = true;

@@ -192,23 +192,21 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
       } catch (final SAXParseException e) {
 
-         final StringBuilder sb = new StringBuilder()//
-               .append("XML error when parsing file:\n") //$NON-NLS-1$
-               .append(NL)
-               .append(importFilePath)
-               .append(NL)
-               .append(NL)
-               .append(e.getLocalizedMessage())
-               .append(NL)
-               .append(NL)
-               .append("Line: ") //$NON-NLS-1$
-               .append(e.getLineNumber())
-               .append("\tColumn: ") //$NON-NLS-1$
-               .append(e.getColumnNumber())
-         //
+         final String errorText = UI.EMPTY_STRING
+
+               + "XML error when parsing file:" + NL //        //$NON-NLS-1$
+               + NL
+               + importFilePath
+               + NL
+               + NL
+               + e.getLocalizedMessage()
+               + NL
+               + NL
+               + "Line: " + e.getLineNumber() //               //$NON-NLS-1$
+               + "   Column: " + e.getColumnNumber() //        //$NON-NLS-1$
          ;
 
-         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString())); //$NON-NLS-1$
+         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", errorText)); //$NON-NLS-1$
 
          TourLogManager.logEx(e);
 
