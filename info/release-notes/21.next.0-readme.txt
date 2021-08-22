@@ -34,6 +34,9 @@ New
 Improvements
 ============
 
+* Tour Import
+  - Ask the user to replace the import filename in the saved tour when the import filename is different
+
 * 2D Map
   - Show tour direction as marker in the tour track
   - Customize colors for hovered/selected tour

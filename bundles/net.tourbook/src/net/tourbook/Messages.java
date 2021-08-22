@@ -785,6 +785,14 @@ public class Messages extends NLS {
    public static String        DeviceManager_Selection_device_is_not_selected;
 
    public static String        Dialog_DeleteData_Title;
+   public static String        Dialog_ReimportData_Title;
+
+   public static String        Dialog_ImportData_ReplaceImportFilename_Message;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_DoNothing;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_DoNothingAnymore;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceAll;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceThis;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Title;
 
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
@@ -1014,7 +1022,6 @@ public class Messages extends NLS {
    public static String        import_data_action_save_tour_for_person;
    public static String        import_data_action_save_tour_with_person;
    public static String        import_data_action_save_tours_for_person;
-   public static String        Dialog_ReimportData_Title;
    public static String        import_data_dlg_save_tour_msg;
    public static String        import_data_dlg_save_tour_title;
    public static String        import_data_importTours_subTask;
@@ -1037,7 +1044,6 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
    public static String        Import_Data_Dialog_DeleteTourValues_Task;
-
    public static String        Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message;
    public static String        Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message;
    public static String        Import_Data_Dialog_EasyImport_NoImportFiles_Message;
@@ -1053,6 +1059,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_Reimport_Task;
    public static String        Import_Data_Dialog_Reimport_Title;
    public static String        Import_Data_Dialog_ReimportFile_Title;
+
    public static String        Import_Data_Error_CreatingFileName_Message;
    public static String        Import_Data_Error_CreatingFileName_Title;
    public static String        Import_Data_HTML_AcquireDeviceInfo;

@@ -4512,7 +4512,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _rawDataMgr.getImportedTours().clear();
       _rawDataMgr.setImportId();
 
-      int importedFileCounter = 0;
+      int numImportedFiles = 0;
 
       // loop: import all files
       for (final String fileName : importedFiles) {
@@ -4536,13 +4536,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   false, //   isBuildNewFileNames
                   true, //    isTourDisplayedInImportView
                   processDeviceDataStates,
-                  allImportedToursFromOneFile
-
+                  allImportedToursFromOneFile //
             );
 
             if (isImported) {
                TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
-               importedFileCounter++;
+               numImportedFiles++;
             } else {
                TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileName);
                notImportedFiles.add(fileName);
@@ -4555,44 +4554,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
-      if (importedFileCounter > 0) {
+      if (numImportedFiles > 0) {
 
          _rawDataMgr.updateTourData_InImportView_FromDb(monitor);
 
-         Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().asyncExec(() -> {
 
-               reloadViewer();
+            reloadViewer();
 
-               /*
-                * restore selected tour
-                */
-               final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
+            /*
+             * Restore selected tour
+             */
+            final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
 
-               if (viewerIndices != null) {
+            if (viewerIndices != null) {
 
-                  final ArrayList<Object> viewerTourData = new ArrayList<>();
+               final ArrayList<Object> viewerTourData = new ArrayList<>();
 
-                  for (final String viewerIndex : viewerIndices) {
+               for (final String viewerIndex : viewerIndices) {
 
-                     Object tourData = null;
+                  Object tourData = null;
 
-                     try {
-                        final int index = Integer.parseInt(viewerIndex);
-                        tourData = _tourViewer.getElementAt(index);
-                     } catch (final NumberFormatException e) {
-                        // just ignore
-                     }
-
-                     if (tourData != null) {
-                        viewerTourData.add(tourData);
-                     }
+                  try {
+                     final int index = Integer.parseInt(viewerIndex);
+                     tourData = _tourViewer.getElementAt(index);
+                  } catch (final NumberFormatException e) {
+                     // just ignore
                   }
 
-                  if (viewerTourData.size() > 0) {
-                     _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
+                  if (tourData != null) {
+                     viewerTourData.add(tourData);
                   }
+               }
+
+               if (viewerTourData.size() > 0) {
+                  _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
                }
             }
          });

@@ -43,6 +43,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
+import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.ITourViewer3;
@@ -120,15 +121,15 @@ public class RawDataManager {
 
 // SET_FORMATTING_ON
 
-   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
-   private static final String           TEMP_IMPORTED_FILE                    = "received-device-data.txt";                             //$NON-NLS-1$
+   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";               //$NON-NLS-1$
+   private static final String           TEMP_IMPORTED_FILE                    = "received-device-data.txt";                              //$NON-NLS-1$
 
-   private static final String           FILE_EXTENSION_FIT                    = ".fit";                                                 //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT                    = ".fit";                                                  //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
+   private static final IDialogSettings  _state_RawDataView                    = TourbookPlugin.getState(RawDataView.ID);
 
-   private static final String           INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                           //$NON-NLS-1$
+   private static final String           INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                            //$NON-NLS-1$
 
    public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
 
@@ -137,7 +138,7 @@ public class RawDataManager {
    private static boolean                _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    private static boolean                _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean                _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-   private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
+   private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_state_RawDataView,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
@@ -165,7 +166,6 @@ public class RawDataManager {
 
    private static List<TourbookDevice>            _allDevices_BySortPriority;
    private static HashMap<String, TourbookDevice> _allDevices_ByExtension;
-
    static {
 
       createDeviceLists();
@@ -211,17 +211,19 @@ public class RawDataManager {
    private boolean                 _isImportCanceled;
    //
    private int                     _importState_ImportYear                  = ADJUST_IMPORT_YEAR_IS_DISABLED;
-   private boolean                 _importState_IsConvertWayPoints          = Util.getStateBoolean(_stateRawDataView,
+   private boolean                 _importState_IsConvertWayPoints          = Util.getStateBoolean(_state_RawDataView,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
-
+   //
    private boolean                 _importState_IsCreateTourIdWithTime      = RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
    private boolean                 _importState_IsHAC4_5_ChecksumValidation = RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
    private boolean                 _importState_IsMergeTracks               = RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
    //
    //
-   private final ArrayList<TourType> _tempTourTypes = new ArrayList<>();
-   private final ArrayList<TourTag>  _tempTourTags  = new ArrayList<>();
+   private final ArrayList<TourType>   _tempTourTypes                           = new ArrayList<>();
+   private final ArrayList<TourTag>    _tempTourTags                            = new ArrayList<>();
+
+   private ReplaceImportFilenameAction _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
 
    /**
     * This is a wrapper to keep the {@link #isBackupImportFile} state.
@@ -234,6 +236,17 @@ public class RawDataManager {
       public ImportFile(final org.eclipse.core.runtime.Path iPath) {
          filePath = iPath;
       }
+   }
+
+   /**
+    * Actions when a import filename is not the same as in the saved tour
+    */
+   private enum ReplaceImportFilenameAction {
+
+      DO_NOTHING, //
+      DO_NOTHING_AND_DONT_ASK_AGAIN, //
+      REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR, //
+      REPLACE_IMPORT_FILENAME_IN_ALL_SAVED_TOUR, //
    }
 
    /**
@@ -612,10 +625,10 @@ public class RawDataManager {
     */
    public void actionImportFromFile() {
 
-      final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+      final List<TourbookDevice> allDevices = DeviceManager.getDeviceList();
 
       // create file filter list
-      final int deviceLength = deviceList.size() + 1;
+      final int deviceLength = allDevices.size() + 1;
       final String[] filterExtensions = new String[deviceLength];
       final String[] filterNames = new String[deviceLength];
 
@@ -628,7 +641,7 @@ public class RawDataManager {
       deviceIndex++;
 
       // add option for every file extension
-      for (final TourbookDevice device : deviceList) {
+      for (final TourbookDevice device : allDevices) {
          filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
          filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + UI.SYMBOL_BRACKET_RIGHT); //$NON-NLS-1$
          deviceIndex++;
@@ -658,21 +671,21 @@ public class RawDataManager {
 
       final String[] selectedFileNames = fileDialog.getFileNames();
 
-      final ArrayList<OSFile> osFiles = new ArrayList<>();
+      final ArrayList<OSFile> allOSFiles = new ArrayList<>();
 
       for (final String fileName : selectedFileNames) {
 
          final Path filePath = Paths.get(filePathFolder, fileName);
          final OSFile osFile = new OSFile(filePath);
 
-         osFiles.add(osFile);
+         allOSFiles.add(osFile);
       }
 
       if (_importState_IsAutoOpenImportLog) {
          TourLogManager.showLogView();
       }
 
-      runImport(osFiles, false, null, new ProcessDeviceDataStates());
+      runImport(allOSFiles, false, null, new ProcessDeviceDataStates());
    }
 
    /**
@@ -689,23 +702,24 @@ public class RawDataManager {
 
       final ArrayList<String> dataToModifyDetails = createTourValuesMessages(tourValueTypes);
 
+      final String toggleState = isReimport
+            ? ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES
+            : ITourbookPreferences.TOGGLE_STATE_DELETE_TOUR_VALUES;
+
+      final String dialogTitle = isReimport
+            ? Messages.Dialog_ReimportData_Title
+            : Messages.Dialog_DeleteData_Title;
+
       String confirmMessage = isReimport
             ? Messages.Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message
             : Messages.Dialog_DeleteTourValues_Dialog_ConfirmDeleteValues_Message;
-
       confirmMessage = NLS.bind(confirmMessage, String.join(UI.NEW_LINE1, dataToModifyDetails));
 
       if (actionModifyTourValues_12_Confirm_Dialog(
-
-            isReimport
-                  ? ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES
-                  : ITourbookPreferences.TOGGLE_STATE_DELETE_TOUR_VALUES,
-
-            isReimport
-                  ? Messages.Dialog_ReimportData_Title
-                  : Messages.Dialog_DeleteData_Title,
-
-            confirmMessage)) {
+            toggleState,
+            dialogTitle,
+            confirmMessage)//
+      ) {
 
          String logMessage = isReimport ? LOG_REIMPORT_COMBINED_VALUES : LOG_DELETE_COMBINED_VALUES;
 
@@ -1191,13 +1205,13 @@ public class RawDataManager {
          StatusUtil.log(e);
       }
 
-      TourManager.saveModifiedTour(tourData, false);
+      final TourData saveTourData = TourManager.saveModifiedTour(tourData, false);
 
       TourLogManager.showLogView();
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S));
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, saveTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S));
 
       for (final TourValueType tourValueType : tourValueTypes) {
-         displayTourModifiedDataDifferences(tourValueType, clonedTourData, tourData);
+         displayTourModifiedDataDifferences(tourValueType, clonedTourData, saveTourData);
       }
 
       // check if tour is displayed in the import view
@@ -1205,7 +1219,7 @@ public class RawDataManager {
 
          // replace tour data in the import view
 
-         _allImportedTours.put(tourData.getTourId(), tourData);
+         _allImportedTours.put(saveTourData.getTourId(), saveTourData);
       }
    }
 
@@ -1248,6 +1262,90 @@ public class RawDataManager {
 
    public ConcurrentHashMap<String, Object> getInvalidFilesList() {
       return _allInvalidFiles;
+   }
+
+   /**
+    * Set selected replacement options into {@link #_selectedImportFilenameReplacementOption}
+    *
+    * @param dbTourData
+    * @param importedFilePathName
+    * @param dbFilePathName
+    */
+   private void getSelectedImportFilenameReplacementOption(final TourData dbTourData,
+                                                           final String importedFilePathName) {
+
+      if (_selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.DO_NOTHING
+            || _selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR//
+      ) {
+
+         Display.getDefault().syncExec(() -> {
+
+            final String dbFilePathName = dbTourData.getImportFilePathName();
+
+            final String message = NLS.bind(Messages.Dialog_ImportData_ReplaceImportFilename_Message,
+                  new Object[] {
+                        TourManager.getTourDateTimeShort(dbTourData),
+                        importedFilePathName,
+                        dbFilePathName
+                  });
+
+            final String[] allOptions = new String[] {
+
+                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_DoNothing, //          0
+                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_DoNothingAnymore, //   1
+                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceThis, //        2
+                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceAll //          3
+            };
+
+            final int defaultOption = _selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR
+
+                  ? 2 // ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR
+                  : 0 // ReplaceImportFilenameAction.DO_NOTHING
+            ;
+
+            final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+                  Display.getDefault().getActiveShell(),
+                  Messages.Dialog_ImportData_ReplaceImportFilename_Title,
+                  null,
+                  message,
+                  MessageDialog.QUESTION,
+                  0, // OK button
+                  new String[] {
+                        IDialogConstants.OK_LABEL,
+                        IDialogConstants.CANCEL_LABEL //
+                  });
+
+            dialog.setRadioOptions(allOptions, defaultOption);
+
+            if (dialog.open() == Window.OK) {
+
+               _selectedImportFilenameReplacementOption = getSelectedImportFilenameReplacementOption_10(dialog.getSelectedOption());
+
+            } else {
+
+               // dialog is canceled
+               _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
+            }
+         });
+      }
+   }
+
+   private ReplaceImportFilenameAction getSelectedImportFilenameReplacementOption_10(final int selectedOption) {
+
+      switch (selectedOption) {
+      case 1:
+         return ReplaceImportFilenameAction.DO_NOTHING_AND_DONT_ASK_AGAIN;
+
+      case 2:
+         return ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR;
+
+      case 3:
+         return ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_ALL_SAVED_TOUR;
+
+      case 0:
+      default:
+         return ReplaceImportFilenameAction.DO_NOTHING;
+      }
    }
 
    public ArrayList<TourTag> getTempTourTags() {
@@ -2489,14 +2587,21 @@ public class RawDataManager {
       });
    }
 
-   public ImportRunState runImport(final ArrayList<OSFile> importFiles,
+   /**
+    * @param allImportFiles
+    * @param isEasyImport
+    * @param fileGlobPattern
+    * @param processDeviceDataStates
+    * @return
+    */
+   public ImportRunState runImport(final ArrayList<OSFile> allImportFiles,
                                    final boolean isEasyImport,
                                    final String fileGlobPattern,
                                    final ProcessDeviceDataStates processDeviceDataStates) {
 
       final ImportRunState importRunState = new ImportRunState();
 
-      if (importFiles.isEmpty()) {
+      if (allImportFiles.isEmpty()) {
          return importRunState;
       }
 
@@ -2515,12 +2620,12 @@ public class RawDataManager {
 
       TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
-      final List<ImportFile> importFilePaths = new ArrayList<>();
+      final List<ImportFile> allImportFilePaths = new ArrayList<>();
 
       /*
        * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
        */
-      for (final OSFile osFile : importFiles) {
+      for (final OSFile osFile : allImportFiles) {
 
          final String absolutePath = osFile.getPath().toString();
          final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
@@ -2528,11 +2633,11 @@ public class RawDataManager {
          final ImportFile importFile = new ImportFile(iPath);
          importFile.isBackupImportFile = osFile.isBackupImportFile;
 
-         importFilePaths.add(importFile);
+         allImportFilePaths.add(importFile);
       }
 
       // resort files by extension priority
-      Collections.sort(importFilePaths, (importFilePath1, importFilePath2) -> {
+      Collections.sort(allImportFilePaths, (importFilePath1, importFilePath2) -> {
 
          final String file1Extension = importFilePath1.filePath.getFileExtension();
          final String file2Extension = importFilePath2.filePath.getFileExtension();
@@ -2562,16 +2667,16 @@ public class RawDataManager {
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
             int imported = 0;
-            final int importSize = importFilePaths.size();
+            final int importSize = allImportFilePaths.size();
 
             monitor.beginTask(Messages.import_data_importTours_task, importSize);
 
             setImportId();
 
-            int importCounter = 0;
+            int numImportedTours = 0;
 
             // loop: import all selected files
-            for (final ImportFile filePath : importFilePaths) {
+            for (final ImportFile filePath : allImportFilePaths) {
 
                if (monitor.isCanceled()) {
 
@@ -2616,7 +2721,7 @@ public class RawDataManager {
                      allImportedToursFromOneFile //
                )) {
 
-                  importCounter++;
+                  numImportedTours++;
 
                   // update state
                   for (final TourData importedTourData : allImportedToursFromOneFile.values()) {
@@ -2650,7 +2755,7 @@ public class RawDataManager {
 
             save_InvalidFilesToIgnore_InTxt();
 
-            if (importCounter > 0) {
+            if (numImportedTours > 0) {
 
                updateTourData_InImportView_FromDb(monitor);
 
@@ -2672,7 +2777,9 @@ public class RawDataManager {
       };
 
       try {
+
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
+
       } catch (final Exception e) {
          TourLogManager.logEx(e);
       }
@@ -2768,6 +2875,9 @@ public class RawDataManager {
     */
    public void updateTourData_InImportView_FromDb(final IProgressMonitor monitor) {
 
+      // reset to default
+      _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
+
       final int numImportTours = _allImportedTours.size();
 
       if (numImportTours == 0) {
@@ -2807,11 +2917,11 @@ public class RawDataManager {
 
    private void updateTourData_InImportView_FromDb_Runnable(final IProgressMonitor monitor) {
 
-      int workedDone = 0;
-      final int workedAll = _allImportedTours.size();
+      int numWorked = 0;
+      final int numImportedTours = _allImportedTours.size();
 
       if (monitor != null) {
-         monitor.beginTask(Messages.import_data_updateDataFromDatabase_task, workedAll);
+         monitor.beginTask(Messages.import_data_updateDataFromDatabase_task, numImportedTours);
       }
 
       long editorTourId = -1;
@@ -2828,7 +2938,7 @@ public class RawDataManager {
 
          if (monitor != null) {
             monitor.worked(1);
-            monitor.subTask(NLS.bind(Messages.import_data_updateDataFromDatabase_subTask, workedDone++, workedAll));
+            monitor.subTask(NLS.bind(Messages.import_data_updateDataFromDatabase_subTask, numWorked++, numImportedTours));
          }
 
          if (importedTourData.isTourDeleted) {
@@ -2858,14 +2968,49 @@ public class RawDataManager {
                if (_allImportedTours.containsKey(dbTourId)) {
 
                   /*
-                   * check if the tour editor contains this tour, this should not be necessary, just
+                   * Check if the tour editor contains this tour, this should not be necessary, just
                    * make sure the correct tour is used !!!
                    */
+                  TourData replacedTourData;
                   if (editorTourId == dbTourId) {
-                     _allImportedTours.put(dbTourId, tourDataEditor.getTourData());
+                     replacedTourData = tourDataEditor.getTourData();
                   } else {
-                     _allImportedTours.put(dbTourId, dbTourData);
+                     replacedTourData = dbTourData;
                   }
+
+                  /**
+                   * Set newly import filename into the tour which was already saved in the db.
+                   * <p>
+                   * This
+                   */
+                  final String importedFilePathName = importedTourData.getImportFilePathName();
+                  final String dbFilePathName = dbTourData.getImportFilePathName();
+
+                  if (importedFilePathName.equalsIgnoreCase(dbFilePathName) == false) {
+
+                     // saved file path name is different when compared with the imported file path name
+
+                     getSelectedImportFilenameReplacementOption(dbTourData, importedFilePathName);
+
+                     switch (_selectedImportFilenameReplacementOption) {
+
+                     case REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR:
+                     case REPLACE_IMPORT_FILENAME_IN_ALL_SAVED_TOUR:
+
+                        replacedTourData.setImportFilePath(importedFilePathName);
+
+                        replacedTourData = TourManager.saveModifiedTour(dbTourData, false);
+
+                        break;
+
+                     case DO_NOTHING:
+                     case DO_NOTHING_AND_DONT_ASK_AGAIN:
+                     default:
+                        break;
+                     }
+                  }
+
+                  _allImportedTours.put(dbTourId, replacedTourData);
                }
             }
          } catch (final Exception e) {
