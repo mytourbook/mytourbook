@@ -20,11 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -150,8 +148,6 @@ public class DataTransferWizard extends Wizard {
       // import received files
       for (final File inFile : _receivedFiles) {
 
-         final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
-
          rawDataManager.importTour(
 
                inFile, //                                                  importFile
@@ -159,8 +155,9 @@ public class DataTransferWizard extends Wizard {
                fileCollision, //                                           fileCollision
                _importDevice.isBuildNewFileNames, //                       isBuildNewFileNames
                true, //                                                    isTourDisplayedInImportView
-               processDeviceDataStates,
-               allImportedToursFromOneFile);
+               processDeviceDataStates, //
+               new HashMap<>() //
+         );
       }
 
       rawDataManager.updateTourData_InImportView_FromDb(null);

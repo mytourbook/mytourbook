@@ -1501,6 +1501,9 @@ public class TourDatabase {
       return _activeTourTypes;
    }
 
+   /**
+    * @return Returns all tour id's without any filter, sorted by tour start date/time
+    */
    public static ArrayList<Long> getAllTourIds() {
 
       final ArrayList<Long> tourIds = new ArrayList<>();
@@ -8404,9 +8407,11 @@ public class TourDatabase {
 
                final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
-               // Data update 43: Converting lat/lon \u2192 E6 - {0} of {1} - {2} % - {3} \u0394
                splashManager.setMessage(NLS.bind(
+                     
+                     // Data update 43: Converting lat/lon \u2192 E6 - {0} of {1} - {2} % - {3} \u0394
                      Messages.Tour_Database_PostUpdate_043_LatLonE6,
+
                      new Object[] {
                            sumUpdatedTours,
                            numAllTourIds,

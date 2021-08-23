@@ -208,7 +208,9 @@ public class FitData {
 
          recordStartTime = _sessionStartTime.toInstant().toEpochMilli();
 
-         TourLogManager.logError("There are no time data, using session date/time");//$NON-NLS-1$
+         TourLogManager.logError(String.format(
+               "There are no time data, using session date/time %s", //$NON-NLS-1$
+               TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
 
       } else {
 
@@ -216,7 +218,9 @@ public class FitData {
 
          recordStartTime = TimeTools.now().toEpochSecond();
 
-         TourLogManager.logError("There are no time data and there is no session date/time");//$NON-NLS-1$
+         TourLogManager.logError(String.format(
+               "There are no time data and there is no session date/time, using %s", //$NON-NLS-1$
+               TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
       }
 
       if (_sessionStartTime != null) {
@@ -225,16 +229,18 @@ public class FitData {
 
          if (recordStartTime != sessionStartTime) {
 
-            final String message =
-                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+// too much noise
 
-            TourLogManager.subLog_Info(
-                  String.format(
-                        message,
-                        _importFilePathName,
-                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
-                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
-                        (recordStartTime - sessionStartTime) / 1000));
+//            final String message =
+//                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+//
+//            TourLogManager.subLog_Info(
+//                  String.format(
+//                        message,
+//                        _importFilePathName,
+//                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
+//                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
+//                        (recordStartTime - sessionStartTime) / 1000));
          }
       }
 

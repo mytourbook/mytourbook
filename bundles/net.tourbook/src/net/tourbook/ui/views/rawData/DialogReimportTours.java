@@ -17,8 +17,6 @@ package net.tourbook.ui.views.rawData;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import de.byteholder.geoclipse.map.UI;
-
 import gnu.trove.list.array.TLongArrayList;
 
 import java.lang.reflect.InvocationTargetException;
@@ -40,7 +38,6 @@ import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.importdata.RawDataManager;
@@ -62,6 +59,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -107,6 +105,8 @@ public class DialogReimportTours extends TitleAreaDialog {
    private static final String STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES     = "STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES";     //$NON-NLS-1$
 
    private static final String STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
+
+   private static final String NUMBER_FORMAT_1F                             = "%.1f";                                         //$NON-NLS-1$
 
    private static final int    VERTICAL_SECTION_MARGIN                      = 10;
 
@@ -606,7 +606,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       Util.clearSelection();
 
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
-
       TourManager.getInstance().clearTourDataCache();
 
       final boolean isReimport_AllTours = _rdoReimport_Tours_All.getSelection();
@@ -624,14 +623,21 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } else {
 
-         doReimport_50_SelectedTours(
+         doReimport_20_SelectedTours(
 
                tourValueTypes,
-               _tourViewer,
                isSkipToursWithFileNotFound);
       }
    }
 
+   /**
+    * Re-import ALL tours or BETWEEN tours
+    *
+    * @param tourValueTypes
+    * @param isReimport_AllTours
+    * @param isReimport_BetweenDates
+    * @param isSkipToursWithFileNotFound
+    */
    private void doReimport_10_All_OR_BetweenDate_Tours(final List<TourValueType> tourValueTypes,
                                                        final boolean isReimport_AllTours,
                                                        final boolean isReimport_BetweenDates,
@@ -648,61 +654,19 @@ public class DialogReimportTours extends TitleAreaDialog {
                Messages.Dialog_DatabaseAction_Confirmation_Message,
                MessageDialog.QUESTION,
                new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
-               1);
+               1 // default index
+         );
 
-         final int choice = dialog.open();
-
-         if (choice == IDialogConstants.CANCEL_ID) {
-
+         if (dialog.open() != Window.OK) {
             return;
          }
       }
 
-      final RawDataManager rawDataManager = RawDataManager.getInstance();
-
-      // re-import ALL tours or BETWEEN tours
-
-      if (rawDataManager.actionModifyTourValues_10_Confirm(tourValueTypes, true) == false) {
+      if (RawDataManager.getInstance().actionModifyTourValues_10_Confirm(tourValueTypes, true) == false) {
          return;
       }
 
       saveState();
-
-      TourLogManager.showLogView();
-
-      final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
-            .setIsReimport(true)
-            .setIsRunningConcurrently(true);
-
-      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
-
-         @Override
-         public boolean computeTourValues(final TourData oldTourData) {
-
-            final ReImportStatus reImportStatus = new ReImportStatus();
-
-            rawDataManager.reimportTour(
-                  oldTourData,
-                  tourValueTypes,
-                  isSkipToursWithFileNotFound,
-                  reImportStatus,
-                  processDeviceDataStates);
-
-            return true;
-         }
-
-         @Override
-         public String getResultText() {
-
-            return UI.EMPTY_STRING;
-         }
-
-         @Override
-         public String getSubTaskText(final TourData savedTourData) {
-
-            return UI.EMPTY_STRING;
-         }
-      };
 
       ArrayList<Long> allTourIDs = null;
 
@@ -730,26 +694,23 @@ public class DialogReimportTours extends TitleAreaDialog {
 
             return;
          }
+
+      } else {
+
+         allTourIDs = TourDatabase.getAllTourIds();
       }
 
-      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, allTourIDs);
-
-      fireTourModifyEvent();
+      doReimport_50_TourIds(tourValueTypes, isSkipToursWithFileNotFound, allTourIDs);
    }
 
    /**
     * @param tourValueTypes
     *           A list of tour values to be re-imported
-    * @param tourViewer
-    *           Tour viewer containing the selected tours to be re-imported.
     * @param isSkipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
-   private void doReimport_50_SelectedTours(final List<TourValueType> tourValueTypes,
-                                            final ITourViewer3 tourViewer,
+   private void doReimport_20_SelectedTours(final List<TourValueType> tourValueTypes,
                                             final boolean isSkipToursWithFileNotFound) {
-
-      final long start = System.currentTimeMillis();
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
 
@@ -761,8 +722,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       final Shell activeShell = display.getActiveShell();
 
       // get selected tour IDs
-
-      final Object[] allSelectedItems = TourManager.getTourViewerSelectedTourIds(tourViewer);
+      final Object[] allSelectedItems = TourManager.getTourViewerSelectedTourIds(_tourViewer);
 
       if (allSelectedItems == null || allSelectedItems.length == 0) {
 
@@ -773,34 +733,51 @@ public class DialogReimportTours extends TitleAreaDialog {
          return;
       }
 
-      final int numTours = allSelectedItems.length;
-
       /*
-       * Convert selection to long array
+       * Convert selection to long
        */
-      final long[] allSelectedTourIds = new long[numTours];
-      for (int i = 0; i < allSelectedItems.length; i++) {
-         allSelectedTourIds[i] = (long) allSelectedItems[i];
+      final ArrayList<Long> allSelectedTourIds = new ArrayList<>();
+      for (final Object selectedItem : allSelectedItems) {
+         allSelectedTourIds.add((Long) selectedItem);
       }
+
+      doReimport_50_TourIds(
+            tourValueTypes,
+            isSkipToursWithFileNotFound,
+            allSelectedTourIds);
+   }
+
+   private void doReimport_50_TourIds(final List<TourValueType> tourValueTypes,
+                                      final boolean isSkipToursWithFileNotFound,
+                                      final ArrayList<Long> allTourIDs) {
+
+      final long start = System.currentTimeMillis();
+
+      TourLogManager.showLogView();
+
+      final RawDataManager rawDataManager = RawDataManager.getInstance();
 
       rawDataManager.setImportId();
       rawDataManager.setImportCanceled(false);
 
-      final TLongArrayList allReimportedTourIds = new TLongArrayList();
-
       /*
        * Cleanup everything which could cause caching problems
        */
-      TourManager.getInstance().clearTourDataCache();
+//      TourManager.getInstance().clearTourDataCache();
 
       // ensure the tour editor do not show anything
-      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+//      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+      final int numAllTourIDs = allTourIDs.size();
 
       /*
        * Setup concurrency
        */
-      _reimport_CountDownLatch = new CountDownLatch(numTours);
+      _reimport_CountDownLatch = new CountDownLatch(numAllTourIDs);
       _reimport_Queue.clear();
+
+      final ReImportStatus reImportStatus = new ReImportStatus();
+      final TLongArrayList allReimportedTourIds = new TLongArrayList();
 
       final IRunnableWithProgress reImportRunnable = new IRunnableWithProgress() {
 
@@ -810,17 +787,23 @@ public class DialogReimportTours extends TitleAreaDialog {
             final long startTime = System.currentTimeMillis();
             long lastUpdateTime = startTime;
 
-            final ReImportStatus reImportStatus = new ReImportStatus();
             final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+
                   .setIsReimport(true)
-                  .setIsRunningConcurrently(true);
+                  .setIsRunningConcurrently(true)
 
-            final AtomicInteger numWorked = new AtomicInteger();
+                  .setIsLog_DEFAULT(false)
+                  .setIsLog_INFO(false)
+                  .setIsLog_OK(false);
 
-            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numTours);
+            final AtomicInteger numWorkedTours = new AtomicInteger();
+
+            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numAllTourIDs);
+
+            int lastUpdateNumItems = 1;
 
             // loop: all selected tours in the viewer
-            for (final long tourId : allSelectedTourIds) {
+            for (final long tourId : allTourIDs) {
 
                if (monitor.isCanceled() || reImportStatus.isCanceled_WholeReimport.get()) {
 
@@ -835,42 +818,46 @@ public class DialogReimportTours extends TitleAreaDialog {
                final long timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 200) {
+               if (timeDiff > 1000) {
 
                   lastUpdateTime = currentTime;
 
+                  final int numWorkedValue = numWorkedTours.get();
+
+                  final long numTourDiff = numWorkedValue - lastUpdateNumItems;
+                  lastUpdateNumItems = numWorkedValue;
+
+                  final String percentValue = String.format(NUMBER_FORMAT_1F, (float) numWorkedValue / numAllTourIDs * 100.0);
+
                   monitor.subTask(NLS.bind(
-                        Messages.Import_Data_Dialog_Reimport_SubTask,
-                        new Object[] { numWorked.get(), numTours }));
+                        "{0} of {1} - {2} % - {3} Δ",
+                        new Object[] {
+                              numWorkedValue,
+                              numAllTourIDs,
+                              percentValue,
+                              numTourDiff,
+                        }));
                }
 
-               doReimport_52_RunConcurrent(
+               doReimport_60_RunConcurrent(
                      tourId,
                      tourValueTypes,
                      allReimportedTourIds,
                      isSkipToursWithFileNotFound,
                      monitor,
-                     numWorked,
+                     numWorkedTours,
                      reImportStatus,
                      processDeviceDataStates);
             }
 
             // wait until all re-imports are performed
             _reimport_CountDownLatch.await();
-
-            if (reImportStatus.isAnyTourReImported.get()) {
-
-               rawDataManager.updateTourData_InImportView_FromDb(monitor);
-
-               // reselect tours, run in UI thread
-               display.asyncExec(tourViewer::reloadViewer);
-            }
          }
       };
 
       try {
 
-         new ProgressMonitorDialog(activeShell).run(true, true, reImportRunnable);
+         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, reImportRunnable);
 
       } catch (final Exception e) {
 
@@ -883,15 +870,24 @@ public class DialogReimportTours extends TitleAreaDialog {
          // net.tourbook.database.TourDatabase.saveTour_PostSaveActions(TourData)
 
          TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(allReimportedTourIds.toArray());
-
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_REIMPORT_END, time));
       }
+
+      if (reImportStatus.isAnyTourReImported.get()) {
+
+         rawDataManager.updateTourData_InImportView_FromDb(null);
+
+         // reselect tours, run in UI thread
+         Display.getDefault().asyncExec(_tourViewer::reloadViewer);
+      }
+
+      TourLogManager.addLog(
+            TourLogState.DEFAULT,
+            String.format(RawDataManager.LOG_REIMPORT_END, (System.currentTimeMillis() - start) / 1000.0));
+
+      fireTourModifyEvent();
    }
 
-   private void doReimport_52_RunConcurrent(final long tourId,
+   private void doReimport_60_RunConcurrent(final long tourId,
                                             final List<TourValueType> tourValueTypes,
                                             final TLongArrayList allReimportedTourIds,
                                             final boolean isSkipToursWithFileNotFound,
@@ -1035,7 +1031,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       // keep window size and position
       return _state;
 
-      //Helpful during development
+      // Helpful during development
 //    return null;
    }
 

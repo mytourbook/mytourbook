@@ -65,9 +65,55 @@ public class ProcessDeviceDataStates {
     */
    public AtomicBoolean isFire_NewTourType = new AtomicBoolean();
 
-   public ProcessDeviceDataStates setIsRunningConcurrently(final boolean isRunningConcurrently) {
+   public boolean       isLog_DEFAULT;
+   public boolean       isLog_INFO;
+   public boolean       isLog_OK;
 
-      this.isRunningConcurrently = isRunningConcurrently;
+   /**
+    *
+    */
+   public ProcessDeviceDataStates() {
+
+      setIsLog_DEFAULT(true);
+      setIsLog_INFO(true);
+      setIsLog_OK(true);
+   }
+
+   /**
+    * IN state:
+    *
+    * @param isLog
+    * @return
+    */
+   public ProcessDeviceDataStates setIsLog_DEFAULT(final boolean isLog) {
+
+      isLog_DEFAULT = isLog;
+
+      return this;
+   }
+
+   /**
+    * IN state:
+    *
+    * @param isLog
+    * @return
+    */
+   public ProcessDeviceDataStates setIsLog_INFO(final boolean isLog) {
+
+      isLog_INFO = isLog;
+
+      return this;
+   }
+
+   /**
+    * IN state:
+    *
+    * @param isLog
+    * @return
+    */
+   public ProcessDeviceDataStates setIsLog_OK(final boolean isLog) {
+
+      isLog_OK = isLog;
 
       return this;
    }
@@ -75,6 +121,13 @@ public class ProcessDeviceDataStates {
    public ProcessDeviceDataStates setIsReimport(final boolean isReimport) {
 
       this.isReimport = isReimport;
+
+      return this;
+   }
+
+   public ProcessDeviceDataStates setIsRunningConcurrently(final boolean isRunningConcurrently) {
+
+      this.isRunningConcurrently = isRunningConcurrently;
 
       return this;
    }

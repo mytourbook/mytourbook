@@ -142,7 +142,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -876,49 +875,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-               if (_isPartVisible) {
-                  updateViewerPersonData();
-               } else {
-                  // keep new active person until the view is visible
-                  _newActivePerson = TourbookPlugin.getActivePerson();
-               }
-
-            } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
-
-               _actionSaveTour.resetPeopleList();
-
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-               // tour type images can have been changed
-               disposeConfigImages();
-
-               // update tour type in the raw data
-               _rawDataMgr.updateTourData_InImportView_FromDb(null);
-
-               _tourViewer.refresh();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
-
-               updateToolTipState();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-               _tourViewer.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tourViewer.getTable().redraw();
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            if (_isPartVisible) {
+               updateViewerPersonData();
+            } else {
+               // keep new active person until the view is visible
+               _newActivePerson = TourbookPlugin.getActivePerson();
             }
+
+         } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+            _actionSaveTour.resetPeopleList();
+
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+            // tour type images can have been changed
+            disposeConfigImages();
+
+            // update tour type in the raw data
+            _rawDataMgr.updateTourData_InImportView_FromDb(null);
+
+            _tourViewer.refresh();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+            updateToolTipState();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+            _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+            _tourViewer.refresh();
+
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _tourViewer.getTable().redraw();
          }
       };
 
@@ -927,23 +923,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Common preferences
        */
-      _prefChangeListener_Common = new IPropertyChangeListener() {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+            recreateViewer();
 
-               recreateViewer();
+         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            // measurement system has changed
 
-               // measurement system has changed
-
-               recreateViewer();
-            }
+            recreateViewer();
          }
       };
 
@@ -969,56 +961,53 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-            if (part == RawDataView.this) {
-               return;
+         if (part == RawDataView.this) {
+            return;
+         }
+         if (_isInUpdate) {
+            return;
+         }
+
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            // update modified tours
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
+
+               // update model
+               _rawDataMgr.updateTourDataModel(modifiedTours);
+
+               // update viewer
+               _tourViewer.update(modifiedTours.toArray(), null);
+
+               // remove old selection, old selection can have the same tour but with old data
+               _postSelectionProvider.clearSelection();
             }
-            if (_isInUpdate) {
-               return;
+
+         } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+            // save imported file names
+            final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+
+            _state.put(STATE_IMPORTED_FILENAMES, importedFiles.keySet().toArray(String[]::new));
+
+            if (!RawDataManager.isReimportingActive() &&
+                  !RawDataManager.isDeleteValuesActive()) {
+
+               /*
+                * Re-import files because computed values could be changed, e.g. elevation gain
+                */
+
+               reimportAllImportFiles(false);
             }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-               // update modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            _rawDataMgr.updateTourData_InImportView_FromDb(null);
 
-                  // update model
-                  _rawDataMgr.updateTourDataModel(modifiedTours);
-
-                  // update viewer
-                  _tourViewer.update(modifiedTours.toArray(), null);
-
-                  // remove old selection, old selection can have the same tour but with old data
-                  _postSelectionProvider.clearSelection();
-               }
-
-            } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
-               // save imported file names
-               final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
-
-               _state.put(STATE_IMPORTED_FILENAMES, importedFiles.keySet().toArray(String[]::new));
-
-               if (!RawDataManager.isReimportingActive() &&
-                     !RawDataManager.isDeleteValuesActive()) {
-
-                  /*
-                   * Re-import files because computed values could be changed, e.g. elevation gain
-                   */
-
-                  reimportAllImportFiles(false);
-               }
-
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
-
-               _rawDataMgr.updateTourData_InImportView_FromDb(null);
-
-               reloadViewer();
-            }
+            reloadViewer();
          }
       };
       TourManager.getInstance().addTourEventListener(_tourEventListener);
@@ -1026,28 +1015,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void createActions() {
 
-      _actionEditImportPreferences = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+// SET_FORMATTING_OFF
 
-      _actionClearView = new ActionClearView(this);
-      _actionDeleteTourFile = new ActionDeleteTourFiles(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionExportTour = new ActionExport(this);
-      _actionJoinTours = new ActionJoinTours(this);
-      _actionMergeIntoTour = new ActionMergeIntoMenu(this);
-      _actionMergeTour = new ActionMergeTour(this);
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-      _actionOpenTourLogView = new ActionOpenTourLogView();
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-      _actionOpenTour = new ActionOpenTour(this);
-      _actionReimport_Tours = new ActionReimportTours(this);
-      _actionRemoveTour = new ActionRemoveTour(this);
-      _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
-      _actionSaveTour = new ActionSaveTourInDatabase(this, false);
-      _actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-      _actionSetupImport = new ActionSetupImport(this);
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
-      _actionUploadTour = new ActionUpload(this);
+      _actionEditImportPreferences     = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+
+      _actionClearView                 = new ActionClearView(this);
+      _actionDeleteTourFile            = new ActionDeleteTourFiles(this);
+      _actionEditTour                  = new ActionEditTour(this);
+      _actionEditQuick                 = new ActionEditQuick(this);
+      _actionExportTour                = new ActionExport(this);
+      _actionJoinTours                 = new ActionJoinTours(this);
+      _actionMergeIntoTour             = new ActionMergeIntoMenu(this);
+      _actionMergeTour                 = new ActionMergeTour(this);
+      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this);
+      _actionOpenTourLogView           = new ActionOpenTourLogView();
+      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, true);
+      _actionOpenTour                  = new ActionOpenTour(this);
+      _actionReimport_Tours            = new ActionReimportTours(this);
+      _actionRemoveTour                = new ActionRemoveTour(this);
+      _actionRemoveToursWhenClosed     = new ActionRemoveToursWhenClosed();
+      _actionSaveTour                  = new ActionSaveTourInDatabase(this, false);
+      _actionSaveTourWithPerson        = new ActionSaveTourInDatabase(this, true);
+      _actionSetupImport               = new ActionSetupImport(this);
+      _actionSetTourType               = new ActionSetTourTypeMenu(this);
+      _actionUploadTour                = new ActionUpload(this);
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -4526,17 +4519,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
-
             final boolean isImported = _rawDataMgr.importTour(
 
-                  file, //    importFile
-                  null, //    destinationPath
-                  null, //    fileCollision
-                  false, //   isBuildNewFileNames
-                  true, //    isTourDisplayedInImportView
-                  processDeviceDataStates,
-                  allImportedToursFromOneFile //
+                  file, //                         importFile
+                  null, //                         destinationPath
+                  null, //                         fileCollision
+                  false, //                        isBuildNewFileNames
+                  true, //                         isTourDisplayedInImportView
+                  processDeviceDataStates, //
+                  new HashMap<>() //
             );
 
             if (isImported) {

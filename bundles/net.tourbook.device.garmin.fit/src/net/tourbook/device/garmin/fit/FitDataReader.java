@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -76,8 +77,7 @@ public class FitDataReader extends TourbookDevice {
       }
    }
 
-   private int     _logCounter;
-   private boolean _isVersionLogged;
+   private AtomicBoolean _isVersionLogged = new AtomicBoolean();
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -511,7 +511,7 @@ public class FitDataReader extends TourbookDevice {
       }
    }
 
-   private void onMesg_ForDebugLogging(final Mesg mesg) {
+   private void onMesg_ForDebugLogging(final Mesg mesg, final int[] logCounter) {
 
       long garminTimestamp = 0;
 
@@ -622,7 +622,7 @@ public class FitDataReader extends TourbookDevice {
 
                FitDataReader.class.getSimpleName(),
 
-               _logCounter++,
+               logCounter[0]++,
 
                TimeTools.getZonedDateTime(javaTime), //  show readable date/time
                javaTime / 1000, //                       java time in s
@@ -690,7 +690,7 @@ public class FitDataReader extends TourbookDevice {
 
                FitDataReader.class.getSimpleName(),
 
-               _logCounter++,
+               logCounter[0]++,
 
                TimeTools.getZonedDateTime(javaTime), //  show readable date/time
                javaTime / 1000, //                       java time in s
@@ -798,10 +798,18 @@ public class FitDataReader extends TourbookDevice {
 
             System.out.println();
 
-            _logCounter = 0;
+            final int[] logCounter = { 0 };
 
             // add debug logger which is listening to all events
-            fitBroadcaster.addListener((MesgListener) this::onMesg_ForDebugLogging);
+            fitBroadcaster.addListener(new MesgListener() {
+
+               final int[] _logCounter = logCounter;
+
+               @Override
+               public void onMesg(final Mesg mesg) {
+                  onMesg_ForDebugLogging(mesg, _logCounter);
+               }
+            });
          }
 
          fitBroadcaster.run(fileInputStream);
@@ -834,15 +842,13 @@ public class FitDataReader extends TourbookDevice {
 
             // log version if not yet done
 
-            if (_isVersionLogged == false) {
+            if (_isVersionLogged.getAndSet(true) == false) {
 
                TourLogManager.logInfo(
                      String.format(
                            "FIT SDK %d.%d", //$NON-NLS-1$
                            Fit.PROFILE_VERSION_MAJOR,
                            Fit.PROFILE_VERSION_MINOR));
-
-               _isVersionLogged = true;
             }
 
          } else {

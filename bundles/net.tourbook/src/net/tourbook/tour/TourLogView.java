@@ -25,12 +25,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.StatisticManager;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -42,6 +46,9 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -78,7 +85,8 @@ public class TourLogView extends ViewPart {
 
    private IPartListener2      _partListener;
 
-   private Action              _actionReset;
+   private Action              _action_CopyIntoClipboard;
+   private Action              _action_Reset;
 
    private boolean             _isNewUI;
    private boolean             _isBrowserCompleted;
@@ -104,9 +112,27 @@ public class TourLogView extends ViewPart {
    private Composite _page_WithBrowser;
    private Text      _txtNoBrowser;
 
-   private class ActionReset extends Action {
+   private class Action_CopyLogValuesIntoClipboard extends Action {
 
-      public ActionReset() {
+      Action_CopyLogValuesIntoClipboard() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_CopyIntoClipboard();
+      }
+   }
+
+   private class Action_Reset extends Action {
+
+      public Action_Reset() {
 
          setText(Messages.Tour_Log_Action_Clear_Tooltip);
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
@@ -114,56 +140,43 @@ public class TourLogView extends ViewPart {
 
       @Override
       public void run() {
-         actionClearView();
+         onAction_ClearView();
       }
-   }
-
-   private void actionClearView() {
-
-      TourLogManager.clear();
    }
 
    public void addLog(final TourLog tourLog) {
 
-      final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
-
-      if (isBrowserAvailable && _isBrowserCompleted == false) {
+      if (isBrowserAvailable() && _isBrowserCompleted == false) {
 
          // this occures when the view is opening but not yet ready
          return;
       }
 
       // Run always async that the flow is not blocked.
-      Display.getDefault().syncExec(() -> {
+      Display.getDefault().asyncExec(() -> {
 
-         String jsText = UI.replaceJS_BackSlash(tourLog.message);
-         jsText = UI.replaceJS_Apostrophe(jsText);
-         final String message = jsText;
+         final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog));
 
-         final String subItem = tourLog.isSubLogItem
-               ? CSS_LOG_SUB_ITEM
-               : UI.EMPTY_STRING;
+         if (isBrowserAvailable()) {
 
-         final String css = tourLog.css == null
-               ? CSS_LOG_ITEM
-               : tourLog.css;
+            String jsText = UI.replaceJS_BackSlash(tourLog.message);
+            jsText = UI.replaceJS_Apostrophe(jsText);
+            final String message = jsText;
 
-         final String[] stateWithBrowser = { UI.EMPTY_STRING };
-         final String[] stateNoBrowser = { UI.EMPTY_STRING };
+            final String subItem = tourLog.isSubLogItem
+                  ? CSS_LOG_SUB_ITEM
+                  : UI.EMPTY_STRING;
 
-         setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
-
-         final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
-
-         final boolean isBrowserAvailable1 = _browser != null && _browser.isDisposed() == false;
-
-         if (isBrowserAvailable1) {
+            final String css = tourLog.css == null
+                  ? CSS_LOG_ITEM
+                  : tourLog.css;
 
             final String[] messageSplitted = message.split(WEB.HTML_ELEMENT_BR);
 
 // SET_FORMATTING_OFF
 
             String tdContent;
+
             if (messageSplitted.length == 1) {
 
                tdContent = "td.appendChild(document.createTextNode('" + message + "'));"     + NL; //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,7 +204,7 @@ public class TourLogView extends ViewPart {
                   // state (icon)
                   + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
                   + "td.className='column icon';"                                            + NL //$NON-NLS-1$
-                  + stateWithBrowser[0]
+                  + getStateImage_WithBrowser(tourLog)
                   + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
 
                   // message
@@ -217,7 +230,8 @@ public class TourLogView extends ViewPart {
                   + "htmlSectionElement.appendChild(tr);"                                    + NL //$NON-NLS-1$
 
                   // scroll to the bottom -> debugger do not work
-//                   + ("debugger;\n") //$NON-NLS-1$
+//                + ("debugger;\n") //$NON-NLS-1$
+
                   + "var html = document.documentElement;"                                   + NL //$NON-NLS-1$
                   + "var scrollHeight = html.scrollHeight;"                                  + NL //$NON-NLS-1$
                   + "html.scrollTop = scrollHeight;"                                         + NL //$NON-NLS-1$
@@ -318,7 +332,8 @@ public class TourLogView extends ViewPart {
 
    private void createActions() {
 
-      _actionReset = new ActionReset();
+      _action_Reset = new Action_Reset();
+      _action_CopyIntoClipboard = new Action_CopyLogValuesIntoClipboard();
    }
 
    private String createHTML() {
@@ -358,12 +373,15 @@ public class TourLogView extends ViewPart {
 
    private String createNoBrowserText(final TourLog tourLog, final String stateNoBrowser) {
 
-      final String subIndent = tourLog.isSubLogItem ? UI.SPACE3 : UI.EMPTY_STRING;
+      final String subIndent = tourLog.isSubLogItem
+            ? UI.SPACE3
+            : UI.EMPTY_STRING;
 
-      return String.format("%s %-5s %s   %s", //$NON-NLS-1$
+      return String.format("[%s] %s %-5s %s   %s", //$NON-NLS-1$
 
+            tourLog.threadName,
             tourLog.time,
-            stateNoBrowser,
+            stateNoBrowser, // text instead of an icon
             subIndent,
             tourLog.message
 
@@ -400,7 +418,7 @@ public class TourLogView extends ViewPart {
       {
          _txtNoBrowser = new Text(_page_NoBrowser, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
          _txtNoBrowser.setBackground(bgColor);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.FILL)
                .applyTo(_txtNoBrowser);
@@ -484,7 +502,8 @@ public class TourLogView extends ViewPart {
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionReset);
+      tbm.add(_action_CopyIntoClipboard);
+      tbm.add(_action_Reset);
    }
 
    private boolean httpAction(final String location) {
@@ -521,6 +540,11 @@ public class TourLogView extends ViewPart {
 
    }
 
+   private boolean isBrowserAvailable() {
+
+      return _browser != null && _browser.isDisposed() == false;
+   }
+
    public boolean isDisposed() {
 
       return _pageBook == null || _pageBook.isDisposed();
@@ -529,6 +553,54 @@ public class TourLogView extends ViewPart {
    private String js_SetStyleBgImage(final String imageUrl) {
 
       return "td.style.backgroundImage=\"url('" + imageUrl + "')\";" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   private void onAction_ClearView() {
+
+      TourLogManager.clear();
+   }
+
+   private void onAction_CopyIntoClipboard() {
+
+      for (final TourLog tourLog : TourLogManager.getLogs()) {
+
+         final String[] stateWithBrowser = { UI.EMPTY_STRING };
+         final String[] stateNoBrowser = { UI.EMPTY_STRING };
+
+         final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog));
+
+         addLog_NoBrowser(noBrowserText);
+      }
+
+      final String statValues = ;
+
+      final Display display = Display.getDefault();
+
+      if (statValues.length() > 0) {
+
+         final TextTransfer textTransfer = TextTransfer.getInstance();
+
+         final Clipboard clipBoard = new Clipboard(display);
+         {
+            clipBoard.setContents(
+
+                  new Object[] { statValues },
+                  new Transfer[] { textTransfer }
+
+            );
+         }
+         clipBoard.dispose();
+
+         final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+         if (statusLineMgr != null) {
+
+            // show info that data are copied
+            statusLineMgr.setMessage(Messages.Tour_StatisticValues_Info_DataAreCopied);
+
+            // cleanup message
+            display.timerExec(2000, () -> statusLineMgr.setMessage(null));
+         }
+      }
    }
 
    private void onBrowser_Completed() {
@@ -568,54 +640,55 @@ public class TourLogView extends ViewPart {
       }
    }
 
-   private void setLogStateImage(final TourLog importLog, final String[] stateNoBrowser, final String[] stateWithBrowser) {
+   private String getStateImage_NoBrowser(final TourLog importLog) {
+
+// SET_FORMATTING_OFF
 
       switch (importLog.state) {
 
-      case IMPORT_OK:
-         stateNoBrowser[0] = STATE_OK;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateOK);
-         break;
-
-      case IMPORT_ERROR:
-         stateNoBrowser[0] = STATE_ERROR;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
-         break;
-
-      case IMPORT_EXCEPTION:
-         stateNoBrowser[0] = STATE_EXCEPTION;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
-         break;
-
-      case INFO:
-         stateNoBrowser[0] = STATE_INFO;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateInfo);
-         break;
-
-      case EASY_IMPORT_COPY:
-         stateNoBrowser[0] = STATE_COPY;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
-         break;
+      case IMPORT_OK:                  return STATE_OK;
+      case IMPORT_ERROR:               return STATE_ERROR;
+      case IMPORT_EXCEPTION:           return STATE_EXCEPTION;
+      case INFO:                       return STATE_INFO;
+      case EASY_IMPORT_COPY:           return STATE_COPY;
 
       case EASY_IMPORT_DELETE_BACKUP:
-      case TOUR_DELETED:
-         stateNoBrowser[0] = STATE_DELETE;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
-         break;
+      case TOUR_DELETED:               return STATE_DELETE;
 
-      case EASY_IMPORT_DELETE_DEVICE:
-         stateNoBrowser[0] = STATE_DELETE;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-         break;
+      case EASY_IMPORT_DELETE_DEVICE:  return STATE_DELETE;
+      case TOUR_SAVED:                 return STATE_SAVE;
 
-      case TOUR_SAVED:
-         stateNoBrowser[0] = STATE_SAVE;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateSave);
-         break;
+// SET_FORMATTING_ON
 
       default:
-         break;
       }
+      return UI.EMPTY_STRING;
+   }
+
+   private String getStateImage_WithBrowser(final TourLog importLog) {
+
+// SET_FORMATTING_OFF
+
+      switch (importLog.state) {
+
+      case IMPORT_OK:                  return js_SetStyleBgImage(_imageUrl_StateOK);
+      case IMPORT_ERROR:               return js_SetStyleBgImage(_imageUrl_StateError);
+      case IMPORT_EXCEPTION:           return js_SetStyleBgImage(_imageUrl_StateError);
+      case INFO:                       return js_SetStyleBgImage(_imageUrl_StateInfo);
+      case EASY_IMPORT_COPY:           return js_SetStyleBgImage(_imageUrl_StateCopy);
+
+      case EASY_IMPORT_DELETE_BACKUP:
+      case TOUR_DELETED:               return js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
+
+      case EASY_IMPORT_DELETE_DEVICE:  return js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
+      case TOUR_SAVED:                 return js_SetStyleBgImage(_imageUrl_StateSave);
+
+// SET_FORMATTING_ON
+
+      default:
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    /**
@@ -649,11 +722,7 @@ public class TourLogView extends ViewPart {
           */
          for (final TourLog tourLog : TourLogManager.getLogs()) {
 
-            final String[] stateWithBrowser = { UI.EMPTY_STRING };
-            final String[] stateNoBrowser = { UI.EMPTY_STRING };
-
-            setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
-            final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
+            final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog));
 
             addLog_NoBrowser(noBrowserText);
          }
