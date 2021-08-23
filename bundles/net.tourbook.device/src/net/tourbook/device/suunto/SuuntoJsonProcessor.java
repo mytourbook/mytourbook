@@ -87,9 +87,9 @@ public class SuuntoJsonProcessor {
 
    private List<TimeData>      _sampleList;
    private int                 _numLaps;
-   private boolean             isBatteryPercentageStart;
-   private short               _tourBatteryPercentageStart;
-   private short               _tourBatteryPercentageEnd;
+   private boolean             isBatteryPercentageStart    = true;
+   private short               _tourBatteryPercentageStart = -1;
+   private short               _tourBatteryPercentageEnd   = -1;
 
    private IPreferenceStore    _prefStore           = Activator.getDefault().getPreferenceStore();
 
@@ -189,9 +189,6 @@ public class SuuntoJsonProcessor {
       _sampleList = new ArrayList<>();
       final ArrayList<Long> _pausedTime_Start = new ArrayList<>();
       final ArrayList<Long> _pausedTime_End = new ArrayList<>();
-      isBatteryPercentageStart = true;
-      _tourBatteryPercentageStart = -1;
-      _tourBatteryPercentageEnd = -1;
 
       JSONArray samples = null;
       try {
