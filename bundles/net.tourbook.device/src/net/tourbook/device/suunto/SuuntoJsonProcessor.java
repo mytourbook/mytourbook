@@ -497,6 +497,7 @@ public class SuuntoJsonProcessor {
 
             _tourBatteryPercentageEnd = batteryPercentageValue;
          }
+
          return true;
       }
       return false;
