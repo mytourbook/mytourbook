@@ -1479,11 +1479,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       final int cellWidth = tourRect.width;
       final int cellHeight = tourRect.height;
 
-      final int devXRight = devX + cellWidth - 1;
-      final int devYBottom = devY + cellHeight - 1;
-
       drawDay_TourBackground(gc, calendarTourData, devX, devY, cellWidth, cellHeight);
-      drawDay_TourBorder(gc, calendarTourData, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
+      drawDay_TourBorder(gc, calendarTourData, devX, devY, cellWidth, cellHeight);
       drawDay_TourContent(gc, tourRect, calendarTourData);
    }
 
@@ -1604,9 +1601,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
                                    final int devX,
                                    final int devY,
                                    final int cellWidth,
-                                   final int cellHeight,
-                                   final int devXRight,
-                                   final int devYBottom) {
+                                   final int cellHeight) {
 
       final RGB tourBorderRGB = getColor_Graph(
             data,
