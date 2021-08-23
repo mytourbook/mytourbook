@@ -1636,10 +1636,8 @@ public class TourInfoUI {
       _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ELEVATION);
 
-      final float totalElevationChange = (_tourData.getTourAltUp() + _tourData.getTourAltDown()) / UI.UNIT_VALUE_ELEVATION;
-      final float elevationChangePerDistanceUnit = totalElevationChange / (distance / 1000f);
-      final var averageElevationChange = UI.computeAverageElevationChange(_tourData.getTourAltUp() + _tourData.getTourAltDown(), distance);
-      _lblAvgElevationChange.setText(Integer.toString(averageElevationChange);
+      final int averageElevationChange = Math.round(UI.convertAverageElevationChangeFromMetric(_tourData.getAvgAltitudeChange()));
+      _lblAvgElevationChange.setText(Integer.toString(averageElevationChange));
       _lblAvgElevationChangeUnit.setText(UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
 
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
