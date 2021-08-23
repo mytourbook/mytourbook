@@ -375,9 +375,6 @@ public class SuuntoJsonProcessor {
          // Temperature
          wasDataPopulated |= TryAddTemperatureData(currentSampleData, timeData);
 
-         // Battery Charge
-         wasDataPopulated |= TryAddBatteryData(currentSampleData);
-
          //Swimming data
          wasDataPopulated |= TryAddSwimmingData(
                _allSwimData,
@@ -387,6 +384,9 @@ public class SuuntoJsonProcessor {
          if (wasDataPopulated && !reusePreviousTimeEntry) {
             _sampleList.add(timeData);
          }
+
+         // Battery Charge
+         TryAddBatteryData(currentSampleData);
       }
 
       // We clean-up the data series ONLY if we're not in a swimming activity.
@@ -497,6 +497,7 @@ public class SuuntoJsonProcessor {
 
          return true;
       }
+
       return false;
    }
 
