@@ -86,24 +86,120 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final int devGraphHeight = drawingData.devGraphHeight;
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
+      LABEL_OFFSET = PAUSE_POINT_SIZE = PAUSE_HOVER_SIZE = pc.convertVerticalDLUsToPixels(2);
+      final Color colorDefault = UI.IS_DARK_THEME
+            ? new Color(new RGB(0xa0, 0xa0, 0xa0))
+            : new Color(new RGB(0x60, 0x60, 0x60));
+
+      DrawPausePointAndLabel(gc, drawingData, chart, colorDefault);
+
+      gc.setClipping((Rectangle) null);
+   }
+
+   /**
+    * This is painting the hovered pause.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
+
+      final ChartLabelPause hoveredLabel = _hoveredLabel;
+
+      if (hoveredLabel == null) {
+         return;
+      }
+
+      // the label is hovered
+
+      //TODO FB
+      drawOverlay_Label(hoveredLabel,
+            gc,
+            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
+            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
+            false);
+
+   }
+
+   private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
+                                  final GC gc,
+                                  final Color colorDefault,
+                                  final Color colorHidden,
+                                  final boolean isSelected) {
+
+      if (chartLabelPause == null) {
+         return;
+      }
+
+      if (isSelected) {
+         gc.setAlpha(0x60);
+      } else {
+         gc.setAlpha(0x30);
+      }
+
+      Color backgroundColor = colorHidden;
+      if (isSelected) {
+
+         backgroundColor = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
+      } else if (chartLabelPause.isVisible) {
+
+         backgroundColor = colorDefault;
+      }
+
+      gc.setBackground(backgroundColor);
+
+      /*
+       * Rectangles can be merged into a union with regions, took me some time to find this solution
+       * :-)
+       */
+      final Region region = new Region(gc.getDevice());
+
+      final Rectangle paintedLabel = chartLabelPause.paintedLabel;
+      if (paintedLabel != null) {
+
+         final int devLabelX = paintedLabel.x - PAUSE_HOVER_SIZE;
+         final int devLabelY = paintedLabel.y - PAUSE_HOVER_SIZE;
+         final int devLabelWidth = paintedLabel.width + 2 * PAUSE_HOVER_SIZE;
+         final int devLabelHeight = paintedLabel.height + 2 * PAUSE_HOVER_SIZE;
+
+         region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
+      }
+
+      final int devPauseX = chartLabelPause.devXPause - PAUSE_HOVER_SIZE;
+      final int devPauseY = chartLabelPause.devYPause - PAUSE_HOVER_SIZE;
+      final int devPauseSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
+
+      region.add(devPauseX, devPauseY, devPauseSize, devPauseSize);
+
+      // get whole chart rectangle
+      final Rectangle clientRectangle = gc.getClipping();
+
+      gc.setClipping(region);
+      {
+         gc.fillRectangle(clientRectangle);
+      }
+      region.dispose();
+      gc.setClipping((Region) null);
+   }
+
+   private void DrawPausePointAndLabel(final GC gc,
+                                       final GraphDrawingData drawingData,
+                                       final Chart chart,
+                                       final Color colorDefault) {
+
+      final int devYTop = drawingData.getDevYTop();
       final int devYBottom = drawingData.getDevYBottom();
       final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
       final long devVirtualGraphWidth = drawingData.devVirtualGraphWidth;
       final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
       final boolean isGraphZoomed = devVirtualGraphWidth != devVisibleChartWidth;
-      LABEL_OFFSET = PAUSE_POINT_SIZE = PAUSE_HOVER_SIZE = pc.convertVerticalDLUsToPixels(2);
       final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
       final float graphYBottom = drawingData.getGraphYBottom();
       final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
       final double scaleX = drawingData.getScaleX();
       final double scaleY = drawingData.getScaleY();
-      final Color colorDefault = UI.IS_DARK_THEME
-            ? new Color(new RGB(0xa0, 0xa0, 0xa0))
-            : new Color(new RGB(0x60, 0x60, 0x60));
       final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(2);
-      /*
-       * Draw pause point and label
-       */
+
       for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
 
          final float yValue = yValues[chartLabelPause.serieIndex];
@@ -216,94 +312,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          chartLabelPause.devYTop = devYTop;
          chartLabelPause.devGraphWidth = devVisibleChartWidth;
       }
-
-      gc.setClipping((Rectangle) null);
-   }
-
-   /**
-    * This is painting the hovered pause.
-    * <p>
-    * {@inheritDoc}
-    */
-   @Override
-   public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
-
-      final ChartLabelPause hoveredLabel = _hoveredLabel;
-
-      if (hoveredLabel == null) {
-         return;
-      }
-
-      // the label is hovered
-
-      //TODO FB
-      drawOverlay_Label(hoveredLabel,
-            gc,
-            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
-            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
-            false);
-
-   }
-
-   private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
-                                  final GC gc,
-                                  final Color colorDefault,
-                                  final Color colorHidden,
-                                  final boolean isSelected) {
-
-      if (chartLabelPause == null) {
-         return;
-      }
-
-      if (isSelected) {
-         gc.setAlpha(0x60);
-      } else {
-         gc.setAlpha(0x30);
-      }
-
-      Color backgroundColor = colorHidden;
-      if (isSelected) {
-
-         backgroundColor = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
-      } else if (chartLabelPause.isVisible) {
-
-         backgroundColor = colorDefault;
-      }
-
-      gc.setBackground(backgroundColor);
-
-      /*
-       * Rectangles can be merged into a union with regions, took me some time to find this solution
-       * :-)
-       */
-      final Region region = new Region(gc.getDevice());
-
-      final Rectangle paintedLabel = chartLabelPause.paintedLabel;
-      if (paintedLabel != null) {
-
-         final int devLabelX = paintedLabel.x - PAUSE_HOVER_SIZE;
-         final int devLabelY = paintedLabel.y - PAUSE_HOVER_SIZE;
-         final int devLabelWidth = paintedLabel.width + 2 * PAUSE_HOVER_SIZE;
-         final int devLabelHeight = paintedLabel.height + 2 * PAUSE_HOVER_SIZE;
-
-         region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
-      }
-
-      final int devPauseX = chartLabelPause.devXPause - PAUSE_HOVER_SIZE;
-      final int devPauseY = chartLabelPause.devYPause - PAUSE_HOVER_SIZE;
-      final int devPauseSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
-
-      region.add(devPauseX, devPauseY, devPauseSize, devPauseSize);
-
-      // get whole chart rectangle
-      final Rectangle clientRectangle = gc.getClipping();
-
-      gc.setClipping(region);
-      {
-         gc.fillRectangle(clientRectangle);
-      }
-      region.dispose();
-      gc.setClipping((Region) null);
    }
 
    private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {

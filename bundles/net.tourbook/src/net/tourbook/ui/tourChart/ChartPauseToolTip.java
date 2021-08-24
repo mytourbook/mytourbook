@@ -215,6 +215,74 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       label.setText(labelBuilder.toString());
    }
 
+   private void FixupDisplayBounds(final Point tipSize,
+                                   final int devHoveredY,
+                                   final int devHoveredWidth,
+                                   final int devHoveredHeight,
+                                   final int devHoverSize,
+                                   final int tipWidth,
+                                   final int tipHeight,
+                                   final ChartComponentGraph chartComponentGraph,
+                                   final Point graphLocation,
+                                   final Point tooltipLocation) {
+
+      final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
+      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
+
+      if (!(displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds))) {
+
+         final int displayX = displayBounds.x;
+         final int displayY = displayBounds.y;
+         final int displayWidth = displayBounds.width;
+         final int displayHeight = displayBounds.height;
+
+         if (tooltipLocation.x < displayX) {
+
+            switch (_chartPauseConfig.pauseTooltipPosition) {
+
+            case TOOLTIP_POSITION_LEFT:
+               tooltipLocation.x = tooltipLocation.x + tipWidth + devHoveredWidth + 2;
+               break;
+
+            case TOOLTIP_POSITION_BELOW:
+            case TOOLTIP_POSITION_ABOVE:
+            case TOOLTIP_POSITION_CHART_TOP:
+            case TOOLTIP_POSITION_CHART_BOTTOM:
+            default:
+               tooltipLocation.x = displayX;
+               break;
+            }
+         }
+
+         if (rightBottomBounds.x > displayX + displayWidth) {
+
+            if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
+                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP
+                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM) {
+
+               tooltipLocation.x = displayWidth - tipWidth;
+            } else if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_RIGHT) {
+
+               tooltipLocation.x = tooltipLocation.x - tipWidth - devHoveredWidth - 2;
+            }
+         }
+
+         if (tooltipLocation.y < displayY &&
+               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
+                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP)) {
+
+            tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
+         }
+
+         if (rightBottomBounds.y > displayY + displayHeight &&
+               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW
+                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM)) {
+
+            tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
+         }
+      }
+   }
+
    //TODO FB
    /**
     * This is copied from {@link ChartLayerMarker#drawOverlay()}.
@@ -396,63 +464,16 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
       final Point tooltipLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
 
-      /*
-       * Fixup display bounds
-       */
-      final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
-      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
-
-      if (!(displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds))) {
-
-         final int displayX = displayBounds.x;
-         final int displayY = displayBounds.y;
-         final int displayWidth = displayBounds.width;
-         final int displayHeight = displayBounds.height;
-
-         if (tooltipLocation.x < displayX) {
-
-            switch (_chartPauseConfig.pauseTooltipPosition) {
-
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
-               tooltipLocation.x = displayX;
-               break;
-
-            case TOOLTIP_POSITION_LEFT:
-               tooltipLocation.x = tooltipLocation.x + tipWidth + devHoveredWidth + 2;
-               break;
-            }
-         }
-
-         if (rightBottomBounds.x > displayX + displayWidth) {
-
-            if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
-                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP
-                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM) {
-
-               tooltipLocation.x = displayWidth - tipWidth;
-            } else if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_RIGHT) {
-
-               tooltipLocation.x = tooltipLocation.x - tipWidth - devHoveredWidth - 2;
-            }
-         }
-
-         if (tooltipLocation.y < displayY &&
-               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
-                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP)) {
-
-            tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
-         }
-
-         if (rightBottomBounds.y > displayY + displayHeight &&
-               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW
-                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM)) {
-
-            tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
-         }
-      }
+      FixupDisplayBounds(tipSize,
+            devHoveredY,
+            devHoveredWidth,
+            devHoveredHeight,
+            devHoverSize,
+            tipWidth,
+            tipHeight,
+            chartComponentGraph,
+            graphLocation,
+            tooltipLocation);
 
       return tooltipLocation;
    }
@@ -526,13 +547,9 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       } else {
 
-         // another pause is hovered, show tooltip
-
+         // a pause is hovered, show tooltip
          _hoveredLabel = hoveredLabel;
-         //_hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
 
-         //TODO FB
-         System.out.println("HOVEREDPAUSE"); //$NON-NLS-1$
          showToolTip();
       }
    }
