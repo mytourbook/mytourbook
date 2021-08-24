@@ -197,7 +197,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
                /*
                 * Do not fire an event when this is running already in an update event. This
-                * occures when a tour is modified (marker) in the toubook view and the stat view
+                * occurs when a tour is modified (marker) in the toubook view and the stat view
                 * is opened !!!
                 */
 
