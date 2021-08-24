@@ -2552,7 +2552,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (_isImportedMTTour) {
          // use imported value
-         prefDPTolerance = dpTolerance / 10;
+         prefDPTolerance = dpTolerance / 10f;
       } else {
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
@@ -2591,7 +2591,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (_isImportedMTTour) {
          // use imported value
-         prefDPTolerance = dpTolerance / 10;
+         prefDPTolerance = dpTolerance / 10f;
       } else {
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
