@@ -261,7 +261,7 @@ public class NmeaDataReader extends TourbookDevice {
 
 //   Begin of O. Budischewski, 2008.03.20
       if (_isNullCoordinates == true) {
-         TourLogManager.logError(NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath));
+         TourLogManager.log_ERROR(NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath));
       }
 //   End of O. Budischewski, 2008.03.20
 

@@ -36,7 +36,7 @@ public class MesgListener_Activity extends AbstractMesgListener implements Activ
 
 			final String message = "%s - Invalid number of sessions: %d, expected at least one session."; //$NON-NLS-1$
 
-			TourLogManager.subLog_Info(String.format(
+			TourLogManager.subLog_INFO(String.format(
 					message,
                fitData.getTourTitle(),
 					numSessions));

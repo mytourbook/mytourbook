@@ -860,7 +860,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } catch (final Exception e) {
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
          Thread.currentThread().interrupt();
 
       } finally {
@@ -879,7 +879,7 @@ public class DialogReimportTours extends TitleAreaDialog {
          Display.getDefault().asyncExec(_tourViewer::reloadViewer);
       }
 
-      TourLogManager.logDefault(String.format(
+      TourLogManager.log_DEFAULT(String.format(
             RawDataManager.LOG_REIMPORT_END,
             (System.currentTimeMillis() - start) / 1000.0));
 

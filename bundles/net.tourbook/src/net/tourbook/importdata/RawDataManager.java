@@ -444,11 +444,10 @@ public class RawDataManager {
 
       for (int index = 0; index < previousData.size(); ++index) {
 
-         TourLogManager.addSubLog(TourLogState.INFO,
-               NLS.bind(
-                     LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA,
-                     previousData.get(index),
-                     newData.get(index)));
+         TourLogManager.subLog_INFO(NLS.bind(
+               LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA,
+               previousData.get(index),
+               newData.get(index)));
       }
    }
 
@@ -1058,10 +1057,10 @@ public class RawDataManager {
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
       } catch (final Exception e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       } finally {
 
-         TourLogManager.logDefault(String.format(
+         TourLogManager.log_DEFAULT(String.format(
                RawDataManager.LOG_DELETE_TOURVALUES_END,
                (System.currentTimeMillis() - start) / 1000.0));
       }
@@ -1622,7 +1621,7 @@ public class RawDataManager {
                   processDeviceDataStates);
 
          } catch (final Exception e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
 
          if (isTourDisplayedInImportView) {
@@ -1655,7 +1654,7 @@ public class RawDataManager {
          try {
             destFileName = device.buildFileNameFromRawData(sourceFileName);
          } catch (final Exception e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          } finally {
 
             if (destFileName == null) {
@@ -1743,7 +1742,7 @@ public class RawDataManager {
          }
 
       } catch (final IOException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
          return null;
       }
 
@@ -1900,25 +1899,24 @@ public class RawDataManager {
 
                      if (processDeviceDataStates.isLog_OK) {
 
-                        TourLogManager.addSubLog(
-                              TourLogState.IMPORT_OK,
-                              NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                                    importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                                    osFilePath));
+                        TourLogManager.subLog_OK(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                              importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                              osFilePath));
                      }
                   }
 
                   if (processDeviceDataStates.isLog_INFO) {
-                     TourLogManager.addSubLog(
-                           TourLogState.INFO,
-                           NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE, allImportedToursFromOneFile.size(), osFilePath));
+
+                     TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
+                           allImportedToursFromOneFile.size(),
+                           osFilePath));
                   }
 
                } else {
 
                   _allInvalidFiles.put(osFilePath, new Object());
 
-                  TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, osFilePath);
+                  TourLogManager.subLog_ERROR(osFilePath);
                }
 
                if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
@@ -1957,18 +1955,14 @@ public class RawDataManager {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
 
       } catch (final Exception e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
-      TourLogManager.addLog(
-
-            TourLogState.DEFAULT,
-
-            String.format(isEasyImport
+      TourLogManager.log_DEFAULT(String.format(
+            isEasyImport
                   ? EasyImportManager.LOG_EASY_IMPORT_002_END
                   : RawDataManager.LOG_IMPORT_TOUR_END,
-                  (System.currentTimeMillis() - start) / 1000.0) //
-      );
+            (System.currentTimeMillis() - start) / 1000.0));
 
       return importRunState;
    }
@@ -2002,10 +1996,9 @@ public class RawDataManager {
           */
          if (processDeviceDataStates.isLog_INFO) {
 
-            TourLogManager.addSubLog(TourLogState.INFO,
-                  NLS.bind(
-                        LOG_REIMPORT_MANUAL_TOUR,
-                        oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
+            TourLogManager.subLog_INFO(NLS.bind(
+                  LOG_REIMPORT_MANUAL_TOUR,
+                  oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
          }
 
          return false;
@@ -2038,10 +2031,10 @@ public class RawDataManager {
             reason = Messages.Log_Reimport_Tour_Skipped_OtherReasons;
          }
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
-               NLS.bind(LOG_REIMPORT_TOUR_SKIPPED,
-                     oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                     reason));
+         TourLogManager.subLog_ERROR(NLS.bind(
+               LOG_REIMPORT_TOUR_SKIPPED,
+               oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+               reason));
 
       } else {
 
@@ -2357,10 +2350,10 @@ public class RawDataManager {
 
             if (processDeviceDataStates.isLog_OK) {
 
-               TourLogManager.addSubLog(TourLogState.IMPORT_OK,
-                     NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                           updatedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                           reimportFileNamePath));
+               TourLogManager.subLog_OK(NLS.bind(
+                     LOG_IMPORT_TOUR_IMPORTED,
+                     updatedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                     reimportFileNamePath));
             }
 
             // log the old vs new data comparison
@@ -2383,7 +2376,7 @@ public class RawDataManager {
 
       } else {
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, reimportFileNamePath);
+         TourLogManager.subLog_ERROR(reimportFileNamePath);
 
          isRevertTour = true;
       }
@@ -2559,14 +2552,14 @@ public class RawDataManager {
       if (message == null) {
 
          // undefined error
-         TourLogManager.subLog_Error(NLS.bind(
+         TourLogManager.subLog_ERROR(NLS.bind(
                Messages.Import_Data_Log_ReimportIsInvalid_TourNotFoundInFile_Message,
                new Object[] {
                      oldTourDateTimeShort,
                      reImportedFile.toString() }));
 
       } else {
-         TourLogManager.subLog_Error(message);
+         TourLogManager.subLog_ERROR(message);
       }
 
       return null;
@@ -2889,7 +2882,7 @@ public class RawDataManager {
          return (RawDataView) Util.showView(RawDataView.ID, true);
 
       } catch (final WorkbenchException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
       return null;
    }
@@ -2935,7 +2928,7 @@ public class RawDataManager {
                      });
 
             } catch (final InvocationTargetException | InterruptedException e) {
-               TourLogManager.logEx(e);
+               TourLogManager.log_EXCEPTION_WithStacktrace(e);
             }
          } else {
             updateTourData_InImportView_FromDb_Runnable(monitor);
@@ -3047,7 +3040,7 @@ public class RawDataManager {
                }
             }
          } catch (final Exception e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
 

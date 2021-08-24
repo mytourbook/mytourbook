@@ -96,7 +96,7 @@ public class MesgListener_Hr extends AbstractMesgListener implements HrMesgListe
 
       if (allFilteredBpm.length != allEventTime.length) {
 
-         TourLogManager.logError(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
+         TourLogManager.log_ERROR(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
                allEventTime.length,
                allFilteredBpm.length));
 

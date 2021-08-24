@@ -422,7 +422,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             final float milliSeconds = (float) (time - timeInSeconds * 1000) / 1000;
             _markerData.relativeTime = timeInSeconds + Math.round(milliSeconds);
          } catch (final ParseException e) {
-            TourLogManager.logError(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
+            TourLogManager.log_ERROR(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
          }
 
          //If existing, we need to use the previous marker relative time

@@ -257,7 +257,7 @@ public class EasyImportManager {
          }
 
       } catch (final IOException ex) {
-         TourLogManager.logEx(ex);
+         TourLogManager.log_EXCEPTION_WithStacktrace(ex);
       }
 
       return backupFiles;
@@ -513,7 +513,7 @@ public class EasyImportManager {
          }
 
       } catch (final IOException ex) {
-         TourLogManager.logEx(ex);
+         TourLogManager.log_EXCEPTION_WithStacktrace(ex);
       }
 
       return osFiles;
@@ -969,7 +969,7 @@ public class EasyImportManager {
          return false;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES);
+      TourLogManager.log_DEFAULT(LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES);
 
       final boolean[] isCanceled = { false };
 
@@ -1010,7 +1010,7 @@ public class EasyImportManager {
                         String.format(LOG_EASY_IMPORT_001_COPY, devicePath, targetPath));
 
                } catch (final IOException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                }
             }
          }
@@ -1019,7 +1019,7 @@ public class EasyImportManager {
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
       } catch (final Exception e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       return isCanceled[0];
@@ -1036,7 +1036,7 @@ public class EasyImportManager {
       }
 
       if (importLauncher.isSetTourType) {
-         TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
+         TourLogManager.log_DEFAULT(LOG_EASY_IMPORT_003_TOUR_TYPE);
       }
 
       final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
@@ -1090,7 +1090,7 @@ public class EasyImportManager {
 
       } catch (final IOException e) {
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
@@ -1276,11 +1276,9 @@ public class EasyImportManager {
          // tour type is not set
       }
 
-      TourLogManager.addSubLog(
-            TourLogState.DEFAULT,
-            String.format(
-                  LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
-                  tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                  String.format("%s (%s)", tourTypeName, tourTypeCadence.getNlsLabel())));//$NON-NLS-1$
+      TourLogManager.subLog_DEFAULT(String.format(
+            LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
+            tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+            String.format("%s (%s)", tourTypeName, tourTypeCadence.getNlsLabel())));//$NON-NLS-1$
    }
 }

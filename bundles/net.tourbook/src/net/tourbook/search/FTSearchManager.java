@@ -971,11 +971,11 @@ public class FTSearchManager {
 
          // this occures when an old index exists -> delete index
 
-         TourLogManager.logError(e.getMessage());
+         TourLogManager.log_ERROR(e.getMessage());
 
          final java.nio.file.Path rootPath = getLuceneIndexRootPath();
 
-         TourLogManager.logInfo(String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString()));
+         TourLogManager.log_INFO(String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString()));
 
          Files.walkFileTree(rootPath, new SimpleFileVisitor<java.nio.file.Path>() {
 
@@ -996,7 +996,7 @@ public class FTSearchManager {
             }
          });
 
-         TourLogManager.logInfo(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
+         TourLogManager.log_INFO(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
 
          indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
       }
@@ -1369,7 +1369,7 @@ public class FTSearchManager {
       queryResult.allQueryFields = setWithAllQueryFields.toArray(String[]::new);
       queryResult.query = allQueryBuilder.build();
 
-      TourLogManager.logInfo("Search Tours: " + queryResult.query);
+      TourLogManager.log_INFO("Search Tours: " + queryResult.query);
 
       return queryResult;
    }
@@ -1865,7 +1865,7 @@ public class FTSearchManager {
       final long end = System.nanoTime();
       final float timeDiff = (end - start) / 1_000_000_000.0f;
 
-      TourLogManager.subLog_Default(String.format("Updated fulltext index in %1.3f s for %d tours",
+      TourLogManager.subLog_DEFAULT(String.format("Updated fulltext index in %1.3f s for %d tours",
 
             timeDiff,
             numAllTourIDs));

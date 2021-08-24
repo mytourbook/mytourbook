@@ -208,13 +208,13 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", errorText)); //$NON-NLS-1$
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
          return false;
 
       } catch (final Exception e) {
 
-         TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+         TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
 
          return false;
       }

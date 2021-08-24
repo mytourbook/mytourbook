@@ -403,7 +403,7 @@ public class TourManager {
       // ensure data are available
       if (temperatureSerie == null) {
 
-         TourLogManager.subLog_Error(
+         TourLogManager.subLog_ERROR(
                String.format(//
                      LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -413,7 +413,7 @@ public class TourManager {
 
       if (timeSerie == null) {
 
-         TourLogManager.subLog_Error(
+         TourLogManager.subLog_ERROR(
                String.format(//
                      LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -439,7 +439,7 @@ public class TourManager {
       // an initial temperature could not be computed because the tour is too short
       if (initialTemperature == Integer.MIN_VALUE) {
 
-         TourLogManager.subLog_Error(
+         TourLogManager.subLog_ERROR(
                String.format(//
                      LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
                      getTourDateTimeShort(tourData)));
@@ -467,14 +467,12 @@ public class TourManager {
 
       final float newAvgTemperature = tourData.getAvgTemperature();
 
-      TourLogManager.addSubLog(
-            TourLogState.IMPORT_OK,
-            String.format(
-                  LOG_TEMP_ADJUST_003_TOUR_CHANGES,
-                  getTourDateTimeShort(tourData),
-                  oldAvgTemperature,
-                  newAvgTemperature,
-                  newAvgTemperature - oldAvgTemperature));
+      TourLogManager.subLog_OK(String.format(
+            LOG_TEMP_ADJUST_003_TOUR_CHANGES,
+            getTourDateTimeShort(tourData),
+            oldAvgTemperature,
+            newAvgTemperature,
+            newAvgTemperature - oldAvgTemperature));
 
       return true;
    }
@@ -559,11 +557,14 @@ public class TourManager {
             }
          }
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
+         TourLogManager.subLog_OK(NLS.bind(
+               Messages.Log_ComputeCadenceZonesTimes_010_Success,
+               numComputedTour));
 
          if (numNotComputedTour >= 0) {
-            TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
-                  NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+            TourLogManager.subLog_ERROR(NLS.bind(
+                  Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess,
+                  numNotComputedTour));
          }
       } catch (final SQLException e) {
          SQL.showException(e);
@@ -2457,21 +2458,20 @@ public class TourManager {
       // ensure data is available
       if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-         TourLogManager.subLog_Error(
-               String.format(
-                     LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-                     getTourDateTimeShort(tourData)));
+         TourLogManager.subLog_ERROR(String.format(
+               LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+               getTourDateTimeShort(tourData)));
 
          return false;
       }
 
       final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
-         TourLogManager.subLog_Error(
-               NLS.bind(
-                     Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-                     new Object[] {
-                           TourManager.getTourDateTimeShort(tourData) }));
+
+         TourLogManager.subLog_ERROR(NLS.bind(
+               Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+               TourManager.getTourDateTimeShort(tourData)));
+
          return false;
       }
 
@@ -2490,7 +2490,7 @@ public class TourManager {
       tourData.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
       tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
 
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, getTourDateTimeShort(tourData));
+      TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
 
       return true;
    }

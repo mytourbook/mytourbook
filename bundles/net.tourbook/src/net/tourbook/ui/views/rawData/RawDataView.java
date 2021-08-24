@@ -1085,7 +1085,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   + "}" + NL; //                                                          //$NON-NLS-1$
 
          } catch (IOException | URISyntaxException e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
 
@@ -1753,7 +1753,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (allImportLauncher.isEmpty() || allImportConfigs.isEmpty()) {
 
          // this case should not happen
-         TourLogManager.logEx(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+         TourLogManager.log_EXCEPTION_WithStacktrace(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
 
          return;
       }
@@ -2318,7 +2318,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
       } catch (final IOException | URISyntaxException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
@@ -3428,7 +3428,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final String fileNamePath = '"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"';
          notDeletedFiles.add(fileNamePath);
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileNamePath);
+         TourLogManager.subLog_ERROR(fileNamePath);
       }
    }
 
@@ -4469,14 +4469,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } catch (final Exception e) {
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
       } finally {
 
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_REIMPORT_END, time));
+         TourLogManager.log_DEFAULT(String.format(
+               RawDataManager.LOG_REIMPORT_END,
+               (System.currentTimeMillis() - start) / 1000.0));
       }
    }
 
@@ -4531,10 +4530,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             );
 
             if (isImported) {
-               TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
+               TourLogManager.subLog_OK(fileName);
                numImportedFiles++;
             } else {
-               TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileName);
+               TourLogManager.subLog_ERROR(fileName);
                notImportedFiles.add(fileName);
             }
          }
@@ -4852,7 +4851,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
          if (importConfig.isTurnOffWatching) {
 
-            TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
+            TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
 
             setWatcher_Off();
          }
@@ -4860,10 +4859,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          /*
           * Log import end
           */
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               String.format(EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END, time));
+         TourLogManager.log_DEFAULT(String.format(
+               EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END,
+               (System.currentTimeMillis() - start) / 1000.0));
 
       } finally {
 
@@ -4891,7 +4889,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
 
       final int ilLastMarkerDistance = importLauncher.lastMarkerDistance;
 
@@ -4926,7 +4924,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             lastMarker.setLabel(lastMarkerText);
 
-            TourLogManager.addSubLog(TourLogState.DEFAULT, TourManager.getTourDateTimeShort(tourData));
+            TourLogManager.subLog_DEFAULT(TourManager.getTourDateTimeShort(tourData));
          }
       }
    }
@@ -4938,13 +4936,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final float temperature = UI.convertTemperatureFromMetric(avgMinimumTemperature);
       final int durationTime = importLauncher.temperatureAdjustmentDuration;
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            NLS.bind(EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
-                  new Object[] {
-                        getDurationText(importLauncher),
-                        _nf1.format(temperature),
-                        UI.UNIT_LABEL_TEMPERATURE }));
+      TourLogManager.log_DEFAULT(NLS.bind(
+            EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
+            new Object[] {
+                  getDurationText(importLauncher),
+                  _nf1.format(temperature),
+                  UI.UNIT_LABEL_TEMPERATURE }));
 
       for (final TourData tourData : importedTours) {
 
@@ -4953,7 +4950,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.subLog_Info(String.format(
+            TourLogManager.subLog_INFO(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -4969,12 +4966,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void runEasyImport_006_RetrieveWeatherData(final ImportLauncher importLauncher,
                                                       final ArrayList<TourData> importedTours) {
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            NLS.bind(EasyImportManager.LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA,
-                  new Object[] {
-                        getDurationText(importLauncher),
-                        UI.UNIT_LABEL_TEMPERATURE }));
+      TourLogManager.log_DEFAULT(NLS.bind(
+            EasyImportManager.LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA,
+            new Object[] {
+                  getDurationText(importLauncher),
+                  UI.UNIT_LABEL_TEMPERATURE }));
 
       for (final TourData tourData : importedTours) {
          TourManager.retrieveWeatherData(tourData);
@@ -5035,7 +5031,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       doSaveTour_PostActions(savedTours);
@@ -5172,7 +5168,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       // show delete state in UI
@@ -5181,11 +5177,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Log deleted files
        */
-      final String logText = String.format(
+      TourLogManager.log_DEFAULT(String.format(
             RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE_END,
             deletedFiles.size(),
-            notDeletedFiles.size());
-      TourLogManager.addLog(TourLogState.DEFAULT, logText);
+            notDeletedFiles.size()));
    }
 
    @PersistState
@@ -5307,7 +5302,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                _watchingStoresThread.join();
             }
          } catch (final InterruptedException e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
    }
@@ -5429,7 +5424,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   THREAD_WATCHER_LOCK.lock();
                   _folderWatcher.close();
                } catch (final IOException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                } finally {
                   _watchingFolderThread.interrupt(); // (rtdog) CancelWatchfolders
                   THREAD_WATCHER_LOCK.unlock();
@@ -5565,7 +5560,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          } catch (final InterruptedException | ClosedWatchServiceException e3) {
             // no-op
          } catch (final Exception e4) {
-            TourLogManager.logEx(e4);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e4);
          } finally {
 
             try {
@@ -5577,7 +5572,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   folderWatcher.close();
                }
             } catch (final Exception e5) {
-               TourLogManager.logEx(e5);
+               TourLogManager.log_EXCEPTION_WithStacktrace(e5);
             }
          }
       };
@@ -5615,7 +5610,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   }
 
                } catch (final InterruptedException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                } finally {
                   _watchingStoresThread = null;
                }
@@ -5625,7 +5620,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
    }
@@ -5679,7 +5674,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   }
                   // interrupt();
                } catch (final Exception e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                }
 
             }

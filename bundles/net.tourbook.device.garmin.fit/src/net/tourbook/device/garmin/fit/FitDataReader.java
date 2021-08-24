@@ -819,7 +819,7 @@ public class FitDataReader extends TourbookDevice {
          returnValue = true;
 
       } catch (final IOException e) {
-         TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+         TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
       }
 
       return returnValue;
@@ -844,29 +844,27 @@ public class FitDataReader extends TourbookDevice {
 
             if (_isVersionLogged.getAndSet(true) == false) {
 
-               TourLogManager.logInfo(
-                     String.format(
-                           "FIT SDK %d.%d", //$NON-NLS-1$
-                           Fit.PROFILE_VERSION_MAJOR,
-                           Fit.PROFILE_VERSION_MINOR));
+               TourLogManager.log_INFO(String.format(
+                     "FIT SDK %d.%d", //$NON-NLS-1$
+                     Fit.PROFILE_VERSION_MAJOR,
+                     Fit.PROFILE_VERSION_MINOR));
             }
 
          } else {
 
-            TourLogManager.logError(
-                  String.format(
-                        "FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
-                        fileName,
-                        Fit.PROFILE_VERSION_MAJOR,
-                        Fit.PROFILE_VERSION_MINOR));
+            TourLogManager.log_ERROR(String.format(
+                  "FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
+                  fileName,
+                  Fit.PROFILE_VERSION_MAJOR,
+                  Fit.PROFILE_VERSION_MINOR));
          }
 
       } catch (final FileNotFoundException e) {
-         TourLogManager.logError_CannotReadDataFile(fileName, e);
+         TourLogManager.log_ERROR_CannotReadDataFile(fileName, e);
       } catch (final FitRuntimeException e) {
-         TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
+         TourLogManager.log_EXCEPTION_WithStacktrace(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
       } catch (final IOException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       return returnValue;

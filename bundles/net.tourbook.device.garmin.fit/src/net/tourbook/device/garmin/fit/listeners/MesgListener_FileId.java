@@ -40,11 +40,11 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
 
       if (type == null) {
 
-         TourLogManager.logError("Garmin file type is not defined");//$NON-NLS-1$
+         TourLogManager.log_ERROR("Garmin file type is not defined");//$NON-NLS-1$
 
       } else if (type != File.ACTIVITY) {
 
-         TourLogManager.logError("Garmin file type is not an ACTIVITY, it is " + type.name());//$NON-NLS-1$
+         TourLogManager.log_ERROR("Garmin file type is not an ACTIVITY, it is " + type.name());//$NON-NLS-1$
       }
 
       /*
@@ -52,7 +52,7 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
        */
       final Long serialNumber = mesg.getSerialNumber();
       if (serialNumber == null) {
-         TourLogManager.logError("File serial number is missing, device id cannot not be set");//$NON-NLS-1$
+         TourLogManager.log_ERROR("File serial number is missing, device id cannot not be set");//$NON-NLS-1$
       } else {
          fitData.setDeviceId(serialNumber.toString());
       }

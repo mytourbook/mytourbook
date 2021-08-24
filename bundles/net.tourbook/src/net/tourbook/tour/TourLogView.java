@@ -516,9 +516,9 @@ public class TourLogView extends ViewPart {
 
       switch (state) {
 
-      case IMPORT_OK:                  return STATE_OK;
-      case IMPORT_ERROR:               return STATE_ERROR;
-      case IMPORT_EXCEPTION:           return STATE_EXCEPTION;
+      case OK:                         return STATE_OK;
+      case ERROR:                      return STATE_ERROR;
+      case EXCEPTION:                  return STATE_EXCEPTION;
       case INFO:                       return STATE_INFO;
       case EASY_IMPORT_COPY:           return STATE_COPY;
 
@@ -541,9 +541,9 @@ public class TourLogView extends ViewPart {
 
       switch (state) {
 
-      case IMPORT_OK:                  return js_SetStyleBgImage(_imageUrl_StateOK);
-      case IMPORT_ERROR:               return js_SetStyleBgImage(_imageUrl_StateError);
-      case IMPORT_EXCEPTION:           return js_SetStyleBgImage(_imageUrl_StateError);
+      case OK:                         return js_SetStyleBgImage(_imageUrl_StateOK);
+      case ERROR:                      return js_SetStyleBgImage(_imageUrl_StateError);
+      case EXCEPTION:                  return js_SetStyleBgImage(_imageUrl_StateError);
       case INFO:                       return js_SetStyleBgImage(_imageUrl_StateInfo);
       case EASY_IMPORT_COPY:           return js_SetStyleBgImage(_imageUrl_StateCopy);
 
@@ -590,7 +590,7 @@ public class TourLogView extends ViewPart {
          ;
 
       } catch (IOException | URISyntaxException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
    }

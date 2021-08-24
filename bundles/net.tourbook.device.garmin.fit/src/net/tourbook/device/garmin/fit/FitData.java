@@ -208,7 +208,7 @@ public class FitData {
 
          recordStartTime = _sessionStartTime.toInstant().toEpochMilli();
 
-         TourLogManager.logError(String.format(
+         TourLogManager.log_ERROR(String.format(
                "There are no time data, using session date/time %s", //$NON-NLS-1$
                TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
 
@@ -218,7 +218,7 @@ public class FitData {
 
          recordStartTime = TimeTools.now().toEpochSecond();
 
-         TourLogManager.logError(String.format(
+         TourLogManager.log_ERROR(String.format(
                "There are no time data and there is no session date/time, using %s", //$NON-NLS-1$
                TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
       }
