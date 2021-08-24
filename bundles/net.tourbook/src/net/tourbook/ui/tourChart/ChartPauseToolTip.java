@@ -287,10 +287,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
    //TODO FB
    /**
-    * This is copied from {@link ChartLayerMarker#drawOverlay()}.
-    * <p>
-    * The region which is computed in drawOverlay() cannot be used because the overlay is painted
-    * <b>after</b> the tooltip is displayed and <b>not before.</b>
+    * This is copied from {@link ChartLayerPause#drawOverlay()}.
     */
    private Rectangle getHoveredRectangle() {
 
@@ -418,7 +415,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          break;
 
-      // case TOOLTIP_POSITION_BELOW:
+      case TOOLTIP_POSITION_BELOW:
       default:
 
          ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
@@ -582,9 +579,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          backgroundColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
       }
 
-      UI.setColorForAllChildren(container,
-            foregroundColor,
-            backgroundColor);
+      UI.setColorForAllChildren(container, foregroundColor, backgroundColor);
    }
 
 }
