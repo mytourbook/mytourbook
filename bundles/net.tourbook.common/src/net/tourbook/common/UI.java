@@ -739,7 +739,7 @@ public class UI {
    private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
    /**
-    * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
+    * When <code>true</code> then data in the UI are scrambled. This is used to create anonymous
     * screenshots.
     * <p>
     * Commandline parameter: <code>-DscrambleData</code>
@@ -845,6 +845,38 @@ public class UI {
 
       final int oldValue = spinner.getSelection();
       spinner.setSelection(oldValue + valueAdjustment);
+   }
+
+   /**
+    * Computes the average elevation change with given values of total elevation
+    * change and total distance.
+    *
+    * @return
+    *         If successful, the average elevation change in the current
+    *         measurement system, 0 otherwise.
+    */
+   public static float computeAverageElevationChange(final float totalElevationChange,
+                                                     final float distance) {
+
+      if (Math.signum(distance) == 0) {
+         return 0;
+      }
+
+      return totalElevationChange / (distance / 1000f);
+   }
+
+   /**
+    * @param averageElevationChange
+    *           In m/km
+    * @return Returns the average elevation change in the current measurement system.
+    */
+   public static float convertAverageElevationChangeFromMetric(final float averageElevationChange) {
+
+      if (UNIT_IS_ELEVATION_METER) {
+         return averageElevationChange;
+      }
+
+      return averageElevationChange * UNIT_VALUE_DISTANCE / UNIT_VALUE_ELEVATION;
    }
 
    public static float convertBodyHeightFromMetric(final float height) {
@@ -1771,7 +1803,7 @@ public class UI {
    }
 
    /**
-    * Opens the control context menu, the menue is aligned below the control to the right side
+    * Opens the control context menu, the menu is aligned below the control to the right side
     *
     * @param control
     *           Controls which menu is opened
@@ -2078,7 +2110,7 @@ public class UI {
    }
 
    /**
-    * Update colors for all decendants.
+    * Update colors for all descendants.
     *
     * @param child
     * @param bgColor
@@ -2857,6 +2889,7 @@ public class UI {
          }
       };
    }
+
 }
 
 //this conversion is not working for all png images, found SWT2Dutil.java

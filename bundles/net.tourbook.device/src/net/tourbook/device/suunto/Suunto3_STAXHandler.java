@@ -71,9 +71,11 @@ public class Suunto3_STAXHandler {
    private static final String TAG_DEVLOG_SAMPLES = "Samples";   //$NON-NLS-1$
 
    // header tags
-   private static final String TAG_HEADER_ENERGY               = "Energy";             //$NON-NLS-1$
-   private static final String TAG_HEADER_DATETIME             = "DateTime";           //$NON-NLS-1$
-   private static final String TAG_HEADER_PEAK_TRAINING_EFFECT = "PeakTrainingEffect"; //$NON-NLS-1$
+   private static final String TAG_HEADER_BATTERY_CHARGE          = "BatteryCharge";        //$NON-NLS-1$
+   private static final String TAG_HEADER_BATTERY_CHARGE_AT_START = "BatteryChargeAtStart"; //$NON-NLS-1$
+   private static final String TAG_HEADER_ENERGY                  = "Energy";               //$NON-NLS-1$
+   private static final String TAG_HEADER_DATETIME                = "DateTime";             //$NON-NLS-1$
+   private static final String TAG_HEADER_PEAK_TRAINING_EFFECT    = "PeakTrainingEffect";   //$NON-NLS-1$
 
    // device tags
    private static final String TAG_DEVICE_SW   = "SW";   //$NON-NLS-1$
@@ -141,6 +143,9 @@ public class Suunto3_STAXHandler {
    private float               _tourPerformanceLevel;
 
    private int                 _tourCalories;
+
+   private short               _tourBatteryPercentageStart;
+   private short               _tourBatteryPercentageEnd;
 
    /**
     * This time is used when a time is not available.
@@ -275,6 +280,9 @@ public class Suunto3_STAXHandler {
 
       tourData.setCalories(_tourCalories);
 
+      tourData.setBattery_Percentage_Start(_tourBatteryPercentageStart);
+      tourData.setBattery_Percentage_End(_tourBatteryPercentageEnd);
+
       tourData.setTraining_TrainingEffect_Aerob(_tourPeakTrainingEffect);
       tourData.setTraining_TrainingPerformance(_tourPerformanceLevel);
 
@@ -401,6 +409,22 @@ public class Suunto3_STAXHandler {
             final String elementName = startElement.getName().getLocalPart();
 
             switch (elementName) {
+
+            case TAG_HEADER_BATTERY_CHARGE_AT_START:
+
+               data = ((Characters) eventReader.nextEvent()).getData();
+
+               _tourBatteryPercentageStart = (short) (Util.parseFloat(data) * 100);
+
+               break;
+
+            case TAG_HEADER_BATTERY_CHARGE:
+
+               data = ((Characters) eventReader.nextEvent()).getData();
+
+               _tourBatteryPercentageEnd = (short) (Util.parseFloat(data) * 100);
+
+               break;
 
             case TAG_HEADER_ENERGY:
 

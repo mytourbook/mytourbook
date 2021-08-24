@@ -46,32 +46,33 @@ import org.json.JSONObject;
 
 public class SuuntoJsonProcessor {
 
-   public static final String  DeviceName      = "Suunto Spartan/9"; //$NON-NLS-1$
-   public static final String  TAG_SAMPLE      = "Sample";           //$NON-NLS-1$
-   public static final String  TAG_SAMPLES     = "Samples";          //$NON-NLS-1$
-   public static final String  TAG_EVENTS      = "Events";           //$NON-NLS-1$
-   public static final String  TAG_TIMEISO8601 = "TimeISO8601";      //$NON-NLS-1$
-   public static final String  TAG_ATTRIBUTES  = "Attributes";       //$NON-NLS-1$
+   public static final String  DeviceName         = "Suunto Spartan/9"; //$NON-NLS-1$
+   public static final String  TAG_SAMPLE         = "Sample";           //$NON-NLS-1$
+   public static final String  TAG_SAMPLES        = "Samples";          //$NON-NLS-1$
+   public static final String  TAG_EVENTS         = "Events";           //$NON-NLS-1$
+   public static final String  TAG_TIMEISO8601    = "TimeISO8601";      //$NON-NLS-1$
+   public static final String  TAG_ATTRIBUTES     = "Attributes";       //$NON-NLS-1$
 
-   public static final String  TAG_SOURCE      = "Source";           //$NON-NLS-1$
-   private static final String TAG_SUUNTOSML   = "suunto/sml";       //$NON-NLS-1$
-   private static final String TAG_LAP         = "Lap";              //$NON-NLS-1$
-   private static final String TAG_MANUAL      = "Manual";           //$NON-NLS-1$
-   private static final String TAG_DISTANCE    = "Distance";         //$NON-NLS-1$
-   public static final String  TAG_GPSALTITUDE = "GPSAltitude";      //$NON-NLS-1$
-   public static final String  TAG_LATITUDE    = "Latitude";         //$NON-NLS-1$
-   public static final String  TAG_LONGITUDE   = "Longitude";        //$NON-NLS-1$
-   private static final String TAG_START       = "Start";            //$NON-NLS-1$
-   private static final String TAG_TYPE        = "Type";             //$NON-NLS-1$
-   private static final String TAG_PAUSE       = "Pause";            //$NON-NLS-1$
-   private static final String TAG_HR          = "HR";               //$NON-NLS-1$
-   private static final String TAG_RR          = "R-R";              //$NON-NLS-1$
-   private static final String TAG_DATA        = "Data";             //$NON-NLS-1$
-   private static final String TAG_SPEED       = "Speed";            //$NON-NLS-1$
-   private static final String TAG_CADENCE     = "Cadence";          //$NON-NLS-1$
-   public static final String  TAG_ALTITUDE    = "Altitude";         //$NON-NLS-1$
-   private static final String TAG_POWER       = "Power";            //$NON-NLS-1$
-   private static final String TAG_TEMPERATURE = "Temperature";      //$NON-NLS-1$
+   public static final String  TAG_BATTERY_CHARGE = "BatteryCharge";    //$NON-NLS-1$
+   public static final String  TAG_SOURCE         = "Source";           //$NON-NLS-1$
+   private static final String TAG_SUUNTOSML      = "suunto/sml";       //$NON-NLS-1$
+   private static final String TAG_LAP            = "Lap";              //$NON-NLS-1$
+   private static final String TAG_MANUAL         = "Manual";           //$NON-NLS-1$
+   private static final String TAG_DISTANCE       = "Distance";         //$NON-NLS-1$
+   public static final String  TAG_GPSALTITUDE    = "GPSAltitude";      //$NON-NLS-1$
+   public static final String  TAG_LATITUDE       = "Latitude";         //$NON-NLS-1$
+   public static final String  TAG_LONGITUDE      = "Longitude";        //$NON-NLS-1$
+   private static final String TAG_START          = "Start";            //$NON-NLS-1$
+   private static final String TAG_TYPE           = "Type";             //$NON-NLS-1$
+   private static final String TAG_PAUSE          = "Pause";            //$NON-NLS-1$
+   private static final String TAG_HR             = "HR";               //$NON-NLS-1$
+   private static final String TAG_RR             = "R-R";              //$NON-NLS-1$
+   private static final String TAG_DATA           = "Data";             //$NON-NLS-1$
+   private static final String TAG_SPEED          = "Speed";            //$NON-NLS-1$
+   private static final String TAG_CADENCE        = "Cadence";          //$NON-NLS-1$
+   public static final String  TAG_ALTITUDE       = "Altitude";         //$NON-NLS-1$
+   private static final String TAG_POWER          = "Power";            //$NON-NLS-1$
+   private static final String TAG_TEMPERATURE    = "Temperature";      //$NON-NLS-1$
 
    // Swimming
    private static final String Swimming             = "Swimming";                                 //$NON-NLS-1$
@@ -86,6 +87,10 @@ public class SuuntoJsonProcessor {
 
    private List<TimeData>      _sampleList;
    private int                 _numLaps;
+   private boolean             isBatteryPercentageStart    = true;
+   private short               _tourBatteryPercentageStart = -1;
+   private short               _tourBatteryPercentageEnd   = -1;
+
    private IPreferenceStore    _prefStore           = Activator.getDefault().getPreferenceStore();
 
    /**
@@ -379,6 +384,9 @@ public class SuuntoJsonProcessor {
          if (wasDataPopulated && !reusePreviousTimeEntry) {
             _sampleList.add(timeData);
          }
+
+         // Battery Charge
+         TryAddBatteryData(currentSampleData);
       }
 
       // We clean-up the data series ONLY if we're not in a swimming activity.
@@ -392,6 +400,9 @@ public class SuuntoJsonProcessor {
 
       tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
       tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
+
+      tourData.setBattery_Percentage_Start(_tourBatteryPercentageStart);
+      tourData.setBattery_Percentage_End(_tourBatteryPercentageEnd);
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);
 
@@ -458,6 +469,35 @@ public class SuuntoJsonProcessor {
          timeData.absoluteAltitude = Util.parseFloat(value);
          return true;
       }
+      return false;
+   }
+
+   /**
+    * Attempts to retrieve and add battery charge data to the current tour.
+    *
+    * @param currentSample
+    *           The current sample data.
+    * @return True if successful, false otherwise.
+    */
+   private boolean TryAddBatteryData(final String currentSample) {
+
+      float value;
+      if ((value = TryRetrieveFloatElementValue(currentSample, TAG_BATTERY_CHARGE)) != Float.MIN_VALUE) {
+
+         final short batteryPercentageValue = (short) (value * 100);
+
+         if (isBatteryPercentageStart) {
+
+            _tourBatteryPercentageStart = batteryPercentageValue;
+            isBatteryPercentageStart = false;
+         } else {
+
+            _tourBatteryPercentageEnd = batteryPercentageValue;
+         }
+
+         return true;
+      }
+
       return false;
    }
 
@@ -731,6 +771,31 @@ public class SuuntoJsonProcessor {
    }
 
    /**
+    * Searches for an element and returns its value as a double.
+    *
+    * @param token
+    *           The JSON token in which to look for a given element.
+    * @param elementName
+    *           The element name to look for in a JSON content.
+    * @return The element value, if found.
+    */
+   private float TryRetrieveFloatElementValue(final String token, final String elementName) {
+
+      if (!token.contains(elementName)) {
+         return Float.MIN_VALUE;
+      }
+
+      float result = Float.MIN_VALUE;
+      try {
+         result = Float.parseFloat(new JSONObject(token).get(elementName).toString());
+      } catch (final Exception e) {
+         return Float.MIN_VALUE;
+      }
+
+      return result;
+   }
+
+   /**
     * Searches for an element and returns its value as a list of integer.
     *
     * @param token
@@ -752,7 +817,6 @@ public class SuuntoJsonProcessor {
       Arrays.stream(stringValues).forEach(stringValue -> elementValues.add(Integer.parseInt(stringValue)));
 
       return elementValues;
-
    }
 
    /**

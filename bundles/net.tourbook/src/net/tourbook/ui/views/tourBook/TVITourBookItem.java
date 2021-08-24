@@ -295,7 +295,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    }
 
-   protected final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   protected static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    //
    //
    TourBookView tourBookView;
@@ -661,7 +661,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final long time = isPaceAndSpeedFromRecordedTime ? dbRecordedTime : dbMovingTime;
       tourItem.colAvgSpeed = time == 0 ? 0 : 3.6f * dbDistance / time;
-      tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000 / dbDistance;
+      tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000f / dbDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourItem.scrambleData();
@@ -685,7 +685,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       // VERY IMPORTANT !
       // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
       // Indeed, we can't do a mean average as we need to do a distance-weighted average.
-      colAltitude_AvgChange            = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
+      colAltitude_AvgChange            = UI.computeAverageElevationChange(colAltitudeUp + colAltitudeDown, colTourDistance);
 
       colCounter                       = result.getLong(startIndex + 5);
 
