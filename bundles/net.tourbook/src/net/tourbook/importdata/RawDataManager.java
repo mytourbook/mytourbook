@@ -729,7 +729,7 @@ public class RawDataManager {
 
          String logMessage = isReimport ? LOG_REIMPORT_COMBINED_VALUES : LOG_DELETE_COMBINED_VALUES;
 
-         logMessage = logMessage.concat(String.join(UI.COMMA_SPACE, dataToModifyDetails));
+         logMessage = logMessage.concat(String.join(UI.SPACE1, dataToModifyDetails));
 
          TourLogManager.addLog(
                TourLogState.DEFAULT,
