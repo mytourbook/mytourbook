@@ -2954,11 +2954,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * distance.
     *
     * @return
-    *         If successful, the average elevation change of a given tour, 0 otherwise.
+    *         If successful, the average elevation change (in m/km) of a given tour, 0 otherwise.
     */
    private void computeAvg_AltitudeChange() {
 
-      avgAltitudeChange = tourDistance <= 0f ? 0 : (int) ((tourAltUp + tourAltDown) / (tourDistance / 1000f));
+      avgAltitudeChange = Math.round(UI.computeAverageElevationChange(tourAltUp + tourAltDown, tourDistance));
    }
 
    private void computeAvg_Cadence() {

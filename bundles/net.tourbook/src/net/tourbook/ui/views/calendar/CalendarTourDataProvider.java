@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2021 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,18 +54,14 @@ public class CalendarTourDataProvider {
    private static ThreadPoolExecutor                    _weekLoadingExecutor;
    static {
 
-      final ThreadFactory threadFactoryFolder = new ThreadFactory() {
+      final ThreadFactory threadFactoryFolder = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "LoadingCalendarData");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "LoadingCalendarData");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
       _weekLoadingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10, threadFactoryFolder);
@@ -169,7 +165,7 @@ public class CalendarTourDataProvider {
       return dt;
    }
 
-   public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay, final CalendarView calendarView) {
+   public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay) {
 
       final WeekFields cw = TimeTools.calendarWeek;
 
@@ -201,7 +197,7 @@ public class CalendarTourDataProvider {
 
          weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
 
-         // update cached data otherwise an endless loop occures !!!
+         // update cached data otherwise an endless loop occurs !!!
          _weekCache.get(year)[week] = weekData;
 
       } else {
@@ -223,20 +219,17 @@ public class CalendarTourDataProvider {
 
       _weekWaitingQueue.add(new WeekLoader(week1stDay, year, week, weekData, _weekExecuterId.get()));
 
-      final Runnable executorTask = new Runnable() {
-         @Override
-         public void run() {
+      final Runnable executorTask = () -> {
 
-            // get last added loader item
-            final WeekLoader weekLoader = _weekWaitingQueue.pollFirst();
+         // get last added loader item
+         final WeekLoader weekLoader = _weekWaitingQueue.pollFirst();
 
-            if (weekLoader == null) {
-               return;
-            }
+         if (weekLoader == null) {
+            return;
+         }
 
-            if (loadFromDB_Week(weekLoader)) {
-               _calendarGraph.updateUI_AfterDataLoading();
-            }
+         if (loadFromDB_Week(weekLoader)) {
+            _calendarGraph.updateUI_AfterDataLoading();
          }
       };
 
@@ -673,7 +666,7 @@ public class CalendarTourDataProvider {
 
                data.distance = dbDistance.get(tourIndex);
                data.elevationGain = dbElevationGain.get(tourIndex);
-               data.elevationLoss = dbElevationGain.get(tourIndex);
+               data.elevationLoss = dbElevationLoss.get(tourIndex);
 
                data.elapsedTime = dbTourElapsedTime.get(tourIndex);
                data.recordedTime = dbTourDeviceTime_Recorded.get(tourIndex);

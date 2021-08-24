@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.gallery.MT20;
 
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -28,7 +31,6 @@ import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -36,25 +38,14 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -327,7 +318,7 @@ public abstract class GalleryMT20 extends Canvas {
     *           SWT.MULTI allows only several items to be selected at the same time.
     * @param state
     */
-   public GalleryMT20(final Composite parent, final int style, final IDialogSettings state) {
+   protected GalleryMT20(final Composite parent, final int style, final IDialogSettings state) {
 
 //		super(parent, style);
 //		super(parent, style | SWT.DOUBLE_BUFFERED);
@@ -374,12 +365,7 @@ public abstract class GalleryMT20 extends Canvas {
     * Add internal dispose listeners to this gallery.
     */
    private void addDisposeListeners() {
-      addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      addDisposeListener(disposeEvent -> onDispose());
    }
 
    private void addFocusListener() {
@@ -388,12 +374,12 @@ public abstract class GalleryMT20 extends Canvas {
 
          @Override
          public void focusGained(final FocusEvent event) {
-            onFocusGained(event);
+            onFocusGained();
          }
 
          @Override
          public void focusLost(final FocusEvent event) {
-            onFocusLost(event);
+            onFocusLost();
          }
       });
    }
@@ -422,12 +408,7 @@ public abstract class GalleryMT20 extends Canvas {
     */
    private void addMouseListeners() {
 
-      addMouseWheelListener(new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            onMouseWheel(event);
-         }
-      });
+      addMouseWheelListener(this::onMouseWheel);
 
       addMouseListener(new MouseListener() {
 
@@ -448,46 +429,18 @@ public abstract class GalleryMT20 extends Canvas {
 
       });
 
-      addMouseTrackListener(new MouseTrackListener() {
+      addMouseTrackListener(mouseExitAdapter(this::onMouseExit));
 
-         @Override
-         public void mouseEnter(final MouseEvent e) {}
+      addMouseMoveListener(this::onMouseMove);
 
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            onMouseExit(e);
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
-
-      addMouseMoveListener(new MouseMoveListener() {
-
-         @Override
-         public void mouseMove(final MouseEvent e) {
-            onMouseMove(e);
-         }
-      });
-
-      addMenuDetectListener(new MenuDetectListener() {
-         @Override
-         public void menuDetected(final MenuDetectEvent menuEvent) {
-            onMouseContextMenu(menuEvent);
-         }
-      });
+      addMenuDetectListener(this::onMouseContextMenu);
    }
 
    /**
     * Add internal paint listeners to this gallery.
     */
    private void addPaintListeners() {
-      addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent event) {
-            onPaint(event.gc);
-         }
-      });
+      addPaintListener(paintEvent -> onPaint(paintEvent.gc));
    }
 
    /**
@@ -531,47 +484,33 @@ public abstract class GalleryMT20 extends Canvas {
       final ScrollBar verticalBar = getVerticalBar();
       if (verticalBar != null) {
 
-         verticalBar.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-               onScrollVertical(event);
-            }
-         });
+         verticalBar.addSelectionListener(widgetSelectedAdapter(this::onScrollVertical));
       }
 
       // Horizontal bar
 
       final ScrollBar horizontalBar = getHorizontalBar();
       if (horizontalBar != null) {
-         horizontalBar.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-               if (_isHorizontal) {
-                  onScrollHorizontal();
-               }
+         horizontalBar.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_isHorizontal) {
+               onScrollHorizontal();
             }
-         });
+         }));
       }
 
    }
 
    private void addTraverseListener() {
-      addTraverseListener(new TraverseListener() {
+      addTraverseListener(traverseEvent -> {
 
-         @Override
-         public void keyTraversed(final TraverseEvent event) {
-
-            /*
-             * traverse with the tab key to the next/previous control
-             */
-            switch (event.detail) {
-            case SWT.TRAVERSE_TAB_NEXT:
-            case SWT.TRAVERSE_TAB_PREVIOUS:
-               event.doit = true;
-               break;
-            }
+         /*
+          * traverse with the tab key to the next/previous control
+          */
+         switch (traverseEvent.detail) {
+         case SWT.TRAVERSE_TAB_NEXT:
+         case SWT.TRAVERSE_TAB_PREVIOUS:
+            traverseEvent.doit = true;
+            break;
          }
       });
    }
@@ -635,12 +574,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       _contextMenuMgr.setRemoveAllWhenShown(true);
 
-      _contextMenuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-            fillContextMenu(menuMgr);
-         }
-      });
+      _contextMenuMgr.addMenuListener(this::fillContextMenu);
 
       setMenu(_contextMenuMgr.createContextMenu(this));
    }
@@ -680,7 +614,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       // Notify listeners if necessary.
       if (isNotifyListeners) {
-         notifySelectionListeners(null, -1, false);
+         notifySelectionListeners(null, false);
       }
    }
 
@@ -1019,12 +953,12 @@ public abstract class GalleryMT20 extends Canvas {
       final int indexX = contentPosX / _itemWidth;
       final int indexY = contentPosY / _itemHeight;
 
-      // ckeck if mouse click is outside of the gallery horizontal items
+      // check if mouse click is outside of the gallery horizontal items
       if (indexX >= _gridHorizItems) {
          return -1;
       }
 
-      // ckeck if mouse click is outside of the gallery vertical items
+      // check if mouse click is outside of the gallery vertical items
       if (indexY >= _gridVertItems) {
          return -1;
       }
@@ -1372,10 +1306,9 @@ public abstract class GalleryMT20 extends Canvas {
     * nothing is selected
     *
     * @param item
-    * @param index
     * @param isDefault
     */
-   private void notifySelectionListeners(final GalleryMT20Item item, final int index, final boolean isDefault) {
+   private void notifySelectionListeners(final GalleryMT20Item item, final boolean isDefault) {
 
       final Event e = new Event();
       e.widget = this;
@@ -1447,14 +1380,14 @@ public abstract class GalleryMT20 extends Canvas {
       _fullScreenImageViewer.close();
    }
 
-   private void onFocusGained(final FocusEvent event) {
+   private void onFocusGained() {
 
       _isFocusActive = true;
 
       redrawGallery();
    }
 
-   private void onFocusLost(final FocusEvent event) {
+   private void onFocusLost() {
 
       _isFocusActive = false;
 
@@ -1855,7 +1788,7 @@ public abstract class GalleryMT20 extends Canvas {
          selectionAdd(virtualIndex);
       }
 
-      notifySelectionListeners(getInitializedItem(virtualLast), virtualLast, false);
+      notifySelectionListeners(getInitializedItem(virtualLast), false);
 
       redrawGallery();
    }
@@ -2345,7 +2278,7 @@ public abstract class GalleryMT20 extends Canvas {
          selectionAdd(itemIndex);
       }
 
-      notifySelectionListeners(getInitializedItem(0), 0, false);
+      notifySelectionListeners(getInitializedItem(0), false);
 
       redrawGallery();
    }
@@ -2531,7 +2464,6 @@ public abstract class GalleryMT20 extends Canvas {
       // Notify listeners if necessary.
       if (isNotifyListeners) {
 
-         final int index = -1;
          GalleryMT20Item notifiedItem = null;
 
          if (itemIndex != -1 && isSelected) {
@@ -2548,7 +2480,7 @@ public abstract class GalleryMT20 extends Canvas {
 //				index = getItemIndex(notifiedItem);
 //			}
 
-         notifySelectionListeners(notifiedItem, index, false);
+         notifySelectionListeners(notifiedItem, false);
       }
    }
 
@@ -2583,7 +2515,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       showItem(itemEndIndex);
 
-      notifySelectionListeners(_lastSelectedItem, itemEndIndex, false);
+      notifySelectionListeners(_lastSelectedItem, false);
    }
 
    /**
@@ -3235,7 +3167,6 @@ public abstract class GalleryMT20 extends Canvas {
             if (contentWidth <= clientAreaWidth) {
 
                _contentVirtualWidth = contentWidth;
-               _contentVirtualWidthScrollbar = _contentVirtualWidth;
                _contentVirtualWidthScrollbar = _contentVirtualWidth;
 
             } else {

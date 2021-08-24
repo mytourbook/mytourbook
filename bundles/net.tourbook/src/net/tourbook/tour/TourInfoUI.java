@@ -184,6 +184,8 @@ public class TourInfoUI {
    private Label     _lblAltitudeUpUnit;
    private Label     _lblAltitudeDown;
    private Label     _lblAltitudeDownUnit;
+   private Label     _lblAvgElevationChange;
+   private Label     _lblAvgElevationChangeUnit;
    private Label     _lblAvgSpeed;
    private Label     _lblAvgSpeedUnit;
    private Label     _lblAvgPace;
@@ -657,6 +659,14 @@ public class TourInfoUI {
 
       _lblAltitudeDown = createUI_LabelValue(container, SWT.TRAIL);
       _lblAltitudeDownUnit = createUI_LabelValue(container, SWT.LEAD);
+
+      /*
+       * Average elevation change
+       */
+      createUI_Label(container, Messages.Tour_Tooltip_Label_AvgElevationChange);
+
+      _lblAvgElevationChange = createUI_LabelValue(container, SWT.TRAIL);
+      _lblAvgElevationChangeUnit = createUI_LabelValue(container, SWT.LEAD);
 
       createUI_Spacer(container);
    }
@@ -1625,6 +1635,10 @@ public class TourInfoUI {
 
       _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ELEVATION);
+
+      final int averageElevationChange = Math.round(UI.convertAverageElevationChangeFromMetric(_tourData.getAvgAltitudeChange()));
+      _lblAvgElevationChange.setText(Integer.toString(averageElevationChange));
+      _lblAvgElevationChangeUnit.setText(UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
 
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
