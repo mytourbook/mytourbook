@@ -24,8 +24,6 @@ public class ChartPauseConfig {
 
    public RGB                         pauseColorDefault_Light;
    public RGB                         pauseColorDefault_Dark;
-   public RGB                         pauseColorDevice_Light;
-   public RGB                         pauseColorDevice_Dark;
    public RGB                         pauseColorHidden_Light;
    public RGB                         pauseColorHidden_Dark;
 
