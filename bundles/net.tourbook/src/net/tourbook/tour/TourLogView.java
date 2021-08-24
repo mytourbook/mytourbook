@@ -37,6 +37,8 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -62,44 +64,47 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourLogView extends ViewPart {
 
-   public static final String  ID                               = "net.tourbook.tour.TourLogView";        //$NON-NLS-1$
+   public static final String            ID                               = "net.tourbook.tour.TourLogView";        //$NON-NLS-1$
 
-   private static final char   NL                               = UI.NEW_LINE;
+   private static final char             NL                               = UI.NEW_LINE;
 
-   private static final String STATE_COPY                       = "COPY";                                 //$NON-NLS-1$
-   private static final String STATE_DELETE                     = "DELETE";                               //$NON-NLS-1$
-   private static final String STATE_ERROR                      = "ERROR";                                //$NON-NLS-1$
-   private static final String STATE_EXCEPTION                  = "EXCEPTION";                            //$NON-NLS-1$
-   private static final String STATE_INFO                       = "INFO";                                 //$NON-NLS-1$
-   private static final String STATE_OK                         = "OK";                                   //$NON-NLS-1$
-   private static final String STATE_SAVE                       = "SAVE";                                 //$NON-NLS-1$
+   private static final String           STATE_COPY                       = "COPY";                                 //$NON-NLS-1$
+   private static final String           STATE_DELETE                     = "DELETE";                               //$NON-NLS-1$
+   private static final String           STATE_ERROR                      = "ERROR";                                //$NON-NLS-1$
+   private static final String           STATE_EXCEPTION                  = "EXCEPTION";                            //$NON-NLS-1$
+   private static final String           STATE_INFO                       = "INFO";                                 //$NON-NLS-1$
+   private static final String           STATE_OK                         = "OK";                                   //$NON-NLS-1$
+   private static final String           STATE_SAVE                       = "SAVE";                                 //$NON-NLS-1$
 
-   public static final String  CSS_LOG_INFO                     = "info";                                 //$NON-NLS-1$
-   private static final String CSS_LOG_ITEM                     = "logItem";                              //$NON-NLS-1$
-   private static final String CSS_LOG_SUB_ITEM                 = "subItem";                              //$NON-NLS-1$
-   public static final String  CSS_LOG_TITLE                    = "title";                                //$NON-NLS-1$
+   public static final String            CSS_LOG_INFO                     = "info";                                 //$NON-NLS-1$
+   private static final String           CSS_LOG_ITEM                     = "logItem";                              //$NON-NLS-1$
+   private static final String           CSS_LOG_SUB_ITEM                 = "subItem";                              //$NON-NLS-1$
+   public static final String            CSS_LOG_TITLE                    = "title";                                //$NON-NLS-1$
 
-   private static final String DOM_ID_LOG                       = "logs";                                 //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                  //$NON-NLS-1$
+   private static final String           DOM_ID_LOG                       = "logs";                                 //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                  //$NON-NLS-1$
 
-   private IPartListener2      _partListener;
+   private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private Action              _action_CopyIntoClipboard;
-   private Action              _action_Reset;
+   private IPartListener2                _partListener;
+   private IPropertyChangeListener       _prefChangeListener;
 
-   private boolean             _isNewUI;
-   private boolean             _isBrowserCompleted;
+   private Action                        _action_CopyIntoClipboard;
+   private Action                        _action_Reset;
 
-   private String              _tourLogCSS;
-   private String              _noBrowserLog                    = UI.EMPTY_STRING;
+   private boolean                       _isNewUI;
+   private boolean                       _isBrowserCompleted;
 
-   private String              _imageUrl_StateCopy              = getIconUrl(Images.State_Copy);
-   private String              _imageUrl_StateDeleteDevice      = getIconUrl(Images.State_Deleted_Device);
-   private String              _imageUrl_StateDeleteBackup      = getIconUrl(Images.State_Deleted_Backup);
-   private String              _imageUrl_StateError             = getIconUrl(Images.State_Error);
-   private String              _imageUrl_StateInfo              = getIconUrl(Images.State_Info);
-   private String              _imageUrl_StateOK                = getIconUrl(Images.State_OK);
-   private String              _imageUrl_StateSave              = getIconUrl(Images.State_Save);
+   private String                        _tourLogCSS;
+   private String                        _noBrowserLog                    = UI.EMPTY_STRING;
+
+   private String                        _imageUrl_StateCopy              = getIconUrl(Images.State_Copy);
+   private String                        _imageUrl_StateDeleteDevice      = getIconUrl(Images.State_Deleted_Device);
+   private String                        _imageUrl_StateDeleteBackup      = getIconUrl(Images.State_Deleted_Backup);
+   private String                        _imageUrl_StateError             = getIconUrl(Images.State_Error);
+   private String                        _imageUrl_StateInfo              = getIconUrl(Images.State_Info);
+   private String                        _imageUrl_StateOK                = getIconUrl(Images.State_OK);
+   private String                        _imageUrl_StateSave              = getIconUrl(Images.State_Save);
 
    /*
     * UI controls
@@ -314,6 +319,23 @@ public class TourLogView extends ViewPart {
       getViewSite().getPage().addPartListener(_partListener);
    }
 
+   private void addPrefListener() {
+
+      _prefChangeListener = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
+
+            // update font
+
+            _txtNoBrowser.setFont(net.tourbook.ui.UI.getLogFont());
+         }
+      };
+
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
+
    /**
     * Clear logs.
     */
@@ -372,10 +394,17 @@ public class TourLogView extends ViewPart {
             ? UI.SPACE3
             : UI.EMPTY_STRING;
 
-      return String.format("[%s] %s %-5s %s   %s", //$NON-NLS-1$
+      return String.format(UI.EMPTY_STRING
 
-            tourLog.threadName,
+            + "%s" //            time              //$NON-NLS-1$
+            + " [%-25s]" //      thread name       //$NON-NLS-1$
+            + " %-5s" //         state icon        //$NON-NLS-1$
+            + " %s" //           indent            //$NON-NLS-1$
+            + "   %s" //         message           //$NON-NLS-1$
+            ,
+
             tourLog.time,
+            tourLog.threadName,
             stateNoBrowser, // text instead of an icon
             subIndent,
             tourLog.message
@@ -396,6 +425,7 @@ public class TourLogView extends ViewPart {
       fillToolbar();
 
       addPartListener();
+      addPrefListener();
 
       updateUI();
 
@@ -404,25 +434,25 @@ public class TourLogView extends ViewPart {
 
    private void createUI(final Composite parent) {
 
-      final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _page_NoBrowser = new Composite(_pageBook, SWT.NONE);
-      _page_NoBrowser.setBackground(bgColor);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_page_NoBrowser);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_page_NoBrowser);
-      {
-         _txtNoBrowser = new Text(_page_NoBrowser, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
-         _txtNoBrowser.setBackground(bgColor);
-         GridDataFactory.fillDefaults()
-               .grab(true, true)
-               .align(SWT.FILL, SWT.FILL)
-               .applyTo(_txtNoBrowser);
+      _page_NoBrowser = createUI_20_NoBrowser(_pageBook);
+   }
+
+   private void createUI_10_NewUI() {
+
+      if (_page_WithBrowser == null) {
+
+         _page_WithBrowser = new Composite(_pageBook, SWT.NONE);
+
+         GridLayoutFactory.fillDefaults().applyTo(_page_WithBrowser);
+         {
+            createUI_12_Browser(_page_WithBrowser);
+         }
       }
    }
 
-   private void createUI_10_Browser(final Composite parent) {
+   private void createUI_12_Browser(final Composite parent) {
 
       try {
 
@@ -471,23 +501,34 @@ public class TourLogView extends ViewPart {
       }
    }
 
-   private void createUI_NewUI() {
+   private Composite createUI_20_NoBrowser(final Composite parent) {
 
-      if (_page_WithBrowser == null) {
+      final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 
-         _page_WithBrowser = new Composite(_pageBook, SWT.NONE);
-
-         GridLayoutFactory.fillDefaults().applyTo(_page_WithBrowser);
-         {
-            createUI_10_Browser(_page_WithBrowser);
-         }
+      final Composite container = new Composite(parent, SWT.NONE);
+      container.setBackground(bgColor);
+      container.setFont(net.tourbook.ui.UI.getLogFont());
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         _txtNoBrowser = new Text(container, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
+         _txtNoBrowser.setFont(net.tourbook.ui.UI.getLogFont());
+         _txtNoBrowser.setBackground(bgColor);
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .align(SWT.FILL, SWT.FILL)
+               .applyTo(_txtNoBrowser);
       }
+
+      return container;
    }
 
    @Override
    public void dispose() {
 
       getViewSite().getPage().removePartListener(_partListener);
+
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       super.dispose();
    }
@@ -709,12 +750,13 @@ public class TourLogView extends ViewPart {
 
       if (_isNewUI) {
 
-         createUI_NewUI();
+         createUI_10_NewUI();
 
          final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
 
-         // set dashboard page
-         _pageBook.showPage(isBrowserAvailable//
+         // set log page
+         _pageBook.showPage(isBrowserAvailable
+
                ? _page_WithBrowser
                : _page_NoBrowser);
 
