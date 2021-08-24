@@ -45,6 +45,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
    //todo fb display a gray area hwen hovering just like the markers
    //Bug when the pauses layer is hidden, the pause tooltip is not displayed anymore
+   // why the spacing in the tooltip??
 
    private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
    private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;
