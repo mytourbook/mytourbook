@@ -16,6 +16,7 @@
 package net.tourbook.ui.tourChart;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -44,8 +45,6 @@ import org.eclipse.swt.widgets.Shell;
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
    //todo fb display a gray area hwen hovering just like the markers
-   // make sure it works with multiple tours
-
    //Bug when the pauses layer is hidden, the pause tooltip is not displayed anymore
 
    /**
@@ -177,21 +176,21 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         UI.createLabel(container, "Start time");//GRAPH_LABEL_TIME);
-         createUI_12_TimeField(
+         UI.createLabel(container, "Start time");//GRAPH_LABEL_TIME); //$NON-NLS-1$
+         createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_Start(),
                _hoveredLabel.getTimeZoneId());
 
-         UI.createLabel(container, "End time");//GRAPH_LABEL_TIME);
-         createUI_12_TimeField(
+         UI.createLabel(container, "End time");//GRAPH_LABEL_TIME); //$NON-NLS-1$
+         createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_End(),
                _hoveredLabel.getTimeZoneId());
       }
    }
 
-   private void createUI_12_TimeField(final Composite parent,
+   private void createUI_11_TimeField(final Composite parent,
                                       final long value,
                                       final String dbTimeZoneId) {
 
@@ -200,22 +199,20 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       final ZonedDateTime tourZonedDateTime = TimeTools.createTourDateTime(value, dbTimeZoneId).tourZonedDateTime;
 
+      final StringBuilder labelBuilder = new StringBuilder();
+
       if (_tourData.isMultipleTours()) {
 
-         //todo get the timezoneid from the current tour
-         final String format_yyyymmdd_hhmmss = UI.format_yyyymmdd_hhmmss(tourZonedDateTime.getYear(),
-               tourZonedDateTime.getMonthValue(),
-               tourZonedDateTime.getDayOfMonth(),
-               tourZonedDateTime.getHour(),
-               tourZonedDateTime.getMinute(),
-               tourZonedDateTime.getSecond());
-         label.setText(format_yyyymmdd_hhmmss);
-      } else {
+         labelBuilder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tourZonedDateTime)); //$NON-NLS-1$
 
-         final String format_hh_mm_ss = UI.format_hh_mm_ss(
-               tourZonedDateTime.getHour() * 3600 + tourZonedDateTime.getMinute() * 60 + tourZonedDateTime.getSecond());
-         label.setText(format_hh_mm_ss);
       }
+
+      final String format_hh_mm_ss = UI.format_hh_mm_ss(
+            tourZonedDateTime.getHour() * 3600L + tourZonedDateTime.getMinute() * 60 + tourZonedDateTime.getSecond());
+
+      labelBuilder.append(UI.SPACE + format_hh_mm_ss);
+
+      label.setText(labelBuilder.toString());
    }
 
    //TODO FB
@@ -225,7 +222,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
     * The region which is computed in drawOverlay() cannot be used because the overlay is painted
     * <b>after</b> the tooltip is displayed and <b>not before.</b>
     */
-   private Rectangle getHoveredRect() {
+   private Rectangle getHoveredRectangle() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
 
@@ -243,7 +240,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
       rectHovered = rectHovered.union(rectMarker);
 
-      // add label rect
+      // add label rectangle
       if (_hoveredLabel.paintedLabel != null) {
 
          final Rectangle paintedLabel = _hoveredLabel.paintedLabel;
@@ -281,7 +278,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    @Override
    public Point getToolTipLocation(final Point tipSize) {
 
-      final Rectangle hoveredRect = getHoveredRect();
+      final Rectangle hoveredRect = getHoveredRectangle();
 
       final int devHoveredX = hoveredRect.x;
       int devHoveredY = hoveredRect.y;
@@ -431,41 +428,29 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          if (rightBottomBounds.x > displayX + displayWidth) {
 
-            switch (_chartPauseConfig.pauseTooltipPosition) {
+            if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
+                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP
+                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM) {
 
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
                tooltipLocation.x = displayWidth - tipWidth;
-               break;
+            } else if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_RIGHT) {
 
-            case TOOLTIP_POSITION_RIGHT:
                tooltipLocation.x = tooltipLocation.x - tipWidth - devHoveredWidth - 2;
-               break;
             }
          }
 
-         if (tooltipLocation.y < displayY) {
+         if (tooltipLocation.y < displayY &&
+               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
+                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP)) {
 
-            switch (_chartPauseConfig.pauseTooltipPosition) {
-
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
-               tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
-               break;
-            }
+            tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
          }
 
-         if (rightBottomBounds.y > displayY + displayHeight) {
+         if (rightBottomBounds.y > displayY + displayHeight &&
+               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW
+                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM)) {
 
-            switch (_chartPauseConfig.pauseTooltipPosition) {
-
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
-               tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
-               break;
-            }
+            tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
          }
       }
 
@@ -546,7 +531,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          _hoveredLabel = hoveredLabel;
          //_hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
 
-         System.out.println("HOVEREDPAUSE");
+         //TODO FB
+         System.out.println("HOVEREDPAUSE"); //$NON-NLS-1$
          showToolTip();
       }
    }

@@ -295,12 +295,12 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       region.add(devPauseX, devPauseY, devPauseSize, devPauseSize);
 
-      // get whole chart rect
-      final Rectangle clientRect = gc.getClipping();
+      // get whole chart rectangle
+      final Rectangle clientRectangle = gc.getClipping();
 
       gc.setClipping(region);
       {
-         gc.fillRectangle(clientRect);
+         gc.fillRectangle(clientRectangle);
       }
       region.dispose();
       gc.setClipping((Region) null);

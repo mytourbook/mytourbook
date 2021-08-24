@@ -2051,8 +2051,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       chartLabelPause.graphX = xAxisSerie[xAxisSerieIndex];
       chartLabelPause.serieIndex = xAxisSerieIndex;
-
-      //todo fb will that work for multiple tours that have different time zones ???
       chartLabelPause.setPausedTime_Start(pausedTime_Start);
       chartLabelPause.setPausedTime_End(pausedTime_End);
       chartLabelPause.setTimeZoneId(timeZoneId);
@@ -2118,7 +2116,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int currentTourPauseIndex = 0;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
-            tourStartTime = multipleTourZonedStartTime[tourIndex].toInstant().toEpochMilli();
+            final ZonedDateTime currentTourZonedStartTime = multipleTourZonedStartTime[tourIndex];
+            tourStartTime = currentTourZonedStartTime.toInstant().toEpochMilli();
+            final String tourTimeZoneId = currentTourZonedStartTime.getZone().getId();
             numberOfPauses = multipleNumberOfPauses[tourIndex];
             tourSerieIndex = multipleStartTimeIndex[tourIndex];
 
@@ -2146,7 +2146,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                         pausedTime_Start,
                         pausedTime_End,
-                        _tourData.getTimeZoneId(),
+                        tourTimeZoneId,
                         xAxisSerie,
                         tourSerieIndex);
 
