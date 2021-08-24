@@ -1061,10 +1061,9 @@ public class RawDataManager {
          TourLogManager.logEx(e);
       } finally {
 
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_DELETE_TOURVALUES_END, time));
+         TourLogManager.logDefault(String.format(
+               RawDataManager.LOG_DELETE_TOURVALUES_END,
+               (System.currentTimeMillis() - start) / 1000.0));
       }
    }
 
@@ -1215,7 +1214,7 @@ public class RawDataManager {
       final TourData saveTourData = TourManager.saveModifiedTour(tourData, false);
 
       TourLogManager.showLogView();
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, saveTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S));
+      TourLogManager.subLog_OK(saveTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S));
 
       for (final TourValueType tourValueType : tourValueTypes) {
          displayTourModifiedDataDifferences(tourValueType, clonedTourData, saveTourData);
@@ -2001,11 +2000,13 @@ public class RawDataManager {
           * <p>
           * It took a very long time (years) until this case was discovered
           */
+         if (processDeviceDataStates.isLog_INFO) {
 
-         TourLogManager.addSubLog(TourLogState.INFO,
-               NLS.bind(
-                     LOG_REIMPORT_MANUAL_TOUR,
-                     oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
+            TourLogManager.addSubLog(TourLogState.INFO,
+                  NLS.bind(
+                        LOG_REIMPORT_MANUAL_TOUR,
+                        oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
+         }
 
          return false;
       }

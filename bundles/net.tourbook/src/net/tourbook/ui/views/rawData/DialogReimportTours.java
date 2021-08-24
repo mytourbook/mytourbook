@@ -45,7 +45,6 @@ import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -794,7 +793,8 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   .setIsLog_DEFAULT(false)
                   .setIsLog_INFO(false)
-                  .setIsLog_OK(false);
+                  .setIsLog_OK(false) //
+            ;
 
             final AtomicInteger numWorkedTours = new AtomicInteger();
 
@@ -829,8 +829,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final String percentValue = String.format(NUMBER_FORMAT_1F, (float) numWorkedValue / numAllTourIDs * 100.0);
 
-                  monitor.subTask(NLS.bind(
-                        "{0} of {1} - {2} % - {3} Δ",
+                  monitor.subTask(NLS.bind("{0} / {1} - {2} % - {3} Δ",
                         new Object[] {
                               numWorkedValue,
                               numAllTourIDs,
@@ -880,9 +879,9 @@ public class DialogReimportTours extends TitleAreaDialog {
          Display.getDefault().asyncExec(_tourViewer::reloadViewer);
       }
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            String.format(RawDataManager.LOG_REIMPORT_END, (System.currentTimeMillis() - start) / 1000.0));
+      TourLogManager.logDefault(String.format(
+            RawDataManager.LOG_REIMPORT_END,
+            (System.currentTimeMillis() - start) / 1000.0));
 
       fireTourModifyEvent();
    }
@@ -925,6 +924,10 @@ public class DialogReimportTours extends TitleAreaDialog {
                      isSkipToursWithFileNotFound,
                      reImportStatus,
                      processDeviceDataStates);
+
+// this was used for debugging to speedup the process
+//
+//             final boolean isReimported = true;
 
                if (isReimported) {
                   allReimportedTourIds.add(oldTourData.getTourId());

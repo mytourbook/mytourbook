@@ -30,7 +30,6 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.StatisticManager;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
@@ -118,7 +117,8 @@ public class TourLogView extends ViewPart {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
+         // Copy log into the clipboard
+         setToolTipText(Messages.Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
@@ -126,7 +126,7 @@ public class TourLogView extends ViewPart {
 
       @Override
       public void run() {
-         onAction_CopyIntoClipboard();
+         onAction_CopyLogIntoClipboard();
       }
    }
 
@@ -152,10 +152,10 @@ public class TourLogView extends ViewPart {
          return;
       }
 
-      // Run always async that the flow is not blocked.
+      // Run always async that the flow is not blocked
       Display.getDefault().asyncExec(() -> {
 
-         final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog));
+         final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog.state));
 
          if (isBrowserAvailable()) {
 
@@ -204,7 +204,7 @@ public class TourLogView extends ViewPart {
                   // state (icon)
                   + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
                   + "td.className='column icon';"                                            + NL //$NON-NLS-1$
-                  + getStateImage_WithBrowser(tourLog)
+                  + getStateImage_WithBrowser(tourLog.state)
                   + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
 
                   // message
@@ -239,25 +239,20 @@ public class TourLogView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-//            final long start = System.nanoTime();
-
             _browser.execute(js);
 
-            final boolean isLogToConsole = true;
-
             // log the log text to the console
+            final boolean isLogToConsole = true;
             if (isLogToConsole) {
                System.out.println("[TourLog] " + noBrowserText);//$NON-NLS-1$
             }
-
-//            System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
-//                  + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
-//            // TODO remove SYSTEM.OUT.PRINTLN
 
          } else {
 
             addLog_NoBrowser(noBrowserText);
          }
+
+         enableControls();
       });
    }
 
@@ -403,6 +398,8 @@ public class TourLogView extends ViewPart {
       addPartListener();
 
       updateUI();
+
+      enableControls();
    }
 
    private void createUI(final Composite parent) {
@@ -495,6 +492,13 @@ public class TourLogView extends ViewPart {
       super.dispose();
    }
 
+   private void enableControls() {
+
+      final boolean isLogAvailable = TourLogManager.getLogs().size() > 0;
+
+      _action_CopyIntoClipboard.setEnabled(isLogAvailable);
+   }
+
    private void fillToolbar() {
 
       /*
@@ -504,6 +508,57 @@ public class TourLogView extends ViewPart {
 
       tbm.add(_action_CopyIntoClipboard);
       tbm.add(_action_Reset);
+   }
+
+   private String getStateImage_NoBrowser(final TourLogState state) {
+
+// SET_FORMATTING_OFF
+
+      switch (state) {
+
+      case IMPORT_OK:                  return STATE_OK;
+      case IMPORT_ERROR:               return STATE_ERROR;
+      case IMPORT_EXCEPTION:           return STATE_EXCEPTION;
+      case INFO:                       return STATE_INFO;
+      case EASY_IMPORT_COPY:           return STATE_COPY;
+
+      case EASY_IMPORT_DELETE_BACKUP:
+      case TOUR_DELETED:               return STATE_DELETE;
+
+      case EASY_IMPORT_DELETE_DEVICE:  return STATE_DELETE;
+      case TOUR_SAVED:                 return STATE_SAVE;
+
+// SET_FORMATTING_ON
+
+      default:
+      }
+      return UI.EMPTY_STRING;
+   }
+
+   private String getStateImage_WithBrowser(final TourLogState state) {
+
+// SET_FORMATTING_OFF
+
+      switch (state) {
+
+      case IMPORT_OK:                  return js_SetStyleBgImage(_imageUrl_StateOK);
+      case IMPORT_ERROR:               return js_SetStyleBgImage(_imageUrl_StateError);
+      case IMPORT_EXCEPTION:           return js_SetStyleBgImage(_imageUrl_StateError);
+      case INFO:                       return js_SetStyleBgImage(_imageUrl_StateInfo);
+      case EASY_IMPORT_COPY:           return js_SetStyleBgImage(_imageUrl_StateCopy);
+
+      case EASY_IMPORT_DELETE_BACKUP:
+      case TOUR_DELETED:               return js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
+
+      case EASY_IMPORT_DELETE_DEVICE:  return js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
+      case TOUR_SAVED:                 return js_SetStyleBgImage(_imageUrl_StateSave);
+
+// SET_FORMATTING_ON
+
+      default:
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    private boolean httpAction(final String location) {
@@ -558,36 +613,42 @@ public class TourLogView extends ViewPart {
    private void onAction_ClearView() {
 
       TourLogManager.clear();
+
+      enableControls();
    }
 
-   private void onAction_CopyIntoClipboard() {
+   /**
+    * Copy log text into clipboard
+    */
+   private void onAction_CopyLogIntoClipboard() {
 
-      for (final TourLog tourLog : TourLogManager.getLogs()) {
+      final StringBuilder sb = new StringBuilder();
+      final CopyOnWriteArrayList<TourLog> allTourLogs = TourLogManager.getLogs();
 
-         final String[] stateWithBrowser = { UI.EMPTY_STRING };
-         final String[] stateNoBrowser = { UI.EMPTY_STRING };
+      for (int logIndex = 0; logIndex < allTourLogs.size(); logIndex++) {
 
-         final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog));
+         final TourLog tourLog = allTourLogs.get(logIndex);
 
-         addLog_NoBrowser(noBrowserText);
+         if (logIndex > 0) {
+            sb.append(UI.NEW_LINE);
+         }
+
+         sb.append(createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog.state)));
       }
 
-      final String statValues = ;
+      final String logText = sb.toString();
 
-      final Display display = Display.getDefault();
+      if (logText.length() > 0) {
 
-      if (statValues.length() > 0) {
-
+         final Display display = Display.getDefault();
          final TextTransfer textTransfer = TextTransfer.getInstance();
 
          final Clipboard clipBoard = new Clipboard(display);
          {
             clipBoard.setContents(
 
-                  new Object[] { statValues },
-                  new Transfer[] { textTransfer }
-
-            );
+                  new Object[] { logText },
+                  new Transfer[] { textTransfer });
          }
          clipBoard.dispose();
 
@@ -595,10 +656,11 @@ public class TourLogView extends ViewPart {
          if (statusLineMgr != null) {
 
             // show info that data are copied
-            statusLineMgr.setMessage(Messages.Tour_StatisticValues_Info_DataAreCopied);
+            // "The log were copied into the clipboard"
+            statusLineMgr.setMessage(Messages.Tour_Log_Info_TourLogWasCopied);
 
             // cleanup message
-            display.timerExec(2000, () -> statusLineMgr.setMessage(null));
+            display.timerExec(3000, () -> statusLineMgr.setMessage(null));
          }
       }
    }
@@ -640,57 +702,6 @@ public class TourLogView extends ViewPart {
       }
    }
 
-   private String getStateImage_NoBrowser(final TourLog importLog) {
-
-// SET_FORMATTING_OFF
-
-      switch (importLog.state) {
-
-      case IMPORT_OK:                  return STATE_OK;
-      case IMPORT_ERROR:               return STATE_ERROR;
-      case IMPORT_EXCEPTION:           return STATE_EXCEPTION;
-      case INFO:                       return STATE_INFO;
-      case EASY_IMPORT_COPY:           return STATE_COPY;
-
-      case EASY_IMPORT_DELETE_BACKUP:
-      case TOUR_DELETED:               return STATE_DELETE;
-
-      case EASY_IMPORT_DELETE_DEVICE:  return STATE_DELETE;
-      case TOUR_SAVED:                 return STATE_SAVE;
-
-// SET_FORMATTING_ON
-
-      default:
-      }
-      return UI.EMPTY_STRING;
-   }
-
-   private String getStateImage_WithBrowser(final TourLog importLog) {
-
-// SET_FORMATTING_OFF
-
-      switch (importLog.state) {
-
-      case IMPORT_OK:                  return js_SetStyleBgImage(_imageUrl_StateOK);
-      case IMPORT_ERROR:               return js_SetStyleBgImage(_imageUrl_StateError);
-      case IMPORT_EXCEPTION:           return js_SetStyleBgImage(_imageUrl_StateError);
-      case INFO:                       return js_SetStyleBgImage(_imageUrl_StateInfo);
-      case EASY_IMPORT_COPY:           return js_SetStyleBgImage(_imageUrl_StateCopy);
-
-      case EASY_IMPORT_DELETE_BACKUP:
-      case TOUR_DELETED:               return js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
-
-      case EASY_IMPORT_DELETE_DEVICE:  return js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-      case TOUR_SAVED:                 return js_SetStyleBgImage(_imageUrl_StateSave);
-
-// SET_FORMATTING_ON
-
-      default:
-      }
-
-      return UI.EMPTY_STRING;
-   }
-
    /**
     * Set/create dashboard page.
     */
@@ -722,7 +733,7 @@ public class TourLogView extends ViewPart {
           */
          for (final TourLog tourLog : TourLogManager.getLogs()) {
 
-            final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog));
+            final String noBrowserText = createNoBrowserText(tourLog, getStateImage_NoBrowser(tourLog.state));
 
             addLog_NoBrowser(noBrowserText);
          }

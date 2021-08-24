@@ -49,6 +49,7 @@ import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -555,7 +556,8 @@ public class FTSearchManager {
       return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
    }
 
-   private static void createStore_TourData(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourData(final Connection conn,
+                                            final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -804,6 +806,31 @@ public class FTSearchManager {
 
          logCreateIndex(tableName, start);
       }
+   }
+
+   /**
+    * Split all tour id's into smaller parts because of this limit
+    *
+    * <pre>
+    * org.apache.lucene.search.BooleanQuery$TooManyClauses: maxClauseCount is set to 1024
+    * at org.apache.lucene.search.BooleanQuery$Builder.add(BooleanQuery.java:114)
+    * at org.apache.lucene.search.BooleanQuery$Builder.add(BooleanQuery.java:127)
+    * at net.tourbook.search.FTSearchManager.updateIndex(FTSearchManager.java:1751)
+    * </pre>
+    */
+   private static List<List<Long>> createTourIdParts(final long[] allTourIds) {
+
+      final ArrayList<Long> allTourIds_List = new ArrayList<>();
+
+      for (final long tourId : allTourIds) {
+         allTourIds_List.add(tourId);
+      }
+
+      final int maxClauseCount = BooleanQuery.getMaxClauseCount() - 1;
+
+      final List<List<Long>> allPartitionedTourIDs = ListUtils.partition(allTourIds_List, maxClauseCount);
+
+      return allPartitionedTourIDs;
    }
 
    /**
@@ -1566,38 +1593,35 @@ public class FTSearchManager {
          return;
       }
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> {
 
-            try {
+         try {
 
-               final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-                  @Override
-                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
+               @Override
+               public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                     InterruptedException {
 
-                     monitor.subTask(Messages.Database_Monitor_SetupLucene);
+                  monitor.subTask(Messages.Database_Monitor_SetupLucene);
 
-                     try (Connection conn = TourDatabase.getInstance().getConnection()) {
+                  try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-                        createStore_TourData(conn, monitor);
-                        createStore_TourMarker(conn, monitor);
-                        createStore_TourWaypoint(conn, monitor);
+                     createStore_TourData(conn, monitor);
+                     createStore_TourMarker(conn, monitor);
+                     createStore_TourWaypoint(conn, monitor);
 
-                     } catch (final SQLException e) {
+                  } catch (final SQLException e) {
 
-                        net.tourbook.ui.UI.showSQLException(e);
-                     }
+                     net.tourbook.ui.UI.showSQLException(e);
                   }
-               };
+               }
+            };
 
-               new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
+            new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
-            } catch (final InvocationTargetException | InterruptedException e) {
-               StatusUtil.log(e);
-            }
+         } catch (final InvocationTargetException | InterruptedException e) {
+            StatusUtil.log(e);
          }
       });
    }
@@ -1711,15 +1735,155 @@ public class FTSearchManager {
     */
    public static void updateIndex(final long[] allTourIds) {
 
-      setupIndexReader();
+      final long start = System.nanoTime();
 
-      FSDirectory indexStore_TourData = null;
-      FSDirectory indexStore_Marker = null;
-      FSDirectory indexStore_WayPoint = null;
+      final int numAllTourIDs = allTourIds.length;
 
-      IndexWriter indexWriter_TourData = null;
-      IndexWriter indexWriter_Marker = null;
-      IndexWriter indexWriter_WayPoint = null;
+      final FSDirectory[] indexStore_TourData = { null };
+      final FSDirectory[] indexStore_Marker = { null };
+      final FSDirectory[] indexStore_WayPoint = { null };
+
+      // these values MUST be final
+      final IndexWriter[] indexWriter_TourData = { null };
+      final IndexWriter[] indexWriter_Marker = { null };
+      final IndexWriter[] indexWriter_WayPoint = { null };
+
+      final boolean[] isIndexClosed = { false };
+
+      try {
+
+         setupIndexReader();
+
+         indexStore_TourData[0] = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker[0] = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint[0] = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+         indexWriter_TourData[0] = new IndexWriter(indexStore_TourData[0], getIndexWriterConfig());
+         indexWriter_Marker[0] = new IndexWriter(indexStore_Marker[0], getIndexWriterConfig());
+         indexWriter_WayPoint[0] = new IndexWriter(indexStore_WayPoint[0], getIndexWriterConfig());
+
+         if (numAllTourIDs < 5) {
+
+            // run without progress monitor
+
+            for (final List<Long> tourIDPart : createTourIdParts(allTourIds)) {
+
+               updateIndex_10_Parts(
+                     tourIDPart,
+                     indexWriter_TourData[0],
+                     indexWriter_Marker[0],
+                     indexWriter_WayPoint[0],
+
+                     // monitor parameters
+                     null,
+                     0,
+                     null);
+            }
+
+         } else {
+
+            try {
+
+               final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+                  @Override
+                  public void run(final IProgressMonitor monitor)
+                        throws InvocationTargetException, InterruptedException {
+
+                     monitor.beginTask("Updating fulltext index", numAllTourIDs);
+
+                     try {
+
+                        final int[] numWorked = { 0 };
+
+                        for (final List<Long> tourIDPart : createTourIdParts(allTourIds)) {
+
+                           updateIndex_10_Parts(
+
+                                 tourIDPart,
+
+                                 indexWriter_TourData[0],
+                                 indexWriter_Marker[0],
+                                 indexWriter_WayPoint[0],
+
+                                 // monitor parameters
+                                 monitor,
+                                 numAllTourIDs,
+                                 numWorked);
+                        }
+
+                     } catch (final IOException e) {
+
+                        StatusUtil.showStatus(e);
+
+                     } finally {
+
+                        updateIndex_20_ClosingStores(
+
+                              indexStore_TourData[0],
+                              indexStore_Marker[0],
+                              indexStore_WayPoint[0],
+                              indexWriter_TourData[0],
+                              indexWriter_Marker[0],
+                              indexWriter_WayPoint[0],
+                              monitor);
+
+                        isIndexClosed[0] = true;
+                     }
+                  }
+               };
+
+               new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, false, runnable);
+
+            } catch (final InvocationTargetException | InterruptedException e) {
+
+               StatusUtil.showStatus(e);
+            }
+         }
+
+      } catch (final IOException e) {
+
+         StatusUtil.showStatus(e);
+
+      } finally {
+
+         if (isIndexClosed[0] == false) {
+
+            updateIndex_20_ClosingStores(
+
+                  indexStore_TourData[0],
+                  indexStore_Marker[0],
+                  indexStore_WayPoint[0],
+                  indexWriter_TourData[0],
+                  indexWriter_Marker[0],
+                  indexWriter_WayPoint[0],
+                  null);
+         }
+      }
+
+      closeIndexReaderSuggester();
+
+      final long end = System.nanoTime();
+      final float timeDiff = (end - start) / 1_000_000_000.0f;
+
+      TourLogManager.subLog_Default(String.format("Updated fulltext index in %1.3f s for %d tours",
+
+            timeDiff,
+            numAllTourIDs));
+   }
+
+   private static void updateIndex_10_Parts(final List<Long> allTourIDParts,
+                                            final IndexWriter indexWriter_TourData,
+                                            final IndexWriter indexWriter_Marker,
+                                            final IndexWriter indexWriter_WayPoint,
+
+                                            // monitor parameters
+                                            final IProgressMonitor monitor,
+                                            final int numTourIDs,
+                                            final int[] numWorked
+
+   ) throws IOException {
+
+      long lastUpdateTime = System.currentTimeMillis();
 
       final Builder deleteDoc_TourData = new BooleanQuery.Builder();
       final Builder deleteDoc_Marker = new BooleanQuery.Builder();
@@ -1729,19 +1893,28 @@ public class FTSearchManager {
       final ArrayList<Document> newDoc_Marker = new ArrayList<>();
       final ArrayList<Document> newDoc_WayPoint = new ArrayList<>();
 
-      try {
+      for (final Long tourId : allTourIDParts) {
 
-         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
-         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
-         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+         if (monitor != null) {
 
-         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
-         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
-         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
+            final long now = System.currentTimeMillis();
 
-         for (final Long tourId : allTourIds) {
+            if (now > lastUpdateTime + 500) {
 
-            final TourData tourData = TourManager.getTour(tourId);
+               lastUpdateTime = now;
+
+               monitor.subTask(String.format("Loading tours %d / %d",
+                     numWorked[0],
+                     numTourIDs));
+            }
+
+            numWorked[0]++;
+            monitor.worked(1);
+         }
+
+         final TourData tourData = TourManager.getTour(tourId);
+
+         if (tourData != null) {
 
             /*
              * Delete existing tour, marker and waypoint
@@ -1789,32 +1962,60 @@ public class FTSearchManager {
                newDoc_WayPoint.add(wayPointDoc);
             }
          }
-
-         indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
-         indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
-         indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
-
-         for (final Document document : newDoc_TourData) {
-            indexWriter_TourData.addDocument(document);
-         }
-         for (final Document document : newDoc_Marker) {
-            indexWriter_Marker.addDocument(document);
-         }
-         for (final Document document : newDoc_WayPoint) {
-            indexWriter_WayPoint.addDocument(document);
-         }
-
-      } catch (final IOException e) {
-
-         StatusUtil.showStatus(e);
-
-      } finally {
-
-         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
-         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
-         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
       }
 
-      closeIndexReaderSuggester();
+      if (monitor != null) {
+         monitor.subTask("Updating index...");
+      }
+
+      indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
+      indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
+      indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
+
+      for (final Document document : newDoc_TourData) {
+         indexWriter_TourData.addDocument(document);
+      }
+      for (final Document document : newDoc_Marker) {
+         indexWriter_Marker.addDocument(document);
+      }
+      for (final Document document : newDoc_WayPoint) {
+         indexWriter_WayPoint.addDocument(document);
+      }
+   }
+
+   /**
+    * This is a time consuming task which can have a duration of several seconds when using
+    * many tours
+    *
+    * @param indexStore_TourData
+    * @param indexStore_Marker
+    * @param indexStore_WayPoint
+    * @param indexWriter_TourData
+    * @param indexWriter_Marker
+    * @param indexWriter_WayPoint
+    * @param monitor
+    */
+   private static void updateIndex_20_ClosingStores(final FSDirectory indexStore_TourData,
+                                                    final FSDirectory indexStore_Marker,
+                                                    final FSDirectory indexStore_WayPoint,
+                                                    final IndexWriter indexWriter_TourData,
+                                                    final IndexWriter indexWriter_Marker,
+                                                    final IndexWriter indexWriter_WayPoint,
+                                                    final IProgressMonitor monitor) {
+
+      if (monitor != null) {
+         monitor.subTask("Closing fulltext index store: Tours");
+      }
+      closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+
+      if (monitor != null) {
+         monitor.subTask("Closing fulltext index store: Marker");
+      }
+      closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+
+      if (monitor != null) {
+         monitor.subTask("Closing fulltext index store: Waypoints");
+      }
+      closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
    }
 }
