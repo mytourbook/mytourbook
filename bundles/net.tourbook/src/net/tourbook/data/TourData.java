@@ -4356,7 +4356,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          computeDataSeries_Smoothed();
       }
 
-      // double check was necessary because this case occured but it should not
+      // double check was necessary because this case occurred but it should not
       if (altitudeSerieSmoothed == null) {
          return;
       }
@@ -11196,7 +11196,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          /**
           * !!!! <br>
           * Way point must be cloned because the entity could be saved within different tour data
-          * instances, otherwise hibernate exceptions occure this also sets the createId. <br>
+          * instances, otherwise hibernate exceptions occur this also sets the createId. <br>
           * !!!!
           */
          final TourWayPoint clonedWP = tourWayPoint.clone(this);
