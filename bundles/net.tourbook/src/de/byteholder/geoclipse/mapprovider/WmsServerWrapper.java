@@ -52,37 +52,37 @@ public class WmsServerWrapper {
 
             wmsServer[0] = new WebMapServer(new URL(capsUrl));
 
-         } catch (final MalformedURLException e1) {
+         } catch (final MalformedURLException e) {
 
-            exception[0] = e1;
-            message[0] = NLS.bind(Messages.DBG028_Wms_Server_Error_MalformedUrl, e1.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG028_Wms_Server_Error_MalformedUrl, e.getMessage(), capsUrl);
 
-         } catch (final FileNotFoundException e2) {
+         } catch (final FileNotFoundException e) {
 
-            exception[0] = e2;
-            message[0] = NLS.bind(Messages.DBG029_Wms_Server_Error_FileNotFound, e2.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG029_Wms_Server_Error_FileNotFound, e.getMessage(), capsUrl);
 
-         } catch (final UnknownHostException e3) {
+         } catch (final UnknownHostException e) {
 
-            exception[0] = e3;
+            exception[0] = e;
             message[0] = NLS.bind(
                   Messages.DBG030_Wms_Server_Error_CannotConnectToServer,
-                  e3.getMessage(),
+                  e.getMessage(),
                   capsUrl);
 
-         } catch (final IOException e4) {
+         } catch (final IOException e) {
 
-            exception[0] = e4;
-            message[0] = NLS.bind(Messages.DBG031_Wms_Server_Error_IoException, e4.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG031_Wms_Server_Error_IoException, e.getMessage(), capsUrl);
 
-         } catch (final ServiceException e5) {
+         } catch (final ServiceException e) {
 
-            exception[0] = e5;
-            message[0] = NLS.bind(Messages.DBG032_Wms_Server_Error_ServiceException, e5.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG032_Wms_Server_Error_ServiceException, e.getMessage(), capsUrl);
 
-         } catch (final Exception e6) {
-            exception[0] = e6;
-            message[0] = NLS.bind(Messages.DBG033_Wms_Server_Error_OtherException, e6.getMessage(), capsUrl);
+         } catch (final Exception e) {
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG033_Wms_Server_Error_OtherException, e.getMessage(), capsUrl);
          }
       });
 
