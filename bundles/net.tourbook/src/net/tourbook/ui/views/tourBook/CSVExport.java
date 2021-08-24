@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -234,15 +234,15 @@ public class CSVExport {
 
                      export_500_Value_Time(sb, isTour, tviItem);
                      export_520_Value_Tour(sb, isTour, tviItem);
-                     export_540_Value_Motion(sb, isTour, tviItem);
-                     export_560_Value_Elevation(sb, isTour, tviItem);
+                     export_540_Value_Motion(sb, tviItem);
+                     export_560_Value_Elevation(sb, tviItem);
                      export_580_Value_Weather(sb, isTour, tviItem);
                      export_600_Value_Body(sb, isTour, tviItem);
-                     export_620_Value_Power(sb, isTour, tviItem);
-                     export_640_Value_Powertrain(sb, isTour, tviItem);
-                     export_660_Value_Training(sb, isTour, tviItem);
-                     export_680_Value_RunningDynamics(sb, isTour, tviItem);
-                     export_700_Value_Surfing(sb, isTour, tviItem);
+                     export_620_Value_Power(sb, tviItem);
+                     export_640_Value_Powertrain(sb, tviItem);
+                     export_660_Value_Training(sb, tviItem);
+                     export_680_Value_RunningDynamics(sb, tviItem);
+                     export_700_Value_Surfing(sb, tviItem);
                      export_720_Value_Device(sb, isTour, tviItem);
                      export_740_Value_Data(sb, isTour, tviItem);
                   }
@@ -306,7 +306,7 @@ public class CSVExport {
       sb.append(UI.TAB);
    }
 
-   private void export_100_Header_Time(final StringBuilder sb) throws IOException {
+   private void export_100_Header_Time(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -363,7 +363,7 @@ public class CSVExport {
 
    }
 
-   private void export_120_Header_Tour(final StringBuilder sb) throws IOException {
+   private void export_120_Header_Tour(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -391,7 +391,7 @@ public class CSVExport {
 
    }
 
-   private void export_140_Header_Motion(final StringBuilder sb) throws IOException {
+   private void export_140_Header_Motion(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -409,7 +409,7 @@ public class CSVExport {
 
    }
 
-   private void export_160_Header_Elevation(final StringBuilder sb) throws IOException {
+   private void export_160_Header_Elevation(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -429,7 +429,7 @@ public class CSVExport {
 
    }
 
-   private void export_180_Header_Weather(final StringBuilder sb) throws IOException {
+   private void export_180_Header_Weather(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -451,7 +451,7 @@ public class CSVExport {
 
    }
 
-   private void export_200_Header_Body(final StringBuilder sb) throws IOException {
+   private void export_200_Header_Body(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -473,7 +473,7 @@ public class CSVExport {
 
    }
 
-   private void export_220_Header_Power(final StringBuilder sb) throws IOException {
+   private void export_220_Header_Power(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -491,7 +491,7 @@ public class CSVExport {
 
    }
 
-   private void export_240_Header_Powertrain(final StringBuilder sb) throws IOException {
+   private void export_240_Header_Powertrain(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -523,7 +523,7 @@ public class CSVExport {
 
    }
 
-   private void export_260_Header_Training(final StringBuilder sb) throws IOException {
+   private void export_260_Header_Training(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -547,7 +547,7 @@ public class CSVExport {
 
    }
 
-   private void export_280_Header_RunningDynamics(final StringBuilder sb) throws IOException {
+   private void export_280_Header_RunningDynamics(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -595,7 +595,7 @@ public class CSVExport {
 
    }
 
-   private void export_300_Header_Surfing(final StringBuilder sb) throws IOException {
+   private void export_300_Header_Surfing(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -615,7 +615,7 @@ public class CSVExport {
 
    }
 
-   private void export_320_Header_Device(final StringBuilder sb) throws IOException {
+   private void export_320_Header_Device(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -629,7 +629,7 @@ public class CSVExport {
 
    }
 
-   private void export_340_Header_Data(final StringBuilder sb) throws IOException {
+   private void export_340_Header_Data(final StringBuilder sb) {
 
 // SET_FORMATTING_OFF
 
@@ -928,7 +928,6 @@ public class CSVExport {
    }
 
    private void export_540_Value_Motion(final StringBuilder sb,
-                                        final boolean isTour,
                                         final TVITourBookItem tviItem) {
 
 //    // Motion / Bewegung
@@ -980,7 +979,6 @@ public class CSVExport {
    }
 
    private void export_560_Value_Elevation(final StringBuilder sb,
-                                           final boolean isTour,
                                            final TVITourBookItem tviItem) {
 
 //    // Elevation
@@ -1023,8 +1021,7 @@ public class CSVExport {
 
       { // HEADER_ELEVATION_AVERAGE_CHANGE
 
-         final double dbValue = (tviItem).colAltitude_AvgChange / UI.UNIT_VALUE_ELEVATION
-               * UI.UNIT_VALUE_DISTANCE;
+         final double dbValue = UI.convertAverageElevationChangeFromMetric((tviItem).colAltitude_AvgChange);
 
          if (dbValue != 0) {
             sb.append(_nf0.format(dbValue));
@@ -1149,7 +1146,7 @@ public class CSVExport {
 
       { // HEADER_BODY_CALORIES
 
-         final double calories = tviItem.colCalories / 1000;
+         final double calories = tviItem.colCalories / 1000.0;
          if (calories != 0) {
             sb.append(_nf3.format(calories));
          }
@@ -1209,7 +1206,6 @@ public class CSVExport {
    }
 
    private void export_620_Value_Power(final StringBuilder sb,
-                                       final boolean isTour,
                                        final TVITourBookItem tviItem) {
 
 //    // Power - Leistung
@@ -1223,13 +1219,12 @@ public class CSVExport {
       csvField_Nf1(sb, tviItem.colPower_Avg);                     // HEADER_POWER_AVG
       csvField_Nf1(sb, tviItem.colPower_Max);                     // HEADER_POWER_MAX
       csvField_Nf1(sb, tviItem.colPower_Normalized);              // HEADER_POWER_NORMALIZED
-      csvField_Nf1(sb, tviItem.colPower_TotalWork / 1000_000);    // HEADER_POWER_TOTAL_WORK
+      csvField_Nf1(sb, tviItem.colPower_TotalWork / 1000_000f);   // HEADER_POWER_TOTAL_WORK
 
 // SET_FORMATTING_ON
    }
 
    private void export_640_Value_Powertrain(final StringBuilder sb,
-                                            final boolean isTour,
                                             final TVITourBookItem tviItem) {
 
 //    // Powertrain - Antrieb/Pedal
@@ -1263,7 +1258,6 @@ public class CSVExport {
    }
 
    private void export_660_Value_Training(final StringBuilder sb,
-                                          final boolean isTour,
                                           final TVITourBookItem tviItem) {
 
 //    // Training - Trainingsanalyse
@@ -1289,7 +1283,6 @@ public class CSVExport {
    }
 
    private void export_680_Value_RunningDynamics(final StringBuilder sb,
-                                                 final boolean isTour,
                                                  final TVITourBookItem tviItem) {
 
 //    // Running dynamics
@@ -1339,7 +1332,6 @@ public class CSVExport {
    }
 
    private void export_700_Value_Surfing(final StringBuilder sb,
-                                         final boolean isTour,
                                          final TVITourBookItem tviItem) {
 
 //    // Surfing

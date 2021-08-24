@@ -581,7 +581,7 @@ public class Tile extends Observable {
     */
    private Image getCheckedImage(Image image) {
 
-      // cjeck if available or disposed
+      // check if available or disposed
       if ((image == null) || image.isDisposed()) {
          image = null;
          return null;

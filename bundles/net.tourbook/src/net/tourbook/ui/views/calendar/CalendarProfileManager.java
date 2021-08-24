@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -626,8 +626,8 @@ public class CalendarProfileManager {
    //
    private static String                                       _fromXml_ActiveCalendarProfileId;
    //
-   private final static ListenerList<ICalendarProfileListener> _profileListener = new ListenerList<>();
-   private final static IPreferenceStore                       _prefStore       = TourbookPlugin.getPrefStore();
+   private static final ListenerList<ICalendarProfileListener> _profileListener = new ListenerList<>();
+   private static final IPreferenceStore                       _prefStore       = TourbookPlugin.getPrefStore();
 
    static class CalendarColor_ComboData {
 
@@ -980,10 +980,9 @@ public class CalendarProfileManager {
 
             if (data.elevationGain > 0 && data.distance > 0) {
 
-               final float totalDistance = data.distance / 1000f / UI.UNIT_VALUE_DISTANCE;
+               final float totalDistance = data.distance / UI.UNIT_VALUE_DISTANCE;
                final float totalElevationChange = (data.elevationGain + data.elevationLoss) / UI.UNIT_VALUE_ELEVATION;
-               final float elevationChangePerDistanceUnit = totalElevationChange / totalDistance;
-               final String valueText = valueFormatter.printDouble(elevationChangePerDistanceUnit);
+               final String valueText = valueFormatter.printDouble(UI.computeAverageElevationChange(totalElevationChange, totalDistance));
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE //$NON-NLS-1$
@@ -3380,8 +3379,7 @@ public class CalendarProfileManager {
       // tour formatter
       final FormatterData[] tourFormatterData = restoreProfile_FormatterData(
             xmlProfile,
-            TAG_ALL_TOUR_FORMATTER,
-            profile);
+            TAG_ALL_TOUR_FORMATTER);
       if (tourFormatterData != null) {
          profile.allTourFormatterData = tourFormatterData;
       }
@@ -3389,8 +3387,7 @@ public class CalendarProfileManager {
       // week formatter
       final FormatterData[] weekFormatterData = restoreProfile_FormatterData(
             xmlProfile,
-            TAG_ALL_WEEK_FORMATTER,
-            profile);
+            TAG_ALL_WEEK_FORMATTER);
       if (weekFormatterData != null) {
          profile.allWeekFormatterData = weekFormatterData;
       }
@@ -3399,8 +3396,7 @@ public class CalendarProfileManager {
    }
 
    private static FormatterData[] restoreProfile_FormatterData(final XMLMemento xmlProfile,
-                                                               final String tagAllFormatter,
-                                                               final CalendarProfile profile) {
+                                                               final String tagAllFormatter) {
 
       final XMLMemento xmlAllFormatter = (XMLMemento) xmlProfile.getChild(tagAllFormatter);
       if (xmlAllFormatter != null) {

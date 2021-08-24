@@ -31,8 +31,9 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
+   private static final String            _10S                = " %10s";                                          //$NON-NLS-1$
    private static final String            FORMAT_FLOAT_10_3   = "%10.3f";                                         //$NON-NLS-1$
-   private static final String            LOG_SEPARATOR       = "\t";
+   private static final String            LOG_SEPARATOR       = "\t";                                             //$NON-NLS-1$
 
    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH-mm-ss"); //$NON-NLS-1$
 
@@ -156,36 +157,36 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
             System.out.println(String.format(UI.EMPTY_STRING
 
-                  + "%s" + LOG_SEPARATOR //         date time
+                  + "%s" + LOG_SEPARATOR //         date time //$NON-NLS-1$
 
-                  + "   prod:" + LOG_SEPARATOR
-                  + " %10s" + LOG_SEPARATOR //      manufacturer
-                  + " %10s" + LOG_SEPARATOR //      product
-                  + " %10s" + LOG_SEPARATOR //      prduct name
-                  + " %10s" + LOG_SEPARATOR //      garmin product
-                  + " %10s" + LOG_SEPARATOR //      descriptor
+                  + "   prod:" + LOG_SEPARATOR //$NON-NLS-1$
+                  + _10S + LOG_SEPARATOR //      manufacturer
+                  + _10S + LOG_SEPARATOR //      product
+                  + _10S + LOG_SEPARATOR //      prduct name
+                  + _10S + LOG_SEPARATOR //      garmin product
+                  + _10S + LOG_SEPARATOR //      descriptor
 
-                  + "   ser:" + LOG_SEPARATOR
-                  + " %10s" + LOG_SEPARATOR //      serial no
-                  + " %10s" + LOG_SEPARATOR //      device index
-                  + " %10s" + LOG_SEPARATOR //      hardware version
-                  + " %10s" + LOG_SEPARATOR //      software version
+                  + "   ser:" + LOG_SEPARATOR //$NON-NLS-1$
+                  + _10S + LOG_SEPARATOR //      serial no
+                  + _10S + LOG_SEPARATOR //      device index
+                  + _10S + LOG_SEPARATOR //      hardware version
+                  + _10S + LOG_SEPARATOR //      software version
 
-                  + "   bat:" + LOG_SEPARATOR
-                  + " %10s" + LOG_SEPARATOR //      battery status
-                  + " %10s" + LOG_SEPARATOR //      battery voltage
-                  + " %10s" + LOG_SEPARATOR //      cummulated operating time
+                  + "   bat:" + LOG_SEPARATOR //$NON-NLS-1$
+                  + _10S + LOG_SEPARATOR //      battery status
+                  + _10S + LOG_SEPARATOR //      battery voltage
+                  + _10S + LOG_SEPARATOR //      cummulated operating time
 
-                  + "  ant:" + LOG_SEPARATOR
-                  + " %10s" + LOG_SEPARATOR //      source type
-                  + " %10s" + LOG_SEPARATOR //      ant network
-                  + " %10s" + LOG_SEPARATOR //      ant device type
-                  + " %10s" + LOG_SEPARATOR //      ant device nummer
-                  + " %10s" + LOG_SEPARATOR //      ant plus
-                  + " %10s" + LOG_SEPARATOR //      ant transmision type
+                  + "  ant:" + LOG_SEPARATOR //$NON-NLS-1$
+                  + _10S + LOG_SEPARATOR //      source type
+                  + _10S + LOG_SEPARATOR //      ant network
+                  + _10S + LOG_SEPARATOR //      ant device type
+                  + _10S + LOG_SEPARATOR //      ant device nummer
+                  + _10S + LOG_SEPARATOR //      ant plus
+                  + _10S + LOG_SEPARATOR //      ant transmision type
 
-                  + "   src:"
-                  + " %10s" + LOG_SEPARATOR //      sensorPosition
+                  + "   src:" //$NON-NLS-1$
+                  + _10S + LOG_SEPARATOR //      sensorPosition
 
                   ,
 
@@ -232,7 +233,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          final boolean hasStrideSensor = hasStrideSensor(deviceType);
 
          /*
-          * This event occures several times and can set a true to false, therefore only true is
+          * This event occurs several times and can set a true to false, therefore only true is
           * set, false is the default.
           */
 
@@ -300,9 +301,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
    private String removeNull(final String value) {
 
-      return value == null
-            ? UI.EMPTY_STRING
-            : value.toString();
+      return value == null ? UI.EMPTY_STRING : value;
    }
 
    private String removeNull_3(final Float value) {
