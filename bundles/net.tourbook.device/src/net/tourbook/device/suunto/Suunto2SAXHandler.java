@@ -78,7 +78,9 @@ public class Suunto2SAXHandler extends DefaultHandler {
    private static final String TAG_ROOT_SAMPLES = "Samples"; //$NON-NLS-1$
 
    // header tags
-   private static final String TAG_ENERGY = "Energy"; //$NON-NLS-1$
+   private static final String TAG_BATTERY_CHARGE          = "BatteryCharge";        //$NON-NLS-1$
+   private static final String TAG_BATTERY_CHARGE_AT_START = "BatteryChargeAtStart"; //$NON-NLS-1$
+   private static final String TAG_ENERGY                  = "Energy";               //$NON-NLS-1$
 
    // device tags
    private static final String TAG_SW = "SW"; //$NON-NLS-1$
@@ -140,6 +142,8 @@ public class Suunto2SAXHandler extends DefaultHandler {
    private boolean             _isInCadence;
    private boolean             _isInDistance;
    private boolean             _isInEnergy;
+   private boolean             _isInBatteryPercentageStart;
+   private boolean             _isInBatteryPercentage;
    private boolean             _isInEvents;
    private boolean             _isInHR;
    private boolean             _isInLatitude;
@@ -153,6 +157,8 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
    private boolean             _isInTemperature;
    private int                 _tourCalories;
+   private short               _tourBatteryPercentageStart;
+   private short               _tourBatteryPercentageEnd;
 
    private String              _tourSW;
 
@@ -172,6 +178,8 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
       if (_isInSampleType //
             || _isInAltitude
+            || _isInBatteryPercentage
+            || _isInBatteryPercentageStart
             || _isInCadence
             || _isInDistance
             || _isInEnergy
@@ -265,7 +273,17 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
    private void endElement_InHeader(final String name) {
 
-      if (name.equals(TAG_ENERGY)) {
+      if (name.equals(TAG_BATTERY_CHARGE)) {
+
+         _isInBatteryPercentage = false;
+
+         _tourBatteryPercentageEnd = (short) (Util.parseFloat(_characters.toString()) * 100);
+      } else if (name.equals(TAG_BATTERY_CHARGE_AT_START)) {
+
+         _isInBatteryPercentageStart = false;
+
+         _tourBatteryPercentageStart = (short) (Util.parseFloat(_characters.toString()) * 100);
+      } else if (name.equals(TAG_ENERGY)) {
 
          _isInEnergy = false;
 
@@ -487,6 +505,9 @@ public class Suunto2SAXHandler extends DefaultHandler {
       tourData.setImportFilePath(_importFilePath);
 
       tourData.setCalories(_tourCalories);
+
+      tourData.setBattery_Percentage_Start(_tourBatteryPercentageStart);
+      tourData.setBattery_Percentage_End(_tourBatteryPercentageEnd);
 
       tourData.setDeviceId(_device.deviceId);
       tourData.setDeviceName(_device.visibleName);
@@ -759,7 +780,15 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
       boolean isData = false;
 
-      if (name.equals(TAG_ENERGY)) {
+      if (name.equals(TAG_BATTERY_CHARGE)) {
+
+         isData = true;
+         _isInBatteryPercentage = true;
+      } else if (name.equals(TAG_BATTERY_CHARGE_AT_START)) {
+
+         isData = true;
+         _isInBatteryPercentageStart = true;
+      } else if (name.equals(TAG_ENERGY)) {
 
          isData = true;
          _isInEnergy = true;

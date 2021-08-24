@@ -111,9 +111,9 @@ public abstract class ChartDataSerie {
    /*
     * Bar colors are mainly used for bar graphs
     */
-   private RGB _rgbBar_Gradient_Bright[] = new RGB[] { DEFAULT_GRAPH_RGB };
-   private RGB _rgbBar_Gradient_Dark[]   = new RGB[] { DEFAULT_GRAPH_RGB };
-   private RGB _rgbBar_Line[]            = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB[] _rgbBar_Gradient_Bright = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB[] _rgbBar_Gradient_Dark   = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB[] _rgbBar_Line            = new RGB[] { DEFAULT_GRAPH_RGB };
 
    /*
     * Graph colors are mainly used for line graphs, graph title or units

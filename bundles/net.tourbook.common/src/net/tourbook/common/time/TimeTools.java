@@ -333,7 +333,7 @@ public class TimeTools {
       return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
    }
 
-   public static ZonedDateTime determineSunRiseTimes(final ZonedDateTime zonedDateTime,
+   public static ZonedDateTime determineSunriseTimes(final ZonedDateTime zonedDateTime,
                                                      final double latitude,
                                                      final double longitude) {
 
@@ -455,7 +455,7 @@ public class TimeTools {
       final ZonedDateTime zdt = ZonedDateTime.now();
       final int tzOffset = zdt.getOffset().getTotalSeconds();
 
-      final Period period = new Period(tzOffset * 1000);
+      final Period period = new Period(tzOffset * 1000L);
 
       return period.toString(DURATION_FORMATTER);
    }
