@@ -759,14 +759,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       rawDataManager.setImportId();
       rawDataManager.setImportCanceled(false);
 
-      /*
-       * Cleanup everything which could cause caching problems
-       */
-//      TourManager.getInstance().clearTourDataCache();
-
-      // ensure the tour editor do not show anything
-//      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-
       final int numAllTourIDs = allTourIDs.size();
 
       /*
@@ -786,15 +778,21 @@ public class DialogReimportTours extends TitleAreaDialog {
             final long startTime = System.currentTimeMillis();
             long lastUpdateTime = startTime;
 
-            final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+            ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
 
                   .setIsReimport(true)
-                  .setIsRunningConcurrently(true)
+                  .setIsRunningConcurrently(true);
 
-                  .setIsLog_DEFAULT(false)
-                  .setIsLog_INFO(false)
-                  .setIsLog_OK(false) //
-            ;
+            if (allTourIDs.size() > 1) {
+
+               // logging is a performance hog of about additional 30 %
+
+               processDeviceDataStates = processDeviceDataStates
+
+                     .setIsLog_DEFAULT(false)
+                     .setIsLog_INFO(false)
+                     .setIsLog_OK(false);
+            }
 
             final AtomicInteger numWorkedTours = new AtomicInteger();
 
