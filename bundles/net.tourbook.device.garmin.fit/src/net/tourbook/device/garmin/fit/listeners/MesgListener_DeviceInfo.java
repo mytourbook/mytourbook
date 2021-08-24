@@ -31,7 +31,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
-   private static final String            _10S                = " %10s";                                          //$NON-NLS-1$
+   private static final String            FORMAT_STRING_10    = " %10s";                                          //$NON-NLS-1$
    private static final String            FORMAT_FLOAT_10_3   = "%10.3f";                                         //$NON-NLS-1$
    private static final String            LOG_SEPARATOR       = "\t";                                             //$NON-NLS-1$
 
@@ -160,33 +160,33 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                   + "%s" + LOG_SEPARATOR //         date time //$NON-NLS-1$
 
                   + "   prod:" + LOG_SEPARATOR //$NON-NLS-1$
-                  + _10S + LOG_SEPARATOR //      manufacturer
-                  + _10S + LOG_SEPARATOR //      product
-                  + _10S + LOG_SEPARATOR //      prduct name
-                  + _10S + LOG_SEPARATOR //      garmin product
-                  + _10S + LOG_SEPARATOR //      descriptor
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      manufacturer
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      product
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      prduct name
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      garmin product
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      descriptor
 
                   + "   ser:" + LOG_SEPARATOR //$NON-NLS-1$
-                  + _10S + LOG_SEPARATOR //      serial no
-                  + _10S + LOG_SEPARATOR //      device index
-                  + _10S + LOG_SEPARATOR //      hardware version
-                  + _10S + LOG_SEPARATOR //      software version
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      serial no
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      device index
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      hardware version
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      software version
 
                   + "   bat:" + LOG_SEPARATOR //$NON-NLS-1$
-                  + _10S + LOG_SEPARATOR //      battery status
-                  + _10S + LOG_SEPARATOR //      battery voltage
-                  + _10S + LOG_SEPARATOR //      cummulated operating time
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      battery status
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      battery voltage
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      cummulated operating time
 
                   + "  ant:" + LOG_SEPARATOR //$NON-NLS-1$
-                  + _10S + LOG_SEPARATOR //      source type
-                  + _10S + LOG_SEPARATOR //      ant network
-                  + _10S + LOG_SEPARATOR //      ant device type
-                  + _10S + LOG_SEPARATOR //      ant device nummer
-                  + _10S + LOG_SEPARATOR //      ant plus
-                  + _10S + LOG_SEPARATOR //      ant transmision type
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      source type
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      ant network
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      ant device type
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      ant device nummer
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      ant plus
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      ant transmision type
 
                   + "   src:" //$NON-NLS-1$
-                  + _10S + LOG_SEPARATOR //      sensorPosition
+                  + FORMAT_STRING_10 + LOG_SEPARATOR //      sensorPosition
 
                   ,
 
