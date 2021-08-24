@@ -239,6 +239,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
       tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
 
+      //todo fb
+
 //      final RGB defaultColor_Light  = _colorDefaultMarker_Light.getColorValue();
 //      final RGB defaultColor_Dark   = _colorDefaultMarker_Dark.getColorValue();
 //      final RGB hiddenColor_Light   = _colorHiddenMarker_Light.getColorValue();

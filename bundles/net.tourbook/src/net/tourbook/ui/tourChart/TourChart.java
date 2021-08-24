@@ -19,6 +19,7 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -3228,7 +3229,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return _tourData;
    }
 
-   public ArrayList<TourSegment> getTourSegments() {
+   public List<TourSegment> getTourSegments() {
 
       final IViewPart viewPart = Util.getView(TourSegmenterView.ID);
 
@@ -3872,7 +3873,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       int tourSegmentHash = Integer.MIN_VALUE;
       if (tourSegments != null) {
-         tourSegmentHash = tourSegments.hashCode();
+         tourSegmentHash = Arrays.hashCode(tourSegments);
       }
 
       if (tourSegments == null || tourSegmentHash != _oldTourSegmentsHash) {
