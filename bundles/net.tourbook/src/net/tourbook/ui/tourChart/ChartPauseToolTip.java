@@ -25,7 +25,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -46,6 +45,9 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
    //todo fb display a gray area hwen hovering just like the markers
    //Bug when the pauses layer is hidden, the pause tooltip is not displayed anymore
+
+   private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
+   private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;
 
    /**
     * Visual position for the pause tooltip, they must correspond to the position id
@@ -176,13 +178,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         UI.createLabel(container, "Start time");//GRAPH_LABEL_TIME); //$NON-NLS-1$
+         UI.createLabel(container, GRAPH_LABEL_STARTTIME);
          createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_Start(),
                _hoveredLabel.getTimeZoneId());
 
-         UI.createLabel(container, "End time");//GRAPH_LABEL_TIME); //$NON-NLS-1$
+         UI.createLabel(container, GRAPH_LABEL_ENDTIME);
          createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_End(),
@@ -294,19 +296,19 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       final int hoverSize = _hoveredLabel.devHoverSize;
 
-      Rectangle rectHovered = new Rectangle(_hoveredLabel.devXPause, _hoveredLabel.devYPause, 1, 1);
+      Rectangle hoveredRectangle = new Rectangle(_hoveredLabel.devXPause, _hoveredLabel.devYPause, 1, 1);
 
-      int devMarkerPointSize = 1;
-      if (devMarkerPointSize < 1) {
-         devMarkerPointSize = 1;
+      int devPausePointSize = 1;
+      if (devPausePointSize < 1) {
+         devPausePointSize = 1;
       }
 
-      final int devMarkerX = _hoveredLabel.devXPause - hoverSize;
-      final int devMarkerY = _hoveredLabel.devYPause - hoverSize;
-      final int devMarkerSize = devMarkerPointSize + 2 * hoverSize;
+      final int devPauseX = _hoveredLabel.devXPause - hoverSize;
+      final int devPauseY = _hoveredLabel.devYPause - hoverSize;
+      final int devPauseSize = devPausePointSize + 2 * hoverSize;
 
-      final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
-      rectHovered = rectHovered.union(rectMarker);
+      final Rectangle pauseRectangle = new Rectangle(devPauseX, devPauseY, devPauseSize, devPauseSize);
+      hoveredRectangle = hoveredRectangle.union(pauseRectangle);
 
       // add label rectangle
       if (_hoveredLabel.paintedLabel != null) {
@@ -323,11 +325,11 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
             final Rectangle rectLabel = new Rectangle(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
 
-            rectHovered = rectHovered.union(rectLabel);
+            hoveredRectangle = hoveredRectangle.union(rectLabel);
          }
       }
 
-      return rectHovered;
+      return hoveredRectangle;
    }
 
    @Override
@@ -340,8 +342,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    }
 
    /**
-    * By default the tooltip is located to the left side of the tour marker point, when not visible
-    * it is displayed to the right side of the tour marker point.
+    * By default the tooltip is located to the left side of the tour pause point, when not visible
+    * it is displayed to the right side of the tour pause point.
     */
    @Override
    public Point getToolTipLocation(final Point tipSize) {
@@ -422,13 +424,14 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
          ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
          ttPosY = devHoveredY + devHoveredHeight + 1;
 
-         if (_hoveredLabel.visualPosition == TourMarker.LABEL_POS_VERTICAL_TOP_CHART) {
-
-            /*
-             * y position is wrong, adjust it but this do NOT cover all possible positions, but some
-             */
-            ttPosY -= devHoverSize;
-         }
+         //todo fb
+//         if (_hoveredLabel.visualPosition == TourMarker.LABEL_POS_VERTICAL_TOP_CHART) {
+//
+//            /*
+//             * y position is wrong, adjust it but this do NOT cover all possible positions, but some
+//             */
+//            ttPosY -= devHoverSize;
+//         }
 
          break;
       }
@@ -486,7 +489,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    }
 
    @Override
-   protected void onDispose() {}
+   protected void onDispose() {/* Nothing to do */}
 
    @Override
    protected void onMouseExitToolTip(final MouseEvent mouseEvent) {
@@ -494,8 +497,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       /*
        * When exit tooltip, hide hovered label
        */
-      final ChartLayerPause markerPause = _tourChart.getLayerTourPause();
-      markerPause.setTooltipLabel(null);
+      final ChartLayerPause pauseLayer = _tourChart.getLayerTourPause();
+      pauseLayer.setTooltipLabel(null);
    }
 
    @Override
@@ -504,8 +507,8 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       /*
        * When in tooltip, the hovered label state is not displayed, keep it displayed
        */
-      //  final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
-      //markerLayer.setTooltipLabel(_hoveredLabel);
+      final ChartLayerPause pauseLayer = _tourChart.getLayerTourPause();
+      pauseLayer.setTooltipLabel(_hoveredLabel);
    }
 
    private void onPaintShellContainer(final PaintEvent paintEvent) {

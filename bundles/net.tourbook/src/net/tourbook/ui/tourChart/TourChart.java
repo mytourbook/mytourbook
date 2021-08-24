@@ -2086,7 +2086,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          // setup pause layer, a layer is created only once
 
-         _layerPause = new ChartLayerPause();
+         _layerPause = new ChartLayerPause(this);
 
          // set overlay painter
          addChartOverlay(_layerPause);

@@ -56,8 +56,9 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private TourChart        _tourChart;
 
-   public ChartLayerPause() {
-      //Nothing to do
+   public ChartLayerPause(final TourChart tourChart) {
+
+      _tourChart = tourChart;
    }
 
    /**
@@ -131,16 +132,13 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          return;
       }
 
-      if (isSelected) {
-         gc.setAlpha(0x60);
-      } else {
-         gc.setAlpha(0x30);
-      }
+      gc.setAlpha(isSelected ? 0x60 : 0x30);
 
       Color backgroundColor = colorHidden;
       if (isSelected) {
 
          backgroundColor = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
+
       } else if (chartLabelPause.isVisible) {
 
          backgroundColor = colorDefault;
