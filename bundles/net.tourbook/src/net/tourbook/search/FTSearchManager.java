@@ -1059,6 +1059,7 @@ public class FTSearchManager {
          return suggestions;
 
       } catch (final Exception e) {
+
          return _emptyProposal;
       }
    }
@@ -1369,7 +1370,7 @@ public class FTSearchManager {
       queryResult.allQueryFields = setWithAllQueryFields.toArray(String[]::new);
       queryResult.query = allQueryBuilder.build();
 
-      TourLogManager.log_INFO("Search Tours: " + queryResult.query);
+      TourLogManager.log_INFO(Messages.Search_Manager_Log_SearchingToursWith + queryResult.query);
 
       return queryResult;
    }
@@ -1789,7 +1790,7 @@ public class FTSearchManager {
                   public void run(final IProgressMonitor monitor)
                         throws InvocationTargetException, InterruptedException {
 
-                     monitor.beginTask("Updating fulltext index", numAllTourIDs);
+                     monitor.beginTask(Messages.Search_Manager_Log_UpdatedFTIndex_Title, numAllTourIDs);
 
                      try {
 
@@ -1865,7 +1866,7 @@ public class FTSearchManager {
       final long end = System.nanoTime();
       final float timeDiff = (end - start) / 1_000_000_000.0f;
 
-      TourLogManager.subLog_DEFAULT(String.format("Updated fulltext index in %1.3f s for %d tours",
+      TourLogManager.subLog_DEFAULT(String.format(Messages.Search_Manager_Log_UpdatedFTIndex_Final,
 
             timeDiff,
             numAllTourIDs));
@@ -1903,7 +1904,7 @@ public class FTSearchManager {
 
                lastUpdateTime = now;
 
-               monitor.subTask(String.format("Loading tours %d / %d",
+               monitor.subTask(String.format(Messages.Search_Manager_SubTask_LoadingTours,
                      numWorked[0],
                      numTourIDs));
             }
@@ -1965,7 +1966,7 @@ public class FTSearchManager {
       }
 
       if (monitor != null) {
-         monitor.subTask("Updating index...");
+         monitor.subTask(Messages.Search_Manager_SubTask_UpdatingIndex);
       }
 
       indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
@@ -2004,17 +2005,17 @@ public class FTSearchManager {
                                                     final IProgressMonitor monitor) {
 
       if (monitor != null) {
-         monitor.subTask("Closing fulltext index store: Tours");
+         monitor.subTask(Messages.Search_Manager_SubTask_ClosingFTIndexStore_Tours);
       }
       closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
 
       if (monitor != null) {
-         monitor.subTask("Closing fulltext index store: Marker");
+         monitor.subTask(Messages.Search_Manager_SubTask_ClosingFTIndexStore_Markers);
       }
       closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
 
       if (monitor != null) {
-         monitor.subTask("Closing fulltext index store: Waypoints");
+         monitor.subTask(Messages.Search_Manager_SubTask_ClosingFTIndexStore_Waypoints);
       }
       closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
    }

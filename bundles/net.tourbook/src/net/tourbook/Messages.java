@@ -1796,6 +1796,14 @@ public class Messages extends NLS {
    public static String Search_Manager_CreateFTIndex;
    public static String Search_Manager_Log_DeletingLuceneRootFolder;
    public static String Search_Manager_Log_LuceneRootFolderIsDeleted;
+   public static String Search_Manager_Log_SearchingToursWith;
+   public static String Search_Manager_Log_UpdatedFTIndex_Final;
+   public static String Search_Manager_Log_UpdatedFTIndex_Title;
+   public static String Search_Manager_SubTask_ClosingFTIndexStore_Markers;
+   public static String Search_Manager_SubTask_ClosingFTIndexStore_Tours;
+   public static String Search_Manager_SubTask_ClosingFTIndexStore_Waypoints;
+   public static String Search_Manager_SubTask_LoadingTours;
+   public static String Search_Manager_SubTask_UpdatingIndex;
 
    public static String Search_View_Action_ExternalSearchUI;
    public static String Search_View_Action_ExternalSearchUI_Tooltip;
@@ -2552,7 +2560,7 @@ public class Messages extends NLS {
    public static String Tour_Log_Action_Clear_Tooltip;
    public static String Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;
    public static String Tour_Log_Info_TourLogWasCopied;
-   
+
    public static String TourManager_Dialog_OutOfSyncError_Message;
    public static String TourManager_Dialog_OutOfSyncError_Title;
 
