@@ -89,7 +89,7 @@ public class TourType implements Comparable<Object> {
    private long             _createId                             = 0;
 
    /**
-    * default constructor used in ejb
+    * Default constructor used in ejb
     */
    public TourType() {}
 

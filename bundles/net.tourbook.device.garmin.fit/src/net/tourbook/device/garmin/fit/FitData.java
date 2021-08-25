@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -36,14 +35,11 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Collects all data from a fit file
@@ -100,15 +96,19 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
+   private ProcessDeviceDataStates       _processDeviceDataStates;
+
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
-                  final Map<Long, TourData> newlyImportedTours) {
+                  final Map<Long, TourData> newlyImportedTours,
+                  final ProcessDeviceDataStates processDeviceDataStates) {
 
       _fitDataReader = fitDataReader;
       _importFilePathName = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+      _processDeviceDataStates = processDeviceDataStates;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
@@ -118,63 +118,41 @@ public class FitData {
    }
 
    /**
+    * Creates a tour type when it do not yet exist for the provided label
+    *
     * @param tourData
     * @param parsedTourTypeLabel
-    * @return <code>true</code> when a new {@link TourType} is created
     */
-   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
-
-      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
-      TourType tourType = null;
-      TourType newSavedTourType = null;
+   private void applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
 
       // do not add tours when label string is blank
       if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
 
+         TourType existingTourType = null;
+
          // find tour type in existing tour types
-         for (final TourType mapTourType : tourTypeMap) {
-            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
-               tourType = mapTourType;
+         for (final TourType availableTourType : TourDatabase.getAllTourTypes()) {
+
+            if (parsedTourTypeLabel.equalsIgnoreCase(availableTourType.getName())) {
+
+               existingTourType = availableTourType;
                break;
             }
          }
 
-         if (tourType == null) {
+         TourType appliedTourType = existingTourType;
+
+         if (existingTourType == null) {
 
             // create new tour type
 
-            final TourType newTourType = new TourType(parsedTourTypeLabel);
+            appliedTourType = TourDatabase.createTourType(parsedTourTypeLabel);
 
-            final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(newTourType,
-                  Long.toString(newTourType.getTypeId()),
-                  newTourType.getName());
-
-            newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
-            newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
-
-            newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
-            newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
-
-            // save new entity
-            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-            if (newSavedTourType != null) {
-
-               tourType = newSavedTourType;
-
-               TourDatabase.clearTourTypes();
-               TourManager.getInstance().clearTourDataCache();
-
-               // Update Tour Type (Filter) list UI
-               Display.getDefault().syncExec(() ->
-               // fire modify event
-               TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
-            }
+            _processDeviceDataStates.isFire_NewTourType.set(true);
          }
 
-         tourData.setTourType(tourType);
+         tourData.setTourType(appliedTourType);
       }
-
-      return newSavedTourType != null;
    }
 
    public void finalizeTour() {

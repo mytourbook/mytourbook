@@ -846,6 +846,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final String percentValue = String.format(NUMBER_FORMAT_1F, (float) numWorkedValue / numAllTourIDs * 100.0);
 
+                  // "{0} / {1} - {2} % - {3} Δ"
                   monitor.subTask(NLS.bind(SUB_TASK_REIMPORT_PROGRESS,
                         new Object[] {
                               numWorkedValue,

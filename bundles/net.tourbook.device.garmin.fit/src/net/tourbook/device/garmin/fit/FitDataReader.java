@@ -743,7 +743,8 @@ public class FitDataReader extends TourbookDevice {
                this,
                importFilePath,
                alreadyImportedTours,
-               newlyImportedTours);
+               newlyImportedTours,
+               processDeviceDataStates);
 
          // setup all fit listeners
          fitBroadcaster.addListener(new MesgListener_Activity(fitData));

@@ -77,6 +77,7 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourEventId;
@@ -1276,6 +1277,127 @@ public class TourDatabase {
    }
 
    /**
+    * Add new tour tags and save them in the database
+    *
+    * @param allNewTourTags
+    * @return Returns all newly created tour tags
+    */
+   public static synchronized ArrayList<TourTag> createTourTags(final HashMap<String, Object> allNewTourTags) {
+
+      /*
+       * Check tags if they are still unavailable
+       */
+      clearTourTags();
+      final HashMap<Long, TourTag> allAvailableTourTags = getAllTourTags();
+
+      final ArrayList<TourTag> allNewOrOldTourTags = new ArrayList<>();
+      final ArrayList<String> allMissingTourTagLabel = new ArrayList<>();
+
+      for (final String tourTagLabel : allNewTourTags.keySet()) {
+
+         boolean isLabelFound = false;
+
+         for (final TourTag availableTourTag : allAvailableTourTags.values()) {
+
+            if (availableTourTag.getTagName().equalsIgnoreCase(tourTagLabel)) {
+
+               // tag label do exist
+
+               allNewOrOldTourTags.add(availableTourTag);
+               isLabelFound = true;
+
+               break;
+            }
+         }
+
+         if (isLabelFound == false) {
+
+            // tag label do not exist
+
+            allMissingTourTagLabel.add(tourTagLabel);
+         }
+      }
+
+      /*
+       * Create missing tour tags
+       */
+      boolean isNewTagCreated = false;
+      for (final String tourTagLabel : allMissingTourTagLabel) {
+
+         // create a new tag
+         final TourTag tourTag = new TourTag(tourTagLabel);
+         tourTag.setRoot(true);
+
+         // persist tag
+         final TourTag savedTag = saveEntity(
+               tourTag,
+               ENTITY_IS_NOT_SAVED,
+               TourTag.class);
+
+         if (savedTag != null) {
+
+            allNewOrOldTourTags.add(savedTag);
+
+            isNewTagCreated = true;
+         }
+      }
+
+      if (isNewTagCreated) {
+
+         // force to reload tour tag list
+
+         clearTourTags();
+      }
+
+      return allNewOrOldTourTags;
+   }
+
+   /**
+    * Create new tour type and save it in the database
+    *
+    * @param tourTypeLabel
+    * @return Returns the newly saved tour type
+    */
+   public static synchronized TourType createTourType(final String tourTypeLabel) {
+
+      /*
+       * Check if tour type is still unavailable
+       */
+      clearTourTypes();
+      for (final TourType availableTourType : getAllTourTypes()) {
+
+         if (tourTypeLabel.equalsIgnoreCase(availableTourType.getName())) {
+
+            return availableTourType;
+         }
+      }
+
+      // tour type is for sure not available -> create it now
+
+      final TourType newTourType = new TourType(tourTypeLabel);
+
+      final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(
+            newTourType,
+            Long.toString(newTourType.getTypeId()),
+            newTourType.getName());
+
+      newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
+      newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
+      newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
+      newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
+
+      // save new entity
+      final TourType savedTourType = saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
+      if (savedTourType != null) {
+
+         clearTourTypes();
+         TourManager.getInstance().clearTourDataCache();
+      }
+
+      return savedTourType;
+   }
+
+   /**
     * Remove a tour from the database
     *
     * @param tourId
@@ -1660,9 +1782,7 @@ public class TourDatabase {
    }
 
    /**
-    * This method is synchronized to conform to FindBugs
-    *
-    * @return Returns all tour tags which are stored in the database, the hash key is the tag id
+    * @return Returns all tour tags which are stored in the database, the key is the tag id
     */
    public static HashMap<Long, TourTag> getAllTourTags() {
 
@@ -8408,7 +8528,7 @@ public class TourDatabase {
                final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
                splashManager.setMessage(NLS.bind(
-                     
+
                      // Data update 43: Converting lat/lon \u2192 E6 - {0} of {1} - {2} % - {3} \u0394
                      Messages.Tour_Database_PostUpdate_043_LatLonE6,
 

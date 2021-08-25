@@ -1805,7 +1805,9 @@ public class RawDataManager {
          allImportFilePaths.add(importFile);
       }
 
-      // resort files by extension priority
+      /*
+       * Resort files by extension priority
+       */
       Collections.sort(allImportFilePaths, (importFilePath1, importFilePath2) -> {
 
          final String file1Extension = importFilePath1.filePath.getFileExtension();
