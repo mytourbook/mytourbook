@@ -1380,9 +1380,9 @@ public class RawDataManager {
     *           When <code>true</code>, the newly imported tours are displayed in the import view,
     *           otherwise they are imported into {@link #_multipleTours_FromLastImportFile} but
     *           not displayed in the import view.
-    * @param processDeviceDataStates
     * @param allImportedTourDataFromOneFile
     *           Contains all tours which are imported from <code>importFile</code>
+    * @param processDeviceDataStates
     * @return Returns <code>true</code> when the import was successfully
     */
    public boolean importTour(final File importFile,
@@ -1390,8 +1390,8 @@ public class RawDataManager {
                              final FileCollisionBehavior fileCollision,
                              final boolean isBuildNewFileNames,
                              final boolean isTourDisplayedInImportView,
-                             final ProcessDeviceDataStates processDeviceDataStates,
-                             final Map<Long, TourData> allImportedTourDataFromOneFile) {
+                             final Map<Long, TourData> allImportedTourDataFromOneFile,
+                             final ProcessDeviceDataStates processDeviceDataStates) {
 
       final String importFilePathName = importFile.getAbsolutePath();
       final Display display = Display.getDefault();
@@ -1886,8 +1886,8 @@ public class RawDataManager {
                      null, //                         fileCollision
                      false, //                        isBuildNewFileNames
                      true, //                         isTourDisplayedInImportView
-                     processDeviceDataStates, //
-                     allImportedToursFromOneFile //
+                     allImportedToursFromOneFile,
+                     processDeviceDataStates //
                )) {
 
                   numImportedTours++;
@@ -1974,8 +1974,6 @@ public class RawDataManager {
     *           The tour to re-import
     * @param tourValueTypes
     *           A list of tour values to be re-imported
-    * @param isSkipToursWithFileNotFound
-    *           Indicates whether to re-import or not a tour for which the file is not found
     * @param reImportStatus
     * @param processDeviceDataStates
     * @return Returns <code>true</code> when <code>oldTourData</code> was reimported, otherwise
@@ -1983,7 +1981,6 @@ public class RawDataManager {
     */
    public boolean reimportTour(final TourData oldTourData,
                                final List<TourValueType> tourValueTypes,
-                               final boolean isSkipToursWithFileNotFound,
                                final ReImportStatus reImportStatus,
                                final ProcessDeviceDataStates processDeviceDataStates) {
 
@@ -2008,7 +2005,7 @@ public class RawDataManager {
 
       final File currentTourImportFile = reimportTour_10_GetImportFile(
             oldTourData,
-            isSkipToursWithFileNotFound,
+            processDeviceDataStates,
             reImportStatus);
 
       if (currentTourImportFile == null) {
@@ -2059,13 +2056,13 @@ public class RawDataManager {
 
    /**
     * @param tourData
-    * @param isSkipToursWithFileNotFound
+    * @param processDeviceDataStates
     *           Indicates whether to re-import or not a tour for which the file is not found
     * @param reImportStatus
     * @return Returns <code>null</code> when the user has canceled the file dialog.
     */
    private File reimportTour_10_GetImportFile(final TourData tourData,
-                                              final boolean isSkipToursWithFileNotFound,
+                                              final ProcessDeviceDataStates processDeviceDataStates,
                                               final ReImportStatus reImportStatus) {
 
       final String[] reimportFilePathName = { null };
@@ -2080,7 +2077,7 @@ public class RawDataManager {
          // import filepath is not available
 
          // The user doesn't want to look for a new file path for the current tour
-         if (isSkipToursWithFileNotFound) {
+         if (processDeviceDataStates.isSkipToursWithFileNotFound) {
 
             reImportStatus.isCanceled_Auto_ImportFilePathIsEmpty = true;
 
@@ -2104,7 +2101,7 @@ public class RawDataManager {
 
          reimportTour_12_RequestFileFromUser(
                tourData,
-               isSkipToursWithFileNotFound,
+               processDeviceDataStates,
                reImportStatus,
                savedImportFilePathName,
                reimportFilePathName);
@@ -2133,7 +2130,7 @@ public class RawDataManager {
    }
 
    private void reimportTour_12_RequestFileFromUser(final TourData tourData,
-                                                    final boolean isSkipToursWithFileNotFound,
+                                                    final ProcessDeviceDataStates processDeviceDataStates,
                                                     final ReImportStatus reImportStatus,
                                                     final String savedImportFilePathName,
                                                     final String[] outReimportFilePathName) {
@@ -2196,7 +2193,7 @@ public class RawDataManager {
                   if (outReimportFilePathName[0] == null) {
 
                      //The user doesn't want to look for a new file path for the current tour.
-                     if (isSkipToursWithFileNotFound) {
+                     if (processDeviceDataStates.isSkipToursWithFileNotFound) {
 
                         reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
 
@@ -2303,8 +2300,8 @@ public class RawDataManager {
             null, //                         fileCollision
             false, //                        isBuildNewFileNames
             false, //                        isTourDisplayedInImportView
-            processDeviceDataStates,
-            allImportedToursFromOneFile //
+            allImportedToursFromOneFile,
+            processDeviceDataStates //
       )) {
 
          /*

@@ -18,9 +18,17 @@ package net.tourbook.importdata;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Different IN and OUT states for the import/re-import process
+ * Various IN and OUT states for the import/re-import process
  */
 public class ProcessDeviceDataStates {
+
+   /**
+    * IN state:
+    * <p>
+    * When <code>true</code> then tours will be skipped when the import file is not defined or not
+    * available
+    */
+   public boolean       isSkipToursWithFileNotFound;
 
    /**
     * IN state:
@@ -128,6 +136,13 @@ public class ProcessDeviceDataStates {
    public ProcessDeviceDataStates setIsRunningConcurrently(final boolean isRunningConcurrently) {
 
       this.isRunningConcurrently = isRunningConcurrently;
+
+      return this;
+   }
+
+   public ProcessDeviceDataStates setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
+
+      this.isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
 
       return this;
    }

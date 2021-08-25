@@ -155,8 +155,8 @@ public class DataTransferWizard extends Wizard {
                fileCollision, //                                           fileCollision
                _importDevice.isBuildNewFileNames, //                       isBuildNewFileNames
                true, //                                                    isTourDisplayedInImportView
-               processDeviceDataStates, //
-               new HashMap<>() //
+               new HashMap<>(),
+               processDeviceDataStates //
          );
       }
 

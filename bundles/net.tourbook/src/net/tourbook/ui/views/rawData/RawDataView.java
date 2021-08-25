@@ -4525,8 +4525,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   null, //                         fileCollision
                   false, //                        isBuildNewFileNames
                   true, //                         isTourDisplayedInImportView
-                  processDeviceDataStates, //
-                  new HashMap<>() //
+                  new HashMap<>(),
+                  processDeviceDataStates //
             );
 
             if (isImported) {

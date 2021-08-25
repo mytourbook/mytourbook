@@ -398,6 +398,7 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Checkbox_EntireTour;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip;
+   public static String        Dialog_ReimportTours_Checkbox_LogDetails;
    public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
    public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
    public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;

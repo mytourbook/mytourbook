@@ -77,6 +77,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
+   private static final String SUB_TASK_REIMPORT_PROGRESS                   = "{0} / {1} - {2} % - {3} Δ";                    //$NON-NLS-1$
+
    private static final String STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
    private static final String STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
 
@@ -103,6 +105,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    private static final String STATE_IS_IMPORT_TIME_SLICE__TRAINING         = "STATE_IS_IMPORT_TIME_SLICE__TRAINING";         //$NON-NLS-1$
    private static final String STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES     = "STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES";     //$NON-NLS-1$
 
+   private static final String STATE_IS_LOG_DETAILS                         = "STATE_IS_LOG_DETAILS";                         //$NON-NLS-1$
    private static final String STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
 
    private static final String NUMBER_FORMAT_1F                             = "%.1f";                                         //$NON-NLS-1$
@@ -160,12 +163,14 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_TimeSlice_PowerAndPulse;
    private Button    _chkData_TimeSlice_PowerAndSpeed;
    private Button    _chkData_TimeSlice_RunningDynamics;
-   private Button    _chkSkip_Tours_With_ImportFile_NotFound;
    private Button    _chkData_TimeSlice_Swimming;
    private Button    _chkData_TimeSlice_Temperature;
    private Button    _chkData_TimeSlice_Training;
    private Button    _chkData_Tour_Markers;
    private Button    _chkData_TimeSlice_TourTimerPauses;
+
+   private Button    _chkLogDetails;
+   private Button    _chkSkipTours_With_ImportFile_NotFound;
 
    private Button    _rdoData_EntireTour;
    private Button    _rdoData_PartOfATour;
@@ -268,14 +273,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       {
          createUI_10_Tours(container);
          createUI_20_Data(container);
-         {
-            /*
-             * Checkbox: Skip tours for which the import file is not found
-             */
-            _chkSkip_Tours_With_ImportFile_NotFound = new Button(container, SWT.CHECK);
-            _chkSkip_Tours_With_ImportFile_NotFound.setText(Messages.Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound);
-            GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(_chkSkip_Tours_With_ImportFile_NotFound);
-         }
+         createUI_30_Options(container);
       }
    }
 
@@ -385,7 +383,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             gridDataTour.applyTo(_rdoData_PartOfATour);
          }
 
-         createUI_30_PartOfATour(group);
+         createUI_22_PartOfATour(group);
 
          {
             /*
@@ -408,7 +406,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
    }
 
-   private void createUI_30_PartOfATour(final Group parent) {
+   private void createUI_22_PartOfATour(final Group parent) {
 
       final GridDataFactory gridDataItem = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
@@ -586,6 +584,25 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
    }
 
+   private void createUI_30_Options(final Composite parent) {
+      {
+         /*
+          * Checkbox: Skip tours for which the import file is not found
+          */
+         _chkSkipTours_With_ImportFile_NotFound = new Button(parent, SWT.CHECK);
+         _chkSkipTours_With_ImportFile_NotFound.setText(Messages.Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound);
+         GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(_chkSkipTours_With_ImportFile_NotFound);
+      }
+      {
+         /*
+          * Checkbox: Skip tours for which the import file is not found
+          */
+         _chkLogDetails = new Button(parent, SWT.CHECK);
+         _chkLogDetails.setText(Messages.Dialog_ReimportTours_Checkbox_LogDetails);
+         GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(_chkLogDetails);
+      }
+   }
+
    /**
     * Start the re-import process
     *
@@ -609,7 +626,25 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       final boolean isReimport_AllTours = _rdoReimport_Tours_All.getSelection();
       final boolean isReimport_BetweenDates = _rdoReimport_Tours_BetweenDates.getSelection();
-      final boolean isSkipToursWithFileNotFound = _chkSkip_Tours_With_ImportFile_NotFound.getSelection();
+      final boolean isSkipToursWithFileNotFound = _chkSkipTours_With_ImportFile_NotFound.getSelection();
+      final boolean isLogDetails = _chkLogDetails.getSelection();
+
+      ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+
+            .setIsReimport(true)
+            .setIsRunningConcurrently(true)
+            .setIsSkipToursWithFileNotFound(isSkipToursWithFileNotFound);
+
+      if (isLogDetails == false) {
+
+         // ignore detail logging, this can be a performance hog
+
+         processDeviceDataStates = processDeviceDataStates
+
+               .setIsLog_DEFAULT(false)
+               .setIsLog_INFO(false)
+               .setIsLog_OK(false);
+      }
 
       if (isReimport_AllTours || isReimport_BetweenDates) {
 
@@ -618,14 +653,14 @@ public class DialogReimportTours extends TitleAreaDialog {
                tourValueTypes,
                isReimport_AllTours,
                isReimport_BetweenDates,
-               isSkipToursWithFileNotFound);
+               processDeviceDataStates);
 
       } else {
 
          doReimport_20_SelectedTours(
 
                tourValueTypes,
-               isSkipToursWithFileNotFound);
+               processDeviceDataStates);
       }
    }
 
@@ -635,12 +670,12 @@ public class DialogReimportTours extends TitleAreaDialog {
     * @param tourValueTypes
     * @param isReimport_AllTours
     * @param isReimport_BetweenDates
-    * @param isSkipToursWithFileNotFound
+    * @param processDeviceDataStates
     */
    private void doReimport_10_All_OR_BetweenDate_Tours(final List<TourValueType> tourValueTypes,
                                                        final boolean isReimport_AllTours,
                                                        final boolean isReimport_BetweenDates,
-                                                       final boolean isSkipToursWithFileNotFound) {
+                                                       final ProcessDeviceDataStates processDeviceDataStates) {
 
       if (isReimport_AllTours) {
 
@@ -699,17 +734,17 @@ public class DialogReimportTours extends TitleAreaDialog {
          allTourIDs = TourDatabase.getAllTourIds();
       }
 
-      doReimport_50_TourIds(tourValueTypes, isSkipToursWithFileNotFound, allTourIDs);
+      doReimport_50_TourIds(tourValueTypes, allTourIDs, processDeviceDataStates);
    }
 
    /**
     * @param tourValueTypes
     *           A list of tour values to be re-imported
-    * @param isSkipToursWithFileNotFound
+    * @param processDeviceDataStates
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void doReimport_20_SelectedTours(final List<TourValueType> tourValueTypes,
-                                            final boolean isSkipToursWithFileNotFound) {
+                                            final ProcessDeviceDataStates processDeviceDataStates) {
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
 
@@ -742,13 +777,13 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       doReimport_50_TourIds(
             tourValueTypes,
-            isSkipToursWithFileNotFound,
-            allSelectedTourIds);
+            allSelectedTourIds,
+            processDeviceDataStates);
    }
 
    private void doReimport_50_TourIds(final List<TourValueType> tourValueTypes,
-                                      final boolean isSkipToursWithFileNotFound,
-                                      final ArrayList<Long> allTourIDs) {
+                                      final ArrayList<Long> allTourIDs,
+                                      final ProcessDeviceDataStates processDeviceDataStates) {
 
       final long start = System.currentTimeMillis();
 
@@ -777,22 +812,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
             final long startTime = System.currentTimeMillis();
             long lastUpdateTime = startTime;
-
-            ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
-
-                  .setIsReimport(true)
-                  .setIsRunningConcurrently(true);
-
-            if (allTourIDs.size() > 1) {
-
-               // logging is a performance hog of about additional 30 %
-
-               processDeviceDataStates = processDeviceDataStates
-
-                     .setIsLog_DEFAULT(false)
-                     .setIsLog_INFO(false)
-                     .setIsLog_OK(false);
-            }
 
             final AtomicInteger numWorkedTours = new AtomicInteger();
 
@@ -827,7 +846,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final String percentValue = String.format(NUMBER_FORMAT_1F, (float) numWorkedValue / numAllTourIDs * 100.0);
 
-                  monitor.subTask(NLS.bind("{0} / {1} - {2} % - {3} Δ",
+                  monitor.subTask(NLS.bind(SUB_TASK_REIMPORT_PROGRESS,
                         new Object[] {
                               numWorkedValue,
                               numAllTourIDs,
@@ -840,7 +859,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                      tourId,
                      tourValueTypes,
                      allReimportedTourIds,
-                     isSkipToursWithFileNotFound,
                      monitor,
                      numWorkedTours,
                      reImportStatus,
@@ -887,7 +905,6 @@ public class DialogReimportTours extends TitleAreaDialog {
    private void doReimport_60_RunConcurrent(final long tourId,
                                             final List<TourValueType> tourValueTypes,
                                             final TLongArrayList allReimportedTourIds,
-                                            final boolean isSkipToursWithFileNotFound,
                                             final IProgressMonitor monitor,
                                             final AtomicInteger numWorked,
                                             final ReImportStatus reImportStatus,
@@ -919,7 +936,6 @@ public class DialogReimportTours extends TitleAreaDialog {
                final boolean isReimported = RawDataManager.getInstance().reimportTour(
                      oldTourData,
                      tourValueTypes,
-                     isSkipToursWithFileNotFound,
                      reImportStatus,
                      processDeviceDataStates);
 
@@ -1233,7 +1249,8 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_TimeSlice_TourTimerPauses  .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES));
 
       // Skip tours for which the import file is not found
-      _chkSkip_Tours_With_ImportFile_NotFound.setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
+      _chkSkipTours_With_ImportFile_NotFound .setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
+      _chkLogDetails                         .setSelection(_state.getBoolean(STATE_IS_LOG_DETAILS));
 
       enableControls();
 
@@ -1273,7 +1290,8 @@ public class DialogReimportTours extends TitleAreaDialog {
       _state.put(STATE_IS_IMPORT_TIME_SLICE__TRAINING,         _chkData_TimeSlice_Training.getSelection());
 
       // Skip tours for which the import file is not found
-      _state.put(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND, _chkSkip_Tours_With_ImportFile_NotFound.getSelection());
+      _state.put(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND, _chkSkipTours_With_ImportFile_NotFound.getSelection());
+      _state.put(STATE_IS_LOG_DETAILS,                         _chkLogDetails.getSelection());
 
 // SET_FORMATTING_ON
    }
