@@ -50,7 +50,10 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
@@ -114,7 +117,10 @@ public class TourLogView extends ViewPart {
 
    private Composite _page_NoBrowser;
    private Composite _page_WithBrowser;
+
    private Text      _txtNoBrowser;
+
+   private Font      _zoomFont;
 
    private class Action_CopyLogValuesIntoClipboard extends Action {
 
@@ -514,6 +520,7 @@ public class TourLogView extends ViewPart {
          _txtNoBrowser = new Text(container, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
          _txtNoBrowser.setFont(net.tourbook.ui.UI.getLogFont());
          _txtNoBrowser.setBackground(bgColor);
+         _txtNoBrowser.addMouseWheelListener(this::onMouseWheel);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.FILL)
@@ -525,6 +532,10 @@ public class TourLogView extends ViewPart {
 
    @Override
    public void dispose() {
+
+      if (_zoomFont != null) {
+         _zoomFont.dispose();
+      }
 
       getViewSite().getPage().removePartListener(_partListener);
 
@@ -728,6 +739,41 @@ public class TourLogView extends ViewPart {
          event.doit = false;
       }
 
+   }
+
+   private void onMouseWheel(final MouseEvent mouseEvent) {
+
+      if (UI.isCtrlKey(mouseEvent)) {
+
+         // enlarge/reduce font size
+
+         final Font txtFont = _txtNoBrowser.getFont();
+         final FontData fontData = txtFont.getFontData()[0];
+
+         final int fontHeight_OLD = fontData.getHeight();
+         int fontHeight_NEW = fontHeight_OLD
+
+               // adjust to mouse wheel direction
+               + (mouseEvent.count > 0 ? 1 : -1);
+
+         fontHeight_NEW = Math.max(1, Math.min(fontHeight_NEW, 100));
+
+         if (fontHeight_OLD != fontHeight_NEW) {
+
+            // fontsize has changed
+
+            fontData.setHeight(fontHeight_NEW);
+
+            // dispose old font
+            if (_zoomFont != null) {
+               _zoomFont.dispose();
+            }
+
+            _zoomFont = new Font(_txtNoBrowser.getDisplay(), fontData);
+
+            _txtNoBrowser.setFont(_zoomFont);
+         }
+      }
    }
 
    private void restoreState() {
