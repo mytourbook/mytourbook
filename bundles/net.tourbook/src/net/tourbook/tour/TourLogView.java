@@ -212,6 +212,12 @@ public class TourLogView extends ViewPart {
                   + "td.appendChild(document.createTextNode('" + tourLog.time + "'));"       + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
 
+                  // thread name
+                  + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
+                  + "td.className='column logItem';"                                         + NL //$NON-NLS-1$
+                  + "td.appendChild(document.createTextNode('[" + tourLog.threadName + "]'));" + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
+
                   // state (icon)
                   + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
                   + "td.className='column icon';"                                            + NL //$NON-NLS-1$

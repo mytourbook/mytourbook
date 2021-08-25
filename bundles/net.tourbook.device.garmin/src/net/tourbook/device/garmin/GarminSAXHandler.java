@@ -460,7 +460,7 @@ public class GarminSAXHandler extends DefaultHandler {
          }
       }
 
-      StatusUtil.log(NLS.bind(
+      TourLogManager.subLog_INFO(NLS.bind(
             Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
             _importFilePath,
             TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));

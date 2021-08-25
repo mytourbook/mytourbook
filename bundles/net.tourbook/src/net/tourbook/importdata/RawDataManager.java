@@ -1905,10 +1905,13 @@ public class RawDataManager {
                      }
                   }
 
-                  if (processDeviceDataStates.isLog_INFO) {
+                  final int numImportedToursFromOneFile = allImportedToursFromOneFile.size();
+
+                  // reduce noise: log only when more than 1 tour is imported from one file
+                  if (processDeviceDataStates.isLog_INFO && numImportedToursFromOneFile > 1) {
 
                      TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
-                           allImportedToursFromOneFile.size(),
+                           numImportedToursFromOneFile,
                            osFilePath));
                   }
 
