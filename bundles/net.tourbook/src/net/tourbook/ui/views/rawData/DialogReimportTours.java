@@ -43,6 +43,7 @@ import net.tourbook.importdata.ProcessDeviceDataStates;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
@@ -900,7 +901,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             RawDataManager.LOG_REIMPORT_END,
             (System.currentTimeMillis() - start) / 1000.0));
 
-      fireTourModifyEvent();
+      doReimport_70_FireModifyEvents(processDeviceDataStates);
    }
 
    private void doReimport_60_RunConcurrent(final long tourId,
@@ -955,6 +956,34 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          _reimport_CountDownLatch.countDown();
       });
+   }
+
+   private void doReimport_70_FireModifyEvents(final ProcessDeviceDataStates processDeviceDataStates) {
+
+      TourManager.getInstance().removeAllToursFromCache();
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+      // prevent re-importing in the import view
+      RawDataManager.setIsReimportingActive(true);
+      {
+         // fire unique event for all changes
+         TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+      }
+      RawDataManager.setIsReimportingActive(false);
+
+      // fire modify event for tags
+      if (processDeviceDataStates.isFire_NewTag.get()) {
+
+         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
+      }
+
+      // fire modify event for tour types
+      if (processDeviceDataStates.isFire_NewTourType.get()) {
+
+         Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore().setValue(
+               ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+               Math.random()));
+      }
    }
 
    private void enableControls() {
@@ -1027,20 +1056,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       // OK button
       getButton(IDialogConstants.OK_ID).setEnabled(isTourSelected && isDataSelected && isValid);
-   }
-
-   private void fireTourModifyEvent() {
-
-      TourManager.getInstance().removeAllToursFromCache();
-      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-
-      // prevent re-importing in the import view
-      RawDataManager.setIsReimportingActive(true);
-      {
-         // fire unique event for all changes
-         TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-      }
-      RawDataManager.setIsReimportingActive(false);
    }
 
    @Override

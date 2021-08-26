@@ -1866,10 +1866,14 @@ public class FTSearchManager {
       final long end = System.nanoTime();
       final float timeDiff = (end - start) / 1_000_000_000.0f;
 
-      TourLogManager.subLog_DEFAULT(String.format(Messages.Search_Manager_Log_UpdatedFTIndex_Final,
+      // reduce logging
+      if (allTourIds.length > 1) {
 
-            timeDiff,
-            numAllTourIDs));
+         TourLogManager.subLog_DEFAULT(String.format(Messages.Search_Manager_Log_UpdatedFTIndex_Final,
+
+               timeDiff,
+               numAllTourIDs));
+      }
    }
 
    private static void updateIndex_10_Parts(final List<Long> allTourIDParts,

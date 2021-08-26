@@ -812,7 +812,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    void actionSaveTour(final TourPerson person) {
 
-      doSaveTour(person);
+      final ArrayList<TourData> selectedTours = getAnySelectedTours();
+
+      runEasyImport_099_SaveTour(person, selectedTours, false);
    }
 
    private void addPartListener() {
@@ -3478,106 +3480,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       updateUI_2_Dashboard();
    }
 
-   private void doSaveTour(final TourPerson person) {
-
-      final ArrayList<TourData> selectedTours = getAnySelectedTours();
-
-      runEasyImport_099_SaveTour(person, selectedTours, false);
-   }
-
-   /**
-    * @param tourData
-    *           {@link TourData} which is not yet saved.
-    * @param person
-    *           Person for which the tour is being saved.
-    * @param savedTours
-    *           The saved tour is added to this list.
-    */
-   private void doSaveTour_OneTour(final TourData tourData,
-                                   final TourPerson person,
-                                   final ArrayList<TourData> savedTours) {
-
-      // workaround for hibernate problems
-      if (tourData.isTourDeleted) {
-         return;
-      }
-
-      if (tourData.getTourPerson() != null) {
-
-         /*
-          * tour is already saved, resaving cannot be done in the import view it can be done in the
-          * tour editor
-          */
-         return;
-      }
-
-      // a saved tour needs a person
-      tourData.setTourPerson(person);
-
-      // set weight from person
-      if (RawDataManager.isSetBodyWeight()) {
-         tourData.setBodyWeight(person.getWeight());
-      }
-
-      tourData.setTourBike(person.getTourBike());
-
-      final TourData savedTour = TourDatabase.saveTour(tourData, true);
-
-      if (savedTour != null) {
-
-         savedTours.add(savedTour);
-
-         // update fields which are not saved but used in the UI and easy setup
-         savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
-         savedTour.isTourFileMoved = tourData.isTourFileMoved;
-         savedTour.isBackupImportFile = tourData.isBackupImportFile;
-         savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
-      }
-   }
-
-   /**
-    * After tours are saved, the internal structures and ui viewers must be updated
-    *
-    * @param savedTours
-    *           contains the saved {@link TourData}
-    */
-   private void doSaveTour_PostActions(final ArrayList<TourData> savedTours) {
-
-      // update viewer, fire selection event
-      if (savedTours.isEmpty()) {
-         return;
-      }
-
-      final ArrayList<Long> savedToursIds = new ArrayList<>();
-
-      // update raw data map with the saved tour data
-      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
-      for (final TourData tourData : savedTours) {
-
-         final Long tourId = tourData.getTourId();
-
-         rawDataMap.put(tourId, tourData);
-         savedToursIds.add(tourId);
-      }
-
-      /*
-       * the selection provider can contain old tour data which conflicts with the tour data in the
-       * tour data editor
-       */
-      _postSelectionProvider.clearSelection();
-
-      // update import viewer
-      reloadViewer();
-
-      enableActions();
-
-      /*
-       * notify all views, it is not checked if the tour data editor is dirty because newly saved
-       * tours can not be modified in the tour data editor
-       */
-      TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
-   }
-
    private void enableActions() {
 
       final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
@@ -4987,56 +4889,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                                                           final ArrayList<TourData> selectedTours,
                                                           final boolean isEasyImport) {
 
-      final String css = isEasyImport //
+      final String css = isEasyImport
             ? UI.EMPTY_STRING
             : TourLogView.CSS_LOG_TITLE;
-      final String message = isEasyImport //
+
+      final String message = isEasyImport
             ? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
             : TourLogManager.LOG_TOUR_SAVE_TOURS;
 
       TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
-      final ArrayList<TourData> savedTours = new ArrayList<>();
-
-      final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-         @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-            int saveCounter = 0;
-            final int selectionSize = selectedTours.size();
-
-            monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, selectionSize);
-
-            // loop: all selected tours, selected tours can already be saved
-            for (final TourData tourData : selectedTours) {
-
-               monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
-
-               doSaveTour_OneTour(tourData, person, savedTours);
-
-               TourLogManager.addSubLog(
-                     TourLogState.TOUR_SAVED,
-                     String.format(
-                           TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
-                           tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                           tourData.getImportFilePathNameText()));
-
-               monitor.worked(1);
-            }
-         }
-      };
-
-      try {
-
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
-
-      } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-      }
-
-      doSaveTour_PostActions(savedTours);
-
-      return savedTours;
+      return saveTours(selectedTours, person);
    }
 
    /**
@@ -5213,6 +5076,142 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
 
       _columnManager.saveState(_state);
+   }
+
+   private ArrayList<TourData> saveTours(final ArrayList<TourData> allTourData, final TourPerson person) {
+
+      final ArrayList<TourData> allSavedTours = new ArrayList<>();
+
+      final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            int numSaved = 0;
+            final int numTours = allTourData.size();
+
+            monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, numTours);
+
+            // loop: all selected tours, selected tours can already be saved
+            for (final TourData tourData : allTourData) {
+
+               monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++numSaved, numTours));
+
+               saveTours_10_OneTour(tourData, person, allSavedTours);
+
+               TourLogManager.addSubLog(TourLogState.TOUR_SAVED,
+                     String.format(TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
+                           tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                           tourData.getImportFilePathNameText()));
+
+               monitor.worked(1);
+            }
+         }
+      };
+
+      try {
+
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+
+      } catch (InvocationTargetException | InterruptedException e) {
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+      }
+
+      saveTours_20_PostActions(allSavedTours);
+
+      return allSavedTours;
+   }
+
+   /**
+    * @param tourData
+    *           {@link TourData} which is not yet saved.
+    * @param person
+    *           Person for which the tour is being saved.
+    * @param savedTours
+    *           The saved tour is added to this list.
+    */
+   private void saveTours_10_OneTour(final TourData tourData,
+                                     final TourPerson person,
+                                     final ArrayList<TourData> savedTours) {
+
+      // workaround for hibernate problems
+      if (tourData.isTourDeleted) {
+         return;
+      }
+
+      if (tourData.getTourPerson() != null) {
+
+         /*
+          * tour is already saved, resaving cannot be done in the import view it can be done in the
+          * tour editor
+          */
+         return;
+      }
+
+      // a saved tour needs a person
+      tourData.setTourPerson(person);
+
+      // set weight from person
+      if (RawDataManager.isSetBodyWeight()) {
+         tourData.setBodyWeight(person.getWeight());
+      }
+
+      tourData.setTourBike(person.getTourBike());
+
+      final TourData savedTour = TourDatabase.saveTour(tourData, true);
+
+      if (savedTour != null) {
+
+         savedTours.add(savedTour);
+
+         // update fields which are not saved but used in the UI and easy setup
+         savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
+         savedTour.isTourFileMoved = tourData.isTourFileMoved;
+         savedTour.isBackupImportFile = tourData.isBackupImportFile;
+         savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
+      }
+   }
+
+   /**
+    * After tours are saved, the internal structures and ui viewers must be updated
+    *
+    * @param savedTours
+    *           contains the saved {@link TourData}
+    */
+   private void saveTours_20_PostActions(final ArrayList<TourData> savedTours) {
+
+      // update viewer, fire selection event
+      if (savedTours.isEmpty()) {
+         return;
+      }
+
+      final ArrayList<Long> savedToursIds = new ArrayList<>();
+
+      // update raw data map with the saved tour data
+      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
+      for (final TourData tourData : savedTours) {
+
+         final Long tourId = tourData.getTourId();
+
+         rawDataMap.put(tourId, tourData);
+         savedToursIds.add(tourId);
+      }
+
+      /*
+       * the selection provider can contain old tour data which conflicts with the tour data in the
+       * tour data editor
+       */
+      _postSelectionProvider.clearSelection();
+
+      // update import viewer
+      reloadViewer();
+
+      enableActions();
+
+      /*
+       * notify all views, it is not checked if the tour data editor is dirty because newly saved
+       * tours can not be modified in the tour data editor
+       */
+      TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
    }
 
    /**

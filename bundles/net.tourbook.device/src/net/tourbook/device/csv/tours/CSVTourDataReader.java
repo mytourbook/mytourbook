@@ -202,24 +202,22 @@ public class CSVTourDataReader extends TourbookDevice {
             }
          }
 
-         if (allMissingTourTagLabel.size() > 0) {
-
-            // create missing tour tags
-            final ArrayList<TourTag> allNewTourTags = TourDatabase.createTourTags(allMissingTourTagLabel);
-
-            allTourDataTags.addAll(allNewTourTags);
-
-            isNewTag = true;
-         }
-
       } catch (final NoSuchElementException e) {
 
          // no further tokens
-
-      } finally {
-
-         tourData.setTourTags(allTourDataTags);
       }
+
+      if (allMissingTourTagLabel.size() > 0) {
+
+         // create missing tour tags
+         final ArrayList<TourTag> allNewTourTags = TourDatabase.createTourTags(allMissingTourTagLabel);
+
+         allTourDataTags.addAll(allNewTourTags);
+
+         isNewTag = true;
+      }
+
+      tourData.setTourTags(allTourDataTags);
 
       return isNewTag;
 
@@ -306,7 +304,7 @@ public class CSVTourDataReader extends TourbookDevice {
                 * The split method is used because the Tokenizer ignores empty tokens !!!
                 */
 
-               final String[] allToken = tokenLine.split(CSV_TOKEN_SEPARATOR);
+               final String[] allToken = tokenLine.split(CSV_TOKEN_SEPARATOR, 20);
 
                parseDate(dateTime, allToken[0]); //                           1 Date (yyyy-mm-dd);
                parseTime(dateTime, allToken[1]); //                           2 Time (hh-mm);
@@ -343,7 +341,9 @@ public class CSVTourDataReader extends TourbookDevice {
                }
 
             } catch (final NoSuchElementException e) {
+               
                // not all tokens are defined
+               
             } finally {
 
                tourData.setImportFilePath(importFilePath);

@@ -219,39 +219,52 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_ON
    //
-   public static final String              ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
+   public static final String            ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
    //
-   private static final IPreferenceStore   _prefStore                                      = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore   _prefStore_Common                               = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                               = CommonActivator.getPrefStore();
    //
-   private static final IDialogSettings    _state                                          = TourbookPlugin.getState(ID);
-   private static final IDialogSettings    _state_NatTable                                 = TourbookPlugin.getState(ID + "_NAT_TABLE"); //$NON-NLS-1$
-   private static final IDialogSettings    _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");      //$NON-NLS-1$
+   private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_NatTable                                 = TourbookPlugin.getState(ID + "_NAT_TABLE"); //$NON-NLS-1$
+   private static final IDialogSettings  _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");      //$NON-NLS-1$
    //
-   private static final String             STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                    //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                    //$NON-NLS-1$
    //
-   private static final String             STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";           //$NON-NLS-1$
-   private static final String             STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";         //$NON-NLS-1$
-   static final String                     STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";                //$NON-NLS-1$
-   static final String                     STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";  //$NON-NLS-1$
-   private static final String             STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                     //$NON-NLS-1$
-   private static final String             STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                     //$NON-NLS-1$
-   private static final String             STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                      //$NON-NLS-1$
-   private static final String             STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                        //$NON-NLS-1$
+   private static final String           STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";           //$NON-NLS-1$
+   private static final String           STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";         //$NON-NLS-1$
+   static final String                   STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";                //$NON-NLS-1$
+   static final String                   STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";  //$NON-NLS-1$
+   private static final String           STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                     //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                     //$NON-NLS-1$
+   private static final String           STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                      //$NON-NLS-1$
+   private static final String           STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                        //$NON-NLS-1$
    //
-   private static final String             STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
-   private static final String             STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                     //$NON-NLS-1$
+   private static final String           STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
+   private static final String           STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                     //$NON-NLS-1$
    //
-   static final boolean                    STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
-   static final boolean                    STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
+   static final boolean                  STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
+   static final boolean                  STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
    //
-   private static final String             CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                                //$NON-NLS-1$
+   //
+   private static final String CSV_EXPORT_DEFAULT_FILE_NAME           = "TourBook_";                                                       //$NON-NLS-1$
+   private static final String SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT = "useSimpleCSVExportFormat";                                        //$NON-NLS-1$
+   private static boolean      USE_SIMPLE_CSV_EXPORT_FORMAT           = System.getProperty(SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT) != null;
+
+   static {
+
+      if (USE_SIMPLE_CSV_EXPORT_FORMAT) {
+
+         Util.logSystemProperty_IsEnabled(TourManager.class,
+               SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT,
+               "Using simple format when exporting tours in CSV format"); //$NON-NLS-1$
+      }
+   }
    //
    /**
     * The header column id needs a different id than the body column otherwise drag&drop or column
     * selection shows the 1st row image :-(
     */
-   private static final String             HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";                                  //$NON-NLS-1$
+   private static final String             HEADER_COLUMN_ID_POSTFIX            = "_HEADER";                         //$NON-NLS-1$
    //
    private static TourBookViewLayout       _viewLayout;
    //
@@ -259,7 +272,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ColumnManager                   _columnManager_NatTable;
    private ColumnManager                   _columnManager_Tree;
    //
-   private OpenDialogManager               _openDlgMgr                                     = new OpenDialogManager();
+   private OpenDialogManager               _openDlgMgr                         = new OpenDialogManager();
    //
    private PostSelectionProvider           _postSelectionProvider;
    //
@@ -295,9 +308,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private int                             _natTable_ContextMenuActivator;
    //
-   private int                             _selectedYear                                   = -1;
-   private int                             _selectedYearSub                                = -1;
-   private final ArrayList<Long>           _selectedTourIds                                = new ArrayList<>();
+   private int                             _selectedYear                       = -1;
+   private int                             _selectedYearSub                    = -1;
+   private final ArrayList<Long>           _selectedTourIds                    = new ArrayList<>();
    //
    private boolean                         _isCollapseOthers;
    private boolean                         _isInFireSelection;
@@ -305,7 +318,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private boolean                         _isInStartup;
    private boolean                         _isLayoutNatTable;
    //
-   private final TourDoubleClickState      _tourDoubleClickState                           = new TourDoubleClickState();
+   private final TourDoubleClickState      _tourDoubleClickState               = new TourDoubleClickState();
    //
    private NatTableViewer_TourInfo_ToolTip _tourInfoToolTip_NatTable;
    private TreeViewerTourInfoToolTip       _tourInfoToolTip_Tree;
@@ -313,8 +326,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private TagMenuManager                  _tagMenuManager;
    private MenuManager                     _viewerMenuManager_NatTable;
    private MenuManager                     _viewerMenuManager_Tree;
-   private IContextMenuProvider            _viewerContextMenuProvider_NatTable             = new ContextMenuProvider_NatTable();
-   private IContextMenuProvider            _viewerContextMenuProvider_Tree                 = new ContextMenuProvider_Tree();
+   private IContextMenuProvider            _viewerContextMenuProvider_NatTable = new ContextMenuProvider_NatTable();
+   private IContextMenuProvider            _viewerContextMenuProvider_Tree     = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues        _subMenu_AdjustTourValues;
    //
@@ -888,7 +901,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          return;
       }
 
-      new CSVExport(selection, selectedFilePath, this);
+      new CSVExport(
+            selection,
+            selectedFilePath,
+            this,
+            USE_SIMPLE_CSV_EXPORT_FORMAT);
 
 //      // DEBUGGING: USING DEFAULT PATH
 //      final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
@@ -2136,17 +2153,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    /**
     * @param yearSubItem
-    * @param tourIds
+    * @param allTourIds
     * @return Return all tours for one yearSubItem
     */
-   private void getYearSubTourIDs(final TVITourBookYearCategorized yearSubItem, final LinkedHashSet<Long> tourIds) {
+   private void getYearSubTourIDs(final TVITourBookYearCategorized yearSubItem, final LinkedHashSet<Long> allTourIds) {
 
       // get all tours for the month item
       for (final TreeViewerItem viewerItem : yearSubItem.getFetchedChildren()) {
          if (viewerItem instanceof TVITourBookTour) {
 
             final TVITourBookTour tourItem = (TVITourBookTour) viewerItem;
-            tourIds.add(tourItem.getTourId());
+            allTourIds.add(tourItem.getTourId());
          }
       }
    }
@@ -2547,7 +2564,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final boolean isSelectAllChildren = _actionSelectAllTours.isChecked();
 
-      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
+      final LinkedHashSet<Long> allTourIds = new LinkedHashSet<>();
 
       boolean isFirstYear = true;
       boolean isFirstYearSub = true;
@@ -2576,7 +2593,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                // get all tours for the selected year
                for (final TreeViewerItem viewerItem : yearItem.getFetchedChildren()) {
                   if (viewerItem instanceof TVITourBookYearCategorized) {
-                     getYearSubTourIDs((TVITourBookYearCategorized) viewerItem, tourIds);
+                     getYearSubTourIDs((TVITourBookYearCategorized) viewerItem, allTourIds);
                   }
                }
 
@@ -2593,7 +2610,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                }
 
                // get all tours for the selected month
-               getYearSubTourIDs(yearSubItem, tourIds);
+               getYearSubTourIDs(yearSubItem, allTourIds);
 
             } else if (treeItem instanceof TVITourBookTour) {
 
@@ -2607,7 +2624,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                   _selectedYearSub = tourItem.tourYearSub;
                }
 
-               tourIds.add(tourItem.getTourId());
+               allTourIds.add(tourItem.getTourId());
             }
 
          } else {
@@ -2625,12 +2642,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                   _selectedYearSub = tourItem.tourYearSub;
                }
 
-               tourIds.add(tourItem.getTourId());
+               allTourIds.add(tourItem.getTourId());
             }
          }
       }
 
-      onSelect_CreateTourSelection(tourIds);
+      onSelect_CreateTourSelection(allTourIds);
    }
 
    private void onSelectionChanged(final ISelection selection) {

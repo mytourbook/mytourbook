@@ -1287,7 +1287,7 @@ public class TourDatabase {
       /*
        * Check tags if they are still unavailable
        */
-      clearTourTags();
+//      clearTourTags();
       final HashMap<Long, TourTag> allAvailableTourTags = getAllTourTags();
 
       final ArrayList<TourTag> allNewOrOldTourTags = new ArrayList<>();
@@ -2964,7 +2964,10 @@ public class TourDatabase {
          // do post save actions for only ONE tour
          saveTour_PostSaveActions_Concurrent_1_ForOneTour(persistedEntity);
 
-         // !!! This method MUST be called, AFTER all tours are saved !!!
+         // !!! This method MUST be called AFTER all tours are saved !!!
+         // !!! This method MUST be called AFTER all tours are saved !!!
+         // !!! This method MUST be called AFTER all tours are saved !!!
+
 //       saveTour_PostSaveActions_Concurrent_2_ForAllTours(allTourIds);
       }
 
