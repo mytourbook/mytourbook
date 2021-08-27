@@ -115,7 +115,7 @@ Bugfix
   - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
 
 * 3D Map (Frederic)
-  - Fixed an issue that could happen under Linux with ATI graphic cards and that would make the 3D map view crash https://github.com/wolfgang-ch/mytourbook/issues/383
+  - Fixed an issue that could happen under Linux with ATI graphic cards and that could make the 3D map view crash https://github.com/wolfgang-ch/mytourbook/issues/383
 
 Translation    
 ===========
