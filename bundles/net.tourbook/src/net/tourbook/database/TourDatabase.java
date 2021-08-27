@@ -2904,6 +2904,8 @@ public class TourDatabase {
    }
 
    /**
+    * {@link #saveTour_PostSaveActions_Concurrent_2_ForAllTours(long[])} <b>MUST</b> be
+    * called <b>AFTER</b> all tours are saved
     * <p>
     * !!! {@link #checkUnsavedTransientInstances(TourData)} may cause troubles with concurrency,
     * when new tour types or tags are created !!!
@@ -2931,16 +2933,24 @@ public class TourDatabase {
 
             ts.begin();
             {
+               final long dtSaved = TimeTools.createdNowAsYMDhms();
+
                // get tour data by tour id
                final TourData dbTourData = em.find(TourData.class, tourData.getTourId());
                if (dbTourData == null) {
 
-                  // this should not happen
+                  // tour is not yet persisted
+
+                  tourData.setDateTimeCreated(dtSaved);
+
+                  em.persist(tourData);
+
+                  persistedEntity = tourData;
 
                } else {
 
                   if (isUpdateModifiedDate) {
-                     tourData.setDateTimeModified(TimeTools.createdNowAsYMDhms());
+                     tourData.setDateTimeModified(dtSaved);
                   }
 
                   persistedEntity = em.merge(tourData);

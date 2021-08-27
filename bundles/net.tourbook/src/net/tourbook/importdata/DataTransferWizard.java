@@ -148,7 +148,7 @@ public class DataTransferWizard extends Wizard {
       // import received files
       for (final File inFile : _receivedFiles) {
 
-         rawDataManager.importTour(
+         rawDataManager.importTours_FromOneFile(
 
                inFile, //                                                  importFile
                _dataTransferWizardPage._pathEditor.getStringValue(), //    destinationPath

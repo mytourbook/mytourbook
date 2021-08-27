@@ -687,7 +687,7 @@ public class RawDataManager {
          TourLogManager.showLogView();
       }
 
-      importTours(
+      importTours_FromMultipleFiles(
             allOSFiles,
             false,
             null,
@@ -1364,396 +1364,8 @@ public class RawDataManager {
    }
 
    /**
-    * Import multiple tours from one file, all imported tours can be retrieved with
+    * Import tours from multiple files. The imported tours can be retrieved with
     * {@link #getImportedTours()}
-    *
-    * @param importFile
-    *           The file to be imported
-    * @param destinationPath
-    *           If not <code>null</code> copy the file to this path
-    * @param fileCollision
-    *           Behavior if destination file exists (ask if null)
-    * @param isBuildNewFileNames
-    *           If <code>true</code> create a new filename depending on the content of the file,
-    *           keep old name if <code>false</code>
-    * @param isTourDisplayedInImportView
-    *           When <code>true</code>, the newly imported tours are displayed in the import view,
-    *           otherwise they are imported into {@link #_multipleTours_FromLastImportFile} but
-    *           not displayed in the import view.
-    * @param allImportedTourDataFromOneFile
-    *           Contains all tours which are imported from <code>importFile</code>
-    * @param processDeviceDataStates
-    * @return Returns <code>true</code> when the import was successfully
-    */
-   public boolean importTour(final File importFile,
-                             final String destinationPath,
-                             final FileCollisionBehavior fileCollision,
-                             final boolean isBuildNewFileNames,
-                             final boolean isTourDisplayedInImportView,
-                             final Map<Long, TourData> allImportedTourDataFromOneFile,
-                             final ProcessDeviceDataStates processDeviceDataStates) {
-
-      final String importFilePathName = importFile.getAbsolutePath();
-      final Display display = Display.getDefault();
-
-      // check if importFile exist
-      if (importFile.exists() == false) {
-
-         display.syncExec(() -> {
-
-            final Shell activeShell = display.getActiveShell();
-
-            // during initialization there is no active shell
-            if (activeShell != null) {
-
-               MessageDialog.openError(
-                     activeShell,
-                     Messages.DataImport_Error_file_does_not_exist_title,
-                     NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
-            }
-         });
-
-         return false;
-      }
-
-      // find the file extension in the filename
-      final int dotPos = importFilePathName.lastIndexOf(UI.SYMBOL_DOT);
-      if (dotPos == -1) {
-         return false;
-      }
-      final String fileExtension = importFilePathName.substring(dotPos + 1);
-
-      final boolean[] importReturnValue = { false };
-      final String[] lastImportedFileName = { null };
-
-      BusyIndicator.showWhile(null, () -> {
-
-         boolean isDataImported = false;
-         final ArrayList<String> additionalImportedFiles = new ArrayList<>();
-
-         /*
-          * Try to import from all devices which have the defined extension
-          */
-         for (final TourbookDevice device1 : _allDevices_BySortPriority) {
-
-            final String deviceFileExtension = device1.fileExtension;
-
-            if (deviceFileExtension.equals(UI.SYMBOL_STAR) || deviceFileExtension.equalsIgnoreCase(fileExtension)) {
-
-               // Check if the file we want to import requires confirmation and if yes, ask user
-               if (device1.userConfirmationRequired()) {
-
-                  display.syncExec(() -> {
-
-                     final Shell activeShell = display.getActiveShell();
-
-                     if (activeShell != null) {
-                        if (MessageDialog.openConfirm(
-                              display.getActiveShell(),
-                              NLS.bind(Messages.DataImport_ConfirmImport_title, device1.visibleName),
-                              device1.userConfirmationMessage())) {
-                           _isImportCanceled = false;
-                        } else {
-                           _isImportCanceled = true;
-                        }
-                     }
-                  });
-               }
-
-               if (_isImportCanceled) {
-                  importReturnValue[0] = true; // don't display an error to the user
-                  return;
-               }
-
-               // device file extension was found in the filename extension
-               lastImportedFileName[0] = importTour_10(
-                     device1,
-                     importFilePathName,
-                     destinationPath,
-                     fileCollision,
-                     isBuildNewFileNames,
-                     isTourDisplayedInImportView,
-                     processDeviceDataStates,
-                     allImportedTourDataFromOneFile);
-
-               if (lastImportedFileName[0] != null) {
-
-                  isDataImported = true;
-                  importReturnValue[0] = true;
-
-                  final ArrayList<String> deviceImportedFiles = device1.getAdditionalImportedFiles();
-                  if (deviceImportedFiles != null) {
-                     additionalImportedFiles.addAll(deviceImportedFiles);
-                  }
-
-                  break;
-               }
-
-               if (_isImportCanceled) {
-                  break;
-               }
-            }
-         }
-
-         if (isDataImported == false && !_isImportCanceled) {
-
-            /*
-             * When data has not imported yet, try all available devices without checking the
-             * file extension
-             */
-            for (final TourbookDevice device2 : _allDevices_BySortPriority) {
-
-               lastImportedFileName[0] = importTour_10(
-                     device2,
-                     importFilePathName,
-                     destinationPath,
-                     fileCollision,
-                     isBuildNewFileNames,
-                     isTourDisplayedInImportView,
-                     processDeviceDataStates,
-                     allImportedTourDataFromOneFile);
-
-               if (lastImportedFileName[0] != null) {
-
-                  isDataImported = true;
-                  importReturnValue[0] = true;
-
-                  final ArrayList<String> otherImportedFiles = device2.getAdditionalImportedFiles();
-                  if (otherImportedFiles != null) {
-                     additionalImportedFiles.addAll(otherImportedFiles);
-                  }
-
-                  break;
-               }
-            }
-         }
-
-         if (isDataImported) {
-
-            _allImportedFileNames.put(lastImportedFileName[0], lastImportedFileName[0]);
-
-            if (!additionalImportedFiles.isEmpty()) {
-
-               for (final String fileName : additionalImportedFiles) {
-                  _allImportedFileNamesChildren.put(fileName, fileName);
-               }
-            }
-         }
-
-         // cleanup
-         additionalImportedFiles.clear();
-      });
-
-      return importReturnValue[0];
-   }
-
-   /**
-    * import the raw data of the given file
-    *
-    * @param device
-    *           the device which is able to process the data of the file
-    * @param sourceFileName
-    *           the file to be imported
-    * @param destinationPath
-    *           if not null copy the file to this path
-    * @param fileCollision
-    *           behavior if destination file exists (ask if null)
-    * @param isBuildNewFileName
-    *           if true create a new filename depending on the content of the file, keep old name if
-    *           false
-    * @param isTourDisplayedInImportView
-    * @param allNewlyImportedToursFromOneFile
-    * @return Returns the import filename or <code>null</code> when it was not imported
-    */
-   private String importTour_10(final TourbookDevice device,
-                                String sourceFileName,
-                                final String destinationPath,
-                                FileCollisionBehavior fileCollision,
-                                final boolean isBuildNewFileName,
-                                final boolean isTourDisplayedInImportView,
-                                final ProcessDeviceDataStates processDeviceDataStates,
-                                final Map<Long, TourData> allNewlyImportedToursFromOneFile) {
-
-      if (fileCollision == null) {
-         fileCollision = new FileCollisionBehavior();
-      }
-
-      device.setIsChecksumValidation(_importState_IsHAC4_5_ChecksumValidation);
-
-      if (device.validateRawData(sourceFileName)) {
-
-         // file contains valid raw data for the raw data reader
-
-         if (_importState_ImportYear != -1) {
-            device.setImportYear(_importState_ImportYear);
-         }
-
-         device.setMergeTracks(_importState_IsMergeTracks);
-         device.setCreateTourIdWithTime(_importState_IsCreateTourIdWithTime);
-         device.setConvertWayPoints(_importState_IsConvertWayPoints);
-
-         // copy file to destinationPath
-         if (destinationPath != null) {
-
-            final String newFileName = importTour_20_CopyFile(
-                  device,
-                  sourceFileName,
-                  destinationPath,
-                  isBuildNewFileName,
-                  fileCollision);
-
-            if (newFileName == null) {
-               return null;
-            }
-
-            sourceFileName = newFileName;
-         }
-
-         boolean isImported = false;
-
-         try {
-
-            isImported = device.processDeviceData(
-                  sourceFileName,
-                  _deviceData,
-                  _allImportedTours,
-                  allNewlyImportedToursFromOneFile,
-                  processDeviceDataStates);
-
-         } catch (final Exception e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
-         }
-
-         if (isTourDisplayedInImportView) {
-            _allImportedTours.putAll(allNewlyImportedToursFromOneFile);
-         }
-
-         // keep tours in _newlyImportedTours because they are used when tours are re-imported
-
-         return isImported
-               ? sourceFileName
-               : null;
-      }
-
-      return null;
-
-   }
-
-   private String importTour_20_CopyFile(final TourbookDevice device,
-                                         final String sourceFileName,
-                                         final String destinationPath,
-                                         final boolean isBuildNewFileName,
-                                         final FileCollisionBehavior fileCollision) {
-
-      String destFileName = new File(sourceFileName).getName();
-
-      if (isBuildNewFileName) {
-
-         destFileName = null;
-
-         try {
-            destFileName = device.buildFileNameFromRawData(sourceFileName);
-         } catch (final Exception e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
-         } finally {
-
-            if (destFileName == null) {
-
-               final String dialogMessage = NLS.bind(
-                     Messages.Import_Data_Error_CreatingFileName_Message,
-                     new Object[] {
-                           sourceFileName,
-                           new org.eclipse.core.runtime.Path(destinationPath)
-                                 .addTrailingSeparator()
-                                 .toString(), TEMP_IMPORTED_FILE });
-
-               MessageDialog.openError(
-                     Display.getDefault().getActiveShell(),
-                     Messages.Import_Data_Error_CreatingFileName_Title,
-                     dialogMessage);
-
-               destFileName = TEMP_IMPORTED_FILE;
-            }
-         }
-      }
-      final File newFile = new File(
-            (new org.eclipse.core.runtime.Path(destinationPath)
-                  .addTrailingSeparator()
-                  .toString() + destFileName));
-
-      // get source file
-      final File fileIn = new File(sourceFileName);
-
-      // check if file already exist
-      if (newFile.exists()) {
-
-         // TODO allow user to rename the file
-
-         boolean keepFile = false; // for MessageDialog result
-         if (fileCollision.value == FileCollisionBehavior.ASK) {
-
-            final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-            final MessageDialog messageDialog = new MessageDialog(
-                  shell,
-                  Messages.Import_Wizard_Message_Title,
-                  null,
-                  NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, newFile),
-                  MessageDialog.QUESTION,
-                  new String[] {
-                        IDialogConstants.YES_LABEL,
-                        IDialogConstants.YES_TO_ALL_LABEL,
-                        IDialogConstants.NO_LABEL,
-                        IDialogConstants.NO_TO_ALL_LABEL },
-                  0);
-            messageDialog.open();
-            final int returnCode = messageDialog.getReturnCode();
-            switch (returnCode) {
-
-            case 1: // YES_TO_ALL
-               fileCollision.value = FileCollisionBehavior.REPLACE;
-               break;
-
-            case 3: // NO_TO_ALL
-               fileCollision.value = FileCollisionBehavior.KEEP;
-            case 2: // NO
-               keepFile = true;
-               break;
-
-            default:
-               break;
-            }
-         }
-
-         if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
-            _isImportCanceled = true;
-            fileIn.delete();
-            return null;
-         }
-      }
-
-      // copy source file into destination file
-      try (FileInputStream inReader = new FileInputStream(fileIn);
-            FileOutputStream outReader = new FileOutputStream(newFile)) {
-
-         int c;
-
-         while ((c = inReader.read()) != -1) {
-            outReader.write(c);
-         }
-
-      } catch (final IOException e) {
-         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-         return null;
-      }
-
-      // delete source file
-      fileIn.delete();
-
-      return newFile.getAbsolutePath();
-   }
-
-   /**
-    * Import tours from multiple files which can be retrieved with {@link #getImportedTours()}
     *
     * @param allImportFiles
     * @param isEasyImport
@@ -1761,10 +1373,10 @@ public class RawDataManager {
     * @param processDeviceDataStates
     * @return
     */
-   public ImportRunState importTours(final ArrayList<OSFile> allImportFiles,
-                                     final boolean isEasyImport,
-                                     final String fileGlobPattern,
-                                     final ProcessDeviceDataStates processDeviceDataStates) {
+   public ImportRunState importTours_FromMultipleFiles(final ArrayList<OSFile> allImportFiles,
+                                                       final boolean isEasyImport,
+                                                       final String fileGlobPattern,
+                                                       final ProcessDeviceDataStates processDeviceDataStates) {
 
       final ImportRunState importRunState = new ImportRunState();
 
@@ -1881,7 +1493,7 @@ public class RawDataManager {
 
                final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
 
-               if (importTour(
+               if (importTours_FromOneFile(
 
                      importFile, //                   importFile
                      null, //                         destinationPath
@@ -1909,7 +1521,7 @@ public class RawDataManager {
 
                   final int numImportedToursFromOneFile = allImportedToursFromOneFile.size();
 
-                  // reduce noise: log only when more than 1 tour is imported from one file
+                  // reduce noise: log only when more than ONE tour is imported from ONE file
                   if (processDeviceDataStates.isLog_INFO && numImportedToursFromOneFile > 1) {
 
                      TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
@@ -1970,6 +1582,395 @@ public class RawDataManager {
             (System.currentTimeMillis() - start) / 1000.0));
 
       return importRunState;
+   }
+
+   /**
+    * Import multiple tours from one file, all imported tours can be retrieved with
+    * {@link #getImportedTours()}
+    *
+    * @param importFile
+    *           The file to be imported
+    * @param destinationPath
+    *           If not <code>null</code> copy the file to this path
+    * @param fileCollision
+    *           Behavior if destination file exists (ask if null)
+    * @param isBuildNewFileNames
+    *           If <code>true</code> create a new filename depending on the content of the file,
+    *           keep old name if <code>false</code>
+    * @param isTourDisplayedInImportView
+    *           When <code>true</code>, the newly imported tours are displayed in the import view,
+    *           otherwise they are imported into {@link #_multipleTours_FromLastImportFile} but
+    *           not displayed in the import view.
+    * @param allImportedTourDataFromOneFile
+    *           Contains all tours which are imported from <code>importFile</code>
+    * @param processDeviceDataStates
+    * @return Returns <code>true</code> when the import was successfully
+    */
+   public boolean importTours_FromOneFile(final File importFile,
+                                          final String destinationPath,
+                                          final FileCollisionBehavior fileCollision,
+                                          final boolean isBuildNewFileNames,
+                                          final boolean isTourDisplayedInImportView,
+                                          final Map<Long, TourData> allImportedTourDataFromOneFile,
+                                          final ProcessDeviceDataStates processDeviceDataStates) {
+
+      final String importFilePathName = importFile.getAbsolutePath();
+      final Display display = Display.getDefault();
+
+      // check if importFile exist
+      if (importFile.exists() == false) {
+
+         display.syncExec(() -> {
+
+            final Shell activeShell = display.getActiveShell();
+
+            // during initialization there is no active shell
+            if (activeShell != null) {
+
+               MessageDialog.openError(
+                     activeShell,
+                     Messages.DataImport_Error_file_does_not_exist_title,
+                     NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
+            }
+         });
+
+         return false;
+      }
+
+      // find the file extension in the filename
+      final int dotPos = importFilePathName.lastIndexOf(UI.SYMBOL_DOT);
+      if (dotPos == -1) {
+         return false;
+      }
+      final String fileExtension = importFilePathName.substring(dotPos + 1);
+
+      final boolean[] importReturnValue = { false };
+      final String[] lastImportedFileName = { null };
+
+      BusyIndicator.showWhile(null, () -> {
+
+         boolean isDataImported = false;
+         final ArrayList<String> additionalImportedFiles = new ArrayList<>();
+
+         /*
+          * Try to import from all devices which have the defined extension
+          */
+         for (final TourbookDevice device1 : _allDevices_BySortPriority) {
+
+            final String deviceFileExtension = device1.fileExtension;
+
+            if (deviceFileExtension.equals(UI.SYMBOL_STAR) || deviceFileExtension.equalsIgnoreCase(fileExtension)) {
+
+               // Check if the file we want to import requires confirmation and if yes, ask user
+               if (device1.userConfirmationRequired()) {
+
+                  display.syncExec(() -> {
+
+                     final Shell activeShell = display.getActiveShell();
+
+                     if (activeShell != null) {
+                        if (MessageDialog.openConfirm(
+                              display.getActiveShell(),
+                              NLS.bind(Messages.DataImport_ConfirmImport_title, device1.visibleName),
+                              device1.userConfirmationMessage())) {
+                           _isImportCanceled = false;
+                        } else {
+                           _isImportCanceled = true;
+                        }
+                     }
+                  });
+               }
+
+               if (_isImportCanceled) {
+                  importReturnValue[0] = true; // don't display an error to the user
+                  return;
+               }
+
+               // device file extension was found in the filename extension
+               lastImportedFileName[0] = importTours_FromOneFile_10(
+                     device1,
+                     importFilePathName,
+                     destinationPath,
+                     fileCollision,
+                     isBuildNewFileNames,
+                     isTourDisplayedInImportView,
+                     processDeviceDataStates,
+                     allImportedTourDataFromOneFile);
+
+               if (lastImportedFileName[0] != null) {
+
+                  isDataImported = true;
+                  importReturnValue[0] = true;
+
+                  final ArrayList<String> deviceImportedFiles = device1.getAdditionalImportedFiles();
+                  if (deviceImportedFiles != null) {
+                     additionalImportedFiles.addAll(deviceImportedFiles);
+                  }
+
+                  break;
+               }
+
+               if (_isImportCanceled) {
+                  break;
+               }
+            }
+         }
+
+         if (isDataImported == false && !_isImportCanceled) {
+
+            /*
+             * When data has not imported yet, try all available devices without checking the
+             * file extension
+             */
+            for (final TourbookDevice device2 : _allDevices_BySortPriority) {
+
+               lastImportedFileName[0] = importTours_FromOneFile_10(
+                     device2,
+                     importFilePathName,
+                     destinationPath,
+                     fileCollision,
+                     isBuildNewFileNames,
+                     isTourDisplayedInImportView,
+                     processDeviceDataStates,
+                     allImportedTourDataFromOneFile);
+
+               if (lastImportedFileName[0] != null) {
+
+                  isDataImported = true;
+                  importReturnValue[0] = true;
+
+                  final ArrayList<String> otherImportedFiles = device2.getAdditionalImportedFiles();
+                  if (otherImportedFiles != null) {
+                     additionalImportedFiles.addAll(otherImportedFiles);
+                  }
+
+                  break;
+               }
+            }
+         }
+
+         if (isDataImported) {
+
+            _allImportedFileNames.put(lastImportedFileName[0], lastImportedFileName[0]);
+
+            if (!additionalImportedFiles.isEmpty()) {
+
+               for (final String fileName : additionalImportedFiles) {
+                  _allImportedFileNamesChildren.put(fileName, fileName);
+               }
+            }
+         }
+
+         // cleanup
+         additionalImportedFiles.clear();
+      });
+
+      return importReturnValue[0];
+   }
+
+   /**
+    * import the raw data of the given file
+    *
+    * @param device
+    *           the device which is able to process the data of the file
+    * @param sourceFileName
+    *           the file to be imported
+    * @param destinationPath
+    *           if not null copy the file to this path
+    * @param fileCollision
+    *           behavior if destination file exists (ask if null)
+    * @param isBuildNewFileName
+    *           if true create a new filename depending on the content of the file, keep old name if
+    *           false
+    * @param isTourDisplayedInImportView
+    * @param allNewlyImportedToursFromOneFile
+    * @return Returns the import filename or <code>null</code> when it was not imported
+    */
+   private String importTours_FromOneFile_10(final TourbookDevice device,
+                                             String sourceFileName,
+                                             final String destinationPath,
+                                             FileCollisionBehavior fileCollision,
+                                             final boolean isBuildNewFileName,
+                                             final boolean isTourDisplayedInImportView,
+                                             final ProcessDeviceDataStates processDeviceDataStates,
+                                             final Map<Long, TourData> allNewlyImportedToursFromOneFile) {
+
+      if (fileCollision == null) {
+         fileCollision = new FileCollisionBehavior();
+      }
+
+      device.setIsChecksumValidation(_importState_IsHAC4_5_ChecksumValidation);
+
+      if (device.validateRawData(sourceFileName)) {
+
+         // file contains valid raw data for the raw data reader
+
+         if (_importState_ImportYear != -1) {
+            device.setImportYear(_importState_ImportYear);
+         }
+
+         device.setMergeTracks(_importState_IsMergeTracks);
+         device.setCreateTourIdWithTime(_importState_IsCreateTourIdWithTime);
+         device.setConvertWayPoints(_importState_IsConvertWayPoints);
+
+         // copy file to destinationPath
+         if (destinationPath != null) {
+
+            final String newFileName = importTours_FromOneFile_20_CopyFile(
+                  device,
+                  sourceFileName,
+                  destinationPath,
+                  isBuildNewFileName,
+                  fileCollision);
+
+            if (newFileName == null) {
+               return null;
+            }
+
+            sourceFileName = newFileName;
+         }
+
+         boolean isImported = false;
+
+         try {
+
+            isImported = device.processDeviceData(
+                  sourceFileName,
+                  _deviceData,
+                  _allImportedTours,
+                  allNewlyImportedToursFromOneFile,
+                  processDeviceDataStates);
+
+         } catch (final Exception e) {
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         }
+
+         if (isTourDisplayedInImportView) {
+            _allImportedTours.putAll(allNewlyImportedToursFromOneFile);
+         }
+
+         // keep tours in _newlyImportedTours because they are used when tours are re-imported
+
+         return isImported
+               ? sourceFileName
+               : null;
+      }
+
+      return null;
+
+   }
+
+   private String importTours_FromOneFile_20_CopyFile(final TourbookDevice device,
+                                                      final String sourceFileName,
+                                                      final String destinationPath,
+                                                      final boolean isBuildNewFileName,
+                                                      final FileCollisionBehavior fileCollision) {
+
+      String destFileName = new File(sourceFileName).getName();
+
+      if (isBuildNewFileName) {
+
+         destFileName = null;
+
+         try {
+            destFileName = device.buildFileNameFromRawData(sourceFileName);
+         } catch (final Exception e) {
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         } finally {
+
+            if (destFileName == null) {
+
+               final String dialogMessage = NLS.bind(
+                     Messages.Import_Data_Error_CreatingFileName_Message,
+                     new Object[] {
+                           sourceFileName,
+                           new org.eclipse.core.runtime.Path(destinationPath)
+                                 .addTrailingSeparator()
+                                 .toString(), TEMP_IMPORTED_FILE });
+
+               MessageDialog.openError(
+                     Display.getDefault().getActiveShell(),
+                     Messages.Import_Data_Error_CreatingFileName_Title,
+                     dialogMessage);
+
+               destFileName = TEMP_IMPORTED_FILE;
+            }
+         }
+      }
+      final File newFile = new File(
+            (new org.eclipse.core.runtime.Path(destinationPath)
+                  .addTrailingSeparator()
+                  .toString() + destFileName));
+
+      // get source file
+      final File fileIn = new File(sourceFileName);
+
+      // check if file already exist
+      if (newFile.exists()) {
+
+         // TODO allow user to rename the file
+
+         boolean keepFile = false; // for MessageDialog result
+         if (fileCollision.value == FileCollisionBehavior.ASK) {
+
+            final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            final MessageDialog messageDialog = new MessageDialog(
+                  shell,
+                  Messages.Import_Wizard_Message_Title,
+                  null,
+                  NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, newFile),
+                  MessageDialog.QUESTION,
+                  new String[] {
+                        IDialogConstants.YES_LABEL,
+                        IDialogConstants.YES_TO_ALL_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.NO_TO_ALL_LABEL },
+                  0);
+            messageDialog.open();
+            final int returnCode = messageDialog.getReturnCode();
+            switch (returnCode) {
+
+            case 1: // YES_TO_ALL
+               fileCollision.value = FileCollisionBehavior.REPLACE;
+               break;
+
+            case 3: // NO_TO_ALL
+               fileCollision.value = FileCollisionBehavior.KEEP;
+            case 2: // NO
+               keepFile = true;
+               break;
+
+            default:
+               break;
+            }
+         }
+
+         if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
+            _isImportCanceled = true;
+            fileIn.delete();
+            return null;
+         }
+      }
+
+      // copy source file into destination file
+      try (FileInputStream inReader = new FileInputStream(fileIn);
+            FileOutputStream outReader = new FileOutputStream(newFile)) {
+
+         int c;
+
+         while ((c = inReader.read()) != -1) {
+            outReader.write(c);
+         }
+
+      } catch (final IOException e) {
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         return null;
+      }
+
+      // delete source file
+      fileIn.delete();
+
+      return newFile.getAbsolutePath();
    }
 
    /**
@@ -2298,7 +2299,7 @@ public class RawDataManager {
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
 
-      if (importTour(
+      if (importTours_FromOneFile(
 
             reimportedFile, //               importFile
             null, //                         destinationPath

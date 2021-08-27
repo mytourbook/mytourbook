@@ -931,7 +931,7 @@ public class EasyImportManager {
       /*
        * 02. Import files
        */
-      final ImportRunState importRunState = rawDataManager.importTours(
+      final ImportRunState importRunState = rawDataManager.importTours_FromMultipleFiles(
             notImportedFiles,
             true,
             importConfig.fileGlobPattern,

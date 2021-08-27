@@ -39,14 +39,6 @@ public class ProcessDeviceDataStates {
    public boolean       isReimport;
 
    /**
-    * IN state:
-    * <p>
-    * When <code>true</code> then the tour import/re-import is running concurrently, default is
-    * <code>false</code>
-    */
-   public boolean       isRunningConcurrently;
-
-   /**
     * OUT state:
     * <p>
     * When <code>true</code> then this code should be fired, when all tours are
@@ -129,13 +121,6 @@ public class ProcessDeviceDataStates {
    public ProcessDeviceDataStates setIsReimport(final boolean isReimport) {
 
       this.isReimport = isReimport;
-
-      return this;
-   }
-
-   public ProcessDeviceDataStates setIsRunningConcurrently(final boolean isRunningConcurrently) {
-
-      this.isRunningConcurrently = isRunningConcurrently;
 
       return this;
    }

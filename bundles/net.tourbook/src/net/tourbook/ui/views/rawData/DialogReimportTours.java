@@ -633,7 +633,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
 
             .setIsReimport(true)
-            .setIsRunningConcurrently(true)
             .setIsSkipToursWithFileNotFound(isSkipToursWithFileNotFound);
 
       if (isLogDetails == false) {
