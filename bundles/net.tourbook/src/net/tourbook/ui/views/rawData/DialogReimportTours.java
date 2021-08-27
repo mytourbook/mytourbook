@@ -34,6 +34,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -60,7 +61,6 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -77,8 +77,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
-
-   private static final String SUB_TASK_REIMPORT_PROGRESS                   = "{0} / {1} - {2} % - {3} Δ";                    //$NON-NLS-1$
 
    private static final String STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
    private static final String STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
@@ -108,8 +106,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
    private static final String STATE_IS_LOG_DETAILS                         = "STATE_IS_LOG_DETAILS";                         //$NON-NLS-1$
    private static final String STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
-
-   private static final String NUMBER_FORMAT_1F                             = "%.1f";                                         //$NON-NLS-1$
 
    private static final int    VERTICAL_SECTION_MARGIN                      = 10;
 
@@ -218,15 +214,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          shell.setSize(shellDefaultSize);
       });
-   }
-
-   private void countDownLatch() {
-
-      long numCounts = _reimport_CountDownLatch.getCount();
-
-      while (numCounts-- > 0) {
-         _reimport_CountDownLatch.countDown();
-      }
    }
 
    @Override
@@ -807,23 +794,28 @@ public class DialogReimportTours extends TitleAreaDialog {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
+            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numAllTourIDs);
+
             final long startTime = System.currentTimeMillis();
             long lastUpdateTime = startTime;
 
             final AtomicInteger numWorkedTours = new AtomicInteger();
 
-            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numAllTourIDs);
-
-            int lastUpdateNumItems = 1;
+            int numLastWorked = 1;
 
             // loop: all selected tours in the viewer
             for (final long tourId : allTourIDs) {
 
                if (monitor.isCanceled() || reImportStatus.isCanceled_WholeReimport.get()) {
 
-                  // count down all, that the re-import task can finish but process re-imported tours
-
-                  countDownLatch();
+                  /*
+                   * Count down all, that the re-import task can finish but process re-imported
+                   * tours
+                   */
+                  long numCounts = _reimport_CountDownLatch.getCount();
+                  while (numCounts-- > 0) {
+                     _reimport_CountDownLatch.countDown();
+                  }
 
                   break;
                }
@@ -836,21 +828,12 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   lastUpdateTime = currentTime;
 
-                  final int numWorkedValue = numWorkedTours.get();
-
-                  final long numTourDiff = numWorkedValue - lastUpdateNumItems;
-                  lastUpdateNumItems = numWorkedValue;
-
-                  final String percentValue = String.format(NUMBER_FORMAT_1F, (float) numWorkedValue / numAllTourIDs * 100.0);
+                  final int numWorked = numWorkedTours.get();
 
                   // "{0} / {1} - {2} % - {3} Δ"
-                  monitor.subTask(NLS.bind(SUB_TASK_REIMPORT_PROGRESS,
-                        new Object[] {
-                              numWorkedValue,
-                              numAllTourIDs,
-                              percentValue,
-                              numTourDiff,
-                        }));
+                  UI.showWorkedInProgressMonitor(monitor, numWorked, numAllTourIDs, numLastWorked);
+
+                  numLastWorked = numWorked;
                }
 
                doReimport_60_RunConcurrent(

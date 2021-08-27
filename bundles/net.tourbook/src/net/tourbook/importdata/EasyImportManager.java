@@ -937,7 +937,13 @@ public class EasyImportManager {
        */
       final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
 
-            .setIsEasyImport(true);
+            .setIsEasyImport(true)
+
+            .setIsLog_DEFAULT(false)
+            .setIsLog_INFO(false)
+            .setIsLog_OK(false)
+
+      ;
 
       rawDataManager.importTours_FromMultipleFiles(
             notImportedFiles,

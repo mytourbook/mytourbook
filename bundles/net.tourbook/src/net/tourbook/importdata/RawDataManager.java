@@ -34,7 +34,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
@@ -109,7 +115,6 @@ public class RawDataManager {
    public static final String    LOG_IMPORT_TOURS_IMPORTED_FROM_FILE         = Messages.Log_Import_Tours_Imported_From_File;
 
    public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
-
    public static final String    LOG_DELETE_TOURVALUES_END                   = Messages.Log_Delete_TourValues_End;
    public static final String    LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA       = Messages.Log_ModifiedTour_Old_Data_Vs_New_Data;
 
@@ -121,26 +126,24 @@ public class RawDataManager {
 
 // SET_FORMATTING_ON
 
-   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";               //$NON-NLS-1$
-   private static final String           TEMP_IMPORTED_FILE                    = "received-device-data.txt";                              //$NON-NLS-1$
+   private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
+   private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
 
-   private static final String           FILE_EXTENSION_FIT                    = ".fit";                                                  //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT               = ".fit";                                                //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state_RawDataView                    = TourbookPlugin.getState(RawDataView.ID);
+   private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
 
-   private static final String           INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                            //$NON-NLS-1$
+   private static final String           INVALIDFILES_TO_IGNORE           = "invalidfiles_to_ignore.txt";                          //$NON-NLS-1$
 
-   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
+   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
 
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean                _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-   private static boolean                _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean                _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-   private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_state_RawDataView,
-         RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
-         RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+   private static boolean                _importState_IsAutoOpenImportLog = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+   private static boolean                _importState_IsIgnoreInvalidFile = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
+   private static boolean                _importState_IsSetBodyWeight     = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static CadenceMultiplier      _importState_DefaultCadenceMultiplier;
 
    static {
 
@@ -150,9 +153,15 @@ public class RawDataManager {
             new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed, TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
 
       };
+
+      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_state_RawDataView,
+            RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
+            RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
    }
 
-   private static RawDataManager                  _instance = null;
+
+   private static RawDataManager                  _instance;
 
    /**
     * Is <code>true</code> when currently a re-importing is running
@@ -206,17 +215,38 @@ public class RawDataManager {
    /**
     * Contains the device data imported from the device/file
     */
-   private static final DeviceData _deviceData                              = new DeviceData();
+   private static final DeviceData               _deviceData       = new DeviceData();
    //
-   private int                     _importState_ImportYear                  = ADJUST_IMPORT_YEAR_IS_DISABLED;
-   private boolean                 _importState_IsConvertWayPoints          = Util.getStateBoolean(_state_RawDataView,
-         RawDataView.STATE_IS_CONVERT_WAYPOINTS,
-         RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+   private static ThreadPoolExecutor             _importTour_Executor;
+   private static ArrayBlockingQueue<ImportFile> _importTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch                 _importTour_CountDownLatch;
+
+   static {
+
+      final ThreadFactory threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Importing tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+   }
    //
-   private boolean                 _importState_IsCreateTourIdWithTime      = RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
-   private boolean                 _importState_IsHAC4_5_ChecksumValidation = RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
-   private boolean                 _importState_IsMergeTracks               = RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
-   //
+   private int     _importState_ImportYear                  = ADJUST_IMPORT_YEAR_IS_DISABLED;
+   private boolean _importState_IsConvertWayPoints;
+   private boolean _importState_IsCreateTourIdWithTime      = RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
+   private boolean _importState_IsHAC4_5_ChecksumValidation = RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+   private boolean _importState_IsMergeTracks               = RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+   {
+      _importState_IsConvertWayPoints = Util.getStateBoolean(_state_RawDataView,
+
+            RawDataView.STATE_IS_CONVERT_WAYPOINTS,
+            RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+   }
    //
    private final ArrayList<TourType>   _tempTourTypes                           = new ArrayList<>();
    private final ArrayList<TourTag>    _tempTourTags                            = new ArrayList<>();
@@ -230,9 +260,12 @@ public class RawDataManager {
 
       IPath   filePath;
       boolean isBackupImportFile;
+      String  osFilePath;
 
       public ImportFile(final org.eclipse.core.runtime.Path iPath) {
+
          filePath = iPath;
+         osFilePath = filePath.toOSString();
       }
    }
 
@@ -1451,17 +1484,27 @@ public class RawDataManager {
    private void importTours_FromMultipleFiles_10(final List<ImportFile> allImportFilePaths,
                                                  final ProcessDeviceDataStates processDeviceDataStates) {
 
+      final int numAllFiles = allImportFilePaths.size();
+
+      /*
+       * Setup concurrency
+       */
+      _importTour_CountDownLatch = new CountDownLatch(numAllFiles);
+      _importTour_Queue.clear();
+
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            int numImportedFiles = 0;
-            final int numAllFiles = allImportFilePaths.size();
-
             monitor.beginTask(Messages.import_data_importTours_task, numAllFiles);
 
-            int numImportedTours = 0;
+            final long startTime = System.currentTimeMillis();
+            long lastUpdateTime = startTime;
+
+            final AtomicInteger numImportedFiles = new AtomicInteger();
+
+            int numLastWorked = 0;
 
             // loop: import all selected files
             for (final ImportFile filePath : allImportFilePaths) {
@@ -1472,86 +1515,58 @@ public class RawDataManager {
 
                   processDeviceDataStates.isImportCanceled_ByMonitor = true;
 
+                  /*
+                   * Count down all, that the import task can finish but process imported tours
+                   */
+                  long numCounts = _importTour_CountDownLatch.getCount();
+                  while (numCounts-- > 0) {
+                     _importTour_CountDownLatch.countDown();
+                  }
+
                   break;
                }
 
-               final String osFilePath = filePath.filePath.toOSString();
+               final long currentTime = System.currentTimeMillis();
+               final long timeDiff = currentTime - lastUpdateTime;
 
-               final String subTask = NLS.bind(
-                     Messages.import_data_importTours_subTask,
-                     new Object[] { ++numImportedFiles, numAllFiles, osFilePath });
+               // reduce logging
+               if (timeDiff > 1000) {
 
-               monitor.worked(1);
-               monitor.subTask(subTask);
+                  lastUpdateTime = currentTime;
+
+                  final int numWorked = numImportedFiles.get();
+
+                  // "{0} / {1} - {2} % - {3} Δ"
+                  UI.showWorkedInProgressMonitor(monitor, numWorked, numAllFiles, numLastWorked);
+
+                  numLastWorked = numWorked;
+               }
 
                // ignore files which are imported as children from other imported files
-               if (_allImportedFileNamesChildren.contains(osFilePath)) {
+               if (_allImportedFileNamesChildren.contains(filePath.osFilePath)) {
+
+                  _importTour_CountDownLatch.countDown();
+
                   continue;
                }
 
-               File importFile = new File(osFilePath);
+               importTours_FromMultipleFiles_20_Concurrent(
 
-               if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
-
-                  importFile = FileSystemManager.CopyLocally(osFilePath);
-               }
-
-               final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
-
-               if (importTours_FromOneFile(
-
-                     importFile, //                   importFile
-                     null, //                         destinationPath
-                     null, //                         fileCollision
-                     false, //                        isBuildNewFileNames
-                     true, //                         isTourDisplayedInImportView
-                     allImportedToursFromOneFile,
-                     processDeviceDataStates //
-               )) {
-
-                  numImportedTours++;
-
-                  // update state
-                  for (final TourData importedTourData : allImportedToursFromOneFile.values()) {
-
-                     importedTourData.isBackupImportFile = filePath.isBackupImportFile;
-
-                     if (processDeviceDataStates.isLog_OK) {
-
-                        TourLogManager.subLog_OK(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                              importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                              osFilePath));
-                     }
-                  }
-
-                  final int numImportedToursFromOneFile = allImportedToursFromOneFile.size();
-
-                  // reduce noise: log only when more than ONE tour is imported from ONE file
-                  if (processDeviceDataStates.isLog_INFO && numImportedToursFromOneFile > 1) {
-
-                     TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
-                           numImportedToursFromOneFile,
-                           osFilePath));
-                  }
-
-               } else {
-
-                  _allInvalidFiles.put(osFilePath, new Object());
-
-                  TourLogManager.subLog_ERROR(osFilePath);
-               }
-
-               if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
-
-                  // Delete the temporary created file
-                  FilesUtils.deleteIfExists(importFile.toPath());
-               }
-
+                     filePath,
+                     numImportedFiles,
+                     monitor,
+                     processDeviceDataStates);
             }
 
+            // wait until all imports are performed
+            _importTour_CountDownLatch.await();
+
+            /*
+             * Do post import actions
+             */
             save_InvalidFilesToIgnore_InTxt();
 
-            if (numImportedTours > 0) {
+            if (numImportedFiles.get() > 0) {
 
                updateTourData_InImportView_FromDb(monitor);
 
@@ -1571,6 +1586,7 @@ public class RawDataManager {
                });
             }
          }
+
       };
 
       try {
@@ -1579,6 +1595,108 @@ public class RawDataManager {
 
       } catch (final Exception e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
+      }
+   }
+
+   private void importTours_FromMultipleFiles_20_Concurrent(final ImportFile filePath,
+                                                            final AtomicInteger numImportedFiles,
+                                                            final IProgressMonitor monitor,
+                                                            final ProcessDeviceDataStates processDeviceDataStates) {
+      try {
+
+         // put file path into the queue AND wait when it is full
+
+         _importTour_Queue.put(filePath);
+
+      } catch (final InterruptedException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _importTour_Executor.submit(() -> {
+
+         // get last added item
+         final ImportFile queueItem_FilePath = _importTour_Queue.poll();
+
+         try {
+
+            if (queueItem_FilePath != null) {
+
+               importTours_FromMultipleFiles_30_OneFile(
+
+                     filePath,
+                     processDeviceDataStates);
+            }
+
+         } finally {
+
+            monitor.worked(1);
+            numImportedFiles.incrementAndGet();
+
+            _importTour_CountDownLatch.countDown();
+         }
+      });
+   }
+
+   private void importTours_FromMultipleFiles_30_OneFile(final ImportFile filePath,
+                                                         final ProcessDeviceDataStates processDeviceDataStates) {
+
+      final String osFilePath = filePath.osFilePath;
+      File importFile = new File(osFilePath);
+
+      if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
+
+         importFile = FileSystemManager.CopyLocally(osFilePath);
+      }
+
+      final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
+
+      if (importTours_FromOneFile(
+
+            importFile, //                   importFile
+            null, //                         destinationPath
+            null, //                         fileCollision
+            false, //                        isBuildNewFileNames
+            true, //                         isTourDisplayedInImportView
+            allImportedToursFromOneFile,
+            processDeviceDataStates //
+      )) {
+
+         // update state
+         for (final TourData importedTourData : allImportedToursFromOneFile.values()) {
+
+            importedTourData.isBackupImportFile = filePath.isBackupImportFile;
+
+            if (processDeviceDataStates.isLog_OK) {
+
+               TourLogManager.subLog_OK(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                     importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                     osFilePath));
+            }
+         }
+
+         final int numImportedToursFromOneFile = allImportedToursFromOneFile.size();
+
+         // reduce log noise: log only when more than ONE tour is imported from ONE file
+         if (processDeviceDataStates.isLog_INFO && numImportedToursFromOneFile > 1) {
+
+            TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
+                  numImportedToursFromOneFile,
+                  osFilePath));
+         }
+
+      } else {
+
+         _allInvalidFiles.put(osFilePath, new Object());
+
+         TourLogManager.subLog_ERROR(osFilePath);
+      }
+
+      if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
+
+         // Delete the temporary created file
+         FilesUtils.deleteIfExists(importFile.toPath());
       }
    }
 
@@ -2878,6 +2996,8 @@ public class RawDataManager {
       }
       return null;
    }
+
+
 
    /**
     * Update {@link TourData} from the database for all imported tours which are contained in

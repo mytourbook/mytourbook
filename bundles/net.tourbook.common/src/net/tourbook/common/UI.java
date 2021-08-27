@@ -43,6 +43,7 @@ import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.StatusLineManager;
@@ -64,6 +65,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -253,20 +255,23 @@ public class UI {
    /**
     * On Linux an async selection event is fired since e4
     */
-   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2"; //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";   //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";   //$NON-NLS-1$
 
-   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                 //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                   //$NON-NLS-1$
 
-   public static final String  TIME_ZONE_UTC                  = "UTC";                     //$NON-NLS-1$
+   public static final String  TIME_ZONE_UTC                  = "UTC";                       //$NON-NLS-1$
 
-   public static final String  UTF_8                          = "UTF-8";                   //$NON-NLS-1$
-   public static final String  UTF_16                         = "UTF-16";                  //$NON-NLS-1$
-   public static final String  ISO_8859_1                     = "ISO-8859-1";              //$NON-NLS-1$
+   public static final String  UTF_8                          = "UTF-8";                     //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                    //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";                //$NON-NLS-1$
 
    public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";               //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                 //$NON-NLS-1$
+
+   private static final String NUMBER_FORMAT_1F               = "%.1f";                      //$NON-NLS-1$
+   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ"; //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
@@ -2527,6 +2532,40 @@ public class UI {
       }
 
       return shortedText;
+   }
+
+   /**
+    * Show worked values in progress monitor with the format
+    *
+    * <pre>
+    * {0} / {1} - {2} % - {3} Δ
+    * </pre>
+    *
+    * @param monitor
+    * @param numWorked
+    * @param numAll
+    * @param numLastWorked
+    */
+   public static void showWorkedInProgressMonitor(final IProgressMonitor monitor,
+                                                  final int numWorked,
+                                                  final int numAll,
+                                                  final int numLastWorked) {
+
+      final long numDiff = numWorked - numLastWorked;
+
+      final String percentValue = numAll == 0
+
+            ? UI.EMPTY_STRING
+            : String.format(NUMBER_FORMAT_1F, (float) numWorked / numAll * 100.0);
+
+      // "{0} / {1} - {2} % - {3} Δ"
+      monitor.subTask(NLS.bind(SUB_TASK_PROGRESS,
+            new Object[] {
+                  numWorked,
+                  numAll,
+                  percentValue,
+                  numDiff,
+            }));
    }
 
    /**

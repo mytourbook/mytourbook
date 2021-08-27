@@ -4934,7 +4934,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             : TourLogView.CSS_LOG_TITLE;
 
       final String message = isEasyImport
+
+            // "99. Save tours"
             ? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
+
+            // "Save tours"
             : TourLogManager.LOG_TOUR_SAVE_TOURS;
 
       TourLogManager.addLog(TourLogState.DEFAULT, message, css);
