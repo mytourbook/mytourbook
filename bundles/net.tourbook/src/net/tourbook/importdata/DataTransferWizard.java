@@ -99,7 +99,7 @@ public class DataTransferWizard extends Wizard {
       }
 
       /*
-       * get port name
+       * Get port name
        */
       final int selectedComPort = comboPorts.getSelectionIndex();
       if (selectedComPort == -1) {
@@ -109,14 +109,14 @@ public class DataTransferWizard extends Wizard {
       final String portName = comboPorts.getItem(selectedComPort);
 
       /*
-       * when the Cancel button is pressed multiple times, the app calls this function each time
+       * When the Cancel button is pressed multiple times, the app calls this function each time
        */
       if (_runnableReceiveData != null) {
          return false;
       }
 
       /*
-       * set the device which is used to read the data
+       * Set the device which is used to read the data
        */
       _importDevice = _dataTransferWizardPage.getSelectedDevice();
       if (_importDevice == null) {
@@ -124,20 +124,22 @@ public class DataTransferWizard extends Wizard {
       }
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
-      rawDataManager.setImportCanceled(false);
-      rawDataManager.setImportId();
 
       /*
-       * receive data from the device
+       * Receive data from the device
        */
       try {
+
          _runnableReceiveData = _importDevice.createImportRunnable(portName, _receivedFiles);
+
          getContainer().run(true, true, _runnableReceiveData);
+
       } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       }
 
       if (_receivedFiles.isEmpty() || _importDevice.isImportCanceled()) {
+
          // data has not been received or the user canceled the import
          return true;
       }

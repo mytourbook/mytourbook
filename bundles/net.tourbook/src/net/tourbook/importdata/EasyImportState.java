@@ -15,22 +15,10 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-/*
- * Author: Wolfgang Schramm Created: 23.05.2005
- */
+public class EasyImportState {
 
-/**
- * Contains device data
- *
- * @author Wolfgang Schramm
- */
-public class DeviceData {
+   public boolean isImportCanceled;
 
-   /**
-    * The transfer date is used to create the filename for the transfered tours
-    */
-   public short transferYear  = 1999;
-   public short transferMonth = 1;
-   public short transferDay   = 1;
-
+   public boolean isOpenSetup;
+   public boolean isUpdateImportViewer;
 }

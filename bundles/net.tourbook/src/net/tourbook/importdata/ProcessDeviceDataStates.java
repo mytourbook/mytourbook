@@ -23,6 +23,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ProcessDeviceDataStates {
 
    /**
+    * OUT state:
+    * <p>
+    * Is <code>true</code> when the import was canceled by the user
+    */
+   public boolean       isImportCanceled_ByMonitor;
+
+   /**
+    * OUT state:
+    * <p>
+    * Is <code>true</code> when the import was canceled after a dialog was displayed to the user
+    */
+   public boolean       isImportCanceled_ByUserDialog;
+
+   /**
     * IN state:
     * <p>
     * When <code>true</code> then tours will be skipped when the import file is not defined or not
@@ -37,6 +51,18 @@ public class ProcessDeviceDataStates {
     * <code>false</code>
     */
    public boolean       isReimport;
+
+   /**
+    * IN state:
+    * <p>
+    * Is <code>true</code> when the import is started from easy import
+    */
+   public boolean       isEasyImport;
+
+   /**
+    * Contains a unique id so that each import can be identified.
+    */
+   public long          importId           = System.currentTimeMillis();
 
    /**
     * OUT state:
@@ -77,6 +103,19 @@ public class ProcessDeviceDataStates {
       setIsLog_DEFAULT(true);
       setIsLog_INFO(true);
       setIsLog_OK(true);
+   }
+
+   /**
+    * IN state:
+    *
+    * @param isEasyImport
+    * @return
+    */
+   public ProcessDeviceDataStates setIsEasyImport(final boolean isEasyImport) {
+
+      this.isEasyImport = isEasyImport;
+
+      return this;
    }
 
    /**

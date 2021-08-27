@@ -208,8 +208,6 @@ public class RawDataManager {
     */
    private static final DeviceData _deviceData                              = new DeviceData();
    //
-   private boolean                 _isImportCanceled;
-   //
    private int                     _importState_ImportYear                  = ADJUST_IMPORT_YEAR_IS_DISABLED;
    private boolean                 _importState_IsConvertWayPoints          = Util.getStateBoolean(_state_RawDataView,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS,
@@ -689,9 +687,8 @@ public class RawDataManager {
 
       importTours_FromMultipleFiles(
             allOSFiles,
-            false,
             null,
-            new ProcessDeviceDataStates());
+            new ProcessDeviceDataStates().setIsEasyImport(false));
    }
 
    /**
@@ -1373,15 +1370,12 @@ public class RawDataManager {
     * @param processDeviceDataStates
     * @return
     */
-   public ImportRunState importTours_FromMultipleFiles(final ArrayList<OSFile> allImportFiles,
-                                                       final boolean isEasyImport,
-                                                       final String fileGlobPattern,
-                                                       final ProcessDeviceDataStates processDeviceDataStates) {
-
-      final ImportRunState importRunState = new ImportRunState();
+   public void importTours_FromMultipleFiles(final ArrayList<OSFile> allImportFiles,
+                                             final String fileGlobPattern,
+                                             final ProcessDeviceDataStates processDeviceDataStates) {
 
       if (allImportFiles.isEmpty()) {
-         return importRunState;
+         return;
       }
 
       final long start = System.currentTimeMillis();
@@ -1389,11 +1383,11 @@ public class RawDataManager {
       /*
        * Log import
        */
-      final String css = isEasyImport
+      final String css = processDeviceDataStates.isEasyImport
             ? UI.EMPTY_STRING
             : TourLogView.CSS_LOG_TITLE;
 
-      final String message = isEasyImport
+      final String message = processDeviceDataStates.isEasyImport
             ? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
             : RawDataManager.LOG_IMPORT_TOUR;
 
@@ -1442,7 +1436,20 @@ public class RawDataManager {
          return Integer.MAX_VALUE;
       });
 
-      _isImportCanceled = false;
+      importTours_FromMultipleFiles_10(allImportFilePaths, processDeviceDataStates);
+
+      TourLogManager.log_DEFAULT(String.format(
+
+            processDeviceDataStates.isEasyImport
+                  ? EasyImportManager.LOG_EASY_IMPORT_002_END
+                  : RawDataManager.LOG_IMPORT_TOUR_END,
+
+            (System.currentTimeMillis() - start) / 1000.0));
+
+   }
+
+   private void importTours_FromMultipleFiles_10(final List<ImportFile> allImportFilePaths,
+                                                 final ProcessDeviceDataStates processDeviceDataStates) {
 
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
@@ -1454,8 +1461,6 @@ public class RawDataManager {
 
             monitor.beginTask(Messages.import_data_importTours_task, numAllFiles);
 
-            setImportId();
-
             int numImportedTours = 0;
 
             // loop: import all selected files
@@ -1465,7 +1470,7 @@ public class RawDataManager {
 
                   // stop importing but process imported tours
 
-                  importRunState.isImportCanceled = true;
+                  processDeviceDataStates.isImportCanceled_ByMonitor = true;
 
                   break;
                }
@@ -1557,7 +1562,8 @@ public class RawDataManager {
                   if (view != null) {
                      view.reloadViewer();
 
-                     if (isEasyImport == false) {
+                     if (processDeviceDataStates.isEasyImport == false) {
+
                         // first tour is selected later
                         view.selectFirstTour();
                      }
@@ -1574,14 +1580,6 @@ public class RawDataManager {
       } catch (final Exception e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
-
-      TourLogManager.log_DEFAULT(String.format(
-            isEasyImport
-                  ? EasyImportManager.LOG_EASY_IMPORT_002_END
-                  : RawDataManager.LOG_IMPORT_TOUR_END,
-            (System.currentTimeMillis() - start) / 1000.0));
-
-      return importRunState;
    }
 
    /**
@@ -1673,15 +1671,15 @@ public class RawDataManager {
                               display.getActiveShell(),
                               NLS.bind(Messages.DataImport_ConfirmImport_title, device1.visibleName),
                               device1.userConfirmationMessage())) {
-                           _isImportCanceled = false;
+                           processDeviceDataStates.isImportCanceled_ByUserDialog = false;
                         } else {
-                           _isImportCanceled = true;
+                           processDeviceDataStates.isImportCanceled_ByUserDialog = true;
                         }
                      }
                   });
                }
 
-               if (_isImportCanceled) {
+               if (processDeviceDataStates.isImportCanceled_ByUserDialog) {
                   importReturnValue[0] = true; // don't display an error to the user
                   return;
                }
@@ -1710,13 +1708,13 @@ public class RawDataManager {
                   break;
                }
 
-               if (_isImportCanceled) {
+               if (processDeviceDataStates.isImportCanceled_ByUserDialog) {
                   break;
                }
             }
          }
 
-         if (isDataImported == false && !_isImportCanceled) {
+         if (isDataImported == false && !processDeviceDataStates.isImportCanceled_ByUserDialog) {
 
             /*
              * When data has not imported yet, try all available devices without checking the
@@ -1821,7 +1819,8 @@ public class RawDataManager {
                   sourceFileName,
                   destinationPath,
                   isBuildNewFileName,
-                  fileCollision);
+                  fileCollision,
+                  processDeviceDataStates);
 
             if (newFileName == null) {
                return null;
@@ -1864,7 +1863,8 @@ public class RawDataManager {
                                                       final String sourceFileName,
                                                       final String destinationPath,
                                                       final boolean isBuildNewFileName,
-                                                      final FileCollisionBehavior fileCollision) {
+                                                      final FileCollisionBehavior fileCollision,
+                                                      final ProcessDeviceDataStates processDeviceDataStates) {
 
       String destFileName = new File(sourceFileName).getName();
 
@@ -1946,7 +1946,7 @@ public class RawDataManager {
          }
 
          if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
-            _isImportCanceled = true;
+            processDeviceDataStates.isImportCanceled_ByUserDialog = true;
             fileIn.delete();
             return null;
          }
@@ -2819,17 +2819,6 @@ public class RawDataManager {
       });
    }
 
-   public void setImportCanceled(final boolean importCanceled) {
-      _isImportCanceled = importCanceled;
-   }
-
-   /**
-    * Sets a unique id into the device data so that each import can be identified.
-    */
-   public void setImportId() {
-      _deviceData.importId = System.currentTimeMillis();
-   }
-
    public void setImportYear(final int year) {
       _importState_ImportYear = year;
    }
@@ -3070,5 +3059,4 @@ public class RawDataManager {
          }
       }
    }
-
 }

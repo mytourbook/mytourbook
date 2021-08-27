@@ -853,9 +853,13 @@ public class EasyImportManager {
       _fileStoresHash = null;
    }
 
-   public ImportDeviceState runImport(final ImportLauncher importLauncher) {
+   /**
+    * @param importLauncher
+    * @return Returns a state about the import
+    */
+   public EasyImportState runImport(final ImportLauncher importLauncher) {
 
-      final ImportDeviceState importState = new ImportDeviceState();
+      final EasyImportState importState = new EasyImportState();
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -931,13 +935,16 @@ public class EasyImportManager {
       /*
        * 02. Import files
        */
-      final ImportRunState importRunState = rawDataManager.importTours_FromMultipleFiles(
-            notImportedFiles,
-            true,
-            importConfig.fileGlobPattern,
-            new ProcessDeviceDataStates());
+      final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
 
-      importState.isImportCanceled = importRunState.isImportCanceled;
+            .setIsEasyImport(true);
+
+      rawDataManager.importTours_FromMultipleFiles(
+            notImportedFiles,
+            importConfig.fileGlobPattern,
+            processDeviceDataStates);
+
+      importState.isImportCanceled = processDeviceDataStates.isImportCanceled_ByMonitor;
 
       /*
        * Update tour data
@@ -1026,7 +1033,7 @@ public class EasyImportManager {
    }
 
    private void runImport_20_UpdateTourData(final ImportLauncher importLauncher,
-                                            final ImportDeviceState importState,
+                                            final EasyImportState importState,
                                             final Map<Long, TourData> importedTours) {
 
       if (importedTours.isEmpty()) {

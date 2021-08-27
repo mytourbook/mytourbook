@@ -90,8 +90,8 @@ import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
+import net.tourbook.importdata.EasyImportState;
 import net.tourbook.importdata.ImportConfig;
-import net.tourbook.importdata.ImportDeviceState;
 import net.tourbook.importdata.ImportLauncher;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.ProcessDeviceDataStates;
@@ -4390,9 +4390,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
 
-            .setIsReimport(true)
-//          .setIsRunningConcurrently(true)
-      ;
+            .setIsReimport(true);
 
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
@@ -4447,7 +4445,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<String> notImportedFiles = new ArrayList<>();
 
       _rawDataMgr.getImportedTours().clear();
-      _rawDataMgr.setImportId();
 
       int numImportedFiles = 0;
 
@@ -4699,7 +4696,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Run easy import
        */
-      ImportDeviceState importState = null;
+      EasyImportState importState = null;
 
       if (RawDataManager.isAutoOpenImportLog()) {
          TourLogManager.showLogView();

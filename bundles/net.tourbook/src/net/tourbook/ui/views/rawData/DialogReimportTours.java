@@ -791,9 +791,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
 
-      rawDataManager.setImportId();
-      rawDataManager.setImportCanceled(false);
-
       final int numAllTourIDs = allTourIDs.size();
 
       /*
