@@ -23,11 +23,9 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.common.UI;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -113,11 +111,15 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       // the label is hovered
 
+      final boolean isDarkTheme = UI.isDarkTheme();
+      final Color colorDefault = new Color(isDarkTheme ? _chartPauseConfig.pauseColorDefault_Dark : _chartPauseConfig.pauseColorDefault_Light);
+      final Color colorHidden = new Color(isDarkTheme ? _chartPauseConfig.pauseColorHidden_Dark : _chartPauseConfig.pauseColorHidden_Light);
+
       //TODO FB
       drawOverlay_Label(hoveredLabel,
             gc,
-            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
-            new Color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK)),
+            colorDefault,
+            colorHidden,
             false);
 
    }
