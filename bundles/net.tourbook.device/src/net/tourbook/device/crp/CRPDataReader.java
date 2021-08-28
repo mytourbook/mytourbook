@@ -28,6 +28,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -97,13 +98,12 @@ public class CRPDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       // reset tour data list
       // tourDataList.clear();
@@ -121,7 +121,7 @@ public class CRPDataReader extends TourbookDevice {
 
          final String fileHeader = fileReader.readLine();
          if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
-            return false;
+            return;
          }
 
          String line;
@@ -418,14 +418,12 @@ public class CRPDataReader extends TourbookDevice {
             tourData.completeTourMarkerWithRelativeTime();
          }
 
-         returnValue = true;
+         importState_File.isImported = true;
 
       } catch (final Exception e) {
-         e.printStackTrace();
-         return false;
-      }
 
-      return returnValue;
+         e.printStackTrace();
+      }
    }
 
    /**

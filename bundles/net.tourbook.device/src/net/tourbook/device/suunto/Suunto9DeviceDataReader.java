@@ -35,6 +35,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -259,11 +260,12 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       _newlyImportedTours = newlyImportedTours;
       _alreadyImportedTours = alreadyImportedTours;
@@ -273,10 +275,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          cleanUpActivities();
       }
 
-      final String jsonFileContent =
-            GetJsonContentFromGZipFile(importFilePath, false);
+      final String jsonFileContent = GetJsonContentFromGZipFile(importFilePath, false);
 
-      return processFile(importFilePath, jsonFileContent);
+      importState_File.isImported = processFile(importFilePath, jsonFileContent);
    }
 
    /**

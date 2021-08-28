@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -81,18 +82,20 @@ public class FitLogDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       final boolean isFitLogExFile = isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true) ||
             isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);
 
-      if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true) == false &&
-            !isFitLogExFile) {
-         return false;
+      if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true) == false
+            && !isFitLogExFile) {
+         
+         return;
       }
 
       final FitLogSAXHandler saxHandler = new FitLogSAXHandler(
@@ -109,12 +112,14 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 
          parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
+         importState_File.isImported = saxHandler.isImported();
+
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);
-         return false;
+         return;
       } catch (final Exception e) {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
+         return;
       } finally {
 
          final Display display = Display.getDefault();
@@ -132,8 +137,6 @@ public class FitLogDeviceDataReader extends TourbookDevice {
             display.syncExec(() -> _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
          }
       }
-
-      return saxHandler.isImported();
    }
 
    @Override

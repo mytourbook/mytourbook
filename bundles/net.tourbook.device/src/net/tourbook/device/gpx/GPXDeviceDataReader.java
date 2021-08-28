@@ -31,6 +31,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -156,11 +157,12 @@ public class GPXDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       InputStream inputStream = null;
 
@@ -169,7 +171,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
          inputStream = getWellFormedGPX(importFilePath);
 
          if (inputStream == null) {
-            return false;
+            return;
          }
       }
 
@@ -210,16 +212,16 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
-         return false;
+         return;
 
       } catch (final Exception e) {
 
          TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
 
-         return false;
+         return;
       }
 
-      return handler.isImported();
+      importState_File.isImported = handler.isImported();
    }
 
    @Override

@@ -29,6 +29,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -115,14 +116,15 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       if (isValidSuuntoXMLFile(importFilePath) == false) {
-         return false;
+         return;
       }
 
       final SuuntoQuestSAXHandler saxHandler =
@@ -139,18 +141,16 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
 
          parser.parse(inputStream, saxHandler);
 
+         importState_File.isImported = saxHandler.isImported();
+
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);
-         return false;
       } catch (final Exception e) {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
       } finally {
 
          saxHandler.dispose();
       }
-
-      return saxHandler.isImported();
    }
 
    @Override

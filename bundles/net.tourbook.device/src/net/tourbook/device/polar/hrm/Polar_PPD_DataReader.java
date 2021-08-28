@@ -34,6 +34,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -438,11 +439,12 @@ public class Polar_PPD_DataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       if (_isDebug) {
          System.out.println(importFilePath);
@@ -450,7 +452,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 
       // parse this person file
       if (!parseSection(importFilePath)) {
-         return false;
+         return;
       }
 
       // check all sports and create TourTypes if the are not there
@@ -459,7 +461,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
       // read all exercise file names for this person
       final File dataDir = new File(_person.dataPath);
       if (!dataDir.isDirectory()) {
-         return false;
+         return;
       }
 
       // first find all years containing data
@@ -479,14 +481,17 @@ public class Polar_PPD_DataReader extends TourbookDevice {
                   return name.matches(".*\\.pdd$"); // 4-digit year //$NON-NLS-1$
                }
             });
+
             // load all exercises from that pdd file
             for (final File pddFile : pddFiles) {
+
                _polarPDDDataReader.processDeviceData(
                      pddFile.getAbsolutePath(),
                      deviceData,
                      alreadyImportedTours,
                      newlyImportedTours,
-                     importStates);
+                     importStates,
+                     new ImportState_File());
             }
 
             for (final Long tourId : newlyImportedTours.keySet()) {
@@ -501,7 +506,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
          }
       }
 
-      return true;
+      importState_File.isImported = true;
    }
 
    private String skipRows(final BufferedReader fileReader, final int numberOfRows) throws IOException {

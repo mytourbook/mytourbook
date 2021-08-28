@@ -50,6 +50,7 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Sport;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -727,13 +728,12 @@ public class FitDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       try (FileInputStream fileInputStream = new FileInputStream(importFilePath)) {
 
@@ -817,13 +817,11 @@ public class FitDataReader extends TourbookDevice {
 
          fitData.finalizeTour();
 
-         returnValue = true;
+         importState_File.isImported = true;
 
       } catch (final IOException e) {
          TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
       }
-
-      return returnValue;
    }
 
    @Override

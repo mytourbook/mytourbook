@@ -35,6 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.Activator;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -271,13 +272,18 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final ImportState_Process importStates = new ImportState_Process().setIsReimport(_isReimport);
-      
-      if (deviceDataReader.processDeviceData(
+
+      final ImportState_File importState_File = new ImportState_File();
+
+      deviceDataReader.processDeviceData(
             importFilePath.toOSString(),
             _deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            importStates) == false) {
+            importStates,
+            importState_File);
+
+      if (importState_File.isImported == false) {
 
          return null;
       }
@@ -962,11 +968,12 @@ public class Polar_PDD_DataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       _importFilePath = importFilePath;
       _deviceData = deviceData;
@@ -982,9 +989,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
          System.out.println(importFilePath);
       }
 
-      final boolean returnValue = parseSection();
-
-      return returnValue;
+      importState_File.isImported = parseSection();
    }
 
    private String skipRows(final BufferedReader fileReader, final int numberOfRows) throws IOException {

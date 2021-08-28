@@ -32,6 +32,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -94,11 +95,12 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       // must be local because of concurrency
       DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
@@ -130,8 +132,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
       }
 
-      boolean returnValue = false;
-
       try (FileReader fileReader = new FileReader(importFilePath);
             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
@@ -140,7 +140,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
           */
          final String fileHeader = bufferedReader.readLine();
          if (fileHeader.startsWith(DAUM_ERGO_BIKE_CSV_ID) == false) {
-            return false;
+            return;
          }
 
          StringTokenizer tokenizer;
@@ -261,10 +261,12 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          }
 
          if (timeDataList.isEmpty()) {
-            /*
-             * data are valid but have no data points
-             */
-            return true;
+
+            // data are valid but have no data points
+
+            importState_File.isImported = true;
+
+            return;
          }
 
          final float joule = kJoule * 1000;
@@ -302,16 +304,12 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             tourData.computeComputedValues();
          }
 
-         returnValue = true;
+         importState_File.isImported = true;
 
       } catch (final Exception e) {
 
          StatusUtil.log(importFilePath, e);
-
-         return false;
       }
-
-      return returnValue;
    }
 
    /**

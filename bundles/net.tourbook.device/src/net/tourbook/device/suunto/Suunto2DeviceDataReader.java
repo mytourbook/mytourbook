@@ -32,6 +32,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -158,14 +159,15 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       if (isSuuntoXMLFile(importFilePath) == false) {
-         return false;
+         return;
       }
 
       final Suunto2SAXHandler saxHandler = new Suunto2SAXHandler(
@@ -181,18 +183,18 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
 
          parser.parse(inputStream, saxHandler);
 
+         importState_File.isImported = saxHandler.isImported();
+
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);
-         return false;
+         return;
       } catch (final Exception e) {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
+         return;
       } finally {
 
          saxHandler.dispose();
       }
-
-      return saxHandler.isImported();
    }
 
    @Override

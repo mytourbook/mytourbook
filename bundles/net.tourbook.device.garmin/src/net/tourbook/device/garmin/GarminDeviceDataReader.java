@@ -23,6 +23,7 @@ import javax.xml.parsers.SAXParserFactory;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -68,14 +69,15 @@ public class GarminDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importState_Process,
+                                 final ImportState_File importState_File) {
 
       if (isValidXMLFile(importFilePath, XML_GARMIN_TAG) == false) {
-         return false;
+         return;
       }
 
       final GarminSAXHandler saxHandler = new GarminSAXHandler(
@@ -83,7 +85,8 @@ public class GarminDeviceDataReader extends TourbookDevice {
             importFilePath,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            importState_File);
 
       try {
 
@@ -94,15 +97,10 @@ public class GarminDeviceDataReader extends TourbookDevice {
       } catch (final Exception e) {
 
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
 
       } finally {
          saxHandler.dispose();
       }
-
-//      final boolean isLogged = saxHandler.isLogged();
-
-      return saxHandler.isImported();
    }
 
    @Override

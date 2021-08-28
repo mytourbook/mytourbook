@@ -18,7 +18,7 @@ package net.tourbook.importdata;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Various IN and OUT states for the whole import/re-import process
+ * IN and OUT states for the whole import/re-import process
  */
 public class ImportState_Process {
 

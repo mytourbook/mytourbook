@@ -36,6 +36,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -159,11 +160,12 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;
@@ -539,7 +541,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       deviceData.transferMonth = cm4xxmDeviceData.transferMonth;
       deviceData.transferDay = cm4xxmDeviceData.transferDay;
 
-      return true;
+      importState_File.isImported = true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {

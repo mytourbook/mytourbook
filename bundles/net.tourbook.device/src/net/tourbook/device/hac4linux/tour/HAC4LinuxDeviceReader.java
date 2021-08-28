@@ -39,6 +39,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -291,11 +292,12 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
+   public void processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       BufferedReader fileHac4LinuxData = null;
 
@@ -304,7 +306,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
       try {
          if (validateRawData(importFilePath) == false) {
-            return false;
+            return;
          }
 
          fileHac4LinuxData = new BufferedReader(new FileReader(importFilePath));
@@ -637,11 +639,15 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
             tourData.completeTourMarkerWithRelativeTime();
          }
+         
+         importState_File.isImported = true;
 
       } catch (final Exception e) {
+      
          e.printStackTrace();
-         return false;
+
       } finally {
+         
          if (fileHac4LinuxData != null) {
             try {
                fileHac4LinuxData.close();
@@ -650,9 +656,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
             }
          }
       }
-
-      return true;
-
    }
 
    /*

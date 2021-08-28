@@ -35,6 +35,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -264,13 +265,12 @@ public class CSVTourDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       boolean isNewTag = false;
       boolean isNewTourType = false;
@@ -281,7 +281,7 @@ public class CSVTourDataReader extends TourbookDevice {
          // check file header
          final String fileHeader = bufferedReader.readLine();
          if (isFileValid(fileHeader) == false) {
-            return false;
+            return;
          }
          final boolean isId3 = fileHeader.startsWith(TOUR_CSV_ID_3);
 
@@ -341,9 +341,9 @@ public class CSVTourDataReader extends TourbookDevice {
                }
 
             } catch (final NoSuchElementException e) {
-               
+
                // not all tokens are defined
-               
+
             } finally {
 
                tourData.setImportFilePath(importFilePath);
@@ -361,7 +361,7 @@ public class CSVTourDataReader extends TourbookDevice {
                   // add new tour to the map
                   newlyImportedTours.put(tourId, tourData);
 
-                  returnValue = true;
+                  importState_File.isImported = true;
                }
             }
          }
@@ -370,7 +370,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
          StatusUtil.log(e);
 
-         return false;
+         return;
 
       } finally {
 
@@ -400,8 +400,6 @@ public class CSVTourDataReader extends TourbookDevice {
             StatusUtil.log(e);
          }
       }
-
-      return returnValue;
    }
 
    /**

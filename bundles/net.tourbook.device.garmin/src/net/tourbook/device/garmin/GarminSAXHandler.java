@@ -36,6 +36,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
@@ -121,6 +122,7 @@ public class GarminSAXHandler extends DefaultHandler {
 // SET_FORMATTING_ON
    }
 
+   private ImportState_File    _importState_File;
    private boolean             _importState_IsIgnoreSpeedValues;
 
    private boolean             _isInActivity;
@@ -161,7 +163,6 @@ public class GarminSAXHandler extends DefaultHandler {
    private Map<Long, TourData> _newlyImportedTours;
    private TourbookDevice      _device;
    private String              _importFilePath;
-   private boolean             _isImported;
 
    private boolean             _isPreviousTrackPointAPause;
    private boolean             _isFirstTrackPointInTrack;
@@ -204,12 +205,14 @@ public class GarminSAXHandler extends DefaultHandler {
                            final String importFileName,
                            final DeviceData deviceData,
                            final Map<Long, TourData> alreadyImportedTours,
-                           final Map<Long, TourData> newlyImportedTours) {
+                           final Map<Long, TourData> newlyImportedTours,
+                           final ImportState_File importState_File) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+      _importState_File = importState_File;
 
       final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
@@ -617,7 +620,7 @@ public class GarminSAXHandler extends DefaultHandler {
                Messages.Garmin_SAXHandler_ImportFileIsEmpty,
                _importFilePath));
 
-//         _isLogged = true;
+         _importState_File.isLogged = true;
 
          return;
       }
@@ -700,7 +703,7 @@ public class GarminSAXHandler extends DefaultHandler {
          tourData.computeComputedValues();
       }
 
-      _isImported = true;
+      _importState_File.isImported = true;
    }
 
    private void finalize_Trackpoint() {
@@ -1070,13 +1073,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
       _pausedTime_Start.clear();
       _pausedTime_End.clear();
-   }
-
-   /**
-    * @return Returns <code>true</code> when a tour was imported
-    */
-   public boolean isImported() {
-      return _isImported;
    }
 
    /**

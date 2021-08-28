@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminDeviceDataReader;
 import net.tourbook.device.garmin.GarminSAXHandler;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -78,7 +79,8 @@ public class GarminTcxTester {
             importFilePath,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            new ImportState_File());
 
       parser.parse(tcxFile, handler);
 
@@ -102,7 +104,8 @@ public class GarminTcxTester {
             importFilePath,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            new ImportState_File());
 
       parser.parse(tcxFile, handler);
 

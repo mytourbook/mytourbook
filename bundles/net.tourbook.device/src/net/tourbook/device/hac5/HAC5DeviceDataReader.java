@@ -34,6 +34,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
@@ -187,13 +188,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final ImportState_Process importStates) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_Process importStates,
+                                 final ImportState_File importState_File) {
 
       final byte[] recordBuffer = new byte[RECORD_LENGTH];
 
@@ -250,7 +250,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetDDRecord);
             file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xDD) {
-               returnValue = true;
+               importState_File.isImported = true;
                break;
             }
 
@@ -261,7 +261,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
             file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xAA) {
-               returnValue = true;
+               importState_File.isImported = true;
                break;
             }
 
@@ -270,7 +270,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
              */
             final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
             if (offsetDDRecordInAARecord != offsetDDRecord) {
-               returnValue = true;
+               importState_File.isImported = true;
                break;
             }
 
@@ -509,7 +509,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
              * after the first implementation)
              */
             if (offsetDDRecord == initialOffsetDDRecord) {
-               returnValue = true;
+               importState_File.isImported = true;
                break;
             }
 
@@ -524,9 +524,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
                   // second loop has not yet ended
                   checkedOffset2 = offsetDDRecord;
                } else {
-                  StatusUtil
-                        .showStatus(new Exception(NLS.bind(Messages.Import_Error_EndlessLoop, importFilePath)));
-                  returnValue = true;
+                  StatusUtil.showStatus(new Exception(NLS.bind(Messages.Import_Error_EndlessLoop, importFilePath)));
+                  importState_File.isImported = true;
                   break;
                }
             }
@@ -536,7 +535,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
          e.printStackTrace();
-         returnValue = false;
+         importState_File.isImported = false;
       } finally {
          if (file != null) {
             try {
@@ -547,14 +546,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
          }
       }
 
-      if (returnValue) {
+      if (importState_File.isImported) {
 
          deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
          deviceData.transferMonth = (short) firstTourMonth;
          deviceData.transferDay = (short) firstTourDay;
       }
-
-      return returnValue;
    }
 
    /**
