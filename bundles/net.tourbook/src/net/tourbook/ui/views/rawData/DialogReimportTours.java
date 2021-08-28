@@ -17,18 +17,18 @@ package net.tourbook.ui.views.rawData;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import gnu.trove.list.array.TLongArrayList;
-
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -787,7 +787,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _reimport_Queue.clear();
 
       final ReImportStatus reImportStatus = new ReImportStatus();
-      final TLongArrayList allReimportedTourIds = new TLongArrayList();
+      final ConcurrentSkipListSet<Long> allReimportedTourIds = new ConcurrentSkipListSet<>();
 
       final IRunnableWithProgress reImportRunnable = new IRunnableWithProgress() {
 
@@ -800,8 +800,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             long lastUpdateTime = startTime;
 
             final AtomicInteger numWorkedTours = new AtomicInteger();
-
-            int numLastWorked = 1;
+            int numLastWorked = 0;
 
             // loop: all selected tours in the viewer
             for (final long tourId : allTourIDs) {
@@ -865,7 +864,10 @@ public class DialogReimportTours extends TitleAreaDialog {
          // do post save actions for all re-imported tours, simalar to
          // net.tourbook.database.TourDatabase.saveTour_PostSaveActions(TourData)
 
-         TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(allReimportedTourIds.toArray());
+         TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
+               allReimportedTourIds
+                     .stream()
+                     .collect(Collectors.toList()));
       }
 
       if (reImportStatus.isAnyTourReImported.get()) {
@@ -885,7 +887,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
    private void doReimport_60_RunConcurrent(final long tourId,
                                             final List<TourValueType> tourValueTypes,
-                                            final TLongArrayList allReimportedTourIds,
+                                            final ConcurrentSkipListSet<Long> allReimportedTourIds,
                                             final IProgressMonitor monitor,
                                             final AtomicInteger numWorked,
                                             final ReImportStatus reImportStatus,
@@ -905,35 +907,40 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       _reimport_Executor.submit(() -> {
 
-         // get last added item
-         final Long queueItem_TourId = _reimport_Queue.poll();
+         try {
 
-         if (queueItem_TourId != null) {
+            // get last added item
+            final Long queueItem_TourId = _reimport_Queue.poll();
 
-            final TourData oldTourData = TourManager.getTour(queueItem_TourId);
+            if (queueItem_TourId != null) {
 
-            if (oldTourData != null) {
+               final TourData oldTourData = TourManager.getTour(queueItem_TourId);
 
-               final boolean isReimported = RawDataManager.getInstance().reimportTour(
-                     oldTourData,
-                     tourValueTypes,
-                     reImportStatus,
-                     importStates);
+               if (oldTourData != null) {
+
+                  final boolean isReimported = RawDataManager.getInstance().reimportTour(
+                        oldTourData,
+                        tourValueTypes,
+                        reImportStatus,
+                        importStates);
 
 // this was used for debugging to speedup the process
 //
 //             final boolean isReimported = true;
 
-               if (isReimported) {
-                  allReimportedTourIds.add(oldTourData.getTourId());
+                  if (isReimported) {
+                     allReimportedTourIds.add(oldTourData.getTourId());
+                  }
                }
             }
+
+         } finally {
+
+            monitor.worked(1);
+            numWorked.incrementAndGet();
+
+            _reimport_CountDownLatch.countDown();
          }
-
-         monitor.worked(1);
-         numWorked.incrementAndGet();
-
-         _reimport_CountDownLatch.countDown();
       });
    }
 

@@ -93,8 +93,8 @@ import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.EasyImportState;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
-import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
 import net.tourbook.importdata.TourTypeConfig;
@@ -837,9 +837,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    void actionSaveTour(final TourPerson person) {
 
-      final ArrayList<TourData> selectedTours = getAnySelectedTours();
+      TourLogManager.addLog(
 
-      runEasyImport_099_SaveTour(person, selectedTours, false);
+            TourLogState.DEFAULT,
+
+            // "Save tours"
+            TourLogManager.LOG_TOUR_SAVE_TOURS,
+
+            TourLogView.CSS_LOG_TITLE);
+
+      saveImportedTours(getAnySelectedTours(), person);
    }
 
    private void addPartListener() {
@@ -3790,15 +3797,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return selectedTourData;
    }
 
-   private long[] getAllTourIds(final ArrayList<TourData> allTourData) {
+   private ArrayList<Long> getAllTourIds(final ArrayList<TourData> allTourData) {
 
-      final int numSavedTours = allTourData.size();
+      final ArrayList<Long> allTourIds = new ArrayList<>(allTourData.size());
 
-      final long[] allTourIds = new long[numSavedTours];
-      for (int tourIndex = 0; tourIndex < allTourData.size(); tourIndex++) {
-
-         final TourData tourData = allTourData.get(tourIndex);
-         allTourIds[tourIndex] = tourData.getTourId();
+      for (final TourData tourData : allTourData) {
+         allTourIds.add(tourData.getTourId());
       }
 
       return allTourIds;
@@ -4765,7 +4769,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
          if (importLauncher.isSaveTour) {
 
-            importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours, true);
+            importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours);
 
          } else {
 
@@ -4919,29 +4923,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   /**
-    * @param person
-    * @param importedTours
-    * @param isEasyImport
-    * @return Returns list with saved tours.
-    */
-   private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person,
-                                                          final ArrayList<TourData> importedTours,
-                                                          final boolean isEasyImport) {
+   private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {
 
-      final String css = isEasyImport
-            ? UI.EMPTY_STRING
-            : TourLogView.CSS_LOG_TITLE;
-
-      final String message = isEasyImport
-
-            // "99. Save tours"
-            ? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
-
-            // "Save tours"
-            : TourLogManager.LOG_TOUR_SAVE_TOURS;
-
-      TourLogManager.addLog(TourLogState.DEFAULT, message, css);
+      // "99. Save tours"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR);
 
       return saveImportedTours(importedTours, person);
    }

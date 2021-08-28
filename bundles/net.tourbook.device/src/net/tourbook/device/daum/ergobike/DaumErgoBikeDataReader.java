@@ -306,9 +306,9 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(e);
-         return false;
+         StatusUtil.log(importFilePath, e);
 
+         return false;
       }
 
       return returnValue;

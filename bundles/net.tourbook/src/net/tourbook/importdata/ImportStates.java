@@ -23,20 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ImportStates {
 
    /**
-    * OUT state:
-    * <p>
-    * Is <code>true</code> when the import was canceled by the user
-    */
-   public boolean       isImportCanceled_ByMonitor;
-
-   /**
-    * OUT state:
-    * <p>
-    * Is <code>true</code> when the import was canceled after a dialog was displayed to the user
-    */
-   public boolean       isImportCanceled_ByUserDialog;
-
-   /**
     * IN state:
     * <p>
     * When <code>true</code> then tours will be skipped when the import file is not defined or not
@@ -60,9 +46,25 @@ public class ImportStates {
    public boolean       isEasyImport;
 
    /**
+    * INTERNAL state:
+    * <p>
     * Contains a unique id so that each import can be identified.
     */
    public long          importId           = System.currentTimeMillis();
+
+   /**
+    * OUT state:
+    * <p>
+    * Is <code>true</code> when the import was canceled by the user
+    */
+   public boolean       isImportCanceled_ByMonitor;
+
+   /**
+    * OUT state:
+    * <p>
+    * Is <code>true</code> when the import was canceled after a dialog was displayed to the user
+    */
+   public boolean       isImportCanceled_ByUserDialog;
 
    /**
     * OUT state:
@@ -157,6 +159,12 @@ public class ImportStates {
       return this;
    }
 
+   /**
+    * INTERNAL state:
+    *
+    * @param isReimport
+    * @return
+    */
    public ImportStates setIsReimport(final boolean isReimport) {
 
       this.isReimport = isReimport;

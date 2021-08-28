@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -160,7 +161,6 @@ public class RawDataManager {
 
    }
 
-
    private static RawDataManager                  _instance;
 
    /**
@@ -215,15 +215,19 @@ public class RawDataManager {
    /**
     * Contains the device data imported from the device/file
     */
-   private static final DeviceData               _deviceData       = new DeviceData();
+   private static final DeviceData               _deviceData        = new DeviceData();
    //
    private static ThreadPoolExecutor             _importTour_Executor;
-   private static ArrayBlockingQueue<ImportFile> _importTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static ArrayBlockingQueue<ImportFile> _importTour_Queue  = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static CountDownLatch                 _importTour_CountDownLatch;
+
+   private static ThreadPoolExecutor             _loadingTour_Executor;
+   private static ArrayBlockingQueue<TourData>   _loadingTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch                 _loadingTour_CountDownLatch;
 
    static {
 
-      final ThreadFactory threadFactory = runnable -> {
+      final ThreadFactory importThreadFactory = runnable -> {
 
          final Thread thread = new Thread(runnable, "Importing tours");//$NON-NLS-1$
 
@@ -233,7 +237,19 @@ public class RawDataManager {
          return thread;
       };
 
-      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, importThreadFactory);
+
+      final ThreadFactory loadingThreadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Loading imported tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _loadingTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, loadingThreadFactory);
    }
    //
    private int     _importState_ImportYear                  = ADJUST_IMPORT_YEAR_IS_DISABLED;
@@ -248,10 +264,10 @@ public class RawDataManager {
             RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
    }
    //
-   private final ArrayList<TourType>   _tempTourTypes                           = new ArrayList<>();
-   private final ArrayList<TourTag>    _tempTourTags                            = new ArrayList<>();
+   private final ArrayList<TourType>            _tempTourTypes                           = new ArrayList<>();
+   private final ArrayList<TourTag>             _tempTourTags                            = new ArrayList<>();
 
-   private ReplaceImportFilenameAction _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
+   private volatile ReplaceImportFilenameAction _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
 
    /**
     * This is a wrapper to keep the {@link #isBackupImportFile} state.
@@ -1300,14 +1316,15 @@ public class RawDataManager {
    }
 
    /**
-    * Set selected replacement options into {@link #_selectedImportFilenameReplacementOption}
+    * Ask user for the replacement options and set the selected replacement options into
+    * {@link #_selectedImportFilenameReplacementOption}
     *
     * @param dbTourData
     * @param importedFilePathName
     * @param dbFilePathName
     */
-   private void getSelectedImportFilenameReplacementOption(final TourData dbTourData,
-                                                           final String importedFilePathName) {
+   private synchronized void getSelectedImportFilenameReplacementOption(final TourData dbTourData,
+                                                                        final String importedFilePathName) {
 
       if (_selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.DO_NOTHING
             || _selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR//
@@ -1652,6 +1669,16 @@ public class RawDataManager {
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
 
+//      if ("C:\\Users\\Wolfgang\\Desktop\\ALL my Device Data\\all xml files\\2010-11-14_13-08-51.gpx.sta".equals(osFilePath)) {
+//         int a = 0;
+//         a++;
+//      }
+
+      if ("C:\\Users\\Wolfgang\\Desktop\\ALL my Device Data\\all xml files\\2009-03-27-13-21-38.tcx".equals(osFilePath)) {
+         int a = 0;
+         a++;
+      }
+
       if (importTours_FromOneFile(
 
             importFile, //                   importFile
@@ -1768,6 +1795,15 @@ public class RawDataManager {
          boolean isDataImported = false;
          final ArrayList<String> additionalImportedFiles = new ArrayList<>();
 
+         if ("C:\\Users\\Wolfgang\\Desktop\\ALL my Device Data\\all xml files\\2010-11-14_13-08-51.gpx.sta".equals(importFilePathName)) {
+            int a = 0;
+            a++;
+         }
+         if ("C:\\Users\\Wolfgang\\Desktop\\ALL my Device Data\\all xml files\\2009-03-27-13-21-38.tcx".equals(importFilePathName)) {
+            int a = 0;
+            a++;
+         }
+
          /*
           * Try to import from all devices which have the defined extension
           */
@@ -1775,7 +1811,8 @@ public class RawDataManager {
 
             final String deviceFileExtension = device1.fileExtension;
 
-            if (deviceFileExtension.equals(UI.SYMBOL_STAR) || deviceFileExtension.equalsIgnoreCase(fileExtension)) {
+            if (deviceFileExtension.equals(UI.SYMBOL_STAR)
+                  || deviceFileExtension.equalsIgnoreCase(fileExtension)) {
 
                // Check if the file we want to import requires confirmation and if yes, ask user
                if (device1.userConfirmationRequired()) {
@@ -2997,8 +3034,6 @@ public class RawDataManager {
       return null;
    }
 
-
-
    /**
     * Update {@link TourData} from the database for all imported tours which are contained in
     * {@link #_allImportedTours} and displayed in the import view, a progress dialog is displayed.
@@ -3011,153 +3046,241 @@ public class RawDataManager {
       // reset to default
       _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
 
-      final int numImportTours = _allImportedTours.size();
+      try {
 
-      if (numImportTours == 0) {
+         final int numImportTours = _allImportedTours.size();
 
-         // nothing to do
+         if (numImportTours == 0) {
 
-      } else if (numImportTours < 3) {
+            // nothing to do
 
-         // don't show progress dialog
-         updateTourData_InImportView_FromDb_Runnable(null);
+         } else if (numImportTours < 3) {
 
-      } else {
+            // don't show progress dialog
+            updateTourData_InImportView_FromDb_Runnable(null);
 
-         if (monitor == null) {
-            try {
-               new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
-                     true,
-                     false,
-                     new IRunnableWithProgress() {
-
-                        @Override
-                        public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                              InterruptedException {
-
-                           updateTourData_InImportView_FromDb_Runnable(monitor);
-                        }
-                     });
-
-            } catch (final InvocationTargetException | InterruptedException e) {
-               TourLogManager.log_EXCEPTION_WithStacktrace(e);
-            }
          } else {
-            updateTourData_InImportView_FromDb_Runnable(monitor);
+
+            if (monitor == null) {
+
+               new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
+                     true, // fork
+                     false, // cancelable
+                     newMonitor -> updateTourData_InImportView_FromDb_Runnable(newMonitor));
+
+            } else {
+
+               // a monitor is provided
+
+               updateTourData_InImportView_FromDb_Runnable(monitor);
+            }
          }
+
+      } catch (final InvocationTargetException | InterruptedException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
-   private void updateTourData_InImportView_FromDb_Runnable(final IProgressMonitor monitor) {
+   private void updateTourData_InImportView_FromDb_Runnable(final IProgressMonitor monitor) throws InterruptedException {
 
-      int numWorked = 0;
-      final int numImportedTours = _allImportedTours.size();
+      final int numAllImportedTours = _allImportedTours.size();
+
+      /*
+       * Setup concurrency
+       */
+      _loadingTour_CountDownLatch = new CountDownLatch(numAllImportedTours);
+      _loadingTour_Queue.clear();
+
+      final ConcurrentSkipListSet<Long> allSavedTourIds = new ConcurrentSkipListSet<>();
 
       if (monitor != null) {
-         monitor.beginTask(Messages.import_data_updateDataFromDatabase_task, numImportedTours);
+         monitor.beginTask(Messages.import_data_updateDataFromDatabase_task, numAllImportedTours);
       }
 
-      long editorTourId = -1;
+      final long startTime = System.currentTimeMillis();
+      long lastUpdateTime = startTime;
 
-      final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-      if (tourDataEditor != null) {
-         final TourData tourData = tourDataEditor.getTourData();
-         if (tourData != null) {
-            editorTourId = tourData.getTourId();
-         }
-      }
+      final AtomicInteger numWorkedTours = new AtomicInteger();
+      int numLastWorked = 0;
 
       for (final TourData importedTourData : _allImportedTours.values()) {
 
          if (monitor != null) {
-            monitor.worked(1);
-            monitor.subTask(NLS.bind(Messages.import_data_updateDataFromDatabase_subTask, numWorked++, numImportedTours));
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > 500) {
+
+               lastUpdateTime = currentTime;
+
+               final int numWorked = numWorkedTours.get();
+
+               // "{0} / {1} - {2} % - {3} Δ"
+               UI.showWorkedInProgressMonitor(monitor, numWorked, numAllImportedTours, numLastWorked);
+
+               numLastWorked = numWorked;
+            }
          }
 
          if (importedTourData.isTourDeleted) {
+            _loadingTour_CountDownLatch.countDown();
             continue;
          }
 
-         final Long tourId = importedTourData.getTourId();
-
-         try {
-
-            final TourData dbTourData = TourManager.getInstance().getTourDataFromDb(tourId);
-            if (dbTourData != null) {
-
-               /*
-                * Imported tour is saved in the database, set transient fields.
-                */
-
-               // used to delete the device import file
-               dbTourData.isTourFileDeleted = importedTourData.isTourFileDeleted;
-               dbTourData.isTourFileMoved = importedTourData.isTourFileMoved;
-               dbTourData.isBackupImportFile = importedTourData.isBackupImportFile;
-               dbTourData.importFilePathOriginal = importedTourData.importFilePathOriginal;
-
-               final Long dbTourId = dbTourData.getTourId();
-
-               // replace existing tours but do not add new tours
-               if (_allImportedTours.containsKey(dbTourId)) {
-
-                  /*
-                   * Check if the tour editor contains this tour, this should not be necessary, just
-                   * make sure the correct tour is used !!!
-                   */
-                  TourData replacedTourData;
-                  if (editorTourId == dbTourId) {
-                     replacedTourData = tourDataEditor.getTourData();
-                  } else {
-                     replacedTourData = dbTourData;
-                  }
-
-                  /**
-                   * Set newly import filename into the tour which was already saved in the db.
-                   * <p>
-                   * This
-                   */
-                  final String importedFilePathName = importedTourData.getImportFilePathName();
-                  final String dbFilePathName = dbTourData.getImportFilePathName();
-
-                  if (importedFilePathName != null
-                        && importedFilePathName.equalsIgnoreCase(dbFilePathName) == false) {
-
-                     // saved file path name is different when compared with the imported file path name
-
-                     getSelectedImportFilenameReplacementOption(dbTourData, importedFilePathName);
-
-                     switch (_selectedImportFilenameReplacementOption) {
-
-                     case REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR:
-                     case REPLACE_IMPORT_FILENAME_IN_ALL_SAVED_TOUR:
-
-                        replacedTourData.setImportFilePath(importedFilePathName);
-
-                        // also update device name/version
-                        replacedTourData.setDeviceName(importedTourData.getDeviceName());
-                        replacedTourData.setDeviceFirmwareVersion(importedTourData.getDeviceFirmwareVersion());
-
-                        replacedTourData = TourManager.saveModifiedTour(dbTourData, false);
-
-                        break;
-
-                     case DO_NOTHING:
-                     case DO_NOTHING_AND_DONT_ASK_AGAIN:
-                     default:
-                        break;
-                     }
-                  }
-
-                  _allImportedTours.put(dbTourId, replacedTourData);
-               }
-            }
-         } catch (final Exception e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
-         }
+         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(importedTourData,
+               monitor,
+               numWorkedTours,
+               allSavedTourIds);
       }
+
+      // wait until all re-imports are performed
+      _loadingTour_CountDownLatch.await();
+
+      TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
+            allSavedTourIds
+                  .stream()
+                  .collect(Collectors.toList()));
 
       // prevent async error
       Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null));
+   }
+
+   private void updateTourData_InImportView_FromDb_Runnable_10_Concurrent(final TourData importedTourData,
+                                                                          final IProgressMonitor monitor,
+                                                                          final AtomicInteger numWorkedTours,
+                                                                          final ConcurrentSkipListSet<Long> allSavedTourIds) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _loadingTour_Queue.put(importedTourData);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _loadingTour_Executor.submit(() -> {
+
+         try {
+
+            // get last added item
+            final TourData queueItem_ImportedTourData = _loadingTour_Queue.poll();
+
+            if (queueItem_ImportedTourData != null) {
+
+               updateTourData_InImportView_FromDb_Runnable_20_OneTour(
+                     queueItem_ImportedTourData,
+                     allSavedTourIds);
+            }
+
+         } finally {
+
+            if (monitor != null) {
+               monitor.worked(1);
+            }
+
+            numWorkedTours.incrementAndGet();
+
+            _loadingTour_CountDownLatch.countDown();
+         }
+      });
+   }
+
+   private void updateTourData_InImportView_FromDb_Runnable_20_OneTour(final TourData importedTourData,
+                                                                       final ConcurrentSkipListSet<Long> allSavedTourIds) {
+
+      try {
+
+         final Long tourId = importedTourData.getTourId();
+
+         final TourData dbTourData = TourManager.getInstance().getTourDataFromDb(tourId);
+         if (dbTourData != null) {
+
+            /*
+             * Imported tour is saved in the database, set transient fields.
+             */
+
+            // used to delete the device import file
+            dbTourData.isTourFileDeleted = importedTourData.isTourFileDeleted;
+            dbTourData.isTourFileMoved = importedTourData.isTourFileMoved;
+            dbTourData.isBackupImportFile = importedTourData.isBackupImportFile;
+            dbTourData.importFilePathOriginal = importedTourData.importFilePathOriginal;
+
+            final Long dbTourId = dbTourData.getTourId();
+
+            // replace existing tours but do not add new tours
+            if (_allImportedTours.containsKey(dbTourId)) {
+
+               TourData replacedTourData = dbTourData;
+
+               /*
+                * Check if the tour editor contains this tour, this should not be necessary, just
+                * make sure the correct tour is used !!!
+                */
+               final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+               if (tourDataEditor != null) {
+                  final TourData editorTourData = tourDataEditor.getTourData();
+                  if (editorTourData != null) {
+                     final long editorTourId = editorTourData.getTourId();
+                     if (editorTourId == dbTourId) {
+                        replacedTourData = editorTourData;
+                     }
+                  }
+               }
+
+               /**
+                * Set newly import filename into the tour which was already saved in the db.
+                * <p>
+                * This
+                */
+               final String importedFilePathName = importedTourData.getImportFilePathName();
+               final String dbFilePathName = dbTourData.getImportFilePathName();
+
+               if (importedFilePathName != null
+                     && importedFilePathName.equalsIgnoreCase(dbFilePathName) == false) {
+
+                  // saved file path name is different when compared with the imported file path name
+
+                  getSelectedImportFilenameReplacementOption(dbTourData, importedFilePathName);
+
+                  switch (_selectedImportFilenameReplacementOption) {
+
+                  case REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR:
+                  case REPLACE_IMPORT_FILENAME_IN_ALL_SAVED_TOUR:
+
+                     replacedTourData.setImportFilePath(importedFilePathName);
+
+                     // also update device name/version
+                     replacedTourData.setDeviceName(importedTourData.getDeviceName());
+                     replacedTourData.setDeviceFirmwareVersion(importedTourData.getDeviceFirmwareVersion());
+
+                     // save tour
+                     replacedTourData = TourDatabase.saveTour_Concurrent(dbTourData, true);
+
+                     allSavedTourIds.add(replacedTourData.getTourId());
+
+                     break;
+
+                  case DO_NOTHING:
+                  case DO_NOTHING_AND_DONT_ASK_AGAIN:
+                  default:
+                     break;
+                  }
+               }
+
+               _allImportedTours.put(dbTourId, replacedTourData);
+            }
+         }
+
+      } catch (final Exception e) {
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+      }
    }
 
    /**

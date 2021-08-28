@@ -100,6 +100,8 @@ public class GarminDeviceDataReader extends TourbookDevice {
          saxHandler.dispose();
       }
 
+      final boolean isLogged = saxHandler.isLogged();
+
       return saxHandler.isImported();
    }
 

@@ -612,6 +612,13 @@ public class GarminSAXHandler extends DefaultHandler {
 
       // check if data are available
       if (_allTimeData.isEmpty()) {
+
+         TourLogManager.subLog_INFO(NLS.bind(
+               Messages.Garmin_SAXHandler_ImportFileIsEmpty,
+               _importFilePath));
+
+//         _isLogged = true;
+
          return;
       }
 

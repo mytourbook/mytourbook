@@ -2904,7 +2904,7 @@ public class TourDatabase {
    }
 
    /**
-    * {@link #saveTour_PostSaveActions_Concurrent_2_ForAllTours(long[])} <b>MUST</b> be
+    * This method {@link #saveTour_PostSaveActions_Concurrent_2_ForAllTours(long[])} <b>MUST</b> be
     * called <b>AFTER</b> all tours are saved
     * <p>
     * !!! {@link #checkUnsavedTransientInstances(TourData)} may cause troubles with concurrency,
@@ -3072,7 +3072,9 @@ public class TourDatabase {
       saveTour_GeoParts(persistedEntity);
 
       // update ft index
-      final long[] allTourIds = new long[] { persistedEntity.getTourId() };
+      final ArrayList<Long> allTourIds = new ArrayList<>();
+      allTourIds.add(persistedEntity.getTourId());
+
       FTSearchManager.updateIndex(allTourIds);
    }
 
@@ -3091,14 +3093,14 @@ public class TourDatabase {
    }
 
    /**
-    * Perform concurrent actions after multiple tours are saved
+    * Perform concurrent actions after multiple tours are saved, e.g. update fulltext index
     *
-    * @param allTourIds
+    * @param allTourIDs
     */
-   public static void saveTour_PostSaveActions_Concurrent_2_ForAllTours(final long[] allTourIds) {
+   public static void saveTour_PostSaveActions_Concurrent_2_ForAllTours(final List<Long> allTourIDs) {
 
       // do this expensive action only once for all tours
-      FTSearchManager.updateIndex(allTourIds);
+      FTSearchManager.updateIndex(allTourIDs);
    }
 
    /**

@@ -818,11 +818,11 @@ public class FTSearchManager {
     * at net.tourbook.search.FTSearchManager.updateIndex(FTSearchManager.java:1751)
     * </pre>
     */
-   private static List<List<Long>> createTourIdParts(final long[] allTourIds) {
+   private static List<List<Long>> createTourIdParts(final List<Long> allTourIDs) {
 
       final ArrayList<Long> allTourIds_List = new ArrayList<>();
 
-      for (final long tourId : allTourIds) {
+      for (final long tourId : allTourIDs) {
          allTourIds_List.add(tourId);
       }
 
@@ -1688,41 +1688,32 @@ public class FTSearchManager {
 
       final Lookup suggester[] = new FreeTextSuggester[1];
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> BusyIndicator.showWhile(Display.getDefault(), () -> {
 
-            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-               @Override
-               public void run() {
+         try {
 
-                  try {
+            final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
 
-                     final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
+            final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
-                     final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
+            suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
 
-                     suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
+            try {
+               suggester[0].build(inputIterator);
+            } catch (final IllegalArgumentException e1) {
 
-                     try {
-                        suggester[0].build(inputIterator);
-                     } catch (final IllegalArgumentException e) {
+               // java.lang.IllegalArgumentException: need at least one suggestion
 
-                        // java.lang.IllegalArgumentException: need at least one suggestion
+               /*
+                * This exception can occure when there are documents available but do not
+                * contain any content which the suggester can use.
+                */
+            }
 
-                        /*
-                         * This exception can occure when there are documents available but do not
-                         * contain any content which the suggester can use.
-                         */
-                     }
-
-                  } catch (final Exception e) {
-                     StatusUtil.showStatus(e);
-                  }
-               }
-            });
+         } catch (final Exception e2) {
+            StatusUtil.showStatus(e2);
          }
-      });
+      }));
 
       return suggester[0];
    }
@@ -1732,13 +1723,13 @@ public class FTSearchManager {
     * tours and their markers/waypoints are deleted and recreated, however it is fast enought for a
     * few thousand items otherwise it would be more complex.
     *
-    * @param allTourIds
+    * @param allTourIDs
     */
-   public static void updateIndex(final long[] allTourIds) {
+   public static void updateIndex(final List<Long> allTourIDs) {
 
       final long start = System.nanoTime();
 
-      final int numAllTourIDs = allTourIds.length;
+      final int numAllTourIDs = allTourIDs.size();
 
       final FSDirectory[] indexStore_TourData = { null };
       final FSDirectory[] indexStore_Marker = { null };
@@ -1767,7 +1758,7 @@ public class FTSearchManager {
 
             // run without progress monitor
 
-            for (final List<Long> tourIDPart : createTourIdParts(allTourIds)) {
+            for (final List<Long> tourIDPart : createTourIdParts(allTourIDs)) {
 
                updateIndex_10_Parts(
                      tourIDPart,
@@ -1783,12 +1774,11 @@ public class FTSearchManager {
 
          } else {
 
-            try {
+            Display.getDefault().syncExec(() -> {
 
-               final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-                  @Override
-                  public void run(final IProgressMonitor monitor)
-                        throws InvocationTargetException, InterruptedException {
+               try {
+
+                  final IRunnableWithProgress runnable = (monitor) -> {
 
                      monitor.beginTask(Messages.Search_Manager_Log_UpdatedFTIndex_Title, numAllTourIDs);
 
@@ -1796,7 +1786,7 @@ public class FTSearchManager {
 
                         final int[] numWorked = { 0 };
 
-                        for (final List<Long> tourIDPart : createTourIdParts(allTourIds)) {
+                        for (final List<Long> tourIDPart : createTourIdParts(allTourIDs)) {
 
                            updateIndex_10_Parts(
 
@@ -1830,15 +1820,15 @@ public class FTSearchManager {
 
                         isIndexClosed[0] = true;
                      }
-                  }
-               };
+                  };
 
-               new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, false, runnable);
+                  new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
-            } catch (final InvocationTargetException | InterruptedException e) {
+               } catch (final InvocationTargetException | InterruptedException e) {
 
-               StatusUtil.showStatus(e);
-            }
+                  StatusUtil.showStatus(e);
+               }
+            });
          }
 
       } catch (final IOException e) {
@@ -1867,7 +1857,7 @@ public class FTSearchManager {
       final float timeDiff = (end - start) / 1_000_000_000.0f;
 
       // reduce logging
-      if (allTourIds.length > 1) {
+      if (numAllTourIDs > 1) {
 
          TourLogManager.subLog_DEFAULT(String.format(Messages.Search_Manager_Log_UpdatedFTIndex_Final,
 
