@@ -935,7 +935,7 @@ public class EasyImportManager {
       /*
        * 02. Import files
        */
-      final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+      final ImportStates importStates = new ImportStates()
 
             .setIsEasyImport(true)
 
@@ -948,9 +948,9 @@ public class EasyImportManager {
       rawDataManager.importTours_FromMultipleFiles(
             notImportedFiles,
             importConfig.fileGlobPattern,
-            processDeviceDataStates);
+            importStates);
 
-      importState.isImportCanceled = processDeviceDataStates.isImportCanceled_ByMonitor;
+      importState.isImportCanceled = importStates.isImportCanceled_ByMonitor;
 
       /*
        * Update tour data

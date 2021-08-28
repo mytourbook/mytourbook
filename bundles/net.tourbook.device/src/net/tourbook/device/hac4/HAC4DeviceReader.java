@@ -33,7 +33,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -175,7 +175,7 @@ public class HAC4DeviceReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ProcessDeviceDataStates processDeviceDataStates) {
+                                    final ImportStates importStates) {
 
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;

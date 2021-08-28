@@ -94,7 +94,7 @@ import net.tourbook.importdata.EasyImportState;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
 import net.tourbook.importdata.OSFile;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
 import net.tourbook.importdata.TourTypeConfig;
@@ -4388,7 +4388,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          TourLogManager.showLogView();
       }
 
-      final ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+      final ImportStates importStates = new ImportStates()
 
             .setIsReimport(true);
 
@@ -4406,7 +4406,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                            monitor,
                            prevImportedFiles,
                            canCancelProcess,
-                           processDeviceDataStates);
+                           importStates);
                   }
                });
 
@@ -4428,12 +4428,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     * @param monitor
     * @param importedFiles
     * @param canCancelProcess
-    * @param processDeviceDataStates
+    * @param importStates
     */
    private void reimportAllImportFiles_Runnable(final IProgressMonitor monitor,
                                                 final String[] importedFiles,
                                                 final boolean canCancelProcess,
-                                                final ProcessDeviceDataStates processDeviceDataStates) {
+                                                final ImportStates importStates) {
 
       int workedDone = 0;
       final int workedAll = importedFiles.length;
@@ -4468,7 +4468,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   false, //                        isBuildNewFileNames
                   true, //                         isTourDisplayedInImportView
                   new HashMap<>(),
-                  processDeviceDataStates //
+                  importStates //
             );
 
             if (isImported) {

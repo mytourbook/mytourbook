@@ -50,7 +50,7 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Sport;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -731,7 +731,7 @@ public class FitDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ProcessDeviceDataStates processDeviceDataStates) {
+                                    final ImportStates importStates) {
 
       boolean returnValue = false;
 
@@ -744,7 +744,7 @@ public class FitDataReader extends TourbookDevice {
                importFilePath,
                alreadyImportedTours,
                newlyImportedTours,
-               processDeviceDataStates);
+               importStates);
 
          // setup all fit listeners
          fitBroadcaster.addListener(new MesgListener_Activity(fitData));

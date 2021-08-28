@@ -33,7 +33,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -105,7 +105,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    //
    private boolean                 _isDebug                = false;
 
-   private ProcessDeviceDataStates _processDeviceDataStates;
+   private ImportStates _importStates;
 
    /**
     * <pre>
@@ -1597,10 +1597,10 @@ public class Polar_HRM_DataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ProcessDeviceDataStates processDeviceDataStates) {
+                                    final ImportStates importStates) {
 
       _importFilePath = importFilePath;
-      _processDeviceDataStates = processDeviceDataStates;
+      _importStates = importStates;
 
       if (_isDebug) {
          System.out.println(importFilePath);
@@ -1611,13 +1611,13 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    protected void showError(final String message) {
 
-      if (_lastUsedImportId == _processDeviceDataStates.importId) {
+      if (_lastUsedImportId == _importStates.importId) {
 
          // do not bother the user with the same error message
 
       } else {
 
-         _lastUsedImportId = _processDeviceDataStates.importId;
+         _lastUsedImportId = _importStates.importId;
 
          Display.getDefault().syncExec(() -> MessageDialog.openError(
                Display.getCurrent().getActiveShell(),

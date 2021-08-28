@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Various IN and OUT states for the import/re-import process
  */
-public class ProcessDeviceDataStates {
+public class ImportStates {
 
    /**
     * OUT state:
@@ -98,7 +98,7 @@ public class ProcessDeviceDataStates {
    /**
     *
     */
-   public ProcessDeviceDataStates() {
+   public ImportStates() {
 
       setIsLog_DEFAULT(true);
       setIsLog_INFO(true);
@@ -111,7 +111,7 @@ public class ProcessDeviceDataStates {
     * @param isEasyImport
     * @return
     */
-   public ProcessDeviceDataStates setIsEasyImport(final boolean isEasyImport) {
+   public ImportStates setIsEasyImport(final boolean isEasyImport) {
 
       this.isEasyImport = isEasyImport;
 
@@ -124,7 +124,7 @@ public class ProcessDeviceDataStates {
     * @param isLog
     * @return
     */
-   public ProcessDeviceDataStates setIsLog_DEFAULT(final boolean isLog) {
+   public ImportStates setIsLog_DEFAULT(final boolean isLog) {
 
       isLog_DEFAULT = isLog;
 
@@ -137,7 +137,7 @@ public class ProcessDeviceDataStates {
     * @param isLog
     * @return
     */
-   public ProcessDeviceDataStates setIsLog_INFO(final boolean isLog) {
+   public ImportStates setIsLog_INFO(final boolean isLog) {
 
       isLog_INFO = isLog;
 
@@ -150,21 +150,21 @@ public class ProcessDeviceDataStates {
     * @param isLog
     * @return
     */
-   public ProcessDeviceDataStates setIsLog_OK(final boolean isLog) {
+   public ImportStates setIsLog_OK(final boolean isLog) {
 
       isLog_OK = isLog;
 
       return this;
    }
 
-   public ProcessDeviceDataStates setIsReimport(final boolean isReimport) {
+   public ImportStates setIsReimport(final boolean isReimport) {
 
       this.isReimport = isReimport;
 
       return this;
    }
 
-   public ProcessDeviceDataStates setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
+   public ImportStates setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
 
       this.isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
 

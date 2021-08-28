@@ -35,7 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
@@ -96,19 +96,19 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
-   private ProcessDeviceDataStates       _processDeviceDataStates;
+   private ImportStates       _importStates;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
                   final Map<Long, TourData> newlyImportedTours,
-                  final ProcessDeviceDataStates processDeviceDataStates) {
+                  final ImportStates importStates) {
 
       _fitDataReader = fitDataReader;
       _importFilePathName = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
-      _processDeviceDataStates = processDeviceDataStates;
+      _importStates = importStates;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
@@ -148,7 +148,7 @@ public class FitData {
 
             appliedTourType = TourDatabase.createTourType(parsedTourTypeLabel);
 
-            _processDeviceDataStates.isFire_NewTourType.set(true);
+            _importStates.isFire_NewTourType.set(true);
          }
 
          tourData.setTourType(appliedTourType);

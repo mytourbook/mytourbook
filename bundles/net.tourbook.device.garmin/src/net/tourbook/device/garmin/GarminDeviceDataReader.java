@@ -23,7 +23,7 @@ import javax.xml.parsers.SAXParserFactory;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
@@ -72,7 +72,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ProcessDeviceDataStates processDeviceDataStates) {
+                                    final ImportStates importStates) {
 
       if (isValidXMLFile(importFilePath, XML_GARMIN_TAG) == false) {
          return false;

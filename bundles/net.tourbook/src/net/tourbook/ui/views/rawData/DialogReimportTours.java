@@ -40,7 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.ProcessDeviceDataStates;
+import net.tourbook.importdata.ImportStates;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
@@ -617,7 +617,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       final boolean isSkipToursWithFileNotFound = _chkSkipTours_With_ImportFile_NotFound.getSelection();
       final boolean isLogDetails = _chkLogDetails.getSelection();
 
-      ProcessDeviceDataStates processDeviceDataStates = new ProcessDeviceDataStates()
+      ImportStates importStates = new ImportStates()
 
             .setIsReimport(true)
             .setIsSkipToursWithFileNotFound(isSkipToursWithFileNotFound);
@@ -626,7 +626,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          // ignore detail logging, this can be a performance hog
 
-         processDeviceDataStates = processDeviceDataStates
+         importStates = importStates
 
                .setIsLog_DEFAULT(false)
                .setIsLog_INFO(false)
@@ -640,14 +640,14 @@ public class DialogReimportTours extends TitleAreaDialog {
                tourValueTypes,
                isReimport_AllTours,
                isReimport_BetweenDates,
-               processDeviceDataStates);
+               importStates);
 
       } else {
 
          doReimport_20_SelectedTours(
 
                tourValueTypes,
-               processDeviceDataStates);
+               importStates);
       }
    }
 
@@ -657,12 +657,12 @@ public class DialogReimportTours extends TitleAreaDialog {
     * @param tourValueTypes
     * @param isReimport_AllTours
     * @param isReimport_BetweenDates
-    * @param processDeviceDataStates
+    * @param importStates
     */
    private void doReimport_10_All_OR_BetweenDate_Tours(final List<TourValueType> tourValueTypes,
                                                        final boolean isReimport_AllTours,
                                                        final boolean isReimport_BetweenDates,
-                                                       final ProcessDeviceDataStates processDeviceDataStates) {
+                                                       final ImportStates importStates) {
 
       if (isReimport_AllTours) {
 
@@ -721,17 +721,17 @@ public class DialogReimportTours extends TitleAreaDialog {
          allTourIDs = TourDatabase.getAllTourIds();
       }
 
-      doReimport_50_TourIds(tourValueTypes, allTourIDs, processDeviceDataStates);
+      doReimport_50_TourIds(tourValueTypes, allTourIDs, importStates);
    }
 
    /**
     * @param tourValueTypes
     *           A list of tour values to be re-imported
-    * @param processDeviceDataStates
+    * @param importStates
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void doReimport_20_SelectedTours(final List<TourValueType> tourValueTypes,
-                                            final ProcessDeviceDataStates processDeviceDataStates) {
+                                            final ImportStates importStates) {
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
 
@@ -765,12 +765,12 @@ public class DialogReimportTours extends TitleAreaDialog {
       doReimport_50_TourIds(
             tourValueTypes,
             allSelectedTourIds,
-            processDeviceDataStates);
+            importStates);
    }
 
    private void doReimport_50_TourIds(final List<TourValueType> tourValueTypes,
                                       final ArrayList<Long> allTourIDs,
-                                      final ProcessDeviceDataStates processDeviceDataStates) {
+                                      final ImportStates importStates) {
 
       final long start = System.currentTimeMillis();
 
@@ -843,7 +843,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                      monitor,
                      numWorkedTours,
                      reImportStatus,
-                     processDeviceDataStates);
+                     importStates);
             }
 
             // wait until all re-imports are performed
@@ -880,7 +880,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             RawDataManager.LOG_REIMPORT_END,
             (System.currentTimeMillis() - start) / 1000.0));
 
-      doReimport_70_FireModifyEvents(processDeviceDataStates);
+      doReimport_70_FireModifyEvents(importStates);
    }
 
    private void doReimport_60_RunConcurrent(final long tourId,
@@ -889,7 +889,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                                             final IProgressMonitor monitor,
                                             final AtomicInteger numWorked,
                                             final ReImportStatus reImportStatus,
-                                            final ProcessDeviceDataStates processDeviceDataStates) {
+                                            final ImportStates importStates) {
 
       try {
 
@@ -918,7 +918,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                      oldTourData,
                      tourValueTypes,
                      reImportStatus,
-                     processDeviceDataStates);
+                     importStates);
 
 // this was used for debugging to speedup the process
 //
@@ -937,7 +937,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       });
    }
 
-   private void doReimport_70_FireModifyEvents(final ProcessDeviceDataStates processDeviceDataStates) {
+   private void doReimport_70_FireModifyEvents(final ImportStates importStates) {
 
       TourManager.getInstance().removeAllToursFromCache();
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
@@ -951,13 +951,13 @@ public class DialogReimportTours extends TitleAreaDialog {
       RawDataManager.setIsReimportingActive(false);
 
       // fire modify event for tags
-      if (processDeviceDataStates.isFire_NewTag.get()) {
+      if (importStates.isFire_NewTag.get()) {
 
          Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
       }
 
       // fire modify event for tour types
-      if (processDeviceDataStates.isFire_NewTourType.get()) {
+      if (importStates.isFire_NewTourType.get()) {
 
          Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore().setValue(
                ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
