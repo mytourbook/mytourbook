@@ -91,8 +91,8 @@ public class CadenceTester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -125,8 +125,8 @@ public class CadenceTester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

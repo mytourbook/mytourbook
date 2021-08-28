@@ -99,8 +99,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -119,8 +119,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -139,8 +139,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -159,8 +159,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -205,20 +205,20 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
       deviceDataReader.processDeviceData(maxWell2FilePath,
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
       deviceDataReader.processDeviceData(maxWell3FilePath,
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData entry = getLastTourDataImported();
       Comparison.compareTourDataAgainstControl(entry, controlDocumentPath);
@@ -237,8 +237,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -257,8 +257,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -277,8 +277,8 @@ class Suunto9Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

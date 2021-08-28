@@ -46,17 +46,17 @@ public interface IRawDataReader {
     *           import view.
     * @param newlyImportedTours
     *           Contains all tours which are imported by this method.
-    * @param importState_Process,
-    *           Different IN/OUT states for the whole import process
     * @param importState_File
     *           Different OUT states for the imported file
+    * @param importState_Process,
+    *           Different IN/OUT states for the whole import process
     */
    public void processDeviceData(final String importFilePath,
                                  final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_Process importState_Process,
-                                 final ImportState_File importState_File);
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process);
 
    /**
     * Validate data format

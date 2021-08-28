@@ -161,8 +161,8 @@ public class GPXDeviceDataReader extends TourbookDevice {
                                  final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_Process importStates,
-                                 final ImportState_File importState_File) {
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       InputStream inputStream = null;
 

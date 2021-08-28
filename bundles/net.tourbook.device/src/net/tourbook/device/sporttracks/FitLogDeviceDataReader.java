@@ -86,8 +86,8 @@ public class FitLogDeviceDataReader extends TourbookDevice {
                                  final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_Process importStates,
-                                 final ImportState_File importState_File) {
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       final boolean isFitLogExFile = isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true) ||
             isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);
@@ -104,7 +104,7 @@ public class FitLogDeviceDataReader extends TourbookDevice {
             alreadyImportedTours,
             newlyImportedTours,
             isFitLogExFile,
-            importStates.isReimport);
+            importState_Process.isReimport);
 
       try {
 

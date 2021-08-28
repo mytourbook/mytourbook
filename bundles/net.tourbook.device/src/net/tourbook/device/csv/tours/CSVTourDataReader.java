@@ -269,8 +269,8 @@ public class CSVTourDataReader extends TourbookDevice {
                                  final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_Process importStates,
-                                 final ImportState_File importState_File) {
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       boolean isNewTag = false;
       boolean isNewTourType = false;
@@ -382,7 +382,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
                Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
 
-               importStates.isFire_NewTag.set(true);
+               importState_Process.isFire_NewTag.set(true);
             }
 
             if (isNewTourType) {
@@ -393,7 +393,7 @@ public class CSVTourDataReader extends TourbookDevice {
                      ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
                      Math.random()));
 
-               importStates.isFire_NewTourType.set(true);
+               importState_Process.isFire_NewTourType.set(true);
             }
 
          } catch (final Exception e) {

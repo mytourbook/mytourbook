@@ -1598,11 +1598,11 @@ public class Polar_HRM_DataReader extends TourbookDevice {
                                  final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_Process importStates,
-                                 final ImportState_File importState_File) {
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       _importFilePath = importFilePath;
-      _importStates = importStates;
+      _importStates = importState_Process;
 
       if (_isDebug) {
          System.out.println(importFilePath);

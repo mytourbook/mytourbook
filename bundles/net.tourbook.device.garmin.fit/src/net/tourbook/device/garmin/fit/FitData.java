@@ -102,13 +102,13 @@ public class FitData {
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
                   final Map<Long, TourData> newlyImportedTours,
-                  final ImportState_Process importStates) {
+                  final ImportState_Process importState_Process) {
 
       _fitDataReader = fitDataReader;
       _importFilePathName = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
-      _importStates = importStates;
+      _importStates = importState_Process;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;

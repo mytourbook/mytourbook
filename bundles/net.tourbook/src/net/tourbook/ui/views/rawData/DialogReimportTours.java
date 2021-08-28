@@ -617,7 +617,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       final boolean isSkipToursWithFileNotFound = _chkSkipTours_With_ImportFile_NotFound.getSelection();
       final boolean isLogDetails = _chkLogDetails.getSelection();
 
-      ImportState_Process importStates = new ImportState_Process()
+      ImportState_Process importState_Process = new ImportState_Process()
 
             .setIsReimport(true)
             .setIsSkipToursWithFileNotFound(isSkipToursWithFileNotFound);
@@ -626,7 +626,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
          // ignore detail logging, this can be a performance hog
 
-         importStates = importStates
+         importState_Process = importState_Process
 
                .setIsLog_DEFAULT(false)
                .setIsLog_INFO(false)
@@ -640,14 +640,14 @@ public class DialogReimportTours extends TitleAreaDialog {
                tourValueTypes,
                isReimport_AllTours,
                isReimport_BetweenDates,
-               importStates);
+               importState_Process);
 
       } else {
 
          doReimport_20_SelectedTours(
 
                tourValueTypes,
-               importStates);
+               importState_Process);
       }
    }
 
@@ -657,12 +657,12 @@ public class DialogReimportTours extends TitleAreaDialog {
     * @param tourValueTypes
     * @param isReimport_AllTours
     * @param isReimport_BetweenDates
-    * @param importStates
+    * @param importState_Process
     */
    private void doReimport_10_All_OR_BetweenDate_Tours(final List<TourValueType> tourValueTypes,
                                                        final boolean isReimport_AllTours,
                                                        final boolean isReimport_BetweenDates,
-                                                       final ImportState_Process importStates) {
+                                                       final ImportState_Process importState_Process) {
 
       if (isReimport_AllTours) {
 
@@ -721,17 +721,17 @@ public class DialogReimportTours extends TitleAreaDialog {
          allTourIDs = TourDatabase.getAllTourIds();
       }
 
-      doReimport_50_TourIds(tourValueTypes, allTourIDs, importStates);
+      doReimport_50_TourIds(tourValueTypes, allTourIDs, importState_Process);
    }
 
    /**
     * @param tourValueTypes
     *           A list of tour values to be re-imported
-    * @param importStates
+    * @param importState_Process
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void doReimport_20_SelectedTours(final List<TourValueType> tourValueTypes,
-                                            final ImportState_Process importStates) {
+                                            final ImportState_Process importState_Process) {
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
 
@@ -765,12 +765,12 @@ public class DialogReimportTours extends TitleAreaDialog {
       doReimport_50_TourIds(
             tourValueTypes,
             allSelectedTourIds,
-            importStates);
+            importState_Process);
    }
 
    private void doReimport_50_TourIds(final List<TourValueType> tourValueTypes,
                                       final ArrayList<Long> allTourIDs,
-                                      final ImportState_Process importStates) {
+                                      final ImportState_Process importState_Process) {
 
       final long start = System.currentTimeMillis();
 
@@ -842,7 +842,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                      monitor,
                      numWorkedTours,
                      reImportStatus,
-                     importStates);
+                     importState_Process);
             }
 
             // wait until all re-imports are performed
@@ -882,7 +882,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             RawDataManager.LOG_REIMPORT_END,
             (System.currentTimeMillis() - start) / 1000.0));
 
-      doReimport_70_FireModifyEvents(importStates);
+      doReimport_70_FireModifyEvents(importState_Process);
    }
 
    private void doReimport_60_RunConcurrent(final long tourId,
@@ -891,7 +891,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                                             final IProgressMonitor monitor,
                                             final AtomicInteger numWorked,
                                             final ReImportStatus reImportStatus,
-                                            final ImportState_Process importStates) {
+                                            final ImportState_Process importState_Process) {
 
       try {
 
@@ -922,7 +922,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                         oldTourData,
                         tourValueTypes,
                         reImportStatus,
-                        importStates);
+                        importState_Process);
 
 // this was used for debugging to speedup the process
 //
@@ -944,7 +944,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       });
    }
 
-   private void doReimport_70_FireModifyEvents(final ImportState_Process importStates) {
+   private void doReimport_70_FireModifyEvents(final ImportState_Process importState_Process) {
 
       TourManager.getInstance().removeAllToursFromCache();
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
@@ -958,13 +958,13 @@ public class DialogReimportTours extends TitleAreaDialog {
       RawDataManager.setIsReimportingActive(false);
 
       // fire modify event for tags
-      if (importStates.isFire_NewTag.get()) {
+      if (importState_Process.isFire_NewTag.get()) {
 
          Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
       }
 
       // fire modify event for tour types
-      if (importStates.isFire_NewTourType.get()) {
+      if (importState_Process.isFire_NewTourType.get()) {
 
          Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore().setValue(
                ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,

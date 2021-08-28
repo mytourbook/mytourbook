@@ -67,8 +67,8 @@ class Suunto3Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -89,8 +89,8 @@ class Suunto3Tester {
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_Process(),
-            new ImportState_File());
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

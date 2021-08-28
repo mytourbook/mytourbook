@@ -4392,7 +4392,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          TourLogManager.showLogView();
       }
 
-      final ImportState_Process importStates = new ImportState_Process()
+      final ImportState_Process importState_Process = new ImportState_Process()
 
             .setIsReimport(true);
 
@@ -4410,7 +4410,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                            monitor,
                            prevImportedFiles,
                            canCancelProcess,
-                           importStates);
+                           importState_Process);
                   }
                });
 
@@ -4432,12 +4432,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     * @param monitor
     * @param importedFiles
     * @param canCancelProcess
-    * @param importStates
+    * @param importState_Process
     */
    private void reimportAllImportFiles_Runnable(final IProgressMonitor monitor,
                                                 final String[] importedFiles,
                                                 final boolean canCancelProcess,
-                                                final ImportState_Process importStates) {
+                                                final ImportState_Process importState_Process) {
 
       int workedDone = 0;
       final int workedAll = importedFiles.length;
@@ -4472,7 +4472,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   false, //                        isBuildNewFileNames
                   true, //                         isTourDisplayedInImportView
                   new HashMap<>(),
-                  importStates //
+                  importState_Process //
             );
 
             if (isImported) {

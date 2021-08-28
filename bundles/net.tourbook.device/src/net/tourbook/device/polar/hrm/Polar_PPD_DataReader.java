@@ -443,8 +443,8 @@ public class Polar_PPD_DataReader extends TourbookDevice {
                                  final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_Process importStates,
-                                 final ImportState_File importState_File) {
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       if (_isDebug) {
          System.out.println(importFilePath);
@@ -490,8 +490,8 @@ public class Polar_PPD_DataReader extends TourbookDevice {
                      deviceData,
                      alreadyImportedTours,
                      newlyImportedTours,
-                     importStates,
-                     new ImportState_File());
+                     new ImportState_File(),
+                     importState_Process);
             }
 
             for (final Long tourId : newlyImportedTours.keySet()) {

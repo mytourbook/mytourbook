@@ -1417,12 +1417,12 @@ public class RawDataManager {
     * @param allImportFiles
     * @param isEasyImport
     * @param fileGlobPattern
-    * @param importStates
+    * @param importState_Process
     * @return
     */
    public void importTours_FromMultipleFiles(final ArrayList<OSFile> allImportFiles,
                                              final String fileGlobPattern,
-                                             final ImportState_Process importStates) {
+                                             final ImportState_Process importState_Process) {
 
       if (allImportFiles.isEmpty()) {
          return;
@@ -1433,15 +1433,15 @@ public class RawDataManager {
       /*
        * Log import
        */
-      final String css = importStates.isEasyImport
+      final String css = importState_Process.isEasyImport
             ? UI.EMPTY_STRING
             : TourLogView.CSS_LOG_TITLE;
 
-      final String message = importStates.isEasyImport
+      final String message = importState_Process.isEasyImport
             ? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
             : RawDataManager.LOG_IMPORT_TOUR;
 
-      if (importStates.isLog_DEFAULT) {
+      if (importState_Process.isLog_DEFAULT) {
          TourLogManager.addLog(TourLogState.DEFAULT, message, css);
       }
 
@@ -1486,11 +1486,11 @@ public class RawDataManager {
          return Integer.MAX_VALUE;
       });
 
-      importTours_FromMultipleFiles_10(allImportFilePaths, importStates);
+      importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);
 
       TourLogManager.log_DEFAULT(String.format(
 
-            importStates.isEasyImport
+            importState_Process.isEasyImport
                   ? EasyImportManager.LOG_EASY_IMPORT_002_END
                   : RawDataManager.LOG_IMPORT_TOUR_END,
 
@@ -1499,7 +1499,7 @@ public class RawDataManager {
    }
 
    private void importTours_FromMultipleFiles_10(final List<ImportFile> allImportFilePaths,
-                                                 final ImportState_Process importStates) {
+                                                 final ImportState_Process importState_Process) {
 
       final int numAllFiles = allImportFilePaths.size();
 
@@ -1530,7 +1530,7 @@ public class RawDataManager {
 
                   // stop importing but process imported tours
 
-                  importStates.isImportCanceled_ByMonitor = true;
+                  importState_Process.isImportCanceled_ByMonitor = true;
 
                   /*
                    * Count down all, that the import task can finish but process imported tours
@@ -1572,7 +1572,7 @@ public class RawDataManager {
                      filePath,
                      numImportedFiles,
                      monitor,
-                     importStates);
+                     importState_Process);
             }
 
             // wait until all imports are performed
@@ -1594,7 +1594,7 @@ public class RawDataManager {
                   if (view != null) {
                      view.reloadViewer();
 
-                     if (importStates.isEasyImport == false) {
+                     if (importState_Process.isEasyImport == false) {
 
                         // first tour is selected later
                         view.selectFirstTour();
@@ -1618,7 +1618,7 @@ public class RawDataManager {
    private void importTours_FromMultipleFiles_20_Concurrent(final ImportFile filePath,
                                                             final AtomicInteger numImportedFiles,
                                                             final IProgressMonitor monitor,
-                                                            final ImportState_Process importStates) {
+                                                            final ImportState_Process importState_Process) {
       try {
 
          // put file path into the queue AND wait when it is full
@@ -1643,7 +1643,7 @@ public class RawDataManager {
                importTours_FromMultipleFiles_30_OneFile(
 
                      filePath,
-                     importStates);
+                     importState_Process);
             }
 
          } finally {
@@ -1657,7 +1657,7 @@ public class RawDataManager {
    }
 
    private void importTours_FromMultipleFiles_30_OneFile(final ImportFile filePath,
-                                                         final ImportState_Process importStates) {
+                                                         final ImportState_Process importState_Process) {
 
       final String osFilePath = filePath.osFilePath;
       File importFile = new File(osFilePath);
@@ -1677,7 +1677,7 @@ public class RawDataManager {
             false, //                        isBuildNewFileNames
             true, //                         isTourDisplayedInImportView
             allImportedToursFromOneFile,
-            importStates //
+            importState_Process //
       )) {
 
          // update state
@@ -1685,7 +1685,7 @@ public class RawDataManager {
 
             importedTourData.isBackupImportFile = filePath.isBackupImportFile;
 
-            if (importStates.isLog_OK) {
+            if (importState_Process.isLog_OK) {
 
                TourLogManager.subLog_OK(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
                      importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
@@ -1696,7 +1696,7 @@ public class RawDataManager {
          final int numImportedToursFromOneFile = allImportedToursFromOneFile.size();
 
          // reduce log noise: log only when more than ONE tour is imported from ONE file
-         if (importStates.isLog_INFO && numImportedToursFromOneFile > 1) {
+         if (importState_Process.isLog_INFO && numImportedToursFromOneFile > 1) {
 
             TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
                   numImportedToursFromOneFile,
@@ -1977,8 +1977,8 @@ public class RawDataManager {
                   _deviceData,
                   _allImportedTours,
                   allNewlyImportedToursFromOneFile,
-                  importState_Process,
-                  importState_File);
+                  importState_File,
+                  importState_Process);
 
          } catch (final Exception e) {
             TourLogManager.log_EXCEPTION_WithStacktrace(e);
@@ -2001,7 +2001,7 @@ public class RawDataManager {
                                                       final String destinationPath,
                                                       final boolean isBuildNewFileName,
                                                       final FileCollisionBehavior fileCollision,
-                                                      final ImportState_Process importStates) {
+                                                      final ImportState_Process importState_Process) {
 
       String destFileName = new File(sourceFileName).getName();
 
@@ -2083,7 +2083,7 @@ public class RawDataManager {
          }
 
          if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
-            importStates.isImportCanceled_ByUserDialog = true;
+            importState_Process.isImportCanceled_ByUserDialog = true;
             fileIn.delete();
             return null;
          }
@@ -2118,14 +2118,14 @@ public class RawDataManager {
     * @param tourValueTypes
     *           A list of tour values to be re-imported
     * @param reImportStatus
-    * @param importStates
+    * @param importState_Process
     * @return Returns <code>true</code> when <code>oldTourData</code> was reimported, otherwise
     *         <code>false</code>
     */
    public boolean reimportTour(final TourData oldTourData,
                                final List<TourValueType> tourValueTypes,
                                final ReImportStatus reImportStatus,
-                               final ImportState_Process importStates) {
+                               final ImportState_Process importState_Process) {
 
       if (oldTourData.isManualTour()) {
 
@@ -2134,7 +2134,7 @@ public class RawDataManager {
           * <p>
           * It took a very long time (years) until this case was discovered
           */
-         if (importStates.isLog_INFO) {
+         if (importState_Process.isLog_INFO) {
 
             TourLogManager.subLog_INFO(NLS.bind(
                   LOG_REIMPORT_MANUAL_TOUR,
@@ -2148,7 +2148,7 @@ public class RawDataManager {
 
       final File currentTourImportFile = reimportTour_10_GetImportFile(
             oldTourData,
-            importStates,
+            importState_Process,
             reImportStatus);
 
       if (currentTourImportFile == null) {
@@ -2185,7 +2185,7 @@ public class RawDataManager {
                tourValueTypes,
                currentTourImportFile,
                oldTourData,
-               importStates
+               importState_Process
 
          );
       }
@@ -2199,13 +2199,13 @@ public class RawDataManager {
 
    /**
     * @param tourData
-    * @param importStates
+    * @param importState_Process
     *           Indicates whether to re-import or not a tour for which the file is not found
     * @param reImportStatus
     * @return Returns <code>null</code> when the user has canceled the file dialog.
     */
    private File reimportTour_10_GetImportFile(final TourData tourData,
-                                              final ImportState_Process importStates,
+                                              final ImportState_Process importState_Process,
                                               final ReImportStatus reImportStatus) {
 
       final String[] reimportFilePathName = { null };
@@ -2220,7 +2220,7 @@ public class RawDataManager {
          // import filepath is not available
 
          // The user doesn't want to look for a new file path for the current tour
-         if (importStates.isSkipToursWithFileNotFound) {
+         if (importState_Process.isSkipToursWithFileNotFound) {
 
             reImportStatus.isCanceled_Auto_ImportFilePathIsEmpty = true;
 
@@ -2244,7 +2244,7 @@ public class RawDataManager {
 
          reimportTour_12_RequestFileFromUser(
                tourData,
-               importStates,
+               importState_Process,
                reImportStatus,
                savedImportFilePathName,
                reimportFilePathName);
@@ -2273,7 +2273,7 @@ public class RawDataManager {
    }
 
    private void reimportTour_12_RequestFileFromUser(final TourData tourData,
-                                                    final ImportState_Process importStates,
+                                                    final ImportState_Process importState_Process,
                                                     final ReImportStatus reImportStatus,
                                                     final String savedImportFilePathName,
                                                     final String[] outReimportFilePathName) {
@@ -2336,7 +2336,7 @@ public class RawDataManager {
                   if (outReimportFilePathName[0] == null) {
 
                      //The user doesn't want to look for a new file path for the current tour.
-                     if (importStates.isSkipToursWithFileNotFound) {
+                     if (importState_Process.isSkipToursWithFileNotFound) {
 
                         reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
 
@@ -2420,7 +2420,7 @@ public class RawDataManager {
    private boolean reimportTour_20(final List<TourValueType> tourValueTypes,
                                    final File reimportedFile,
                                    final TourData oldTourData,
-                                   final ImportState_Process importStates) {
+                                   final ImportState_Process importState_Process) {
 
       boolean isTourReImported = false;
 
@@ -2444,7 +2444,7 @@ public class RawDataManager {
             false, //                        isBuildNewFileNames
             false, //                        isTourDisplayedInImportView
             allImportedToursFromOneFile,
-            importStates //
+            importState_Process //
       )) {
 
          /*
@@ -2488,7 +2488,7 @@ public class RawDataManager {
                updatedTourData = savedTourData;
             }
 
-            if (importStates.isLog_OK) {
+            if (importState_Process.isLog_OK) {
 
                TourLogManager.subLog_OK(NLS.bind(
                      LOG_IMPORT_TOUR_IMPORTED,
@@ -2497,7 +2497,7 @@ public class RawDataManager {
             }
 
             // log the old vs new data comparison
-            if (importStates.isLog_INFO) {
+            if (importState_Process.isLog_INFO) {
 
                final TourData tourDataDummyClone = createTourDataDummyClone(tourValueTypes, oldTourData);
                for (final TourValueType tourValueType : tourValueTypes) {
