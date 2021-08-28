@@ -34,7 +34,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -442,7 +442,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ImportStates importStates) {
+                                    final ImportState_Process importStates) {
 
       if (_isDebug) {
          System.out.println(importFilePath);

@@ -26,7 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -85,7 +85,7 @@ public class FitLogDeviceDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ImportStates importStates) {
+                                    final ImportState_Process importStates) {
 
       final boolean isFitLogExFile = isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true) ||
             isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);

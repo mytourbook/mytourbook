@@ -35,7 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.Activator;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -270,7 +270,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
-      final ImportStates importStates = new ImportStates().setIsReimport(_isReimport);
+      final ImportState_Process importStates = new ImportState_Process().setIsReimport(_isReimport);
       
       if (deviceDataReader.processDeviceData(
             importFilePath.toOSString(),
@@ -966,7 +966,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final Map<Long, TourData> alreadyImportedTours,
                                     final Map<Long, TourData> newlyImportedTours,
-                                    final ImportStates importStates) {
+                                    final ImportState_Process importStates) {
 
       _importFilePath = importFilePath;
       _deviceData = deviceData;

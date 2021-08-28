@@ -28,7 +28,7 @@ import net.tourbook.device.garmin.GarminDeviceDataReader;
 import net.tourbook.device.garmin.GarminSAXHandler;
 import net.tourbook.device.suunto.Suunto9DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -87,7 +87,7 @@ public class CadenceTester {
 
 		final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
 		suunto9DeviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours,
-            new ImportStates());
+            new ImportState_Process());
 
 		final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -117,7 +117,7 @@ public class CadenceTester {
 
 		final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
 		suunto9DeviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours,
-            new ImportStates());
+            new ImportState_Process());
 
 		final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

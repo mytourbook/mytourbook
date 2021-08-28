@@ -35,7 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
@@ -96,13 +96,13 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
-   private ImportStates       _importStates;
+   private ImportState_Process       _importStates;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
                   final Map<Long, TourData> newlyImportedTours,
-                  final ImportStates importStates) {
+                  final ImportState_Process importStates) {
 
       _fitDataReader = fitDataReader;
       _importFilePathName = importFilePath;

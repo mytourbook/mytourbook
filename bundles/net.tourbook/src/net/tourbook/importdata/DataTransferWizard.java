@@ -145,7 +145,7 @@ public class DataTransferWizard extends Wizard {
       }
 
       final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
-      final ImportStates importStates = new ImportStates();
+      final ImportState_Process importStates = new ImportState_Process();
 
       // import received files
       for (final File inFile : _receivedFiles) {

@@ -18,9 +18,9 @@ package net.tourbook.importdata;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Various IN and OUT states for the import/re-import process
+ * Various IN and OUT states for the whole import/re-import process
  */
-public class ImportStates {
+public class ImportState_Process {
 
    /**
     * IN state:
@@ -100,7 +100,7 @@ public class ImportStates {
    /**
     *
     */
-   public ImportStates() {
+   public ImportState_Process() {
 
       setIsLog_DEFAULT(true);
       setIsLog_INFO(true);
@@ -113,7 +113,7 @@ public class ImportStates {
     * @param isEasyImport
     * @return
     */
-   public ImportStates setIsEasyImport(final boolean isEasyImport) {
+   public ImportState_Process setIsEasyImport(final boolean isEasyImport) {
 
       this.isEasyImport = isEasyImport;
 
@@ -126,7 +126,7 @@ public class ImportStates {
     * @param isLog
     * @return
     */
-   public ImportStates setIsLog_DEFAULT(final boolean isLog) {
+   public ImportState_Process setIsLog_DEFAULT(final boolean isLog) {
 
       isLog_DEFAULT = isLog;
 
@@ -139,7 +139,7 @@ public class ImportStates {
     * @param isLog
     * @return
     */
-   public ImportStates setIsLog_INFO(final boolean isLog) {
+   public ImportState_Process setIsLog_INFO(final boolean isLog) {
 
       isLog_INFO = isLog;
 
@@ -152,7 +152,7 @@ public class ImportStates {
     * @param isLog
     * @return
     */
-   public ImportStates setIsLog_OK(final boolean isLog) {
+   public ImportState_Process setIsLog_OK(final boolean isLog) {
 
       isLog_OK = isLog;
 
@@ -165,14 +165,14 @@ public class ImportStates {
     * @param isReimport
     * @return
     */
-   public ImportStates setIsReimport(final boolean isReimport) {
+   public ImportState_Process setIsReimport(final boolean isReimport) {
 
       this.isReimport = isReimport;
 
       return this;
    }
 
-   public ImportStates setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
+   public ImportState_Process setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
 
       this.isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
 

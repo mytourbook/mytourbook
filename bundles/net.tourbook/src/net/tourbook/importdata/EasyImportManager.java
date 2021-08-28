@@ -935,7 +935,7 @@ public class EasyImportManager {
       /*
        * 02. Import files
        */
-      final ImportStates importStates = new ImportStates()
+      final ImportState_Process importStates = new ImportState_Process()
 
             .setIsEasyImport(true)
 

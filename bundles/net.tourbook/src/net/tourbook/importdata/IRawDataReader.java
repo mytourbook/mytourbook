@@ -55,7 +55,7 @@ public interface IRawDataReader {
                                     DeviceData deviceData,
                                     Map<Long, TourData> alreadyImportedTours,
                                     Map<Long, TourData> newlyImportedTours,
-                                    final ImportStates importStates);
+                                    final ImportState_Process importStates);
 
    /**
     * Validate data format

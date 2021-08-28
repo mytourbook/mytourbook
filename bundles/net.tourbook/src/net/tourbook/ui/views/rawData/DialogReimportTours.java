@@ -40,7 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
@@ -617,7 +617,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       final boolean isSkipToursWithFileNotFound = _chkSkipTours_With_ImportFile_NotFound.getSelection();
       final boolean isLogDetails = _chkLogDetails.getSelection();
 
-      ImportStates importStates = new ImportStates()
+      ImportState_Process importStates = new ImportState_Process()
 
             .setIsReimport(true)
             .setIsSkipToursWithFileNotFound(isSkipToursWithFileNotFound);
@@ -662,7 +662,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    private void doReimport_10_All_OR_BetweenDate_Tours(final List<TourValueType> tourValueTypes,
                                                        final boolean isReimport_AllTours,
                                                        final boolean isReimport_BetweenDates,
-                                                       final ImportStates importStates) {
+                                                       final ImportState_Process importStates) {
 
       if (isReimport_AllTours) {
 
@@ -731,7 +731,7 @@ public class DialogReimportTours extends TitleAreaDialog {
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
    private void doReimport_20_SelectedTours(final List<TourValueType> tourValueTypes,
-                                            final ImportStates importStates) {
+                                            final ImportState_Process importStates) {
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
 
@@ -770,7 +770,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
    private void doReimport_50_TourIds(final List<TourValueType> tourValueTypes,
                                       final ArrayList<Long> allTourIDs,
-                                      final ImportStates importStates) {
+                                      final ImportState_Process importStates) {
 
       final long start = System.currentTimeMillis();
 
@@ -891,7 +891,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                                             final IProgressMonitor monitor,
                                             final AtomicInteger numWorked,
                                             final ReImportStatus reImportStatus,
-                                            final ImportStates importStates) {
+                                            final ImportState_Process importStates) {
 
       try {
 
@@ -944,7 +944,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       });
    }
 
-   private void doReimport_70_FireModifyEvents(final ImportStates importStates) {
+   private void doReimport_70_FireModifyEvents(final ImportState_Process importStates) {
 
       TourManager.getInstance().removeAllToursFromCache();
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);

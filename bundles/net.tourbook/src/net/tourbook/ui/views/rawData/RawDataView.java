@@ -93,7 +93,7 @@ import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.EasyImportState;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
-import net.tourbook.importdata.ImportStates;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
@@ -4392,7 +4392,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          TourLogManager.showLogView();
       }
 
-      final ImportStates importStates = new ImportStates()
+      final ImportState_Process importStates = new ImportState_Process()
 
             .setIsReimport(true);
 
@@ -4437,7 +4437,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void reimportAllImportFiles_Runnable(final IProgressMonitor monitor,
                                                 final String[] importedFiles,
                                                 final boolean canCancelProcess,
-                                                final ImportStates importStates) {
+                                                final ImportState_Process importStates) {
 
       int workedDone = 0;
       final int workedAll = importedFiles.length;
