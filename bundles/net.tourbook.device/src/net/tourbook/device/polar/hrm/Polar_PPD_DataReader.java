@@ -506,7 +506,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
          }
       }
 
-      importState_File.isImported = true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    private String skipRows(final BufferedReader fileReader, final int numberOfRows) throws IOException {

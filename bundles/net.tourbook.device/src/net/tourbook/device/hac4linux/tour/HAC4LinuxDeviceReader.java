@@ -640,7 +640,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
             tourData.completeTourMarkerWithRelativeTime();
          }
          
-         importState_File.isImported = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final Exception e) {
       

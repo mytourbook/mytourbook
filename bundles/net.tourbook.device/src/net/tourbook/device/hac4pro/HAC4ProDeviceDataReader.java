@@ -315,7 +315,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetDDRecord);
             bytes = file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xDD || bytes == -1) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -329,7 +329,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
             bytes = file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xAA || bytes == -1) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -338,7 +338,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
              */
             final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
             if (offsetDDRecordInAARecord != offsetDDRecord) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -573,20 +573,20 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
              * after the first implementation)
              */
             if (offsetDDRecord == initialOffsetDDRecord) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
             // check if something got wrong
             if (tourCounter++ == 1000) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
          }
 
       } catch (final IOException | NumberFormatException e) {
          e.printStackTrace();
-         importState_File.isImported = false;
+         importState_File.isFileImportedWithValidData = false;
       } finally {
          if (file != null) {
             try {
@@ -597,7 +597,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
          }
       }
 
-      if (importState_File.isImported) {
+      if (importState_File.isFileImportedWithValidData) {
 
          deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
          deviceData.transferMonth = (short) (fileDate.get(Calendar.MONTH) + 1);

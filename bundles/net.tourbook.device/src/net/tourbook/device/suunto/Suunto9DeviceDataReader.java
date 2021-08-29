@@ -277,7 +277,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       final String jsonFileContent = GetJsonContentFromGZipFile(importFilePath, false);
 
-      importState_File.isImported = processFile(importFilePath, jsonFileContent);
+      importState_File.isFileImportedWithValidData = processFile(importFilePath, jsonFileContent);
    }
 
    /**

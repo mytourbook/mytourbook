@@ -141,7 +141,7 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
 
          parser.parse(inputStream, saxHandler);
 
-         importState_File.isImported = saxHandler.isImported();
+         importState_File.isFileImportedWithValidData = saxHandler.isImported();
 
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);

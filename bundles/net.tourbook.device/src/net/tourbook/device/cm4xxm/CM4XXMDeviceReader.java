@@ -541,7 +541,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       deviceData.transferMonth = cm4xxmDeviceData.transferMonth;
       deviceData.transferDay = cm4xxmDeviceData.transferDay;
 
-      importState_File.isImported = true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {

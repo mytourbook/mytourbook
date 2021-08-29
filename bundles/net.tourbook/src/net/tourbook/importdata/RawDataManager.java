@@ -1669,7 +1669,7 @@ public class RawDataManager {
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
 
-      if (importTours_FromOneFile(
+      final ImportState_File importState_File = importTours_FromOneFile(
 
             importFile, //                   importFile
             null, //                         destinationPath
@@ -1678,7 +1678,9 @@ public class RawDataManager {
             true, //                         isTourDisplayedInImportView
             allImportedToursFromOneFile,
             importState_Process //
-      )) {
+      );
+
+      if (importState_File.isFileImportedWithValidData) {
 
          // update state
          for (final TourData importedTourData : allImportedToursFromOneFile.values()) {
@@ -1705,9 +1707,15 @@ public class RawDataManager {
 
       } else {
 
+         // import failed
+
          _allInvalidFiles.put(osFilePath, new Object());
 
-         TourLogManager.subLog_ERROR(osFilePath);
+         if (importState_File.isImportLogged == false) {
+
+            // do default logging
+            TourLogManager.subLog_ERROR(osFilePath);
+         }
       }
 
       if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
@@ -1739,18 +1747,22 @@ public class RawDataManager {
     * @param importState_Process
     * @return Returns <code>true</code> when the import was successfully
     */
-   public boolean importTours_FromOneFile(final File importFile,
-                                          final String destinationPath,
-                                          final FileCollisionBehavior fileCollision,
-                                          final boolean isBuildNewFileNames,
-                                          final boolean isTourDisplayedInImportView,
-                                          final Map<Long, TourData> allImportedTourDataFromOneFile,
-                                          final ImportState_Process importState_Process) {
+   public ImportState_File importTours_FromOneFile(final File importFile,
+                                                   final String destinationPath,
+                                                   final FileCollisionBehavior fileCollision,
+                                                   final boolean isBuildNewFileNames,
+                                                   final boolean isTourDisplayedInImportView,
+                                                   final Map<Long, TourData> allImportedTourDataFromOneFile,
+                                                   final ImportState_Process importState_Process) {
+
+      final ImportState_File importState_File = new ImportState_File();
 
       final String importFilePathName = importFile.getAbsolutePath();
       final Display display = Display.getDefault();
 
-      // check if importFile exist
+      /*
+       * Check if importFile exist
+       */
       if (importFile.exists() == false) {
 
          display.syncExec(() -> {
@@ -1767,47 +1779,46 @@ public class RawDataManager {
             }
          });
 
-         return false;
+         return importState_File;
       }
 
-      // find the file extension in the filename
+      /*
+       * Find the file extension in the filename
+       */
       final int dotPos = importFilePathName.lastIndexOf(UI.SYMBOL_DOT);
       if (dotPos == -1) {
-         return false;
+         return importState_File;
       }
       final String fileExtension = importFilePathName.substring(dotPos + 1);
-
-      final boolean[] importReturnValue = { false };
 
       BusyIndicator.showWhile(null, () -> {
 
          boolean isDataImported = false;
          final ArrayList<String> additionalImportedFiles = new ArrayList<>();
 
-         final ImportState_File importState_File = new ImportState_File();
-
          /*
           * Try to import from all devices which have the defined extension
           */
-         for (final TourbookDevice device1 : _allDevices_BySortPriority) {
+         for (final TourbookDevice device : _allDevices_BySortPriority) {
 
-            final String deviceFileExtension = device1.fileExtension;
+            final String deviceFileExtension = device.fileExtension;
 
             if (deviceFileExtension.equals(UI.SYMBOL_STAR)
                   || deviceFileExtension.equalsIgnoreCase(fileExtension)) {
 
                // Check if the file we want to import requires confirmation and if yes, ask user
-               if (device1.userConfirmationRequired()) {
+               if (device.userConfirmationRequired()) {
 
                   display.syncExec(() -> {
 
                      final Shell activeShell = display.getActiveShell();
 
+                     // during initialization there is no active shell
                      if (activeShell != null) {
                         if (MessageDialog.openConfirm(
-                              display.getActiveShell(),
-                              NLS.bind(Messages.DataImport_ConfirmImport_title, device1.visibleName),
-                              device1.userConfirmationMessage())) {
+                              activeShell,
+                              NLS.bind(Messages.DataImport_ConfirmImport_title, device.visibleName),
+                              device.userConfirmationMessage())) {
                            importState_Process.isImportCanceled_ByUserDialog = false;
                         } else {
                            importState_Process.isImportCanceled_ByUserDialog = true;
@@ -1817,28 +1828,31 @@ public class RawDataManager {
                }
 
                if (importState_Process.isImportCanceled_ByUserDialog) {
-                  importReturnValue[0] = true; // don't display an error to the user
+
+                  // don't display an error to the user
+                  importState_File.isImportDone = true;
+
                   return;
                }
 
                // device file extension was found in the filename extension
                importTours_FromOneFile_10(
-                     device1,
+                     device,
                      importFilePathName,
                      destinationPath,
                      fileCollision,
                      isBuildNewFileNames,
                      isTourDisplayedInImportView,
+                     allImportedTourDataFromOneFile,
                      importState_Process,
-                     importState_File,
-                     allImportedTourDataFromOneFile);
+                     importState_File);
 
                if (importState_File.importedFileName != null) {
 
                   isDataImported = true;
-                  importReturnValue[0] = true;
+                  importState_File.isImportDone = true;
 
-                  final ArrayList<String> deviceImportedFiles = device1.getAdditionalImportedFiles();
+                  final ArrayList<String> deviceImportedFiles = device.getAdditionalImportedFiles();
                   if (deviceImportedFiles != null) {
                      additionalImportedFiles.addAll(deviceImportedFiles);
                   }
@@ -1846,41 +1860,49 @@ public class RawDataManager {
                   break;
                }
 
-               if (importState_Process.isImportCanceled_ByUserDialog) {
+               if (importState_Process.isImportCanceled_ByUserDialog
+                     || importState_File.isImportDone) {
+
                   break;
                }
             }
          }
 
-         if (isDataImported == false && !importState_Process.isImportCanceled_ByUserDialog) {
+         if (isDataImported == false
+               && importState_Process.isImportCanceled_ByUserDialog == false
+               && importState_File.isImportDone == false) {
 
             /*
              * When data has not imported yet, try all available devices without checking the
              * file extension
              */
-            for (final TourbookDevice device2 : _allDevices_BySortPriority) {
+            for (final TourbookDevice device_2nd : _allDevices_BySortPriority) {
 
                importTours_FromOneFile_10(
-                     device2,
+                     device_2nd,
                      importFilePathName,
                      destinationPath,
                      fileCollision,
                      isBuildNewFileNames,
                      isTourDisplayedInImportView,
+                     allImportedTourDataFromOneFile,
                      importState_Process,
-                     importState_File,
-                     allImportedTourDataFromOneFile);
+                     importState_File);
 
                if (importState_File.importedFileName != null) {
 
                   isDataImported = true;
-                  importReturnValue[0] = true;
+                  importState_File.isImportDone = true;
 
-                  final ArrayList<String> otherImportedFiles = device2.getAdditionalImportedFiles();
+                  final ArrayList<String> otherImportedFiles = device_2nd.getAdditionalImportedFiles();
                   if (otherImportedFiles != null) {
                      additionalImportedFiles.addAll(otherImportedFiles);
                   }
 
+                  break;
+               }
+
+               if (importState_File.isImportDone) {
                   break;
                }
             }
@@ -1902,7 +1924,7 @@ public class RawDataManager {
          additionalImportedFiles.clear();
       });
 
-      return importReturnValue[0];
+      return importState_File;
    }
 
    /**
@@ -1920,8 +1942,8 @@ public class RawDataManager {
     *           if true create a new filename depending on the content of the file, keep old name if
     *           false
     * @param isTourDisplayedInImportView
-    * @param importState_File
     * @param allNewlyImportedToursFromOneFile
+    * @param importState_File
     * @return Returns the import filename or <code>null</code> when it was not imported
     */
    private void importTours_FromOneFile_10(final TourbookDevice device,
@@ -1930,9 +1952,9 @@ public class RawDataManager {
                                            FileCollisionBehavior fileCollision,
                                            final boolean isBuildNewFileName,
                                            final boolean isTourDisplayedInImportView,
+                                           final Map<Long, TourData> allNewlyImportedToursFromOneFile,
                                            final ImportState_Process importState_Process,
-                                           final ImportState_File importState_File,
-                                           final Map<Long, TourData> allNewlyImportedToursFromOneFile) {
+                                           final ImportState_File importState_File) {
 
       if (fileCollision == null) {
          fileCollision = new FileCollisionBehavior();
@@ -1988,9 +2010,7 @@ public class RawDataManager {
             _allImportedTours.putAll(allNewlyImportedToursFromOneFile);
          }
 
-         // keep tours in _newlyImportedTours because they are used when tours are re-imported
-
-         if (importState_File.isImported) {
+         if (importState_File.isFileImportedWithValidData) {
             importState_File.importedFileName = sourceFileName;
          }
       }
@@ -2436,7 +2456,7 @@ public class RawDataManager {
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
 
-      if (importTours_FromOneFile(
+      final ImportState_File importState_File = importTours_FromOneFile(
 
             reimportedFile, //               importFile
             null, //                         destinationPath
@@ -2445,7 +2465,9 @@ public class RawDataManager {
             false, //                        isTourDisplayedInImportView
             allImportedToursFromOneFile,
             importState_Process //
-      )) {
+      );
+
+      if (importState_File.isFileImportedWithValidData) {
 
          /*
           * Tour(s) could be re-imported from the file, check if it contains a valid tour

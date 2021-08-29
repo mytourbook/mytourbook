@@ -93,6 +93,7 @@ import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.EasyImportState;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
@@ -4464,7 +4465,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final boolean isImported = _rawDataMgr.importTours_FromOneFile(
+            final ImportState_File importState_File = _rawDataMgr.importTours_FromOneFile(
 
                   file, //                         importFile
                   null, //                         destinationPath
@@ -4475,17 +4476,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   importState_Process //
             );
 
-            if (isImported) {
+            if (importState_File.isFileImportedWithValidData) {
+
                TourLogManager.subLog_OK(fileName);
                numImportedFiles++;
+
             } else {
-               TourLogManager.subLog_ERROR(fileName);
+
+               if (importState_File.isImportLogged == false) {
+
+                  // do default logging
+
+                  TourLogManager.subLog_ERROR(fileName);
+               }
+
                notImportedFiles.add(fileName);
             }
          }
 
          if (canCancelProcess && monitor.isCanceled()) {
+
             // stop importing but process imported tours
+
             break;
          }
       }

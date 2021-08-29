@@ -418,7 +418,7 @@ public class CRPDataReader extends TourbookDevice {
             tourData.completeTourMarkerWithRelativeTime();
          }
 
-         importState_File.isImported = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final Exception e) {
 

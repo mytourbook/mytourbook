@@ -202,11 +202,11 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
    }
 
    public GarminTCX_SAXHandler(final TourbookDevice deviceDataReader,
-                           final String importFileName,
-                           final DeviceData deviceData,
-                           final Map<Long, TourData> alreadyImportedTours,
-                           final Map<Long, TourData> newlyImportedTours,
-                           final ImportState_File importState_File) {
+                               final String importFileName,
+                               final DeviceData deviceData,
+                               final Map<Long, TourData> alreadyImportedTours,
+                               final Map<Long, TourData> newlyImportedTours,
+                               final ImportState_File importState_File) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -620,7 +620,8 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
                Messages.Garmin_SAXHandler_ImportFileIsEmpty,
                _importFilePath));
 
-         _importState_File.isLogged = true;
+         _importState_File.isImportDone = true;
+         _importState_File.isImportLogged = true;
 
          return;
       }
@@ -703,7 +704,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
          tourData.computeComputedValues();
       }
 
-      _importState_File.isImported = true;
+      _importState_File.isFileImportedWithValidData = true;
    }
 
    private void finalize_Trackpoint() {

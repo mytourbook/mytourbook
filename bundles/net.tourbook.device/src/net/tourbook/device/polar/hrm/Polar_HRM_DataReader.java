@@ -1608,7 +1608,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
          System.out.println(importFilePath);
       }
 
-      importState_File.isImported = parseSection(importFilePath, alreadyImportedTours, newlyImportedTours);
+      importState_File.isFileImportedWithValidData = parseSection(importFilePath, alreadyImportedTours, newlyImportedTours);
    }
 
    protected void showError(final String message) {

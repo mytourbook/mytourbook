@@ -221,7 +221,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
          return;
       }
 
-      importState_File.isImported = handler.isImported();
+      importState_File.isFileImportedWithValidData = handler.isImported();
    }
 
    @Override

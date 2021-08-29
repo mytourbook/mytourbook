@@ -280,7 +280,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
       }
 
-      importState_File.isImported = true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    /**

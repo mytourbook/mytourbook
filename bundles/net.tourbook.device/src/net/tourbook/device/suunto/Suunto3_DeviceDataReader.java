@@ -87,7 +87,7 @@ public class Suunto3_DeviceDataReader extends TourbookDevice {
                alreadyImportedTours,
                newlyImportedTours);
 
-         importState_File.isImported = staxHandler.isImported();
+         importState_File.isFileImportedWithValidData = staxHandler.isImported();
 
       } catch (final Exception e) {
 

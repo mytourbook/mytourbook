@@ -264,7 +264,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
             // data are valid but have no data points
 
-            importState_File.isImported = true;
+            importState_File.isFileImportedWithValidData = true;
 
             return;
          }
@@ -304,7 +304,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             tourData.computeComputedValues();
          }
 
-         importState_File.isImported = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final Exception e) {
 

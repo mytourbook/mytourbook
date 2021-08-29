@@ -283,7 +283,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
             importState_File,
             importState_Process);
 
-      if (importState_File.isImported == false) {
+      if (importState_File.isFileImportedWithValidData == false) {
 
          return null;
       }
@@ -989,7 +989,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
          System.out.println(importFilePath);
       }
 
-      importState_File.isImported = parseSection();
+      importState_File.isFileImportedWithValidData = parseSection();
    }
 
    private String skipRows(final BufferedReader fileReader, final int numberOfRows) throws IOException {

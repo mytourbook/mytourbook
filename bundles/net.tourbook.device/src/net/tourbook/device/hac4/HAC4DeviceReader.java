@@ -563,7 +563,7 @@ public class HAC4DeviceReader extends TourbookDevice {
       deviceData.transferMonth = hac4DeviceData.transferMonth;
       deviceData.transferDay = hac4DeviceData.transferDay;
 
-      importState_File.isImported = true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {

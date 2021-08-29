@@ -817,7 +817,7 @@ public class FitDataReader extends TourbookDevice {
 
          fitData.finalizeTour();
 
-         importState_File.isImported = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final IOException e) {
          TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);

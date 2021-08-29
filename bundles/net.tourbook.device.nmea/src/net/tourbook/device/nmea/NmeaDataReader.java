@@ -267,7 +267,7 @@ public class NmeaDataReader extends TourbookDevice {
       }
 //   End of O. Budischewski, 2008.03.20
 
-      importState_File.isImported = setTourData();
+      importState_File.isFileImportedWithValidData = setTourData();
    }
 
    private boolean setTourData() {

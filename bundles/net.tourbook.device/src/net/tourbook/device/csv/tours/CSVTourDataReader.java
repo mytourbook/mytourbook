@@ -361,7 +361,7 @@ public class CSVTourDataReader extends TourbookDevice {
                   // add new tour to the map
                   newlyImportedTours.put(tourId, tourData);
 
-                  importState_File.isImported = true;
+                  importState_File.isFileImportedWithValidData = true;
                }
             }
          }

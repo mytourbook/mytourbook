@@ -250,7 +250,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetDDRecord);
             file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xDD) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -261,7 +261,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
             file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xAA) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -270,7 +270,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
              */
             final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
             if (offsetDDRecordInAARecord != offsetDDRecord) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -509,7 +509,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
              * after the first implementation)
              */
             if (offsetDDRecord == initialOffsetDDRecord) {
-               importState_File.isImported = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -525,7 +525,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
                   checkedOffset2 = offsetDDRecord;
                } else {
                   StatusUtil.showStatus(new Exception(NLS.bind(Messages.Import_Error_EndlessLoop, importFilePath)));
-                  importState_File.isImported = true;
+                  importState_File.isFileImportedWithValidData = true;
                   break;
                }
             }
@@ -535,7 +535,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
          e.printStackTrace();
-         importState_File.isImported = false;
+         importState_File.isFileImportedWithValidData = false;
       } finally {
          if (file != null) {
             try {
@@ -546,7 +546,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
          }
       }
 
-      if (importState_File.isImported) {
+      if (importState_File.isFileImportedWithValidData) {
 
          deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
          deviceData.transferMonth = (short) firstTourMonth;

@@ -15,25 +15,51 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import net.tourbook.common.UI;
+
 /**
  * OUT states for the import of one file
  */
 public class ImportState_File {
 
+   private static final char NL = UI.NEW_LINE;
+
+   /**
+    * Is <code>true</code> when the import for this file is done, successfully or not which is set
+    * in {@link #isFileImportedWithValidData}
+    */
+   public boolean            isImportDone;
+
    /**
     * Is <code>true</code> when a file could be imported successfully
     */
-   public boolean isImported;
+   public boolean            isFileImportedWithValidData;
+
+   /**
+    * Is <code>true</code> when the import is logged for this file, this prevents additional default
+    * logging
+    */
+   public boolean            isImportLogged;
 
    /**
     * File name which was imported
     */
-   public String  importedFileName;
+   public String             importedFileName;
 
-   /**
-    * Is <code>true</code> when {@link #isImported} is <code>false</code> but the info/error is
-    * logged why it failed
-    */
-   public boolean isLogged;
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "ImportState_File" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+            + "isImportDone                  =" + isImportDone + NL //$NON-NLS-1$
+            + "isFileImportedWithValidData   =" + isFileImportedWithValidData + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "importedFileName              =" + importedFileName + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]"; //$NON-NLS-1$
+   }
 
 }
