@@ -46,7 +46,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class GarminSAXHandler extends DefaultHandler {
+public class GarminTCX_SAXHandler extends DefaultHandler {
 
    private static final String    TRAINING_CENTER_DATABASE_V1 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
    private static final String    TRAINING_CENTER_DATABASE_V2 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
@@ -201,7 +201,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
    }
 
-   public GarminSAXHandler(final TourbookDevice deviceDataReader,
+   public GarminTCX_SAXHandler(final TourbookDevice deviceDataReader,
                            final String importFileName,
                            final DeviceData deviceData,
                            final Map<Long, TourData> alreadyImportedTours,
@@ -1280,8 +1280,8 @@ public class GarminSAXHandler extends DefaultHandler {
     * There are cases where the lap end time and the next lap start time have the same time value,
     * so there are duplicated times which causes problems like markers are not displayed because the
     * marker time is twice available.
-    * There are cases where the {@link GarminSAXHandler#TAG_DISTANCE_METERS} element (at the
-    * {@link GarminSAXHandler#TAG_TRACKPOINT} level) is reset within each new lap.
+    * There are cases where the {@link GarminTCX_SAXHandler#TAG_DISTANCE_METERS} element (at the
+    * {@link GarminTCX_SAXHandler#TAG_TRACKPOINT} level) is reset within each new lap.
     * In this case, we need to recompute correctly all the {@link TimeData#absoluteDistance} values.
     */
    private void validateTimeSeries() {

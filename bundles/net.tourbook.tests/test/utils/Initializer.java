@@ -36,7 +36,7 @@ import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.GarminDeviceDataReader;
+import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 
@@ -93,7 +93,7 @@ public class Initializer {
       final DeviceData deviceData = new DeviceData();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
-      final GarminDeviceDataReader deviceDataReader = new GarminDeviceDataReader();
+      final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
 
       final String IMPORT_FILE_PATH = "/utils/files/LongsPeak-Manual.gpx"; //$NON-NLS-1$
 

@@ -29,7 +29,7 @@ import javax.xml.parsers.SAXParser;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.device.garmin.GarminDeviceDataReader;
+import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.tour.TourManager;
@@ -54,7 +54,7 @@ class GPX_SAX_HandlerTest {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static GarminDeviceDataReader  deviceDataReader;
+   private static GarminTCX_DeviceDataReader  deviceDataReader;
 
    /**
     * Resource path to GPX file, generally available from net.tourbook Plugin in test/net.tourbook
@@ -67,7 +67,7 @@ class GPX_SAX_HandlerTest {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new GarminDeviceDataReader();
+      deviceDataReader = new GarminTCX_DeviceDataReader();
    }
 
    /**

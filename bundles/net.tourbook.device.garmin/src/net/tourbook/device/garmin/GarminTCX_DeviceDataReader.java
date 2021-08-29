@@ -29,11 +29,11 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
 
-public class GarminDeviceDataReader extends TourbookDevice {
+public class GarminTCX_DeviceDataReader extends TourbookDevice {
 
    private static final String XML_GARMIN_TAG = "<TrainingCenterDatabase"; //$NON-NLS-1$
 
-   public GarminDeviceDataReader() {
+   public GarminTCX_DeviceDataReader() {
       // plugin constructor
    }
 
@@ -80,7 +80,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
          return;
       }
 
-      final GarminSAXHandler saxHandler = new GarminSAXHandler(
+      final GarminTCX_SAXHandler saxHandler = new GarminTCX_SAXHandler(
             this,
             importFilePath,
             deviceData,

@@ -24,8 +24,8 @@ import javax.xml.parsers.SAXParser;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.GarminDeviceDataReader;
-import net.tourbook.device.garmin.GarminSAXHandler;
+import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
+import net.tourbook.device.garmin.GarminTCX_SAXHandler;
 import net.tourbook.device.suunto.Suunto9DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -53,7 +53,7 @@ public class CadenceTester {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static GarminDeviceDataReader  garminDeviceDataReader;
+   private static GarminTCX_DeviceDataReader  garminDeviceDataReader;
    private static Suunto9DeviceDataReader suunto9DeviceDataReader;
 
    private static final IPreferenceStore  _prefStore              = TourbookPlugin.getPrefStore();
@@ -65,7 +65,7 @@ public class CadenceTester {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      garminDeviceDataReader = new GarminDeviceDataReader();
+      garminDeviceDataReader = new GarminTCX_DeviceDataReader();
       suunto9DeviceDataReader = new Suunto9DeviceDataReader();
    }
 
@@ -149,7 +149,7 @@ public class CadenceTester {
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
       final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
 
-      final GarminSAXHandler handler = new GarminSAXHandler(
+      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(
             garminDeviceDataReader,
             importFilePath,
             deviceData,
@@ -182,7 +182,7 @@ public class CadenceTester {
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
       final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
 
-      final GarminSAXHandler handler = new GarminSAXHandler(
+      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(
             garminDeviceDataReader,
             importFilePath,
             deviceData,
