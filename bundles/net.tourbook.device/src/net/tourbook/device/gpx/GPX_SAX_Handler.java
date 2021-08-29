@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -42,14 +42,13 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.device.Activator;
 import net.tourbook.device.IPreferences;
 import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.tour.TourLogManager;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -226,7 +225,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
             .toEpochMilli();
 
 // SET_FORMATTING_OFF
-      
+
       final String DateTimePattern = "yyyy-MM-dd'T'HH:mm:ss"; //$NON-NLS-1$
 
       TIME_FORMAT          = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
@@ -236,7 +235,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       TIME_FORMAT          .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
       TIME_FORMAT_SSSZ     .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
       TIME_FORMAT_RFC822   .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
-      
+
 // SET_FORMATTING_ON
    }
 
@@ -317,7 +316,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private float                         _absoluteDistance;
 
-   private boolean                       _isImported;
    private boolean                       _isError;
 
    private final StringBuilder           _characters          = new StringBuilder();
@@ -329,6 +327,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
     * Is <code>true</code> when tour contained mt: custom tags.
     */
    private boolean                       _isMTData;
+
+   private ImportState_File              _importState_File;
 
    private class GPXDataLap {
 
@@ -344,12 +344,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
                           final String importFileName,
                           final DeviceData deviceData,
                           final Map<Long, TourData> alreadyImportedTours,
-                          final Map<Long, TourData> newlyImportedTours) {
+                          final Map<Long, TourData> newlyImportedTours,
+                          final ImportState_File importState_File) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+      _importState_File = importState_File;
 
       _gpxHasLocalTime = false; // Polar exports local time :-(
 
@@ -399,14 +401,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          _characters.append(chars, startIndex, length);
       }
-   }
-
-   private void displayError(final ParseException e) {
-      Display.getDefault().syncExec(() -> {
-         final String message = e.getMessage();
-         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-         System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-      });
    }
 
    @Override
@@ -739,7 +733,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
                         _isError = true;
 
-                        displayError(e3);
+                        logError(e3);
                      }
                   }
                }
@@ -877,7 +871,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
                         _isError = true;
 
-                        displayError(e3);
+                        logError(e3);
                      }
                   }
                }
@@ -927,7 +921,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
                      _isError = true;
 
-                     displayError(e3);
+                     logError(e3);
                   }
                }
             }
@@ -1120,7 +1114,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
       }
 
       _tourData = null;
-      _isImported = true;
+
+      _importState_File.isFileImportedWithValidData = true;
    }
 
    private void finalizeTour_AdjustMarker() {
@@ -1158,20 +1153,26 @@ public class GPX_SAX_Handler extends DefaultHandler {
       final Set<TourTag> tourTags = new HashSet<>();
 
       final Collection<TourTag> dbTags = TourDatabase.getAllTourTags().values();
-      final List<TourTag> tempTags = RawDataManager.getInstance().getTempTourTags();
+      final ConcurrentHashMap<String, TourTag> tempTags = TourDatabase.getAllTourTags_NotYetSaved();
 
       for (final String tagName : _allImportedTagNames) {
+
+         final String tagName_Key = tagName.toUpperCase();
 
          TourTag tourTag = TourDatabase.findTourTag(tagName, dbTags);
 
          if (tourTag == null) {
-            tourTag = TourDatabase.findTourTag(tagName, tempTags);
+            tourTag = tempTags.get(tagName_Key);
          }
 
          if (tourTag == null) {
 
-            tourTag = new TourTag(tagName);
-            tourTag.setRoot(true);
+            final TourTag newTourTag = new TourTag(tagName);
+            newTourTag.setRoot(true);
+
+            tempTags.put(tagName_Key, newTourTag);
+
+            tourTag = newTourTag;
          }
 
          tourTags.add(tourTag);
@@ -1186,12 +1187,15 @@ public class GPX_SAX_Handler extends DefaultHandler {
          return;
       }
 
+      final String tourType_Key = _tourTypeName.toUpperCase();
+
       TourType tourType = TourDatabase.findTourType(_tourTypeName, TourDatabase.getAllTourTypes());
 
-      final List<TourType> tempTourTypes = RawDataManager.getInstance().getTempTourTypes();
+      final ConcurrentHashMap<String, TourType> tempTourTypes = TourDatabase.getAllTourTypes_NotYetSaved();
 
       if (tourType == null) {
-         tourType = TourDatabase.findTourType(_tourTypeName, tempTourTypes);
+
+         tourType = tempTourTypes.get(tourType_Key);
       }
 
       if (tourType == null) {
@@ -1200,7 +1204,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          final TourType newTourType = new TourType(_tourTypeName);
 
-         final TourTypeColorDefinition newColor = new TourTypeColorDefinition(//
+         final TourTypeColorDefinition newColor = new TourTypeColorDefinition(
                newTourType,
                Long.toString(newTourType.getTypeId()),
                newTourType.getName());
@@ -1216,7 +1220,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
                newColor.getTextColor_Default_Light(),
                newColor.getTextColor_Default_Dark());
 
-         tempTourTypes.add(newTourType);
+         tempTourTypes.put(tourType_Key, newTourType);
 
          tourType = newTourType;
       }
@@ -1490,16 +1494,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
       }
    }
 
-   /**
-    * @return Returns <code>true</code> when a tour was imported
-    */
-   public boolean isImported() {
+   private void logError(final ParseException e) {
 
-      if (_isError) {
-         return false;
-      }
-
-      return _isImported;
+      TourLogManager.log_EXCEPTION_WithStacktrace(_importFilePath, e);
    }
 
    @Override

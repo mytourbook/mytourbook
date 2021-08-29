@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -265,31 +266,41 @@ public class TourDatabase {
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE     = ";upgrade=true";                                        //$NON-NLS-1$
    //
    //
-   private static volatile TourDatabase                   _instance;
+   private static volatile TourDatabase                     _instance;
 
-   private static ArrayList<TourType>                     _activeTourTypes;
+   private static ArrayList<TourType>                       _activeTourTypes;
 
-   private static volatile ArrayList<TourType>            _dbTourTypes;
+   private static volatile ArrayList<TourType>              _dbTourTypes;
 
    /**
     * Key is tour type ID
     */
-   private static HashMap<Long, TourType>                 _dbTourTypeIds;
+   private static HashMap<Long, TourType>                   _dbTourTypeIds;
 
    /**
     * Key is tag ID.
     */
-   private static volatile HashMap<Long, TourTag>         _allTourTags;
+   private static volatile HashMap<Long, TourTag>           _allTourTags;
 
    /**
     * Key is tag category ID.
     */
-   private static volatile HashMap<Long, TourTagCategory> _allTourTagCategories;
+   private static volatile HashMap<Long, TourTagCategory>   _allTourTagCategories;
 
    /**
     * Key is category ID or <code>-1</code> for the root.
     */
-   private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
+   private static HashMap<Long, TagCollection>              _tagCollections           = new HashMap<>();
+
+   /**
+    * Contains {@link TourType}s which are imported but not yet saved, key is the tour type name
+    */
+   private static final ConcurrentHashMap<String, TourType> _allTourTypes_NotYetSaved = new ConcurrentHashMap<>();
+
+   /**
+    * Contains {@link TourTag}s which are imported but not yet saved, key is the tour tag name
+    */
+   private static final ConcurrentHashMap<String, TourTag>  _allTourTags_NotYetSaved  = new ConcurrentHashMap<>();
 
    /*
     * Cached distinct fields
@@ -335,7 +346,9 @@ public class TourDatabase {
 
       _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, updateThreadFactory);
    }
-   private static final Object DB_LOCK = new Object();
+
+   private static final Object DB_LOCK        = new Object();
+   private static final Object TRANSIENT_LOCK = new Object();
 
 //   Derby Limitations
 //
@@ -756,141 +769,6 @@ public class TourDatabase {
    }
 
    /**
-    * @param tourData
-    * @return Returns <code>true</code> when new tags are created.
-    */
-   private static boolean check_Tags(final TourData tourData) {
-
-      final Set<TourTag> tourTags = tourData.getTourTags();
-
-      if (tourTags.isEmpty()) {
-         return false;
-      }
-
-      final ArrayList<TourTag> oldTags = new ArrayList<>();
-      final ArrayList<TourTag> newTags = new ArrayList<>();
-
-      HashMap<Long, TourTag> allDbTags = TourDatabase.getAllTourTags();
-
-      for (final TourTag tourTag : tourTags) {
-
-         if (tourTag.getTagId() != TourDatabase.ENTITY_IS_NOT_SAVED) {
-            // tag is saved
-            continue;
-         }
-
-         // tag is not yet saved
-         // 1. tag can still be new
-         // 2. tag is already created but not updated in the not yet saved tour
-
-         final TourTag dbTag = findTourTag(tourTag.getTagName(), allDbTags.values());
-
-         if (dbTag != null) {
-
-            // use found tag
-
-            oldTags.add(tourTag);
-            newTags.add(dbTag);
-
-         } else {
-
-            // create new tag
-
-            final TourTag savedTag = saveEntity(
-                  tourTag,
-                  TourDatabase.ENTITY_IS_NOT_SAVED,
-                  TourTag.class);
-
-            if (savedTag != null) {
-
-               oldTags.add(tourTag);
-               newTags.add(savedTag);
-
-               // reload db tags
-               TourDatabase.clearTourTags();
-               allDbTags = TourDatabase.getAllTourTags();
-            }
-         }
-      }
-
-      final boolean isNewTags = newTags.size() > 0;
-
-      if (isNewTags) {
-
-         // replace tags in the tour
-
-         tourTags.removeAll(oldTags);
-         tourTags.addAll(newTags);
-      }
-
-      return isNewTags;
-   }
-
-   /**
-    * @param tourData
-    * @return Returns <code>true</code> when a new tour type is created.
-    */
-   private static boolean check_TourType(final TourData tourData) {
-
-      final TourType tourType = tourData.getTourType();
-
-      if (tourType == null) {
-         return false;
-      }
-
-      if (tourType.getTypeId() != TourDatabase.ENTITY_IS_NOT_SAVED) {
-         // type is saved
-         return false;
-      }
-
-      TourType newType = null;
-
-      final Collection<TourType> allDbTypes = TourDatabase.getAllTourTypes();
-
-      // type is not yet saved
-      // 1. type can still be new
-      // 2. type is already created but not updated in the not yet saved tour
-
-      final TourType dbType = findTourType(tourType.getName(), allDbTypes);
-
-      if (dbType != null) {
-
-         // use found tag
-
-         newType = dbType;
-
-      } else {
-
-         // create new tag
-
-         final TourType savedType = saveEntity(
-               tourType,
-               TourDatabase.ENTITY_IS_NOT_SAVED,
-               TourTag.class);
-
-         if (savedType != null) {
-
-            newType = savedType;
-
-            // force reload of the db tour types
-            TourDatabase.clearTourTypes();
-            TourManager.getInstance().clearTourDataCache();
-         }
-      }
-
-      final boolean isNewTourType = newType != null;
-
-      if (isNewTourType) {
-
-         // replace tour type in the tour
-
-         tourData.setTourType(newType);
-      }
-
-      return isNewTourType;
-   }
-
-   /**
     * This error can occur when transient instances are not saved.
     *
     * <pre>
@@ -916,8 +794,8 @@ public class TourDatabase {
     */
    private static void checkUnsavedTransientInstances(final TourData tourData) {
 
-      final boolean isNewTag = check_Tags(tourData);
-      final boolean isNewTourType = check_TourType(tourData);
+      final boolean isNewTag = checkUnsavedTransientInstances_Tags(tourData);
+      final boolean isNewTourType = checkUnsavedTransientInstances_TourType(tourData);
 
       if (isNewTag) {
 
@@ -930,11 +808,182 @@ public class TourDatabase {
 
          // fire modify event
 
-         Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore()
-               .setValue(
-                     ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-                     Math.random()));
+         Display.getDefault().syncExec(() -> _prefStore.setValue(
+               ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+               Math.random()));
       }
+   }
+
+   /**
+    * @param tourData
+    * @return Returns <code>true</code> when new tags are created.
+    */
+   private static boolean checkUnsavedTransientInstances_Tags(final TourData tourData) {
+
+      final Set<TourTag> allTourTags = tourData.getTourTags();
+
+      if (allTourTags.isEmpty()) {
+         return false;
+      }
+
+      final HashMap<Long, TourTag> oldTags = new HashMap<>();
+      final HashMap<Long, TourTag> newTags = new HashMap<>();
+      final HashMap<Long, TourTag> newAndNotSavedTags = new HashMap<>();
+
+      final HashMap<Long, TourTag> allDbTags = TourDatabase.getAllTourTags();
+
+      for (final TourTag tourTag : allTourTags) {
+
+         final long tagId = tourTag.getTagId();
+
+         if (tagId != TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+            // tag is saved
+
+            continue;
+         }
+
+         // tag is not yet saved
+         // 1. tag can still be new
+         // 2. tag is already created but not updated in the not yet saved tour
+
+         final TourTag dbTag = findTourTag(tourTag.getTagName(), allDbTags.values());
+
+         if (dbTag != null) {
+
+            // use found tag
+
+            oldTags.put(tagId, tourTag);
+            newTags.put(tagId, dbTag);
+
+         } else {
+
+            // create new tag
+
+            newAndNotSavedTags.put(tagId, tourTag);
+         }
+      }
+
+      if (newAndNotSavedTags.size() > 0) {
+
+         // create new tags
+
+         synchronized (TRANSIENT_LOCK) {
+
+            final HashMap<Long, TourTag> allDbTags_2nd = TourDatabase.getAllTourTags();
+
+            for (final TourTag tourTag : newAndNotSavedTags.values()) {
+
+               final long tagId = tourTag.getTagId();
+
+               // check again, tour tag list could be updated when running concurrently
+               final TourTag dbTag = findTourTag(tourTag.getTagName(), allDbTags_2nd.values());
+
+               if (dbTag == null) {
+
+                  oldTags.put(tagId, tourTag);
+                  newTags.put(tagId, dbTag);
+
+               } else {
+
+                  final TourTag savedTag = saveEntity(
+                        tourTag,
+                        TourDatabase.ENTITY_IS_NOT_SAVED,
+                        TourTag.class);
+
+                  if (savedTag != null) {
+
+                     oldTags.put(tagId, tourTag);
+                     newTags.put(tagId, savedTag);
+
+                     // force to reload db tags
+                     clearTourTags();
+                     TourManager.getInstance().clearTourDataCache();
+                  }
+               }
+            }
+         }
+      }
+
+      final boolean isNewTags = newTags.size() > 0;
+
+      if (isNewTags) {
+
+         // replace tags in the tour
+
+         allTourTags.removeAll(oldTags.values());
+         allTourTags.addAll(newTags.values());
+      }
+
+      return isNewTags;
+   }
+
+   /**
+    * @param tourData
+    * @return Returns <code>true</code> when a new tour type is created.
+    */
+   private static boolean checkUnsavedTransientInstances_TourType(final TourData tourData) {
+
+      final TourType tourType = tourData.getTourType();
+
+      if (tourType == null) {
+         return false;
+      }
+
+      if (tourType.getTypeId() != ENTITY_IS_NOT_SAVED) {
+
+         // tour type is saved
+         return false;
+      }
+
+      TourType newType = null;
+
+      synchronized (TRANSIENT_LOCK) {
+
+         final Collection<TourType> allDbTypes = getAllTourTypes();
+
+         // type is not yet saved
+         // 1. type can still be new
+         // 2. type is already created but not updated in the not yet saved tour
+
+         final TourType dbType = findTourType(tourType.getName(), allDbTypes);
+
+         if (dbType != null) {
+
+            // use found tag
+
+            newType = dbType;
+
+         } else {
+
+            // create new tag
+
+            final TourType savedType = saveEntity(
+                  tourType,
+                  ENTITY_IS_NOT_SAVED,
+                  TourType.class);
+
+            if (savedType != null) {
+
+               newType = savedType;
+
+               // force reload of the db tour types
+               clearTourTypes();
+               TourManager.getInstance().clearTourDataCache();
+            }
+         }
+      }
+
+      final boolean isNewTourType = newType != null;
+
+      if (isNewTourType) {
+
+         // replace tour type in the tour
+
+         tourData.setTourType(newType);
+      }
+
+      return isNewTourType;
    }
 
    /**
@@ -1823,6 +1872,10 @@ public class TourDatabase {
       return _allTourTags;
    }
 
+   public static ConcurrentHashMap<String, TourTag> getAllTourTags_NotYetSaved() {
+      return _allTourTags_NotYetSaved;
+   }
+
    /**
     * @return Returns the backend of all tour types which are stored in the database sorted by name.
     */
@@ -1847,11 +1900,11 @@ public class TourDatabase {
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
 
-            final Query emQuery = em.createQuery(//
-                  //
-                  "SELECT tourType" //$NON-NLS-1$
-                        + " FROM TourType AS tourType" //$NON-NLS-1$
-                        + " ORDER  BY tourType.name"); //$NON-NLS-1$
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT tourType" //              //$NON-NLS-1$
+                  + " FROM TourType AS tourType" //   //$NON-NLS-1$
+                  + " ORDER  BY tourType.name"); //   //$NON-NLS-1$
 
             _dbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
 
@@ -1864,6 +1917,15 @@ public class TourDatabase {
       }
 
       return _dbTourTypes;
+   }
+
+   /**
+    * Key is the tour type name in UPPERCASE
+    *
+    * @return
+    */
+   public static ConcurrentHashMap<String, TourType> getAllTourTypes_NotYetSaved() {
+      return _allTourTypes_NotYetSaved;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourMarkerNames() {
@@ -2906,9 +2968,6 @@ public class TourDatabase {
    /**
     * This method {@link #saveTour_PostSaveActions_Concurrent_2_ForAllTours(long[])} <b>MUST</b> be
     * called <b>AFTER</b> all tours are saved
-    * <p>
-    * !!! {@link #checkUnsavedTransientInstances(TourData)} may cause troubles with concurrency,
-    * when new tour types or tags are created !!!
     *
     * @param tourData
     * @return

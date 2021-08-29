@@ -32,6 +32,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.tour.TourManager;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -50,16 +51,16 @@ import utils.Initializer;
  */
 class GPX_SAX_HandlerTest {
 
-   private static SAXParser               parser;
-   private static DeviceData              deviceData;
-   private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
-   private static GarminTCX_DeviceDataReader  deviceDataReader;
+   private static SAXParser                  parser;
+   private static DeviceData                 deviceData;
+   private static HashMap<Long, TourData>    newlyImportedTours;
+   private static HashMap<Long, TourData>    alreadyImportedTours;
+   private static GarminTCX_DeviceDataReader deviceDataReader;
 
    /**
     * Resource path to GPX file, generally available from net.tourbook Plugin in test/net.tourbook
     */
-   public static final String             IMPORT_FILE_PATH = "/importdata/gpx/files/test.gpx"; //$NON-NLS-1$
+   public static final String                IMPORT_FILE_PATH = "/importdata/gpx/files/test.gpx"; //$NON-NLS-1$
 
    @BeforeAll
    static void initAll() {
@@ -87,7 +88,8 @@ class GPX_SAX_HandlerTest {
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            new ImportState_File());
 
       parser.parse(gpx, handler);
 

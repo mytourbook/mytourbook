@@ -39,6 +39,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 
 import org.xml.sax.SAXException;
 
@@ -104,7 +105,8 @@ public class Initializer {
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            new ImportState_File());
 
       if (parser != null) {
          try {

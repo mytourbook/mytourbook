@@ -60,8 +60,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.CadenceMultiplier;
@@ -265,9 +263,6 @@ public class RawDataManager {
             RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
    }
    //
-   private final ArrayList<TourType>            _tempTourTypes                           = new ArrayList<>();
-   private final ArrayList<TourTag>             _tempTourTags                            = new ArrayList<>();
-
    private volatile ReplaceImportFilenameAction _selectedImportFilenameReplacementOption = ReplaceImportFilenameAction.DO_NOTHING;
 
    /**
@@ -1399,14 +1394,6 @@ public class RawDataManager {
       default:
          return ReplaceImportFilenameAction.DO_NOTHING;
       }
-   }
-
-   public ArrayList<TourTag> getTempTourTags() {
-      return _tempTourTags;
-   }
-
-   public ArrayList<TourType> getTempTourTypes() {
-      return _tempTourTypes;
    }
 
    /**
@@ -2946,8 +2933,8 @@ public class RawDataManager {
       _allImportedFileNames.clear();
       _allImportedFileNamesChildren.clear();
 
-      _tempTourTags.clear();
-      _tempTourTypes.clear();
+      TourDatabase.getAllTourTags_NotYetSaved().clear();
+      TourDatabase.getAllTourTypes_NotYetSaved().clear();
    }
 
    public void removeTours(final TourData[] removedTours) {

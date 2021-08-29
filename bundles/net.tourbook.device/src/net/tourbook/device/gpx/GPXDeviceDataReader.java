@@ -175,16 +175,17 @@ public class GPXDeviceDataReader extends TourbookDevice {
          }
       }
 
-      final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            this,
-            importFilePath,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours);
-
       try {
 
          final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+
+         final GPX_SAX_Handler handler = new GPX_SAX_Handler(
+               this,
+               importFilePath,
+               deviceData,
+               alreadyImportedTours,
+               newlyImportedTours,
+               importState_File);
 
          if (inputStream == null) {
             saxParser.parse("file:" + importFilePath, handler);//$NON-NLS-1$
@@ -220,8 +221,6 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          return;
       }
-
-      importState_File.isFileImportedWithValidData = handler.isImported();
    }
 
    @Override
