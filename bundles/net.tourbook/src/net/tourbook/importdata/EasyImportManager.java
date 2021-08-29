@@ -73,6 +73,8 @@ public class EasyImportManager {
 
    private static final String      ID                                                 = "net.tourbook.importdata.EasyImportManager";        //$NON-NLS-1$
    //
+   private static final char        NL                                                 = UI.NEW_LINE;                                        //
+   //
    private static final String      XML_STATE_EASY_IMPORT                              = "XML_STATE_EASY_IMPORT";                            //$NON-NLS-1$
    //
    private static final String      TAG_ROOT                                           = "EasyImportConfig";                                 //$NON-NLS-1$
@@ -251,7 +253,7 @@ public class EasyImportManager {
 
             } catch (final Exception e) {
 // this can occur too often
-//					TourLogManager.logEx(e);
+//               TourLogManager.logEx(e);
             }
 
          }
@@ -283,25 +285,29 @@ public class EasyImportManager {
 
          sb.append('\'');
 
-         // escape single quotes
-         sb.append(fileName.replace("\'", "\\\'")); //$NON-NLS-1$ //$NON-NLS-2$
+         // escape single quotes by doubling them
+         sb.append(fileName.replace("\'", "\'\'")); //$NON-NLS-1$ //$NON-NLS-2$
 
          sb.append('\'');
       }
 
-      final String deviceFileNameINList = sb.toString();
+      final String deviceFileName_INList = sb.toString();
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                                         //$NON-NLS-1$
+
+            + "TourImportFileName" + NL //                                             //$NON-NLS-1$
+
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+            + "WHERE TourImportFileName IN (" + deviceFileName_INList + ")" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + "ORDER BY TourImportFileName" + NL //                                    //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final String sqlQuery = UI.EMPTY_STRING//
-               + "SELECT" //															//$NON-NLS-1$
-               + " TourImportFileName" //												//$NON-NLS-1$
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$
-               + (" WHERE TourImportFileName IN (" + deviceFileNameINList + UI.SYMBOL_BRACKET_RIGHT) //	//$NON-NLS-1$
-               + " ORDER BY TourImportFileName"; //									//$NON-NLS-1$
-
-         final ResultSet result = stmt.executeQuery(sqlQuery);
+         final ResultSet result = stmt.executeQuery(sql);
 
          while (result.next()) {
 
@@ -311,7 +317,8 @@ public class EasyImportManager {
          }
 
       } catch (final SQLException e) {
-         SQL.showException(e);
+
+         SQL.showException(e, sql);
       }
 
       return dbFileNames;
@@ -1004,7 +1011,7 @@ public class EasyImportManager {
                }
 
                // for debugging
-//					Thread.sleep(800);
+//               Thread.sleep(800);
 
                monitor.worked(1);
                monitor.subTask(NLS.bind(
