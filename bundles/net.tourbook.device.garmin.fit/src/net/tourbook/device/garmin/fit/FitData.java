@@ -96,7 +96,7 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
-   private ImportState_Process       _importStates;
+   private ImportState_Process       _importState_Process;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -108,7 +108,7 @@ public class FitData {
       _importFilePathName = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
-      _importStates = importState_Process;
+      _importState_Process = importState_Process;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
@@ -148,7 +148,7 @@ public class FitData {
 
             appliedTourType = TourDatabase.createTourType(parsedTourTypeLabel);
 
-            _importStates.isFire_NewTourType.set(true);
+            _importState_Process.isFire_NewTourType.set(true);
          }
 
          tourData.setTourType(appliedTourType);

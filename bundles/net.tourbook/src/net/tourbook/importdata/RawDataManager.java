@@ -465,10 +465,8 @@ public class RawDataManager {
        */
       if (isEntireTour || tourValueType == TourValueType.TOUR__CALORIES) {
 
-         previousData.add(
-               oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
-         newData.add(
-               newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
+         previousData.add(oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
+         newData.add(newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
       }
 
       if (isEntireTour || tourValueType == TourValueType.TOUR__MARKER) {

@@ -106,7 +106,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    //
    private boolean                _isDebug                = false;
 
-   private ImportState_Process    _importStates;
+   private ImportState_Process    _importState_Process;
 
    /**
     * <pre>
@@ -1602,7 +1602,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
                                  final ImportState_Process importState_Process) {
 
       _importFilePath = importFilePath;
-      _importStates = importState_Process;
+      _importState_Process = importState_Process;
 
       if (_isDebug) {
          System.out.println(importFilePath);
@@ -1613,13 +1613,13 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    protected void showError(final String message) {
 
-      if (_lastUsedImportId == _importStates.importId) {
+      if (_lastUsedImportId == _importState_Process.importId) {
 
          // do not bother the user with the same error message
 
       } else {
 
-         _lastUsedImportId = _importStates.importId;
+         _lastUsedImportId = _importState_Process.importId;
 
          Display.getDefault().syncExec(() -> MessageDialog.openError(
                Display.getCurrent().getActiveShell(),

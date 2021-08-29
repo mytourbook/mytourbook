@@ -19,6 +19,11 @@ Issues
 
 *  
 
+Experimental
+============
+
+* Concurrent Tour Import/Re-import and Save Process
+  The whole import/re-import and save process where completely reworked to run it concurrently, with the advantage that this is now multiple time faster, depending on the number of CPU cores
   
 New
 ===
