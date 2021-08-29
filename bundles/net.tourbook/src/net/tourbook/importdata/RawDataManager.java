@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1422,78 +1423,97 @@ public class RawDataManager {
                                              final String fileGlobPattern,
                                              final ImportState_Process importState_Process) {
 
-      if (allImportFiles.isEmpty()) {
-         return;
-      }
+      try {
 
-      final long start = System.currentTimeMillis();
-
-      /*
-       * Log import
-       */
-      final String css = importState_Process.isEasyImport
-            ? UI.EMPTY_STRING
-            : TourLogView.CSS_LOG_TITLE;
-
-      final String message = importState_Process.isEasyImport
-            ? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
-            : RawDataManager.LOG_IMPORT_TOUR;
-
-      if (importState_Process.isLog_DEFAULT) {
-         TourLogManager.addLog(TourLogState.DEFAULT, message, css);
-      }
-
-      final List<ImportFile> allImportFilePaths = new ArrayList<>();
-
-      /*
-       * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
-       */
-      for (final OSFile osFile : allImportFiles) {
-
-         final String absolutePath = osFile.getPath().toString();
-         final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
-
-         final ImportFile importFile = new ImportFile(iPath);
-         importFile.isBackupImportFile = osFile.isBackupImportFile;
-
-         allImportFilePaths.add(importFile);
-      }
-
-      /*
-       * Resort files by extension priority
-       */
-      Collections.sort(allImportFilePaths, (importFilePath1, importFilePath2) -> {
-
-         final String file1Extension = importFilePath1.filePath.getFileExtension();
-         final String file2Extension = importFilePath2.filePath.getFileExtension();
-
-         if (file1Extension != null
-               && file1Extension.length() > 0
-               && file2Extension != null
-               && file2Extension.length() > 0) {
-
-            final TourbookDevice file1Device = _allDevices_ByExtension.get(file1Extension.toLowerCase());
-            final TourbookDevice file2Device = _allDevices_ByExtension.get(file2Extension.toLowerCase());
-
-            if (file1Device != null && file2Device != null) {
-               return file1Device.extensionSortPriority - file2Device.extensionSortPriority;
-            }
+         if (allImportFiles.isEmpty()) {
+            return;
          }
 
-         // sort invalid files to the end
-         return Integer.MAX_VALUE;
-      });
+         final long start = System.currentTimeMillis();
 
-      importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);
+         /*
+          * Log import
+          */
+         final String css = importState_Process.isEasyImport
+               ? UI.EMPTY_STRING
+               : TourLogView.CSS_LOG_TITLE;
 
-      TourLogManager.log_DEFAULT(String.format(
+         final String message = importState_Process.isEasyImport
+               ? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
+               : RawDataManager.LOG_IMPORT_TOUR;
 
-            importState_Process.isEasyImport
-                  ? EasyImportManager.LOG_EASY_IMPORT_002_END
-                  : RawDataManager.LOG_IMPORT_TOUR_END,
+         if (importState_Process.isLog_DEFAULT) {
+            TourLogManager.addLog(TourLogState.DEFAULT, message, css);
+         }
 
-            (System.currentTimeMillis() - start) / 1000.0));
+         final List<ImportFile> allImportFilePaths = new ArrayList<>();
 
+         /*
+          * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
+          */
+         for (final OSFile osFile : allImportFiles) {
+
+            final String absolutePath = osFile.getPath().toString();
+            final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
+
+            final ImportFile importFile = new ImportFile(iPath);
+            importFile.isBackupImportFile = osFile.isBackupImportFile;
+
+            allImportFilePaths.add(importFile);
+         }
+
+         /*
+          * Resort files by extension priority
+          */
+         Collections.sort(allImportFilePaths, new Comparator<>() {
+            @Override
+            public int compare(final ImportFile importFilePath1, final ImportFile importFilePath2) {
+
+               final String file1Extension = importFilePath1.filePath.getFileExtension();
+               final String file2Extension = importFilePath2.filePath.getFileExtension();
+
+               int rc = 0;
+
+               if (file1Extension != null
+                     && file1Extension.length() > 0
+                     && file2Extension != null
+                     && file2Extension.length() > 0) {
+
+                  final TourbookDevice file1Device = _allDevices_ByExtension.get(file1Extension.toLowerCase());
+                  final TourbookDevice file2Device = _allDevices_ByExtension.get(file2Extension.toLowerCase());
+
+                  if (file1Device != null && file2Device != null) {
+                     rc = file1Device.extensionSortPriority - file2Device.extensionSortPriority;
+                  }
+
+               } else {
+
+                  // sort invalid files to the end
+                  rc = Integer.MAX_VALUE;
+               }
+
+               return rc > 0
+                     ? 1
+                     : rc < 0
+                           ? -1
+                           : 0;
+            }
+         });
+
+         importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);
+
+         TourLogManager.log_DEFAULT(String.format(
+
+               importState_Process.isEasyImport
+                     ? EasyImportManager.LOG_EASY_IMPORT_002_END
+                     : RawDataManager.LOG_IMPORT_TOUR_END,
+
+               (System.currentTimeMillis() - start) / 1000.0));
+
+      } catch (final Exception e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+      }
    }
 
    private void importTours_FromMultipleFiles_10(final List<ImportFile> allImportFilePaths,
