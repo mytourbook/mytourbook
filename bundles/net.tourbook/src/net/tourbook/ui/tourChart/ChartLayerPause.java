@@ -115,13 +115,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final Color colorDefault = new Color(isDarkTheme ? _chartPauseConfig.pauseColorDefault_Dark : _chartPauseConfig.pauseColorDefault_Light);
       final Color colorHidden = new Color(isDarkTheme ? _chartPauseConfig.pauseColorHidden_Dark : _chartPauseConfig.pauseColorHidden_Light);
 
-      //TODO FB
-      drawOverlay_Label(hoveredLabel,
-            gc,
-            colorDefault,
-            colorHidden,
-            false);
-
+      //TODO FB what is hidden ? does it apply for pauses
+      drawOverlay_Label(hoveredLabel, gc, colorDefault, colorHidden, false);
    }
 
    private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
