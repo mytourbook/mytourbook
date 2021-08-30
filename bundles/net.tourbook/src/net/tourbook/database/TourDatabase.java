@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -78,7 +77,6 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourEventId;
@@ -266,41 +264,36 @@ public class TourDatabase {
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE     = ";upgrade=true";                                        //$NON-NLS-1$
    //
    //
-   private static volatile TourDatabase                     _instance;
+   private static volatile TourDatabase                   _instance;
 
-   private static ArrayList<TourType>                       _activeTourTypes;
+   private static ArrayList<TourType>                     _activeTourTypes;
 
-   private static volatile ArrayList<TourType>              _dbTourTypes;
+   private static volatile ArrayList<TourType>            _dbTourTypes;
 
    /**
     * Key is tour type ID
     */
-   private static HashMap<Long, TourType>                   _dbTourTypeIds;
+   private static HashMap<Long, TourType>                 _dbTourTypeIds;
 
    /**
     * Key is tag ID.
     */
-   private static volatile HashMap<Long, TourTag>           _allTourTags;
+   private static volatile HashMap<Long, TourTag>         _allTourTags_ByTagId;
+
+   /**
+    * Key is the UPPERCASE tag name
+    */
+   private static volatile HashMap<String, TourTag>       _allTourTags_ByTagName;
 
    /**
     * Key is tag category ID.
     */
-   private static volatile HashMap<Long, TourTagCategory>   _allTourTagCategories;
+   private static volatile HashMap<Long, TourTagCategory> _allTourTagCategories;
 
    /**
     * Key is category ID or <code>-1</code> for the root.
     */
-   private static HashMap<Long, TagCollection>              _tagCollections           = new HashMap<>();
-
-   /**
-    * Contains {@link TourType}s which are imported but not yet saved, key is the tour type name
-    */
-   private static final ConcurrentHashMap<String, TourType> _allTourTypes_NotYetSaved = new ConcurrentHashMap<>();
-
-   /**
-    * Contains {@link TourTag}s which are imported but not yet saved, key is the tour tag name
-    */
-   private static final ConcurrentHashMap<String, TourTag>  _allTourTags_NotYetSaved  = new ConcurrentHashMap<>();
+   private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
 
    /*
     * Cached distinct fields
@@ -992,9 +985,13 @@ public class TourDatabase {
     */
    public static synchronized void clearTourTags() {
 
-      if (_allTourTags != null) {
-         _allTourTags.clear();
-         _allTourTags = null;
+      if (_allTourTags_ByTagId != null) {
+
+         _allTourTags_ByTagId.clear();
+         _allTourTags_ByTagId = null;
+
+         _allTourTags_ByTagName.clear();
+         _allTourTags_ByTagName = null;
       }
 
       if (_allTourTagCategories != null) {
@@ -1326,127 +1323,6 @@ public class TourDatabase {
    }
 
    /**
-    * Add new tour tags and save them in the database
-    *
-    * @param allNewTourTags
-    * @return Returns all newly created tour tags
-    */
-   public static synchronized ArrayList<TourTag> createTourTags(final HashMap<String, Object> allNewTourTags) {
-
-      /*
-       * Check tags if they are still unavailable
-       */
-//      clearTourTags();
-      final HashMap<Long, TourTag> allAvailableTourTags = getAllTourTags();
-
-      final ArrayList<TourTag> allNewOrOldTourTags = new ArrayList<>();
-      final ArrayList<String> allMissingTourTagLabel = new ArrayList<>();
-
-      for (final String tourTagLabel : allNewTourTags.keySet()) {
-
-         boolean isLabelFound = false;
-
-         for (final TourTag availableTourTag : allAvailableTourTags.values()) {
-
-            if (availableTourTag.getTagName().equalsIgnoreCase(tourTagLabel)) {
-
-               // tag label do exist
-
-               allNewOrOldTourTags.add(availableTourTag);
-               isLabelFound = true;
-
-               break;
-            }
-         }
-
-         if (isLabelFound == false) {
-
-            // tag label do not exist
-
-            allMissingTourTagLabel.add(tourTagLabel);
-         }
-      }
-
-      /*
-       * Create missing tour tags
-       */
-      boolean isNewTagCreated = false;
-      for (final String tourTagLabel : allMissingTourTagLabel) {
-
-         // create a new tag
-         final TourTag tourTag = new TourTag(tourTagLabel);
-         tourTag.setRoot(true);
-
-         // persist tag
-         final TourTag savedTag = saveEntity(
-               tourTag,
-               ENTITY_IS_NOT_SAVED,
-               TourTag.class);
-
-         if (savedTag != null) {
-
-            allNewOrOldTourTags.add(savedTag);
-
-            isNewTagCreated = true;
-         }
-      }
-
-      if (isNewTagCreated) {
-
-         // force to reload tour tag list
-
-         clearTourTags();
-      }
-
-      return allNewOrOldTourTags;
-   }
-
-   /**
-    * Create new tour type and save it in the database
-    *
-    * @param tourTypeLabel
-    * @return Returns the newly saved tour type
-    */
-   public static synchronized TourType createTourType(final String tourTypeLabel) {
-
-      /*
-       * Check if tour type is still unavailable
-       */
-      clearTourTypes();
-      for (final TourType availableTourType : getAllTourTypes()) {
-
-         if (tourTypeLabel.equalsIgnoreCase(availableTourType.getName())) {
-
-            return availableTourType;
-         }
-      }
-
-      // tour type is for sure not available -> create it now
-
-      final TourType newTourType = new TourType(tourTypeLabel);
-
-      final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(
-            newTourType,
-            Long.toString(newTourType.getTypeId()),
-            newTourType.getName());
-
-      newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
-      newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
-      newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
-      newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
-
-      // save new entity
-      final TourType savedTourType = saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-      if (savedTourType != null) {
-
-         clearTourTypes();
-         TourManager.getInstance().clearTourDataCache();
-      }
-
-      return savedTourType;
-   }
-
-   /**
     * Remove a tour from the database
     *
     * @param tourId
@@ -1640,15 +1516,15 @@ public class TourDatabase {
    }
 
    /**
-    * Find tour type in other tour types.
+    * Find tour type by name within the provided collection
     *
     * @param tourTypeName
-    * @param allDbTypes
+    * @param allTourTypes
     * @return Returns found {@link TourType} or <code>null</code> when not available.
     */
-   public static TourType findTourType(final String tourTypeName, final Collection<TourType> allDbTypes) {
+   public static TourType findTourType(final String tourTypeName, final Collection<TourType> allTourTypes) {
 
-      for (final TourType tourType : allDbTypes) {
+      for (final TourType tourType : allTourTypes) {
 
          if (tourTypeName.equalsIgnoreCase(tourType.getName())) {
 
@@ -1835,45 +1711,27 @@ public class TourDatabase {
     */
    public static HashMap<Long, TourTag> getAllTourTags() {
 
-      if (_allTourTags != null) {
-         return _allTourTags;
+      if (_allTourTags_ByTagId != null) {
+         return _allTourTags_ByTagId;
       }
 
-      synchronized (DB_LOCK) {
+      loadAllTourTags();
 
-         // check again, field must be volatile to work correctly
-         if (_allTourTags != null) {
-            return _allTourTags;
-         }
-
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
-
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
-
-                  + "SELECT tourTag" //                                             //$NON-NLS-1$
-                  + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //   //$NON-NLS-1$ //$NON-NLS-2$
-
-            _allTourTags = new HashMap<>();
-
-            final List<?> resultList = emQuery.getResultList();
-            for (final Object result : resultList) {
-
-               if (result instanceof TourTag) {
-                  final TourTag tourTag = (TourTag) result;
-                  _allTourTags.put(tourTag.getTagId(), tourTag);
-               }
-            }
-
-            em.close();
-         }
-      }
-
-      return _allTourTags;
+      return _allTourTags_ByTagId;
    }
 
-   public static ConcurrentHashMap<String, TourTag> getAllTourTags_NotYetSaved() {
-      return _allTourTags_NotYetSaved;
+   /**
+    * @return Returns all tour tags, the key is the tag name in UPPERCASE
+    */
+   public static HashMap<String, TourTag> getAllTourTags_ByTagName() {
+
+      if (_allTourTags_ByTagName != null) {
+         return _allTourTags_ByTagName;
+      }
+
+      loadAllTourTags();
+
+      return _allTourTags_ByTagName;
    }
 
    /**
@@ -1917,15 +1775,6 @@ public class TourDatabase {
       }
 
       return _dbTourTypes;
-   }
-
-   /**
-    * Key is the tour type name in UPPERCASE
-    *
-    * @return
-    */
-   public static ConcurrentHashMap<String, TourType> getAllTourTypes_NotYetSaved() {
-      return _allTourTypes_NotYetSaved;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourMarkerNames() {
@@ -2368,7 +2217,7 @@ public class TourDatabase {
       final ArrayList<String> tagNames = new ArrayList<>();
 
       for (final Long tagId : alltagIds) {
-         final TourTag tourTag = _allTourTags.get(tagId);
+         final TourTag tourTag = _allTourTags_ByTagId.get(tagId);
          tagNames.add(tourTag.getTagName());
       }
 
@@ -2755,6 +2604,43 @@ public class TourDatabase {
       }
 
       return false;
+   }
+
+   private static void loadAllTourTags() {
+
+      synchronized (DB_LOCK) {
+
+         // check again, field must be volatile to work correctly
+         if (_allTourTags_ByTagId != null) {
+            return;
+         }
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT tourTag" //                                             //$NON-NLS-1$
+                  + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //   //$NON-NLS-1$ //$NON-NLS-2$
+
+            _allTourTags_ByTagId = new HashMap<>();
+            _allTourTags_ByTagName = new HashMap<>();
+
+            final List<?> resultList = emQuery.getResultList();
+            for (final Object result : resultList) {
+
+               if (result instanceof TourTag) {
+
+                  final TourTag tourTag = (TourTag) result;
+
+                  _allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
+                  _allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);
+               }
+            }
+
+            em.close();
+         }
+      }
    }
 
    /**

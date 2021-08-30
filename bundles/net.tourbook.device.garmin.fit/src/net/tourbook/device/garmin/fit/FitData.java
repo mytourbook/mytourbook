@@ -33,9 +33,8 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
@@ -96,7 +95,7 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
-   private ImportState_Process       _importState_Process;
+   private ImportState_Process           _importState_Process;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -125,34 +124,14 @@ public class FitData {
     */
    private void applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
 
-      // do not add tours when label string is blank
-      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
-
-         TourType existingTourType = null;
-
-         // find tour type in existing tour types
-         for (final TourType availableTourType : TourDatabase.getAllTourTypes()) {
-
-            if (parsedTourTypeLabel.equalsIgnoreCase(availableTourType.getName())) {
-
-               existingTourType = availableTourType;
-               break;
-            }
-         }
-
-         TourType appliedTourType = existingTourType;
-
-         if (existingTourType == null) {
-
-            // create new tour type
-
-            appliedTourType = TourDatabase.createTourType(parsedTourTypeLabel);
-
-            _importState_Process.isFire_NewTourType.set(true);
-         }
-
-         tourData.setTourType(appliedTourType);
+      // ignore empty tour type label
+      if (UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
+         return;
       }
+
+      final boolean isNewTourType = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
+
+      _importState_Process.isCreated_NewTourType.set(isNewTourType);
    }
 
    public void finalizeTour() {

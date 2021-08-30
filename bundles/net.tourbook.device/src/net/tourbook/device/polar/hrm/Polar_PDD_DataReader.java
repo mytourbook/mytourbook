@@ -271,9 +271,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
-      final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(_isReimport);
 
       final ImportState_File importState_File = new ImportState_File();
+      final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(_isReimport);
 
       deviceDataReader.processDeviceData(
             importFilePath.toOSString(),
@@ -282,6 +282,8 @@ public class Polar_PDD_DataReader extends TourbookDevice {
             newlyImportedTours,
             importState_File,
             importState_Process);
+
+      importState_Process.runPostProcess();
 
       if (importState_File.isFileImportedWithValidData == false) {
 

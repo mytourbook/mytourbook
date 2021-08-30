@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -60,8 +61,11 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
@@ -184,31 +188,43 @@ public class RawDataManager {
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<String, Object> _allInvalidFiles              = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, Object>   _allInvalidFiles               = new ConcurrentHashMap<>();
 
    /**
     * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<IPath, Object>  _allPreviousReimportFolders   = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<IPath, Object>    _allPreviousReimportFolders    = new ConcurrentHashMap<>();
 
-   private static volatile IPath                          _previousReimportFolder;
+   private static volatile IPath                            _previousReimportFolder;
 
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private static final ConcurrentHashMap<Long, TourData> _allImportedTours             = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<Long, TourData>   _allImported_Tours             = new ConcurrentHashMap<>();
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
     */
-   private static final ConcurrentHashMap<String, String> _allImportedFileNames         = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>   _allImported_FileNames         = new ConcurrentHashMap<>();
 
    /**
     * Contains filenames which are not directly imported but is imported from other imported files
     */
-   private static final ConcurrentHashMap<String, String> _allImportedFileNamesChildren = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>   _allImported_FileNamesChildren = new ConcurrentHashMap<>();
+
+   /**
+    * Contains {@link TourType}'s which are imported and could be saved or not, key is the tour type
+    * name in UPPERCASE
+    */
+   private static final ConcurrentHashMap<String, TourType> _allImported_NewTourTypes      = new ConcurrentHashMap<>();
+
+   /**
+    * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
+    * name in UPPERCASE
+    */
+   private static final ConcurrentHashMap<String, TourTag>  _allImported_NewTourTags       = new ConcurrentHashMap<>();
 
    //
    /**
@@ -343,6 +359,101 @@ public class RawDataManager {
       for (final TourbookDevice device : _allDevices_BySortPriority) {
          _allDevices_ByExtension.put(device.fileExtension.toLowerCase(), device);
       }
+   }
+
+   /**
+    * Add new tour tags and save them in the database
+    *
+    * @param allRequestedTourTagNames
+    *           Contains the tag names which should be created
+    * @param allNewTourTags
+    * @param allOldTourTags
+    */
+   private static synchronized void createTourTags(final HashSet<String> allRequestedTourTagNames,
+                                                   final ArrayList<TourTag> allNewTourTags,
+                                                   final ArrayList<TourTag> allOldTourTags) {
+
+      /*
+       * Check tags again if they are still unavailable
+       */
+      final HashMap<String, TourTag> allTourTags_ByTagName = TourDatabase.getAllTourTags_ByTagName();
+
+      final HashSet<String> allTourTags_NotAvailable = new HashSet<>();
+
+      for (final String tagName : allRequestedTourTagNames) {
+
+         final String tagNameKey = tagName.toUpperCase();
+
+         final TourTag tourTag = allTourTags_ByTagName.get(tagNameKey);
+
+         if (tourTag == null) {
+
+            allTourTags_NotAvailable.add(tagName);
+
+         } else {
+
+            allOldTourTags.add(tourTag);
+         }
+      }
+
+      for (final String tagName : allTourTags_NotAvailable) {
+
+         final TourTag tourTag = new TourTag(tagName);
+         tourTag.setRoot(true);
+
+         allNewTourTags.add(tourTag);
+
+         _allImported_NewTourTags.put(tagName.toUpperCase(), tourTag);
+      }
+   }
+
+   /**
+    * Create new tour type and keep it in {@link #_allImported_NewTourTypes}
+    *
+    * @param tourTypeLabel
+    * @return Returns the newly saved tour type
+    */
+   private static synchronized TourType createTourType(final String tourTypeLabel) {
+
+      final String tourTypeLabelKey = tourTypeLabel.toUpperCase();
+
+      /*
+       * Check imported tour types
+       */
+      final TourType importedTourType = _allImported_NewTourTypes.get(tourTypeLabelKey);
+      if (importedTourType != null) {
+         return importedTourType;
+      }
+
+      /*
+       * Check if tour type is still unavailable in the database
+       */
+      for (final TourType availableTourType : TourDatabase.getAllTourTypes()) {
+
+         if (tourTypeLabel.equalsIgnoreCase(availableTourType.getName())) {
+
+            return availableTourType;
+         }
+      }
+
+      /*
+       * Tour type is for sure not available -> create it now
+       */
+      final TourType newTourType = new TourType(tourTypeLabel);
+
+      final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(
+            newTourType,
+            Long.toString(newTourType.getTypeId()),
+            newTourType.getName());
+
+      newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
+      newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
+      newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
+      newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
+
+      _allImported_NewTourTypes.put(tourTypeLabelKey, newTourType);
+
+      return newTourType;
    }
 
    /**
@@ -632,6 +743,99 @@ public class RawDataManager {
       _isReimportingActive = isReimportingActive;
    }
 
+   /**
+    * @param tourData
+    * @param allTourTagNames
+    * @return Returns <code>true</code> when new tour tags were created.
+    */
+   public static boolean setTourTags(final TourData tourData, final Set<String> allTourTagNames) {
+
+      final HashMap<String, TourTag> allTourTags_Available = new HashMap<>();
+      final HashSet<String> allTourTags_NotAvailable = new HashSet<>();
+
+      final HashMap<String, TourTag> allTourTags_ByTagName = TourDatabase.getAllTourTags_ByTagName();
+
+      for (final String tagName : allTourTagNames) {
+
+         final String tagNameKey = tagName.toUpperCase();
+
+         final TourTag tourTag = allTourTags_ByTagName.get(tagNameKey);
+
+         if (tourTag == null) {
+
+            allTourTags_NotAvailable.add(tagName);
+
+         } else {
+
+            allTourTags_Available.put(tagNameKey, tourTag);
+         }
+      }
+
+      final ArrayList<TourTag> allNewTourTags = new ArrayList<>();
+      final ArrayList<TourTag> allOldTourTags = new ArrayList<>();
+
+      if (allTourTags_NotAvailable.size() > 1) {
+
+         // some tags are not available -> create them
+
+         createTourTags(allTourTags_NotAvailable, allNewTourTags, allOldTourTags);
+      }
+
+      final Set<TourTag> tourData_TourTags = tourData.getTourTags();
+
+      tourData_TourTags.clear();
+      tourData_TourTags.addAll(allTourTags_Available.values());
+      tourData_TourTags.addAll(allOldTourTags);
+      tourData_TourTags.addAll(allNewTourTags);
+
+      return allNewTourTags.size() > 0;
+   }
+
+   /**
+    * Set {@link TourType} into {@link TourData} by using it's tour type label
+    *
+    * @param tourData
+    * @param tourTypeLabel
+    * @return Returns <code>true</code> when a new tour type was created.
+    */
+   public static boolean setTourType(final TourData tourData, final String tourTypeLabel) {
+
+      final String tourTypeLabelStripped = tourTypeLabel.strip();
+
+      if (UI.EMPTY_STRING.equals(tourTypeLabelStripped)) {
+
+         // ignore empty tour type label
+
+         return false;
+      }
+
+      TourType existingTourType = null;
+
+      // find tour type in existing tour types
+      for (final TourType availableTourType : TourDatabase.getAllTourTypes()) {
+
+         if (tourTypeLabelStripped.equalsIgnoreCase(availableTourType.getName())) {
+
+            existingTourType = availableTourType;
+            break;
+         }
+      }
+
+      TourType appliedTourType = existingTourType;
+      TourType newTourType = null;
+
+      if (existingTourType == null) {
+
+         // create new tour type
+
+         appliedTourType = newTourType = createTourType(tourTypeLabelStripped);
+      }
+
+      tourData.setTourType(appliedTourType);
+
+      return newTourType != null;
+   }
+
    public void actionImportFromDevice() {
 
       final DataTransferWizardDialog dialog = new DataTransferWizardDialog(
@@ -728,10 +932,14 @@ public class RawDataManager {
          TourLogManager.showLogView();
       }
 
+      final ImportState_Process importState_Process = new ImportState_Process().setIsEasyImport(false);
+
       importTours_FromMultipleFiles(
             allOSFiles,
             null,
-            new ImportState_Process().setIsEasyImport(false));
+            importState_Process);
+
+      importState_Process.runPostProcess();
    }
 
    /**
@@ -1115,7 +1323,7 @@ public class RawDataManager {
        * Tour must be removed otherwise it would be recognized as a duplicate and therefore not
        * imported
        */
-      final TourData oldTourDataInImportView = _allImportedTours.remove(tourId);
+      final TourData oldTourDataInImportView = _allImported_Tours.remove(tourId);
 
       TourData clonedTourData = null;
       try {
@@ -1264,7 +1472,7 @@ public class RawDataManager {
 
          // replace tour data in the import view
 
-         _allImportedTours.put(saveTourData.getTourId(), saveTourData);
+         _allImported_Tours.put(saveTourData.getTourId(), saveTourData);
       }
    }
 
@@ -1276,7 +1484,7 @@ public class RawDataManager {
     * @return Returns filenames of all imported tour files which are displayed in the import view
     */
    public ConcurrentHashMap<String, String> getImportedFiles() {
-      return _allImportedFileNames;
+      return _allImported_FileNames;
    }
 
    /**
@@ -1284,7 +1492,7 @@ public class RawDataManager {
     *         the import view, tour id is the key.
     */
    public Map<Long, TourData> getImportedTours() {
-      return _allImportedTours;
+      return _allImported_Tours;
    }
 
    /**
@@ -1292,7 +1500,7 @@ public class RawDataManager {
     */
    public ArrayList<TourData> getImportedTours_AsList() {
 
-      final Collection<TourData> importedToursCollection = _allImportedTours.values();
+      final Collection<TourData> importedToursCollection = _allImported_Tours.values();
       final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
 
       return importedTours;
@@ -1565,7 +1773,7 @@ public class RawDataManager {
                }
 
                // ignore files which are imported as children from other imported files
-               if (_allImportedFileNamesChildren.contains(filePath.osFilePath)) {
+               if (_allImported_FileNamesChildren.contains(filePath.osFilePath)) {
 
                   _importTour_CountDownLatch.countDown();
 
@@ -1915,12 +2123,12 @@ public class RawDataManager {
 
          if (isDataImported) {
 
-            _allImportedFileNames.put(importState_File.importedFileName, importState_File.importedFileName);
+            _allImported_FileNames.put(importState_File.importedFileName, importState_File.importedFileName);
 
             if (!additionalImportedFiles.isEmpty()) {
 
                for (final String fileName : additionalImportedFiles) {
-                  _allImportedFileNamesChildren.put(fileName, fileName);
+                  _allImported_FileNamesChildren.put(fileName, fileName);
                }
             }
          }
@@ -2002,7 +2210,7 @@ public class RawDataManager {
             device.processDeviceData(
                   sourceFileName,
                   _deviceData,
-                  _allImportedTours,
+                  _allImported_Tours,
                   allNewlyImportedToursFromOneFile,
                   importState_File,
                   importState_Process);
@@ -2012,7 +2220,7 @@ public class RawDataManager {
          }
 
          if (isTourDisplayedInImportView) {
-            _allImportedTours.putAll(allNewlyImportedToursFromOneFile);
+            _allImported_Tours.putAll(allNewlyImportedToursFromOneFile);
          }
 
          if (importState_File.isFileImportedWithValidData) {
@@ -2457,7 +2665,7 @@ public class RawDataManager {
        * imported
        */
       boolean isRevertTour = false;
-      final TourData oldTourDataInImportView = _allImportedTours.remove(oldTourId);
+      final TourData oldTourDataInImportView = _allImported_Tours.remove(oldTourId);
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
 
@@ -2537,7 +2745,7 @@ public class RawDataManager {
 
                // replace tour data in the import view
 
-               _allImportedTours.put(updatedTourData.getTourId(), updatedTourData);
+               _allImported_Tours.put(updatedTourData.getTourId(), updatedTourData);
             }
          }
 
@@ -2552,7 +2760,7 @@ public class RawDataManager {
 
          // re-attach removed tour
 
-         _allImportedTours.put(oldTourId, oldTourDataInImportView);
+         _allImported_Tours.put(oldTourId, oldTourDataInImportView);
       }
 
       return isTourReImported;
@@ -2928,26 +3136,26 @@ public class RawDataManager {
 
    public void removeAllTours() {
 
-      _allImportedTours.clear();
+      _allImported_Tours.clear();
 
-      _allImportedFileNames.clear();
-      _allImportedFileNamesChildren.clear();
+      _allImported_FileNames.clear();
+      _allImported_FileNamesChildren.clear();
 
-      TourDatabase.getAllTourTags_NotYetSaved().clear();
-      TourDatabase.getAllTourTypes_NotYetSaved().clear();
+      _allImported_NewTourTags.clear();
+      _allImported_NewTourTypes.clear();
    }
 
    public void removeTours(final TourData[] removedTours) {
 
       // clone map
-      final ConcurrentHashMap<String, String> oldFileNames = new ConcurrentHashMap<>(_allImportedFileNames);
+      final ConcurrentHashMap<String, String> oldFileNames = new ConcurrentHashMap<>(_allImported_FileNames);
 
       for (final TourData tourData : removedTours) {
 
          final Long key = tourData.getTourId();
 
-         if (_allImportedTours.containsKey(key)) {
-            _allImportedTours.remove(key);
+         if (_allImported_Tours.containsKey(key)) {
+            _allImported_Tours.remove(key);
          }
       }
 
@@ -2964,7 +3172,7 @@ public class RawDataManager {
             final String oldFilePath = key;
             boolean isNeeded = false;
 
-            for (final TourData tourData : _allImportedTours.values()) {
+            for (final TourData tourData : _allImported_Tours.values()) {
 
                final String tourFilePathName = tourData.getImportFilePathName();
 
@@ -2977,7 +3185,7 @@ public class RawDataManager {
             if (isNeeded == false) {
 
                // file path is not needed any more
-               _allImportedFileNames.remove(oldFilePath);
+               _allImported_FileNames.remove(oldFilePath);
             }
          }
       });
@@ -3045,7 +3253,7 @@ public class RawDataManager {
 
    /**
     * Update {@link TourData} from the database for all imported tours which are contained in
-    * {@link #_allImportedTours} and displayed in the import view, a progress dialog is displayed.
+    * {@link #_allImported_Tours} and displayed in the import view, a progress dialog is displayed.
     *
     * @param monitor
     *           Progress monitor or <code>null</code>
@@ -3057,7 +3265,7 @@ public class RawDataManager {
 
       try {
 
-         final int numImportTours = _allImportedTours.size();
+         final int numImportTours = _allImported_Tours.size();
 
          if (numImportTours == 0) {
 
@@ -3093,7 +3301,7 @@ public class RawDataManager {
 
    private void updateTourData_InImportView_FromDb_Runnable(final IProgressMonitor monitor) throws InterruptedException {
 
-      final int numAllImportedTours = _allImportedTours.size();
+      final int numAllImportedTours = _allImported_Tours.size();
 
       /*
        * Setup concurrency
@@ -3113,7 +3321,7 @@ public class RawDataManager {
       final AtomicInteger numWorkedTours = new AtomicInteger();
       int numLastWorked = 0;
 
-      for (final TourData importedTourData : _allImportedTours.values()) {
+      for (final TourData importedTourData : _allImported_Tours.values()) {
 
          if (monitor != null) {
 
@@ -3224,7 +3432,7 @@ public class RawDataManager {
             final Long dbTourId = dbTourData.getTourId();
 
             // replace existing tours but do not add new tours
-            if (_allImportedTours.containsKey(dbTourId)) {
+            if (_allImported_Tours.containsKey(dbTourId)) {
 
                TourData replacedTourData = dbTourData;
 
@@ -3283,7 +3491,7 @@ public class RawDataManager {
                   }
                }
 
-               _allImportedTours.put(dbTourId, replacedTourData);
+               _allImported_Tours.put(dbTourId, replacedTourData);
             }
          }
 
@@ -3305,8 +3513,8 @@ public class RawDataManager {
             final Long tourId = tourData.getTourId();
 
             // replace existing tour do not add new tours
-            if (_allImportedTours.containsKey(tourId)) {
-               _allImportedTours.put(tourId, tourData);
+            if (_allImported_Tours.containsKey(tourId)) {
+               _allImported_Tours.put(tourId, tourData);
             }
          }
       }

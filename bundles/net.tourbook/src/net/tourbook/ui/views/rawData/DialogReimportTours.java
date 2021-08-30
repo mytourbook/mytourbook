@@ -649,6 +649,8 @@ public class DialogReimportTours extends TitleAreaDialog {
                tourValueTypes,
                importState_Process);
       }
+
+      importState_Process.runPostProcess();
    }
 
    /**
@@ -957,19 +959,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
       RawDataManager.setIsReimportingActive(false);
 
-      // fire modify event for tags
-      if (importState_Process.isFire_NewTag.get()) {
-
-         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
-      }
-
-      // fire modify event for tour types
-      if (importState_Process.isFire_NewTourType.get()) {
-
-         Display.getDefault().syncExec(() -> TourbookPlugin.getPrefStore().setValue(
-               ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-               Math.random()));
-      }
+      importState_Process.runPostProcess();
    }
 
    private void enableControls() {

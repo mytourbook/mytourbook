@@ -4393,10 +4393,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          TourLogManager.showLogView();
       }
 
-      final ImportState_Process importState_Process = new ImportState_Process()
-
-            .setIsReimport(true);
-
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                true,
@@ -4407,11 +4403,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   public void run(final IProgressMonitor monitor) throws InvocationTargetException,
                         InterruptedException {
 
+                     final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(true);
+
                      reimportAllImportFiles_Runnable(
                            monitor,
                            prevImportedFiles,
                            canCancelProcess,
                            importState_Process);
+
+                     importState_Process.runPostProcess();
                   }
                });
 

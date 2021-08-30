@@ -180,12 +180,16 @@ public class GPXDeviceDataReader extends TourbookDevice {
          final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
 
          final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-               this,
+               
                importFilePath,
                deviceData,
                alreadyImportedTours,
                newlyImportedTours,
-               importState_File);
+               
+               importState_File,
+               importState_Process,
+               
+               this);
 
          if (inputStream == null) {
             saxParser.parse("file:" + importFilePath, handler);//$NON-NLS-1$

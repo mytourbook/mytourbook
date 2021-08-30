@@ -20,13 +20,11 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -35,16 +33,15 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.Activator;
 import net.tourbook.device.IPreferences;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -301,7 +298,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private final Set<TourMarker>         _allTourMarker       = new HashSet<>();
    private final ArrayList<TourWayPoint> _allWayPoints        = new ArrayList<>();
-   private final ArrayList<String>       _allImportedTagNames = new ArrayList<>();
+   private final HashSet<String>         _allImportedTagNames = new HashSet<>();
 
    private TourData                      _tourData;
    private TourMarker                    _tempTourMarker;
@@ -329,6 +326,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private boolean                       _isMTData;
 
    private ImportState_File              _importState_File;
+   private ImportState_Process           _importState_Process;
 
    private class GPXDataLap {
 
@@ -340,18 +338,22 @@ public class GPX_SAX_Handler extends DefaultHandler {
       public float  distance;
    }
 
-   public GPX_SAX_Handler(final TourbookDevice deviceDataReader,
-                          final String importFileName,
+   public GPX_SAX_Handler(final String importFileName,
                           final DeviceData deviceData,
                           final Map<Long, TourData> alreadyImportedTours,
                           final Map<Long, TourData> newlyImportedTours,
-                          final ImportState_File importState_File) {
+                          final ImportState_File importState_File,
+                          final ImportState_Process importState_Process,
+                          final TourbookDevice deviceDataReader) {
 
-      _device = deviceDataReader;
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+
       _importState_File = importState_File;
+      _importState_Process = importState_Process;
+
+      _device = deviceDataReader;
 
       _gpxHasLocalTime = false; // Polar exports local time :-(
 
@@ -1093,6 +1095,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       _tourData.createTimeSeries(_timeDataList, true);
 
+      boolean isNewTourType = false;
+      boolean isNewTourTags = false;
+
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GPX);
       final Long tourId = _tourData.createTourId(uniqueId);
@@ -1109,13 +1114,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.computeComputedValues();
 
          finalizeTour_AdjustMarker();
-         finalizeTour_TourType();
-         finalizeTour_Tags();
+
+         isNewTourType = finalizeTour_TourType();
+         isNewTourTags = finalizeTour_Tags();
       }
 
       _tourData = null;
 
       _importState_File.isFileImportedWithValidData = true;
+
+      _importState_Process.isCreated_NewTourType.set(isNewTourType);
+      _importState_Process.isCreated_NewTag.set(isNewTourTags);
    }
 
    private void finalizeTour_AdjustMarker() {
@@ -1144,88 +1153,22 @@ public class GPX_SAX_Handler extends DefaultHandler {
       }
    }
 
-   private void finalizeTour_Tags() {
+   private boolean finalizeTour_Tags() {
 
       if (_allImportedTagNames.isEmpty()) {
-         return;
+         return false;
       }
 
-      final Set<TourTag> tourTags = new HashSet<>();
-
-      final Collection<TourTag> dbTags = TourDatabase.getAllTourTags().values();
-      final ConcurrentHashMap<String, TourTag> tempTags = TourDatabase.getAllTourTags_NotYetSaved();
-
-      for (final String tagName : _allImportedTagNames) {
-
-         final String tagName_Key = tagName.toUpperCase();
-
-         TourTag tourTag = TourDatabase.findTourTag(tagName, dbTags);
-
-         if (tourTag == null) {
-            tourTag = tempTags.get(tagName_Key);
-         }
-
-         if (tourTag == null) {
-
-            final TourTag newTourTag = new TourTag(tagName);
-            newTourTag.setRoot(true);
-
-            tempTags.put(tagName_Key, newTourTag);
-
-            tourTag = newTourTag;
-         }
-
-         tourTags.add(tourTag);
-      }
-
-      _tourData.setTourTags(tourTags);
+      return RawDataManager.setTourTags(_tourData, _allImportedTagNames);
    }
 
-   private void finalizeTour_TourType() {
+   private boolean finalizeTour_TourType() {
 
       if (_tourTypeName == null) {
-         return;
+         return false;
       }
 
-      final String tourType_Key = _tourTypeName.toUpperCase();
-
-      TourType tourType = TourDatabase.findTourType(_tourTypeName, TourDatabase.getAllTourTypes());
-
-      final ConcurrentHashMap<String, TourType> tempTourTypes = TourDatabase.getAllTourTypes_NotYetSaved();
-
-      if (tourType == null) {
-
-         tourType = tempTourTypes.get(tourType_Key);
-      }
-
-      if (tourType == null) {
-
-         // create new tour type
-
-         final TourType newTourType = new TourType(_tourTypeName);
-
-         final TourTypeColorDefinition newColor = new TourTypeColorDefinition(
-               newTourType,
-               Long.toString(newTourType.getTypeId()),
-               newTourType.getName());
-
-         newTourType.setColors(
-
-               newColor.getGradientBright_Default(),
-               newColor.getGradientDark_Default(),
-
-               newColor.getLineColor_Default_Light(),
-               newColor.getLineColor_Default_Dark(),
-
-               newColor.getTextColor_Default_Light(),
-               newColor.getTextColor_Default_Dark());
-
-         tempTourTypes.put(tourType_Key, newTourType);
-
-         tourType = newTourType;
-      }
-
-      _tourData.setTourType(tourType);
+      return RawDataManager.setTourType(_tourData, _tourTypeName);
    }
 
    private void finalizeTrackpoint() {

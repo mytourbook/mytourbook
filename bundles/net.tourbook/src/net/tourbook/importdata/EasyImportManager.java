@@ -948,9 +948,7 @@ public class EasyImportManager {
 
             .setIsLog_DEFAULT(false)
             .setIsLog_INFO(false)
-            .setIsLog_OK(false)
-
-      ;
+            .setIsLog_OK(false);
 
       rawDataManager.importTours_FromMultipleFiles(
             notImportedFiles,
@@ -958,6 +956,10 @@ public class EasyImportManager {
             importState_Process);
 
       importState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor;
+
+      Display.getDefault().asyncExec(() -> {
+         importState_Process.runPostProcess();
+      });
 
       /*
        * Update tour data

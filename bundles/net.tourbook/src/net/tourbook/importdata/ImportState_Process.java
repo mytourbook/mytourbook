@@ -17,6 +17,11 @@ package net.tourbook.importdata;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+
 /**
  * IN and OUT states for the whole import/re-import process
  */
@@ -50,7 +55,7 @@ public class ImportState_Process {
     * <p>
     * Contains a unique id so that each import can be identified.
     */
-   public long          importId           = System.currentTimeMillis();
+   public long          importId              = System.currentTimeMillis();
 
    /**
     * OUT state:
@@ -67,35 +72,29 @@ public class ImportState_Process {
    public boolean       isImportCanceled_ByUserDialog;
 
    /**
-    * OUT state:
+    * IN state:
     * <p>
-    * When <code>true</code> then this code should be fired, when all tours are
-    * imported/re-imported, default is <code>false</code>
-    * <p>
-    * <code>
-    * TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED)
-    * </code>
+    * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
+    * imported.
     */
-   public AtomicBoolean isFire_NewTag      = new AtomicBoolean();
+   public AtomicBoolean isCreated_NewTag      = new AtomicBoolean();
 
    /**
-    * OUT state:
+    * IN state:
     * <p>
-    * When <code>true</code> then this code should be fired, when all tours are
-    * imported/re-imported, default is <code>false</code>
-    * <p>
-    * <code>
-    *
-    * TourbookPlugin.getDefault()
-    *               .getPreferenceStore()
-    *               .setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random())
-    * </code>
+    * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
+    * imported.
     */
-   public AtomicBoolean isFire_NewTourType = new AtomicBoolean();
+   public AtomicBoolean isCreated_NewTourType = new AtomicBoolean();
 
    public boolean       isLog_DEFAULT;
    public boolean       isLog_INFO;
    public boolean       isLog_OK;
+
+   /**
+    * When <code>true</code> then errors are not displayed to the user
+    */
+   public boolean       isSilentError;
 
    /**
     *
@@ -105,6 +104,22 @@ public class ImportState_Process {
       setIsLog_DEFAULT(true);
       setIsLog_INFO(true);
       setIsLog_OK(true);
+   }
+
+   /**
+    * Run post process actions, e.g. when new tour tags or tour types were created, update the UI
+    */
+   public void runPostProcess() {
+
+      if (isCreated_NewTourType.get()) {
+
+         TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+      }
+
+      if (isCreated_NewTag.get()) {
+
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+      }
    }
 
    /**

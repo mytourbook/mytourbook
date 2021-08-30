@@ -40,6 +40,7 @@ import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.xml.sax.SAXException;
 
@@ -101,12 +102,16 @@ public class Initializer {
       final InputStream gpx = Initializer.class.getResourceAsStream(IMPORT_FILE_PATH);
 
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            deviceDataReader,
+            
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_File());
+            
+            new ImportState_File(),
+            new ImportState_Process(),
+            
+            deviceDataReader);
 
       if (parser != null) {
          try {

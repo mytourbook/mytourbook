@@ -162,6 +162,8 @@ public class DataTransferWizard extends Wizard {
          );
       }
 
+      importState_Process.runPostProcess();
+
       rawDataManager.updateTourData_InImportView_FromDb(null);
 
       // show imported data in the raw data view

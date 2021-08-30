@@ -90,9 +90,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
             importState_File,
             importState_Process,
 
-            this)
+            this
 
-                  .parseSection();
+      ).parseSection();
 
    }
 

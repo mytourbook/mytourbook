@@ -80,8 +80,22 @@ public class Polar_PPD_DataReader extends TourbookDevice {
    class SilentPolarHRMDateReader extends Polar_HRM_DataReader {
 
       @Override
-      protected void showError(final String error) {
+      public void processDeviceData(final String importFilePath,
+                                    final DeviceData deviceData,
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final ImportState_File importState_File,
+                                    final ImportState_Process importState_Process) {
 
+         importState_Process.isSilentError = true;
+
+         super.processDeviceData(
+               importFilePath,
+               deviceData,
+               alreadyImportedTours,
+               newlyImportedTours,
+               importState_File,
+               importState_Process);
       }
    }
 
