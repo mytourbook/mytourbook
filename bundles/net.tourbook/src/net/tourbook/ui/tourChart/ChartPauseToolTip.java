@@ -113,7 +113,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    protected void beforeHideToolTip() {
 
       /*
-       * This is the tricky part that the hovered marker is reset before the tooltip is closed and
+       * This is the tricky part that the hovered pause is reset before the tooltip is closed and
        * not when nothing is hovered. This ensures that the tooltip has a valid state.
        */
       _hoveredLabel = null;
