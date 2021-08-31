@@ -420,7 +420,6 @@ public class Polar_HRM_Data {
       }
    }
 
-   // plugin constructor
    public Polar_HRM_Data(final String importFilePath,
                          final Map<Long, TourData> alreadyImportedTours,
                          final Map<Long, TourData> newlyImportedTours,
@@ -432,10 +431,10 @@ public class Polar_HRM_Data {
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
 
-      _polar_HRM_DataReader = polar_HRM_DataReader;
-
       _importState_File = importState_File;
       _importState_Process = importState_Process;
+
+      _polar_HRM_DataReader = polar_HRM_DataReader;
    }
 
    private void cleanup() {
