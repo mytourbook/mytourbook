@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.tour.TourManager;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -84,12 +85,16 @@ class GPX_SAX_HandlerTest {
       final InputStream gpx = GPX_SAX_HandlerTest.class.getResourceAsStream(IMPORT_FILE_PATH);
 
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            deviceDataReader,
+
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_File());
+
+            new ImportState_File(),
+            new ImportState_Process(),
+
+            deviceDataReader);
 
       parser.parse(gpx, handler);
 

@@ -97,7 +97,7 @@ public class ImportState_Process {
    public boolean       isSilentError;
 
    /**
-    *
+    * IN and OUT states for the whole import/re-import process
     */
    public ImportState_Process() {
 

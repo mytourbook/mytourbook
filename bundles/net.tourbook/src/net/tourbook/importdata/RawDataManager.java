@@ -376,19 +376,27 @@ public class RawDataManager {
       /*
        * Check tags again if they are still unavailable
        */
-      final HashMap<String, TourTag> allTourTags_ByTagName = TourDatabase.getAllTourTags_ByTagName();
-
-      final HashSet<String> allTourTags_NotAvailable = new HashSet<>();
+      final HashMap<String, TourTag> allDbTourTags_ByTagName = TourDatabase.getAllTourTags_ByTagName();
+      final HashSet<String> allTagNames_NotAvailable = new HashSet<>();
 
       for (final String tagName : allRequestedTourTagNames) {
 
          final String tagNameKey = tagName.toUpperCase();
 
-         final TourTag tourTag = allTourTags_ByTagName.get(tagNameKey);
+         TourTag tourTag = allDbTourTags_ByTagName.get(tagNameKey);
 
          if (tourTag == null) {
 
-            allTourTags_NotAvailable.add(tagName);
+            tourTag = _allImported_NewTourTags.get(tagNameKey);
+
+            if (tourTag == null) {
+
+               allTagNames_NotAvailable.add(tagName);
+
+            } else {
+
+               allOldTourTags.add(tourTag);
+            }
 
          } else {
 
@@ -396,7 +404,7 @@ public class RawDataManager {
          }
       }
 
-      for (final String tagName : allTourTags_NotAvailable) {
+      for (final String tagName : allTagNames_NotAvailable) {
 
          final TourTag tourTag = new TourTag(tagName);
          tourTag.setRoot(true);
@@ -410,12 +418,12 @@ public class RawDataManager {
    /**
     * Create new tour type and keep it in {@link #_allImported_NewTourTypes}
     *
-    * @param tourTypeLabel
+    * @param requestedTourTypeName
     * @return Returns the newly saved tour type
     */
-   private static synchronized TourType createTourType(final String tourTypeLabel) {
+   private static synchronized TourType createTourType(final String requestedTourTypeName) {
 
-      final String tourTypeLabelKey = tourTypeLabel.toUpperCase();
+      final String tourTypeLabelKey = requestedTourTypeName.toUpperCase();
 
       /*
        * Check imported tour types
@@ -430,7 +438,7 @@ public class RawDataManager {
        */
       for (final TourType availableTourType : TourDatabase.getAllTourTypes()) {
 
-         if (tourTypeLabel.equalsIgnoreCase(availableTourType.getName())) {
+         if (requestedTourTypeName.equalsIgnoreCase(availableTourType.getName())) {
 
             return availableTourType;
          }
@@ -439,7 +447,7 @@ public class RawDataManager {
       /*
        * Tour type is for sure not available -> create it now
        */
-      final TourType newTourType = new TourType(tourTypeLabel);
+      final TourType newTourType = new TourType(requestedTourTypeName);
 
       final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(
             newTourType,
@@ -744,43 +752,57 @@ public class RawDataManager {
    }
 
    /**
+    * Sets {@link TourTag} 's into {@link TourData}
+    *
     * @param tourData
-    * @param allTourTagNames
-    * @return Returns <code>true</code> when new tour tags were created.
+    * @param allRequestedTourTagNames
+    * @return Returns <code>true</code> when new tour tags were created
     */
-   public static boolean setTourTags(final TourData tourData, final Set<String> allTourTagNames) {
+   public static boolean setTourTags(final TourData tourData, final Set<String> allRequestedTourTagNames) {
 
       final HashMap<String, TourTag> allTourTags_Available = new HashMap<>();
-      final HashSet<String> allTourTags_NotAvailable = new HashSet<>();
+      final HashSet<String> allTagNames_NotAvailable = new HashSet<>();
 
-      final HashMap<String, TourTag> allTourTags_ByTagName = TourDatabase.getAllTourTags_ByTagName();
+      final HashMap<String, TourTag> allDbTourTags_ByTagName = TourDatabase.getAllTourTags_ByTagName();
 
-      for (final String tagName : allTourTagNames) {
+      for (final String tagName : allRequestedTourTagNames) {
 
          final String tagNameKey = tagName.toUpperCase();
 
-         final TourTag tourTag = allTourTags_ByTagName.get(tagNameKey);
+         TourTag existingTourTag = allDbTourTags_ByTagName.get(tagNameKey);
 
-         if (tourTag == null) {
+         if (existingTourTag == null) {
 
-            allTourTags_NotAvailable.add(tagName);
+            existingTourTag = _allImported_NewTourTags.get(tagNameKey);
+
+            if (existingTourTag == null) {
+
+               allTagNames_NotAvailable.add(tagName);
+
+            } else {
+
+               allTourTags_Available.put(tagNameKey, existingTourTag);
+            }
 
          } else {
 
-            allTourTags_Available.put(tagNameKey, tourTag);
+            allTourTags_Available.put(tagNameKey, existingTourTag);
          }
       }
 
       final ArrayList<TourTag> allNewTourTags = new ArrayList<>();
       final ArrayList<TourTag> allOldTourTags = new ArrayList<>();
 
-      if (allTourTags_NotAvailable.size() > 1) {
+      if (allTagNames_NotAvailable.size() > 0) {
 
          // some tags are not available -> create them
 
-         createTourTags(allTourTags_NotAvailable, allNewTourTags, allOldTourTags);
+         createTourTags(allTagNames_NotAvailable, allNewTourTags, allOldTourTags);
       }
 
+      /*
+       * Set tags into tour data
+       */
       final Set<TourTag> tourData_TourTags = tourData.getTourTags();
 
       tourData_TourTags.clear();
@@ -792,15 +814,15 @@ public class RawDataManager {
    }
 
    /**
-    * Set {@link TourType} into {@link TourData} by using it's tour type label
+    * Set {@link TourType} into {@link TourData} by using it's tour type name
     *
     * @param tourData
-    * @param tourTypeLabel
+    * @param requestedTourTypeLabel
     * @return Returns <code>true</code> when a new tour type was created.
     */
-   public static boolean setTourType(final TourData tourData, final String tourTypeLabel) {
+   public static boolean setTourType(final TourData tourData, final String requestedTourTypeLabel) {
 
-      final String tourTypeLabelStripped = tourTypeLabel.strip();
+      final String tourTypeLabelStripped = requestedTourTypeLabel.strip();
 
       if (UI.EMPTY_STRING.equals(tourTypeLabelStripped)) {
 
@@ -811,20 +833,27 @@ public class RawDataManager {
 
       TourType existingTourType = null;
 
-      // find tour type in existing tour types
-      for (final TourType availableTourType : TourDatabase.getAllTourTypes()) {
+      /*
+       * Find tour type in existing tour types
+       */
+      for (final TourType dbTourType : TourDatabase.getAllTourTypes()) {
 
-         if (tourTypeLabelStripped.equalsIgnoreCase(availableTourType.getName())) {
+         if (tourTypeLabelStripped.equalsIgnoreCase(dbTourType.getName())) {
 
-            existingTourType = availableTourType;
+            existingTourType = dbTourType;
             break;
          }
+      }
+
+      if (existingTourType == null) {
+
+         existingTourType = _allImported_NewTourTypes.get(tourTypeLabelStripped.toUpperCase());
       }
 
       TourType appliedTourType = existingTourType;
       TourType newTourType = null;
 
-      if (existingTourType == null) {
+      if (appliedTourType == null) {
 
          // create new tour type
 

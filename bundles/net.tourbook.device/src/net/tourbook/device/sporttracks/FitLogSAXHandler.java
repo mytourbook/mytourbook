@@ -22,7 +22,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -318,8 +317,10 @@ public class FitLogSAXHandler extends DefaultHandler {
                            final Map<Long, TourData> alreadyImportedTours,
                            final Map<Long, TourData> newlyImportedTours,
                            final boolean isFitLogExFile,
+
                            final ImportState_File importState_File,
                            final ImportState_Process importState_Process,
+
                            final FitLogDeviceDataReader device) {
 
       _importFilePath = importFilePath;
@@ -585,23 +586,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       return tourMarker;
    }
 
-   private TourTag createTourTag(final Equipment tag) {
-
-      final TourTag tourTag = new TourTag(tag.getName());
-      // There is no notes to import as we are here in a FitLog file as
-      // FitLogEx files would not have unavailable tags since, at this
-      // point, they would be already imported.
-      tourTag.setRoot(true);
-
-      // persist tag
-      final TourTag savedTag = TourDatabase.saveEntity(
-            tourTag,
-            TourDatabase.ENTITY_IS_NOT_SAVED,
-            TourTag.class);
-
-      return savedTag;
-   }
-
    @Override
    public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
@@ -742,93 +726,17 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
-      final List<Equipment> allEquipmentNames = _currentActivity.equipmentNames;
-      if (allEquipmentNames.isEmpty()) {
+      final List<Equipment> allEquipments = _currentActivity.equipmentNames;
+      if (allEquipments.isEmpty()) {
          return;
       }
 
-      boolean isNewTag = false;
-
-      HashMap<Long, TourTag> allTourTagsInDb = TourDatabase.getAllTourTags();
-      final Collection<TourTag> allTourTagValues = allTourTagsInDb.values();
-
-      final Set<TourTag> allFoundTourTags = new HashSet<>();
-      try {
-
-         for (final Equipment equipment : allEquipmentNames) {
-
-            final boolean isTagAvailable = finalizeTour_22_SearchTourTagInDatabase(
-                  allTourTagValues,
-                  allFoundTourTags,
-                  equipment);
-
-            if (isTagAvailable) {
-               continue;
-            }
-
-            // create a new tag
-            final TourTag savedTag = createTourTag(equipment);
-
-            if (savedTag != null) {
-
-               allFoundTourTags.add(savedTag);
-
-               // reload tour tag list
-
-               TourDatabase.clearTourTags();
-
-               allTourTagsInDb = TourDatabase.getAllTourTags();
-               allTourTags = allTourTagsInDb.values().toArray(new TourTag[allTourTagsInDb.size()]);
-
-               isNewTag = true;
-            }
-         }
-
-      } finally {
-
-         tourData.setTourTags(allFoundTourTags);
+      final Set<String> allTagNames = new HashSet<>();
+      for (final Equipment equipment : allEquipments) {
+         allTagNames.add(equipment.Name);
       }
 
-      _isNewTag |= isNewTag;
-   }
-
-   private boolean finalizeTour_22_SearchTourTagInDatabase(final Collection<TourTag> allTourTagValues,
-                                                           final Set<TourTag> tourTags,
-                                                           final Equipment equipment) {
-
-      // If we are in a FitLogEx file, then we have parsed equipments
-      // and we need to map tour tags using each equipment's GUID.
-      boolean isSearchTagById = false;
-      if (_allEquipments_FromFitLogEx != null && _allEquipments_FromFitLogEx.size() > 0) {
-         isSearchTagById = true;
-      }
-
-      boolean isTagAvailable = false;
-      for (final TourTag tourTag : allTourTagValues) {
-
-         if ((isSearchTagById && tourTag.getNotes().contains(equipment.Id))
-               || (!isSearchTagById && tourTag.getTagName().equals(equipment.getName()))) {
-
-            isTagAvailable = true;
-
-            tourTags.add(tourTag);
-            break;
-         }
-      }
-
-      return isTagAvailable;
-   }
-
-   private void finalizeTour_29_SetTags_2(final TourData tourData) {
-
-      final List<Equipment> equipmentNames = _currentActivity.equipmentNames;
-      if (equipmentNames.isEmpty()) {
-         return;
-      }
-
-      final Set<String> allTourTagNames = new HashSet<>();
-
-      final boolean isNewTags = RawDataManager.setTourTags(tourData, allTourTagNames);
+      final boolean isNewTags = RawDataManager.setTourTags(tourData, allTagNames);
 
       _importState_Process.isCreated_NewTag.set(isNewTags);
    }
