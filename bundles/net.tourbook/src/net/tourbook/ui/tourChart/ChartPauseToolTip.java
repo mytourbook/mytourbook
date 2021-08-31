@@ -45,6 +45,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
    //todo fb display a gray area hwen hovering just like the markers
    //Bug when the pauses layer is hidden, the pause tooltip is not displayed anymore
+   //todo fb where is the best place to show the pauses, before the pause, in the middle, at the end ?
 
    private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
    private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;
@@ -93,7 +94,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
     * UI controls
     */
    private Composite _shellContainer;
-   private Composite _ttContainer;
+   private Composite _tooltipContainer;
 
    public ChartPauseToolTip(final TourChart tourChart) {
 
@@ -157,12 +158,12 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .applyTo(_shellContainer);
       _shellContainer.addPaintListener(this::onPaintShellContainer);
       {
-         _ttContainer = new Composite(_shellContainer, SWT.NONE);
+         _tooltipContainer = new Composite(_shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()
                .extendedMargins(2, 5, 2, 5)
-               .applyTo(_ttContainer);
+               .applyTo(_tooltipContainer);
          {
-            createUI_10_Values(_ttContainer);
+            createUI_10_Values(_tooltipContainer);
          }
       }
 
@@ -209,7 +210,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       if (_tourData.isMultipleTours()) {
 
          labelBuilder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tourZonedDateTime)); //$NON-NLS-1$
-
       }
 
       final String format_hh_mm_ss = UI.format_hh_mm_ss(
