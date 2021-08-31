@@ -131,7 +131,9 @@ public class FitData {
 
       final boolean isNewTourType = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
 
-      _importState_Process.isCreated_NewTourType.set(isNewTourType);
+      if (isNewTourType) {
+         _importState_Process.isCreated_NewTourType().set(true);
+      }
    }
 
    public void finalizeTour() {

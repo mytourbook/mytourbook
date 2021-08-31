@@ -27,13 +27,24 @@ import net.tourbook.tour.TourManager;
  */
 public class ImportState_Process {
 
+   private boolean       isLog_DEFAULT;
+   private boolean       isLog_INFO;
+   private boolean       isLog_OK;
+
+   /**
+    * IN state:
+    * <p>
+    * When <code>true</code> then errors are not displayed to the user
+    */
+   private boolean       isSilentError;
+
    /**
     * IN state:
     * <p>
     * When <code>true</code> then tours will be skipped when the import file is not defined or not
     * available
     */
-   public boolean       isSkipToursWithFileNotFound;
+   private boolean       isSkipToursWithFileNotFound;
 
    /**
     * IN state:
@@ -41,69 +52,110 @@ public class ImportState_Process {
     * When <code>true</code> then it is a re-import, otherwise it is a normal import, default is
     * <code>false</code>
     */
-   public boolean       isReimport;
+   private boolean       isReimport;
 
    /**
     * IN state:
     * <p>
     * Is <code>true</code> when the import is started from easy import
     */
-   public boolean       isEasyImport;
+   private boolean       isEasyImport;
 
    /**
     * INTERNAL state:
     * <p>
     * Contains a unique id so that each import can be identified.
     */
-   public long          importId              = System.currentTimeMillis();
+   private long          importId                      = System.currentTimeMillis();
 
    /**
     * OUT state:
     * <p>
     * Is <code>true</code> when the import was canceled by the user
     */
-   public boolean       isImportCanceled_ByMonitor;
+   private AtomicBoolean isImportCanceled_ByMonitor    = new AtomicBoolean();
 
    /**
     * OUT state:
     * <p>
     * Is <code>true</code> when the import was canceled after a dialog was displayed to the user
     */
-   public boolean       isImportCanceled_ByUserDialog;
+   private AtomicBoolean isImportCanceled_ByUserDialog = new AtomicBoolean();
 
    /**
-    * IN state:
+    * OUT state:
     * <p>
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
     * imported.
     */
-   public AtomicBoolean isCreated_NewTag      = new AtomicBoolean();
+   private AtomicBoolean isCreated_NewTag              = new AtomicBoolean();
 
    /**
-    * IN state:
+    * OUT state:
     * <p>
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
     * imported.
     */
-   public AtomicBoolean isCreated_NewTourType = new AtomicBoolean();
-
-   public boolean       isLog_DEFAULT;
-   public boolean       isLog_INFO;
-   public boolean       isLog_OK;
+   private AtomicBoolean isCreated_NewTourType         = new AtomicBoolean();
 
    /**
-    * When <code>true</code> then errors are not displayed to the user
-    */
-   public boolean       isSilentError;
-
-   /**
-    * IN and OUT states for the whole import/re-import process
+    * IN and OUT states for the whole import/re-import process.
+    * <p>
+    * This constructor set's all logging to <code>true</code>.
     */
    public ImportState_Process() {
 
       setIsLog_DEFAULT(true);
       setIsLog_INFO(true);
       setIsLog_OK(true);
+   }
+
+   public long getImportId() {
+      return importId;
+   }
+
+   public AtomicBoolean isCreated_NewTag() {
+      return isCreated_NewTag;
+   }
+
+   public AtomicBoolean isCreated_NewTourType() {
+      return isCreated_NewTourType;
+   }
+
+   public boolean isEasyImport() {
+      return isEasyImport;
+   }
+
+   public AtomicBoolean isImportCanceled_ByMonitor() {
+      return isImportCanceled_ByMonitor;
+   }
+
+   public AtomicBoolean isImportCanceled_ByUserDialog() {
+      return isImportCanceled_ByUserDialog;
+   }
+
+   public boolean isLog_DEFAULT() {
+      return isLog_DEFAULT;
+   }
+
+   public boolean isLog_INFO() {
+      return isLog_INFO;
+   }
+
+   public boolean isLog_OK() {
+      return isLog_OK;
+   }
+
+   public boolean isReimport() {
+      return isReimport;
+   }
+
+   public boolean isSilentError() {
+      return isSilentError;
+   }
+
+   public boolean isSkipToursWithFileNotFound() {
+      return isSkipToursWithFileNotFound;
    }
 
    /**
@@ -187,10 +239,30 @@ public class ImportState_Process {
       return this;
    }
 
+   /**
+    * IN state:
+    *
+    * @param isSilentError
+    * @return
+    */
+   public ImportState_Process setIsSilentError(final boolean isSilentError) {
+
+      this.isSilentError = isSilentError;
+
+      return this;
+   }
+
+   /**
+    * IN state:
+    *
+    * @param isSkipToursWithFileNotFound
+    * @return
+    */
    public ImportState_Process setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
 
       this.isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
 
       return this;
    }
+
 }

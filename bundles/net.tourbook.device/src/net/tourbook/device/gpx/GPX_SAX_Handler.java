@@ -1095,9 +1095,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       _tourData.createTimeSeries(_timeDataList, true);
 
-      boolean isNewTourType = false;
-      boolean isNewTourTags = false;
-
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GPX);
       final Long tourId = _tourData.createTourId(uniqueId);
@@ -1114,17 +1111,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.computeComputedValues();
 
          finalizeTour_AdjustMarker();
-
-         isNewTourType = finalizeTour_TourType();
-         isNewTourTags = finalizeTour_Tags();
+         finalizeTour_TourType();
+         finalizeTour_Tags();
       }
 
       _tourData = null;
 
       _importState_File.isFileImportedWithValidData = true;
-
-      _importState_Process.isCreated_NewTourType.set(isNewTourType);
-      _importState_Process.isCreated_NewTag.set(isNewTourTags);
    }
 
    private void finalizeTour_AdjustMarker() {
@@ -1153,22 +1146,30 @@ public class GPX_SAX_Handler extends DefaultHandler {
       }
    }
 
-   private boolean finalizeTour_Tags() {
+   private void finalizeTour_Tags() {
 
       if (_allImportedTagNames.isEmpty()) {
-         return false;
+         return;
       }
 
-      return RawDataManager.setTourTags(_tourData, _allImportedTagNames);
+      final boolean isNewTourTag = RawDataManager.setTourTags(_tourData, _allImportedTagNames);
+
+      if (isNewTourTag) {
+         _importState_Process.isCreated_NewTag().set(true);
+      }
    }
 
-   private boolean finalizeTour_TourType() {
+   private void finalizeTour_TourType() {
 
       if (_tourTypeName == null) {
-         return false;
+         return;
       }
 
-      return RawDataManager.setTourType(_tourData, _tourTypeName);
+      final boolean isNewTourType = RawDataManager.setTourType(_tourData, _tourTypeName);
+
+      if (isNewTourType) {
+         _importState_Process.isCreated_NewTourType().set(true);
+      }
    }
 
    private void finalizeTrackpoint() {

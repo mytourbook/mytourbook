@@ -955,7 +955,7 @@ public class EasyImportManager {
             importConfig.fileGlobPattern,
             importState_Process);
 
-      importState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor;
+      importState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor().get();
 
       Display.getDefault().asyncExec(() -> {
          importState_Process.runPostProcess();

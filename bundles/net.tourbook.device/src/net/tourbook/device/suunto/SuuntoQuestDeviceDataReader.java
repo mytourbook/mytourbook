@@ -133,7 +133,7 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
                   importFilePath,
                   alreadyImportedTours,
                   newlyImportedTours,
-                  importState_Process.isReimport);
+                  importState_Process.isReimport());
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
 

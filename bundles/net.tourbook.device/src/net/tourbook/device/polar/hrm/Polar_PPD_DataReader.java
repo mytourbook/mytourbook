@@ -87,7 +87,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
                                     final ImportState_File importState_File,
                                     final ImportState_Process importState_Process) {
 
-         importState_Process.isSilentError = true;
+         importState_Process.setIsSilentError(true);
 
          super.processDeviceData(
                importFilePath,

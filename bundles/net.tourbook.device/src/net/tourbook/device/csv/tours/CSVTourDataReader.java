@@ -312,11 +312,11 @@ public class CSVTourDataReader extends TourbookDevice {
       } finally {
 
          if (isNewTag) {
-            importState_Process.isCreated_NewTag.set(true);
+            importState_Process.isCreated_NewTag().set(true);
          }
 
          if (isNewTourType) {
-            importState_Process.isCreated_NewTourType.set(true);
+            importState_Process.isCreated_NewTourType().set(true);
          }
       }
    }

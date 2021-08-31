@@ -332,7 +332,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       _device = device;
 
-      _isReimport = importState_Process.isReimport;
+      _isReimport = importState_Process.isReimport();
 
       if (isFitLogExFile) {
 
@@ -721,7 +721,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       final boolean isNewTourType = RawDataManager.setTourType(tourData, categoryName);
 
-      _importState_Process.isCreated_NewTourType.set(isNewTourType);
+      if (isNewTourType) {
+         _importState_Process.isCreated_NewTourType().set(true);
+      }
    }
 
    private void finalizeTour_20_SetTags(final TourData tourData) {
@@ -738,7 +740,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       final boolean isNewTags = RawDataManager.setTourTags(tourData, allTagNames);
 
-      _importState_Process.isCreated_NewTag.set(isNewTags);
+      if (isNewTags) {
+         _importState_Process.isCreated_NewTag().set(true);
+      }
    }
 
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {

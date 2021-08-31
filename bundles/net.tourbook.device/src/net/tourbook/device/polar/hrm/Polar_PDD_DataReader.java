@@ -985,7 +985,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       _additionalImportedFiles.clear();
       _exerciseFiles.clear();
 
-      _isReimport = importState_Process.isReimport;
+      _isReimport = importState_Process.isReimport();
 
       if (_isDebug) {
          System.out.println(importFilePath);

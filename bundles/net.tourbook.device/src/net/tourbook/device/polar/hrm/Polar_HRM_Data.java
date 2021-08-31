@@ -1580,17 +1580,17 @@ public class Polar_HRM_Data {
 
    private void showError(final String message) {
 
-      if (_importState_Process.isSilentError) {
+      if (_importState_Process.isSilentError()) {
          return;
       }
 
-      if (_lastUsedImportId == _importState_Process.importId) {
+      if (_lastUsedImportId == _importState_Process.getImportId()) {
 
          // do not bother the user with the same error message
 
       } else {
 
-         _lastUsedImportId = _importState_Process.importId;
+         _lastUsedImportId = _importState_Process.getImportId();
 
          Display.getDefault().syncExec(() -> MessageDialog.openError(
                Display.getCurrent().getActiveShell(),
