@@ -17,16 +17,16 @@ package net.tourbook.ui.tourChart;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.util.Arrays;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceTourChart;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -75,7 +75,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       };
    }
 
-   private ActionOpenPrefDialog  _actionPrefDialog;
    private ActionResetToDefaults _actionRestoreDefaults;
 
    /*
@@ -120,10 +119,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    private void createActions() {
 
       _actionRestoreDefaults = new ActionResetToDefaults(this);
-
-      _actionPrefDialog = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
-      _actionPrefDialog.closeThisTooltip(this);
-      _actionPrefDialog.setShell(_tourChart.getShell());
    }
 
    @Override
@@ -180,7 +175,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       final ToolBarManager tbm = new ToolBarManager(toolbar);
 
       tbm.add(_actionRestoreDefaults);
-      tbm.add(_actionPrefDialog);
 
       tbm.update(true);
    }
@@ -219,9 +213,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
    private void fillUI() {
 
-      for (final String position : ChartPauseToolTip.TOOLTIP_POSITIONS) {
-         _comboTooltipPosition.add(position);
-      }
+      Arrays.asList(ChartPauseToolTip.TOOLTIP_POSITIONS).forEach(tooltipPosition -> _comboTooltipPosition.add(tooltipPosition));
    }
 
    private void onChangeUI() {
