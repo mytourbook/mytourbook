@@ -4825,6 +4825,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // update viewer when required
 
+         final ImportState_Process importState_Process = importState.importState_Process;
+
+         xDisplay.getDefault().asyncExec(() -> {
+            importState_Process.runPostProcess();
+         });
+
          if (importState.isUpdateImportViewer) {
 
             _tourViewer.update(importedToursCollection.toArray(), null);

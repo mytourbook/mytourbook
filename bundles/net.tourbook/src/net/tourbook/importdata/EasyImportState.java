@@ -17,8 +17,10 @@ package net.tourbook.importdata;
 
 public class EasyImportState {
 
-   public boolean isImportCanceled;
+   public boolean             isImportCanceled;
 
-   public boolean isOpenSetup;
-   public boolean isUpdateImportViewer;
+   public boolean             isOpenSetup;
+   public boolean             isUpdateImportViewer;
+
+   public ImportState_Process importState_Process;
 }

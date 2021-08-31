@@ -866,7 +866,7 @@ public class EasyImportManager {
     */
    public EasyImportState runImport(final ImportLauncher importLauncher) {
 
-      final EasyImportState importState = new EasyImportState();
+      final EasyImportState easyImportState = new EasyImportState();
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -881,9 +881,9 @@ public class EasyImportManager {
             Messages.Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message,
             importConfig.getDeviceFolder())) {
 
-         importState.isOpenSetup = true;
+         easyImportState.isOpenSetup = true;
 
-         return importState;
+         return easyImportState;
       }
 
       /*
@@ -900,15 +900,15 @@ public class EasyImportManager {
                Messages.Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message,
                importConfig.getBackupFolder())) {
 
-            importState.isOpenSetup = true;
+            easyImportState.isOpenSetup = true;
 
-            return importState;
+            return easyImportState;
          }
 
          // folder is valid, run the backup
          final boolean isCanceled = runImport_10_Backup();
          if (isCanceled) {
-            return importState;
+            return easyImportState;
          }
       }
 
@@ -932,9 +932,9 @@ public class EasyImportManager {
                NLS.bind(Messages.Import_Data_Dialog_EasyImport_NoImportFiles_Message, deviceOSFolder));
 
          // there is nothing more to do
-         importState.isImportCanceled = true;
+         easyImportState.isImportCanceled = true;
 
-         return importState;
+         return easyImportState;
       }
 
       final RawDataManager rawDataManager = RawDataManager.getInstance();
@@ -955,20 +955,22 @@ public class EasyImportManager {
             importConfig.fileGlobPattern,
             importState_Process);
 
-      importState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor().get();
-
-      Display.getDefault().asyncExec(() -> {
+      easyImportState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor().get();
+      easyImportState.importState_Process = importState_Process;
+      
+      xDisplay.getDefault().asyncExec(() -> {
          importState_Process.runPostProcess();
       });
+
 
       /*
        * Update tour data
        */
       final Map<Long, TourData> importedTours = rawDataManager.getImportedTours();
 
-      runImport_20_UpdateTourData(importLauncher, importState, importedTours);
+      runImport_20_UpdateTourData(importLauncher, easyImportState, importedTours);
 
-      return importState;
+      return easyImportState;
    }
 
    /**
