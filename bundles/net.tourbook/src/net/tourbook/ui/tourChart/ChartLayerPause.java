@@ -113,16 +113,13 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       final boolean isDarkTheme = UI.isDarkTheme();
       final Color colorDefault = new Color(isDarkTheme ? _chartPauseConfig.pauseColorDefault_Dark : _chartPauseConfig.pauseColorDefault_Light);
-      final Color colorHidden = new Color(isDarkTheme ? _chartPauseConfig.pauseColorHidden_Dark : _chartPauseConfig.pauseColorHidden_Light);
 
-      //TODO FB what is hidden ? does it apply for pauses
-      drawOverlay_Label(hoveredLabel, gc, colorDefault, colorHidden, false);
+      drawOverlay_Label(hoveredLabel, gc, colorDefault, false);
    }
 
    private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
                                   final GC gc,
                                   final Color colorDefault,
-                                  final Color colorHidden,
                                   final boolean isSelected) {
 
       if (chartLabelPause == null) {
@@ -131,7 +128,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       gc.setAlpha(isSelected ? 0x60 : 0x30);
 
-      Color backgroundColor = colorHidden;
+      Color backgroundColor = null;
       if (isSelected) {
 
          backgroundColor = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);

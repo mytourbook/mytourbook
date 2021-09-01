@@ -24,8 +24,6 @@ public class ChartPauseConfig {
 
    public RGB                         pauseColorDefault_Light;
    public RGB                         pauseColorDefault_Dark;
-   public RGB                         pauseColorHidden_Light;
-   public RGB                         pauseColorHidden_Dark;
 
    public boolean                     isShowPauseTooltip;
    public int                         pauseTooltipPosition;

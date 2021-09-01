@@ -2085,8 +2085,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       chartPauseConfig.pauseColorDefault_Light = _tourChartConfiguration.pauseColorDefault_Light;
       chartPauseConfig.pauseColorDefault_Dark = _tourChartConfiguration.pauseColorDefault_Dark;
-      chartPauseConfig.pauseColorHidden_Light = _tourChartConfiguration.pauseColorHidden_Light;
-      chartPauseConfig.pauseColorHidden_Dark = _tourChartConfiguration.pauseColorHidden_Dark;
 
       if (_layerPause == null) {
 
