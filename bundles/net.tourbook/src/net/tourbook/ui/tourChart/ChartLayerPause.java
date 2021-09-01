@@ -178,21 +178,21 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    }
 
    private void DrawPausePointAndLabel(final GC gc,
-                                       final GraphDrawingData drawingData,
+                                       final GraphDrawingData graphDrawingData,
                                        final Chart chart,
                                        final Color colorDefault) {
 
-      final int devYTop = drawingData.getDevYTop();
-      final int devYBottom = drawingData.getDevYBottom();
+      final int devYTop = graphDrawingData.getDevYTop();
+      final int devYBottom = graphDrawingData.getDevYBottom();
       final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
-      final long devVirtualGraphWidth = drawingData.devVirtualGraphWidth;
-      final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
+      final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
+      final int devVisibleChartWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
       final boolean isGraphZoomed = devVirtualGraphWidth != devVisibleChartWidth;
       final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
-      final float graphYBottom = drawingData.getGraphYBottom();
-      final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
-      final double scaleX = drawingData.getScaleX();
-      final double scaleY = drawingData.getScaleY();
+      final float graphYBottom = graphDrawingData.getGraphYBottom();
+      final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
+      final double scaleX = graphDrawingData.getScaleX();
+      final double scaleY = graphDrawingData.getScaleY();
       final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(2);
 
       for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
@@ -231,6 +231,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
          adjustLabelPosition(labelWidth, labelHeight);
 
+         //TODO FB pauses are always horizontal, to remove ?
          /*
           * label is horizontal
           */
