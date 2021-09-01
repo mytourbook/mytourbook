@@ -797,14 +797,14 @@ public class TourDatabase {
 
          // fire modify event
 
-x//         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
+//         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
       }
 
       if (isNewTourType) {
 
          // fire modify event
 
-x//         Display.getDefault().syncExec(() -> _prefStore.setValue(
+//         Display.getDefault().syncExec(() -> _prefStore.setValue(
 //               ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
 //               Math.random()));
       }
@@ -941,7 +941,8 @@ x//         Display.getDefault().syncExec(() -> _prefStore.setValue(
          // 1. type can still be new
          // 2. type is already created but not updated in the not yet saved tour
 
-         final TourType dbType = _allDbTourTypes_ByName.get(tourType.getName().toUpperCase());
+         final String tourTypeNameKEY = tourType.getName().toUpperCase();
+         final TourType dbType = getAllTourTypes_ByName().get(tourTypeNameKEY);
 
          if (dbType != null) {
 
@@ -1697,47 +1698,29 @@ x//         Display.getDefault().syncExec(() -> _prefStore.setValue(
    /**
     * @return Returns the backend of all tour types which are stored in the database sorted by name.
     */
-   @SuppressWarnings("unchecked")
    public static ArrayList<TourType> getAllTourTypes() {
 
       if (_allDbTourTypes != null) {
          return _allDbTourTypes;
       }
 
-      synchronized (DB_LOCK) {
-
-         // check again, field must be volatile to work correctly
-         if (_allDbTourTypes != null) {
-            return _allDbTourTypes;
-         }
-
-         // create empty list
-         _allDbTourTypes = new ArrayList<>();
-         _allDbTourTypes_ByName = new HashMap<>();
-         _allDbTourTypes_ById = new HashMap<>();
-
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
-
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
-
-                  + "SELECT tourType" //              //$NON-NLS-1$
-                  + " FROM TourType AS tourType" //   //$NON-NLS-1$
-                  + " ORDER  BY tourType.name"); //   //$NON-NLS-1$
-
-            _allDbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
-
-            for (final TourType tourType : _allDbTourTypes) {
-
-               _allDbTourTypes_ByName.put(tourType.getName().toUpperCase(), tourType);
-               _allDbTourTypes_ById.put(tourType.getTypeId(), tourType);
-            }
-
-            em.close();
-         }
-      }
+      loadAllTourTypes();
 
       return _allDbTourTypes;
+   }
+
+   /**
+    * @return Returns the backend of all tour types which are stored in the database sorted by name.
+    */
+   public static HashMap<String, TourType> getAllTourTypes_ByName() {
+
+      if (_allDbTourTypes_ByName != null) {
+         return _allDbTourTypes_ByName;
+      }
+
+      loadAllTourTypes();
+
+      return _allDbTourTypes_ByName;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourMarkerNames() {
@@ -2599,6 +2582,43 @@ x//         Display.getDefault().syncExec(() -> _prefStore.setValue(
                   _allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
                   _allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);
                }
+            }
+
+            em.close();
+         }
+      }
+   }
+
+   @SuppressWarnings("unchecked")
+   private static void loadAllTourTypes() {
+
+      synchronized (DB_LOCK) {
+
+         // check again, field must be volatile to work correctly
+         if (_allDbTourTypes != null) {
+            return;
+         }
+
+         // create empty list
+         _allDbTourTypes = new ArrayList<>();
+         _allDbTourTypes_ByName = new HashMap<>();
+         _allDbTourTypes_ById = new HashMap<>();
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT tourType" //              //$NON-NLS-1$
+                  + " FROM TourType AS tourType" //   //$NON-NLS-1$
+                  + " ORDER  BY tourType.name"); //   //$NON-NLS-1$
+
+            _allDbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
+
+            for (final TourType tourType : _allDbTourTypes) {
+
+               _allDbTourTypes_ByName.put(tourType.getName().toUpperCase(), tourType);
+               _allDbTourTypes_ById.put(tourType.getTypeId(), tourType);
             }
 
             em.close();

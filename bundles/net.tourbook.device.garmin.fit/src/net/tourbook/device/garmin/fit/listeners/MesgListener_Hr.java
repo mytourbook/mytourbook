@@ -31,7 +31,7 @@ import net.tourbook.tour.TourLogManager;
 public class MesgListener_Hr extends AbstractMesgListener implements HrMesgListener {
 
    public MesgListener_Hr(final FitData fitData) {
-      super(fitData); 
+      super(fitData);
    }
 
    @Override
@@ -96,7 +96,9 @@ public class MesgListener_Hr extends AbstractMesgListener implements HrMesgListe
 
       if (allFilteredBpm.length != allEventTime.length) {
 
-         TourLogManager.log_ERROR(String.format("Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
+         TourLogManager.subLog_ERROR(String.format(
+               "%s - Fit file has different filtered data: EventTimestamp: %d - FilteredBpm: %d", //$NON-NLS-1$
+               fitData.getImportFilePathName(),
                allEventTime.length,
                allFilteredBpm.length));
 

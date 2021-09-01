@@ -4401,7 +4401,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                monitor -> {
 
-                  final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(true);
+                  final ImportState_Process importState_Process = new ImportState_Process()
+
+                        .setIsReimport(true);
 
                   reimportAllImportFiles_Runnable(
                         monitor,
@@ -4717,7 +4719,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             .setIsLog_DEFAULT(false)
             .setIsLog_INFO(false)
-            .setIsLog_OK(false);
+            .setIsLog_OK(false)
+
+      ;
 
       if (RawDataManager.isAutoOpenImportLog()) {
          TourLogManager.showLogView();
@@ -5107,6 +5111,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final int numTours = allTourData.size();
       final ArrayList<TourData> allSavedTours = new ArrayList<>();
+
+      if (numTours == 0) {
+
+         // nothing to do
+
+         return allSavedTours;
+      }
 
       /*
        * Setup concurrency

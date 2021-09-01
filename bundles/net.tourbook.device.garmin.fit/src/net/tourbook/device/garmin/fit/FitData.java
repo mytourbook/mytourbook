@@ -773,4 +773,8 @@ public class FitData {
 
       _timeDiffMS = timeDiffMS;
    }
+
+   public String getImportFilePathName() {
+      return _importFilePathName;
+   }
 }

@@ -851,7 +851,7 @@ public class FitDataReader extends TourbookDevice {
 
          } else {
 
-            TourLogManager.log_ERROR(String.format(
+            TourLogManager.subLog_ERROR(String.format(
                   "FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
                   fileName,
                   Fit.PROFILE_VERSION_MAJOR,
