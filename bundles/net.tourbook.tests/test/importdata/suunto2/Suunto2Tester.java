@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
-import net.tourbook.device.suunto.Suunto2DeviceDataReader;
+import net.tourbook.device.suunto.Suunto2_DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
@@ -36,14 +36,14 @@ class Suunto2Tester {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static Suunto2DeviceDataReader deviceDataReader;
+   private static Suunto2_DeviceDataReader deviceDataReader;
 
    @BeforeAll
    static void initAll() {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new Suunto2DeviceDataReader();
+      deviceDataReader = new Suunto2_DeviceDataReader();
    }
 
    /**

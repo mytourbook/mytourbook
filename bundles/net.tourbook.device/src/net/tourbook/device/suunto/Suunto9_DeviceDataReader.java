@@ -45,7 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Suunto9DeviceDataReader extends TourbookDevice {
+public class Suunto9_DeviceDataReader extends TourbookDevice {
 
    private HashMap<TourData, List<TimeData>> _processedActivities         = new HashMap<>();
 

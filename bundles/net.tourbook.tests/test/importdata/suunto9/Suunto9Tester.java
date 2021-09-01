@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.device.suunto.Suunto9DeviceDataReader;
+import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
@@ -44,14 +44,14 @@ class Suunto9Tester {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static Suunto9DeviceDataReader deviceDataReader;
+   private static Suunto9_DeviceDataReader deviceDataReader;
 
    @BeforeAll
    static void initAll() {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new Suunto9DeviceDataReader();
+      deviceDataReader = new Suunto9_DeviceDataReader();
    }
 
    /**
@@ -62,7 +62,7 @@ class Suunto9Tester {
    private TourData getLastTourDataImported() {
       Field field = null;
       try {
-         field = Suunto9DeviceDataReader.class.getDeclaredField("_processedActivities"); //$NON-NLS-1$
+         field = Suunto9_DeviceDataReader.class.getDeclaredField("_processedActivities"); //$NON-NLS-1$
          field.setAccessible(true);
 
          @SuppressWarnings("unchecked")

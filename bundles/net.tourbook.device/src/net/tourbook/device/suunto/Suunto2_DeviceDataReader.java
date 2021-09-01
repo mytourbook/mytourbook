@@ -37,7 +37,7 @@ import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
-public class Suunto2DeviceDataReader extends TourbookDevice {
+public class Suunto2_DeviceDataReader extends TourbookDevice {
 
    public static final String  TAG_SUUNTO                   = "suunto";               //$NON-NLS-1$
 
@@ -46,7 +46,7 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    private static final String SUUNTO_TAG_HEADER            = "<header>";             //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES           = "<samples>";            //$NON-NLS-1$
 
-   public Suunto2DeviceDataReader() {
+   public Suunto2_DeviceDataReader() {
       // plugin constructor
    }
 
@@ -170,7 +170,7 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
          return;
       }
 
-      final Suunto2SAXHandler saxHandler = new Suunto2SAXHandler(
+      final Suunto2_SAXHandler saxHandler = new Suunto2_SAXHandler(
             this,
             importFilePath,
             alreadyImportedTours,

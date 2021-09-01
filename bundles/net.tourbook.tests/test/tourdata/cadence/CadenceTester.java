@@ -26,7 +26,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.garmin.GarminTCX_SAXHandler;
-import net.tourbook.device.suunto.Suunto9DeviceDataReader;
+import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
@@ -54,7 +54,7 @@ public class CadenceTester {
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
    private static GarminTCX_DeviceDataReader  garminDeviceDataReader;
-   private static Suunto9DeviceDataReader suunto9DeviceDataReader;
+   private static Suunto9_DeviceDataReader suunto9DeviceDataReader;
 
    private static final IPreferenceStore  _prefStore              = TourbookPlugin.getPrefStore();
 
@@ -66,7 +66,7 @@ public class CadenceTester {
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       garminDeviceDataReader = new GarminTCX_DeviceDataReader();
-      suunto9DeviceDataReader = new Suunto9DeviceDataReader();
+      suunto9DeviceDataReader = new Suunto9_DeviceDataReader();
    }
 
    @AfterEach
