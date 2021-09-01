@@ -44,7 +44,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * This device reader is importing data from Polar device files.
+ * This device reader is importing data from Polar Device files.
  */
 public class Polar_PDD_Data {
 
@@ -52,26 +52,24 @@ public class Polar_PDD_Data {
 
    private static final String    SECTION_DAY_INFO         = "[DayInfo]";                                //$NON-NLS-1$
    private static final String    SECTION_EXERCISE_INFO    = "[ExerciseInfo";                            //$NON-NLS-1$
-   //
+
    private final IPreferenceStore _prefStore               = Activator.getDefault().getPreferenceStore();
 
-   private DeviceData             _deviceData;
    private String                 _importFilePath;
    private Map<Long, TourData>    _alreadyImportedTours;
    private Map<Long, TourData>    _newlyImportedTours;
+
+   private DeviceData             _deviceData;
    private Polar_PDD_DataReader   _polar_PDD_DataReader;
+
    private ImportState_File       _importState_File;
-   private ImportState_Process    _importState_Process;
-   //
-   private boolean                _isDebug                 = false;
+
    private int                    _fileVersionDayInfo      = -1;
 
    private Day                    _currentDay;
    private Exercise               _currentExercise;
 
    private ArrayList<String>      _exerciseFiles           = new ArrayList<>();
-   private ArrayList<String>      _additionalImportedFiles = new ArrayList<>();
-   private HashMap<Long, Integer> _tourSportMap            = new HashMap<>();
 
    private boolean                _isReimport;
 
@@ -98,8 +96,10 @@ public class Polar_PDD_Data {
    public Polar_PDD_Data(final String importFilePath,
                          final Map<Long, TourData> alreadyImportedTours,
                          final Map<Long, TourData> newlyImportedTours,
+
                          final ImportState_File importState_File,
                          final ImportState_Process importState_Process,
+
                          final Polar_PDD_DataReader polar_PDD_DataReader) {
 
       _importFilePath = importFilePath;
@@ -107,7 +107,6 @@ public class Polar_PDD_Data {
       _newlyImportedTours = newlyImportedTours;
 
       _importState_File = importState_File;
-      _importState_Process = importState_Process;
 
       _polar_PDD_DataReader = polar_PDD_DataReader;
    }
@@ -157,8 +156,9 @@ public class Polar_PDD_Data {
       }
 
       // save the sport type for this exercise
-      if (_tourSportMap.containsKey(tourId) == false) {
-         _tourSportMap.put(tourId, _currentExercise.sport);
+      final HashMap<Long, Integer> tourSportMap = _importState_File.getTourSportMap();
+      if (tourSportMap.containsKey(tourId) == false) {
+         tourSportMap.put(tourId, _currentExercise.sport);
       }
 
       return true;
@@ -241,12 +241,13 @@ public class Polar_PDD_Data {
       }
 
       // save the sport type for this exercise
-      if (_tourSportMap.containsKey(tourId) == false) {
-         _tourSportMap.put(tourId, _currentExercise.sport);
+      final HashMap<Long, Integer> tourSportMap = _importState_File.getTourSportMap();
+      if (tourSportMap.containsKey(tourId) == false) {
+         tourSportMap.put(tourId, _currentExercise.sport);
       }
 
       if (_exerciseFiles.size() > 0) {
-         _additionalImportedFiles.addAll(_exerciseFiles);
+         _importState_File.getAdditionalImportedFiles().addAll(_exerciseFiles);
       }
 
       return true;
@@ -470,13 +471,6 @@ public class Polar_PDD_Data {
       return new Polar_HRM_DataReader();
    }
 
-   public int getTourSport(final Long tourId) {
-      if (_tourSportMap.containsKey(tourId)) {
-         return _tourSportMap.get(tourId);
-      } else {
-         return -1;
-      }
-   }
 
    boolean parseSection() {
 

@@ -2094,7 +2094,7 @@ public class RawDataManager {
                   isDataImported = true;
                   importState_File.isImportDone = true;
 
-                  final ArrayList<String> deviceImportedFiles = device.getAdditionalImportedFiles();
+                  final ArrayList<String> deviceImportedFiles = importState_File.getAdditionalImportedFiles();
                   if (deviceImportedFiles != null) {
                      additionalImportedFiles.addAll(deviceImportedFiles);
                   }
@@ -2136,7 +2136,7 @@ public class RawDataManager {
                   isDataImported = true;
                   importState_File.isImportDone = true;
 
-                  final ArrayList<String> otherImportedFiles = device_2nd.getAdditionalImportedFiles();
+                  final ArrayList<String> otherImportedFiles = importState_File.getAdditionalImportedFiles();
                   if (otherImportedFiles != null) {
                      additionalImportedFiles.addAll(otherImportedFiles);
                   }

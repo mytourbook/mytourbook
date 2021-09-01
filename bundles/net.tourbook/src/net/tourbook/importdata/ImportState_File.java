@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import net.tourbook.common.UI;
 
 /**
@@ -46,20 +49,40 @@ public class ImportState_File {
     */
    public String             importedFileName;
 
+   /*
+    * Polar specific fields
+    */
+   private ArrayList<String>      _additionalImportedFiles = new ArrayList<>();
+   private HashMap<Long, Integer> _tourSportMap            = new HashMap<>();
+
+   /**
+    * @return Returns a list of files which are also imported additional to the selected imported
+    *         file or <code>null</code> otherwise.
+    */
+   public ArrayList<String> getAdditionalImportedFiles() {
+
+      return _additionalImportedFiles;
+   }
+
+   public HashMap<Long, Integer> getTourSportMap() {
+      return _tourSportMap;
+   }
+
    @Override
    public String toString() {
 
       return UI.EMPTY_STRING
 
-            + "ImportState_File" + NL //$NON-NLS-1$
+            + "ImportState_File" + NL //                                                     //$NON-NLS-1$
 
-            + "[" + NL //$NON-NLS-1$
+            + "[" + NL //                                                                    //$NON-NLS-1$
 
-            + "isImportDone                  =" + isImportDone + NL //$NON-NLS-1$
-            + "isFileImportedWithValidData   =" + isFileImportedWithValidData + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "importedFileName              =" + importedFileName + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "isImportDone                  =" + isImportDone + NL //                       //$NON-NLS-1$
+            + "isFileImportedWithValidData   =" + isFileImportedWithValidData + NL //        //$NON-NLS-1$
+            + "importedFileName              =" + importedFileName + NL //                   //$NON-NLS-1$
+            + "_additionalImportedFiles      =" + _additionalImportedFiles + NL //           //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "]"; //                                                                        //$NON-NLS-1$
    }
 
 }

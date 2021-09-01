@@ -18,7 +18,6 @@ package net.tourbook.device.polar.hrm;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import net.tourbook.data.TourData;
@@ -34,12 +33,9 @@ import net.tourbook.importdata.TourbookDevice;
  */
 public class Polar_PDD_DataReader extends TourbookDevice {
 
-   private static final String    SECTION_DAY_INFO         = "[DayInfo]";      //$NON-NLS-1$
+   private static final String SECTION_DAY_INFO = "[DayInfo]"; //$NON-NLS-1$
 
-   private boolean                _isDebug                 = false;
-
-//   private ArrayList<String>      _additionalImportedFiles = new ArrayList<>();
-//   private HashMap<Long, Integer> _tourSportMap            = new HashMap<>();
+   private boolean             _isDebug         = false;
 
    // plugin constructor
    public Polar_PDD_DataReader() {}
@@ -52,16 +48,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
    @Override
    public boolean checkStartSequence(final int byteIndex, final int newByte) {
       return false;
-   }
-
-   @Override
-   public ArrayList<String> getAdditionalImportedFiles() {
-
-      if (_additionalImportedFiles.size() > 0) {
-         return _additionalImportedFiles;
-      }
-
-      return null;
    }
 
    @Override
@@ -85,15 +71,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
    @Override
    public int getStartSequenceSize() {
       return -1;
-   }
-
-   public int getTourSport(final Long tourId) {
-
-      if (_tourSportMap.containsKey(tourId)) {
-         return _tourSportMap.get(tourId);
-      } else {
-         return -1;
-      }
    }
 
    @Override
