@@ -48,12 +48,12 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Polar_PDD_Data {
 
-   private static final String    DATA_DELIMITER           = "\t";                                       //$NON-NLS-1$
+   private static final String    DATA_DELIMITER        = "\t";                                       //$NON-NLS-1$
 
-   private static final String    SECTION_DAY_INFO         = "[DayInfo]";                                //$NON-NLS-1$
-   private static final String    SECTION_EXERCISE_INFO    = "[ExerciseInfo";                            //$NON-NLS-1$
+   private static final String    SECTION_DAY_INFO      = "[DayInfo]";                                //$NON-NLS-1$
+   private static final String    SECTION_EXERCISE_INFO = "[ExerciseInfo";                            //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore               = Activator.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore            = Activator.getDefault().getPreferenceStore();
 
    private String                 _importFilePath;
    private Map<Long, TourData>    _alreadyImportedTours;
@@ -63,13 +63,14 @@ public class Polar_PDD_Data {
    private Polar_PDD_DataReader   _polar_PDD_DataReader;
 
    private ImportState_File       _importState_File;
+   private ImportState_Process    _importState_Process;
 
-   private int                    _fileVersionDayInfo      = -1;
+   private int                    _fileVersionDayInfo   = -1;
 
    private Day                    _currentDay;
    private Exercise               _currentExercise;
 
-   private ArrayList<String>      _exerciseFiles           = new ArrayList<>();
+   private ArrayList<String>      _exerciseFiles        = new ArrayList<>();
 
    private boolean                _isReimport;
 
@@ -107,6 +108,7 @@ public class Polar_PDD_Data {
       _newlyImportedTours = newlyImportedTours;
 
       _importState_File = importState_File;
+      _importState_Process = importState_Process;
 
       _polar_PDD_DataReader = polar_PDD_DataReader;
    }
@@ -288,16 +290,15 @@ public class Polar_PDD_Data {
             importState_File,
             importState_Process);
 
-      importState_Process.runPostProcess();
+      // transfer process states AND DO NOT fire them now !!!
+      _importState_Process.transferCreateStates(importState_Process);
 
       if (importState_File.isFileImportedWithValidData == false) {
 
          return null;
       }
 
-      final TourData[] importTourData = newlyImportedTours.values()
-            .toArray(
-                  new TourData[newlyImportedTours.values().size()]);
+      final TourData[] importTourData = newlyImportedTours.values().toArray(new TourData[newlyImportedTours.values().size()]);
 
       // check bounds
       if (importTourData.length == 0) {
@@ -470,7 +471,6 @@ public class Polar_PDD_Data {
    protected TourbookDevice getPolarHRMDataReader() {
       return new Polar_HRM_DataReader();
    }
-
 
    boolean parseSection() {
 

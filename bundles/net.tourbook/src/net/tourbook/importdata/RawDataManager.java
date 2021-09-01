@@ -961,7 +961,7 @@ public class RawDataManager {
          TourLogManager.showLogView();
       }
 
-      final ImportState_Process importState_Process = new ImportState_Process().setIsEasyImport(false);
+      final ImportState_Process importState_Process = new ImportState_Process();
 
       importTours_FromMultipleFiles(
             allOSFiles,

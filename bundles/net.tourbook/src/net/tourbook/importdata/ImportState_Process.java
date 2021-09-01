@@ -34,7 +34,8 @@ public class ImportState_Process {
    /**
     * IN state:
     * <p>
-    * When <code>true</code> then errors are not displayed to the user
+    * When <code>true</code> then errors are not displayed to the user, default is
+    * <code>false</code>
     */
    private boolean       isSilentError;
 
@@ -42,7 +43,7 @@ public class ImportState_Process {
     * IN state:
     * <p>
     * When <code>true</code> then tours will be skipped when the import file is not defined or not
-    * available
+    * available, default is <code>false</code>
     */
    private boolean       isSkipToursWithFileNotFound;
 
@@ -57,7 +58,8 @@ public class ImportState_Process {
    /**
     * IN state:
     * <p>
-    * Is <code>true</code> when the import is started from easy import
+    * Is <code>true</code> when the import is started from easy import, default is
+    * <code>false</code>
     */
    private boolean       isEasyImport;
 
@@ -263,6 +265,17 @@ public class ImportState_Process {
       this.isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
 
       return this;
+   }
+
+   public void transferCreateStates(final ImportState_Process importState_Process) {
+
+      if (importState_Process.isCreated_NewTag().get()) {
+         isCreated_NewTag.set(true);
+      }
+
+      if (importState_Process.isCreated_NewTourType.get()) {
+         isCreated_NewTourType.set(true);
+      }
    }
 
 }

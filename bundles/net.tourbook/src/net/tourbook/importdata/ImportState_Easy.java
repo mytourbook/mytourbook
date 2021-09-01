@@ -15,12 +15,13 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-public class EasyImportState {
+/**
+ * Import states for the {@link EasyImportManager}
+ */
+public class ImportState_Easy {
 
-   public boolean             isImportCanceled;
+   public boolean isImportCanceled;
 
-   public boolean             isOpenSetup;
-   public boolean             isUpdateImportViewer;
-
-   public ImportState_Process importState_Process;
+   public boolean isOpenSetup;
+   public boolean isUpdateImportViewer;
 }

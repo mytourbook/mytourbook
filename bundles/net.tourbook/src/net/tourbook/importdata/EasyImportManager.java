@@ -862,11 +862,12 @@ public class EasyImportManager {
 
    /**
     * @param importLauncher
+    * @param importState_Process
     * @return Returns a state about the import
     */
-   public EasyImportState runImport(final ImportLauncher importLauncher) {
+   public ImportState_Easy runImport(final ImportLauncher importLauncher, final ImportState_Process importState_Process) {
 
-      final EasyImportState easyImportState = new EasyImportState();
+      final ImportState_Easy easyImportState = new ImportState_Easy();
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -942,13 +943,6 @@ public class EasyImportManager {
       /*
        * 02. Import files
        */
-      final ImportState_Process importState_Process = new ImportState_Process()
-
-            .setIsEasyImport(true)
-
-            .setIsLog_DEFAULT(false)
-            .setIsLog_INFO(false)
-            .setIsLog_OK(false);
 
       rawDataManager.importTours_FromMultipleFiles(
             notImportedFiles,
@@ -956,12 +950,6 @@ public class EasyImportManager {
             importState_Process);
 
       easyImportState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor().get();
-      easyImportState.importState_Process = importState_Process;
-      
-      xDisplay.getDefault().asyncExec(() -> {
-         importState_Process.runPostProcess();
-      });
-
 
       /*
        * Update tour data
@@ -1050,7 +1038,7 @@ public class EasyImportManager {
    }
 
    private void runImport_20_UpdateTourData(final ImportLauncher importLauncher,
-                                            final EasyImportState importState,
+                                            final ImportState_Easy importState,
                                             final Map<Long, TourData> importedTours) {
 
       if (importedTours.isEmpty()) {

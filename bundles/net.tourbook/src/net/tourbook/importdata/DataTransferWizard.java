@@ -123,7 +123,6 @@ public class DataTransferWizard extends Wizard {
          return false;
       }
 
-      final RawDataManager rawDataManager = RawDataManager.getInstance();
 
       /*
        * Receive data from the device
@@ -143,6 +142,8 @@ public class DataTransferWizard extends Wizard {
          // data has not been received or the user canceled the import
          return true;
       }
+
+      final RawDataManager rawDataManager = RawDataManager.getInstance();
 
       final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
       final ImportState_Process importState_Process = new ImportState_Process();

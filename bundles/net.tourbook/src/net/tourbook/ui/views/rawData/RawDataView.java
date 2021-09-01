@@ -90,9 +90,9 @@ import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
-import net.tourbook.importdata.EasyImportState;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.ImportState_Easy;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
@@ -4234,6 +4234,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
          onSelectUI_Old();
+
       } else {
 
          //We look for the cloud downloader that matches
@@ -4397,22 +4398,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                true,
                canCancelProcess,
-               new IRunnableWithProgress() {
 
-                  @Override
-                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
+               monitor -> {
 
-                     final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(true);
+                  final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(true);
 
-                     reimportAllImportFiles_Runnable(
-                           monitor,
-                           prevImportedFiles,
-                           canCancelProcess,
-                           importState_Process);
+                  reimportAllImportFiles_Runnable(
+                        monitor,
+                        prevImportedFiles,
+                        canCancelProcess,
+                        importState_Process);
 
-                     importState_Process.runPostProcess();
-                  }
+                  importState_Process.runPostProcess();
                });
 
       } catch (final Exception e) {
@@ -4712,7 +4709,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Run easy import
        */
-      EasyImportState importState = null;
+      ImportState_Easy importState_Easy = null;
+
+      final ImportState_Process importState_Process = new ImportState_Process()
+
+            .setIsEasyImport(true)
+
+            .setIsLog_DEFAULT(false)
+            .setIsLog_INFO(false)
+            .setIsLog_OK(false);
 
       if (RawDataManager.isAutoOpenImportLog()) {
          TourLogManager.showLogView();
@@ -4723,7 +4728,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // disable state update during import, this causes lots of problems !!!
          _isUpdateDeviceState = false;
 
-         importState = EasyImportManager.getInstance().runImport(importLauncher);
+         importState_Easy = EasyImportManager.getInstance().runImport(importLauncher, importState_Process);
 
       } finally {
 
@@ -4741,12 +4746,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       try {
 
          // stop all other actions when canceled
-         if (importState.isImportCanceled) {
+         if (importState_Easy.isImportCanceled) {
             return;
          }
 
          // open import config dialog to solve problems
-         if (importState.isOpenSetup) {
+         if (importState_Easy.isOpenSetup) {
 
             _parent.getDisplay().asyncExec(() -> action_Easy_SetupImport(0));
 
@@ -4825,13 +4830,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // update viewer when required
 
-         final ImportState_Process importState_Process = importState.importState_Process;
-
-         xDisplay.getDefault().asyncExec(() -> {
+         Display.getDefault().asyncExec(() -> {
             importState_Process.runPostProcess();
          });
 
-         if (importState.isUpdateImportViewer) {
+         if (importState_Easy.isUpdateImportViewer) {
 
             _tourViewer.update(importedToursCollection.toArray(), null);
 

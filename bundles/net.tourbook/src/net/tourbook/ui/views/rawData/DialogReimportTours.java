@@ -44,7 +44,6 @@ import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.importdata.ReImportStatus;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
@@ -958,8 +957,6 @@ public class DialogReimportTours extends TitleAreaDialog {
          TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
       }
       RawDataManager.setIsReimportingActive(false);
-
-      importState_Process.runPostProcess();
    }
 
    private void enableControls() {
