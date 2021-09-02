@@ -3067,6 +3067,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void fireTourPauseSelection(final TourMarker tourMarker) {
 
+      //TODO FB
       // update selection locally (e.g. in a dialog)
 
       final ArrayList<TourMarker> allTourMarker = new ArrayList<>();
@@ -3442,24 +3443,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onMarker_MouseDown(final ChartMouseEvent mouseEvent) {
 
-      //TODO FB that's where we are when we click on a marker in the tour chart
+      final TourMarker tourMarker = getHoveredTourMarker();
 
-//      final TourMarker tourMarker = getHoveredTourMarker();
-//
-//      if (tourMarker != null) {
-//
-//         // notify the chart mouse listener that no other actions should be done
-//         mouseEvent.isWorked = true;
-//
-//         _selectedTourMarker = tourMarker;
-//
-//         fireTourMarkerSelection(tourMarker);
-//
-//         _firedTourMarker = tourMarker;
-//
-//         // redraw chart
-//         setChartOverlayDirty();
-//      }
+      if (tourMarker != null) {
+
+         // notify the chart mouse listener that no other actions should be done
+         mouseEvent.isWorked = true;
+
+         _selectedTourMarker = tourMarker;
+
+         fireTourMarkerSelection(tourMarker);
+
+         _firedTourMarker = tourMarker;
+
+         // redraw chart
+         setChartOverlayDirty();
+      }
    }
 
    private void onMarker_MouseExit() {
@@ -3554,22 +3553,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       //TODO FB that's where we are when we click on a marker in the tour chart
 
-      final TourMarker tourMarker = getHoveredTourPause();
+      final TourMarker tourMarker = getHoveredTourMarker();
 
-      if (tourMarker != null) {
-
-         // notify the chart mouse listener that no other actions should be done
-         mouseEvent.isWorked = true;
-
-         _selectedTourMarker = tourMarker;
-
-         fireTourPauseSelection(tourMarker);
-
-         _firedTourMarker = tourMarker;
-
-         // redraw chart
-         setChartOverlayDirty();
+      if (tourMarker == null) {
+         return;
       }
+
+      // notify the chart mouse listener that no other actions should be done
+      mouseEvent.isWorked = true;
+
+      _selectedTourMarker = tourMarker;
+
+      fireTourPauseSelection(tourMarker);
+
+      _firedTourMarker = tourMarker;
+
+      // redraw chart
+      setChartOverlayDirty();
    }
 
    private void onPause_MouseMove(final ChartMouseEvent chartMouseEvent) {
