@@ -339,6 +339,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private ControlListener               _ttControlListener              = new ControlListener();
    private IKeyListener                  _chartKeyListener               = new ChartKeyListener();
    private IMouseListener                _mouseMarkerListener            = new MouseMarkerListener();
+   private IMouseListener                _mousePauseListener             = new MousePauseListener();
    private IMouseListener                _mousePhotoListener             = new MousePhotoListener();
    private IMouseListener                _mouseSegmentLabel_Listener     = new MouseListener_SegmenterSegment();
    private IMouseListener                _mouseSegmentLabel_MoveListener = new MouseListener_SegmenterSegment_Move();
@@ -751,12 +752,47 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       public void mouseMove(final ChartMouseEvent chartMouseEvent) {
 
          onMarker_MouseMove(chartMouseEvent);
-         onPause_MouseMove(chartMouseEvent);
       }
 
       @Override
       public void mouseUp(final ChartMouseEvent chartMouseEvent) {
          onMarker_MouseUp(chartMouseEvent);
+      }
+
+   }
+
+   private class MousePauseListener extends MouseAdapter {
+
+      //TODO FB
+      @Override
+      public void chartResized() {
+         //  onMarker_ChartResized();
+      }
+
+      @Override
+      public void mouseDoubleClick(final ChartMouseEvent chartMouseEvent) {
+         //  onMarker_MouseDoubleClick(chartMouseEvent);
+      }
+
+      @Override
+      public void mouseDown(final ChartMouseEvent chartMouseEvent) {
+         onPause_MouseDown(chartMouseEvent);
+      }
+
+      @Override
+      public void mouseExit() {
+         //   onMarker_MouseExit();
+      }
+
+      @Override
+      public void mouseMove(final ChartMouseEvent chartMouseEvent) {
+
+         onPause_MouseMove(chartMouseEvent);
+      }
+
+      @Override
+      public void mouseUp(final ChartMouseEvent chartMouseEvent) {
+         //  onMarker_MouseUp(chartMouseEvent);
       }
 
    }
@@ -2094,6 +2130,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          // set overlay painter
          addChartOverlay(_layerPause);
+
+         addChartMouseListener(_mousePauseListener);
       }
 
       _layerPause.setChartPauseConfig(chartPauseConfig);
@@ -3027,6 +3065,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
+   private void fireTourPauseSelection(final TourMarker tourMarker) {
+
+      // update selection locally (e.g. in a dialog)
+
+      final ArrayList<TourMarker> allTourMarker = new ArrayList<>();
+      allTourMarker.add(tourMarker);
+
+      final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
+
+      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
+      for (final Object listener2 : listeners) {
+         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
+         listener.selectionChanged(tourMarkerSelection);
+      }
+
+      if (_isDisplayedInDialog) {
+         return;
+      }
+
+      TourManager.fireEventWithCustomData(//
+            TourEventId.PAUSE_SELECTION,
+            tourMarkerSelection,
+            _part);
+   }
+
    /**
     * Fires an event when the x-axis values were changed by the user
     *
@@ -3379,24 +3442,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onMarker_MouseDown(final ChartMouseEvent mouseEvent) {
 
-      //TODO that's where we are when we click on a marker in the tour chart
+      //TODO FB that's where we are when we click on a marker in the tour chart
 
-      final TourMarker tourMarker = getHoveredTourMarker();
-
-      if (tourMarker != null) {
-
-         // notify the chart mouse listener that no other actions should be done
-         mouseEvent.isWorked = true;
-
-         _selectedTourMarker = tourMarker;
-
-         fireTourMarkerSelection(tourMarker);
-
-         _firedTourMarker = tourMarker;
-
-         // redraw chart
-         setChartOverlayDirty();
-      }
+//      final TourMarker tourMarker = getHoveredTourMarker();
+//
+//      if (tourMarker != null) {
+//
+//         // notify the chart mouse listener that no other actions should be done
+//         mouseEvent.isWorked = true;
+//
+//         _selectedTourMarker = tourMarker;
+//
+//         fireTourMarkerSelection(tourMarker);
+//
+//         _firedTourMarker = tourMarker;
+//
+//         // redraw chart
+//         setChartOverlayDirty();
+//      }
    }
 
    private void onMarker_MouseExit() {
@@ -3484,6 +3547,28 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             fireTourMarkerSelection(hoveredTourMarker);
          }
          _firedTourMarker = null;
+      }
+   }
+
+   private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
+
+      //TODO FB that's where we are when we click on a marker in the tour chart
+
+      final TourMarker tourMarker = getHoveredTourPause();
+
+      if (tourMarker != null) {
+
+         // notify the chart mouse listener that no other actions should be done
+         mouseEvent.isWorked = true;
+
+         _selectedTourMarker = tourMarker;
+
+         fireTourPauseSelection(tourMarker);
+
+         _firedTourMarker = tourMarker;
+
+         // redraw chart
+         setChartOverlayDirty();
       }
    }
 
