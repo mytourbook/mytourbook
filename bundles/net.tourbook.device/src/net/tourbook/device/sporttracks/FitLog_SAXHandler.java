@@ -59,7 +59,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class FitLogSAXHandler extends DefaultHandler {
+public class FitLog_SAXHandler extends DefaultHandler {
 
    private static final String                  TAG_ACTIVITY                = "Activity";        //$NON-NLS-1$
    private static final String                  TAG_ACTIVITY_CADENCE        = "Cadence";         //$NON-NLS-1$
@@ -245,29 +245,29 @@ public class FitLogSAXHandler extends DefaultHandler {
 // SET_FORMATTING_OFF
 
          if (StringUtils.hasContent(DatePurchased)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_DATE_PURCHASED           + COLON_SPACE + DatePurchased);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_DATE_PURCHASED           + COLON_SPACE + DatePurchased);
          }
          if (StringUtils.hasContent(ExpectedLifeKilometers)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + COLON_SPACE + ExpectedLifeKilometers);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + COLON_SPACE + ExpectedLifeKilometers);
          }
          if (StringUtils.hasContent(InUse)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_IN_USE                   + COLON_SPACE + InUse);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_IN_USE                   + COLON_SPACE + InUse);
          }
          if (StringUtils.hasContent(PurchaseLocation)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_PURCHASE_LOCATION        + COLON_SPACE + PurchaseLocation);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_PURCHASE_LOCATION        + COLON_SPACE + PurchaseLocation);
          }
          if (StringUtils.hasContent(PurchasePrice)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_PURCHASE_PRICE           + COLON_SPACE + PurchasePrice);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_PURCHASE_PRICE           + COLON_SPACE + PurchasePrice);
          }
          if (StringUtils.hasContent(Type)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_TYPE                     + COLON_SPACE + Type);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_TYPE                     + COLON_SPACE + Type);
          }
          if (StringUtils.hasContent(WeightKilograms)
                && !WeightKilograms.equals("0.000")) { //$NON-NLS-1$
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_WEIGHT_KILOGRAMS         + COLON_SPACE + WeightKilograms);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_WEIGHT_KILOGRAMS         + COLON_SPACE + WeightKilograms);
          }
          if (StringUtils.hasContent(Notes)) {
-            notes.append(NL + FitLogExSAXHandler.TAG_EQUIPMENT_NOTES                    + COLON_SPACE + Notes);
+            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_NOTES                    + COLON_SPACE + Notes);
          }
 
 // SET_FORMATTING_ON
@@ -313,7 +313,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private long duration;
    }
 
-   public FitLogSAXHandler(final String importFilePath,
+   public FitLog_SAXHandler(final String importFilePath,
                            final Map<Long, TourData> alreadyImportedTours,
                            final Map<Long, TourData> newlyImportedTours,
                            final boolean isFitLogExFile,
@@ -339,7 +339,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          // We parse the custom field definitions and equipments
          // separately as they can be anywhere in the file
 
-         final FitLogExSAXHandler exSaxHandler = new FitLogExSAXHandler();
+         final FitLogEx_SAXHandler exSaxHandler = new FitLogEx_SAXHandler();
 
          try {
 
@@ -611,7 +611,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          _isInPauses = false;
 
-      } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
+      } else if (name.equals(FitLogEx_SAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
 
          _isInCustomDataFields = false;
 
@@ -932,10 +932,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.avgPower = Util.parseFloat0(attributes, ATTRIB_AVERAGE_WATTS);
          _currentActivity.maxPower = Util.parseFloat0(attributes, ATTRIB_MAXIMUM_WATTS);
          break;
-      case FitLogExSAXHandler.TAG_ACTIVITY_TIMEZONE_UTC_OFFSET:
+      case FitLogEx_SAXHandler.TAG_ACTIVITY_TIMEZONE_UTC_OFFSET:
          _isInTimeZoneUtcOffset = true;
          break;
-      case FitLogExSAXHandler.TAG_ACTIVITY_HAS_START_TIME:
+      case FitLogEx_SAXHandler.TAG_ACTIVITY_HAS_START_TIME:
          _isInHasStartTime = true;
          break;
       case TAG_ACTIVITY_CADENCE:
@@ -1021,10 +1021,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void parseCustomDataFields(final String name, final Attributes attributes) {
 
-      if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELD)) {
+      if (name.equals(FitLogEx_SAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELD)) {
 
-         final String customFieldName = attributes.getValue(FitLogExSAXHandler.ATTRIB_CUSTOM_DATA_FIELD_NAME);
-         final String customFieldValue = attributes.getValue(FitLogExSAXHandler.ATTRIB_CUSTOM_DATA_FIELD_VALUE);
+         final String customFieldName = attributes.getValue(FitLogEx_SAXHandler.ATTRIB_CUSTOM_DATA_FIELD_NAME);
+         final String customFieldValue = attributes.getValue(FitLogEx_SAXHandler.ATTRIB_CUSTOM_DATA_FIELD_VALUE);
 
          final boolean isCustomDataFieldValid = StringUtils.hasContent(customFieldName) &&
                StringUtils.hasContent(customFieldValue);
@@ -1269,7 +1269,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          _isInActivity = true;
 
          initTour(attributes);
-      } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
+      } else if (name.equals(FitLogEx_SAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
          _isInCustomDataFields = true;
 
       }

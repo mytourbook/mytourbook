@@ -87,7 +87,7 @@ public class FitLogDeviceDataReader extends TourbookDevice {
          return;
       }
 
-      final FitLogSAXHandler saxHandler = new FitLogSAXHandler(
+      final FitLog_SAXHandler saxHandler = new FitLog_SAXHandler(
 
             importFilePath,
             alreadyImportedTours,

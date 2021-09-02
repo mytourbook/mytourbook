@@ -23,7 +23,7 @@ import javax.xml.parsers.SAXParser;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
-import net.tourbook.device.sporttracks.FitLogSAXHandler;
+import net.tourbook.device.sporttracks.FitLog_SAXHandler;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -67,7 +67,7 @@ public class FitLogTester {
       final String importFilePath = filePathWithoutExtension + ".fitlog"; //$NON-NLS-1$
       final InputStream fitLogFile = FitLogTester.class.getResourceAsStream(importFilePath);
 
-      final FitLogSAXHandler handler = new FitLogSAXHandler(
+      final FitLog_SAXHandler handler = new FitLog_SAXHandler(
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
