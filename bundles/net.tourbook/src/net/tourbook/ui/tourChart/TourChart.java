@@ -3379,6 +3379,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onMarker_MouseDown(final ChartMouseEvent mouseEvent) {
 
+      //TODO that's where we are when we click on a marker in the tour chart
+
       final TourMarker tourMarker = getHoveredTourMarker();
 
       if (tourMarker != null) {
