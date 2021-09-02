@@ -8499,7 +8499,7 @@ public class TourDatabase {
     * @param tourId
     * @param <T>
     * @param entity
-    * @param id
+    * @param tourId
     * @param entityClass
     */
    private void updateDb_042_To_043_DataUpdate_Concurrent(final Long tourId) {

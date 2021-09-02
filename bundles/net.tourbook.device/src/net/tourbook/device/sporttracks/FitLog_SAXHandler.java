@@ -22,11 +22,12 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ import net.tourbook.device.Messages;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TagWithIds;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.osgi.util.NLS;
@@ -148,8 +150,8 @@ public class FitLog_SAXHandler extends DefaultHandler {
    private ImportState_File       _importState_File;
    private ImportState_Process    _importState_Process;
    private FitLogDeviceDataReader _device;
-   private Map<Long, TourData>    _alreadyImportedTours;
 
+   private Map<Long, TourData>    _alreadyImportedTours;
    private Map<Long, TourData>    _newlyImportedTours;
 
    private Activity               _currentActivity;
@@ -168,20 +170,21 @@ public class FitLog_SAXHandler extends DefaultHandler {
    private boolean                _isInPauses;
    private boolean                _isInTimeZoneUtcOffset;
    private boolean                _isInTrack;
-
    private boolean                _isInWeather;
+
    private Map<String, Integer>   _customDataFieldDefinitions;
 
-   private List<Equipment>        _allEquipments_FromFitLogEx;
-
    private StringBuilder          _characters = new StringBuilder(100);
+
+   //
+   private final HashMap<TourData, List<TagWithIds>> _allTagsWithIds_InAllTours = new HashMap<>();
 
    private class Activity {
 
       private List<TimeData>  timeSlices         = new ArrayList<>();
       private List<Lap>       laps               = new ArrayList<>();
       private List<Pause>     pauses             = new ArrayList<>();
-      private List<Equipment> equipmentNames     = new ArrayList<>();
+      private List<Equipment> equipments         = new ArrayList<>();
 
       private ZonedDateTime   tourStartTime;
       private long            tourStartTimeMills = Long.MIN_VALUE;
@@ -281,6 +284,8 @@ public class FitLog_SAXHandler extends DefaultHandler {
             return Name;
          }
 
+         // create a name from: Brand + Model
+
          final StringBuilder name = new StringBuilder();
          if (StringUtils.hasContent(Brand)) {
             name.append(Brand);
@@ -292,10 +297,13 @@ public class FitLog_SAXHandler extends DefaultHandler {
                name.append(Model);
             }
          }
+
          if (name.length() == 0) {
+
             // Yes, it's crazy but I tested and an equipment can have no model and brand!
             name.append(Messages.FitLog_Equipment_Name_Not_Available);
          }
+
          return name.toString();
       }
    }
@@ -314,14 +322,14 @@ public class FitLog_SAXHandler extends DefaultHandler {
    }
 
    public FitLog_SAXHandler(final String importFilePath,
-                           final Map<Long, TourData> alreadyImportedTours,
-                           final Map<Long, TourData> newlyImportedTours,
-                           final boolean isFitLogExFile,
+                            final Map<Long, TourData> alreadyImportedTours,
+                            final Map<Long, TourData> newlyImportedTours,
+                            final boolean isFitLogExFile,
 
-                           final ImportState_File importState_File,
-                           final ImportState_Process importState_Process,
+                            final ImportState_File importState_File,
+                            final ImportState_Process importState_Process,
 
-                           final FitLogDeviceDataReader device) {
+                            final FitLogDeviceDataReader device) {
 
       _importFilePath = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
@@ -361,11 +369,9 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
             // normal import
 
-            _allEquipments_FromFitLogEx = exSaxHandler.getEquipments();
+            final List<Equipment> allEquipments_FromFitLogEx = exSaxHandler.getEquipments();
 
-            if (_allEquipments_FromFitLogEx.size() > 0) {
-               saveEquipmentsAsTags();
-            }
+            finalizeTours_99_Tags(allEquipments_FromFitLogEx);
          }
       }
    }
@@ -701,7 +707,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
       // cleanup
       _currentActivity.timeSlices.clear();
       _currentActivity.laps.clear();
-      _currentActivity.equipmentNames.clear();
+      _currentActivity.equipments.clear();
 
       _importState_File.isFileImportedWithValidData = true;
    }
@@ -726,23 +732,28 @@ public class FitLog_SAXHandler extends DefaultHandler {
       }
    }
 
+   /**
+    * Set tags from the equipment names AND equipment ID
+    *
+    * @param tourData
+    */
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
-      final List<Equipment> allEquipments = _currentActivity.equipmentNames;
+      final List<Equipment> allEquipments = _currentActivity.equipments;
       if (allEquipments.isEmpty()) {
          return;
       }
 
-      final Set<String> allTagNames = new HashSet<>();
+      final List<TagWithIds> allTagsWithIdsInOneTour = new ArrayList<>();
+
       for (final Equipment equipment : allEquipments) {
-         allTagNames.add(equipment.Name);
+
+         allTagsWithIdsInOneTour.add(new TagWithIds(
+               equipment.getName(),
+               equipment.Id));
       }
 
-      final boolean isNewTags = RawDataManager.setTourTags(tourData, allTagNames);
-
-      if (isNewTags) {
-         _importState_Process.isCreated_NewTag().set(true);
-      }
+      _allTagsWithIds_InAllTours.put(tourData, allTagsWithIdsInOneTour);
    }
 
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
@@ -807,6 +818,111 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
          lapCounter++;
       }
+   }
+
+   /**
+    * This must be run after all tours are imported otherwise {@link #_allEquipments_FromFitLogEx}
+    * is
+    * empty
+    *
+    * @param allEquipments_FromFitLogEx
+    */
+   private void finalizeTours_99_Tags(final List<Equipment> allEquipments_FromFitLogEx) {
+
+      boolean isNewTags = false;
+
+      for (final Entry<TourData, ArrayList<TagWithIds>> entry : _allTagsWithIds_InAllTours.entrySet()) {
+
+         final TourData tourData = entry.getKey();
+         final ArrayList<TagWithIds> allTagWithIds = entry.getValue();
+
+         for (final Equipment equipment : allEquipments_FromFitLogEx) {
+
+            final String equipmentName = equipment.Name;
+            final String equipmentId = equipment.Id;
+         }
+
+         isNewTags |= RawDataManager.setTourTags(tourData, _allTagsWithIds_InAllTours);
+      }
+
+      if (isNewTags) {
+         _importState_Process.isCreated_NewTag().set(true);
+      }
+
+   }
+
+   /**
+    * @param allDbTags
+    * @param allTourTags
+    * @param equipment
+    * @return Return {@link TourTag} when tag is available in the provided list
+    */
+   private TourTag finalizeTours_getTourTagWithEquipment(final TourTag[] allDbTags,
+                                                         final Equipment equipment) {
+
+      // If we are in a FitLogEx file, then we have parsed equipments
+      // and we need to map tour tags using each equipment's GUID.
+      final boolean isEquipmentAvailable = _allEquipments_FromFitLogEx.size() > 0;
+
+      for (final TourTag dbTag : allDbTags) {
+
+         if (
+
+         // with equipment -> compare with equipment id which is contained in the tag notes
+         (isEquipmentAvailable && dbTag.getNotes().contains(equipment.Id))
+
+               // no equipment -> compare by tag name
+               || (!isEquipmentAvailable && dbTag.getTagName().equals(equipment.getName()))) {
+
+            return (dbTag);
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * We save the <Equipment> elements in order to be able to create them if they don't
+    * already exist in MTB
+    *
+    * @param importFilePath
+    *           The file path of the FitLog or FitLogEx file
+    */
+   private void finalizeTours_saveEquipmentsAsTags() {
+
+      final Collection<TourTag> allDbTags = TourDatabase.getAllTourTags().values();
+
+      for (final Equipment equipment : _allEquipments_FromFitLogEx) {
+
+         boolean tagAlreadyExists = false;
+
+         for (final TourTag tourTag : allDbTags) {
+            if (tourTag.getNotes().contains(equipment.Id)) {
+
+               // existing tag is found
+               tagAlreadyExists = true;
+
+               break;
+            }
+         }
+
+         if (tagAlreadyExists == false) {
+
+            // We add the tag in the database if it doesn't already exist
+
+            final TourTag tourTag = new TourTag(equipment.getName());
+            tourTag.setNotes(equipment.generateNotes());
+            tourTag.setRoot(true);
+
+            // persist tag
+            TourDatabase.saveEntity(
+                  tourTag,
+                  TourDatabase.ENTITY_IS_NOT_SAVED,
+                  TourTag.class);
+         }
+      }
+
+      TourDatabase.clearTourTags();
    }
 
    /**
@@ -882,12 +998,17 @@ public class FitLog_SAXHandler extends DefaultHandler {
       case TAG_ACTIVITY_CATEGORY:
          _currentActivity.categoryName = attributes.getValue(ATTRIB_NAME);
          break;
+
       case TAG_ACTIVITY_EQUIPMENT_ITEM:
+
          final Equipment newEquipment = new Equipment();
+
          newEquipment.Name = attributes.getValue(ATTRIB_NAME);
          newEquipment.Id = attributes.getValue(ATTRIB_EQUIPMENT_ID);
-         _currentActivity.equipmentNames.add(newEquipment);
+
+         _currentActivity.equipments.add(newEquipment);
          break;
+
       case TAG_ACTIVITY_CALORIES:
          // Converting from Calories to calories
          _currentActivity.calories = Math.round(Util.parseFloat0(attributes, ATTRIB_TOTAL_CAL) * 1000f);
@@ -1058,6 +1179,16 @@ public class FitLog_SAXHandler extends DefaultHandler {
       }
    }
 
+//   private void parseTrack(final Attributes attributes) {
+//
+//      final String startTime = attributes.getValue(ATTRIB_START_TIME);
+//
+//      if (startTime != null) {
+//         _currentActivity.trackTourDateTime = _dtParser.parseDateTime(startTime);
+//         _currentActivity.trackTourStartTime = _currentActivity.trackTourDateTime.getMillis();
+//      }
+//   }
+
    private void parsePauses(final String name, final Attributes attributes) {
 
       if (name.equals(TAG_PAUSE)) {
@@ -1143,16 +1274,6 @@ public class FitLog_SAXHandler extends DefaultHandler {
       }
    }
 
-//   private void parseTrack(final Attributes attributes) {
-//
-//      final String startTime = attributes.getValue(ATTRIB_START_TIME);
-//
-//      if (startTime != null) {
-//         _currentActivity.trackTourDateTime = _dtParser.parseDateTime(startTime);
-//         _currentActivity.trackTourStartTime = _currentActivity.trackTourDateTime.getMillis();
-//      }
-//   }
-
    /**
     * @param weatherText
     *           Example:
@@ -1181,50 +1302,6 @@ public class FitLog_SAXHandler extends DefaultHandler {
       windSpeedValue *= UI.UNIT_VALUE_DISTANCE;
 
       return Math.round(windSpeedValue);
-   }
-
-   /**
-    * We save the <Equipment> elements in order to be able to create them if they don't
-    * already exist in MTB
-    *
-    * @param importFilePath
-    *           The file path of the FitLog or FitLogEx file
-    */
-   private void saveEquipmentsAsTags() {
-
-      final HashMap<Long, TourTag> tourTagMap = TourDatabase.getAllTourTags();
-      final TourTag[] allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);
-
-      for (final Equipment equipment : _allEquipments_FromFitLogEx) {
-
-         boolean tagAlreadyExists = false;
-         for (final TourTag tourTag : allTourTags) {
-            if (tourTag.getNotes().contains(equipment.Id)) {
-
-               // existing tag is found
-               tagAlreadyExists = true;
-
-               break;
-            }
-         }
-
-         if (!tagAlreadyExists) {
-
-            //We add the tag in the database if it doesn't already exist
-
-            final TourTag tourTag = new TourTag(equipment.getName());
-            tourTag.setNotes(equipment.generateNotes());
-            tourTag.setRoot(true);
-
-            // persist tag
-            TourDatabase.saveEntity(
-                  tourTag,
-                  TourDatabase.ENTITY_IS_NOT_SAVED,
-                  TourTag.class);
-         }
-      }
-
-      TourDatabase.clearTourTags();
    }
 
    @Override

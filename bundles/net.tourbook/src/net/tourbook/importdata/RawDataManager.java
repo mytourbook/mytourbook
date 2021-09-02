@@ -751,6 +751,11 @@ public class RawDataManager {
       _isReimportingActive = isReimportingActive;
    }
 
+   public static boolean setTourTags(final TourData tourData, final ArrayList<TagWithIds> allTagsWithNotesIds) {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    /**
     * Sets {@link TourTag} 's into {@link TourData}
     *
