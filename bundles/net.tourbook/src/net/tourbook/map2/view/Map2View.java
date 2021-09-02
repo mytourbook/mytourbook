@@ -1373,6 +1373,13 @@ public class Map2View extends ViewPart implements
                onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
             }
 
+         } else if (eventId == TourEventId.PAUSE_SELECTION) {
+
+            if (eventData instanceof SelectionTourMarker) {
+
+               onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
+            }
+
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
             onSelectionChanged((ISelection) eventData, true);
