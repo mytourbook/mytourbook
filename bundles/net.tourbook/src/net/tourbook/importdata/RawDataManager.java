@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -188,43 +189,49 @@ public class RawDataManager {
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<String, Object>   _allInvalidFiles               = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, Object>   _allInvalidFiles                         = new ConcurrentHashMap<>();
 
    /**
     * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<IPath, Object>    _allPreviousReimportFolders    = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<IPath, Object>    _allPreviousReimportFolders              = new ConcurrentHashMap<>();
 
    private static volatile IPath                            _previousReimportFolder;
 
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private static final ConcurrentHashMap<Long, TourData>   _allImported_Tours             = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<Long, TourData>   _allImported_Tours                       = new ConcurrentHashMap<>();
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
     */
-   private static final ConcurrentHashMap<String, String>   _allImported_FileNames         = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>   _allImported_FileNames                   = new ConcurrentHashMap<>();
 
    /**
     * Contains filenames which are not directly imported but is imported from other imported files
     */
-   private static final ConcurrentHashMap<String, String>   _allImported_FileNamesChildren = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>   _allImported_FileNamesChildren           = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourType}'s which are imported and could be saved or not, key is the tour type
     * name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourType> _allImported_NewTourTypes      = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourType> _allImported_NewTourTypes                = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
     * name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourTag>  _allImported_NewTourTags       = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourTag>  _allImported_NewTourTags                 = new ConcurrentHashMap<>();
+
+   /**
+    * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
+    * name + contained id in notes, all is in UPPERCASE
+    */
+   private static final ConcurrentHashMap<String, TourTag>  _allImported_NewTourTags_WithContainedId = new ConcurrentHashMap<>();
 
    //
    /**
@@ -404,6 +411,9 @@ public class RawDataManager {
          }
       }
 
+      /*
+       * Create tags
+       */
       for (final String tagName : allTagNames_NotAvailable) {
 
          final TourTag tourTag = new TourTag(tagName);
@@ -412,6 +422,38 @@ public class RawDataManager {
          allNewTourTags.add(tourTag);
 
          _allImported_NewTourTags.put(tagName.toUpperCase(), tourTag);
+      }
+   }
+
+   private static synchronized void createTourTags(final Map<String, TagWithNotes> allRequestedTagsWithNotes,
+                                                   final ArrayList<TourTag> allNewTags,
+                                                   final ArrayList<TourTag> allOldTags) {
+
+      /*
+       * Check tags again if they are still unavailable
+       */
+      final Map<String, TagWithNotes> allTagsWithNotes_NotAvailable = new HashMap<>();
+      final Map<String, TourTag> allTags_Available = new HashMap<>();
+
+      getAvailable_TagsWithNotes(allRequestedTagsWithNotes, allTags_Available, allTagsWithNotes_NotAvailable);
+
+      allOldTags.addAll(allTags_Available.values());
+
+      /*
+       * Create tags
+       */
+      for (final Entry<String, TagWithNotes> entry : allTagsWithNotes_NotAvailable.entrySet()) {
+
+         final String key = entry.getKey();
+         final TagWithNotes tagWithNotes = entry.getValue();
+
+         final TourTag newTag = new TourTag(tagWithNotes.tagName);
+         newTag.setNotes(tagWithNotes.tagNotes);
+         newTag.setRoot(true);
+
+         allNewTags.add(newTag);
+
+         _allImported_NewTourTags_WithContainedId.put(key, newTag);
       }
    }
 
@@ -620,6 +662,51 @@ public class RawDataManager {
             .anyMatch(invalidFilePath -> Paths.get(invalidFilePath).getFileName().toString().equals(fileName));
    }
 
+   private static void getAvailable_TagsWithNotes(final Map<String, TagWithNotes> allRequestedTagsWithNotes,
+                                                  final Map<String, TourTag> allOldTags,
+                                                  final Map<String, TagWithNotes> allNewTags) {
+
+      final Collection<TourTag> allDbTags = TourDatabase.getAllTourTags().values();
+
+      for (final Entry<String, TagWithNotes> entry : allRequestedTagsWithNotes.entrySet()) {
+
+         final String tagKey = entry.getKey();
+         final TagWithNotes requestedTagWithNotes = entry.getValue();
+
+         final String tagName = requestedTagWithNotes.tagName;
+         final String tagNotes_ContainedId = requestedTagWithNotes.tagNotes_ContainedId;
+
+         TourTag existingTag = null;
+
+         // check tag in db
+         for (final TourTag dbTag : allDbTags) {
+
+            if (dbTag.getTagName().equalsIgnoreCase(tagName)
+                  && dbTag.getNotes().contains(tagNotes_ContainedId)) {
+
+               existingTag = dbTag;
+
+               break;
+            }
+         }
+
+         // check tag in newly imported tags
+         if (existingTag == null) {
+
+            existingTag = _allImported_NewTourTags_WithContainedId.get(tagKey);
+         }
+
+         if (existingTag == null) {
+
+            allNewTags.put(tagKey, requestedTagWithNotes);
+
+         } else {
+
+            allOldTags.put(tagKey, existingTag);
+         }
+      }
+   }
+
    /**
     * @return Returns the cadence multiplier default value
     */
@@ -751,13 +838,48 @@ public class RawDataManager {
       _isReimportingActive = isReimportingActive;
    }
 
-   public static boolean setTourTags(final TourData tourData, final ArrayList<TagWithIds> allTagsWithNotesIds) {
-      // TODO Auto-generated method stub
-      return false;
+   /**
+    * Sets {@link TourTag} 's into {@link TourData} and create new tour tags when not available by
+    * comparing the tag names and id's which must be contained in the tag notes
+    *
+    * @param tourData
+    * @param allRequestedTagsWithNotes
+    * @return Returns <code>true</code> when new tour tags were created
+    */
+   public static boolean setTourTags(final TourData tourData,
+                                     final Map<String, TagWithNotes> allRequestedTagsWithNotes) {
+
+      final Map<String, TourTag> allTags_Available = new HashMap<>();
+      final Map<String, TagWithNotes> allTagsWithNotes_NotAvailable = new HashMap<>();
+
+      getAvailable_TagsWithNotes(allRequestedTagsWithNotes, allTags_Available, allTagsWithNotes_NotAvailable);
+
+      final ArrayList<TourTag> allNewTags = new ArrayList<>();
+      final ArrayList<TourTag> allOldTags = new ArrayList<>();
+
+      if (allTagsWithNotes_NotAvailable.size() > 0) {
+
+         // some tags are not available -> create them
+
+         createTourTags(allTagsWithNotes_NotAvailable, allNewTags, allOldTags);
+      }
+
+      /*
+       * Set tags into tour data
+       */
+      final Set<TourTag> tourData_TourTags = tourData.getTourTags();
+
+      tourData_TourTags.clear();
+      tourData_TourTags.addAll(allTags_Available.values());
+      tourData_TourTags.addAll(allOldTags);
+      tourData_TourTags.addAll(allNewTags);
+
+      return allNewTags.size() > 0;
    }
 
    /**
-    * Sets {@link TourTag} 's into {@link TourData}
+    * Sets {@link TourTag} 's into {@link TourData} and create new tour tags when not available by
+    * comparing the tag names
     *
     * @param tourData
     * @param allRequestedTourTagNames
@@ -3176,6 +3298,7 @@ public class RawDataManager {
       _allImported_FileNamesChildren.clear();
 
       _allImported_NewTourTags.clear();
+      _allImported_NewTourTags_WithContainedId.clear();
       _allImported_NewTourTypes.clear();
    }
 
