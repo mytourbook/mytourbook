@@ -480,7 +480,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       fillToolbar();
 
       // this part is a selection provider
-      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      _postSelectionProvider = new PostSelectionProvider(ID);
+      getSite().setSelectionProvider(_postSelectionProvider);
 
       // show default page
       _pageBook.showPage(_pageNoData);
@@ -1090,10 +1091,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    private int getCurrentMarkerIndex(final ViewerCell cell) {
 
       return ((TourMarker) cell.getElement()).getSerieIndex();
-   }
-
-   public Object getMarkerViewer() {
-      return _markerViewer;
    }
 
    private int getMultiTourSerieIndex(final int currentMarkerIndex) {
