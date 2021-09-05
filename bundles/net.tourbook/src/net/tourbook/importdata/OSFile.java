@@ -17,16 +17,20 @@ package net.tourbook.importdata;
 
 import java.nio.file.Path;
 
+import net.tourbook.common.UI;
+
 public class OSFile {
 
-   private Path   path;
-   private String fileName;
+   private static final char NL = UI.NEW_LINE;
 
-   public long    size;
-   public long    modifiedTime;
+   private Path              path;
+   private String            fileName;
+
+   public long               size;
+   public long               modifiedTime;
 
    /** When <code>true</code>, this file is already moved and exists in the backup folder. */
-   public boolean isBackupImportFile;
+   public boolean            isBackupImportFile;
 
    @SuppressWarnings("unused")
    private OSFile() {}
@@ -86,13 +90,18 @@ public class OSFile {
    @Override
    public String toString() {
 
-      return "OSFile [" //$NON-NLS-1$
-            + "fileName=" + fileName + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "path=" + path + ", " //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("size=" + size + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("modifiedTime=" + modifiedTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + "isBackupFile=" + isBackupImportFile //$NON-NLS-1$
-            + "]"; //$NON-NLS-1$
+      return UI.EMPTY_STRING
+
+            + "OSFile [" + NL //                               //$NON-NLS-1$
+
+            + "fileName       =" + fileName + NL //            //$NON-NLS-1$
+//          + "path           =" + path + NL //                //$NON-NLS-1$
+            + "size           =" + size + NL //                //$NON-NLS-1$
+//          + "modifiedTime   =" + modifiedTime + NL //        //$NON-NLS-1$
+//          + "isBackupFile   =" + isBackupImportFile + NL //  //$NON-NLS-1$
+
+            + "]" + NL //                                      //$NON-NLS-1$
+      ;
    }
 
 }

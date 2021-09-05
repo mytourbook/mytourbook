@@ -135,6 +135,8 @@ public class RawDataManager {
    private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
 
    private static final String           FILE_EXTENSION_FIT               = ".fit";                                                //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";
+   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";
 
    private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
@@ -1799,10 +1801,12 @@ public class RawDataManager {
 
          final List<ImportFile> allImportFilePaths = new ArrayList<>();
 
+         final List<OSFile> notSkipedFiles = skipFitLogFiles(allImportFiles);
+
          /*
           * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
           */
-         for (final OSFile osFile : allImportFiles) {
+         for (final OSFile osFile : notSkipedFiles) {
 
             final String absolutePath = osFile.getPath().toString();
             final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
@@ -2957,6 +2961,7 @@ public class RawDataManager {
           * It must be >60 seconds because db version < 7 (9.01) had no saved seconds !!!
           */
          if (timeDiff > 65_000
+
                // disabled for .fit files because they can have different tour start times (of some seconds)
                && !reImportedFile.getName().toLowerCase().endsWith(FILE_EXTENSION_FIT)) {
 
@@ -3406,6 +3411,67 @@ public class RawDataManager {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
       return null;
+   }
+
+   private List<OSFile> skipFitLogFiles(final ArrayList<OSFile> allImportFiles) {
+
+      final List<OSFile> allNotSkippedFiles = new ArrayList<>();
+
+      final HashMap<String, OSFile> allFitLog_Files = new HashMap<>();
+      final HashMap<String, OSFile> allFitLogEx_Files = new HashMap<>();
+
+      final int fitlogLength = FILE_EXTENSION_FIT_LOG.length();
+      final int fitlogexLength = FILE_EXTENSION_FIT_LOG_EX.length();
+
+      // split all files
+      for (final OSFile osFile : allImportFiles) {
+
+         final String absolutePath = osFile.getPath().toString();
+         final String absolutePath_NoCase = absolutePath.toLowerCase();
+
+         if (absolutePath_NoCase.endsWith(FILE_EXTENSION_FIT_LOG)) {
+
+            // FitLog file
+
+            final String fileNameWithoutExtension = absolutePath.substring(0, absolutePath.length() - fitlogLength);
+
+            allFitLog_Files.put(fileNameWithoutExtension, osFile);
+
+         } else if (absolutePath_NoCase.endsWith(FILE_EXTENSION_FIT_LOG_EX)) {
+
+            // FitLogEx file
+
+            final String fileNameWithoutExtension = absolutePath.substring(0, absolutePath.length() - fitlogexLength);
+
+            allFitLogEx_Files.put(fileNameWithoutExtension, osFile);
+
+         } else {
+
+            // all other files
+
+            allNotSkippedFiles.add(osFile);
+         }
+      }
+
+      /*
+       * Find FitLogEx files in FitLog files
+       */
+      for (final String fitlogex_Key : allFitLogEx_Files.keySet()) {
+
+         final OSFile fitlog_File = allFitLog_Files.get(fitlogex_Key);
+
+         if (fitlog_File != null) {
+
+            // fitlog + fitlogex files are available -> remove fitlog file
+
+            allFitLog_Files.remove(fitlogex_Key);
+         }
+      }
+
+      allNotSkippedFiles.addAll(allFitLog_Files.values());
+      allNotSkippedFiles.addAll(allFitLogEx_Files.values());
+
+      return allNotSkippedFiles;
    }
 
    /**
