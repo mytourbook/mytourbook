@@ -2087,7 +2087,7 @@ public class RawDataManager {
          if (importState_File.isImportLogged == false) {
 
             // do default logging
-            TourLogManager.subLog_ERROR(osFilePath);
+            TourLogManager.subLog_ERROR(String.format("[Import failed] %s", osFilePath));
          }
       }
 

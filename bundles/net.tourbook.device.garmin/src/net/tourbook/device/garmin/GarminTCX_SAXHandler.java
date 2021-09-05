@@ -616,9 +616,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       // check if data are available
       if (_allTimeData.isEmpty()) {
 
-         TourLogManager.subLog_INFO(NLS.bind(
-               Messages.Garmin_SAXHandler_ImportFileIsEmpty,
-               _importFilePath));
+         TourLogManager.subLog_INFO(String.format("[TCX] %s - is empty", _importFilePath));
 
          _importState_File.isImportDone = true;
          _importState_File.isImportLogged = true;

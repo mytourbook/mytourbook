@@ -263,11 +263,15 @@ public class NmeaDataReader extends TourbookDevice {
 
 //   Begin of O. Budischewski, 2008.03.20
       if (_isNullCoordinates == true) {
-         TourLogManager.log_ERROR(NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath));
+         TourLogManager.subLog_ERROR(String.format("[NMEA] %s - %s",
+               _importFilePath,
+               NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath)));
       }
 //   End of O. Budischewski, 2008.03.20
 
-      importState_File.isFileImportedWithValidData = setTourData();
+      final boolean isImported = setTourData();
+
+      importState_File.isFileImportedWithValidData = isImported;
    }
 
    private boolean setTourData() {

@@ -167,8 +167,9 @@ public class FitData {
 
          recordStartTime = _sessionStartTime.toInstant().toEpochMilli();
 
-         TourLogManager.log_ERROR(String.format(
-               "There are no time data, using session date/time %s", //$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format(
+               "[FIT] %s - There are no time data, using session date/time %s", //$NON-NLS-1$
+               _importFilePathName,
                TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
 
       } else {
@@ -177,8 +178,9 @@ public class FitData {
 
          recordStartTime = TimeTools.now().toEpochSecond();
 
-         TourLogManager.log_ERROR(String.format(
-               "There are no time data and there is no session date/time, using %s", //$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format(
+               "[FIT] %s - There are no time data and there is no session date/time, using %s", //$NON-NLS-1$
+               _importFilePathName,
                TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
       }
 
@@ -591,6 +593,10 @@ public class FitData {
       return _allGearData;
    }
 
+   public String getImportFilePathName() {
+      return _importFilePathName;
+   }
+
    public TimeData getLastAdded_TimeData() {
       return _lastAdded_TimeData;
    }
@@ -772,9 +778,5 @@ public class FitData {
    public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
-   }
-
-   public String getImportFilePathName() {
-      return _importFilePathName;
    }
 }
