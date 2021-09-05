@@ -41,7 +41,6 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -463,10 +462,11 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
          }
       }
 
-      TourLogManager.subLog_INFO(NLS.bind(
-            Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
-            _importFilePath,
-            TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));
+      TourLogManager.subLog_INFO(
+
+            String.format(Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
+                  _importFilePath,
+                  TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));
    }
 
    @Override
