@@ -472,7 +472,7 @@ public class Polar_PDD_Data {
       return new Polar_HRM_DataReader();
    }
 
-   boolean parseSection() {
+   void parseSection() {
 
       boolean returnValue = false;
 
@@ -517,7 +517,7 @@ public class Polar_PDD_Data {
             }
 
             if (isValid == false) {
-               return false;
+               return;
             }
          }
 
@@ -525,10 +525,10 @@ public class Polar_PDD_Data {
 
       } catch (final Exception e) {
          StatusUtil.showStatus(e);
-         return false;
+         return;
       }
 
-      return returnValue;
+      _importState_File.isFileImportedWithValidData = returnValue;
    }
 
    /**
