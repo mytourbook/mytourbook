@@ -3729,10 +3729,23 @@ public class RawDataManager {
 
                      allSavedTourIds.add(replacedTourData.getTourId());
 
+                     TourLogManager.subLog_INFO(NLS.bind(
+//                           Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
+                           "[Replaced import file] {0} in tour {1}",
+                           importedFilePathName,
+                           TourManager.getTourDateTimeShort(replacedTourData)));
+
                      break;
 
                   case DO_NOTHING:
                   case DO_NOTHING_AND_DONT_ASK_AGAIN:
+
+                     TourLogManager.subLog_INFO(NLS.bind(
+//                           Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
+                           "[Skipped import file] {0} in tour {1}",
+                           importedFilePathName,
+                           TourManager.getTourDateTimeShort(replacedTourData)));
+
                   default:
                      break;
                   }

@@ -5119,6 +5119,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return allSavedTours;
       }
 
+      final long start = System.currentTimeMillis();
+
       /*
        * Setup concurrency
        */
@@ -5178,6 +5180,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // get all saved tour data
          allSavedToursConcurrent.drainTo(allSavedTours);
+
+         TourLogManager.subLog_DEFAULT(String.format("Saved %d tours in %.3f s",
+               allSavedTours.size(),
+               (System.currentTimeMillis() - start) / 1000.0));
 
          // update e.g. fulltext index
          TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(getAllTourIds(allSavedTours));

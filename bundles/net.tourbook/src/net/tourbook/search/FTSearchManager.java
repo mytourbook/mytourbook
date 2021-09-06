@@ -1861,8 +1861,8 @@ public class FTSearchManager {
 
          TourLogManager.subLog_DEFAULT(String.format(Messages.Search_Manager_Log_UpdatedFTIndex_Final,
 
-               timeDiff,
-               numAllTourIDs));
+               numAllTourIDs,
+               timeDiff));
       }
    }
 
