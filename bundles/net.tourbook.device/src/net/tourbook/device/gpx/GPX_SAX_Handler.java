@@ -41,6 +41,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
@@ -1165,9 +1166,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
          return;
       }
 
-      final boolean isNewTourType = RawDataManager.setTourType(_tourData, _tourTypeName);
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(_tourData, _tourTypeName);
 
-      if (isNewTourType) {
+      if (tourTypeWrapper != null && tourTypeWrapper.isNewTourType) {
+
          _importState_Process.isCreated_NewTourType().set(true);
       }
    }

@@ -116,10 +116,26 @@ public class ImportState_Process {
       return importId;
    }
 
+   /**
+    * OUT state:
+    * <p>
+    * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all
+    * isimported.
+    *
+    * @return
+    */
    public AtomicBoolean isCreated_NewTag() {
       return isCreated_NewTag;
    }
 
+   /**
+    * OUT state:
+    * <p>
+    * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all
+    * isimported.
+    *
+    * @return
+    */
    public AtomicBoolean isCreated_NewTourType() {
       return isCreated_NewTourType;
    }

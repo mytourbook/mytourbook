@@ -371,7 +371,7 @@ public class RawDataManager {
    }
 
    /**
-    * Add new tour tags and save them in the database
+    * SYNCHRONIZED: Add new tour tags and save them in the database
     *
     * @param allRequestedTourTagNames
     *           Contains the tag names which should be created
@@ -427,6 +427,13 @@ public class RawDataManager {
       }
    }
 
+   /**
+    * SYNCHRONIZED:
+    *
+    * @param allRequestedTagsWithNotes
+    * @param allNewTags
+    * @param allOldTags
+    */
    private static synchronized void createTourTags(final Map<String, TagWithNotes> allRequestedTagsWithNotes,
                                                    final ArrayList<TourTag> allNewTags,
                                                    final ArrayList<TourTag> allOldTags) {
@@ -460,7 +467,7 @@ public class RawDataManager {
    }
 
    /**
-    * Create new tour type and keep it in {@link #_allImported_NewTourTypes}
+    * SYNCHRONIZED: Create new tour type and keep it in {@link #_allImported_NewTourTypes}
     *
     * @param requestedTourTypeName
     * @return Returns the newly saved tour type
@@ -943,13 +950,15 @@ public class RawDataManager {
    }
 
    /**
-    * Set {@link TourType} into {@link TourData} by using it's tour type name
+    * Set {@link TourType} into {@link TourData} by using it's tour type name. When the tour type is
+    * not yet available it will be created.
     *
     * @param tourData
+    *           Can be <code>null</code> then the tour type is not applied
     * @param requestedTourTypeLabel
-    * @return Returns <code>true</code> when a new tour type was created.
+    * @return Returns the tour type wrapper or <code>null</code> when the tour type label is empty
     */
-   public static boolean setTourType(final TourData tourData, final String requestedTourTypeLabel) {
+   public static TourTypeWrapper setTourType(final TourData tourData, final String requestedTourTypeLabel) {
 
       final String tourTypeLabelStripped = requestedTourTypeLabel.strip();
 
@@ -957,7 +966,7 @@ public class RawDataManager {
 
          // ignore empty tour type label
 
-         return false;
+         return null;
       }
 
       TourType existingTourType = null;
@@ -974,24 +983,39 @@ public class RawDataManager {
          }
       }
 
+      /*
+       * Find tour type in newly created tour types
+       */
       if (existingTourType == null) {
 
          existingTourType = _allImported_NewTourTypes.get(tourTypeLabelStripped.toUpperCase());
       }
 
       TourType appliedTourType = existingTourType;
+
+      /*
+       * Create new tour type
+       */
       TourType newTourType = null;
 
       if (appliedTourType == null) {
 
-         // create new tour type
-
          appliedTourType = newTourType = createTourType(tourTypeLabelStripped);
       }
 
-      tourData.setTourType(appliedTourType);
+      /*
+       * Apply tour type
+       */
+      if (tourData != null) {
+         tourData.setTourType(appliedTourType);
+      }
 
-      return newTourType != null;
+      return new TourTypeWrapper(
+
+            appliedTourType,
+            newTourType != null
+
+      );
    }
 
    public void actionImportFromDevice() {

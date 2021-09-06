@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -30,14 +29,13 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.importdata.TourbookDevice;
-
-import org.eclipse.swt.graphics.RGB;
 
 /**
  * This device reader is importing data from Polar Person File
@@ -62,9 +60,9 @@ public class Polar_PPD_Data {
    private ImportState_Process     _importState_Process;
 
 // private Polar_PPD_DataReader    _polar_PPD_DataReader;
-   private Polar_PDD_DataReader    _polar_PDD_DataReader_Silent;
+   private Polar_PDD_DataReader _polar_PDD_DataReader_Silent;
 
-   private DeviceData              _deviceData;
+   private DeviceData           _deviceData;
 
    @SuppressWarnings("unused")
    private class Person {
@@ -163,56 +161,19 @@ public class Polar_PPD_Data {
 
       final HashMap<Integer, TourType> tourTypeForSport = new HashMap<>();
 
-      final HashMap<String, TourType> knownTourTypes = new HashMap<>();
-
-      final ArrayList<TourType> backendTourTypes = TourDatabase.getAllTourTypes();
-
-      for (final TourType tourType : backendTourTypes) {
-         knownTourTypes.put(tourType.getName(), tourType);
-      }
-
       for (final int sportId : _sports.keySet()) {
+
          final Sport sport = _sports.get(sportId);
-         if (!knownTourTypes.containsKey(sport.name)) { // this is a new sport
 
-            final TourType newTourType = new TourType(sport.name);
+         final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(null, sport.name);
 
-            final int dimParam = 3;
+         if (tourTypeWrapper != null) {
 
-            final int r = (sport.color & 0xFF);
-            final int g = (sport.color & 0xFF00) >>> 8;
-            final int b = (sport.color & 0xFF0000) >>> 16;
+            tourTypeForSport.put(sportId, tourTypeWrapper.tourType);
 
-            final int lr = r + ((255 - r) / dimParam);
-            final int lg = g + ((255 - g) / dimParam);
-            final int lb = b + ((255 - b) / dimParam);
-
-            final int dr = r - (r / dimParam);
-            final int dg = g - (g / dimParam);
-            final int db = b - (b / dimParam);
-
-            final RGB l = new RGB(lr, lg, lb);
-            final RGB n = new RGB(r, g, b);
-            final RGB d = new RGB(dr, dg, db);
-
-            newTourType.setColor_Gradient_Bright(l);
-            newTourType.setColor_Gradient_Dark(n);
-
-            newTourType.setColor_Line(d, d);
-            newTourType.setColor_Text(d, d);
-
-            // add new entity to db
-            final TourType savedTourType = TourDatabase.saveEntity(
-                  newTourType,
-                  newTourType.getTypeId(),
-                  TourType.class);
-            if (null != savedTourType) {
-               tourTypeForSport.put(sportId, savedTourType);
-               backendTourTypes.add(savedTourType);
+            if (tourTypeWrapper.isNewTourType) {
+               _importState_Process.isCreated_NewTag().set(true);
             }
-
-         } else {
-            tourTypeForSport.put(sportId, knownTourTypes.get(sport.name));
          }
       }
 
@@ -270,10 +231,12 @@ public class Polar_PPD_Data {
             for (final File pddFile : pddFiles) {
 
                _polar_PDD_DataReader_Silent.processDeviceData(
+
                      pddFile.getAbsolutePath(),
                      _deviceData,
                      _alreadyImportedTours,
                      _newlyImportedTours,
+
                      _importState_File,
                      _importState_Process);
             }
@@ -340,7 +303,7 @@ public class Polar_PPD_Data {
     * <pre>
     *
     * [PersonInfo]
-    * 100	      1           6           6            4           256    // row0
+    * 100         1           6           6            4           256    // row0
     * 19650504   1 gender    168 size    1            0           3      // row1
     * 22         1           11          51           0           1      // row2
     * 34         20          30          0           -1           0      // row3
@@ -435,17 +398,17 @@ public class Polar_PPD_Data {
     * <pre>
     *
     * [PersonSports]
-    * 100	3	2	6	4	256               // row0
-    * 12	0	0	0	0	0                 // row1
-    * 1	0	0	0	0	0                 // row2
-    * 1	0	0	100	1	0                 // row3 sub1
-    * 185	10354102	0	34	1	0         // row4 sub2
+    * 100   3   2   6   4   256              // row0
+    * 12    0   0   0   0   0                // row1
+    * 1     0   0   0   0   0                // row2
+    * 1     0   0   100   1   0              // row3 sub1
+    * 185   10354102   0   34   1   0        // row4 sub2
     * Running                                // row5 sub3
     * R                                      // row6 sub4
     *                                        // row7 sub5
     *                                        // row7 sub6
-    * 5	0	0	100	0	0                 //      sub1
-    * 0	5876991	0	34	1	0             //      sub2
+    * 5     0   0   100    0   0              //     sub1
+    * 0     5876991   0   34   1   0          //     sub2
     * Intervall
     * INT
     * </pre>
@@ -464,39 +427,48 @@ public class Polar_PPD_Data {
 
       try {
 
-         if (null == fileReader.readLine()) { // row 0
+// row 0
+         if (null == fileReader.readLine()) {
             return false;
          }
-         if (null == (line = fileReader.readLine())) { // row 1
+
+// row 1
+         if (null == (line = fileReader.readLine())) {
             return false;
          }
          tokenLine = new StringTokenizer(line, DATA_DELIMITER);
 
          numberOfSports = Integer.parseInt(tokenLine.nextToken());
 
-         if (null == fileReader.readLine()) { // row 2
+// row 2
+         if (null == fileReader.readLine()) {
             return false;
          }
 
+// row 3 + n*6
+
          // parse all sports sub-sections
-         while (null != (line = fileReader.readLine()) && numberOfSports > 0) { // row 3 + n*6
+         while (null != (line = fileReader.readLine()) && numberOfSports > 0) {
 
             tokenLine = new StringTokenizer(line, DATA_DELIMITER);
             final int id = Integer.parseInt(tokenLine.nextToken());
 
-            if (null == (line = fileReader.readLine())) { // subrow 2
+// subrow 2
+            if (null == (line = fileReader.readLine())) {
                return false;
             }
             tokenLine = new StringTokenizer(line, DATA_DELIMITER);
             tokenLine.nextToken();
             final int color = Integer.parseInt(tokenLine.nextToken());
 
-            if (null == (line = fileReader.readLine())) { // subrow 3
+// subrow 3
+            if (null == (line = fileReader.readLine())) {
                return false;
             }
             final String name = line;
 
-            if (skipRows(fileReader, 3) == null) { // subrow 4,5,6
+// subrow 4,5,6
+            if (skipRows(fileReader, 3) == null) {
                return false;
             }
 

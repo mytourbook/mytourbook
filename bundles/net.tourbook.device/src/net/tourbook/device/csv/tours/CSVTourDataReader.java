@@ -33,6 +33,7 @@ import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.importdata.TourbookDevice;
 
 public class CSVTourDataReader extends TourbookDevice {
@@ -198,7 +199,9 @@ public class CSVTourDataReader extends TourbookDevice {
     */
    private boolean parseTourType(final TourData tourData, final String parsedTourTypeLabel) {
 
-      return RawDataManager.setTourType(tourData, parsedTourTypeLabel);
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
+
+      return tourTypeWrapper != null && tourTypeWrapper.isNewTourType;
    }
 
    @Override

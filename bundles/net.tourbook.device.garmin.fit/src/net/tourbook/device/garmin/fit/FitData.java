@@ -35,6 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
@@ -129,9 +130,9 @@ public class FitData {
          return;
       }
 
-      final boolean isNewTourType = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
 
-      if (isNewTourType) {
+      if (tourTypeWrapper != null && tourTypeWrapper.isNewTourType) {
          _importState_Process.isCreated_NewTourType().set(true);
       }
    }

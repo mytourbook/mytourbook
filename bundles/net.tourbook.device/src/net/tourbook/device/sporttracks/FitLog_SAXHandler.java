@@ -50,6 +50,7 @@ import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TagWithNotes;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.osgi.util.NLS;
@@ -772,9 +773,9 @@ public class FitLog_SAXHandler extends DefaultHandler {
          return;
       }
 
-      final boolean isNewTourType = RawDataManager.setTourType(tourData, categoryName);
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(tourData, categoryName);
 
-      if (isNewTourType) {
+      if (tourTypeWrapper != null && tourTypeWrapper.isNewTourType) {
          _importState_Process.isCreated_NewTourType().set(true);
       }
    }
