@@ -128,12 +128,12 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
       }
 
       final SuuntoQuestSAXHandler saxHandler =
+
             new SuuntoQuestSAXHandler(
                   this,
                   importFilePath,
                   alreadyImportedTours,
-                  newlyImportedTours,
-                  importState_Process.isReimport());
+                  newlyImportedTours);
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
 

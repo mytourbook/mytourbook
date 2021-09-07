@@ -101,6 +101,7 @@ public class EasyImportManager {
    private static final String      ATTR_DASH_ANIMATION_CRAZY_FACTOR                   = "animationCrazyFactor";                             //$NON-NLS-1$
    private static final String      ATTR_DASH_ANIMATION_DURATION                       = "animationDuration";                                //$NON-NLS-1$
    private static final String      ATTR_DASH_IS_LIVE_UPDATE                           = "isLiveUpdate";                                     //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_LOG_DETAILS                           = "isLogDetails";                                     //$NON-NLS-1$
    private static final String      ATTR_DASH_NUM_UI_COLUMNS                           = "uiColumns";                                        //$NON-NLS-1$
    private static final String      ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH = "stateTooltipDisplayAbsoluteFilePath";              //$NON-NLS-1$
    private static final String      ATTR_DASH_STATE_TOOLTIP_WIDTH                      = "stateTooltipWidth";                                //$NON-NLS-1$
@@ -676,49 +677,53 @@ public class EasyImportManager {
 
    private void loadEasyConfig_20_Dash(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
-      dashConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento, //
+      dashConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_ANIMATION_CRAZY_FACTOR,
             EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT,
             EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN,
             EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
 
-      dashConfig.animationDuration = Util.getXmlInteger(xmlMemento, //
+      dashConfig.animationDuration = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_ANIMATION_DURATION,
             EasyConfig.ANIMATION_DURATION_DEFAULT,
             EasyConfig.ANIMATION_DURATION_MIN,
             EasyConfig.ANIMATION_DURATION_MAX);
 
-      dashConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, //
+      dashConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_BACKGROUND_OPACITY,
             EasyConfig.BACKGROUND_OPACITY_DEFAULT,
             EasyConfig.BACKGROUND_OPACITY_MIN,
             EasyConfig.BACKGROUND_OPACITY_MAX);
 
-      dashConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento, //
+      dashConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_NUM_UI_COLUMNS,
             EasyConfig.HORIZONTAL_TILES_DEFAULT,
             EasyConfig.HORIZONTAL_TILES_MIN,
             EasyConfig.HORIZONTAL_TILES_MAX);
 
-      dashConfig.stateToolTipDisplayAbsoluteFilePath = Util.getXmlBoolean(xmlMemento, //
+      dashConfig.stateToolTipDisplayAbsoluteFilePath = Util.getXmlBoolean(xmlMemento,
             ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH,
-            EasyConfig.STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH);
+            EasyConfig.STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH);
 
-      dashConfig.stateToolTipWidth = Util.getXmlInteger(xmlMemento, //
+      dashConfig.stateToolTipWidth = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_STATE_TOOLTIP_WIDTH,
             EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT,
             EasyConfig.STATE_TOOLTIP_WIDTH_MIN,
             EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
 
-      dashConfig.tileSize = Util.getXmlInteger(xmlMemento, //
+      dashConfig.tileSize = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_TILE_SIZE,
             EasyConfig.TILE_SIZE_DEFAULT,
             EasyConfig.TILE_SIZE_MIN,
             EasyConfig.TILE_SIZE_MAX);
 
-      dashConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, //
+      dashConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento,
             ATTR_DASH_IS_LIVE_UPDATE,
-            EasyConfig.LIVE_UPDATE_DEFAULT);
+            EasyConfig.IS_LIVE_UPDATE_DEFAULT);
+
+      dashConfig.isLogDetails = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_LOG_DETAILS,
+            EasyConfig.IS_LOG_DETAILS_DEFAULT);
    }
 
    private void loadEasyConfig_30_Config(final XMLMemento xmlConfig, final EasyConfig dashConfig) {
@@ -1125,6 +1130,7 @@ public class EasyImportManager {
          xmlConfig.putInteger(ATTR_DASH_ANIMATION_DURATION, dashConfig.animationDuration);
          xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY, dashConfig.backgroundOpacity);
          xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, dashConfig.isLiveUpdate);
+         xmlConfig.putBoolean(ATTR_DASH_IS_LOG_DETAILS, dashConfig.isLogDetails);
          xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS, dashConfig.numHorizontalTiles);
          xmlConfig.putBoolean(ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH, dashConfig.stateToolTipDisplayAbsoluteFilePath);
          xmlConfig.putInteger(ATTR_DASH_STATE_TOOLTIP_WIDTH, dashConfig.stateToolTipWidth);

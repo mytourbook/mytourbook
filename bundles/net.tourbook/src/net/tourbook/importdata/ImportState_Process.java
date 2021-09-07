@@ -50,14 +50,6 @@ public class ImportState_Process {
    /**
     * IN state:
     * <p>
-    * When <code>true</code> then it is a re-import, otherwise it is a normal import, default is
-    * <code>false</code>
-    */
-   private boolean       isReimport;
-
-   /**
-    * IN state:
-    * <p>
     * Is <code>true</code> when the import is started from easy import, default is
     * <code>false</code>
     */
@@ -164,10 +156,6 @@ public class ImportState_Process {
       return isLog_OK;
    }
 
-   public boolean isReimport() {
-      return isReimport;
-   }
-
    public boolean isSilentError() {
       return isSilentError;
    }
@@ -240,19 +228,6 @@ public class ImportState_Process {
    public ImportState_Process setIsLog_OK(final boolean isLog) {
 
       isLog_OK = isLog;
-
-      return this;
-   }
-
-   /**
-    * INTERNAL state:
-    *
-    * @param isReimport
-    * @return
-    */
-   public ImportState_Process setIsReimport(final boolean isReimport) {
-
-      this.isReimport = isReimport;
 
       return this;
    }

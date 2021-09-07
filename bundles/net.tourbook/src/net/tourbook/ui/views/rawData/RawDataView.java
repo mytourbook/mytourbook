@@ -4401,9 +4401,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                monitor -> {
 
-                  final ImportState_Process importState_Process = new ImportState_Process()
-
-                        .setIsReimport(true);
+                  final ImportState_Process importState_Process = new ImportState_Process();
 
                   reimportAllImportFiles_Runnable(
                         monitor,
@@ -4717,11 +4715,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             .setIsEasyImport(true)
 
-            .setIsLog_DEFAULT(false)
-            .setIsLog_INFO(false)
-            .setIsLog_OK(false)
-
       ;
+
+      if (easyConfig.isLogDetails == false) {
+
+         // disable logging, the default is to log details
+
+         importState_Process
+
+               .setIsLog_DEFAULT(false)
+               .setIsLog_INFO(false)
+               .setIsLog_OK(false)
+
+         ;
+      }
 
       if (RawDataManager.isAutoOpenImportLog()) {
          TourLogManager.showLogView();
@@ -5863,11 +5870,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // run animation only when it was modified
          _isRunDashboardAnimation = true;
       }
+
       easyConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
       easyConfig.animationDuration = modifiedConfig.animationDuration;
 
       easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
       easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
+      easyConfig.isLogDetails = modifiedConfig.isLogDetails;
       easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
       easyConfig.stateToolTipDisplayAbsoluteFilePath = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
       easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;

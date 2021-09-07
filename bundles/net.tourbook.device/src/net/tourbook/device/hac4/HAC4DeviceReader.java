@@ -234,8 +234,12 @@ public class HAC4DeviceReader extends TourbookDevice {
                break;
             }
 
+//            if (importState_Process.isImportCanceled_ByMonitor().get()) {
+//               break;
+//            }
+
             /*
-             * read tour data
+             * Read tour data
              */
 
             fileRawData.seek(offsetAARecord);
@@ -436,10 +440,8 @@ public class HAC4DeviceReader extends TourbookDevice {
                   // adjust altitude from relative to absolute
                   absoluteAltitude += timeData.altitude;
 
-                  tourData.setTourAltUp(tourData.getTourAltUp()
-                        + ((timeData.altitude > 0) ? timeData.altitude : 0));
-                  tourData.setTourAltDown(tourData.getTourAltDown()
-                        + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+                  tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0));
+                  tourData.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0));
 
                   sumDistance += timeData.distance;
                   sumAltitude += Math.abs(absoluteAltitude);
@@ -495,6 +497,8 @@ public class HAC4DeviceReader extends TourbookDevice {
                tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
                tourData.computeTourMovingTime();
                tourData.computeComputedValues();
+
+               importState_File.isFileImportedWithValidData = true;
             }
 
             // tourData.dumpTourTotal();
@@ -562,8 +566,6 @@ public class HAC4DeviceReader extends TourbookDevice {
       deviceData.transferYear = hac4DeviceData.transferYear;
       deviceData.transferMonth = hac4DeviceData.transferMonth;
       deviceData.transferDay = hac4DeviceData.transferDay;
-
-      importState_File.isFileImportedWithValidData = true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {

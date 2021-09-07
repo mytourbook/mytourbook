@@ -582,11 +582,10 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
       {
          /*
-          * Checkbox: Skip tours for which the import file is not found
+          * Checkbox: Log Details
           */
          _chkLogDetails = new Button(parent, SWT.CHECK);
-         _chkLogDetails.setText(Messages.Dialog_ReimportTours_Checkbox_LogDetails);
-         GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(_chkLogDetails);
+         _chkLogDetails.setText(Messages.Tour_Log_Checkbox_LogDetails);
       }
    }
 
@@ -618,7 +617,6 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       ImportState_Process importState_Process = new ImportState_Process()
 
-            .setIsReimport(true)
             .setIsSkipToursWithFileNotFound(isSkipToursWithFileNotFound);
 
       if (isLogDetails == false) {

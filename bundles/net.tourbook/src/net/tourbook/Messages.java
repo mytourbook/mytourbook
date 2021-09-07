@@ -368,8 +368,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_State_ON;
 
    public static String        Dialog_ImportConfig_Tab_Configuration;
-   public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
+   public static String        Dialog_ImportConfig_Tab_Options;
 
    public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
@@ -398,7 +398,6 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Checkbox_EntireTour;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip;
-   public static String        Dialog_ReimportTours_Checkbox_LogDetails;
    public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
    public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
    public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
@@ -2560,6 +2559,7 @@ public class Messages extends NLS {
 
    public static String Tour_Log_Action_Clear_Tooltip;
    public static String Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;
+   public static String Tour_Log_Checkbox_LogDetails;
    public static String Tour_Log_Info_TourLogWasCopied;
 
    public static String TourManager_Dialog_OutOfSyncError_Message;

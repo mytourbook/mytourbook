@@ -72,8 +72,6 @@ public class Polar_PDD_Data {
 
    private ArrayList<String>      _exerciseFiles        = new ArrayList<>();
 
-   private boolean                _isReimport;
-
    private class Day {
 
       private ZonedDateTime date;
@@ -280,7 +278,7 @@ public class Polar_PDD_Data {
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
 
       final ImportState_File importState_File = new ImportState_File();
-      final ImportState_Process importState_Process = new ImportState_Process().setIsReimport(_isReimport);
+      final ImportState_Process importState_Process = new ImportState_Process();
 
       deviceDataReader.processDeviceData(
             importFilePath.toOSString(),
