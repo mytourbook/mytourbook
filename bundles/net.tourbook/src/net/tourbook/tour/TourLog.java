@@ -15,22 +15,27 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 
 class TourLog {
 
-   private static final char NL = UI.NEW_LINE;
+   private static final char    NL          = UI.NEW_LINE;
 
-   public String             time;
-   public String             threadName;
+   private static AtomicInteger _logCounter = new AtomicInteger();
 
-   public TourLogState       state;
+   public int                   logNumber;
+   public String                time;
+   public String                threadName;
 
-   public String             message;
-   public boolean            isSubLogItem;
+   public TourLogState          state;
+   public String                message;
 
-   public String             css;
+   public boolean               isSubLogItem;
+
+   public String                css;
 
    public TourLog(final TourLogState state, final String message) {
 
@@ -40,6 +45,13 @@ class TourLog {
 
       this.state = state;
       this.message = message;
+
+      this.logNumber = _logCounter.incrementAndGet();
+   }
+
+   public static void clear() {
+
+      _logCounter.set(0);
    }
 
    @Override

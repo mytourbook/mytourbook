@@ -638,16 +638,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
     */
    private void cloneEasyConfig(final EasyConfig easyConfig) {
 
+// SET_FORMATTING_OFF
+
       _dialogEasyConfig = new EasyConfig();
 
-      _dialogEasyConfig.animationCrazinessFactor = easyConfig.animationCrazinessFactor;
-      _dialogEasyConfig.animationDuration = easyConfig.animationDuration;
-      _dialogEasyConfig.backgroundOpacity = easyConfig.backgroundOpacity;
-      _dialogEasyConfig.isLiveUpdate = easyConfig.isLiveUpdate;
-      _dialogEasyConfig.numHorizontalTiles = easyConfig.numHorizontalTiles;
-      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = easyConfig.stateToolTipDisplayAbsoluteFilePath;
-      _dialogEasyConfig.stateToolTipWidth = easyConfig.stateToolTipWidth;
-      _dialogEasyConfig.tileSize = easyConfig.tileSize;
+      _dialogEasyConfig.animationCrazinessFactor               = easyConfig.animationCrazinessFactor;
+      _dialogEasyConfig.animationDuration                      = easyConfig.animationDuration;
+      _dialogEasyConfig.backgroundOpacity                      = easyConfig.backgroundOpacity;
+      _dialogEasyConfig.isLiveUpdate                           = easyConfig.isLiveUpdate;
+      _dialogEasyConfig.isLogDetails                           = easyConfig.isLogDetails;
+      _dialogEasyConfig.numHorizontalTiles                     = easyConfig.numHorizontalTiles;
+      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath    = easyConfig.stateToolTipDisplayAbsoluteFilePath;
+      _dialogEasyConfig.stateToolTipWidth                      = easyConfig.stateToolTipWidth;
+      _dialogEasyConfig.tileSize                               = easyConfig.tileSize;
+
+// SET_FORMATTING_ON      
 
       final ImportConfig activeImportConfig = easyConfig.getActiveImportConfig();
 
@@ -2669,6 +2674,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _chkOptions_LogDetails = new Button(parent, SWT.CHECK);
          _chkOptions_LogDetails.setText(Messages.Tour_Log_Checkbox_LogDetails);
+         _chkOptions_LogDetails.addSelectionListener(_liveUpdateListener);
          GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkOptions_LogDetails);
       }
    }

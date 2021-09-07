@@ -68,6 +68,8 @@ public class TourLogManager {
 
       _logView.clear();
       _allTourLogs.clear();
+
+      TourLog.clear();
    }
 
    public static CopyOnWriteArrayList<TourLog> getLogs() {

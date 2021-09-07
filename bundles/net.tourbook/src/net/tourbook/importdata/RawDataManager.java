@@ -2056,6 +2056,8 @@ public class RawDataManager {
    private void importTours_FromMultipleFiles_30_OneFile(final ImportFile filePath,
                                                          final ImportState_Process importState_Process) {
 
+      final long start = System.nanoTime();
+
       final String osFilePath = filePath.osFilePath;
       File importFile = new File(osFilePath);
 
@@ -2077,6 +2079,11 @@ public class RawDataManager {
             importState_Process //
       );
 
+      final long end = System.nanoTime();
+
+      final double timeDiff = (end - start) / 1_000_000_000.0;
+      final String importTime = String.format("%2.3f s ∙ ", timeDiff);
+
       if (importState_File.isFileImportedWithValidData) {
 
          // update state
@@ -2084,9 +2091,16 @@ public class RawDataManager {
 
             importedTourData.isBackupImportFile = filePath.isBackupImportFile;
 
+            String numTimeSlices = UI.EMPTY_STRING;
+
+            if (importedTourData.timeSerie != null) {
+               numTimeSlices = String.format("%5d # ∙ ", importedTourData.timeSerie.length);
+            }
+
             if (importState_Process.isLog_OK()) {
 
-               TourLogManager.subLog_OK(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+               // {0} ← {1}
+               TourLogManager.subLog_OK(importTime + numTimeSlices + NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
                      importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                      osFilePath));
             }
@@ -2097,7 +2111,7 @@ public class RawDataManager {
          // reduce log noise: log only when more than ONE tour is imported from ONE file
          if (importState_Process.isLog_INFO() && numImportedToursFromOneFile > 1) {
 
-            TourLogManager.subLog_INFO(NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
+            TourLogManager.subLog_INFO(importTime + NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
                   numImportedToursFromOneFile,
                   osFilePath));
          }
@@ -2111,7 +2125,7 @@ public class RawDataManager {
          if (importState_File.isImportLogged == false) {
 
             // do default logging
-            TourLogManager.subLog_ERROR(String.format("[Import failed] %s", osFilePath));
+            TourLogManager.subLog_ERROR(importTime + String.format("[Import failed] %s", osFilePath));
          }
       }
 
