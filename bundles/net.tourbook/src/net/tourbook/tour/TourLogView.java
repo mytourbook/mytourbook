@@ -37,9 +37,11 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -84,6 +86,8 @@ public class TourLogView extends ViewPart {
    private static final String            STATE_OK                         = "OK";                                   //$NON-NLS-1$
    private static final String            STATE_SAVE                       = "SAVE";                                 //$NON-NLS-1$
 
+   private static final String            STATE_IS_UI_COLORFULL            = "STATE_IS_UI_COLORFULL";                //$NON-NLS-1$
+
    public static final String             CSS_LOG_INFO                     = "info";                                 //$NON-NLS-1$
    private static final String            CSS_LOG_ITEM                     = "logItem";                              //$NON-NLS-1$
    private static final String            CSS_LOG_SUB_ITEM                 = "subItem";                              //$NON-NLS-1$
@@ -93,15 +97,17 @@ public class TourLogView extends ViewPart {
    private static final String            WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                  //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStore                       = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state                           = TourbookPlugin.getState(ID);
 
    private IPartListener2                 _partListener;
    private IPropertyChangeListener        _prefChangeListener;
 
    private Action                         _action_CopyIntoClipboard;
-   private Action                         _action_Reset;
+   private Action                         _action_Clear;
+   private Action_ToggleSimpleOrColor     _action_ToggleSimpleOrColor;
 
-   private boolean                        _isNewUI;
    private boolean                        _isBrowserCompleted;
+   private boolean                        _isUIColorfull;
 
    private String                         _tourLogCSS;
    private String                         _noBrowserLog                    = UI.EMPTY_STRING;
@@ -131,6 +137,20 @@ public class TourLogView extends ViewPart {
 
    private Font      _zoomFont;
 
+   private class Action_ClearView extends Action {
+
+      public Action_ClearView() {
+
+         setText(Messages.Tour_Log_Action_Clear_Tooltip);
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
+      }
+
+      @Override
+      public void run() {
+         onAction_ClearView();
+      }
+   }
+
    private class Action_CopyLogValuesIntoClipboard extends Action {
 
       Action_CopyLogValuesIntoClipboard() {
@@ -150,17 +170,17 @@ public class TourLogView extends ViewPart {
       }
    }
 
-   private class Action_Reset extends Action {
+   private class Action_ToggleSimpleOrColor extends Action {
 
-      public Action_Reset() {
+      public Action_ToggleSimpleOrColor() {
 
-         setText(Messages.Tour_Log_Action_Clear_Tooltip);
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
+         setText(Messages.Tour_Log_Action_TourLogLayout_Tooltip);
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLog_Layout_Color));
       }
 
       @Override
       public void run() {
-         onAction_ClearView();
+         onAction_ToggleSimpleOrColorUI();
       }
    }
 
@@ -240,7 +260,7 @@ public class TourLogView extends ViewPart {
          allLogsWithoutJs.add(createLogMessage_NoJs(tourLog_InQueue, getStateImage_NoBrowser(tourLog_InQueue.state)));
       });
 
-      if (isBrowserAvailable()) {
+      if (isBrowserAvailable() && _isUIColorfull) {
 
 //         final long start = System.currentTimeMillis();
 
@@ -273,7 +293,7 @@ public class TourLogView extends ViewPart {
 
       } else {
 
-         final StringBuilder logText = new StringBuilder();
+         final StringBuilder sb = new StringBuilder();
 
          final boolean isFirst[] = { false };
 
@@ -282,16 +302,16 @@ public class TourLogView extends ViewPart {
             if (isFirst[0] == false) {
                isFirst[0] = true;
             } else {
-               logText.append(UI.NEW_LINE);
+               sb.append(UI.NEW_LINE);
             }
 
             final String convertedMessage = WEB.convertHTML_Into_JavaLineBreaks(logMessage);
 
-            logText.append(convertedMessage);
+            sb.append(convertedMessage);
 
          });
 
-         addLog_20_NoBrowser(logText.toString());
+         addLog_20_NoBrowser(sb.toString());
 
       }
 
@@ -379,15 +399,16 @@ public class TourLogView extends ViewPart {
    public void clear() {
 
       _noBrowserLog = UI.EMPTY_STRING;
-      _txtNoBrowser.setText(_noBrowserLog);
+      _txtNoBrowser.setText(UI.EMPTY_STRING);
 
       updateUI_InitBrowser();
    }
 
    private void createActions() {
 
-      _action_Reset = new Action_Reset();
+      _action_Clear = new Action_ClearView();
       _action_CopyIntoClipboard = new Action_CopyLogValuesIntoClipboard();
+      _action_ToggleSimpleOrColor = new Action_ToggleSimpleOrColor();
    }
 
    private String createHTML() {
@@ -459,7 +480,7 @@ public class TourLogView extends ViewPart {
          ;
       }
 
-      final String maxRows = Integer.toString(5000);
+      final String maxRows = Integer.toString(1000);
 
       final String js = UI.EMPTY_STRING
 
@@ -503,7 +524,7 @@ public class TourLogView extends ViewPart {
             // time can be > 100ms for the js code, this code is now not more than 10ms
             + "var allRows = htmlSectionElement.rows"                                     + NL //$NON-NLS-1$
             + "var numRows = allRows.length"                                              + NL //$NON-NLS-1$
-            + "if (numRows > " + maxRows + ") {"                                          + NL //$NON-NLS-1$
+            + "if (numRows > " + maxRows + ") {"                                          + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // delete top row
             + "   htmlSectionElement.deleteRow(0)"                                        + NL //$NON-NLS-1$
@@ -526,7 +547,7 @@ public class TourLogView extends ViewPart {
             ? UI.SPACE3
             : UI.EMPTY_STRING;
 
-      final String separator = "\t";
+      final String separator = "";//"\t"; //$NON-NLS-1$
 
       return String.format(UI.EMPTY_STRING
 
@@ -678,6 +699,7 @@ public class TourLogView extends ViewPart {
 
       final boolean isLogAvailable = TourLogManager.getLogs().size() > 0;
 
+      _action_Clear.setEnabled(isLogAvailable);
       _action_CopyIntoClipboard.setEnabled(isLogAvailable);
    }
 
@@ -689,7 +711,8 @@ public class TourLogView extends ViewPart {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_action_CopyIntoClipboard);
-      tbm.add(_action_Reset);
+      tbm.add(_action_ToggleSimpleOrColor);
+      tbm.add(_action_Clear);
    }
 
    private String getStateImage_NoBrowser(final TourLogState state) {
@@ -856,6 +879,17 @@ public class TourLogView extends ViewPart {
       }
    }
 
+   private void onAction_ToggleSimpleOrColorUI() {
+
+      _isUIColorfull = !_isUIColorfull;
+
+      updateUI_ToggleSimpleOrColor();
+
+      _noBrowserLog = UI.EMPTY_STRING;
+
+      updateUI();
+   }
+
    private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
@@ -917,7 +951,14 @@ public class TourLogView extends ViewPart {
 
    private void restoreState() {
 
-      _isNewUI = TourbookPlugin.getPrefStore().getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
+      _isUIColorfull = Util.getStateBoolean(_state, STATE_IS_UI_COLORFULL, true);
+   }
+
+   @PersistState
+   private void saveState() {
+
+      // keep selected tours
+      _state.put(STATE_IS_UI_COLORFULL, _isUIColorfull);
    }
 
    @Override
@@ -933,7 +974,7 @@ public class TourLogView extends ViewPart {
     */
    private void updateUI() {
 
-      if (_isNewUI) {
+      if (_isUIColorfull) {
 
          createUI_10_NewUI();
 
@@ -958,14 +999,27 @@ public class TourLogView extends ViewPart {
          /*
           * Show already available log entries
           */
-         for (final TourLog tourLog : TourLogManager.getLogs()) {
+         final StringBuilder sb = new StringBuilder();
+         final CopyOnWriteArrayList<TourLog> allTourLogs = TourLogManager.getLogs();
 
-            final String noBrowserText = createLogMessage_NoJs(tourLog, getStateImage_NoBrowser(tourLog.state));
+         for (int logIndex = 0; logIndex < allTourLogs.size(); logIndex++) {
 
-            addLog_20_NoBrowser(noBrowserText);
+            final TourLog tourLog = allTourLogs.get(logIndex);
+
+            if (logIndex > 0) {
+               sb.append(UI.NEW_LINE);
+            }
+
+            final String logMessage = createLogMessage_NoJs(tourLog, getStateImage_NoBrowser(tourLog.state));
+            final String logMessage_WithLineBreaks = WEB.convertHTML_Into_JavaLineBreaks(logMessage);
+
+            sb.append(logMessage_WithLineBreaks);
          }
+
+         addLog_20_NoBrowser(sb.toString());
       }
 
+      updateUI_ToggleSimpleOrColor();
    }
 
    private void updateUI_InitBrowser() {
@@ -979,6 +1033,18 @@ public class TourLogView extends ViewPart {
       _isBrowserCompleted = false;
 
       _browser.setText(html);
+   }
+
+   private void updateUI_ToggleSimpleOrColor() {
+
+      if (_isUIColorfull) {
+
+         _action_ToggleSimpleOrColor.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLog_Layout_Color));
+
+      } else {
+
+         _action_ToggleSimpleOrColor.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLog_Layout_Simple));
+      }
    }
 
 }

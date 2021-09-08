@@ -2559,6 +2559,7 @@ public class Messages extends NLS {
 
    public static String Tour_Log_Action_Clear_Tooltip;
    public static String Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;
+   public static String Tour_Log_Action_TourLogLayout_Tooltip;
    public static String Tour_Log_Checkbox_LogDetails;
    public static String Tour_Log_Info_TourLogWasCopied;
 

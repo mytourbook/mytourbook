@@ -435,7 +435,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private boolean                       _isBrowserCompleted;
    private boolean                       _isInUIStartup;
    private boolean                       _isInUpdate;
-   private boolean                       _isNewUI;
+   private boolean                       _isEasyImportUI;
 
    /**
     * When <code>false</code> then the background WatchStores task must set it valid. Only when it
@@ -572,7 +572,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // do a 2nd sorting by date/time
          if (result == 0) {
-            result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+
+            result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS()
+                  ? 1
+                  : -1;
          }
 
          // if descending order, flip the direction
@@ -4323,8 +4326,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void onSelectUI_New() {
 
-      _isNewUI = true;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
+      _isEasyImportUI = true;
+      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
 
       updateUI_1_TopPage(true);
 
@@ -4335,8 +4338,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       resetEasyImport();
 
-      _isNewUI = false;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
+      _isEasyImportUI = false;
+      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
 
       updateUI_1_TopPage(true);
    }
@@ -4598,7 +4601,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void restoreState() {
 
-      _isNewUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
+      _isEasyImportUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
 
       _actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
             _state,
@@ -5427,7 +5430,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else {
 
-         if (_isNewUI) {
+         if (_isEasyImportUI) {
 
             if (_browser != null) {
                _browser.setFocus();
@@ -5915,7 +5918,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * flickering when the view toolbar is first drawn on the left side of the view !!!
           */
 
-         if (_isNewUI) {
+         if (_isEasyImportUI) {
 
             _parent.getDisplay().asyncExec(new Runnable() {
                @Override
