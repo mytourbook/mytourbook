@@ -5249,7 +5249,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
       for (double maxGeoDiff = MAX_GEO_DIFF; maxGeoDiff <= 1;) {
 
-         for (int timeDiffRange = 0; timeDiffRange < 1000; timeDiffRange++) {
+         for (int timeDiffRange = 0; timeDiffRange < 1000;) {
 
             final int timeDiffRangeMS = timeDiffRange * 1000;
 
@@ -5328,6 +5328,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                // all waypoints are converted
 
                break;
+            }
+
+            if (timeDiffRange < 100) {
+               timeDiffRange += 10;
+            } else {
+               timeDiffRange += 100;
             }
          }
 
