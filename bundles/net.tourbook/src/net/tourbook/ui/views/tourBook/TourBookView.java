@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -862,13 +863,52 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    void actionExportViewCSV() {
 
-      // get selected items
-      final ITreeSelection selection = (ITreeSelection) _tourViewer_Tree.getSelection();
+      /*
+       * Get selected items
+       */
+      final ISelection selection;
+
+      if (_isLayoutNatTable) {
+
+         // flat view
+
+         final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
+         final List<TVITourBookTour> selectedTVITours = rowSelectionModel.getSelectedRowObjects();
+
+         final List<TVITourBookTour> sortedItems = new ArrayList<>();
+
+         for (final Object element : selectedTVITours) {
+
+            if (element instanceof TVITourBookTour) {
+
+               final TVITourBookTour tviTour = (TVITourBookTour) element;
+
+               // collect only fetched items, the other are "empty" !!!
+               if (tviTour.colTourDateTime != null) {
+
+                  sortedItems.add(tviTour);
+               }
+            }
+         }
+
+         Collections.sort(sortedItems);
+
+         selection = new StructuredSelection(sortedItems);
+
+      } else {
+
+         // tree view
+
+         selection = _tourViewer_Tree.getSelection();
+      }
 
       if (selection.isEmpty()) {
          return;
       }
 
+      /*
+       * Get export filename
+       */
       final String defaultExportFilePath = _state.get(STATE_CSV_EXPORT_PATH);
 
       final String defaultExportFileName = CSV_EXPORT_DEFAULT_FILE_NAME
@@ -876,9 +916,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             + UI.SYMBOL_DOT
             + Util.CSV_FILE_EXTENSION;
 
-      /*
-       * get export filename
-       */
       final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
       dialog.setText(Messages.dialog_export_file_dialog_text);
 
@@ -2036,6 +2073,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       if (_isLayoutNatTable) {
 
+         // flat view
+
          final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
 
          final List<TVITourBookTour> selectedTVITours = rowSelectionModel.getSelectedRowObjects();
@@ -2051,47 +2090,47 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //            tourIds.add(_hoveredTourId);
 //         }
 
-         return tourIds;
-
       } else {
 
+         // tree view
+
          selectedTours = _tourViewer_Tree.getStructuredSelection();
-      }
 
-      /*
-       * Convert selected items into selected tour id's
-       */
-      final boolean isSelectAllInHierarchy = _actionSelectAllTours.isChecked();
+         /*
+          * Convert selected items into selected tour id's
+          */
+         final boolean isSelectAllInHierarchy = _actionSelectAllTours.isChecked();
 
-      for (final Object viewItem : selectedTours) {
+         for (final Object viewItem : selectedTours) {
 
-         if (viewItem instanceof TVITourBookYear) {
+            if (viewItem instanceof TVITourBookYear) {
 
-            // one year is selected
+               // one year is selected
 
-            if (isSelectAllInHierarchy) {
+               if (isSelectAllInHierarchy) {
 
-               // loop: all months
-               for (final TreeViewerItem viewerItem : ((TVITourBookYear) viewItem).getFetchedChildren()) {
-                  if (viewerItem instanceof TVITourBookYearCategorized) {
-                     getYearSubTourIDs((TVITourBookYearCategorized) viewerItem, tourIds);
+                  // loop: all months
+                  for (final TreeViewerItem viewerItem : ((TVITourBookYear) viewItem).getFetchedChildren()) {
+                     if (viewerItem instanceof TVITourBookYearCategorized) {
+                        getYearSubTourIDs((TVITourBookYearCategorized) viewerItem, tourIds);
+                     }
                   }
                }
+
+            } else if (viewItem instanceof TVITourBookYearCategorized) {
+
+               // one month/week is selected
+
+               if (isSelectAllInHierarchy) {
+                  getYearSubTourIDs((TVITourBookYearCategorized) viewItem, tourIds);
+               }
+
+            } else if (viewItem instanceof TVITourBookTour) {
+
+               // one tour is selected
+
+               tourIds.add(((TVITourBookTour) viewItem).getTourId());
             }
-
-         } else if (viewItem instanceof TVITourBookYearCategorized) {
-
-            // one month/week is selected
-
-            if (isSelectAllInHierarchy) {
-               getYearSubTourIDs((TVITourBookYearCategorized) viewItem, tourIds);
-            }
-
-         } else if (viewItem instanceof TVITourBookTour) {
-
-            // one tour is selected
-
-            tourIds.add(((TVITourBookTour) viewItem).getTourId());
          }
       }
 

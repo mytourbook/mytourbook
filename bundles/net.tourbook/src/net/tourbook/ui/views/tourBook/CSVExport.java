@@ -34,7 +34,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 
 public class CSVExport {
@@ -207,7 +209,7 @@ public class CSVExport {
     *           When <code>true</code> then the CSVTourDataReader can read the exported file,
     *           otherwise all values are exported
     */
-   CSVExport(final ITreeSelection selection,
+   CSVExport(final ISelection selection,
              final String selectedFilePath,
              final TourBookView tourBookView,
              final boolean isUseSimpleCSVFormat) {
@@ -229,7 +231,7 @@ public class CSVExport {
 
    }
 
-   private void csvExport_DefaultFormat(final ITreeSelection selection, final String selectedFilePath) {
+   private void csvExport_DefaultFormat(final ISelection selection, final String selectedFilePath) {
 
       try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
@@ -256,49 +258,89 @@ public class CSVExport {
 
          exportWriter.write(sb.toString());
 
-         for (final TreePath treePath : selection.getPaths()) {
+         if (selection instanceof ITreeSelection) {
 
-            // truncate buffer
-            sb.setLength(0);
+            for (final TreePath treePath : ((ITreeSelection) selection).getPaths()) {
 
-            final int numSegment = treePath.getSegmentCount();
+               // truncate buffer
+               sb.setLength(0);
 
-            for (int segmentIndex = 0; segmentIndex < numSegment; segmentIndex++) {
+               final int numSegment = treePath.getSegmentCount();
 
-               final Object segment = treePath.getSegment(segmentIndex);
-               final boolean isTour = segment instanceof TVITourBookTour;
+               for (int segmentIndex = 0; segmentIndex < numSegment; segmentIndex++) {
 
-               export_400_Value_DateColumns(sb, numSegment, segment, isTour);
+                  final Object segment = treePath.getSegment(segmentIndex);
+                  final boolean isTour = segment instanceof TVITourBookTour;
 
-               if (segment instanceof TVITourBookItem) {
+                  export_400_Value_DateColumns(sb, numSegment, segment, isTour);
 
-                  final TVITourBookItem tviItem = (TVITourBookItem) segment;
+                  if (segment instanceof TVITourBookItem) {
 
-                  // output data only for the last segment
-                  if (numSegment == 1
-                        || (numSegment == 2 && segmentIndex == 1)
-                        || (numSegment == 3 && segmentIndex == 2)) {
+                     final TVITourBookItem tviItem = (TVITourBookItem) segment;
 
-                     export_500_Value_Time(sb, isTour, tviItem);
-                     export_520_Value_Tour(sb, isTour, tviItem);
-                     export_540_Value_Motion(sb, tviItem);
-                     export_560_Value_Elevation(sb, tviItem);
-                     export_580_Value_Weather(sb, isTour, tviItem);
-                     export_600_Value_Body(sb, isTour, tviItem);
-                     export_620_Value_Power(sb, tviItem);
-                     export_640_Value_Powertrain(sb, tviItem);
-                     export_660_Value_Training(sb, tviItem);
-                     export_680_Value_RunningDynamics(sb, tviItem);
-                     export_700_Value_Surfing(sb, tviItem);
-                     export_720_Value_Device(sb, isTour, tviItem);
-                     export_740_Value_Data(sb, isTour, tviItem);
+                     // output data only for the last segment
+                     if (numSegment == 1
+                           || (numSegment == 2 && segmentIndex == 1)
+                           || (numSegment == 3 && segmentIndex == 2)) {
+
+                        export_500_Value_Time(sb, isTour, tviItem);
+                        export_520_Value_Tour(sb, isTour, tviItem);
+                        export_540_Value_Motion(sb, tviItem);
+                        export_560_Value_Elevation(sb, tviItem);
+                        export_580_Value_Weather(sb, isTour, tviItem);
+                        export_600_Value_Body(sb, isTour, tviItem);
+                        export_620_Value_Power(sb, tviItem);
+                        export_640_Value_Powertrain(sb, tviItem);
+                        export_660_Value_Training(sb, tviItem);
+                        export_680_Value_RunningDynamics(sb, tviItem);
+                        export_700_Value_Surfing(sb, tviItem);
+                        export_720_Value_Device(sb, isTour, tviItem);
+                        export_740_Value_Data(sb, isTour, tviItem);
+                     }
                   }
                }
+
+               // end of line
+               sb.append(NL);
+               exportWriter.write(sb.toString());
             }
 
-            // end of line
-            sb.append(NL);
-            exportWriter.write(sb.toString());
+         } else if (selection instanceof StructuredSelection) {
+
+            final StructuredSelection structuredSelection = (StructuredSelection) selection;
+
+            for (final Object element : structuredSelection) {
+
+               if (element instanceof TVITourBookTour) {
+
+                  final TVITourBookItem tviItem = (TVITourBookItem) element;
+
+                  // truncate buffer
+                  sb.setLength(0);
+
+                  final boolean isTour = true;
+
+                  export_410_Value_DateColumns(sb, tviItem);
+
+                  export_500_Value_Time(sb, isTour, tviItem);
+                  export_520_Value_Tour(sb, isTour, tviItem);
+                  export_540_Value_Motion(sb, tviItem);
+                  export_560_Value_Elevation(sb, tviItem);
+                  export_580_Value_Weather(sb, isTour, tviItem);
+                  export_600_Value_Body(sb, isTour, tviItem);
+                  export_620_Value_Power(sb, tviItem);
+                  export_640_Value_Powertrain(sb, tviItem);
+                  export_660_Value_Training(sb, tviItem);
+                  export_680_Value_RunningDynamics(sb, tviItem);
+                  export_700_Value_Surfing(sb, tviItem);
+                  export_720_Value_Device(sb, isTour, tviItem);
+                  export_740_Value_Data(sb, isTour, tviItem);
+
+                  // end of line
+                  sb.append(NL);
+                  exportWriter.write(sb.toString());
+               }
+            }
          }
 
       } catch (final IOException e) {
@@ -306,7 +348,7 @@ public class CSVExport {
       }
    }
 
-   private void csvExport_SimpleFormat(final ITreeSelection selection, final String selectedFilePath) {
+   private void csvExport_SimpleFormat(final ISelection selection, final String selectedFilePath) {
 
       try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
@@ -330,58 +372,30 @@ public class CSVExport {
 
          exportWriter.write(sb.toString());
 
-         for (final TreePath treePath : selection.getPaths()) {
+         if (selection instanceof ITreeSelection) {
 
-            // truncate buffer
-            sb.setLength(0);
+            for (final TreePath treePath : ((ITreeSelection) selection).getPaths()) {
 
-            final int numSegment = treePath.getSegmentCount();
+               final int numSegment = treePath.getSegmentCount();
 
-            for (int segmentIndex = 0; segmentIndex < numSegment; segmentIndex++) {
+               for (int segmentIndex = 0; segmentIndex < numSegment; segmentIndex++) {
 
-               final Object segment = treePath.getSegment(segmentIndex);
+                  final Object segment = treePath.getSegment(segmentIndex);
 
-               if (segment instanceof TVITourBookTour) {
+                  if (segment instanceof TVITourBookTour) {
 
-                  final TVITourBookTour tviTour = (TVITourBookTour) segment;
+                     csvExport_SimpleFormat_Tour(exportWriter, (TVITourBookTour) segment);
+                  }
+               }
+            }
 
-                  final TourDateTime colDateTime = tviTour.colTourDateTime;
-                  final ZonedDateTime tourZonedDateTime = colDateTime.tourZonedDateTime;
+         } else if (selection instanceof StructuredSelection) {
 
-                  final long tourTypeId = tviTour.getTourTypeId();
-                  final String tourTypeLabel = net.tourbook.ui.UI.getTourTypeLabel(tourTypeId);
-                  final String tagNames = TourDatabase.getTagNames(tviTour.getTagIds());
+            for (final Object element : (StructuredSelection) selection) {
 
-                  sb.append(String.format(UI.EMPTY_STRING
+               if (element instanceof TVITourBookTour) {
 
-                        + "%04d-%02d-%02d;" // date
-                        + "%02d-%02d;" // time
-                        ,
-
-                        tourZonedDateTime.getYear(), //                    // Date (yyyy-mm-dd);
-                        tourZonedDateTime.getMonthValue(),
-                        tourZonedDateTime.getDayOfMonth(),
-
-                        tourZonedDateTime.getHour(), //                    // Time (hh-mm);
-                        tourZonedDateTime.getMinute() //
-                  ));
-
-                  csvField(sb, tviTour.colTourDeviceTime_Recorded); //     // Duration (sec);
-                  csvField(sb, tviTour.colTourComputedTime_Break); //      // Paused Time (sec);
-                  csvField(sb, tviTour.colTourDistance); //                // Distance (m);
-
-                  csvField(sb, tviTour.colTourTitle); //                   // Title;
-                  csvField(sb, UI.EMPTY_STRING); //                        // Comment; !!! THIS IS NOT YET SUPPORTED !!!
-                  csvField(sb, tourTypeLabel); //                          // Tour Type;
-                  csvField(sb, tagNames); //                               // Tags;
-
-                  csvField(sb, tviTour.colAltitudeUp); //                  // Altitude Up (m);
-                  csvField(sb, tviTour.colAltitudeDown); //                // Altitude Down (m);
-
-                  // end of line
-                  sb.append(NL);
-
-                  exportWriter.write(sb.toString());
+                  csvExport_SimpleFormat_Tour(exportWriter, (TVITourBookTour) element);
                }
             }
          }
@@ -389,6 +403,49 @@ public class CSVExport {
       } catch (final IOException e) {
          StatusUtil.showStatus(e);
       }
+   }
+
+   private void csvExport_SimpleFormat_Tour(final Writer exportWriter, final TVITourBookTour tviTour) throws IOException {
+
+      final StringBuilder sb = new StringBuilder();
+
+      final TourDateTime colDateTime = tviTour.colTourDateTime;
+      final ZonedDateTime tourZonedDateTime = colDateTime.tourZonedDateTime;
+
+      final long tourTypeId = tviTour.getTourTypeId();
+      final String tourTypeLabel = net.tourbook.ui.UI.getTourTypeLabel(tourTypeId);
+      final String tagNames = TourDatabase.getTagNames(tviTour.getTagIds());
+
+      sb.append(String.format(UI.EMPTY_STRING
+
+            + "%04d-%02d-%02d;" // date
+            + "%02d-%02d;" // time
+            ,
+
+            tourZonedDateTime.getYear(), //                    // Date (yyyy-mm-dd);
+            tourZonedDateTime.getMonthValue(),
+            tourZonedDateTime.getDayOfMonth(),
+
+            tourZonedDateTime.getHour(), //                    // Time (hh-mm);
+            tourZonedDateTime.getMinute() //
+      ));
+
+      csvField(sb, tviTour.colTourDeviceTime_Recorded); //     // Duration (sec);
+      csvField(sb, tviTour.colTourComputedTime_Break); //      // Paused Time (sec);
+      csvField(sb, tviTour.colTourDistance); //                // Distance (m);
+
+      csvField(sb, tviTour.colTourTitle); //                   // Title;
+      csvField(sb, UI.EMPTY_STRING); //                        // Comment; !!! THIS IS NOT YET SUPPORTED !!!
+      csvField(sb, tourTypeLabel); //                          // Tour Type;
+      csvField(sb, tagNames); //                               // Tags;
+
+      csvField(sb, tviTour.colAltitudeUp); //                  // Altitude Up (m);
+      csvField(sb, tviTour.colAltitudeDown); //                // Altitude Down (m);
+
+      // end of line
+      sb.append(NL);
+
+      exportWriter.write(sb.toString());
    }
 
    private void csvField(final StringBuilder sb, final long fieldValue) {
@@ -832,6 +889,25 @@ public class CSVExport {
          // day
          csvField(sb, tviTour.tourDay);
       }
+   }
+
+   private void export_410_Value_DateColumns(final StringBuilder sb, final TVITourBookItem tviItem) {
+
+      // year
+      csvField(sb, tviItem.tourYear);
+      sb.append(SEPARATOR);
+
+      // month
+      csvField(sb, tviItem.tourMonth);
+      sb.append(SEPARATOR);
+
+      // week
+      csvField(sb, tviItem.colWeekNo);
+      sb.append(SEPARATOR);
+
+      // day
+      csvField(sb, tviItem.tourDay);
+      sb.append(SEPARATOR);
    }
 
    private void export_500_Value_Time(final StringBuilder sb,
