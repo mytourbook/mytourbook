@@ -96,6 +96,8 @@ public class TourLogView extends ViewPart {
    private static final String            DOM_ID_LOG                       = "logs";                                 //$NON-NLS-1$
    private static final String            WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                  //$NON-NLS-1$
 
+   private static final int               MAX_BROWSER_ITEMS                = 1000;
+
    private static final IPreferenceStore  _prefStore                       = TourbookPlugin.getPrefStore();
    private static final IDialogSettings   _state                           = TourbookPlugin.getState(ID);
 
@@ -106,6 +108,7 @@ public class TourLogView extends ViewPart {
    private Action                         _action_Clear;
    private Action_ToggleSimpleOrColor     _action_ToggleSimpleOrColor;
 
+   private boolean                        _isBrowserContentSet;
    private boolean                        _isBrowserCompleted;
    private boolean                        _isUIColorfull;
 
@@ -142,7 +145,9 @@ public class TourLogView extends ViewPart {
       public Action_ClearView() {
 
          setText(Messages.Tour_Log_Action_Clear_Tooltip);
+
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll_Disabled));
       }
 
       @Override
@@ -186,13 +191,13 @@ public class TourLogView extends ViewPart {
 
    public void addLog(final TourLog tourLog) {
 
+      _tourLog_Queue.add(tourLog);
+
       if (isBrowserAvailable() && _isBrowserCompleted == false) {
 
          // this occures when the view is opening but not yet ready
          return;
       }
-
-      _tourLog_Queue.add(tourLog);
 
       final long now = System.currentTimeMillis();
 
@@ -209,14 +214,17 @@ public class TourLogView extends ViewPart {
                return;
             }
 
-            // display at least at every interval
             if (now - _lastLogTime > 1000) {
+
+               // display at least at every interval
 
                addLog_10_UpdateUI();
 
                _lastLogTime = System.currentTimeMillis();
 
             } else {
+
+               // display when idle
 
                final int currentId = _tourLog_RunningId.get();
 
@@ -239,32 +247,35 @@ public class TourLogView extends ViewPart {
 
       List<TourLog> allLogItems;
 
+      // get current log items and cleanup queue
       synchronized (_tourLog_Queue) {
 
          if (_tourLog_Queue.isEmpty()) {
             return;
          }
 
-         // get current log items and cleanup queue
          allLogItems = _tourLog_Queue.stream().collect(Collectors.toList());
          _tourLog_Queue.clear();
       }
 
-      final StringBuilder logJs = new StringBuilder();
-      final ArrayList<String> allLogsWithoutJs = new ArrayList<>();
+      /*
+       * Create log text
+       */
+      final StringBuilder logsWithJs = new StringBuilder();
+      final ArrayList<String> allSimple = new ArrayList<>();
 
       allLogItems.forEach(tourLog_InQueue -> {
 
-         logJs.append(createLogMessage_Js(tourLog_InQueue));
+         logsWithJs.append(createLogMessage_Js(tourLog_InQueue));
 
-         allLogsWithoutJs.add(createLogMessage_NoJs(tourLog_InQueue, getStateImage_NoBrowser(tourLog_InQueue.state)));
+         allSimple.add(createLogMessage_NoJs(tourLog_InQueue, getStateImage_NoBrowser(tourLog_InQueue.state)));
       });
 
       if (isBrowserAvailable() && _isUIColorfull) {
 
-//         final long start = System.currentTimeMillis();
+         // show browser log text
 
-         _browser.execute(logJs.toString());
+         _browser.execute(logsWithJs.toString());
 
          // scroll to the bottom
          _browser.execute(UI.EMPTY_STRING
@@ -277,15 +288,12 @@ public class TourLogView extends ViewPart {
                + "html.scrollTop = scrollHeight" + NL //$NON-NLS-1$
          );
 
-//         System.out.println("time\t" + (System.currentTimeMillis() - start) + " ms");
-//// TODO remove SYSTEM.OUT.PRINTLN
-
          final boolean isLogToConsole = true;
 
          // log the log text to the console
          if (isLogToConsole) {
 
-            for (final String logText : allLogsWithoutJs) {
+            for (final String logText : allSimple) {
                final String convertedMessage = WEB.convertHTML_Into_JavaLineBreaks(logText);
                System.out.println("[TourLog] " + convertedMessage);//$NON-NLS-1$
             }
@@ -293,11 +301,13 @@ public class TourLogView extends ViewPart {
 
       } else {
 
+         // show simple log text
+
          final StringBuilder sb = new StringBuilder();
 
          final boolean isFirst[] = { false };
 
-         allLogsWithoutJs.forEach((logMessage) -> {
+         allSimple.forEach((logMessage) -> {
 
             if (isFirst[0] == false) {
                isFirst[0] = true;
@@ -312,7 +322,6 @@ public class TourLogView extends ViewPart {
          });
 
          addLog_20_NoBrowser(sb.toString());
-
       }
 
       enableControls();
@@ -480,7 +489,6 @@ public class TourLogView extends ViewPart {
          ;
       }
 
-      final String maxRows = Integer.toString(1000);
 
       final String js = UI.EMPTY_STRING
 
@@ -524,7 +532,7 @@ public class TourLogView extends ViewPart {
             // time can be > 100ms for the js code, this code is now not more than 10ms
             + "var allRows = htmlSectionElement.rows"                                     + NL //$NON-NLS-1$
             + "var numRows = allRows.length"                                              + NL //$NON-NLS-1$
-            + "if (numRows > " + maxRows + ") {"                                          + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "if (numRows > " + MAX_BROWSER_ITEMS + ") {"                                          + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // delete top row
             + "   htmlSectionElement.deleteRow(0)"                                        + NL //$NON-NLS-1$
@@ -623,11 +631,9 @@ public class TourLogView extends ViewPart {
 
          } catch (final Exception e) {
 
-//            /*
-//             * Use mozilla browser, this is necessary for Linux when default browser fails
-//             * however the XULrunner needs to be installed.
-//             */
-//            _browser = new Browser(parent, SWT.MOZILLA);
+            // use WebKit browser for Linux when default browser fails
+
+            _browser = new Browser(parent, SWT.WEBKIT);
          }
 
          if (_browser != null) {
@@ -646,9 +652,8 @@ public class TourLogView extends ViewPart {
                @Override
                public void changing(final LocationEvent event) {
 
-                  onLocation_Changing(event);
+                  onBrowser_LocationChanging(event);
                }
-
             });
          }
 
@@ -819,6 +824,8 @@ public class TourLogView extends ViewPart {
 
       TourLogManager.clear();
 
+      _isBrowserContentSet = false;
+
       enableControls();
    }
 
@@ -885,9 +892,17 @@ public class TourLogView extends ViewPart {
 
       updateUI_ToggleSimpleOrColor();
 
-      _noBrowserLog = UI.EMPTY_STRING;
+      if (_isUIColorfull && _page_WithBrowser != null && _isBrowserContentSet) {
 
-      updateUI();
+         _pageBook.showPage(_page_WithBrowser);
+
+      } else {
+
+         _noBrowserLog = UI.EMPTY_STRING;
+
+         updateUI();
+      }
+
    }
 
    private void onBrowser_Completed() {
@@ -899,19 +914,26 @@ public class TourLogView extends ViewPart {
 
       // show already logged items
       final CopyOnWriteArrayList<TourLog> importLogs = TourLogManager.getLogs();
-      for (final TourLog importLog : importLogs) {
-         addLog(importLog);
+
+      final TourLog[] allImportLogs = importLogs.toArray(new TourLog[importLogs.size()]);
+
+      final int numLogs = allImportLogs.length;
+      final int logIndexStart = Math.max(0, numLogs - MAX_BROWSER_ITEMS);
+
+      for (int logIndex = logIndexStart; logIndex < numLogs; logIndex++) {
+         addLog(allImportLogs[logIndex]);
       }
+
+      _isBrowserContentSet = numLogs > 0;
    }
 
-   private void onLocation_Changing(final LocationEvent event) {
+   private void onBrowser_LocationChanging(final LocationEvent event) {
 
       if (httpAction(event.location)) {
 
          // keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
          event.doit = false;
       }
-
    }
 
    private void onMouseWheel(final MouseEvent mouseEvent) {

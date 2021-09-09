@@ -2082,7 +2082,7 @@ public class RawDataManager {
       final long end = System.nanoTime();
 
       final double timeDiff = (end - start) / 1_000_000_000.0;
-      final String importTime = String.format("%.3f s ∙", timeDiff);
+      final String importTime = String.format("%5.3f s ∙", timeDiff);
 
       if (importState_File.isFileImportedWithValidData) {
 
@@ -2094,7 +2094,7 @@ public class RawDataManager {
             String numTimeSlices = UI.EMPTY_STRING;
 
             if (importedTourData.timeSerie != null) {
-               numTimeSlices = String.format("%7d # ∙ ", importedTourData.timeSerie.length);
+               numTimeSlices = String.format("%,7d # ∙ ", importedTourData.timeSerie.length);
             }
 
             if (importState_Process.isLog_OK()) {
