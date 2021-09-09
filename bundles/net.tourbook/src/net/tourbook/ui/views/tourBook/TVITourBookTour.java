@@ -80,15 +80,21 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
    }
 
    @Override
-   public int compareTo(final TVITourBookTour otherHrZone) {
+   public int compareTo(final TVITourBookTour tviTour) {
 
-      return
-
-      colDateTime_MS < otherHrZone.colDateTime_MS
+      int compared = colDateTime_MS < tviTour.colDateTime_MS
             ? -1
-            : colDateTime_MS == otherHrZone.colDateTime_MS
+            : colDateTime_MS == tviTour.colDateTime_MS
                   ? 0
                   : 1;
+
+      // add additional comparing when both tours have the same date/time that the sorting is unique
+      if (compared == 0) {
+
+         compared = col_ImportFileName.compareTo(tviTour.col_ImportFileName);
+      }
+
+      return compared;
    }
 
    @Override
