@@ -164,13 +164,6 @@
   } ],
   "tourSaved" : false,
   "tourStartTimeMS" : 1433091073000,
-  "tourTags" : [ {
-    "expandType" : 1,
-    "root" : true,
-    "tagId" : 0,
-    "tagName" : "Shoes 2",
-    "validForSave" : true
-  } ],
   "tourType" : {
     "colorLine_Dark" : 15243444,
     "colorText_Dark" : 6428465,
