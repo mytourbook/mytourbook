@@ -56,6 +56,14 @@ public class ImportState_Process {
    private boolean       isEasyImport;
 
    /**
+    * IN state:
+    * <p>
+    * Is <code>true</code> when the current import is run within a JUnit test, default is
+    * <code>false</code>
+    */
+   private boolean       isJUnitTest;
+
+   /**
     * INTERNAL state:
     * <p>
     * Contains a unique id so that each import can be identified.
@@ -144,6 +152,10 @@ public class ImportState_Process {
       return isImportCanceled_ByUserDialog;
    }
 
+   public boolean isJUnitTest() {
+      return isJUnitTest;
+   }
+
    public boolean isLog_DEFAULT() {
       return isLog_DEFAULT;
    }
@@ -189,6 +201,19 @@ public class ImportState_Process {
    public ImportState_Process setIsEasyImport(final boolean isEasyImport) {
 
       this.isEasyImport = isEasyImport;
+
+      return this;
+   }
+
+   /**
+    * IN state:
+    *
+    * @param isTest
+    * @return
+    */
+   public ImportState_Process setIsJUnitTest(final boolean isTest) {
+
+      isJUnitTest = isTest;
 
       return this;
    }

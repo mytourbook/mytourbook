@@ -19,12 +19,15 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -37,6 +40,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Suunto9_DeviceDataReader extends TourbookDevice {
+
+   /**
+    * This field MUST be accessed only, when {@link ImportState_Process#isJUnitTest()} == true, it
+    * is NOT save for the concurrent tour import
+    */
+   private HashMap<TourData, List<TimeData>> _processedActivities = new HashMap<>();
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -152,6 +161,8 @@ public class Suunto9_DeviceDataReader extends TourbookDevice {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
+
+            _processedActivities,
 
             importState_File,
             importState_Process,
