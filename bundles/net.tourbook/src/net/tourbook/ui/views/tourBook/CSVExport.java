@@ -233,13 +233,16 @@ public class CSVExport {
 
    private void csvExport_DefaultFormat(final ISelection selection, final String selectedFilePath) {
 
+      final boolean isFlatLayout = selection instanceof StructuredSelection;
+      final boolean isTreeLayout = selection instanceof ITreeSelection;
+
       try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
             Writer exportWriter = new BufferedWriter(outputStreamWriter)) {
 
          final StringBuilder sb = new StringBuilder();
 
-         export_100_Header_Time(sb);
+         export_100_Header_Time(sb, isTreeLayout);
          export_120_Header_Tour(sb);
          export_140_Header_Motion(sb);
          export_160_Header_Elevation(sb);
@@ -258,7 +261,7 @@ public class CSVExport {
 
          exportWriter.write(sb.toString());
 
-         if (selection instanceof ITreeSelection) {
+         if (isTreeLayout) {
 
             for (final TreePath treePath : ((ITreeSelection) selection).getPaths()) {
 
@@ -305,7 +308,7 @@ public class CSVExport {
                exportWriter.write(sb.toString());
             }
 
-         } else if (selection instanceof StructuredSelection) {
+         } else if (isFlatLayout) {
 
             final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
@@ -495,7 +498,7 @@ public class CSVExport {
       sb.append(SEPARATOR);
    }
 
-   private void export_100_Header_Time(final StringBuilder sb) {
+   private void export_100_Header_Time(final StringBuilder sb, final boolean isTreeLayout) {
 
 // SET_FORMATTING_OFF
 
@@ -514,23 +517,37 @@ public class CSVExport {
       // Year
       csvHeader(sb,                 HEADER_TIME_YEAR);
 
-      // Month or Week
-      if (isYearSubWeek()) {
+      // Month / Day / Week
+      if (isTreeLayout) {
+         
+         // the column sorting is according to the tree layout
 
-         // week / month
+         if (isYearSubWeek()) {
 
-         csvHeader(sb,              HEADER_TIME_WEEK);
-         csvHeader(sb,              HEADER_TIME_MONTH);
+            // week / month
+
+            csvHeader(sb,           HEADER_TIME_WEEK);
+            csvHeader(sb,           HEADER_TIME_MONTH);
+
+         } else {
+
+            // month / week
+
+            csvHeader(sb,           HEADER_TIME_MONTH);
+            csvHeader(sb,           HEADER_TIME_WEEK);
+         }
+
+         csvHeader(sb,              HEADER_TIME_DAY);
 
       } else {
 
-         // month / week
+         // flat layout, the preferred columns are year/month/day/week
 
          csvHeader(sb,              HEADER_TIME_MONTH);
+         csvHeader(sb,              HEADER_TIME_DAY);
          csvHeader(sb,              HEADER_TIME_WEEK);
       }
 
-      csvHeader(sb,                 HEADER_TIME_DAY);
       csvHeader(sb,                 HEADER_TIME_TOUR_START_TIME);
       csvHeader(sb,                 HEADER_TIME_ISO_DATE_TIME);
       csvHeader(sb,                 HEADER_TIME_WEEKDAY);
@@ -893,21 +910,11 @@ public class CSVExport {
 
    private void export_410_Value_DateColumns(final StringBuilder sb, final TVITourBookItem tviItem) {
 
-      // year
-      csvField(sb, tviItem.tourYear);
-      sb.append(SEPARATOR);
+      csvField(sb, tviItem.tourYear); // year
+      csvField(sb, tviItem.tourMonth); // month
+      csvField(sb, tviItem.tourDay); // day
 
-      // month
-      csvField(sb, tviItem.tourMonth);
-      sb.append(SEPARATOR);
-
-      // week
-      csvField(sb, tviItem.colWeekNo);
-      sb.append(SEPARATOR);
-
-      // day
-      csvField(sb, tviItem.tourDay);
-      sb.append(SEPARATOR);
+      csvField(sb, tviItem.colWeekNo); // week
    }
 
    private void export_500_Value_Time(final StringBuilder sb,
