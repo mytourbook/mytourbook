@@ -21,6 +21,8 @@ import java.util.HashMap;
 import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto3_DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -56,10 +58,17 @@ class Suunto3Tester {
     */
    @Test
    void testImportForestParkLaps() {
+
       final String filePath = IMPORT_FILE_PATH + "597F0A5112001700-2016-08-27T15_45_41-0"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
-		deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
+
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -71,10 +80,17 @@ class Suunto3Tester {
     */
    @Test
    void testImportTimothyLake() {
+
       final String filePath = IMPORT_FILE_PATH + "F783095113000500-2015-05-31T09_51_13-0"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
-		deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
+
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

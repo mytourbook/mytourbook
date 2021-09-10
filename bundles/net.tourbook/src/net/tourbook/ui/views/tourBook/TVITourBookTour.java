@@ -24,7 +24,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 
-public class TVITourBookTour extends TVITourBookItem {
+public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITourBookTour> {
 
    private static final String SCRAMBLE_FIELD_PREFIX = "col";                           //$NON-NLS-1$
 
@@ -34,7 +34,7 @@ public class TVITourBookTour extends TVITourBookItem {
     * The default for tour type id is not 0 because 0 is a valid tour type id and would be used even
     * when tour type id is not set.
     */
-   long                        tourTypeId             = TourDatabase.ENTITY_IS_NOT_SAVED;
+   long                        tourTypeId            = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    long                        colDateTime_MS;
    String                      colDateTime_Text;
@@ -77,6 +77,24 @@ public class TVITourBookTour extends TVITourBookItem {
       _markerIds = null;
 
       super.clearChildren();
+   }
+
+   @Override
+   public int compareTo(final TVITourBookTour tviTour) {
+
+      int compared = colDateTime_MS < tviTour.colDateTime_MS
+            ? -1
+            : colDateTime_MS == tviTour.colDateTime_MS
+                  ? 0
+                  : 1;
+
+      // add additional comparing when both tours have the same date/time that the sorting is unique
+      if (compared == 0) {
+
+         compared = col_ImportFileName.compareTo(tviTour.col_ImportFileName);
+      }
+
+      return compared;
    }
 
    @Override
@@ -176,18 +194,18 @@ public class TVITourBookTour extends TVITourBookItem {
    @Override
    public String toString() {
 
-      return "TVITourBookTour" + NL //$NON-NLS-1$
+      return NL
 
-            + "[" + NL //$NON-NLS-1$
+            + "TVITourBookTour" + NL //                           //$NON-NLS-1$
 
-            + "colDateTimeText=" + colDateTime_Text //$NON-NLS-1$
-            + NL
-            + "colTourDateTime=" + colTourDateTime + NL //$NON-NLS-1$
-            + "colTourTitle=" + colTourTitle //$NON-NLS-1$
+            + "[" + NL //                                         //$NON-NLS-1$
 
-            + NL
+            + "colDateTimeText   =" + colDateTime_Text + NL //    //$NON-NLS-1$
+            + "colTourDateTime   =" + colTourDateTime + NL //     //$NON-NLS-1$
+            + "colTourTitle      =" + colTourTitle + NL //        //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "]" + NL //                                         //$NON-NLS-1$
+      ;
    }
 
 }

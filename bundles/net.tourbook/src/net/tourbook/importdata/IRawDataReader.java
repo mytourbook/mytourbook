@@ -40,22 +40,23 @@ public interface IRawDataReader {
     *           Contains all tours which are already imported and displayed in the import view.
     *           Tour id is the hash map key. Newly imported tour should not be added to this map,
     *           they are added after this method is returned, they must be put into the parameter
-    *           <i>importedTours</i> map.
+    *           <i>newlyImportedTours</i> map.
     *           <p>
     *           This map can be used to check if a tour is already imported and displayed in the
     *           import view.
     * @param newlyImportedTours
     *           Contains all tours which are imported by this method.
-    * @param isReimport
-    *           True if this tour is re-imported, false otherwise
-    * @return Returns <code>true</code> when the import was successful, the parameters
-    *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
+    * @param importState_File
+    *           Different OUT states for the imported file
+    * @param importState_Process,
+    *           Different IN/OUT states for the whole import process
     */
-   public boolean processDeviceData(String importFilePath,
-                                    DeviceData deviceData,
-                                    Map<Long, TourData> alreadyImportedTours,
-                                    Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport);
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process);
 
    /**
     * Validate data format

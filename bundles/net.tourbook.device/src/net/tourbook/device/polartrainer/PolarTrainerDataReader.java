@@ -20,32 +20,24 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
-
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * This device reader is importing data from Polar Personaltrainer files.
  */
 public class PolarTrainerDataReader extends TourbookDevice {
 
-   private static final String           XML_POLAR_TAG = "<polar-exercise-data";       //$NON-NLS-1$
+   private static final String XML_POLAR_TAG = "<polar-exercise-data"; //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore    = TourbookPlugin.getPrefStore();
-
-   public PolarTrainerDataReader() {
-      // plugin constructor
-   }
+   // plugin constructor
+   public PolarTrainerDataReader() {}
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -78,21 +70,27 @@ public class PolarTrainerDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       if (isValidXMLFile(importFilePath, XML_POLAR_TAG) == false) {
-         return false;
+         return;
       }
 
       final PolarTrainerSAXHandler saxHandler = new PolarTrainerSAXHandler(
-            this,
+
             importFilePath,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+
+            importState_File,
+            importState_Process,
+
+            this);
 
       try {
 
@@ -101,30 +99,22 @@ public class PolarTrainerDataReader extends TourbookDevice {
          parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
       } catch (final InvalidDeviceSAXException e) {
+
          StatusUtil.log(e);
-         return false;
+
       } catch (final Exception e) {
+
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
+
       } finally {
 
          saxHandler.dispose();
-
-         if (saxHandler.isNewTourType()) {
-
-            TourDatabase.clearTourTypes();
-            TourManager.getInstance().clearTourDataCache();
-
-            // fire modify event
-            Display.getDefault().syncExec(() -> _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
-         }
       }
-
-      return saxHandler.isImported();
    }
 
    @Override
    public boolean validateRawData(final String fileName) {
+
       return isValidXMLFile(fileName, XML_POLAR_TAG);
    }
 

@@ -23,19 +23,19 @@ public enum TourLogState {
    DEFAULT,
 
    /**
-    * Tour import is OK.
+    *
     */
-   IMPORT_OK,
-
-   /**
-    * Tour import error.
-    */
-   IMPORT_ERROR,
+   OK,
 
    /**
     *
     */
-   IMPORT_EXCEPTION,
+   ERROR,
+
+   /**
+    *
+    */
+   EXCEPTION,
 
    /**
     * Show info icon in log view

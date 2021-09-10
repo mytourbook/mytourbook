@@ -2920,7 +2920,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             TourManager.saveModifiedTour(dragedTourData);
 
-            TourLogManager.logDefault(
+            TourLogManager.log_DEFAULT(
                   NLS.bind(
                         Messages.Log_Tour_MoveTour,
                         TimeTools.Formatter_Date_M.format(tourStartTime),
@@ -2942,7 +2942,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
                TourManager.saveModifiedTour(tourDataCopy);
 
-               TourLogManager.logDefault(
+               TourLogManager.log_DEFAULT(
                      NLS.bind(
                            Messages.Log_Tour_CopyTour,
                            TimeTools.Formatter_Date_M.format(tourStartTime),
