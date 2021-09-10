@@ -38,6 +38,8 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -53,9 +55,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
    private static final int  OFFSET_TOUR_DATA_START = 0x0140;
    private static final int  OFFSET_TOUR_DATA_END   = 0x10000;
 
-   private GregorianCalendar fFileDate;
-
    private class StartBlock {
+
       public int month;
       public int day;
       public int hour;
@@ -256,19 +257,20 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       final byte[] recordBuffer = new byte[RECORD_LENGTH];
 
       RandomAccessFile file = null;
 
       final HAC4ProDeviceData hac4ProDeviceData = new HAC4ProDeviceData();
+
+      GregorianCalendar fileDate = new GregorianCalendar();
 
       try {
          final File fileRaw = new File(importFilePath);
@@ -287,10 +289,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
           * get the year, because the year is not saved in the raw data file, the modified year
           * of the file is used
           */
-         fFileDate = new GregorianCalendar();
-         fFileDate.setTime(new Date(lastModified));
+         fileDate = new GregorianCalendar();
+         fileDate.setTime(new Date(lastModified));
 
-         int tourYear = fFileDate.get(Calendar.YEAR);
+         int tourYear = fileDate.get(Calendar.YEAR);
          int lastTourMonth = -1;
 
          // read device data
@@ -313,7 +315,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetDDRecord);
             bytes = file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xDD || bytes == -1) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -327,7 +329,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
             bytes = file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xAA || bytes == -1) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -336,7 +338,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
              */
             final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
             if (offsetDDRecordInAARecord != offsetDDRecord) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -571,20 +573,20 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
              * after the first implementation)
              */
             if (offsetDDRecord == initialOffsetDDRecord) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
             // check if something got wrong
             if (tourCounter++ == 1000) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
          }
 
       } catch (final IOException | NumberFormatException e) {
          e.printStackTrace();
-         returnValue = false;
+         importState_File.isFileImportedWithValidData = false;
       } finally {
          if (file != null) {
             try {
@@ -595,16 +597,12 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
          }
       }
 
-      if (returnValue) {
+      if (importState_File.isFileImportedWithValidData) {
 
-         // fImportFileName = fileName;
-
-         deviceData.transferYear = (short) fFileDate.get(Calendar.YEAR);
-         deviceData.transferMonth = (short) (fFileDate.get(Calendar.MONTH) + 1);
-         deviceData.transferDay = (short) fFileDate.get(Calendar.DAY_OF_MONTH);
+         deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
+         deviceData.transferMonth = (short) (fileDate.get(Calendar.MONTH) + 1);
+         deviceData.transferDay = (short) fileDate.get(Calendar.DAY_OF_MONTH);
       }
-
-      return returnValue;
    }
 
    /**

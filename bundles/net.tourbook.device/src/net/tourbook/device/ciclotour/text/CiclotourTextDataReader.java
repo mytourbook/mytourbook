@@ -31,6 +31,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -139,15 +141,16 @@ public class CiclotourTextDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       // immediately bail out if the file format is not correct.
       if (!validateRawData(importFilePath)) {
-         return false;
+         return;
       }
 
       final TourData tourData = new TourData();
@@ -277,7 +280,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
       }
 
-      return true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    /**

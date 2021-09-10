@@ -22,9 +22,10 @@ import java.util.HashMap;
 import javax.xml.parsers.SAXParser;
 
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.GarminDeviceDataReader;
-import net.tourbook.device.garmin.GarminSAXHandler;
+import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
+import net.tourbook.device.garmin.GarminTCX_SAXHandler;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -42,7 +43,7 @@ public class GarminTcxTester {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static GarminDeviceDataReader  deviceDataReader;
+   private static GarminTCX_DeviceDataReader  deviceDataReader;
 
    @BeforeAll
    static void initAll() {
@@ -50,7 +51,7 @@ public class GarminTcxTester {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new GarminDeviceDataReader();
+      deviceDataReader = new GarminTCX_DeviceDataReader();
    }
 
    @AfterEach
@@ -73,12 +74,13 @@ public class GarminTcxTester {
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
       final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
 
-      final GarminSAXHandler handler = new GarminSAXHandler(
+      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(
             deviceDataReader,
             importFilePath,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            new ImportState_File());
 
       parser.parse(tcxFile, handler);
 
@@ -97,12 +99,13 @@ public class GarminTcxTester {
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
       final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
 
-      final GarminSAXHandler handler = new GarminSAXHandler(
+      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(
             deviceDataReader,
             importFilePath,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            new ImportState_File());
 
       parser.parse(tcxFile, handler);
 

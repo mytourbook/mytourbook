@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -34,16 +33,13 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Collects all data from a fit file
@@ -100,82 +96,45 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
+   private ImportState_Process           _importState_Process;
+
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
-                  final Map<Long, TourData> newlyImportedTours) {
+                  final Map<Long, TourData> newlyImportedTours,
+                  final ImportState_Process importState_Process) {
 
       _fitDataReader = fitDataReader;
       _importFilePathName = importFilePath;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+      _importState_Process = importState_Process;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
       _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
       _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-
    }
 
    /**
+    * Creates a tour type when it do not yet exist for the provided label
+    *
     * @param tourData
     * @param parsedTourTypeLabel
-    * @return <code>true</code> when a new {@link TourType} is created
     */
-   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
+   private void applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
 
-      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
-      TourType tourType = null;
-      TourType newSavedTourType = null;
-
-      // do not add tours when label string is blank
-      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
-
-         // find tour type in existing tour types
-         for (final TourType mapTourType : tourTypeMap) {
-            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
-               tourType = mapTourType;
-               break;
-            }
-         }
-
-         if (tourType == null) {
-
-            // create new tour type
-
-            final TourType newTourType = new TourType(parsedTourTypeLabel);
-
-            final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(newTourType,
-                  Long.toString(newTourType.getTypeId()),
-                  newTourType.getName());
-
-            newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
-            newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
-
-            newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
-            newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
-
-            // save new entity
-            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-            if (newSavedTourType != null) {
-
-               tourType = newSavedTourType;
-
-               TourDatabase.clearTourTypes();
-               TourManager.getInstance().clearTourDataCache();
-
-               // Update Tour Type (Filter) list UI
-               Display.getDefault().syncExec(() ->
-               // fire modify event
-               TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
-            }
-         }
-
-         tourData.setTourType(tourType);
+      // ignore empty tour type label
+      if (UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
+         return;
       }
 
-      return newSavedTourType != null;
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
+
+      if (tourTypeWrapper != null && tourTypeWrapper.isNewTourType) {
+         _importState_Process.isCreated_NewTourType().set(true);
+      }
    }
 
    public void finalizeTour() {
@@ -209,7 +168,10 @@ public class FitData {
 
          recordStartTime = _sessionStartTime.toInstant().toEpochMilli();
 
-         TourLogManager.logError("There are no time data, using session date/time");//$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format(
+               "[FIT] %s - There are no time data, using session date/time %s", //$NON-NLS-1$
+               _importFilePathName,
+               TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
 
       } else {
 
@@ -217,7 +179,10 @@ public class FitData {
 
          recordStartTime = TimeTools.now().toEpochSecond();
 
-         TourLogManager.logError("There are no time data and there is no session date/time");//$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format(
+               "[FIT] %s - There are no time data and there is no session date/time, using %s", //$NON-NLS-1$
+               _importFilePathName,
+               TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
       }
 
       if (_sessionStartTime != null) {
@@ -226,16 +191,18 @@ public class FitData {
 
          if (recordStartTime != sessionStartTime) {
 
-            final String message =
-                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+// too much noise
 
-            TourLogManager.subLog_Info(
-                  String.format(
-                        message,
-                        _importFilePathName,
-                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
-                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
-                        (recordStartTime - sessionStartTime) / 1000));
+//            final String message =
+//                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+//
+//            TourLogManager.subLog_Info(
+//                  String.format(
+//                        message,
+//                        _importFilePathName,
+//                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
+//                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
+//                        (recordStartTime - sessionStartTime) / 1000));
          }
       }
 
@@ -625,6 +592,10 @@ public class FitData {
 
    public List<GearData> getGearData() {
       return _allGearData;
+   }
+
+   public String getImportFilePathName() {
+      return _importFilePathName;
    }
 
    public TimeData getLastAdded_TimeData() {
