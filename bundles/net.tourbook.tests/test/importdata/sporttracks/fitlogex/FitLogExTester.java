@@ -17,11 +17,13 @@ package importdata.sporttracks.fitlogex;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 
+import net.tourbook.common.NIO;
 import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLog_SAXHandler;
@@ -55,6 +57,8 @@ class FitLogExTester {
       deviceDataReader = new FitLogDeviceDataReader();
    }
 
+
+
    @AfterEach
    void tearDown() {
       newlyImportedTours.clear();
@@ -77,8 +81,10 @@ class FitLogExTester {
       final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
       final InputStream fitLogExFile = FitLogExTester.class.getResourceAsStream(importFilePath);
 
+      final URL importFile_BundleUrl = FitLogExTester.class.getResource(importFilePath);
+
       final FitLog_SAXHandler handler = new FitLog_SAXHandler(
-            importFilePath,
+            NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
             alreadyImportedTours,
             newlyImportedTours,
             true,
@@ -89,6 +95,9 @@ class FitLogExTester {
       parser.parse(fitLogExFile, handler);
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      // set relative path that it works with different OS
+      tour.setImportFilePath(importFilePath);
 
       Comparison.compareTourDataAgainstControl(tour, "test/" + filePathWithoutExtension); //$NON-NLS-1$
    }
@@ -99,9 +108,10 @@ class FitLogExTester {
       final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
       final InputStream fitLogExFile = FitLogExTester.class.getResourceAsStream(importFilePath);
+      final URL importFile_BundleUrl = FitLogExTester.class.getResource(importFilePath);
 
       final FitLog_SAXHandler handler = new FitLog_SAXHandler(
-            importFilePath,
+            NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
             alreadyImportedTours,
             newlyImportedTours,
             true,
@@ -112,6 +122,9 @@ class FitLogExTester {
       parser.parse(fitLogExFile, handler);
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      // set relative path that it works with different OS
+      tour.setImportFilePath(importFilePath);
 
       Comparison.compareTourDataAgainstControl(tour, "test/" + filePathWithoutExtension); //$NON-NLS-1$
    }
