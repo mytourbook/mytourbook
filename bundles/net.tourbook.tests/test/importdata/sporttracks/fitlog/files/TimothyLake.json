@@ -224,7 +224,7 @@
       "hsb" : [ 339.2, 0.7653061, 0.38431373 ],
       "red" : 98
     },
-    "typeId" : 0
+    "typeId" : -1
   },
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
