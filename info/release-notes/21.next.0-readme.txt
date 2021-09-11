@@ -29,7 +29,7 @@ New
 ===
 
 * Device Battery SoC (State of Charge)   https://en.wikipedia.org/wiki/State_of_charge
-  - Import/Re-import from .fit files
+  - Import/Re-import SoC values from .fit files
   - Show in 
     - New "Battery SoC" statistics
     - New columns in "Tour Book" view
