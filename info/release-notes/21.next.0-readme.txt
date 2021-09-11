@@ -130,6 +130,9 @@ Bugfix
 * 2D Map
   - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
 
+* Tour Marker View (Frederic)
+ - The average speed and pace values are now computed using the distance and time values instead of using the speed serie values. Previously, this could lead to erroneous values. 
+ 
 * 3D Map (Frederic)
   - Fixed an issue that could happen under Linux with ATI graphic cards and that could make the 3D map view crash https://github.com/wolfgang-ch/mytourbook/issues/383
 
