@@ -128,15 +128,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       gc.setAlpha(isSelected ? 0x60 : 0x30);
 
-      Color backgroundColor = null;
-      if (isSelected) {
-
-         backgroundColor = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
-
-      } else if (chartLabelPause.isVisible) {
-
-         backgroundColor = colorDefault;
-      }
+      final Color backgroundColor = isSelected ? gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY) : colorDefault;
 
       gc.setBackground(backgroundColor);
 
