@@ -21,6 +21,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -64,38 +66,38 @@ public class Suunto3_DeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       if (isValidXMLFile(importFilePath, SUUNTO_XML_TAG) == false) {
-         return false;
+         return;
       }
 
       Suunto3_STAXHandler staxHandler = null;
 
       try {
 
-         staxHandler = new Suunto3_STAXHandler(//
+         staxHandler = new Suunto3_STAXHandler(
                this,
                importFilePath,
                alreadyImportedTours,
                newlyImportedTours);
 
+         importState_File.isFileImportedWithValidData = staxHandler.isImported();
+
       } catch (final Exception e) {
 
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
 
       } finally {
          if (staxHandler != null) {
             staxHandler.dispose();
          }
       }
-
-      return staxHandler.isImported();
    }
 
    @Override

@@ -37,18 +37,20 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourTag implements Cloneable, Comparable<Object> {
 
-   public static final int DB_LENGTH_NAME             = 255;
-   public static final int DB_LENGTH_NOTES            = 32000;
+   private static final char NL                         = UI.NEW_LINE;
 
-   public static final int EXPAND_TYPE_YEAR_MONTH_DAY = 0;
-   public static final int EXPAND_TYPE_FLAT           = 1;
-   public static final int EXPAND_TYPE_YEAR_DAY       = 2;
+   public static final int   DB_LENGTH_NAME             = 255;
+   public static final int   DB_LENGTH_NOTES            = 32000;
+
+   public static final int   EXPAND_TYPE_YEAR_MONTH_DAY = 0;
+   public static final int   EXPAND_TYPE_FLAT           = 1;
+   public static final int   EXPAND_TYPE_YEAR_DAY       = 2;
 
    /**
     * Manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static int      _createCounter             = 0;
+   private static int        _createCounter             = 0;
 
    /*
     * DON'T USE THE FINAL KEYWORD FOR THE ID otherwise the Id cannot be set.
@@ -286,7 +288,22 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
    @Override
    public String toString() {
-      return "tag: " + name + " (id:" + tagId + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return UI.EMPTY_STRING
+
+            + "TourTag" + NL //                       //$NON-NLS-1$
+            + "[" + NL //                             //$NON-NLS-1$
+
+            + "tagId       =" + tagId + NL //         //$NON-NLS-1$
+            + "isRoot      =" + isRoot + NL //        //$NON-NLS-1$
+            + "name        =" + name + NL //          //$NON-NLS-1$
+            + "notes       =" + notes + NL //         //$NON-NLS-1$
+            + "expandType  =" + expandType + NL //    //$NON-NLS-1$
+//            + "tourData    =" + tourData + NL //      //$NON-NLS-1$
+            + "_createId   =" + _createId + NL //     //$NON-NLS-1$
+
+            + "]" + NL //                             //$NON-NLS-1$
+      ;
    }
 
    /**

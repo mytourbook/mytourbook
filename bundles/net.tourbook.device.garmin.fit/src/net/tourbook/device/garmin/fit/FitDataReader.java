@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -49,6 +50,8 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Sport;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -75,8 +78,7 @@ public class FitDataReader extends TourbookDevice {
       }
    }
 
-   private int     _logCounter;
-   private boolean _isVersionLogged;
+   private AtomicBoolean _isVersionLogged = new AtomicBoolean();
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -510,7 +512,7 @@ public class FitDataReader extends TourbookDevice {
       }
    }
 
-   private void onMesg_ForDebugLogging(final Mesg mesg) {
+   private void onMesg_ForDebugLogging(final Mesg mesg, final int[] logCounter) {
 
       long garminTimestamp = 0;
 
@@ -621,7 +623,7 @@ public class FitDataReader extends TourbookDevice {
 
                FitDataReader.class.getSimpleName(),
 
-               _logCounter++,
+               logCounter[0]++,
 
                TimeTools.getZonedDateTime(javaTime), //  show readable date/time
                javaTime / 1000, //                       java time in s
@@ -689,7 +691,7 @@ public class FitDataReader extends TourbookDevice {
 
                FitDataReader.class.getSimpleName(),
 
-               _logCounter++,
+               logCounter[0]++,
 
                TimeTools.getZonedDateTime(javaTime), //  show readable date/time
                javaTime / 1000, //                       java time in s
@@ -726,13 +728,12 @@ public class FitDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       try (FileInputStream fileInputStream = new FileInputStream(importFilePath)) {
 
@@ -742,7 +743,8 @@ public class FitDataReader extends TourbookDevice {
                this,
                importFilePath,
                alreadyImportedTours,
-               newlyImportedTours);
+               newlyImportedTours,
+               importState_Process);
 
          // setup all fit listeners
          fitBroadcaster.addListener(new MesgListener_Activity(fitData));
@@ -797,23 +799,29 @@ public class FitDataReader extends TourbookDevice {
 
             System.out.println();
 
-            _logCounter = 0;
+            final int[] logCounter = { 0 };
 
             // add debug logger which is listening to all events
-            fitBroadcaster.addListener((MesgListener) this::onMesg_ForDebugLogging);
+            fitBroadcaster.addListener(new MesgListener() {
+
+               final int[] _logCounter = logCounter;
+
+               @Override
+               public void onMesg(final Mesg mesg) {
+                  onMesg_ForDebugLogging(mesg, _logCounter);
+               }
+            });
          }
 
          fitBroadcaster.run(fileInputStream);
 
          fitData.finalizeTour();
 
-         returnValue = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final IOException e) {
-         TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+         TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
       }
-
-      return returnValue;
    }
 
    @Override
@@ -833,33 +841,29 @@ public class FitDataReader extends TourbookDevice {
 
             // log version if not yet done
 
-            if (_isVersionLogged == false) {
+            if (_isVersionLogged.getAndSet(true) == false) {
 
-               TourLogManager.logInfo(
-                     String.format(
-                           "FIT SDK %d.%d", //$NON-NLS-1$
-                           Fit.PROFILE_VERSION_MAJOR,
-                           Fit.PROFILE_VERSION_MINOR));
-
-               _isVersionLogged = true;
+               TourLogManager.log_INFO(String.format(
+                     "FIT SDK %d.%d", //$NON-NLS-1$
+                     Fit.PROFILE_VERSION_MAJOR,
+                     Fit.PROFILE_VERSION_MINOR));
             }
 
          } else {
 
-            TourLogManager.logError(
-                  String.format(
-                        "FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
-                        fileName,
-                        Fit.PROFILE_VERSION_MAJOR,
-                        Fit.PROFILE_VERSION_MINOR));
+            TourLogManager.subLog_ERROR(String.format(
+                  "FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
+                  fileName,
+                  Fit.PROFILE_VERSION_MAJOR,
+                  Fit.PROFILE_VERSION_MINOR));
          }
 
       } catch (final FileNotFoundException e) {
-         TourLogManager.logError_CannotReadDataFile(fileName, e);
+         TourLogManager.log_ERROR_CannotReadDataFile(fileName, e);
       } catch (final FitRuntimeException e) {
-         TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
+         TourLogManager.log_EXCEPTION_WithStacktrace(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
       } catch (final IOException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       return returnValue;

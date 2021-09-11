@@ -32,10 +32,12 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
-public class Suunto2DeviceDataReader extends TourbookDevice {
+public class Suunto2_DeviceDataReader extends TourbookDevice {
 
    public static final String  TAG_SUUNTO                   = "suunto";               //$NON-NLS-1$
 
@@ -44,7 +46,7 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    private static final String SUUNTO_TAG_HEADER            = "<header>";             //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES           = "<samples>";            //$NON-NLS-1$
 
-   public Suunto2DeviceDataReader() {
+   public Suunto2_DeviceDataReader() {
       // plugin constructor
    }
 
@@ -157,17 +159,18 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       if (isSuuntoXMLFile(importFilePath) == false) {
-         return false;
+         return;
       }
 
-      final Suunto2SAXHandler saxHandler = new Suunto2SAXHandler(
+      final Suunto2_SAXHandler saxHandler = new Suunto2_SAXHandler(
             this,
             importFilePath,
             alreadyImportedTours,
@@ -180,18 +183,18 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
 
          parser.parse(inputStream, saxHandler);
 
+         importState_File.isFileImportedWithValidData = saxHandler.isImported();
+
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);
-         return false;
+         return;
       } catch (final Exception e) {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
+         return;
       } finally {
 
          saxHandler.dispose();
       }
-
-      return saxHandler.isImported();
    }
 
    @Override

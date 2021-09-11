@@ -31,6 +31,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -41,7 +43,9 @@ import org.xml.sax.SAXParseException;
 
 public class GPXDeviceDataReader extends TourbookDevice {
 
-   private static final String XML_GPX_TAG = "<gpx"; //$NON-NLS-1$
+   private static final char   NL          = UI.NEW_LINE;
+
+   private static final String XML_GPX_TAG = "<gpx";     //$NON-NLS-1$
 
    public GPXDeviceDataReader() {
       // plugin constructor
@@ -69,13 +73,13 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          // write "<?xml ..." to be well conformed
          xmlWriter.write(XML_HEADER);
-         xmlWriter.write(UI.NEW_LINE);
+         xmlWriter.write(NL);
 
          // copy all lines
          String line;
          while ((line = fileReader.readLine()) != null) {
             xmlWriter.write(line);
-            xmlWriter.write(UI.NEW_LINE);
+            xmlWriter.write(NL);
          }
 
       } catch (final Exception e1) {
@@ -153,11 +157,12 @@ public class GPXDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       InputStream inputStream = null;
 
@@ -166,20 +171,25 @@ public class GPXDeviceDataReader extends TourbookDevice {
          inputStream = getWellFormedGPX(importFilePath);
 
          if (inputStream == null) {
-            return false;
+            return;
          }
       }
-
-      final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            this,
-            importFilePath,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours);
 
       try {
 
          final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+
+         final GPX_SAX_Handler handler = new GPX_SAX_Handler(
+               
+               importFilePath,
+               deviceData,
+               alreadyImportedTours,
+               newlyImportedTours,
+               
+               importState_File,
+               importState_Process,
+               
+               this);
 
          if (inputStream == null) {
             saxParser.parse("file:" + importFilePath, handler);//$NON-NLS-1$
@@ -189,36 +199,32 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
       } catch (final SAXParseException e) {
 
-         final StringBuilder sb = new StringBuilder()//
-               .append("XML error when parsing file:\n") //$NON-NLS-1$
-               .append(UI.NEW_LINE)
-               .append(importFilePath)
-               .append(UI.NEW_LINE)
-               .append(UI.NEW_LINE)
-               .append(e.getLocalizedMessage())
-               .append(UI.NEW_LINE)
-               .append(UI.NEW_LINE)
-               .append("Line: ") //$NON-NLS-1$
-               .append(e.getLineNumber())
-               .append("\tColumn: ") //$NON-NLS-1$
-               .append(e.getColumnNumber())
-         //
+         final String errorText = UI.EMPTY_STRING
+
+               + "XML error when parsing file:" + NL //        //$NON-NLS-1$
+               + NL
+               + importFilePath
+               + NL
+               + NL
+               + e.getLocalizedMessage()
+               + NL
+               + NL
+               + "Line: " + e.getLineNumber() //               //$NON-NLS-1$
+               + "   Column: " + e.getColumnNumber() //        //$NON-NLS-1$
          ;
 
-         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString())); //$NON-NLS-1$
+         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", errorText)); //$NON-NLS-1$
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
-         return false;
+         return;
 
       } catch (final Exception e) {
 
-         TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+         TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
 
-         return false;
+         return;
       }
-
-      return handler.isImported();
    }
 
    @Override

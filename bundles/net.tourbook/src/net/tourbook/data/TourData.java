@@ -103,6 +103,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
@@ -2145,6 +2146,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _tourWorldPosition.clear();
    }
 
+   /**
+    * This clone() method is cloning only a part of the tour, e.g. {@link #serieData} is not cloned
+    */
    @Override
    public Object clone() throws CloneNotSupportedException {
 
@@ -5244,86 +5248,97 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /**
        * Approach waypoint time to the nearest time slice time
        */
-      for (int timeDiffRange = 0; timeDiffRange < 10; timeDiffRange++) {
+      for (double maxGeoDiff = MAX_GEO_DIFF; maxGeoDiff <= 1;) {
 
-         final int timeDiffRangeMS = timeDiffRange * 1000;
+         for (int timeDiffRange = 0; timeDiffRange < 1000;) {
 
-         final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
+            final int timeDiffRangeMS = timeDiffRange * 1000;
 
-         for (final TourWayPoint wp : remainingWayPoints) {
+            final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
-            final long wpTime = wp.getTime();
-            final double wpLat = wp.getLatitude();
-            final double wpLon = wp.getLongitude();
+            for (final TourWayPoint wp : remainingWayPoints) {
 
-            for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+               final long wpTime = wp.getTime();
+               final double wpLat = wp.getLatitude();
+               final double wpLon = wp.getLongitude();
 
-               final int relativeTime = timeSerie[serieIndex];
-               final long tourTime = tourStartTime + relativeTime * 1000;
+               for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-               // get absolute time diff
-               long timeDiff = tourTime - wpTime;
-               if (timeDiff < 0) {
-                  timeDiff = -timeDiff;
-               }
+                  final int relativeTime = timeSerie[serieIndex];
+                  final long tourTime = tourStartTime + relativeTime * 1000;
 
-               if (timeDiff <= timeDiffRangeMS) {
-
-                  final double tourLat = latitudeSerie[serieIndex];
-                  final double tourLon = longitudeSerie[serieIndex];
-
-                  double latDiff = tourLat - wpLat;
-                  double lonDiff = tourLon - wpLon;
-
-                  if (latDiff < 0) {
-                     latDiff = -latDiff;
-                  }
-                  if (lonDiff < 0) {
-                     lonDiff = -lonDiff;
+                  // get absolute time diff
+                  long timeDiff = tourTime - wpTime;
+                  if (timeDiff < 0) {
+                     timeDiff = -timeDiff;
                   }
 
-                  if (latDiff < MAX_GEO_DIFF && lonDiff < MAX_GEO_DIFF) {
+                  if (timeDiff <= timeDiffRangeMS) {
 
-                     // time and position is the same
+                     final double tourLat = latitudeSerie[serieIndex];
+                     final double tourLon = longitudeSerie[serieIndex];
 
-                     final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_CUSTOM);
+                     double latDiff = tourLat - wpLat;
+                     double lonDiff = tourLon - wpLon;
 
-                     tourMarker.setSerieIndex(serieIndex);
-                     tourMarker.setTime(relativeTime, wpTime);
-
-                     tourMarker.setLatitude(wpLat);
-                     tourMarker.setLongitude(wpLon);
-
-                     tourMarker.setDescription(wp.getDescription());
-                     tourMarker.setLabel(wp.getName());
-
-                     tourMarker.setUrlAddress(wp.getUrlAddress());
-                     tourMarker.setUrlText(wp.getUrlText());
-
-                     final float altitude = wp.getAltitude();
-                     if (altitude != Float.MIN_VALUE) {
-                        tourMarker.setAltitude(altitude);
+                     if (latDiff < 0) {
+                        latDiff = -latDiff;
+                     }
+                     if (lonDiff < 0) {
+                        lonDiff = -lonDiff;
                      }
 
-                     tourMarkers.add(tourMarker);
+                     if (latDiff < maxGeoDiff && lonDiff < maxGeoDiff) {
 
-                     removedWayPoints.add(wp);
-                     allRemovedWayPoints.add(wp);
+                        // time and position is the same
 
-                     break;
+                        final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+
+                        tourMarker.setSerieIndex(serieIndex);
+                        tourMarker.setTime(relativeTime, wpTime);
+
+                        tourMarker.setLatitude(wpLat);
+                        tourMarker.setLongitude(wpLon);
+
+                        tourMarker.setDescription(wp.getDescription());
+                        tourMarker.setLabel(wp.getName());
+
+                        tourMarker.setUrlAddress(wp.getUrlAddress());
+                        tourMarker.setUrlText(wp.getUrlText());
+
+                        final float altitude = wp.getAltitude();
+                        if (altitude != Float.MIN_VALUE) {
+                           tourMarker.setAltitude(altitude);
+                        }
+
+                        tourMarkers.add(tourMarker);
+
+                        removedWayPoints.add(wp);
+                        allRemovedWayPoints.add(wp);
+
+                        break;
+                     }
                   }
                }
             }
+
+            remainingWayPoints.removeAll(removedWayPoints);
+
+            if (remainingWayPoints.isEmpty()) {
+
+               // all waypoints are converted
+
+               break;
+            }
+
+            if (timeDiffRange < 100) {
+               timeDiffRange += 10;
+            } else {
+               timeDiffRange += 100;
+            }
          }
 
-         remainingWayPoints.removeAll(removedWayPoints);
-
-         if (remainingWayPoints.isEmpty()) {
-
-            // all waypoints are converted
-
-            break;
-         }
+         maxGeoDiff *= 10;
       }
 
       // collapse waypoints
@@ -7399,11 +7414,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns device name which is displayed in the tour editor info tab
     */
    public String getDeviceName() {
+
       if ((devicePluginId != null) && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
+
          return Messages.tour_data_label_manually_created_tour;
+
       } else if ((devicePluginName == null) || (devicePluginName.length() == 0)) {
+
          return UI.EMPTY_STRING;
+
       } else {
+
          return devicePluginName;
       }
    }
@@ -9913,6 +9934,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.deviceModeName = deviceModeName;
    }
 
+   /**
+    * Set {@link #devicePluginName}
+    *
+    * @param deviceName
+    */
    public void setDeviceName(final String deviceName) {
       devicePluginName = deviceName;
    }

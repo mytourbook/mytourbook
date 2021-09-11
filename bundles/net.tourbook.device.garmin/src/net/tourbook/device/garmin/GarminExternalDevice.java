@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,7 +72,7 @@ public class GarminExternalDevice extends ExternalDevice {
    private boolean    _isCancelImport;
 
    public GarminExternalDevice() {
-      buildNewFileNames = false;
+      isBuildNewFileNames = false;
       VelocityService.init();
    }
 
@@ -174,10 +174,10 @@ public class GarminExternalDevice extends ExternalDevice {
                   max_latitude = Math.max(max_latitude, waypoint.getLatitude());
                }
             }
-            context.put("min_latitude", new Double(min_latitude)); //$NON-NLS-1$
-            context.put("min_longitude", new Double(min_longitude)); //$NON-NLS-1$
-            context.put("max_latitude", new Double(max_latitude)); //$NON-NLS-1$
-            context.put("max_longitude", new Double(max_longitude)); //$NON-NLS-1$
+            context.put("min_latitude", Double.valueOf(min_latitude)); //$NON-NLS-1$
+            context.put("min_longitude", Double.valueOf(min_longitude)); //$NON-NLS-1$
+            context.put("max_latitude", Double.valueOf(max_latitude)); //$NON-NLS-1$
+            context.put("max_longitude", Double.valueOf(max_longitude)); //$NON-NLS-1$
 
             Date starttime = null;
             Date endtime = null;
@@ -188,10 +188,13 @@ public class GarminExternalDevice extends ExternalDevice {
             short maximumheartrate = 0;
             double totaldistance = 0;
 
-            for (final Object name2 : tracks) {
-               final GPSTrack track = (GPSTrack) name2;
-               for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
-                  final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+            for (final Object trackObject : tracks) {
+
+               final GPSTrack track = (GPSTrack) trackObject;
+
+               for (final Object wpObject : track.getWaypoints()) {
+
+                  final GPSTrackpoint wp = (GPSTrackpoint) wpObject;
 
                   // starttime, totaltime
                   if (wp.getDate() != null) {
@@ -443,9 +446,9 @@ public class GarminExternalDevice extends ExternalDevice {
                      final ArrayList<GarminTrack> tList = new ArrayList<>();
                      tList.add(track);
                      context.put("tracks", tList); //$NON-NLS-1$
-                     context.put("printtracks", new Boolean(true)); //$NON-NLS-1$
-                     context.put("printwaypoints", new Boolean(false)); //$NON-NLS-1$
-                     context.put("printroutes", new Boolean(false)); //$NON-NLS-1$
+                     context.put("printtracks", Boolean.valueOf(true)); //$NON-NLS-1$
+                     context.put("printwaypoints", Boolean.valueOf(false)); //$NON-NLS-1$
+                     context.put("printroutes", Boolean.valueOf(false)); //$NON-NLS-1$
 
                      final File receivedFile = new File(RawDataManager.getTempDir()
                            + File.separator
@@ -492,7 +495,7 @@ public class GarminExternalDevice extends ExternalDevice {
                                  Messages.Garmin_error_receiving_data,
                                  new Status(Status.ERROR,
                                        Activator.PLUGIN_ID,
-                                       Messages.Garmin_commuication_error,
+                                       Messages.Garmin_communication_error,
                                        ex));
                         }
                      };

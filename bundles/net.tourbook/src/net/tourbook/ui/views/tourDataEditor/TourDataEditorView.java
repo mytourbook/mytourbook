@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
@@ -2719,10 +2719,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void clearEditorContent() {
 
-      if ((_tourData != null) && _isTourDirty) {
+      if (_tourData != null && _isTourDirty) {
 
          /*
-          * in this case, nothing is done because the method which fires the event
+          * In this case, nothing is done because the method, which fires the event
           * TourEventId.CLEAR_DISPLAYED_TOUR is responsible to use the correct TourData
           */
 
@@ -3256,7 +3256,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourTitles();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourTitles();
             for (final String string : arr) {
                _comboTitle.add(string);
             }
@@ -3317,7 +3317,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
             for (final String string : arr) {
                if (string != null) {
                   _comboLocation_Start.add(string);
@@ -3351,7 +3351,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceEnds();
             for (final String string : arr) {
                if (string != null) {
                   _comboLocation_End.add(string);
@@ -7837,7 +7837,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _comboTitle.removeAll();
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourTitles();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourTitles();
             for (final String string : arr) {
                _comboTitle.add(string);
             }
@@ -7851,7 +7851,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _comboLocation_Start.removeAll();
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
             for (final String string : arr) {
                _comboLocation_Start.add(string);
             }
@@ -7865,7 +7865,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _comboLocation_End.removeAll();
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceEnds();
             for (final String string : arr) {
                _comboLocation_End.add(string);
             }

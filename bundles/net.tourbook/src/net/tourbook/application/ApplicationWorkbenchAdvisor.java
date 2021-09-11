@@ -74,7 +74,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
    }
 
    /**
-    * Copied from org.eclipse.e4.ui.internal.workbench.ResourceHandler
+    * Copied from org.eclipse.e4.ui.internal.workbench.ResourceHandler.getBaseLocation()
     *
     * @return
     */

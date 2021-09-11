@@ -19,6 +19,11 @@ Issues
 
 *  
 
+Experimental
+============
+
+* Concurrent Tour Import/Re-import and Save Process
+  The whole import/re-import and save process where completely reworked to run it concurrently, with the advantage that this is now multiple time faster, depending on the number of CPU cores
   
 New
 ===
@@ -33,6 +38,17 @@ New
 
 Improvements
 ============
+
+* Tour Import
+  - Ask the user to replace the import filename in the saved tour when the import filename is different or empty
+
+* GPX Import 
+  - Expanded geo diff and time diff to not skip waypoints when converted into tour markers, before the time and distance was too narrow when a waypoint was converted into a tour marker
+    https://github.com/wolfgang-ch/mytourbook/issues/390
+
+* Tour Book 
+  - Export CSV view values when flat layout is displayed 
+    ATTENTION: Only the fetched tours will be exported, ensure to scroll this view from top to bottom that all tours are fetched !!!
 
 * 2D Map
   - Show tour direction as marker in the tour track
@@ -104,15 +120,18 @@ Bugfix
   - Fixed positions for the vertical x-Axis units and vertical tour chart markers
   - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
 
-* Tour cadence zones times (Frederic)
+* Tour Cadence Zones Times (Frederic)
   - Cadence zone times computation should use either the recorded time or moving
     time per the computed values preference 
     
-* Tour chart
+* Tour Chart
   - Fixed height of the x-axis: The x-axis text could be vertically truncated when the system font is too large
 
 * 2D Map
   - Fixed: "when reaching maxzoom, dont shift the map anymore" https://github.com/wolfgang-ch/mytourbook/issues/370
+
+* 3D Map (Frederic)
+  - Fixed an issue that could happen under Linux with ATI graphic cards and that could make the 3D map view crash https://github.com/wolfgang-ch/mytourbook/issues/383
 
 Translation    
 ===========

@@ -807,42 +807,45 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
           * set slider position
           */
          final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-         final int numberOfTourMarkers = tourMarker.size();
-         final TourMarker firstTourMarker = tourMarker.get(0);
+         final int numTourMarkers = tourMarker.size();
+         if (numTourMarkers > 0) {
 
-         int leftSliderValueIndex;
-         if (tourData.isMultipleTours()) {
-            leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
-         } else {
-            leftSliderValueIndex = firstTourMarker.getSerieIndex();
-         }
+            final TourMarker firstTourMarker = tourMarker.get(0);
 
-         int rightSliderValueIndex = 0;
-
-         if (numberOfTourMarkers == 1) {
-
-            rightSliderValueIndex = leftSliderValueIndex;
-
-         } else if (numberOfTourMarkers > 1) {
-
-            final TourMarker lastTourMarker = tourMarker.get(numberOfTourMarkers - 1);
-
+            int leftSliderValueIndex;
             if (tourData.isMultipleTours()) {
-               rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
+               leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
             } else {
-               rightSliderValueIndex = lastTourMarker.getSerieIndex();
+               leftSliderValueIndex = firstTourMarker.getSerieIndex();
             }
+
+            int rightSliderValueIndex = 0;
+
+            if (numTourMarkers == 1) {
+
+               rightSliderValueIndex = leftSliderValueIndex;
+
+            } else if (numTourMarkers > 1) {
+
+               final TourMarker lastTourMarker = tourMarker.get(numTourMarkers - 1);
+
+               if (tourData.isMultipleTours()) {
+                  rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
+               } else {
+                  rightSliderValueIndex = lastTourMarker.getSerieIndex();
+               }
+            }
+
+            final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+                  _tourChart,
+                  SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+                  leftSliderValueIndex,
+                  rightSliderValueIndex);
+
+            xSliderPosition.setCenterSliderPosition(true);
+
+            _tourChart.selectXSliders(xSliderPosition);
          }
-
-         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-               _tourChart,
-               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-               leftSliderValueIndex,
-               rightSliderValueIndex);
-
-         xSliderPosition.setCenterSliderPosition(true);
-
-         _tourChart.selectXSliders(xSliderPosition);
       }
       _isInSelectionChanged = false;
    }
