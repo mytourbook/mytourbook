@@ -1296,7 +1296,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          TourLogManager.showLogView();
-         TourLogManager.logTitle("RESET TAG STRUCTURE"); //$NON-NLS-1$
+         TourLogManager.log_TITLE("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
          {
             String sql;
@@ -1307,7 +1307,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG; //$NON-NLS-1$
                result = stmt1.executeUpdate(sql);
-               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG); //$NON-NLS-1$ //$NON-NLS-2$
+               TourLogManager.log_INFO("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt1.close();
 
@@ -1316,7 +1316,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY; //$NON-NLS-1$
                result = stmt2.executeUpdate(sql);
-               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY); //$NON-NLS-1$ //$NON-NLS-2$
+               TourLogManager.log_INFO("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt2.close();
 
@@ -1325,7 +1325,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$ //$NON-NLS-2$
                result = stmt3.executeUpdate(sql);
-               TourLogManager.logInfo("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+               TourLogManager.log_INFO("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt3.close();
 
@@ -1334,7 +1334,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$ //$NON-NLS-2$
                result = stmt4.executeUpdate(sql);
-               TourLogManager.logInfo("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+               TourLogManager.log_INFO("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt4.close();
          }

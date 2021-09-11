@@ -91,7 +91,7 @@ public class HTTPDownloader {
                final String resourceUrl = baseUrl + remoteFileName;
 
                // show log in log view that a download durting tour import is visible
-               TourLogManager.logInfo(NLS.bind(Messages.Log_SRTM_DownloadingResource, resourceUrl));
+               TourLogManager.log_INFO(NLS.bind(Messages.Log_SRTM_DownloadingResource, resourceUrl));
 
                System.out.println(HTTPDownloader.class.getCanonicalName() + " - downloading: " + resourceUrl); //$NON-NLS-1$
 

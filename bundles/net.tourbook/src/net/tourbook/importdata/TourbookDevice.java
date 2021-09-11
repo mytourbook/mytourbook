@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
@@ -223,14 +222,6 @@ public abstract class TourbookDevice implements IRawDataReader {
       }
 
       return uniqueKey;
-   }
-
-   /**
-    * @return Returns a list of files which are also imported additional to the selected imported
-    *         file or <code>null</code> otherwise.
-    */
-   public ArrayList<String> getAdditionalImportedFiles() {
-      return null;
    }
 
    /**

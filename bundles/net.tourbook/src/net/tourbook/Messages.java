@@ -368,8 +368,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_State_ON;
 
    public static String        Dialog_ImportConfig_Tab_Configuration;
-   public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
+   public static String        Dialog_ImportConfig_Tab_Options;
 
    public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
@@ -785,6 +785,14 @@ public class Messages extends NLS {
    public static String        DeviceManager_Selection_device_is_not_selected;
 
    public static String        Dialog_DeleteData_Title;
+   public static String        Dialog_ReimportData_Title;
+
+   public static String        Dialog_ImportData_ReplaceImportFilename_Message;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_DoNothing;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_DoNothingAnymore;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceAll;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceThis;
+   public static String        Dialog_ImportData_ReplaceImportFilename_Title;
 
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
@@ -1014,7 +1022,6 @@ public class Messages extends NLS {
    public static String        import_data_action_save_tour_for_person;
    public static String        import_data_action_save_tour_with_person;
    public static String        import_data_action_save_tours_for_person;
-   public static String        Dialog_ReimportData_Title;
    public static String        import_data_dlg_save_tour_msg;
    public static String        import_data_dlg_save_tour_title;
    public static String        import_data_importTours_subTask;
@@ -1037,7 +1044,6 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
    public static String        Import_Data_Dialog_DeleteTourValues_Task;
-
    public static String        Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message;
    public static String        Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message;
    public static String        Import_Data_Dialog_EasyImport_NoImportFiles_Message;
@@ -1053,6 +1059,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_Reimport_Task;
    public static String        Import_Data_Dialog_Reimport_Title;
    public static String        Import_Data_Dialog_ReimportFile_Title;
+
    public static String        Import_Data_Error_CreatingFileName_Message;
    public static String        Import_Data_Error_CreatingFileName_Title;
    public static String        Import_Data_HTML_AcquireDeviceInfo;
@@ -1789,6 +1796,14 @@ public class Messages extends NLS {
    public static String Search_Manager_CreateFTIndex;
    public static String Search_Manager_Log_DeletingLuceneRootFolder;
    public static String Search_Manager_Log_LuceneRootFolderIsDeleted;
+   public static String Search_Manager_Log_SearchingToursWith;
+   public static String Search_Manager_Log_UpdatedFTIndex_Final;
+   public static String Search_Manager_Log_UpdatedFTIndex_Title;
+   public static String Search_Manager_SubTask_ClosingFTIndexStore_Markers;
+   public static String Search_Manager_SubTask_ClosingFTIndexStore_Tours;
+   public static String Search_Manager_SubTask_ClosingFTIndexStore_Waypoints;
+   public static String Search_Manager_SubTask_LoadingTours;
+   public static String Search_Manager_SubTask_UpdatingIndex;
 
    public static String Search_View_Action_ExternalSearchUI;
    public static String Search_View_Action_ExternalSearchUI_Tooltip;
@@ -2376,7 +2391,7 @@ public class Messages extends NLS {
    public static String Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
    public static String Tour_Book_Action_ExportViewCSV;
-
+   public static String Tour_Book_Action_ExportViewCSV_Tooltip;
    public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
    public static String Tour_Book_Label_chart_title;
@@ -2543,6 +2558,10 @@ public class Messages extends NLS {
    public static String Tour_Info_Label_AllFields_Tooltip;
 
    public static String Tour_Log_Action_Clear_Tooltip;
+   public static String Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;
+   public static String Tour_Log_Action_TourLogLayout_Tooltip;
+   public static String Tour_Log_Checkbox_LogDetails;
+   public static String Tour_Log_Info_TourLogWasCopied;
 
    public static String TourManager_Dialog_OutOfSyncError_Message;
    public static String TourManager_Dialog_OutOfSyncError_Title;

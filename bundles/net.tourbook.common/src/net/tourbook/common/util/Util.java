@@ -1827,18 +1827,9 @@ public class Util {
       return file.isDirectory();
    }
 
-   public static void logSimpleMessage(final Class<?> clazz,
-                                       final String message) {
-
-      System.out.println(String.format("%s [%s] %s", //$NON-NLS-1$
-            UI.timeStampNano(),
-            clazz.getSimpleName(),
-            message));
-   }
-
    public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
 
-      StatusUtil.log(String.format("%s [%s] - System property \"%s\" is enabled -> %s", //$NON-NLS-1$
+      StatusUtil.log(String.format("%s [System Property - %s] - \"%s\" is enabled -> %s", //$NON-NLS-1$
             UI.timeStampNano(),
             clazz.getSimpleName(),
             propertyName,
@@ -1850,7 +1841,7 @@ public class Util {
                                               final String propertyValue,
                                               final String propertyDescription) {
 
-      StatusUtil.log(String.format("%s [%s] - System property \"%s=%s\" -> %s", //$NON-NLS-1$
+      StatusUtil.log(String.format("%s [System Property - %s] - \"%s=%s\" -> %s", //$NON-NLS-1$
             UI.timeStampNano(),
             clazz.getSimpleName(),
             propertyName,

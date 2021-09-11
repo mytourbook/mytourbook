@@ -20,7 +20,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -1423,7 +1423,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       /*
        * Marker names combo
        */
-      final TreeSet<String> dbTitles = TourDatabase.getAllTourMarkerNames();
+      final ConcurrentSkipListSet<String> dbTitles = TourDatabase.getCachedFields_AllTourMarkerNames();
       for (final String title : dbTitles) {
          _comboMarkerName.add(title);
       }

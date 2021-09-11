@@ -183,6 +183,17 @@ public class WEB {
    ;
 
    /**
+    * Converts <code><br></code> into Java newline.
+    *
+    * @param text
+    * @return
+    */
+   public static String convertHTML_Into_JavaLineBreaks(final String text) {
+
+      return text.replaceAll(HTML_ELEMENT_BR, UI.NEW_LINE1);
+   }
+
+   /**
     * Converts Java newline into HTML newline.
     *
     * @param text
