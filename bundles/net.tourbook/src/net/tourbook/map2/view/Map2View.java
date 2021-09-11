@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -2984,7 +2985,7 @@ public class Map2View extends ViewPart implements
 
       updateUI_ShowTour(tourData);
 
-      final ArrayList<TourMarker> allTourMarker = pauseSelection.getSelectedTourMarker();
+      final List<Long> allTourMarker = pauseSelection.getSelectedTourPauses();
       final int numberOfTourMarkers = allTourMarker.size();
 
       int leftSliderValueIndex = 0;

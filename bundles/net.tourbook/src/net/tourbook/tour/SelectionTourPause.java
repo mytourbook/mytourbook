@@ -15,53 +15,46 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * This selection is fired when tour markers are selected.
+ * This selection is fired when tour pauses are selected.
  */
 public class SelectionTourPause implements ISelection {
-   //TODO FB
 
-	private TourData				_tourData;
-	private ArrayList<TourMarker>	_selectedTourMarker;
+   private TourData   _tourData;
+   private List<Long> _selectedTourPauses;
 
-	/**
-	 * @param tourData
-	 * @param selectedTourMarker
-	 */
-	public SelectionTourPause(final TourData tourData, final ArrayList<TourMarker> selectedTourMarker) {
+   public SelectionTourPause(final TourData tourData, final List<Long> selectedTourPauses) {
 
-		_tourData = tourData;
-		_selectedTourMarker = selectedTourMarker;
-	}
+      _tourData = tourData;
+      _selectedTourPauses = selectedTourPauses;
+   }
 
-	public ArrayList<TourMarker> getSelectedTourMarker() {
-		return _selectedTourMarker;
-	}
+   public List<Long> getSelectedTourPauses() {
+      return _selectedTourPauses;
+   }
 
-	public TourData getTourData() {
-		return _tourData;
-	}
+   public TourData getTourData() {
+      return _tourData;
+   }
 
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
+   @Override
+   public boolean isEmpty() {
+      return false;
+   }
 
-	@Override
-	public String toString() {
-		return "SelectionTourMarker [" //$NON-NLS-1$
-//				+ ("_tourData=" + _tourData + ", ")
-				+ ("_selectedTourMarker=" + _selectedTourMarker) //$NON-NLS-1$
-				+
-				//
-				"]"; //$NON-NLS-1$
-	}
+   @Override
+   public String toString() {
+      return "SelectionTourPause [" //$NON-NLS-1$
+            + ("_selectedTourPauses=" + _selectedTourPauses) //$NON-NLS-1$
+            +
+            //
+            "]"; //$NON-NLS-1$
+   }
 
 }
