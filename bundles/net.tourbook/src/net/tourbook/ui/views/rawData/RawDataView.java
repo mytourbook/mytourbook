@@ -845,8 +845,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             TourLogState.DEFAULT,
 
-            // "Save tours"
-            TourLogManager.LOG_TOUR_SAVE_TOURS,
+            Messages.Log_Tour_SaveTours,
 
             TourLogView.CSS_LOG_TITLE);
 
@@ -4388,7 +4387,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // Log re-import
       TourLogManager.addLog(
             TourLogState.DEFAULT,
-            RawDataManager.LOG_REIMPORT_PREVIOUS_FILES,
+            Messages.Log_Reimport_PreviousFiles,
             TourLogView.CSS_LOG_TITLE);
 
       final long start = System.currentTimeMillis();
@@ -4422,7 +4421,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } finally {
 
          TourLogManager.log_DEFAULT(String.format(
-               RawDataManager.LOG_REIMPORT_END,
+               Messages.Log_Reimport_PreviousFiles_End,
                (System.currentTimeMillis() - start) / 1000.0));
       }
    }
@@ -4986,7 +4985,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String message = isEasyImport
             ? EasyImportManager.LOG_EASY_IMPORT_100_DELETE_TOUR_FILES
-            : RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE;
+            : Messages.Log_Import_DeleteTourFiles;
 
       TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
@@ -5105,7 +5104,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        * Log deleted files
        */
       TourLogManager.log_DEFAULT(String.format(
-            RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE_END,
+            Messages.Log_Import_DeleteTourFiles_End,
             deletedFiles.size(),
             notDeletedFiles.size()));
    }
@@ -5191,7 +5190,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // get all saved tour data
          allSavedToursConcurrent.drainTo(allSavedTours);
 
-         TourLogManager.subLog_DEFAULT(String.format("Saved %d tours in %.3f s",
+         TourLogManager.subLog_DEFAULT(String.format(Messages.Log_Tour_SaveTours_End,
                allSavedTours.size(),
                (System.currentTimeMillis() - start) / 1000.0));
 

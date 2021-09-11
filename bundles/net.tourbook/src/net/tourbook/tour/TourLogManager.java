@@ -17,7 +17,6 @@ package net.tourbook.tour;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -27,11 +26,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
 
-   public static final String                         LOG_TOUR_DELETE_TOURS    = Messages.Log_Tour_DeleteTours;
-   public static final String                         LOG_TOUR_SAVE_TOURS      = Messages.Log_Tour_SaveTours;
-   public static final String                         LOG_TOUR_SAVE_TOURS_FILE = Messages.Log_Tour_SaveTours_File;
-
-   private static final CopyOnWriteArrayList<TourLog> _allTourLogs             = new CopyOnWriteArrayList<>();
+   private static final CopyOnWriteArrayList<TourLog> _allTourLogs = new CopyOnWriteArrayList<>();
 
    private static TourLogView                         _logView;
 

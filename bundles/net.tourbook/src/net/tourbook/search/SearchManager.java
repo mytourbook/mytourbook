@@ -947,7 +947,7 @@ public class SearchManager implements XHRHandler {
                      sb.append(TAG_TD + tour_LocationStart + TAG_TD_END);
                   }
 
-                  sb.append(TAG_TD + " ... " + TAG_TD_END);
+                  sb.append(TAG_TD + " ... " + TAG_TD_END); //$NON-NLS-1$
 
                   if (isAvailable_Tour_LocationEnd) {
                      sb.append(TAG_TD + tour_LocationEnd + TAG_TD_END);
