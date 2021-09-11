@@ -322,7 +322,7 @@ public class GarminExternalDevice extends ExternalDevice {
             // handling of monitor.isCanceled()
             final Thread cancelObserver = new Thread(new Runnable() {
 
-//					@Override
+//               @Override
                @Override
                public void run() {
                   while (!monitor.isCanceled()) {
@@ -361,9 +361,9 @@ public class GarminExternalDevice extends ExternalDevice {
                final String monitorDevInfo;
                final String[] gpsInfo = garminDataProcessor.getGPSInfo();
                if (gpsInfo != null && gpsInfo.length > 0) {
-                  monitorDevInfo = Messages.Garmin_Transfer_msg + gpsInfo[0];
+                  monitorDevInfo = Messages.Garmin_Transfer_DataFrom + gpsInfo[0];
                } else {
-                  monitorDevInfo = Messages.Garmin_unknown_device;
+                  monitorDevInfo = Messages.Garmin_Transfer_UnknownDevice;
                }
 
                final GarminProduct productInfo = garminDataProcessor.getGarminProductInfo(2000L);
@@ -371,18 +371,18 @@ public class GarminExternalDevice extends ExternalDevice {
                garminDataProcessor.addProgressListener(new ProgressListener() {
                   private int done;
 
-//						@Override
+//                  @Override
                   @Override
                   public void actionEnd(final String action_id) {}
 
-//						@Override
+//                  @Override
                   @Override
                   public void actionProgress(final String action_id, final int current_value) {
                      monitor.worked(current_value - done);
                      done = current_value;
                   }
 
-//						@Override
+//                  @Override
                   @Override
                   public void actionStart(final String action_id, final int min_value, final int max_value) {
                      done = 0;
@@ -476,26 +476,26 @@ public class GarminExternalDevice extends ExternalDevice {
                   // "Garmin device does not respond" -> org.dinopolis.gpstool.gpsinput.garmin.GPSGarminDataProcessor.open()
                   if (ex instanceof GPSException && ex.getMessage().equals("Garmin device does not respond!")) { //$NON-NLS-1$
                      runnable = new Runnable() {
-//								@Override
+//                        @Override
                         @Override
                         public void run() {
                            MessageDialog.openError(display.getActiveShell(),
-                                 Messages.Garmin_data_transfer_error,
-                                 Messages.Garmin_no_connection);
+                                 Messages.Garmin_Transfer_DataTransferError,
+                                 Messages.Garmin_Transfer_NoConnection);
                         }
                      };
                   } else {
                      runnable = new Runnable() {
-//								@Override
+//                        @Override
                         @Override
                         public void run() {
                            ex.printStackTrace();
                            ErrorDialog.openError(display.getActiveShell(),
-                                 Messages.Garmin_data_transfer_error,
-                                 Messages.Garmin_error_receiving_data,
+                                 Messages.Garmin_Transfer_DataTransferError,
+                                 Messages.Garmin_Transfer_ErrorReceivingData,
                                  new Status(Status.ERROR,
                                        Activator.PLUGIN_ID,
-                                       Messages.Garmin_commuication_error,
+                                       Messages.Garmin_Transfer_CommuicationError,
                                        ex));
                         }
                      };
