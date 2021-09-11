@@ -28,7 +28,7 @@ public class Messages extends NLS {
    public static String        GarminTCX_SAXHandler_FileIsEmpty;
    public static String        GarminTCX_SAXHandler_InvalidDate_2007_04_01;
 
-   public static String        Garmin_Transfer_CommuicationError;
+   public static String        Garmin_Transfer_CommunicationError;
    public static String        Garmin_Transfer_DataFrom;
    public static String        Garmin_Transfer_DataTransferError;
    public static String        Garmin_Transfer_ErrorReceivingData;
