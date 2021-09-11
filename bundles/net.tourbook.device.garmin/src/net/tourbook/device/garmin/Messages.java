@@ -21,10 +21,6 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.device.garmin.messages"; //$NON-NLS-1$
 
-   public static String        Garmin_communication_error;
-   public static String        Garmin_data_transfer_error;
-   public static String        Garmin_error_receiving_data;
-   public static String        Garmin_no_connection;
    public static String        GarminTCX_SAXHandler_FileIsEmpty;
    public static String        GarminTCX_SAXHandler_InvalidDate_2007_04_01;
 
