@@ -1172,6 +1172,11 @@ public class Messages extends NLS {
 
    public static String        Log_Import_DeleteTourFiles;
    public static String        Log_Import_DeleteTourFiles_End;
+   public static String        Log_Import_Failed;
+   public static String        Log_Import_Part_Time;
+   public static String        Log_Import_Part_TimeSlices;
+   public static String        Log_Import_ReplacedImportFile;
+   public static String        Log_Import_SkippedImportFile;
    public static String        Log_Import_Tour;
    public static String        Log_Import_Tour_End;
    public static String        Log_Import_Tour_Imported;
@@ -1231,6 +1236,7 @@ public class Messages extends NLS {
    public static String        Log_Tour_DeleteTours;
    public static String        Log_Tour_MoveTour;
    public static String        Log_Tour_SaveTours;
+   public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
 
    public static String        Map_Action_SynchWithOtherMap;

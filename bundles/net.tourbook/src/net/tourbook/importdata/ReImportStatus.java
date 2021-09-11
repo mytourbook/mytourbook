@@ -49,16 +49,16 @@ public class ReImportStatus {
 
       return UI.EMPTY_STRING
 
-            + "ReImportStatus [" + NL
+            + "ReImportStatus [" + NL //$NON-NLS-1$
 
-            + "isAnyReImported                           =" + isAnyTourReImported + NL
-            + "isCanceled_WholeReimport                  =" + isCanceled_WholeReimport + NL
-            + "isUserAsked_ToCancelReImport              =" + isUserAsked_ToCancelWholeReImport + NL
+            + "isAnyReImported                           =" + isAnyTourReImported + NL //$NON-NLS-1$
+            + "isCanceled_WholeReimport                  =" + isCanceled_WholeReimport + NL //$NON-NLS-1$
+            + "isUserAsked_ToCancelReImport              =" + isUserAsked_ToCancelWholeReImport + NL //$NON-NLS-1$
 
-            + "isCanceled_ByUser_TheFileLocationDialog   =" + isCanceled_ByUser_TheFileLocationDialog + NL
-            + "isCanceled_Auto_ImportFilePathIsEmpty     =" + isCanceled_Auto_ImportFilePathIsEmpty + NL
-            + "isCanceled_Auto_TheFileLocationDialog     =" + isCanceled_Auto_TheFileLocationDialog + NL
+            + "isCanceled_ByUser_TheFileLocationDialog   =" + isCanceled_ByUser_TheFileLocationDialog + NL //$NON-NLS-1$
+            + "isCanceled_Auto_ImportFilePathIsEmpty     =" + isCanceled_Auto_ImportFilePathIsEmpty + NL //$NON-NLS-1$
+            + "isCanceled_Auto_TheFileLocationDialog     =" + isCanceled_Auto_TheFileLocationDialog + NL //$NON-NLS-1$
 
-            + "]";
+            + "]"; //$NON-NLS-1$
    }
 }

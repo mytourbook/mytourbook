@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMarker;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,8 +80,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -272,6 +272,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _markerViewer.refresh();
+         } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)) {
+
+            // Pace and speed value computation has changed
+
+            refreshView();
          }
       };
 
@@ -283,12 +288,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             // measurement system has changed
 
-            _columnManager.saveState(_state);
-            _columnManager.clearColumns();
-
-            defineAllColumns();
-
-            _markerViewer = (TableViewer) recreateViewer(_markerViewer);
+            refreshView();
          }
       };
 
@@ -410,6 +410,39 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       return averageValue;
    }
 
+   /**
+    * Computes the average speed between two markers (in km/h or mph)
+    *
+    * @param cell
+    * @return
+    */
+   private double computeAverageSpeed(final ViewerCell cell) {
+
+      final int previousMarkerIndex = getPreviousMarkerIndex(cell);
+
+      int currentMarkerIndex = getCurrentMarkerIndex(cell);
+      if (_tourData.isMultipleTours()) {
+         currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
+      }
+
+      //The distance in km or miles
+      final float distanceDifference = (_tourData.getMetricDistanceSerie()[currentMarkerIndex] - _tourData
+            .getMetricDistanceSerie()[previousMarkerIndex]) / UI.UNIT_VALUE_DISTANCE / 1000;
+
+      int timeDifference = _tourData.timeSerie[currentMarkerIndex] - _tourData.timeSerie[previousMarkerIndex];
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
+      if (isPaceAndSpeedFromRecordedTime) {
+         timeDifference -= _tourData.getPausedTime(previousMarkerIndex, currentMarkerIndex);
+      } else {
+         timeDifference -= _tourData.getBreakTime(previousMarkerIndex, currentMarkerIndex);
+      }
+
+      final double averageSpeed = timeDifference == 0 ? 0.0 : 3600 * distanceDifference / timeDifference;
+
+      return averageSpeed;
+   }
+
    private void createActions() {
 
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
@@ -447,7 +480,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       fillToolbar();
 
       // this part is a selection provider
-      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      _postSelectionProvider = new PostSelectionProvider(ID);
+      getSite().setSelectionProvider(_postSelectionProvider);
 
       // show default page
       _pageBook.showPage(_pageNoData);
@@ -484,28 +518,21 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      table.addKeyListener(new KeyListener() {
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
-         @Override
-         public void keyPressed(final KeyEvent e) {
+         if (keyEvent.keyCode == SWT.DEL) {
 
-            if (e.keyCode == SWT.DEL) {
-
-               if (_actionDeleteTourMarkers.isEnabled() == false) {
-                  return;
-               }
-
-               // Retrieves the markers that were selected in the marker dialog
-               final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-               _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
-               _actionDeleteTourMarkers.run();
-
+            if (_actionDeleteTourMarkers.isEnabled() == false) {
+               return;
             }
-         }
 
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+            // Retrieves the markers that were selected in the marker dialog
+            final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+            _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
+            _actionDeleteTourMarkers.run();
+
+         }
+      }));
 
       /*
        * create table viewer
@@ -771,20 +798,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     * Column: Average Pace
     */
    private void defineColumn_Motion_AvgPace() {
+
       final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final int previousMarkerIndex = getPreviousMarkerIndex(cell);
-
-            int currentMarkerIndex = getCurrentMarkerIndex(cell);
-            if (_tourData.isMultipleTours()) {
-               currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
-            }
-
-            final double averagePace = computeAverage(_tourData.getPaceSerieSeconds(), previousMarkerIndex, currentMarkerIndex);
+            final double averageSpeed = computeAverageSpeed(cell);
+            final double averagePace = averageSpeed == 0.0 ? 0.0 : 3600 / averageSpeed;
 
             cell.setText(UI.format_mm_ss((long) averagePace));
          }
@@ -795,24 +817,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     * Column: Average Speed (km/h or mph)
     */
    private void defineColumn_Motion_AvgSpeed() {
+
       final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final int previousMarkerIndex = getPreviousMarkerIndex(cell);
+            final double averageSpeed = computeAverageSpeed(cell);
 
-            int currentMarkerIndex = getCurrentMarkerIndex(cell);
-            if (_tourData.isMultipleTours()) {
-               currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
-            }
-
-            final double averageSpeed = computeAverage(_tourData.getSpeedSerie(), previousMarkerIndex, currentMarkerIndex);
-
-            final Object element = cell.getElement();
-
-            colDef.printDoubleValue(cell, averageSpeed, element instanceof TourMarker);
+            colDef.printDoubleValue(cell, averageSpeed, cell.getElement() instanceof TourMarker);
          }
       });
    }
@@ -1079,10 +1093,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       return ((TourMarker) cell.getElement()).getSerieIndex();
    }
 
-   public Object getMarkerViewer() {
-      return _markerViewer;
-   }
-
    private int getMultiTourSerieIndex(final int currentMarkerIndex) {
 
       if (_tourData == null || _tourData.multiTourMarkers == null) {
@@ -1290,6 +1300,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       _viewerContainer.setRedraw(true);
 
       return _markerViewer;
+   }
+
+   private void refreshView() {
+
+      _columnManager.saveState(_state);
+      _columnManager.clearColumns();
+
+      defineAllColumns();
+
+      _markerViewer = (TableViewer) recreateViewer(_markerViewer);
    }
 
    @Override

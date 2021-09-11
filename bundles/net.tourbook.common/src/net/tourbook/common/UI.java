@@ -136,7 +136,7 @@ public class UI {
    public static final String       NEW_LINE1                          = "\n";       //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";     //$NON-NLS-1$
    public static final String       NEW_LINE3                          = "\n\n\n";   //$NON-NLS-1$
-   public static final String       TAB1                               = "\t";
+   public static final String       TAB1                               = "\t";       //$NON-NLS-1$
    public static final String       SLASH                              = "/";        //$NON-NLS-1$
    public static final String       SLASH_WITH_SPACE                   = " / ";      //$NON-NLS-1$
    public static final String       SPACE1                             = " ";        //$NON-NLS-1$

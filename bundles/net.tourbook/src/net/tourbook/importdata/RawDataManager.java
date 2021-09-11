@@ -112,31 +112,14 @@ public class RawDataManager {
    private static final String   VALUE_UNIT_K_CALORIES                       = net.tourbook.ui.Messages.Value_Unit_KCalories;
    private static final String   VALUE_UNIT_PULSE                            = net.tourbook.ui.Messages.Value_Unit_Pulse;
 
-   public static final String    LOG_IMPORT_DELETE_TOUR_FILE                 = Messages.Log_Import_DeleteTourFiles;
-   public static final String    LOG_IMPORT_DELETE_TOUR_FILE_END             = Messages.Log_Import_DeleteTourFiles_End;
-   private static final String   LOG_IMPORT_TOUR                             = Messages.Log_Import_Tour;
-   public static final String    LOG_IMPORT_TOUR_IMPORTED                    = Messages.Log_Import_Tour_Imported;
-   private static final String   LOG_IMPORT_TOUR_END                         = Messages.Log_Import_Tour_End;
-   public static final String    LOG_IMPORT_TOURS_IMPORTED_FROM_FILE         = Messages.Log_Import_Tours_Imported_From_File;
-
-   public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
-   public static final String    LOG_DELETE_TOURVALUES_END                   = Messages.Log_Delete_TourValues_End;
-   public static final String    LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA       = Messages.Log_ModifiedTour_Old_Data_Vs_New_Data;
-
-   public static final String    LOG_REIMPORT_PREVIOUS_FILES                 = Messages.Log_Reimport_PreviousFiles;
-   public static final String    LOG_REIMPORT_END                            = Messages.Log_Reimport_PreviousFiles_End;
-   public static final String    LOG_REIMPORT_COMBINED_VALUES                = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Reimport_Text);
-   private static final String   LOG_REIMPORT_MANUAL_TOUR                    = Messages.Log_Reimport_ManualTour;
-   private static final String   LOG_REIMPORT_TOUR_SKIPPED                   = Messages.Log_Reimport_Tour_Skipped;
-
 // SET_FORMATTING_ON
 
    private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
    private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
 
    private static final String           FILE_EXTENSION_FIT               = ".fit";                                                //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";
-   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";
+   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";                                             //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";                                           //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
@@ -656,7 +639,7 @@ public class RawDataManager {
       for (int index = 0; index < previousData.size(); ++index) {
 
          TourLogManager.subLog_INFO(NLS.bind(
-               LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA,
+               Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
                previousData.get(index),
                newData.get(index)));
       }
@@ -1154,10 +1137,11 @@ public class RawDataManager {
       if (actionModifyTourValues_12_Confirm_Dialog(
             toggleState,
             dialogTitle,
-            confirmMessage)//
-      ) {
+            confirmMessage)) {
 
-         String logMessage = isReimport ? LOG_REIMPORT_COMBINED_VALUES : LOG_DELETE_COMBINED_VALUES;
+         String logMessage = isReimport
+               ? NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Reimport_Text)
+               : NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
 
          logMessage = logMessage.concat(String.join(UI.SPACE1, dataToModifyDetails));
 
@@ -1491,7 +1475,7 @@ public class RawDataManager {
       } finally {
 
          TourLogManager.log_DEFAULT(String.format(
-               RawDataManager.LOG_DELETE_TOURVALUES_END,
+               Messages.Log_Delete_TourValues_End,
                (System.currentTimeMillis() - start) / 1000.0));
       }
    }
@@ -1817,7 +1801,7 @@ public class RawDataManager {
 
          final String message = importState_Process.isEasyImport()
                ? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
-               : RawDataManager.LOG_IMPORT_TOUR;
+               : Messages.Log_Import_Tour;
 
          if (importState_Process.isLog_DEFAULT()) {
             TourLogManager.addLog(TourLogState.DEFAULT, message, css);
@@ -1885,7 +1869,7 @@ public class RawDataManager {
 
                importState_Process.isEasyImport()
                      ? EasyImportManager.LOG_EASY_IMPORT_002_END
-                     : RawDataManager.LOG_IMPORT_TOUR_END,
+                     : Messages.Log_Import_Tour_End,
 
                (System.currentTimeMillis() - start) / 1000.0));
 
@@ -2082,7 +2066,7 @@ public class RawDataManager {
       final long end = System.nanoTime();
 
       final double timeDiff = (end - start) / 1_000_000_000.0;
-      final String importTime = String.format("%5.3f s ∙", timeDiff);
+      final String importTime = String.format(Messages.Log_Import_Part_Time, timeDiff);
 
       if (importState_File.isFileImportedWithValidData) {
 
@@ -2094,15 +2078,17 @@ public class RawDataManager {
             String numTimeSlices = UI.EMPTY_STRING;
 
             if (importedTourData.timeSerie != null) {
-               numTimeSlices = String.format("%,7d # ∙ ", importedTourData.timeSerie.length);
+               numTimeSlices = String.format(Messages.Log_Import_Part_TimeSlices, importedTourData.timeSerie.length);
             }
 
             if (importState_Process.isLog_OK()) {
 
                // {0} ← {1}
-               TourLogManager.subLog_OK(importTime + numTimeSlices + NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+               final String defaultMessage = NLS.bind(Messages.Log_Import_Tour_Imported,
                      importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                     osFilePath));
+                     osFilePath);
+
+               TourLogManager.subLog_OK(importTime + numTimeSlices + defaultMessage);
             }
          }
 
@@ -2111,7 +2097,7 @@ public class RawDataManager {
          // reduce log noise: log only when more than ONE tour is imported from ONE file
          if (importState_Process.isLog_INFO() && numImportedToursFromOneFile > 1) {
 
-            TourLogManager.subLog_INFO(importTime + NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
+            TourLogManager.subLog_INFO(importTime + NLS.bind(Messages.Log_Import_Tours_Imported_From_File,
                   numImportedToursFromOneFile,
                   osFilePath));
          }
@@ -2125,7 +2111,7 @@ public class RawDataManager {
          if (importState_File.isImportLogged == false) {
 
             // do default logging
-            TourLogManager.subLog_ERROR(importTime + String.format("[Import failed] %s", osFilePath));
+            TourLogManager.subLog_ERROR(importTime + String.format(Messages.Log_Import_Failed, osFilePath));
          }
       }
 
@@ -2568,7 +2554,7 @@ public class RawDataManager {
          if (importState_Process.isLog_INFO()) {
 
             TourLogManager.subLog_INFO(NLS.bind(
-                  LOG_REIMPORT_MANUAL_TOUR,
+                  Messages.Log_Reimport_ManualTour,
                   oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
          }
 
@@ -2603,7 +2589,7 @@ public class RawDataManager {
          }
 
          TourLogManager.subLog_ERROR(NLS.bind(
-               LOG_REIMPORT_TOUR_SKIPPED,
+               Messages.Log_Reimport_Tour_Skipped,
                oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                reason));
 
@@ -2924,7 +2910,7 @@ public class RawDataManager {
             if (importState_Process.isLog_OK()) {
 
                TourLogManager.subLog_OK(NLS.bind(
-                     LOG_IMPORT_TOUR_IMPORTED,
+                     Messages.Log_Import_Tour_Imported,
                      updatedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                      reimportFileNamePath));
             }
@@ -3744,8 +3730,7 @@ public class RawDataManager {
                      allSavedTourIds.add(replacedTourData.getTourId());
 
                      TourLogManager.subLog_INFO(NLS.bind(
-//                           Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
-                           "[Replaced import file] {0} in tour {1}",
+                           Messages.Log_Import_ReplacedImportFile,
                            importedFilePathName,
                            TourManager.getTourDateTimeShort(replacedTourData)));
 
@@ -3755,8 +3740,7 @@ public class RawDataManager {
                   case DO_NOTHING_AND_DONT_ASK_AGAIN:
 
                      TourLogManager.subLog_INFO(NLS.bind(
-//                           Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
-                           "[Skipped import file] {0} in tour {1}",
+                           Messages.Log_Import_SkippedImportFile,
                            importedFilePathName,
                            TourManager.getTourDateTimeShort(replacedTourData)));
 

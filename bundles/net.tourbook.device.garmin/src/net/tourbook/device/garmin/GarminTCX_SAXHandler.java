@@ -464,7 +464,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
       TourLogManager.subLog_INFO(
 
-            String.format(Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
+            String.format(Messages.GarminTCX_SAXHandler_InvalidDate_2007_04_01,
                   _importFilePath,
                   TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));
    }
@@ -616,7 +616,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       // check if data are available
       if (_allTimeData.isEmpty()) {
 
-         TourLogManager.subLog_INFO(String.format("[TCX] %s - is empty", _importFilePath));
+         TourLogManager.subLog_INFO(String.format(Messages.GarminTCX_SAXHandler_FileIsEmpty, _importFilePath));
 
          _importState_File.isImportDone = true;
          _importState_File.isImportLogged = true;

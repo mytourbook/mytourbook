@@ -114,8 +114,8 @@ public class ApplicationTools {
 
       final StringBuilder sb = new StringBuilder();
 
-      sb.append(String.format("%-30s Setting all views closeable=\"true\" in workbench.xmi" + NL, LocalDateTime.now()));
-      sb.append(String.format("%-30s workbenchFolderPath:    %s" + NL, LocalDateTime.now(), workbenchFolderPath));
+      sb.append(String.format("%-30s Setting all views closeable=\"true\" in workbench.xmi" + NL, LocalDateTime.now())); //$NON-NLS-1$
+      sb.append(String.format("%-30s workbenchFolderPath:    %s" + NL, LocalDateTime.now(), workbenchFolderPath)); //$NON-NLS-1$
 
       final File fileWorkbenchXMI = new File(workbenchFolderPath, WORKBENCH_XMI);
       final File fileWorkbenchXMI_Adjusted = new File(workbenchFolderPath, WORKBENCH_XMI_ADJUSTED);
@@ -143,7 +143,7 @@ public class ApplicationTools {
 
          final int numViews = allNodes.getLength();
 
-         sb.append(String.format("%-30s numViews:               %d" + NL, LocalDateTime.now(), numViews));
+         sb.append(String.format("%-30s numViews:               %d" + NL, LocalDateTime.now(), numViews)); //$NON-NLS-1$
 
          // Updated the selected nodes
          for (int nodeIndex = 0; nodeIndex < numViews; nodeIndex++) {
@@ -159,7 +159,7 @@ public class ApplicationTools {
                // skip parts which do not have a closeable attribute
 
                if (IS_DEBUGGING) {
-                  sb.append(String.format("%-30s Skipped view            %s" + NL, LocalDateTime.now(), attrElementId));
+                  sb.append(String.format("%-30s Skipped view            %s" + NL, LocalDateTime.now(), attrElementId)); //$NON-NLS-1$
                }
 
                continue;
@@ -171,11 +171,11 @@ public class ApplicationTools {
 
                numAdjustments++;
 
-               sb.append(String.format("%-30s Set closeable='true' in %s" + NL, LocalDateTime.now(), attrElementId));
+               sb.append(String.format("%-30s Set closeable='true' in %s" + NL, LocalDateTime.now(), attrElementId)); //$NON-NLS-1$
             }
          }
 
-         sb.append(String.format("%-30s closeable='true' is set in %d views" + NL, LocalDateTime.now(), numAdjustments));
+         sb.append(String.format("%-30s closeable='true' is set in %d views" + NL, LocalDateTime.now(), numAdjustments)); //$NON-NLS-1$
 
          if (numAdjustments > 0) {
 
@@ -206,12 +206,12 @@ public class ApplicationTools {
                // rename original workbench.xmi -> workbench-BACKUP.xmi
                final Path originalWorkbenchXMI = Paths.get(fileWorkbenchXMI.getAbsolutePath());
                Files.move(originalWorkbenchXMI, originalWorkbenchXMI.resolveSibling(WORKBENCH_XMI_BACKUP), StandardCopyOption.REPLACE_EXISTING);
-               sb.append(String.format("%-30s Renamed workbench.xmi -> workbench-BACKUP.xmi" + NL, LocalDateTime.now()));
+               sb.append(String.format("%-30s Renamed workbench.xmi -> workbench-BACKUP.xmi" + NL, LocalDateTime.now())); //$NON-NLS-1$
 
                // rename workbench-ADJUSTED.xmi -> workbench.xmi
                final Path newWorkbenchXMI = Paths.get(fileWorkbenchXMI_Adjusted.getAbsolutePath());
                Files.move(newWorkbenchXMI, newWorkbenchXMI.resolveSibling(WORKBENCH_XMI), StandardCopyOption.REPLACE_EXISTING);
-               sb.append(String.format("%-30s Replaced old workbench.xmi with new workbench.xmi" + NL, LocalDateTime.now()));
+               sb.append(String.format("%-30s Replaced old workbench.xmi with new workbench.xmi" + NL, LocalDateTime.now())); //$NON-NLS-1$
 
             } catch (final IOException e) {
 

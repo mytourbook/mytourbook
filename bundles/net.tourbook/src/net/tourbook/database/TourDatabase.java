@@ -703,7 +703,7 @@ public class TourDatabase {
                                                final String tableName,
                                                final String columnName) throws SQLException {
 
-         final String combinedIndexName = tableName + "__" + columnName;
+         final String combinedIndexName = tableName + "__" + columnName; //$NON-NLS-1$
 
          if (isIndexAvailable(stmt.getConnection(), tableName, combinedIndexName)) {
 
