@@ -129,6 +129,7 @@ public class TourCompareManager {
       try {
 
          final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
             @Override
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
@@ -688,7 +689,7 @@ public class TourCompareManager {
        * Firstly navigate in the compare result view when view is available
        */
       final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
-      
+
       if (comparedTours instanceof TourCompareResultView) {
 
          navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);

@@ -23,15 +23,17 @@ import javax.xml.parsers.SAXParserFactory;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
 
-public class GarminDeviceDataReader extends TourbookDevice {
+public class GarminTCX_DeviceDataReader extends TourbookDevice {
 
    private static final String XML_GARMIN_TAG = "<TrainingCenterDatabase"; //$NON-NLS-1$
 
-   public GarminDeviceDataReader() {
+   public GarminTCX_DeviceDataReader() {
       // plugin constructor
    }
 
@@ -67,22 +69,24 @@ public class GarminDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       if (isValidXMLFile(importFilePath, XML_GARMIN_TAG) == false) {
-         return false;
+         return;
       }
 
-      final GarminSAXHandler saxHandler = new GarminSAXHandler(
+      final GarminTCX_SAXHandler saxHandler = new GarminTCX_SAXHandler(
             this,
             importFilePath,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+            importState_File);
 
       try {
 
@@ -93,13 +97,10 @@ public class GarminDeviceDataReader extends TourbookDevice {
       } catch (final Exception e) {
 
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
 
       } finally {
          saxHandler.dispose();
       }
-
-      return saxHandler.isImported();
    }
 
    @Override

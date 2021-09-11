@@ -36,87 +36,92 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class GarminSAXHandler extends DefaultHandler {
+public class GarminTCX_SAXHandler extends DefaultHandler {
 
-   private static final String           TRAINING_CENTER_DATABASE_V1 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
-   private static final String           TRAINING_CENTER_DATABASE_V2 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
+   private static final String    TRAINING_CENTER_DATABASE_V1 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
+   private static final String    TRAINING_CENTER_DATABASE_V2 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
 
-   private static final String           TAG_DATABASE                = "TrainingCenterDatabase";                                     //$NON-NLS-1$
+   private static final String    TAG_DATABASE                = "TrainingCenterDatabase";                                     //$NON-NLS-1$
 
-   private static final String           TAG_ACTIVITY                = "Activity";                                                   //$NON-NLS-1$
-   private static final String           TAG_COURSE                  = "Course";                                                     //$NON-NLS-1$
-   private static final String           TAG_HISTORY                 = "History";                                                    //$NON-NLS-1$
+   private static final String    TAG_ACTIVITY                = "Activity";                                                   //$NON-NLS-1$
+   private static final String    TAG_COURSE                  = "Course";                                                     //$NON-NLS-1$
+   private static final String    TAG_HISTORY                 = "History";                                                    //$NON-NLS-1$
 
-   private static final String           TAG_CREATOR                 = "Creator";                                                    //$NON-NLS-1$
-   private static final String           TAG_CREATOR_VERSION_MAJOR   = "VersionMajor";                                               //$NON-NLS-1$
-   private static final String           TAG_CREATOR_VERSION_MINOR   = "VersionMinor";                                               //$NON-NLS-1$
+   private static final String    TAG_CREATOR                 = "Creator";                                                    //$NON-NLS-1$
+   private static final String    TAG_CREATOR_VERSION_MAJOR   = "VersionMajor";                                               //$NON-NLS-1$
+   private static final String    TAG_CREATOR_VERSION_MINOR   = "VersionMinor";                                               //$NON-NLS-1$
 
-   private static final String           TAG_NAME                    = "Name";                                                       //$NON-NLS-1$
+   private static final String    TAG_NAME                    = "Name";                                                       //$NON-NLS-1$
 
-   private static final String           TAG_ALTITUDE_METERS         = "AltitudeMeters";                                             //$NON-NLS-1$
-   private static final String           TAG_CALORIES                = "Calories";                                                   //$NON-NLS-1$
-   private static final String           TAG_CADENCE                 = "Cadence";                                                    //$NON-NLS-1$
-   private static final String           TAG_DISTANCE_METERS         = "DistanceMeters";                                             //$NON-NLS-1$
-   private static final String           TAG_HEART_RATE_BPM          = "HeartRateBpm";                                               //$NON-NLS-1$
-   private static final String           TAG_LAP                     = "Lap";                                                        //$NON-NLS-1$
-   private static final String           TAG_LATITUDE_DEGREES        = "LatitudeDegrees";                                            //$NON-NLS-1$
-   private static final String           TAG_LONGITUDE_DEGREES       = "LongitudeDegrees";                                           //$NON-NLS-1$
-   private static final String           TAG_NOTES                   = "Notes";                                                      //$NON-NLS-1$
-   private static final String           TAG_RUN_CADENCE             = "RunCadence";                                                 //$NON-NLS-1$
-   private static final String           TAG_SENSOR_STATE            = "SensorState";                                                //$NON-NLS-1$
-   private static final String           TAG_TRACK                   = "Track";                                                      //$NON-NLS-1$
-   private static final String           TAG_TRACKPOINT              = "Trackpoint";                                                 //$NON-NLS-1$
-   private static final String           TAG_TIME                    = "Time";                                                       //$NON-NLS-1$
-   private static final String           TAG_VALUE                   = "Value";                                                      //$NON-NLS-1$
+   private static final String    TAG_ALTITUDE_METERS         = "AltitudeMeters";                                             //$NON-NLS-1$
+   private static final String    TAG_CALORIES                = "Calories";                                                   //$NON-NLS-1$
+   private static final String    TAG_CADENCE                 = "Cadence";                                                    //$NON-NLS-1$
+   private static final String    TAG_DISTANCE_METERS         = "DistanceMeters";                                             //$NON-NLS-1$
+   private static final String    TAG_HEART_RATE_BPM          = "HeartRateBpm";                                               //$NON-NLS-1$
+   private static final String    TAG_LAP                     = "Lap";                                                        //$NON-NLS-1$
+   private static final String    TAG_LATITUDE_DEGREES        = "LatitudeDegrees";                                            //$NON-NLS-1$
+   private static final String    TAG_LONGITUDE_DEGREES       = "LongitudeDegrees";                                           //$NON-NLS-1$
+   private static final String    TAG_NOTES                   = "Notes";                                                      //$NON-NLS-1$
+   private static final String    TAG_RUN_CADENCE             = "RunCadence";                                                 //$NON-NLS-1$
+   private static final String    TAG_SENSOR_STATE            = "SensorState";                                                //$NON-NLS-1$
+   private static final String    TAG_TRACK                   = "Track";                                                      //$NON-NLS-1$
+   private static final String    TAG_TRACKPOINT              = "Trackpoint";                                                 //$NON-NLS-1$
+   private static final String    TAG_TIME                    = "Time";                                                       //$NON-NLS-1$
+   private static final String    TAG_VALUE                   = "Value";                                                      //$NON-NLS-1$
 
-   private static final String           TAG_NS2_SPEED               = "ns2:Speed";                                                  //$NON-NLS-1$
-   private static final String           TAG_NS2_WATTS               = "ns2:Watts";                                                  //$NON-NLS-1$
-   private static final String           TAG_NS3_SPEED               = "ns3:Speed";                                                  //$NON-NLS-1$
-   private static final String           TAG_NS3_WATTS               = "ns3:Watts";                                                  //$NON-NLS-1$
+   private static final String    TAG_NS2_SPEED               = "ns2:Speed";                                                  //$NON-NLS-1$
+   private static final String    TAG_NS2_WATTS               = "ns2:Watts";                                                  //$NON-NLS-1$
+   private static final String    TAG_NS3_SPEED               = "ns3:Speed";                                                  //$NON-NLS-1$
+   private static final String    TAG_NS3_WATTS               = "ns3:Watts";                                                  //$NON-NLS-1$
 
-   private static final String           TAG_TPX                     = "TPX";                                                        //$NON-NLS-1$
-   private static final String           TAG_TPX_SPEED               = "Speed";                                                      //$NON-NLS-1$
-   private static final String           TAG_TPX_WATTS               = "Watts";                                                      //$NON-NLS-1$
+   private static final String    TAG_TPX                     = "TPX";                                                        //$NON-NLS-1$
+   private static final String    TAG_TPX_SPEED               = "Speed";                                                      //$NON-NLS-1$
+   private static final String    TAG_TPX_WATTS               = "Watts";                                                      //$NON-NLS-1$
 
-   private static final String           SENSOR_STATE_PRESENT        = "Present";                                                    //$NON-NLS-1$
-   private static final String           ATTR_VALUE_SPORT            = "Sport";                                                      //$NON-NLS-1$
+   private static final String    SENSOR_STATE_PRESENT        = "Present";                                                    //$NON-NLS-1$
+   private static final String    ATTR_VALUE_SPORT            = "Sport";                                                      //$NON-NLS-1$
 
-   private static final String           DateTimePattern             = "yyyy-MM-dd'T'HH:mm:ss";                                      //$NON-NLS-1$
-   private static final SimpleDateFormat TIME_FORMAT;
-   private static final SimpleDateFormat TIME_FORMAT_SSSZ;
-   private static final SimpleDateFormat TIME_FORMAT_RFC822;
+   private static final int       DEFAULT_YEAR                = 2007;
+   private static final int       DEFAULT_MONTH               = 4;
+   private static final int       DEFAULT_DAY                 = 1;
 
-   private static final int              DEFAULT_YEAR                = 2007;
-   private static final int              DEFAULT_MONTH               = 4;
-   private static final int              DEFAULT_DAY                 = 1;
+   private final long             DEFAULT_TIME;
 
-   private static final long             DEFAULT_TIME;
-
-   static {
+   private final SimpleDateFormat TIME_FORMAT;
+   private final SimpleDateFormat TIME_FORMAT_SSSZ;
+   private final SimpleDateFormat TIME_FORMAT_RFC822;
+   {
 
       DEFAULT_TIME = ZonedDateTime
             .of(DEFAULT_YEAR, DEFAULT_MONTH, DEFAULT_DAY, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
             .toInstant()
             .toEpochMilli();
 
-      TIME_FORMAT = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_SSSZ = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_RFC822 = new SimpleDateFormat(DateTimePattern + "Z"); //$NON-NLS-1$
+      final String DateTimePattern = "yyyy-MM-dd'T'HH:mm:ss"; //$NON-NLS-1$
 
-      TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-      TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-      TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+      TIME_FORMAT          = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_SSSZ     = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_RFC822   = new SimpleDateFormat(DateTimePattern + "Z"); //$NON-NLS-1$
+
+      TIME_FORMAT          .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      TIME_FORMAT_SSSZ     .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      TIME_FORMAT_RFC822   .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+
+// SET_FORMATTING_ON
    }
 
+   private ImportState_File    _importState_File;
    private boolean             _importState_IsIgnoreSpeedValues;
 
    private boolean             _isInActivity;
@@ -157,7 +162,6 @@ public class GarminSAXHandler extends DefaultHandler {
    private Map<Long, TourData> _newlyImportedTours;
    private TourbookDevice      _device;
    private String              _importFilePath;
-   private boolean             _isImported;
 
    private boolean             _isPreviousTrackPointAPause;
    private boolean             _isFirstTrackPointInTrack;
@@ -196,16 +200,18 @@ public class GarminSAXHandler extends DefaultHandler {
 
    }
 
-   public GarminSAXHandler(final TourbookDevice deviceDataReader,
-                           final String importFileName,
-                           final DeviceData deviceData,
-                           final Map<Long, TourData> alreadyImportedTours,
-                           final Map<Long, TourData> newlyImportedTours) {
+   public GarminTCX_SAXHandler(final TourbookDevice deviceDataReader,
+                               final String importFileName,
+                               final DeviceData deviceData,
+                               final Map<Long, TourData> alreadyImportedTours,
+                               final Map<Long, TourData> newlyImportedTours,
+                               final ImportState_File importState_File) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+      _importState_File = importState_File;
 
       final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
@@ -456,10 +462,11 @@ public class GarminSAXHandler extends DefaultHandler {
          }
       }
 
-      StatusUtil.log(NLS.bind(
-            Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
-            _importFilePath,
-            TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));
+      TourLogManager.subLog_INFO(
+
+            String.format(Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
+                  _importFilePath,
+                  TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));
    }
 
    @Override
@@ -608,6 +615,12 @@ public class GarminSAXHandler extends DefaultHandler {
 
       // check if data are available
       if (_allTimeData.isEmpty()) {
+
+         TourLogManager.subLog_INFO(String.format("[TCX] %s - is empty", _importFilePath));
+
+         _importState_File.isImportDone = true;
+         _importState_File.isImportLogged = true;
+
          return;
       }
 
@@ -689,7 +702,7 @@ public class GarminSAXHandler extends DefaultHandler {
          tourData.computeComputedValues();
       }
 
-      _isImported = true;
+      _importState_File.isFileImportedWithValidData = true;
    }
 
    private void finalize_Trackpoint() {
@@ -1019,7 +1032,7 @@ public class GarminSAXHandler extends DefaultHandler {
                      _currentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
                   } catch (final ParseException e3) {
 
-                     TourLogManager.logError(e3.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
+                     TourLogManager.log_ERROR(e3.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
                   }
                }
             }
@@ -1059,13 +1072,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
       _pausedTime_Start.clear();
       _pausedTime_End.clear();
-   }
-
-   /**
-    * @return Returns <code>true</code> when a tour was imported
-    */
-   public boolean isImported() {
-      return _isImported;
    }
 
    /**
@@ -1273,8 +1279,8 @@ public class GarminSAXHandler extends DefaultHandler {
     * There are cases where the lap end time and the next lap start time have the same time value,
     * so there are duplicated times which causes problems like markers are not displayed because the
     * marker time is twice available.
-    * There are cases where the {@link GarminSAXHandler#TAG_DISTANCE_METERS} element (at the
-    * {@link GarminSAXHandler#TAG_TRACKPOINT} level) is reset within each new lap.
+    * There are cases where the {@link GarminTCX_SAXHandler#TAG_DISTANCE_METERS} element (at the
+    * {@link GarminTCX_SAXHandler#TAG_TRACKPOINT} level) is reset within each new lap.
     * In this case, we need to recompute correctly all the {@link TimeData#absoluteDistance} values.
     */
    private void validateTimeSeries() {

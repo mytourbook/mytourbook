@@ -19,7 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -276,7 +276,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_comboTitle);
 
             // fill combobox
-            final TreeSet<String> dbTitles = TourDatabase.getAllTourTitles();
+            final ConcurrentSkipListSet<String> dbTitles = TourDatabase.getCachedFields_AllTourTitles();
             for (final String title : dbTitles) {
                _comboTitle.add(title);
             }
@@ -326,7 +326,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_comboLocation_Start);
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
             for (final String string : arr) {
                if (string != null) {
                   _comboLocation_Start.add(string);
@@ -353,7 +353,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_comboLocation_End);
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceEnds();
             for (final String string : arr) {
                if (string != null) {
                   _comboLocation_End.add(string);

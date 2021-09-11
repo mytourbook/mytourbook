@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.device.sporttracks.FitLogSAXHandler.Equipment;
+import net.tourbook.device.sporttracks.FitLog_SAXHandler.Equipment;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -31,7 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * For FitLogEx files only:
  * We parse and save the CustomDataFieldDefinitions and equipments
  */
-public class FitLogExSAXHandler extends DefaultHandler {
+public class FitLogEx_SAXHandler extends DefaultHandler {
 
    static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELD              = "CustomDataField";                               //$NON-NLS-1$
    static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELDS             = TAG_ACTIVITY_CUSTOM_DATA_FIELD + "s";            //$NON-NLS-1$
@@ -77,7 +77,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
    private StringBuilder                  _characters                                 = new StringBuilder();
 
-   public FitLogExSAXHandler() {
+   public FitLogEx_SAXHandler() {
 
       _customDataFieldDefinitions = new LinkedHashMap<>();
       _equipments = new ArrayList<>();
@@ -242,7 +242,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
          _isInEquipment = true;
 
          final Equipment newEquipment = new Equipment();
-         newEquipment.Id = attributes.getValue(FitLogSAXHandler.ATTRIB_EQUIPMENT_ID);
+         newEquipment.Id = attributes.getValue(FitLog_SAXHandler.ATTRIB_EQUIPMENT_ID);
 
          _equipments.add(newEquipment);
 
