@@ -53,8 +53,6 @@ public class ChartLabelMarker extends ChartLabel {
 
    public int       devYMarker;
 
-   public int       devMarkerPointSize;
-
    /**
     * Bounds where the marker sign image is painted.
     */

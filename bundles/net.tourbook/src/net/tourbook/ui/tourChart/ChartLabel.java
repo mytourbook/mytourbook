@@ -56,6 +56,7 @@ public abstract class ChartLabel {
    public Rectangle paintedLabel;
 
    public int       devHoverSize;
+   public int       devPointSize;
 
    /**
     * Is <code>true</code> when the label is drawn vertically.

@@ -110,9 +110,8 @@ public enum TourEventId {
     */
    MARKER_SELECTION,
 
-   //TODO FB
    /**
-    * A tour pause is selected, event data contain a {@link SelectionTourMarker}.
+    * A tour pause is selected, event data contain a {@link SelectionTourPause}.
     */
    PAUSE_SELECTION,
 

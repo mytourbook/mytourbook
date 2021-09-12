@@ -2988,54 +2988,54 @@ public class Map2View extends ViewPart implements
       final List<Long> allTourMarker = pauseSelection.getSelectedTourPauses();
       final int numberOfTourMarkers = allTourMarker.size();
 
-      int leftSliderValueIndex = 0;
-      int rightSliderValueIndex = 0;
+      final int leftSliderValueIndex = 0;
+      final int rightSliderValueIndex = 0;
 
-      if (tourData.isMultipleTours()) {
-
-         if (numberOfTourMarkers == 1) {
-
-            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
-            rightSliderValueIndex = leftSliderValueIndex;
-
-         } else if (numberOfTourMarkers > 1) {
-
-            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
-            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getMultiTourSerieIndex();
-         }
-
-      } else {
-
-         if (numberOfTourMarkers == 1) {
-
-            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
-            rightSliderValueIndex = leftSliderValueIndex;
-
-         } else if (numberOfTourMarkers > 1) {
-
-            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
-            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
-         }
-      }
-
-      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
-
-         if (isDrawSlider) {
-
-            positionMapTo_0_TourSliders(
-                  tourData,
-                  leftSliderValueIndex,
-                  rightSliderValueIndex,
-                  leftSliderValueIndex,
-                  null);
-
-         } else {
-
-            positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
-         }
-
-         keepMapPosition(tourData);
-      }
+//      if (tourData.isMultipleTours()) {
+//
+//         if (numberOfTourMarkers == 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
+//            rightSliderValueIndex = leftSliderValueIndex;
+//
+//         } else if (numberOfTourMarkers > 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
+//            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getMultiTourSerieIndex();
+//         }
+//
+//      } else {
+//
+//         if (numberOfTourMarkers == 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+//            rightSliderValueIndex = leftSliderValueIndex;
+//
+//         } else if (numberOfTourMarkers > 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+//            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+//         }
+//      }
+//
+//      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
+//
+//         if (isDrawSlider) {
+//
+//            positionMapTo_0_TourSliders(
+//                  tourData,
+//                  leftSliderValueIndex,
+//                  rightSliderValueIndex,
+//                  leftSliderValueIndex,
+//                  null);
+//
+//         } else {
+//
+//            positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+//         }
+//
+//         keepMapPosition(tourData);
+//      }
    }
 
    private void paintEntireTour() {

@@ -68,7 +68,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    private void adjustLabelPosition(final int labelWidth,
                                     final int labelHeight) {
 
-      final int pausePointSize2 = PAUSE_POINT_SIZE / 2 + 0;
+      final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
 
       //LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED:
       _devXPause -= labelWidth / 2;
@@ -177,7 +177,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
       final int devVisibleChartWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
       final boolean isGraphZoomed = devVirtualGraphWidth != devVisibleChartWidth;
-      final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
       final float graphYBottom = graphDrawingData.getGraphYBottom();
       final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
       final double scaleX = graphDrawingData.getScaleX();
@@ -198,6 +197,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          /*
           * Get pause point top/left position
           */
+         final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
          final int devXPauseTopLeft = _devXPause - pausePointSize2;
          final int devYPauseTopLeft = _devYPause - pausePointSize2;
 
@@ -270,9 +270,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
                textWidth + borderWidth2,
                textHeightWithBorder);
 
-         // keep painted positions to identify and paint the hovered positions
-         chartLabelPause.paintedLabel = textRect;
-
          final Rectangle validRect = overlapChecker.getValidRect(
                textRect,
                true,
@@ -292,6 +289,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          }
 
          // keep painted positions to identify and paint hovered positions
+         chartLabelPause.paintedLabel = textRect;
+         chartLabelPause.devPointSize = PAUSE_POINT_SIZE;
          chartLabelPause.devHoverSize = PAUSE_HOVER_SIZE;
          chartLabelPause.devYBottom = devYBottom;
          chartLabelPause.devYTop = devYTop;

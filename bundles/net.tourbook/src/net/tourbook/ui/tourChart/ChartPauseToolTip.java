@@ -296,17 +296,23 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
    private Rectangle getHoveredRectangle() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
+      final int devPausePointSizeRaw = _hoveredLabel.devPointSize;
 
       Rectangle hoveredRectangle = new Rectangle(_hoveredLabel.devXPause, _hoveredLabel.devYPause, 1, 1);
 
-      int devPausePointSize = 1;
-      if (devPausePointSize < 1) {
-         devPausePointSize = 1;
+      if (devPausePointSizeRaw > 0) {
+
+         final int devMarkerX = _hoveredLabel.devXPause - hoverSize;
+         final int devMarkerY = _hoveredLabel.devYPause - hoverSize;
+         final int devMarkerSize = devPausePointSizeRaw + 2 * hoverSize;
+
+         final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+         hoveredRectangle = hoveredRectangle.union(rectMarker);
       }
 
       final int devPauseX = _hoveredLabel.devXPause - hoverSize;
       final int devPauseY = _hoveredLabel.devYPause - hoverSize;
-      final int devPauseSize = devPausePointSize + 2 * hoverSize;
+      final int devPauseSize = devPausePointSizeRaw + 2 * hoverSize;
 
       final Rectangle pauseRectangle = new Rectangle(devPauseX, devPauseY, devPauseSize, devPauseSize);
       hoveredRectangle = hoveredRectangle.union(pauseRectangle);

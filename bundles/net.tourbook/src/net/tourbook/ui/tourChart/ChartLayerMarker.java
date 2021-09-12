@@ -487,7 +487,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
          // keep painted positions to identify and paint hovered positions
          chartLabel.devIsVertical = _isVertical;
-         chartLabel.devMarkerPointSize = MARKER_POINT_SIZE;
+         chartLabel.devPointSize = MARKER_POINT_SIZE;
          chartLabel.devHoverSize = MARKER_HOVER_SIZE;
          chartLabel.devYBottom = devYBottom;
          chartLabel.devYTop = devYTop;

@@ -629,7 +629,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
    private Rectangle getHoveredRect() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
-      final int devMarkerPointSizeRaw = _hoveredLabel.devMarkerPointSize;
+      final int devMarkerPointSizeRaw = _hoveredLabel.devPointSize;
 
       Rectangle rectHovered = new Rectangle(_hoveredLabel.devXMarker, _hoveredLabel.devYMarker, 1, 1);
 
