@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Shell;
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
    //todo fb display a gray area hwen hovering just like the markers
-   //Bug when the pauses layer is hidden, the pause tooltip is not displayed anymore
    //todo fb where is the best place to show the pauses, before the pause, in the middle, at the end ?
    //when clicking on the pause, center the map on the pause just like for markers
 
@@ -289,10 +288,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       }
    }
 
-   //TODO FB
-   /**
-    * This is copied from {@link ChartLayerPause#drawOverlay()}.
-    */
+   //TODO FB Hint : in chartLayermarke, both x,y of rectangles are not the same but here they are!?
    private Rectangle getHoveredRectangle() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
@@ -302,20 +298,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       if (devPausePointSizeRaw > 0) {
 
-         final int devMarkerX = _hoveredLabel.devXPause - hoverSize;
-         final int devMarkerY = _hoveredLabel.devYPause - hoverSize;
-         final int devMarkerSize = devPausePointSizeRaw + 2 * hoverSize;
+         final int devXPause = _hoveredLabel.devXPause - hoverSize;
+         final int devYPause = _hoveredLabel.devYPause - hoverSize;
+         final int devPauseSize = devPausePointSizeRaw + 2 * hoverSize;
 
-         final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+         final Rectangle rectMarker = new Rectangle(devXPause, devYPause, devPauseSize, devPauseSize);
          hoveredRectangle = hoveredRectangle.union(rectMarker);
       }
-
-      final int devPauseX = _hoveredLabel.devXPause - hoverSize;
-      final int devPauseY = _hoveredLabel.devYPause - hoverSize;
-      final int devPauseSize = devPausePointSizeRaw + 2 * hoverSize;
-
-      final Rectangle pauseRectangle = new Rectangle(devPauseX, devPauseY, devPauseSize, devPauseSize);
-      hoveredRectangle = hoveredRectangle.union(pauseRectangle);
 
       // add label rectangle
       if (_hoveredLabel.paintedLabel != null) {
@@ -365,7 +354,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       final int devYTop = _hoveredLabel.devYTop;
       final int devYBottom = _hoveredLabel.devYBottom;
-      final boolean isVertical = _hoveredLabel.devIsVertical;
 
       final int tipWidth = tipSize.x;
       final int tipHeight = tipSize.y;
@@ -385,11 +373,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          ttPosX = devHoveredX - tipWidth - 1;
 
-         if (isVertical) {
-            ttPosY = devHoveredY;
-         } else {
-            ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
-         }
+         ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
 
          break;
 
@@ -397,11 +381,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          ttPosX = devHoveredX + devHoveredWidth + 1;
 
-         if (isVertical) {
-            ttPosY = devHoveredY;
-         } else {
-            ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
-         }
+         ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
 
          break;
 

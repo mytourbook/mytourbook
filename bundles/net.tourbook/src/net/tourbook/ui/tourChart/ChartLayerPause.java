@@ -26,7 +26,6 @@ import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -85,7 +84,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final int devGraphHeight = drawingData.devGraphHeight;
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
-      LABEL_OFFSET = PAUSE_POINT_SIZE = PAUSE_HOVER_SIZE = pc.convertVerticalDLUsToPixels(2);
+      LABEL_OFFSET = PAUSE_POINT_SIZE = pc.convertVerticalDLUsToPixels(2);
+      PAUSE_HOVER_SIZE = pc.convertVerticalDLUsToPixels(4);
       final Color colorDefault = UI.IS_DARK_THEME
             ? new Color(new RGB(0xa0, 0xa0, 0xa0))
             : new Color(new RGB(0x60, 0x60, 0x60));
@@ -114,23 +114,20 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final boolean isDarkTheme = UI.isDarkTheme();
       final Color colorDefault = new Color(isDarkTheme ? _chartPauseConfig.pauseColorDefault_Dark : _chartPauseConfig.pauseColorDefault_Light);
 
-      drawOverlay_Label(hoveredLabel, gc, colorDefault, false);
+      drawOverlay_Label(hoveredLabel, gc, colorDefault);
    }
 
    private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
                                   final GC gc,
-                                  final Color colorDefault,
-                                  final boolean isSelected) {
+                                  final Color colorDefault) {
 
       if (chartLabelPause == null) {
          return;
       }
 
-      gc.setAlpha(isSelected ? 0x60 : 0x30);
+      gc.setAlpha(0x30);
 
-      final Color backgroundColor = isSelected ? gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY) : colorDefault;
-
-      gc.setBackground(backgroundColor);
+      gc.setBackground(colorDefault);
 
       /*
        * Rectangles can be merged into a union with regions, took me some time to find this solution
@@ -205,8 +202,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
           * Draw pause point
           */
          gc.setBackground(colorDefault);
-
-         // draw pause point
          gc.fillRectangle(devXPauseTopLeft, devYPauseTopLeft, PAUSE_POINT_SIZE, PAUSE_POINT_SIZE);
 
          /*
@@ -219,11 +214,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          final int labelHeight = labelExtend.y;
 
          adjustLabelPosition(labelWidth, labelHeight);
-
-         //TODO FB pauses are always horizontal, to remove ?
-         /*
-          * label is horizontal
-          */
 
          // don't draw the pause to the left of the chart
          if (devVirtualGraphImageOffset == 0 && _devXPause < 0) {
@@ -296,6 +286,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          chartLabelPause.devYTop = devYTop;
          chartLabelPause.devGraphWidth = devVisibleChartWidth;
       }
+
+      gc.setClipping((Rectangle) null);
    }
 
    private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
