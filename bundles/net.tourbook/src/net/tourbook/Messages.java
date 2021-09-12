@@ -2078,14 +2078,10 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Label_TourDirection_SymbolColor;
    public static String Slideout_Map_Options_Label_TourDirection_SymbolSize;
    public static String Slideout_Map_Options_Spinner_DimValue_Tooltip;
-
    public static String Slideout_Map_PhotoOptions_Label_Title;
-
    public static String Slideout_Map_SyncMap_Label_Title;
-
    public static String Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_Map_TourColors_Label_Title;
-
    public static String Slideout_Map_TrackOptions_Label_Title;
    public static String Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
