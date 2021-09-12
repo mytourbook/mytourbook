@@ -5131,6 +5131,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final long start = System.currentTimeMillis();
 
       /*
+       * Check if new tour tags / types were created, when yes the UI must be updated afterwards
+       * otherwise e.g. new tour types are not available in the tour type filter !!!
+       */
+      boolean isNewTourType = false;
+      boolean isNewTourTags = false;
+      for (final TourData tourData : allTourData) {
+
+         /*
+          * Check tour type
+          */
+         final TourType tourType = tourData.getTourType();
+         if (tourType != null) {
+
+            if (tourType.getTypeId() == -1) {
+               isNewTourType = true;
+            }
+         }
+
+         /*
+          * Check tour tags
+          */
+         for (final TourTag tourTag : tourData.getTourTags()) {
+
+            if (tourTag.getTagId() == -1) {
+               isNewTourTags = true;
+               break;
+            }
+         }
+      }
+
+      /*
        * Setup concurrency
        */
       _saveTour_CountDownLatch = new CountDownLatch(numTours);
@@ -5197,7 +5228,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // update e.g. fulltext index
          TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(getAllTourIds(allSavedTours));
 
-         saveImportedTours_30_PostActions(allSavedTours);
+         saveImportedTours_30_PostActions(allSavedTours, isNewTourType, isNewTourTags);
       }
 
       return allSavedTours;
@@ -5311,8 +5342,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     *
     * @param savedTours
     *           contains the saved {@link TourData}
+    * @param isNewTourTags
+    * @param isNewTourType
     */
-   private void saveImportedTours_30_PostActions(final ArrayList<TourData> savedTours) {
+   private void saveImportedTours_30_PostActions(final ArrayList<TourData> savedTours,
+                                                 final boolean isNewTourType,
+                                                 final boolean isNewTourTags) {
 
       // update viewer, fire selection event
       if (savedTours.isEmpty()) {
@@ -5341,6 +5376,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       reloadViewer();
 
       enableActions();
+
+      if (isNewTourType) {
+
+         TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+      }
+
+      if (isNewTourTags) {
+
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+      }
 
       /*
        * Notify all views, it is not checked if the tour data editor is dirty because newly saved

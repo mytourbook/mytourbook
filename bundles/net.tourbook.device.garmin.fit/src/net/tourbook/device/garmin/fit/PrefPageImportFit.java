@@ -542,17 +542,13 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       } else if (selectedTab == TAB_FOLDER_MARKER_FILTER) {
 
-         _chkIgnoreLastMarker.setSelection(//
-               _prefStore.getDefaultBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
-         _spinnerIgnorLastMarker_TimeSlices.setSelection(//
-               _prefStore.getDefaultInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
+         _chkIgnoreLastMarker.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
+         _spinnerIgnorLastMarker_TimeSlices.setSelection(_prefStore.getDefaultInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
 
       } else if (selectedTab == TAB_FOLDER_TIME_SLIZE) {
 
-         _chkRemoveExceededDuration.setSelection(//
-               _prefStore.getDefaultBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
-         _spinnerExceededDuration.setSelection(//
-               _prefStore.getDefaultInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
+         _chkRemoveExceededDuration.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
+         _spinnerExceededDuration.setSelection(_prefStore.getDefaultInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
 
       } else if (selectedTab == TAB_FOLDER_POWER) {
 
@@ -596,20 +592,15 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       // temperature
       final float temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
-      _spinnerTemperatureAdjustment.setSelection(//
-            (int) (temperatureAdjustment * TEMPERATURE_DIGITS));
+      _spinnerTemperatureAdjustment.setSelection((int) (temperatureAdjustment * TEMPERATURE_DIGITS));
 
       // last marker
-      _chkIgnoreLastMarker.setSelection(//
-            _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
-      _spinnerIgnorLastMarker_TimeSlices.setSelection(//
-            _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
+      _chkIgnoreLastMarker.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
+      _spinnerIgnorLastMarker_TimeSlices.setSelection(_prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
 
       // exceeded time slice
-      _chkRemoveExceededDuration.setSelection(//
-            _prefStore.getBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
-      _spinnerExceededDuration.setSelection(//
-            _prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
+      _chkRemoveExceededDuration.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
+      _spinnerExceededDuration.setSelection(_prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
 
       // folder
       _tabFolder.setSelection(_prefStore.getInt(STATE_FIT_IMPORT_SELECTED_TAB));
@@ -637,35 +628,21 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       // temperature
       final float temperatureAdjustment = _spinnerTemperatureAdjustment.getSelection() / TEMPERATURE_DIGITS;
-      _prefStore.setValue(//
-            IPreferences.FIT_TEMPERATURE_ADJUSTMENT,
-            temperatureAdjustment);
+      _prefStore.setValue(IPreferences.FIT_TEMPERATURE_ADJUSTMENT, temperatureAdjustment);
 
       // last marker
-      _prefStore.setValue(//
-            IPreferences.FIT_IS_IGNORE_LAST_MARKER,
-            _chkIgnoreLastMarker.getSelection());
-      _prefStore.setValue(
-            IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES,
-            _spinnerIgnorLastMarker_TimeSlices.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_IGNORE_LAST_MARKER, _chkIgnoreLastMarker.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES, _spinnerIgnorLastMarker_TimeSlices.getSelection());
 
       // exceeded time slice
-      _prefStore.setValue(//
-            IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE,
-            _chkRemoveExceededDuration.getSelection());
-      _prefStore.setValue(//
-            IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION,
-            _spinnerExceededDuration.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE, _chkRemoveExceededDuration.getSelection());
+      _prefStore.setValue(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION, _spinnerExceededDuration.getSelection());
 
       // Preferred power data source
-      _prefStore.setValue(
-            IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE,
-            _comboPowerDataSource.getSelectionIndex());
+      _prefStore.setValue(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, _comboPowerDataSource.getSelectionIndex());
 
       // Set Tour Type during FIT import
-      _prefStore.setValue(
-            IPreferences.FIT_IS_IMPORT_TOURTYPE,
-            _chkFitImportTourType.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_IMPORT_TOURTYPE, _chkFitImportTourType.getSelection());
 
       // Mode for Tour Type during FIT import
       String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
@@ -683,9 +660,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
       }
 
-      _prefStore.setValue(
-            IPreferences.FIT_IMPORT_TOURTYPE_MODE,
-            tourTypeMode);
+      _prefStore.setValue(IPreferences.FIT_IMPORT_TOURTYPE_MODE, tourTypeMode);
    }
 
    private void saveUIState() {
