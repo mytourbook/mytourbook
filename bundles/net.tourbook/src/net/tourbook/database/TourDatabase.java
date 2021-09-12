@@ -63,7 +63,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -228,7 +227,7 @@ public class TourDatabase {
    public static final String  ENTITY_ID_WAY_POINT                = "WayPointID";                                           //$NON-NLS-1$
    //
    private static final String KEY_BIKE                           = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
-   private static final String KEY_DEVICE_SENSOR                  = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
+//   private static final String KEY_DEVICE_SENSOR                  = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
    private static final String KEY_PERSON                         = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
    public static final String  KEY_TAG                            = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
    private static final String KEY_TAG_CATEGORY                   = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
@@ -3470,62 +3469,62 @@ public class TourDatabase {
       execUpdate(stmt, sql);
    }
 
-   /**
-    * Create table {@link #TABLE_DEVICE_SENSOR}
-    *
-    * @param stmt
-    * @throws SQLException
-    */
-   private void createTable_DeviceSensor(final Statement stmt) throws SQLException {
-
-      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR + "   (                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR, true)
-
-            + "   " + KEY_TOUR + "         BIGINT,                                     " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            // version 45 start
-
-            + "   Label          VARCHAR(" + DeviceSensor.DB_LENGTH_LABEL + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   SerialNumber   VARCHAR(" + DeviceSensor.DB_LENGTH_LABEL + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            // version 45 end
-
-            + ")" //                                                                          //$NON-NLS-1$
-      );
-
-      SQL.CreateIndex(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$
-   }
-
-   /**
-    * Create table {@link #TABLE_DEVICE_SENSOR_VALUE}
-    *
-    * @param stmt
-    * @throws SQLException
-    */
-   private void createTable_DeviceSensorValues(final Statement stmt) throws SQLException {
-
-      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR_VALUE + "   (                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR_VALUE, true)
-
-            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_DEVICE_SENSOR + "  BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            // version 45 start
-
-            + "   TourStartTime           BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
-
-            + "   BatteryVoltage_Start    FLOAT,                                       " + NL //$NON-NLS-1$
-            + "   BatteryVoltage_End      FLOAT                                        " + NL //$NON-NLS-1$
-
-            // version 45 end
-
-            + ")" //                                                                          //$NON-NLS-1$
-      );
-
-      SQL.CreateIndex_Combined(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
-   }
+//   /**
+//    * Create table {@link #TABLE_DEVICE_SENSOR}
+//    *
+//    * @param stmt
+//    * @throws SQLException
+//    */
+//   private void createTable_DeviceSensor(final Statement stmt) throws SQLException {
+//
+//      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR + "   (                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//      //
+//            + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR, true)
+//
+//            + "   " + KEY_TOUR + "         BIGINT,                                     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//
+//            // version 45 start
+//
+//            + "   Label          VARCHAR(" + DeviceSensor.DB_LENGTH_LABEL + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "   SerialNumber   VARCHAR(" + DeviceSensor.DB_LENGTH_LABEL + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//
+//            // version 45 end
+//
+//            + ")" //                                                                          //$NON-NLS-1$
+//      );
+//
+//      SQL.CreateIndex(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$
+//   }
+//
+//   /**
+//    * Create table {@link #TABLE_DEVICE_SENSOR_VALUE}
+//    *
+//    * @param stmt
+//    * @throws SQLException
+//    */
+//   private void createTable_DeviceSensorValues(final Statement stmt) throws SQLException {
+//
+//      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR_VALUE + "   (                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//      //
+//            + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR_VALUE, true)
+//
+//            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "   " + KEY_DEVICE_SENSOR + "  BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//
+//            // version 45 start
+//
+//            + "   TourStartTime           BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
+//
+//            + "   BatteryVoltage_Start    FLOAT,                                       " + NL //$NON-NLS-1$
+//            + "   BatteryVoltage_End      FLOAT                                        " + NL //$NON-NLS-1$
+//
+//            // version 45 end
+//
+//            + ")" //                                                                          //$NON-NLS-1$
+//      );
+//
+//      SQL.CreateIndex_Combined(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
+//   }
 
    /**
     * create table {@link #TABLE_TOUR_BIKE}
@@ -5032,8 +5031,8 @@ public class TourDatabase {
             createTable_TourCompared(stmt);
             createTable_TourBike(stmt);
             createTable_TourGeoParts(stmt);
-            createTable_DeviceSensor(stmt);
-            createTable_DeviceSensorValues(stmt);
+//            createTable_DeviceSensor(stmt);
+//            createTable_DeviceSensorValues(stmt);
 
             createTable_DbVersion_Design(stmt);
             createTable_DbVersion_Data(stmt, TOURBOOK_DB_VERSION);
@@ -8710,13 +8709,13 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          // double check if db already exists
-         if (isTableAvailable(conn, TABLE_DEVICE_SENSOR) == false) {
-            createTable_DeviceSensor(stmt);
-         }
-
-         if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUE) == false) {
-            createTable_DeviceSensorValues(stmt);
-         }
+//         if (isTableAvailable(conn, TABLE_DEVICE_SENSOR) == false) {
+//            createTable_DeviceSensor(stmt);
+//         }
+//
+//         if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUE) == false) {
+//            createTable_DeviceSensorValues(stmt);
+//         }
 
          // add new fields
          SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start", DEFAULT_IGNORED); //$NON-NLS-1$
