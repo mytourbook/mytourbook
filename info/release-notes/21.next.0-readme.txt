@@ -114,10 +114,15 @@ Changes
 * 2.5D Map
   - direction arrows modified so they looking like the arrows in 2D Map
   - fater trackline, when direction arrows are enabled
-  - enabled building extrusion also for mapilion map  
+  - enabled building extrusion also for mapilion map
+  - Photolayer on top of all other layers
 
 Bugfix
 ======
+
+* Tour Re-import
+  - Elevation up/down values were not re-imported
+    https://sourceforge.net/p/mytourbook/bugs/125/
 
 * 4k Display
   - Fixed positions for the vertical x-Axis units and vertical tour chart markers

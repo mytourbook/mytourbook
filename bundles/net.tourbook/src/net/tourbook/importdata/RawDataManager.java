@@ -2870,6 +2870,12 @@ public class RawDataManager {
           * Tour(s) could be re-imported from the file, check if it contains a valid tour
           */
 
+         // create dummy clone BEFORE oldTourData is modified
+         TourData oldTourDataDummyClone = null;
+         if (importState_Process.isLog_INFO()) {
+            oldTourDataDummyClone = createTourDataDummyClone(tourValueTypes, oldTourData);
+         }
+
          TourData updatedTourData = reimportTour_30(
 
                tourValueTypes,
@@ -2916,11 +2922,10 @@ public class RawDataManager {
             }
 
             // log the old vs new data comparison
-            if (importState_Process.isLog_INFO()) {
+            if (oldTourDataDummyClone != null) {
 
-               final TourData tourDataDummyClone = createTourDataDummyClone(tourValueTypes, oldTourData);
                for (final TourValueType tourValueType : tourValueTypes) {
-                  displayTourModifiedDataDifferences(tourValueType, tourDataDummyClone, updatedTourData);
+                  displayTourModifiedDataDifferences(tourValueType, oldTourDataDummyClone, updatedTourData);
                }
             }
 
@@ -3095,7 +3100,6 @@ public class RawDataManager {
              */
             newTourData.clearComputedSeries();
 
-            newTourData.computeAltitudeUpDown();
             newTourData.computeTourMovingTime();
             newTourData.computeComputedValues();
 
@@ -3162,8 +3166,11 @@ public class RawDataManager {
       // Elevation
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__ELEVATION)) {
 
-         // re-import altitude only
+         // re-import elevation only
+
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
+         oldTourData.setTourAltUp(reimportedTourData.getTourAltUp());
+         oldTourData.setTourAltDown(reimportedTourData.getTourAltDown());
       }
 
       // Gear
