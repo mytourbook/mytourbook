@@ -143,8 +143,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().applyTo(container);
          {
-            createUI_10_Title(container);
-            createUI_12_Actions(container);
+            createUI_10_Header(container);
             createUI_20_Controls(container);
          }
       }
@@ -152,31 +151,36 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       return shellContainer;
    }
 
-   private void createUI_10_Title(final Composite parent) {
+   private void createUI_10_Header(final Composite parent) {
 
-      /*
-       * Label: Slideout title
-       */
-      final Label label = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(label);
-      label.setText(Messages.Slideout_ChartPauseOptions_Label_Title);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Label: Slideout title
+             */
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_ChartPauseOptions_Label_Title);
 
-      MTFont.setBannerFont(label);
-   }
+            MTFont.setBannerFont(label);
+         }
+         {
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.BEGINNING)
+                  .applyTo(toolbar);
 
-   private void createUI_12_Actions(final Composite parent) {
+            final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .align(SWT.END, SWT.BEGINNING)
-            .applyTo(toolbar);
+            tbm.add(_actionRestoreDefaults);
 
-      final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-      tbm.add(_actionRestoreDefaults);
-
-      tbm.update(true);
+            tbm.update(true);
+         }
+      }
    }
 
    private void createUI_20_Controls(final Composite parent) {
@@ -228,6 +232,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
        * Update chart config
        */
       final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
+      tourChartConfiguration.isShowPauseLabel = true;
       tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
       tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
 

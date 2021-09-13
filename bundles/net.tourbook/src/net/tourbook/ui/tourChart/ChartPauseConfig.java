@@ -20,6 +20,7 @@ import java.util.List;
 
 public class ChartPauseConfig {
 
+   public boolean                     isShowPauseLabel;
    public boolean                     isShowPauseTooltip;
    public int                         pauseTooltipPosition;
 

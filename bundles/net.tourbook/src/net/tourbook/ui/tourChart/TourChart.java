@@ -765,14 +765,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private class MousePauseListener extends MouseAdapter {
 
-      //TODO FB
       @Override
       public void chartResized() {
          onPause_ChartResized();
       }
 
       @Override
-      public void mouseDoubleClick(final ChartMouseEvent chartMouseEvent) {}
+      public void mouseDoubleClick(final ChartMouseEvent chartMouseEvent) {
+         //Nothing to do here
+      }
 
       @Override
       public void mouseDown(final ChartMouseEvent chartMouseEvent) {
@@ -790,7 +791,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       @Override
-      public void mouseUp(final ChartMouseEvent chartMouseEvent) {}
+      public void mouseUp(final ChartMouseEvent chartMouseEvent) {
+         //Nothing to do here
+      }
 
    }
 
@@ -2113,6 +2116,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartPauseConfig chartPauseConfig = new ChartPauseConfig();
 
+      chartPauseConfig.isShowPauseLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
       chartPauseConfig.isShowPauseTooltip = _tourChartConfiguration.isShowPauseTooltip;
       chartPauseConfig.pauseTooltipPosition = _tourChartConfiguration.pauseTooltipPosition;
 

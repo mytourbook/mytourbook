@@ -73,6 +73,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       _devXPause -= labelWidth / 2;
       _devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
    }
+
    /**
     * This paints the pause(s) for the current graph configuration.
     */
@@ -175,7 +176,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
 
          // check if a pause should be displayed
-         if (chartLabelPause.isVisible == false && _chartPauseConfig.isShowPauseTooltip == false) {
+         if (chartLabelPause.isVisible == false && _chartPauseConfig.isShowPauseLabel == false) {
             continue;
          }
 
