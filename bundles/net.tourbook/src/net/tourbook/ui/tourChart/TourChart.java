@@ -3367,6 +3367,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          _layerPause = null;
       }
+
+      removeChartMouseListener(_mousePauseListener);
+   }
+
+   void hidePauseTooltip() {
+
+      _tourPauseTooltip.hideNow();
    }
 
    private void hidePhotoLayer() {
@@ -3578,7 +3585,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void onPause_MouseExit() {
 
       // mouse has exited the chart, reset hovered label
-
       if (_layerPause == null) {
          return;
       }
@@ -3596,18 +3602,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       final ChartLabelPause hoveredLabel = _layerPause.retrieveHoveredPause(chartMouseEvent);
-      if (hoveredLabel == null) {
-         return;
-      }
+      final boolean isLabelHovered = hoveredLabel != null;
+      if (isLabelHovered) {
 
-      // set isWorked to true so that no other actions are done in this event
-      chartMouseEvent.isWorked = true;
-      chartMouseEvent.cursor = ChartCursor.Arrow;
+         // set worked that no other actions are done in this event
+         chartMouseEvent.isWorked = isLabelHovered;
+         chartMouseEvent.cursor = ChartCursor.Arrow;
+      }
 
       if (_tourChartConfiguration.isShowPauseTooltip) {
 
-         // marker tooltip is displayed
-
+         // pause tooltip is displayed
          _tourPauseTooltip.open(hoveredLabel);
       }
    }
@@ -6011,7 +6016,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * Toursegmenter is modified, update its layers.
+    * TourSegmenter is modified, update its layers.
     *
     * @param tourSegmenterView
     */
