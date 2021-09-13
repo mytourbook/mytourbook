@@ -768,13 +768,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       //TODO FB
       @Override
       public void chartResized() {
-         //  onMarker_ChartResized();
+         onPause_ChartResized();
       }
 
       @Override
-      public void mouseDoubleClick(final ChartMouseEvent chartMouseEvent) {
-         //  onMarker_MouseDoubleClick(chartMouseEvent);
-      }
+      public void mouseDoubleClick(final ChartMouseEvent chartMouseEvent) {}
 
       @Override
       public void mouseDown(final ChartMouseEvent chartMouseEvent) {
@@ -783,19 +781,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       @Override
       public void mouseExit() {
-         //   onMarker_MouseExit();
+         onPause_MouseExit();
       }
 
       @Override
       public void mouseMove(final ChartMouseEvent chartMouseEvent) {
-
          onPause_MouseMove(chartMouseEvent);
       }
 
       @Override
-      public void mouseUp(final ChartMouseEvent chartMouseEvent) {
-         //  onMarker_MouseUp(chartMouseEvent);
-      }
+      public void mouseUp(final ChartMouseEvent chartMouseEvent) {}
 
    }
 
@@ -3545,6 +3540,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
+   private void onPause_ChartResized() {
+
+      // ensure that a pause does not keep hovered state when chart is zoomed
+      _layerPause.resetHoveredState();
+
+      _tourPauseTooltip.hideNow();
+   }
+
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
 
       //TODO FB that's where we are when we click on a marker in the tour chart
@@ -3563,6 +3566,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       fireTourPauseSelection(tourMarker);
 
       _firedTourMarker = tourMarker;
+
+      // redraw chart
+      setChartOverlayDirty();
+   }
+
+   private void onPause_MouseExit() {
+
+      // mouse has exited the chart, reset hovered label
+
+      if (_layerPause == null) {
+         return;
+      }
+
+      _layerPause.resetHoveredState();
 
       // redraw chart
       setChartOverlayDirty();

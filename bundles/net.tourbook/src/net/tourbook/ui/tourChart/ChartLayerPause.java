@@ -73,7 +73,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       _devXPause -= labelWidth / 2;
       _devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
    }
-
    /**
     * This paints the pause(s) for the current graph configuration.
     */
@@ -264,6 +263,15 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             ? new Color(new RGB(0xa0, 0xa0, 0xa0))
             : new Color(new RGB(0x60, 0x60, 0x60));
       return color;
+   }
+
+   /**
+    * Set state in pause layer so that nothing is hovered.
+    */
+   void resetHoveredState() {
+
+      _hoveredLabel = null;
+      _tooltipLabel = null;
    }
 
    private ChartLabelPause retrieveHoveredLabel(final int devXMouse, final int devYMouse) {
