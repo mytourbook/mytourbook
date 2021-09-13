@@ -307,7 +307,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private final ListenerList<ITourMarkerModifyListener>    _tourMarkerModifyListener    = new ListenerList<>();
    private final ListenerList<ITourMarkerSelectionListener> _tourMarkerSelectionListener = new ListenerList<>();
-   private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
+   // private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
    private final ListenerList<ITourModifyListener>          _tourModifyListener          = new ListenerList<>();
    private final ListenerList<IXAxisSelectionListener>      _xAxisSelectionListener      = new ListenerList<>();
    //

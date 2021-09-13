@@ -216,23 +216,18 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       label.setText(labelBuilder.toString());
    }
 
-   private void FixupDisplayBounds(final Point tipSize,
+   private void FixupDisplayBounds(final Point rightBottomBounds,
                                    final int devHoveredY,
                                    final int devHoveredWidth,
                                    final int devHoveredHeight,
                                    final int devHoverSize,
                                    final int tipWidth,
                                    final int tipHeight,
-                                   final ChartComponentGraph chartComponentGraph,
-                                   final Point graphLocation,
                                    final Point tooltipLocation) {
 
+      final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
+      final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
       final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
-      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
-
-      if (displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds)) {
-         return;
-      }
 
       final int displayX = displayBounds.x;
       final int displayY = displayBounds.y;
@@ -433,18 +428,21 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       // check display bounds
       final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
-      final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
       final Point tooltipLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
+      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
+      final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
 
-      FixupDisplayBounds(tipSize,
+      if (displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds)) {
+         return tooltipLocation;
+      }
+
+      FixupDisplayBounds(rightBottomBounds,
             devHoveredY,
             devHoveredWidth,
             devHoveredHeight,
             devHoverSize,
             tipWidth,
             tipHeight,
-            chartComponentGraph,
-            graphLocation,
             tooltipLocation);
 
       return tooltipLocation;

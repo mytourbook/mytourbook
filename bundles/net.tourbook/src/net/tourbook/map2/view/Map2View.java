@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -2980,15 +2979,15 @@ public class Map2View extends ViewPart implements
 
    private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
 
-      final TourData tourData = pauseSelection.getTourData();
-
-      updateUI_ShowTour(tourData);
-
-      final List<Long> allTourMarker = pauseSelection.getSelectedTourPauses();
-      final int numberOfTourMarkers = allTourMarker.size();
-
-      final int leftSliderValueIndex = 0;
-      final int rightSliderValueIndex = 0;
+//      final TourData tourData = pauseSelection.getTourData();
+//
+//      updateUI_ShowTour(tourData);
+//
+//      final List<Long> allTourMarker = pauseSelection.getSelectedTourPauses();
+//      final int numberOfTourMarkers = allTourMarker.size();
+//
+//      final int leftSliderValueIndex = 0;
+//      final int rightSliderValueIndex = 0;
 
 //      if (tourData.isMultipleTours()) {
 //
