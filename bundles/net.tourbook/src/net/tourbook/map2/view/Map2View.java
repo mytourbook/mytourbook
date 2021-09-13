@@ -2980,7 +2980,6 @@ public class Map2View extends ViewPart implements
 
    private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
 
-      //TODO FB
       final TourData tourData = pauseSelection.getTourData();
 
       updateUI_ShowTour(tourData);

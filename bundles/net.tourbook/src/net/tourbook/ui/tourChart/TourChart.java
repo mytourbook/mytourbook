@@ -77,7 +77,6 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourMarkerModifyListener;
 import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -2197,7 +2196,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
       } else {
-         //TODO FB cest ici qu'on trouve l'index de chaque pause
 
          final long[] pausedTime_Start = _tourData.getPausedTime_Start();
 
@@ -3065,25 +3063,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void fireTourPauseSelection(final TourMarker tourMarker) {
 
-      //TODO FB
-      // update selection locally (e.g. in a dialog)
-
-      final ArrayList<Long> allTourMarker = new ArrayList<>();
-      allTourMarker.add(2L);
-
-      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, allTourMarker);
-
-      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-      for (final Object listener2 : listeners) {
-         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-         //listener.selectionChanged(tourMarkerSelection);
-      }
-
-      if (_isDisplayedInDialog) {
-         return;
-      }
-
-      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
+//      // update selection locally (e.g. in a dialog)
+//
+//      final ArrayList<Long> allTourMarker = new ArrayList<>();
+//      allTourMarker.add(2L);
+//
+//      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, allTourMarker);
+//
+//      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
+//      for (final Object listener2 : listeners) {
+//         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
+//         //listener.selectionChanged(tourMarkerSelection);
+//      }
+//
+//      if (_isDisplayedInDialog) {
+//         return;
+//      }
+//
+//      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
    }
 
    /**
@@ -3561,7 +3558,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
 
-      //TODO FB that's where we are when we click on a marker in the tour chart
 
       final TourMarker tourMarker = getHoveredTourMarker();
 
