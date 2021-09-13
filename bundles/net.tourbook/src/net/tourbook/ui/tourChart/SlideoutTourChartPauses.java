@@ -232,7 +232,6 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
        * Update chart config
        */
       final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
-      tourChartConfiguration.isShowPauseLabel = true;
       tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
       tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
 

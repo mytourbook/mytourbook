@@ -178,7 +178,6 @@ public class TourChartConfiguration {
    public boolean                 isShowTooltipData_DistanceDifference;
    public boolean                 isShowTooltipData_DurationDifference;
 
-   public boolean                 isShowPauseLabel;
    public boolean                 isShowPauseTooltip;
 
    public boolean                 isShowAbsoluteValues;
