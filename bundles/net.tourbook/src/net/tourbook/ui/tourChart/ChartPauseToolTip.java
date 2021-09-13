@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
    //TODO FB when clicking on the pause, center the map on the pause just like for markers
-   //when the mouse exits the tooltip, it doesn't disappear
+   //TODO FBwhen the mouse exits the tooltip, it doesn't disappear
 
    private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
    private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;
@@ -436,7 +436,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       // check display bounds
       final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
-
       final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
       final Point tooltipLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
 
