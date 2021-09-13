@@ -43,9 +43,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   //todo fb display a gray area hwen hovering just like the markers
    //todo fb where is the best place to show the pauses, before the pause, in the middle, at the end ?
    //when clicking on the pause, center the map on the pause just like for markers
+   //when the mouse exits the tooltip, it doesn't disappear
 
    private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
    private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;

@@ -3087,10 +3087,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
-      TourManager.fireEventWithCustomData(//
-            TourEventId.PAUSE_SELECTION,
-            tourPauseSelection,
-            _part);
+      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
    }
 
    /**
