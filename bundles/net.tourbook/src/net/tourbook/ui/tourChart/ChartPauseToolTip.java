@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   //TODO FB when clicking on the pause, center the map on the pause just like for markers
+   //TODO FB 2 when clicking on the pause, center the map on the pause just like for markers
 
    private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
    private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;

@@ -2197,7 +2197,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
       } else {
-         //TODO FB cest ici qu'on trouve l'index de chaque pause
+         //TODO FB 2 cest ici qu'on trouve l'index de chaque pause
 
          final long[] pausedTime_Start = _tourData.getPausedTime_Start();
 
@@ -3065,7 +3065,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void fireTourPauseSelection(final TourMarker tourMarker) {
 
-      //TODO FB
+      //TODO FB 2
       // update selection locally (e.g. in a dialog)
 
       final ArrayList<Long> allTourMarker = new ArrayList<>();
@@ -3561,7 +3561,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
 
-      //TODO FB that's where we are when we click on a marker in the tour chart
+      //TODO FB 2 that's where we are when we click on a marker in the tour chart
 
       final TourMarker tourMarker = getHoveredTourMarker();
 
