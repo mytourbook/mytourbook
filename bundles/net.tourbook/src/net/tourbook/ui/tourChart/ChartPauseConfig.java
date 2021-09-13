@@ -18,12 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.graphics.RGB;
-
 public class ChartPauseConfig {
-
-   public RGB                         pauseColorDefault_Light;
-   public RGB                         pauseColorDefault_Dark;
 
    public boolean                     isShowPauseTooltip;
    public int                         pauseTooltipPosition;

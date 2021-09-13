@@ -43,8 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   //todo fb where is the best place to show the pauses, before the pause, in the middle, at the end ?
-   //when clicking on the pause, center the map on the pause just like for markers
+   //TODO FB when clicking on the pause, center the map on the pause just like for markers
    //when the mouse exits the tooltip, it doesn't disappear
 
    private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
@@ -234,61 +233,57 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
       final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
 
-      if (!(displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds))) {
+      if (displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds)) {
+         return;
+      }
 
-         final int displayX = displayBounds.x;
-         final int displayY = displayBounds.y;
-         final int displayWidth = displayBounds.width;
-         final int displayHeight = displayBounds.height;
+      final int displayX = displayBounds.x;
+      final int displayY = displayBounds.y;
+      final int displayWidth = displayBounds.width;
+      final int displayHeight = displayBounds.height;
+      if (tooltipLocation.x < displayX) {
 
-         if (tooltipLocation.x < displayX) {
+         switch (_chartPauseConfig.pauseTooltipPosition) {
 
-            switch (_chartPauseConfig.pauseTooltipPosition) {
+         case TOOLTIP_POSITION_LEFT:
+            tooltipLocation.x = tooltipLocation.x + tipWidth + devHoveredWidth + 2;
+            break;
 
-            case TOOLTIP_POSITION_LEFT:
-               tooltipLocation.x = tooltipLocation.x + tipWidth + devHoveredWidth + 2;
-               break;
-
-            case TOOLTIP_POSITION_BELOW:
-            case TOOLTIP_POSITION_ABOVE:
-            case TOOLTIP_POSITION_CHART_TOP:
-            case TOOLTIP_POSITION_CHART_BOTTOM:
-            default:
-               tooltipLocation.x = displayX;
-               break;
-            }
+         case TOOLTIP_POSITION_BELOW:
+         case TOOLTIP_POSITION_ABOVE:
+         case TOOLTIP_POSITION_CHART_TOP:
+         case TOOLTIP_POSITION_CHART_BOTTOM:
+         default:
+            tooltipLocation.x = displayX;
+            break;
          }
+      }
+      if (rightBottomBounds.x > displayX + displayWidth) {
 
-         if (rightBottomBounds.x > displayX + displayWidth) {
+         if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
+               || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP
+               || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM) {
 
-            if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
-                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP
-                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM) {
+            tooltipLocation.x = displayWidth - tipWidth;
+         } else if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_RIGHT) {
 
-               tooltipLocation.x = displayWidth - tipWidth;
-            } else if (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_RIGHT) {
-
-               tooltipLocation.x = tooltipLocation.x - tipWidth - devHoveredWidth - 2;
-            }
+            tooltipLocation.x = tooltipLocation.x - tipWidth - devHoveredWidth - 2;
          }
+      }
+      if (tooltipLocation.y < displayY &&
+            (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
+                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP)) {
 
-         if (tooltipLocation.y < displayY &&
-               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_ABOVE
-                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_TOP)) {
+         tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
+      }
+      if (rightBottomBounds.y > displayY + displayHeight &&
+            (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW
+                  || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM)) {
 
-            tooltipLocation.y = graphLocation.y + devHoveredY + devHoveredHeight - devHoverSize + 2;
-         }
-
-         if (rightBottomBounds.y > displayY + displayHeight &&
-               (_chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_BELOW
-                     || _chartPauseConfig.pauseTooltipPosition == TOOLTIP_POSITION_CHART_BOTTOM)) {
-
-            tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
-         }
+         tooltipLocation.y = graphLocation.y + devHoveredY - tipHeight - 1;
       }
    }
 
-   //TODO FB Hint : in chartLayermarke, both x,y of rectangles are not the same but here they are!?
    private Rectangle getHoveredRectangle() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
@@ -410,15 +405,6 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
          ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
          ttPosY = devHoveredY + devHoveredHeight + 1;
-
-         //todo fb
-//         if (_hoveredLabel.visualPosition == TourMarker.LABEL_POS_VERTICAL_TOP_CHART) {
-//
-//            /*
-//             * y position is wrong, adjust it but this do NOT cover all possible positions, but some
-//             */
-//            ttPosY -= devHoverSize;
-//         }
 
          break;
       }

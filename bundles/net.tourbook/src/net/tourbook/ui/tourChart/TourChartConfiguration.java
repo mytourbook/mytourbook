@@ -225,12 +225,6 @@ public class TourChartConfiguration {
    public RGB                     markerColorHidden_Dark;
 
    /**
-    * Color for the tour pause point and label.
-    */
-   public RGB                     pauseColorDefault_Light;
-   public RGB                     pauseColorDefault_Dark;
-
-   /**
     * Is <code>true</code> when graph values are displayed when they are recorded when a break time
     * is detected.
     */
@@ -356,8 +350,6 @@ public class TourChartConfiguration {
       isShowTourPauses              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
       isShowPauseTooltip            = _prefStore.getBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP);
       pauseTooltipPosition          = _prefStore.getInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION);
-      pauseColorDefault_Light      = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_PAUSES_COLOR_DEFAULT);
-      pauseColorDefault_Dark       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_PAUSES_COLOR_DEFAULT_DARK);
 
       /*
        * Tour info

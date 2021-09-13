@@ -208,10 +208,6 @@ public interface ITourbookPreferences {
 
    public static final String GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP                          = "GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP";                          //$NON-NLS-1$
    public static final String GRAPH_PAUSES_TOOLTIP_POSITION                               = "GRAPH_PAUSES_TOOLTIP_POSITION";                          //$NON-NLS-1$
-   public static final String GRAPH_PAUSES_COLOR_DEFAULT                                  = "GRAPH_PAUSES_COLOR_DEFAULT";                                   //$NON-NLS-1$
-   public static final String GRAPH_PAUSES_COLOR_DEFAULT_DARK                             = "GRAPH_PAUSES_COLOR_DEFAULT_DARK";                              //$NON-NLS-1$
-   public static final String GRAPH_PAUSES_COLOR_HIDDEN                                   = "GRAPH_PAUSES_COLOR_HIDDEN";                                    //$NON-NLS-1$
-   public static final String GRAPH_PAUSES_COLOR_HIDDEN_DARK                              = "GRAPH_PAUSES_COLOR_HIDDEN_DARK";                               //$NON-NLS-1$
 
    // SET_FORMATTING_ON
 
