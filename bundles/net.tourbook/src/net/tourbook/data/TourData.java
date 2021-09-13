@@ -8565,6 +8565,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns SRTM metric or imperial data serie depending on the active measurement or
     *         <code>null</code> when SRTM data serie is not available
     */
+   @JsonIgnore
    public float[] getSRTMSerie() {
 
       if (latitudeSerie == null) {
