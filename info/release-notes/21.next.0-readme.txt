@@ -116,6 +116,10 @@ Changes
 Bugfix
 ======
 
+* Tour Re-import
+  - Elevation up/down values were not re-imported
+    https://sourceforge.net/p/mytourbook/bugs/125/
+
 * 4k Display
   - Fixed positions for the vertical x-Axis units and vertical tour chart markers
   - Line width was growing on every paint event https://github.com/wolfgang-ch/mytourbook/issues/356
