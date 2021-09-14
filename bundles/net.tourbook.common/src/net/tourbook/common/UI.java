@@ -953,7 +953,7 @@ public class UI {
    private static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
 
       // round to the nearest pixel
-      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
+      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2.0)
             / HORIZONTAL_DIALOG_UNIT_PER_CHAR);
    }
 
@@ -2027,7 +2027,7 @@ public class UI {
 
    public static int scrambleNumbers(final int number) {
 
-      return (int) (RANDOM_GENERATOR.nextFloat() * number);
+      return RANDOM_GENERATOR.nextInt() * number;
    }
 
    public static long scrambleNumbers(final long number) {

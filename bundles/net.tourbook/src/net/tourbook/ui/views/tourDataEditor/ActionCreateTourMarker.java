@@ -24,7 +24,7 @@ import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -64,7 +64,7 @@ public class ActionCreateTourMarker extends Action {
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
          tourMarker.setSerieIndex(serieIndex);
          tourMarker.setLabel(Messages.TourData_Label_new_marker);
          tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));

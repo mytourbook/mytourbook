@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -25,12 +27,6 @@ import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -73,12 +69,9 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
       if (_actionToolItem == null && toolbar != null) {
 
-         toolbar.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               _actionToolItem.dispose();
-               _actionToolItem = null;
-            }
+         toolbar.addDisposeListener(disposeEvent -> {
+            _actionToolItem.dispose();
+            _actionToolItem = null;
          });
 
          _toolBar = toolbar;
@@ -86,22 +79,14 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
          _actionToolItem.setDisabledImage(_imageDisabled);
-         _actionToolItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction();
-            }
-         });
+         _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction()));
 
-         toolbar.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(mouseEvent -> {
 
-               final Point mousePosition = new Point(e.x, e.y);
-               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-               onMouseMove(hoveredItem);
-            }
+            onMouseMove(hoveredItem);
          });
 
          _slideoutMarkerOptions = new SlideoutTourChartMarker(_parent, _toolBar, _tourChart);

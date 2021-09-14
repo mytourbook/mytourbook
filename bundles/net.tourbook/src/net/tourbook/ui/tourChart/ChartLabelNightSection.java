@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.util.ArrayList;
-import java.util.List;
+public class ChartLabelNightSection extends ChartLabel {
 
-public class ChartPauseConfig {
-
-   public boolean                     isShowPauseLabel;
-   public boolean                     isShowPauseTooltip;
-   public int                         pauseTooltipPosition;
-
-   public final List<ChartLabelPause> chartLabelPauses = new ArrayList<>();
 }

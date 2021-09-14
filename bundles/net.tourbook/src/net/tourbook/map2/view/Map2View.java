@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.IMapContextProvider;
@@ -122,6 +124,7 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
@@ -155,8 +158,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -1373,6 +1374,10 @@ public class Map2View extends ViewPart implements
                onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
             }
 
+         } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+
+               onSelectionChanged_TourPause((SelectionTourPause) eventData, false);
+
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
             onSelectionChanged((ISelection) eventData, true);
@@ -1709,9 +1714,7 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setActionsEnabled(true);
       _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
-      _map.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
+      _map.addControlListener(controlResizedAdapter(ControlEvent -> {
 
             /*
              * Check if the legend size must be adjusted
@@ -1741,7 +1744,7 @@ public class Map2View extends ViewPart implements
                createLegendImage(_tourPainterConfig.getMapColorProvider());
             }
          }
-      });
+      ));
 
       createActions();
 
@@ -2972,6 +2975,65 @@ public class Map2View extends ViewPart implements
 
          keepMapPosition(tourData);
       }
+   }
+
+   private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
+
+//      final TourData tourData = pauseSelection.getTourData();
+//
+//      updateUI_ShowTour(tourData);
+//
+//      final List<Long> allTourMarker = pauseSelection.getSelectedTourPauses();
+//      final int numberOfTourMarkers = allTourMarker.size();
+//
+//      final int leftSliderValueIndex = 0;
+//      final int rightSliderValueIndex = 0;
+
+//      if (tourData.isMultipleTours()) {
+//
+//         if (numberOfTourMarkers == 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
+//            rightSliderValueIndex = leftSliderValueIndex;
+//
+//         } else if (numberOfTourMarkers > 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
+//            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getMultiTourSerieIndex();
+//         }
+//
+//      } else {
+//
+//         if (numberOfTourMarkers == 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+//            rightSliderValueIndex = leftSliderValueIndex;
+//
+//         } else if (numberOfTourMarkers > 1) {
+//
+//            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+//            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+//         }
+//      }
+//
+//      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
+//
+//         if (isDrawSlider) {
+//
+//            positionMapTo_0_TourSliders(
+//                  tourData,
+//                  leftSliderValueIndex,
+//                  rightSliderValueIndex,
+//                  leftSliderValueIndex,
+//                  null);
+//
+//         } else {
+//
+//            positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+//         }
+//
+//         keepMapPosition(tourData);
+//      }
    }
 
    private void paintEntireTour() {

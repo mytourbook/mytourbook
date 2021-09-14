@@ -20,5 +20,5 @@ import java.util.List;
 
 public class ChartNightConfig {
 
-   public final List<ChartLabel> chartLabels = new ArrayList<>();
+   public final List<ChartLabelNightSection> chartLabelNightSections = new ArrayList<>();
 }

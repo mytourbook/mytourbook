@@ -51,7 +51,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -854,7 +854,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                colDef.printDetailValue(cell, value);
             }
 
-            if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+            if (tourMarker.getType() == ChartLabelMarker.MARKER_TYPE_DEVICE) {
                cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
             }
          }

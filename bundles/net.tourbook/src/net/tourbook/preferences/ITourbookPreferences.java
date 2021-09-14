@@ -205,6 +205,10 @@ public interface ITourbookPreferences {
    public static final String GRAPH_MARKER_POINT_SIZE                                     = "GRAPH_MARKER_POINT_SIZE";                                      //$NON-NLS-1$
    public static final String GRAPH_MARKER_SIGN_IMAGE_SIZE                                = "GRAPH_MARKER_SIGN_IMAGE_SIZE";                                 //$NON-NLS-1$
    public static final String GRAPH_MARKER_TOOLTIP_POSITION                               = "GRAPH_MARKER_TOOLTIP_POSITION";                                //$NON-NLS-1$
+
+   public static final String GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP                          = "GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP";                          //$NON-NLS-1$
+   public static final String GRAPH_PAUSES_TOOLTIP_POSITION                               = "GRAPH_PAUSES_TOOLTIP_POSITION";                          //$NON-NLS-1$
+
    // SET_FORMATTING_ON
 
    public static final String GRAPH_PULSE_GRAPH_VALUES              = "GRAPH_PULSE_GRAPH_VALUES";              //$NON-NLS-1$

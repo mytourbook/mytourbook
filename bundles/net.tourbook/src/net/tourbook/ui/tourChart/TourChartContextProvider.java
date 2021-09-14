@@ -154,6 +154,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       final TourChart tourChart = _tourChartViewer.getTourChart();
 
       tourChart.hideMarkerTooltip();
+      tourChart.hidePauseTooltip();
 
       /*
        * Check if a marker is hovered
