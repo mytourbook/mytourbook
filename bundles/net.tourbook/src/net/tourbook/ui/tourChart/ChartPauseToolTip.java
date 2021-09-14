@@ -43,8 +43,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
-   private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;
+   private static final String     GRAPH_LABEL_TIMESTART = net.tourbook.common.Messages.Graph_Label_TimeStart;
+   private static final String     GRAPH_LABEL_TIMEEND   = net.tourbook.common.Messages.Graph_Label_TimeEnd;
 
    /**
     * Visual position for the pause tooltip, they must correspond to the position id
@@ -178,13 +178,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .spacing(5, 1)
             .applyTo(container);
       {
-         UI.createLabel(container, GRAPH_LABEL_STARTTIME);
+         UI.createLabel(container, GRAPH_LABEL_TIMESTART);
          createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_Start(),
                _hoveredLabel.getTimeZoneId());
 
-         UI.createLabel(container, GRAPH_LABEL_ENDTIME);
+         UI.createLabel(container, GRAPH_LABEL_TIMEEND);
          createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_End(),
