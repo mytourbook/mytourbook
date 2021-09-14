@@ -969,18 +969,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       updateUI_Marker(isMarkerVisible);
    }
 
-   /**
-    * Show/Hide tour pauses
-    *
-    * @param isChecked
-    */
-   public void actionShowTourPauses(final boolean isShowTourPauses) {
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, isShowTourPauses);
-
-      updateUI_Pauses(isShowTourPauses);
-   }
-
    public void actionShowTourPhotos() {
 
       boolean isShowPhotos = _tourChartConfiguration.isShowTourPhotos;
@@ -5797,7 +5785,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        * Tour pauses
        */
-      _actionTourChartPauses.setSelected(_tourChartConfiguration.isShowTourPauses);
+      _actionTourChartPauses.setSelection(_tourChartConfiguration.isShowTourPauses);
       _actionTourChartPauses.setEnabled(true);
 
       /*
@@ -6080,14 +6068,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       updateCustomLayers();
    }
 
-   void updateUI_Pauses(final boolean isShowTourPauses) {
+   public void updateUI_Pauses() {
 
+      final boolean isShowTourPauses = _actionTourChartPauses.getSelection();
       _tourChartConfiguration.isShowTourPauses = isShowTourPauses;
+      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, isShowTourPauses);
 
       updateUI_PausesLayer(isShowTourPauses);
-
-      // update actions
-      _actionTourChartPauses.setSelected(isShowTourPauses);
    }
 
    /**
