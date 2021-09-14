@@ -163,7 +163,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
              */
             final Label label = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults().applyTo(label);
-            label.setText(Messages.Slideout_ChartPauseOptions_Label_Title);
+            label.setText(Messages.Slideout_ChartPausesOptions_Label_Title);
 
             MTFont.setBannerFont(label);
          }
