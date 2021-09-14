@@ -58,7 +58,7 @@ public class ActionTourChartPauses extends ContributionItem implements IOpeningD
       _tourChart = tourChart;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourPauses).createImage();
+      _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourPauses).createImage();
       _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled).createImage();
    }
 
