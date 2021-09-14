@@ -3479,41 +3479,38 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onMarker_MouseMove(final ChartMouseEvent chartMouseEvent) {
 
-      if (_layerMarker != null) {
+      if (_layerMarker == null) {
+         return;
+      }
 
-         final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(chartMouseEvent);
+      final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(chartMouseEvent);
+      final boolean isLabelHovered = hoveredLabel != null;
+      if (isLabelHovered) {
 
-         final boolean isLabelHovered = hoveredLabel != null;
-         if (isLabelHovered) {
+         // set worked that no other actions are done in this event
+         chartMouseEvent.isWorked = isLabelHovered;
+         chartMouseEvent.cursor = ChartCursor.Arrow;
+      }
+      // check if the selected marker is hovered
+      final TourMarker hoveredMarker = getHoveredTourMarker();
+      if (_selectedTourMarker != null && hoveredLabel == null || (hoveredMarker != _selectedTourMarker)) {
 
-            // set worked that no other actions are done in this event
-            chartMouseEvent.isWorked = isLabelHovered;
-            chartMouseEvent.cursor = ChartCursor.Arrow;
-         }
+         _selectedTourMarker = null;
 
-         // check if the selected marker is hovered
-         final TourMarker hoveredMarker = getHoveredTourMarker();
-         if (_selectedTourMarker != null && hoveredLabel == null || (hoveredMarker != _selectedTourMarker)) {
+         // redraw chart
+         setChartOverlayDirty();
+      }
+      // ensure that a selected tour marker is drawn in the overlay
+      if (_selectedTourMarker != null) {
 
-            _selectedTourMarker = null;
+         // redraw chart
+         setChartOverlayDirty();
+      }
+      if (_tourChartConfiguration.isShowMarkerTooltip) {
 
-            // redraw chart
-            setChartOverlayDirty();
-         }
+         // marker tooltip is displayed
 
-         // ensure that a selected tour marker is drawn in the overlay
-         if (_selectedTourMarker != null) {
-
-            // redraw chart
-            setChartOverlayDirty();
-         }
-
-         if (_tourChartConfiguration.isShowMarkerTooltip) {
-
-            // marker tooltip is displayed
-
-            _tourMarkerTooltip.open(hoveredLabel);
-         }
+         _tourMarkerTooltip.open(hoveredLabel);
       }
 
    }
@@ -3557,7 +3554,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
-
 
       final TourMarker tourMarker = getHoveredTourMarker();
 
