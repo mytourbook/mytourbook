@@ -2614,13 +2614,6 @@ public class Messages extends NLS {
    public static String Tour_Marker_Position_Vertical_MarkerPoint_Above;
    public static String Tour_Marker_Position_Vertical_MarkerPoint_Below;
 
-   public static String Tour_Pause_TooltipPosition_Bottom;
-   public static String Tour_Pause_TooltipPosition_ChartBottom;
-   public static String Tour_Pause_TooltipPosition_ChartTop;
-   public static String Tour_Pause_TooltipPosition_Left;
-   public static String Tour_Pause_TooltipPosition_Right;
-   public static String Tour_Pause_TooltipPosition_Top;
-
    public static String Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String Tour_Segmenter_Button_SaveTour_Tooltip;
    public static String Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
