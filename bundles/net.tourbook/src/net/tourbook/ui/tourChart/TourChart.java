@@ -3051,6 +3051,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void fireTourPauseSelection(final TourMarker tourMarker) {
 
+      //TODO FB 2
+      // update selection locally (e.g. in a dialog)
 //      // update selection locally (e.g. in a dialog)
 //
 //      final ArrayList<Long> allTourMarker = new ArrayList<>();
@@ -3542,7 +3544,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
-
+      //TODO FB 2 that's where we are when we click on a marker in the tour chart
       final TourMarker tourMarker = getHoveredTourMarker();
 
       if (tourMarker == null) {
