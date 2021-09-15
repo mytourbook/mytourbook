@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.common.UI;
@@ -717,7 +718,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 
    private void updateUI() {
 
-      final ArrayList<TourSegment> tourSegments = _tourChart.getTourSegments();
+      final List<TourSegment> tourSegments = _tourChart.getTourSegments();
       if (tourSegments == null || tourSegments.isEmpty()) {
          return;
       }

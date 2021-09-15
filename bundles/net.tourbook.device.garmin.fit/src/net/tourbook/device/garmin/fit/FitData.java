@@ -36,7 +36,7 @@ import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -630,7 +630,7 @@ public class FitData {
 
       final List<TourMarker> tourMarkers = _allTourMarker;
 
-      _current_TourMarker = new TourMarker(_tourData, ChartLabel.MARKER_TYPE_DEVICE);
+      _current_TourMarker = new TourMarker(_tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
       tourMarkers.add(_current_TourMarker);
    }

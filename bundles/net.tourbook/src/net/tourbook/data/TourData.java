@@ -103,7 +103,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
@@ -2555,7 +2555,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (_isImportedMTTour) {
          // use imported value
-         prefDPTolerance = dpTolerance / 10;
+         prefDPTolerance = dpTolerance / 10f;
       } else {
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
@@ -2594,7 +2594,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (_isImportedMTTour) {
          // use imported value
-         prefDPTolerance = dpTolerance / 10;
+         prefDPTolerance = dpTolerance / 10f;
       } else {
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
@@ -4359,7 +4359,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          computeDataSeries_Smoothed();
       }
 
-      // double check was necessary because this case occured but it should not
+      // double check was necessary because this case occurred but it should not
       if (altitudeSerieSmoothed == null) {
          return;
       }
@@ -5291,7 +5291,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                         // time and position is the same
 
-                        final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+                        final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_CUSTOM);
 
                         tourMarker.setSerieIndex(serieIndex);
                         tourMarker.setTime(relativeTime, wpTime);
@@ -6739,7 +6739,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                                  final float distanceAbsolute) {
 
       // create a new marker
-      final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
+      final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
       /*
        * ??? timeData.marker was added until version 14.9 but I have no idea why this was added ???
@@ -11222,7 +11222,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          /**
           * !!!! <br>
           * Way point must be cloned because the entity could be saved within different tour data
-          * instances, otherwise hibernate exceptions occure this also sets the createId. <br>
+          * instances, otherwise hibernate exceptions occur this also sets the createId. <br>
           * !!!!
           */
          final TourWayPoint clonedWP = tourWayPoint.clone(this);

@@ -44,7 +44,7 @@ import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
 
@@ -96,61 +96,61 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
       /*
        * Files start with HAC4Linux-Tour-File created by HAC4Linux (c) by Rick-Rainer Ludwig
        */
-      if (byteIndex == 0 & newByte == 'H') {
+      if (byteIndex == 0 && newByte == 'H') {
          return true;
       }
-      if (byteIndex == 1 & newByte == 'A') {
+      if (byteIndex == 1 && newByte == 'A') {
          return true;
       }
-      if (byteIndex == 2 & newByte == 'C') {
+      if (byteIndex == 2 && newByte == 'C') {
          return true;
       }
-      if (byteIndex == 3 & newByte == '4') {
+      if (byteIndex == 3 && newByte == '4') {
          return true;
       }
-      if (byteIndex == 4 & newByte == 'L') {
+      if (byteIndex == 4 && newByte == 'L') {
          return true;
       }
-      if (byteIndex == 5 & newByte == 'i') {
+      if (byteIndex == 5 && newByte == 'i') {
          return true;
       }
-      if (byteIndex == 6 & newByte == 'n') {
+      if (byteIndex == 6 && newByte == 'n') {
          return true;
       }
-      if (byteIndex == 7 & newByte == 'u') {
+      if (byteIndex == 7 && newByte == 'u') {
          return true;
       }
-      if (byteIndex == 8 & newByte == 'x') {
+      if (byteIndex == 8 && newByte == 'x') {
          return true;
       }
-      if (byteIndex == 9 & newByte == '-') {
+      if (byteIndex == 9 && newByte == '-') {
          return true;
       }
-      if (byteIndex == 10 & newByte == 'T') {
+      if (byteIndex == 10 && newByte == 'T') {
          return true;
       }
-      if (byteIndex == 11 & newByte == 'o') {
+      if (byteIndex == 11 && newByte == 'o') {
          return true;
       }
-      if (byteIndex == 12 & newByte == 'u') {
+      if (byteIndex == 12 && newByte == 'u') {
          return true;
       }
-      if (byteIndex == 13 & newByte == 'r') {
+      if (byteIndex == 13 && newByte == 'r') {
          return true;
       }
-      if (byteIndex == 14 & newByte == '-') {
+      if (byteIndex == 14 && newByte == '-') {
          return true;
       }
-      if (byteIndex == 15 & newByte == 'F') {
+      if (byteIndex == 15 && newByte == 'F') {
          return true;
       }
-      if (byteIndex == 16 & newByte == 'i') {
+      if (byteIndex == 16 && newByte == 'i') {
          return true;
       }
-      if (byteIndex == 17 & newByte == 'l') {
+      if (byteIndex == 17 && newByte == 'l') {
          return true;
       }
-      if (byteIndex == 18 & newByte == 'e') {
+      if (byteIndex == 18 && newByte == 'e') {
          return true;
       }
 
@@ -570,7 +570,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields.length < 4) {
                   break;
                }
-               final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+               final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
                final int markerIndex = Integer.parseInt(fields[1]);
                tourMarker.setSerieIndex(markerIndex);
                tourMarker.setLabel(fields[0].substring(1, fields[0].length()));

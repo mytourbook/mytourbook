@@ -101,6 +101,9 @@ Improvements
 * Statistics (Frederic)
   - Adding the ability to save the Y-axis min/max values for the athlete's body weight and body fat graphs
 
+* Tour Chart (Frederic)
+  - Added a tour pauses slideout to know the start and end times of a given pause
+
 
 Changes  
 =======

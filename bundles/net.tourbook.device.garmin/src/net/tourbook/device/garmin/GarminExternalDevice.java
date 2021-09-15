@@ -495,7 +495,7 @@ public class GarminExternalDevice extends ExternalDevice {
                                  Messages.Garmin_Transfer_ErrorReceivingData,
                                  new Status(Status.ERROR,
                                        Activator.PLUGIN_ID,
-                                       Messages.Garmin_Transfer_CommuicationError,
+                                       Messages.Garmin_Transfer_CommunicationError,
                                        ex));
                         }
                      };

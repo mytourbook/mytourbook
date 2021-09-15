@@ -59,12 +59,12 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String  GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String  GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String  GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String     GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String     GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
+   private static final String     GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
 
-   private static final int     DEFAULT_TEXT_WIDTH   = 50;
-   private static final int     DEFAULT_TEXT_HEIGHT  = 20;
+   private static final int        DEFAULT_TEXT_WIDTH   = 50;
+   private static final int        DEFAULT_TEXT_HEIGHT  = 20;
 
    /**
     * Visual position for marker tooltip, they must correspond to the position id
@@ -108,7 +108,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
    private TourChart                       _tourChart;
    private TourData                        _tourData;
 
-   private ChartLabel                      _hoveredLabel;
+   private ChartLabelMarker                _hoveredLabel;
    private TourMarker                      _hoveredTourMarker;
 
    /**
@@ -629,7 +629,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
    private Rectangle getHoveredRect() {
 
       final int hoverSize = _hoveredLabel.devHoverSize;
-      final int devMarkerPointSizeRaw = _hoveredLabel.devMarkerPointSize;
+      final int devMarkerPointSizeRaw = _hoveredLabel.devPointSize;
 
       Rectangle rectHovered = new Rectangle(_hoveredLabel.devXMarker, _hoveredLabel.devYMarker, 1, 1);
 
@@ -957,7 +957,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       hideNow();
    }
 
-   void open(final ChartLabel hoveredLabel) {
+   void open(final ChartLabelMarker hoveredLabel) {
 
       boolean isKeepOpened = false;
 
