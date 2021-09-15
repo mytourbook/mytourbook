@@ -2271,6 +2271,13 @@ public class Messages extends NLS {
    public static String Tag_Manager_LogInfo_DeletedTagCategory;
    public static String Tag_Manager_LogInfo_DeletedTags;
 
+   public static String Tooltip_Position_Bottom;
+   public static String Tooltip_Position_ChartBottom;
+   public static String Tooltip_Position_ChartTop;
+   public static String Tooltip_Position_Left;
+   public static String Tooltip_Position_Right;
+   public static String Tooltip_Position_Top;
+
    public static String Tooltip_ValuePoint_Action_CloseContextMenu;
    public static String Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
    public static String Tooltip_ValuePoint_Action_Orientation_Horizontal;
@@ -2606,19 +2613,6 @@ public class Messages extends NLS {
    public static String Tour_Marker_Position_Vertical_Chart_Top;
    public static String Tour_Marker_Position_Vertical_MarkerPoint_Above;
    public static String Tour_Marker_Position_Vertical_MarkerPoint_Below;
-   public static String Tour_Marker_TooltipPosition_Bottom;
-   public static String Tour_Marker_TooltipPosition_ChartBottom;
-   public static String Tour_Marker_TooltipPosition_ChartTop;
-   public static String Tour_Marker_TooltipPosition_Left;
-   public static String Tour_Marker_TooltipPosition_Right;
-   public static String Tour_Marker_TooltipPosition_Top;
-
-   public static String Tour_Pause_TooltipPosition_Bottom;
-   public static String Tour_Pause_TooltipPosition_ChartBottom;
-   public static String Tour_Pause_TooltipPosition_ChartTop;
-   public static String Tour_Pause_TooltipPosition_Left;
-   public static String Tour_Pause_TooltipPosition_Right;
-   public static String Tour_Pause_TooltipPosition_Top;
 
    public static String Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String Tour_Segmenter_Button_SaveTour_Tooltip;
