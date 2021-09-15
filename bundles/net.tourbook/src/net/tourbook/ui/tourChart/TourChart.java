@@ -3545,7 +3545,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
       //TODO FB 2 that's where we are when we click on a marker in the tour chart
-      final TourMarker tourMarker = getHoveredTourMarker();
+      final TourMarker tourMarker = getHovered();
 
       if (tourMarker == null) {
          return;
@@ -3553,8 +3553,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // notify the chart mouse listener that no other actions should be done
       mouseEvent.isWorked = true;
-
-      _selectedTourMarker = tourMarker;
 
       fireTourPauseSelection(tourMarker);
 
