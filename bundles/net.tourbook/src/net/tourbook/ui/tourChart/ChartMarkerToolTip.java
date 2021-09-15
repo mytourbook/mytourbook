@@ -76,12 +76,12 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
       TOOLTIP_POSITIONS = new String[] {
 
-            Messages.Tour_Marker_TooltipPosition_Left, //            0
-            Messages.Tour_Marker_TooltipPosition_Right, //           1
-            Messages.Tour_Marker_TooltipPosition_Top, //             2
-            Messages.Tour_Marker_TooltipPosition_Bottom, //          3
-            Messages.Tour_Marker_TooltipPosition_ChartTop, //        4
-            Messages.Tour_Marker_TooltipPosition_ChartBottom, //     5
+            Messages.Tooltip_Position_Left, //            0
+            Messages.Tooltip_Position_Right, //           1
+            Messages.Tooltip_Position_Top, //             2
+            Messages.Tooltip_Position_Bottom, //          3
+            Messages.Tooltip_Position_ChartTop, //        4
+            Messages.Tooltip_Position_ChartBottom, //     5
       };
    }
 

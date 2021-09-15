@@ -77,7 +77,6 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourMarkerModifyListener;
 import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -308,7 +307,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private final ListenerList<ITourMarkerModifyListener>    _tourMarkerModifyListener    = new ListenerList<>();
    private final ListenerList<ITourMarkerSelectionListener> _tourMarkerSelectionListener = new ListenerList<>();
-   private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
+   // private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
    private final ListenerList<ITourModifyListener>          _tourModifyListener          = new ListenerList<>();
    private final ListenerList<IXAxisSelectionListener>      _xAxisSelectionListener      = new ListenerList<>();
    //
@@ -968,18 +967,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, isMarkerVisible);
 
       updateUI_Marker(isMarkerVisible);
-   }
-
-   /**
-    * Show/Hide tour pauses
-    *
-    * @param isChecked
-    */
-   public void actionShowTourPauses(final boolean isShowTourPauses) {
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, isShowTourPauses);
-
-      updateUI_Pauses(isShowTourPauses);
    }
 
    public void actionShowTourPhotos() {
@@ -2171,9 +2158,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
                }
 
-               tourSerieIndex = findPauseSerieIndexMultipleTours(tourSerieIndex, tourStartTime, pausedTime_Start, previousTourElapsedTime);
+               for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
 
-               if (tourSerieIndex != -1) {
+                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
+
+                  if (currentTime >= pausedTime_Start) {
+                     break;
+                  }
+               }
+
+               if (tourSerieIndex < xAxisSerie.length) {
 
                   final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                         pausedTime_Start,
@@ -2190,7 +2184,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
       } else {
-         //TODO FB 2 cest ici qu'on trouve l'index de chaque pause
 
          final long[] pausedTime_Start = _tourData.getPausedTime_Start();
 
@@ -2200,13 +2193,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          final long[] pausedTime_End = _tourData.getPausedTime_End();
 
+         int serieIndex = 0;
          final int[] timeSerie = _tourData.timeSerie;
          final long tourStartTime = _tourData.getTourStartTimeMS();
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-            final int serieIndex = findPauseSerieIndex(pausedTime_Start[index], timeSerie, tourStartTime);
+            for (; serieIndex < timeSerie.length && serieIndex < xAxisSerie.length; ++serieIndex) {
 
-            if (serieIndex == -1) {
+               final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
+
+               if (currentTime >= pausedTime_Start[index]) {
+                  break;
+               }
+            }
+
+            if (serieIndex >= xAxisSerie.length) {
                continue;
             }
 
@@ -2994,41 +2995,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private int findPauseSerieIndex(final long pausedTime_Start,
-                                   final int[] timeSerie,
-                                   final long tourStartTime) {
-
-      int serieIndex = 0;
-
-      for (; serieIndex < timeSerie.length; ++serieIndex) {
-
-         final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
-
-         if (currentTime >= pausedTime_Start) {
-            break;
-         }
-      }
-
-      if(serieIndex >= timeSerie.length) {
-         return -1;
-      }
-
-      return serieIndex;
-   }
-
-   private int findPauseSerieIndexMultipleTours(int tourSerieIndex, final long tourStartTime, final long pausedTime_Start, final long previousTourElapsedTime) {
-
-      for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
-
-         final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
-
-         if (currentTime >= pausedTime_Start) {
-            break;
-         }
-      }
-      return tourSerieIndex;
-   }
-
    /**
     * Fires an event when the a tour marker is modified.
     *
@@ -3085,25 +3051,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void fireTourPauseSelection(final TourMarker tourMarker) {
 
-      //TODO FB 2
-      // update selection locally (e.g. in a dialog)
-
-      final ArrayList<Long> allTourMarker = new ArrayList<>();
-      allTourMarker.add(2L);
-
-      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, allTourMarker);
-
-      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-      for (final Object listener2 : listeners) {
-         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-         //listener.selectionChanged(tourMarkerSelection);
-      }
-
-      if (_isDisplayedInDialog) {
-         return;
-      }
-
-      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
+//      // update selection locally (e.g. in a dialog)
+//
+//      final ArrayList<Long> allTourMarker = new ArrayList<>();
+//      allTourMarker.add(2L);
+//
+//      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, allTourMarker);
+//
+//      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
+//      for (final Object listener2 : listeners) {
+//         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
+//         //listener.selectionChanged(tourMarkerSelection);
+//      }
+//
+//      if (_isDisplayedInDialog) {
+//         return;
+//      }
+//
+//      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
    }
 
    /**
@@ -3502,41 +3467,38 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onMarker_MouseMove(final ChartMouseEvent chartMouseEvent) {
 
-      if (_layerMarker != null) {
+      if (_layerMarker == null) {
+         return;
+      }
 
-         final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(chartMouseEvent);
+      final ChartLabelMarker hoveredLabel = _layerMarker.retrieveHoveredLabel(chartMouseEvent);
+      final boolean isLabelHovered = hoveredLabel != null;
+      if (isLabelHovered) {
 
-         final boolean isLabelHovered = hoveredLabel != null;
-         if (isLabelHovered) {
+         // set worked that no other actions are done in this event
+         chartMouseEvent.isWorked = isLabelHovered;
+         chartMouseEvent.cursor = ChartCursor.Arrow;
+      }
+      // check if the selected marker is hovered
+      final TourMarker hoveredMarker = getHoveredTourMarker();
+      if (_selectedTourMarker != null && hoveredLabel == null || (hoveredMarker != _selectedTourMarker)) {
 
-            // set worked that no other actions are done in this event
-            chartMouseEvent.isWorked = isLabelHovered;
-            chartMouseEvent.cursor = ChartCursor.Arrow;
-         }
+         _selectedTourMarker = null;
 
-         // check if the selected marker is hovered
-         final TourMarker hoveredMarker = getHoveredTourMarker();
-         if (_selectedTourMarker != null && hoveredLabel == null || (hoveredMarker != _selectedTourMarker)) {
+         // redraw chart
+         setChartOverlayDirty();
+      }
+      // ensure that a selected tour marker is drawn in the overlay
+      if (_selectedTourMarker != null) {
 
-            _selectedTourMarker = null;
+         // redraw chart
+         setChartOverlayDirty();
+      }
+      if (_tourChartConfiguration.isShowMarkerTooltip) {
 
-            // redraw chart
-            setChartOverlayDirty();
-         }
+         // marker tooltip is displayed
 
-         // ensure that a selected tour marker is drawn in the overlay
-         if (_selectedTourMarker != null) {
-
-            // redraw chart
-            setChartOverlayDirty();
-         }
-
-         if (_tourChartConfiguration.isShowMarkerTooltip) {
-
-            // marker tooltip is displayed
-
-            _tourMarkerTooltip.open(hoveredLabel);
-         }
+         _tourMarkerTooltip.open(hoveredLabel);
       }
 
    }
@@ -3580,8 +3542,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
-
-      //TODO FB 2 that's where we are when we click on a marker in the tour chart
 
       final TourMarker tourMarker = getHoveredTourMarker();
 
@@ -5825,7 +5785,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        * Tour pauses
        */
-      _actionTourChartPauses.setSelected(_tourChartConfiguration.isShowTourPauses);
+      _actionTourChartPauses.setSelection(_tourChartConfiguration.isShowTourPauses);
       _actionTourChartPauses.setEnabled(true);
 
       /*
@@ -6108,14 +6068,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       updateCustomLayers();
    }
 
-   void updateUI_Pauses(final boolean isShowTourPauses) {
+   public void updateUI_Pauses() {
 
+      final boolean isShowTourPauses = _actionTourChartPauses.getSelection();
       _tourChartConfiguration.isShowTourPauses = isShowTourPauses;
+      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, isShowTourPauses);
 
       updateUI_PausesLayer(isShowTourPauses);
-
-      // update actions
-      _actionTourChartPauses.setSelected(isShowTourPauses);
    }
 
    /**

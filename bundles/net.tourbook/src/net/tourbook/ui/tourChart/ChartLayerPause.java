@@ -16,7 +16,6 @@
 
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
@@ -25,7 +24,6 @@ import net.tourbook.chart.IChartOverlay;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -48,8 +46,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private int              _devXPause;
    private int              _devYPause;
-
-   final IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
 
    private TourChart        _tourChart;
 

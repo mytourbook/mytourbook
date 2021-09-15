@@ -43,10 +43,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   //TODO FB 2 when clicking on the pause, center the map on the pause just like for markers
-
-   private static final String     GRAPH_LABEL_STARTTIME = net.tourbook.common.Messages.Graph_Label_StartTime;
-   private static final String     GRAPH_LABEL_ENDTIME   = net.tourbook.common.Messages.Graph_Label_EndTime;
+   private static final String     GRAPH_LABEL_TIMESTART = net.tourbook.common.Messages.Graph_Label_TimeStart;
+   private static final String     GRAPH_LABEL_TIMEEND   = net.tourbook.common.Messages.Graph_Label_TimeEnd;
 
    /**
     * Visual position for the pause tooltip, they must correspond to the position id
@@ -180,13 +178,13 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
             .spacing(5, 1)
             .applyTo(container);
       {
-         UI.createLabel(container, GRAPH_LABEL_STARTTIME);
+         UI.createLabel(container, GRAPH_LABEL_TIMESTART);
          createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_Start(),
                _hoveredLabel.getTimeZoneId());
 
-         UI.createLabel(container, GRAPH_LABEL_ENDTIME);
+         UI.createLabel(container, GRAPH_LABEL_TIMEEND);
          createUI_11_TimeField(
                container,
                _hoveredLabel.getPausedTime_End(),
@@ -218,23 +216,18 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       label.setText(labelBuilder.toString());
    }
 
-   private void FixupDisplayBounds(final Point tipSize,
+   private void FixupDisplayBounds(final Point rightBottomBounds,
                                    final int devHoveredY,
                                    final int devHoveredWidth,
                                    final int devHoveredHeight,
                                    final int devHoverSize,
                                    final int tipWidth,
                                    final int tipHeight,
-                                   final ChartComponentGraph chartComponentGraph,
-                                   final Point graphLocation,
                                    final Point tooltipLocation) {
 
+      final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
+      final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
       final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
-      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
-
-      if (displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds)) {
-         return;
-      }
 
       final int displayX = displayBounds.x;
       final int displayY = displayBounds.y;
@@ -435,18 +428,21 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       // check display bounds
       final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
-      final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
       final Point tooltipLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
+      final Point rightBottomBounds = new Point(tipSize.x + tooltipLocation.x, tipSize.y + tooltipLocation.y);
+      final Rectangle displayBounds = UI.getDisplayBounds(chartComponentGraph, tooltipLocation);
 
-      FixupDisplayBounds(tipSize,
+      if (displayBounds.contains(tooltipLocation) && displayBounds.contains(rightBottomBounds)) {
+         return tooltipLocation;
+      }
+
+      FixupDisplayBounds(rightBottomBounds,
             devHoveredY,
             devHoveredWidth,
             devHoveredHeight,
             devHoverSize,
             tipWidth,
             tipHeight,
-            chartComponentGraph,
-            graphLocation,
             tooltipLocation);
 
       return tooltipLocation;
