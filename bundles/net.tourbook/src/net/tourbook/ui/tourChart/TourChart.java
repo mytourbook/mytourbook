@@ -2171,16 +2171,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
                }
 
-               for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
+               tourSerieIndex = findPauseSerieIndexMultipleTours(tourSerieIndex, tourStartTime, pausedTime_Start, previousTourElapsedTime);
 
-                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
-
-                  if (currentTime >= pausedTime_Start) {
-                     break;
-                  }
-               }
-
-               if (tourSerieIndex < xAxisSerie.length) {
+               if (tourSerieIndex != -1) {
 
                   final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                         pausedTime_Start,
@@ -2207,21 +2200,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          final long[] pausedTime_End = _tourData.getPausedTime_End();
 
-         int serieIndex = 0;
          final int[] timeSerie = _tourData.timeSerie;
          final long tourStartTime = _tourData.getTourStartTimeMS();
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-            for (; serieIndex < timeSerie.length && serieIndex < xAxisSerie.length; ++serieIndex) {
+            final int serieIndex = findPauseSerieIndex(pausedTime_Start[index], timeSerie, tourStartTime);
 
-               final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
-
-               if (currentTime >= pausedTime_Start[index]) {
-                  break;
-               }
-            }
-
-            if (serieIndex >= xAxisSerie.length) {
+            if (serieIndex == -1) {
                continue;
             }
 
@@ -3007,6 +2992,41 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                GRAPH_CONTRIBUTION_ID_SLIDEOUT,
                _allTourChartActions.get(getGraphActionId(graphId)));
       }
+   }
+
+   private int findPauseSerieIndex(final long pausedTime_Start,
+                                   final int[] timeSerie,
+                                   final long tourStartTime) {
+
+      int serieIndex = 0;
+
+      for (; serieIndex < timeSerie.length; ++serieIndex) {
+
+         final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
+
+         if (currentTime >= pausedTime_Start) {
+            break;
+         }
+      }
+
+      if(serieIndex >= timeSerie.length) {
+         return -1;
+      }
+
+      return serieIndex;
+   }
+
+   private int findPauseSerieIndexMultipleTours(int tourSerieIndex, final long tourStartTime, final long pausedTime_Start, final long previousTourElapsedTime) {
+
+      for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
+
+         final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
+
+         if (currentTime >= pausedTime_Start) {
+            break;
+         }
+      }
+      return tourSerieIndex;
    }
 
    /**
