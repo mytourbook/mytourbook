@@ -77,6 +77,7 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourMarkerModifyListener;
 import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -307,7 +308,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private final ListenerList<ITourMarkerModifyListener>    _tourMarkerModifyListener    = new ListenerList<>();
    private final ListenerList<ITourMarkerSelectionListener> _tourMarkerSelectionListener = new ListenerList<>();
-   // private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
+   private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
    private final ListenerList<ITourModifyListener>          _tourModifyListener          = new ListenerList<>();
    private final ListenerList<IXAxisSelectionListener>      _xAxisSelectionListener      = new ListenerList<>();
    //
@@ -364,7 +365,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private boolean                       _isSegmentTitleHovered;
    private ChartTitleSegment             _chartTitleSegment;
    private TourMarker                    _lastHoveredTourMarker;
-   private TourMarker                    _lastHoveredTourPause;
+   private ChartLabelPause               _lastHoveredTourPause;
    //
    /**
     * Hide tour segments when tour chart is displayed in dialogs.
@@ -3049,28 +3050,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private void fireTourPauseSelection(final TourMarker tourMarker) {
+   private void fireTourPauseSelection(final ChartLabelPause tourPause) {
 
       //TODO FB 2
       // update selection locally (e.g. in a dialog)
-//      // update selection locally (e.g. in a dialog)
-//
-//      final ArrayList<Long> allTourMarker = new ArrayList<>();
-//      allTourMarker.add(2L);
-//
-//      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, allTourMarker);
-//
-//      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-//      for (final Object listener2 : listeners) {
-//         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-//         //listener.selectionChanged(tourMarkerSelection);
-//      }
-//
-//      if (_isDisplayedInDialog) {
-//         return;
-//      }
-//
-//      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
+
+      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.devXPause);
+
+      final Object[] listeners = _tourPauseSelectionListener.getListeners();
+      for (final Object listener2 : listeners) {
+         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
+         //listener.selectionChanged(tourMarkerSelection);
+      }
+
+      if (_isDisplayedInDialog) {
+         return;
+      }
+
+      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
    }
 
    /**
@@ -3113,6 +3110,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       return _layerMarker.getHoveredLabel();
+   }
+
+   /**
+    * @return Returns the hovered pause or <code>null</code> when a pause is not hovered.
+    */
+   private ChartLabelPause getHoveredPauseLabel() {
+
+      if (_layerPause == null) {
+         return null;
+      }
+
+      return _layerPause.getHoveredLabel();
    }
 
    SegmenterSegment getHoveredSegmenterSegment() {
@@ -3183,12 +3192,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return tourMarker;
    }
 
+   /**
+    * @return Returns a {@link TourMarker} when a {@link ChartLabel} (marker) is hovered or
+    *         <code>null</code> when a {@link ChartLabel} is not hovered.
+    */
+   public ChartLabelPause getHoveredTourPause() {
+
+      TourMarker tourMarker = null;
+
+      final ChartLabelPause hoveredPauseLabel = getHoveredPauseLabel();
+
+      if (hoveredPauseLabel != null) {
+         tourMarker = (TourMarker) hoveredPauseLabel.data;
+      }
+
+      _lastHoveredTourPause = hoveredPauseLabel;
+
+      return hoveredPauseLabel;
+   }
+
    public TourMarker getLastHoveredTourMarker() {
 
       return _lastHoveredTourMarker;
    }
 
-   public TourMarker getLastHoveredTourPause() {
+   public ChartLabelPause getLastHoveredTourPause() {
 
       return _lastHoveredTourPause;
    }
@@ -3544,19 +3572,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
-      //TODO FB 2 that's where we are when we click on a marker in the tour chart
-      final TourMarker tourMarker = getHovered();
 
-      if (tourMarker == null) {
+      final ChartLabelPause tourPause = getHoveredTourPause();
+
+      if (tourPause == null) {
          return;
       }
 
       // notify the chart mouse listener that no other actions should be done
       mouseEvent.isWorked = true;
 
-      fireTourPauseSelection(tourMarker);
-
-      _firedTourMarker = tourMarker;
+      fireTourPauseSelection(tourPause);
 
       // redraw chart
       setChartOverlayDirty();

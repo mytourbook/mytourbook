@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import java.util.List;
-
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -26,17 +24,17 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionTourPause implements ISelection {
 
-   private TourData   _tourData;
-   private List<Long> _selectedTourPauses;
+   private TourData _tourData;
+   private int      _serieIndex;
 
-   public SelectionTourPause(final TourData tourData, final List<Long> selectedTourPauses) {
+   public SelectionTourPause(final TourData tourData, final int serieIndex) {
 
       _tourData = tourData;
-      _selectedTourPauses = selectedTourPauses;
+      _serieIndex = serieIndex;
    }
 
-   public List<Long> getSelectedTourPauses() {
-      return _selectedTourPauses;
+   public int getSerieIndex() {
+      return _serieIndex;
    }
 
    public TourData getTourData() {
@@ -51,7 +49,7 @@ public class SelectionTourPause implements ISelection {
    @Override
    public String toString() {
       return "SelectionTourPause [" //$NON-NLS-1$
-            + ("_selectedTourPauses=" + _selectedTourPauses) //$NON-NLS-1$
+            + ("_serieIndex=" + _serieIndex) //$NON-NLS-1$
             +
             //
             "]"; //$NON-NLS-1$
