@@ -3052,16 +3052,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void fireTourPauseSelection(final ChartLabelPause tourPause) {
 
-      //TODO FB 2
       // update selection locally (e.g. in a dialog)
 
       final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.devXPause);
 
-      final Object[] listeners = _tourPauseSelectionListener.getListeners();
-      for (final Object listener2 : listeners) {
-         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-         //listener.selectionChanged(tourMarkerSelection);
-      }
+      Arrays.asList(_tourPauseSelectionListener.getListeners()).forEach(listener -> ((ITourPauseSelectionListener) listener).selectionChanged(
+            tourPauseSelection));
 
       if (_isDisplayedInDialog) {
          return;
@@ -3193,18 +3189,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * @return Returns a {@link TourMarker} when a {@link ChartLabel} (marker) is hovered or
+    * @return Returns a {@link ChartLabelPause} when a {@link ChartLabel} (pause) is hovered or
     *         <code>null</code> when a {@link ChartLabel} is not hovered.
     */
    public ChartLabelPause getHoveredTourPause() {
 
-      TourMarker tourMarker = null;
-
       final ChartLabelPause hoveredPauseLabel = getHoveredPauseLabel();
-
-      if (hoveredPauseLabel != null) {
-         tourMarker = (TourMarker) hoveredPauseLabel.data;
-      }
 
       _lastHoveredTourPause = hoveredPauseLabel;
 
