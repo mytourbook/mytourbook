@@ -308,7 +308,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private final ListenerList<ITourMarkerModifyListener>    _tourMarkerModifyListener    = new ListenerList<>();
    private final ListenerList<ITourMarkerSelectionListener> _tourMarkerSelectionListener = new ListenerList<>();
-   private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
+   private final ListenerList<ITourPauseSelectionListener>  _tourPauseSelectionListener  = new ListenerList<>();
    private final ListenerList<ITourModifyListener>          _tourModifyListener          = new ListenerList<>();
    private final ListenerList<IXAxisSelectionListener>      _xAxisSelectionListener      = new ListenerList<>();
    //
@@ -1247,6 +1247,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    public void addTourModifyListener(final ITourModifyListener listener) {
       _tourModifyListener.add(listener);
+   }
+
+   public void addTourPauseSelectionListener(final ITourPauseSelectionListener listener) {
+      _tourPauseSelectionListener.add(listener);
    }
 
    public void addXAxisSelectionListener(final IXAxisSelectionListener listener) {
@@ -3021,11 +3025,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
 
-      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-      for (final Object listener2 : listeners) {
-         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-         listener.selectionChanged(tourMarkerSelection);
-      }
+      Arrays.asList(_tourMarkerSelectionListener.getListeners()).forEach(listener -> ((ITourMarkerSelectionListener) listener).selectionChanged(
+            tourMarkerSelection));
 
       if (_isDisplayedInDialog) {
          return;
@@ -3054,7 +3055,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // update selection locally (e.g. in a dialog)
 
-      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.devXPause);
+      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.serieIndex);
 
       Arrays.asList(_tourPauseSelectionListener.getListeners()).forEach(listener -> ((ITourPauseSelectionListener) listener).selectionChanged(
             tourPauseSelection));
@@ -3961,6 +3962,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    public void removeTourModifySelectionListener(final ITourModifyListener listener) {
       _tourModifyListener.remove(listener);
+   }
+
+   public void removeTourPauseSelectionListener(final ITourPauseSelectionListener listener) {
+      _tourPauseSelectionListener.remove(listener);
    }
 
    public void removeXAxisSelectionListener(final IXAxisSelectionListener listener) {

@@ -2983,7 +2983,6 @@ public class Map2View extends ViewPart implements
       updateUI_ShowTour(tourData);
 
       final int leftSliderValueIndex = pauseSelection.getSerieIndex();
-      final int rightSliderValueIndex = leftSliderValueIndex;
 
       if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
 
@@ -2992,7 +2991,7 @@ public class Map2View extends ViewPart implements
             positionMapTo_0_TourSliders(
                   tourData,
                   leftSliderValueIndex,
-                  rightSliderValueIndex,
+                  leftSliderValueIndex,
                   leftSliderValueIndex,
                   null);
 
