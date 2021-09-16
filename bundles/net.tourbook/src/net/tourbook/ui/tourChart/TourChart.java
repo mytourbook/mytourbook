@@ -3054,7 +3054,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void fireTourPauseSelection(final ChartLabelPause tourPause) {
 
       // update selection locally (e.g. in a dialog)
-
       final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.serieIndex);
 
       Arrays.asList(_tourPauseSelectionListener.getListeners()).forEach(listener -> ((ITourPauseSelectionListener) listener).selectionChanged(
