@@ -1039,7 +1039,10 @@ public class Messages extends NLS {
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
-
+   public static String        Import_Data_Dialog_Button_CancelReimport;
+   public static String        Import_Data_Dialog_Button_SelectFile;
+   public static String        Import_Data_Dialog_Button_SkipAllInvalidFiles;
+   public static String        Import_Data_Dialog_Button_SkipFile;
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
@@ -1052,8 +1055,6 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_GetReimportedFilePath_Message;
    public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Message;
    public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Title;
-   public static String        Import_Data_Dialog_IsCancelReImport_Message;
-   public static String        Import_Data_Dialog_IsCancelReImport_Title;
    public static String        Import_Data_Dialog_NoActivePersion_Message;
    public static String        Import_Data_Dialog_Reimport_SubTask;
    public static String        Import_Data_Dialog_Reimport_Task;
@@ -1190,6 +1191,7 @@ public class Messages extends NLS {
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Text;
    public static String        Log_Reimport_Tour_Skipped;
+   public static String        Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
    public static String        Log_Reimport_Tour_Skipped_FilePathIsEmpty;

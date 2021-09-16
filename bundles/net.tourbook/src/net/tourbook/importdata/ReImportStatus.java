@@ -33,15 +33,18 @@ public class ReImportStatus {
 
    public final AtomicBoolean isCanceled_WholeReimport = new AtomicBoolean(false);
 
-   boolean                    isUserAsked_ToCancelWholeReImport;
-
    /**
     * Is <code>true</code> when the invalid import file location is canceled by the user.
     */
    public boolean             isCanceled_ByUser_TheFileLocationDialog;
 
-   boolean                    isCanceled_Auto_ImportFilePathIsEmpty;
+   /**
+    * Is <code>true</code> when the invalid import file location is canceled by the user also for
+    * any subsequent files.
+    */
+   public boolean             isCanceled_ByUser_SkipAllInvalidFiles;
 
+   boolean                    isCanceled_Auto_ImportFilePathIsEmpty;
    boolean                    isCanceled_Auto_TheFileLocationDialog;
 
    @Override
@@ -53,7 +56,6 @@ public class ReImportStatus {
 
             + "isAnyReImported                           =" + isAnyTourReImported + NL //$NON-NLS-1$
             + "isCanceled_WholeReimport                  =" + isCanceled_WholeReimport + NL //$NON-NLS-1$
-            + "isUserAsked_ToCancelReImport              =" + isUserAsked_ToCancelWholeReImport + NL //$NON-NLS-1$
 
             + "isCanceled_ByUser_TheFileLocationDialog   =" + isCanceled_ByUser_TheFileLocationDialog + NL //$NON-NLS-1$
             + "isCanceled_Auto_ImportFilePathIsEmpty     =" + isCanceled_Auto_ImportFilePathIsEmpty + NL //$NON-NLS-1$
