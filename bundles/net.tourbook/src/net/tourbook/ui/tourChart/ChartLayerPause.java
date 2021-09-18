@@ -43,10 +43,9 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private ChartLabelPause  _hoveredLabel;
    private ChartLabelPause  _tooltipLabel;
-
    private int              _devXPause;
-   private int              _devYPause;
 
+   private int              _devYPause;
    private TourChart        _tourChart;
 
    public ChartLayerPause(final TourChart tourChart) {
@@ -252,6 +251,10 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          chartLabelPause.devYTop = devYTop;
          chartLabelPause.devGraphWidth = devVisibleChartWidth;
       }
+   }
+
+   public ChartLabelPause getHoveredLabel() {
+      return _hoveredLabel;
    }
 
    private Color getLabelColor() {

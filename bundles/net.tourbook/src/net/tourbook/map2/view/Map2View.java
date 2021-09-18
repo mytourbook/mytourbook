@@ -1376,7 +1376,7 @@ public class Map2View extends ViewPart implements
 
          } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
 
-               onSelectionChanged_TourPause((SelectionTourPause) eventData, false);
+            onSelectionChanged_TourPause((SelectionTourPause) eventData, false);
 
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
@@ -1716,35 +1716,34 @@ public class Map2View extends ViewPart implements
 
       _map.addControlListener(controlResizedAdapter(ControlEvent -> {
 
-            /*
-             * Check if the legend size must be adjusted
-             */
-            final Image legendImage = _mapLegend.getImage();
-            if ((legendImage == null) || legendImage.isDisposed()) {
-               return;
-            }
-
-            if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
-               return;
-            }
-
-            /*
-             * Check height
-             */
-            final Rectangle mapBounds = _map.getBounds();
-            final Rectangle legendBounds = legendImage.getBounds();
-
-            final int mapHeight = mapBounds.height;
-            final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
-            final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
-
-            if ((mapHeight < defaultLegendHeight + legendTopMargin)
-                  || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
-
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
-            }
+         /*
+          * Check if the legend size must be adjusted
+          */
+         final Image legendImage = _mapLegend.getImage();
+         if ((legendImage == null) || legendImage.isDisposed()) {
+            return;
          }
-      ));
+
+         if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
+            return;
+         }
+
+         /*
+          * Check height
+          */
+         final Rectangle mapBounds = _map.getBounds();
+         final Rectangle legendBounds = legendImage.getBounds();
+
+         final int mapHeight = mapBounds.height;
+         final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
+         final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
+
+         if ((mapHeight < defaultLegendHeight + legendTopMargin)
+               || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
+
+            createLegendImage(_tourPainterConfig.getMapColorProvider());
+         }
+      }));
 
       createActions();
 
@@ -2979,61 +2978,30 @@ public class Map2View extends ViewPart implements
 
    private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
 
-//      final TourData tourData = pauseSelection.getTourData();
-//
-//      updateUI_ShowTour(tourData);
-//
-//      final List<Long> allTourMarker = pauseSelection.getSelectedTourPauses();
-//      final int numberOfTourMarkers = allTourMarker.size();
-//
-//      final int leftSliderValueIndex = 0;
-//      final int rightSliderValueIndex = 0;
+      final TourData tourData = pauseSelection.getTourData();
 
-//      if (tourData.isMultipleTours()) {
-//
-//         if (numberOfTourMarkers == 1) {
-//
-//            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
-//            rightSliderValueIndex = leftSliderValueIndex;
-//
-//         } else if (numberOfTourMarkers > 1) {
-//
-//            leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
-//            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getMultiTourSerieIndex();
-//         }
-//
-//      } else {
-//
-//         if (numberOfTourMarkers == 1) {
-//
-//            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
-//            rightSliderValueIndex = leftSliderValueIndex;
-//
-//         } else if (numberOfTourMarkers > 1) {
-//
-//            leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
-//            rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
-//         }
-//      }
-//
-//      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
-//
-//         if (isDrawSlider) {
-//
-//            positionMapTo_0_TourSliders(
-//                  tourData,
-//                  leftSliderValueIndex,
-//                  rightSliderValueIndex,
-//                  leftSliderValueIndex,
-//                  null);
-//
-//         } else {
-//
-//            positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
-//         }
-//
-//         keepMapPosition(tourData);
-//      }
+      updateUI_ShowTour(tourData);
+
+      final int leftSliderValueIndex = pauseSelection.getSerieIndex();
+
+      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
+
+         if (isDrawSlider) {
+
+            positionMapTo_0_TourSliders(
+                  tourData,
+                  leftSliderValueIndex,
+                  leftSliderValueIndex,
+                  leftSliderValueIndex,
+                  null);
+
+         } else {
+
+            positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+         }
+
+         keepMapPosition(tourData);
+      }
    }
 
    private void paintEntireTour() {

@@ -13,46 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.tourChart;
 
-import net.tourbook.data.TourData;
+import net.tourbook.tour.SelectionTourPause;
 
-import org.eclipse.jface.viewers.ISelection;
+public interface ITourPauseSelectionListener {
 
-/**
- * This selection is fired when tour pauses are selected.
- */
-public class SelectionTourPause implements ISelection {
-
-   private TourData _tourData;
-   private int      _serieIndex;
-
-   public SelectionTourPause(final TourData tourData, final int serieIndex) {
-
-      _tourData = tourData;
-      _serieIndex = serieIndex;
-   }
-
-   public int getSerieIndex() {
-      return _serieIndex;
-   }
-
-   public TourData getTourData() {
-      return _tourData;
-   }
-
-   @Override
-   public boolean isEmpty() {
-      return false;
-   }
-
-   @Override
-   public String toString() {
-      return "SelectionTourPause [" //$NON-NLS-1$
-            + ("_serieIndex=" + _serieIndex) //$NON-NLS-1$
-            +
-            //
-            "]"; //$NON-NLS-1$
-   }
-
+   void selectionChanged(SelectionTourPause tourPauseSelection);
 }

@@ -77,6 +77,7 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourMarkerModifyListener;
 import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -307,7 +308,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private final ListenerList<ITourMarkerModifyListener>    _tourMarkerModifyListener    = new ListenerList<>();
    private final ListenerList<ITourMarkerSelectionListener> _tourMarkerSelectionListener = new ListenerList<>();
-   // private final ListenerList<ITourMarkerSelectionListener> _tourPauseSelectionListener  = new ListenerList<>();
+   private final ListenerList<ITourPauseSelectionListener>  _tourPauseSelectionListener  = new ListenerList<>();
    private final ListenerList<ITourModifyListener>          _tourModifyListener          = new ListenerList<>();
    private final ListenerList<IXAxisSelectionListener>      _xAxisSelectionListener      = new ListenerList<>();
    //
@@ -364,7 +365,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private boolean                       _isSegmentTitleHovered;
    private ChartTitleSegment             _chartTitleSegment;
    private TourMarker                    _lastHoveredTourMarker;
-   private TourMarker                    _lastHoveredTourPause;
+   private ChartLabelPause               _lastHoveredTourPause;
    //
    /**
     * Hide tour segments when tour chart is displayed in dialogs.
@@ -1246,6 +1247,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    public void addTourModifyListener(final ITourModifyListener listener) {
       _tourModifyListener.add(listener);
+   }
+
+   public void addTourPauseSelectionListener(final ITourPauseSelectionListener listener) {
+      _tourPauseSelectionListener.add(listener);
    }
 
    public void addXAxisSelectionListener(final IXAxisSelectionListener listener) {
@@ -3020,11 +3025,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
 
-      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-      for (final Object listener2 : listeners) {
-         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-         listener.selectionChanged(tourMarkerSelection);
-      }
+      Arrays.asList(_tourMarkerSelectionListener.getListeners()).forEach(listener -> ((ITourMarkerSelectionListener) listener).selectionChanged(
+            tourMarkerSelection));
 
       if (_isDisplayedInDialog) {
          return;
@@ -3049,26 +3051,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private void fireTourPauseSelection(final TourMarker tourMarker) {
+   private void fireTourPauseSelection(final ChartLabelPause tourPause) {
 
-//      // update selection locally (e.g. in a dialog)
-//
-//      final ArrayList<Long> allTourMarker = new ArrayList<>();
-//      allTourMarker.add(2L);
-//
-//      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, allTourMarker);
-//
-//      final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-//      for (final Object listener2 : listeners) {
-//         final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-//         //listener.selectionChanged(tourMarkerSelection);
-//      }
-//
-//      if (_isDisplayedInDialog) {
-//         return;
-//      }
-//
-//      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
+      // update selection locally (e.g. in a dialog)
+      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.serieIndex);
+
+      Arrays.asList(_tourPauseSelectionListener.getListeners()).forEach(listener -> ((ITourPauseSelectionListener) listener).selectionChanged(
+            tourPauseSelection));
+
+      if (_isDisplayedInDialog) {
+         return;
+      }
+
+      TourManager.fireEventWithCustomData(TourEventId.PAUSE_SELECTION, tourPauseSelection, _part);
    }
 
    /**
@@ -3111,6 +3106,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       return _layerMarker.getHoveredLabel();
+   }
+
+   /**
+    * @return Returns the hovered pause or <code>null</code> when a pause is not hovered.
+    */
+   private ChartLabelPause getHoveredPauseLabel() {
+
+      if (_layerPause == null) {
+         return null;
+      }
+
+      return _layerPause.getHoveredLabel();
    }
 
    SegmenterSegment getHoveredSegmenterSegment() {
@@ -3181,12 +3188,25 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return tourMarker;
    }
 
+   /**
+    * @return Returns a {@link ChartLabelPause} when a {@link ChartLabel} (pause) is hovered or
+    *         <code>null</code> when a {@link ChartLabel} is not hovered.
+    */
+   public ChartLabelPause getHoveredTourPause() {
+
+      final ChartLabelPause hoveredPauseLabel = getHoveredPauseLabel();
+
+      _lastHoveredTourPause = hoveredPauseLabel;
+
+      return hoveredPauseLabel;
+   }
+
    public TourMarker getLastHoveredTourMarker() {
 
       return _lastHoveredTourMarker;
    }
 
-   public TourMarker getLastHoveredTourPause() {
+   public ChartLabelPause getLastHoveredTourPause() {
 
       return _lastHoveredTourPause;
    }
@@ -3543,20 +3563,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void onPause_MouseDown(final ChartMouseEvent mouseEvent) {
 
-      final TourMarker tourMarker = getHoveredTourMarker();
+      final ChartLabelPause tourPause = getHoveredTourPause();
 
-      if (tourMarker == null) {
+      if (tourPause == null) {
          return;
       }
 
       // notify the chart mouse listener that no other actions should be done
       mouseEvent.isWorked = true;
 
-      _selectedTourMarker = tourMarker;
-
-      fireTourPauseSelection(tourMarker);
-
-      _firedTourMarker = tourMarker;
+      fireTourPauseSelection(tourPause);
 
       // redraw chart
       setChartOverlayDirty();
@@ -3945,6 +3961,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    public void removeTourModifySelectionListener(final ITourModifyListener listener) {
       _tourModifyListener.remove(listener);
+   }
+
+   public void removeTourPauseSelectionListener(final ITourPauseSelectionListener listener) {
+      _tourPauseSelectionListener.remove(listener);
    }
 
    public void removeXAxisSelectionListener(final IXAxisSelectionListener listener) {

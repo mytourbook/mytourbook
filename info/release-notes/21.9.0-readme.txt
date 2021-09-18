@@ -40,6 +40,7 @@ Improvements
 
 * Tour Chart (Frederic)
   - Added a tour pauses slideout to know the start and end times of a given pause
+  - When selecting a tour pause in the Tour Chart, the pause is centered in the 2D Map
   
 * 2D Map
   - Show tour direction as marker in the tour track

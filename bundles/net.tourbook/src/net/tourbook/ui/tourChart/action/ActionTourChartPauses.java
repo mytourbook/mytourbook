@@ -16,6 +16,7 @@
 package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -34,6 +35,8 @@ public class ActionTourChartPauses extends ActionToolbarSlideout {
 
       super(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses),
             TourbookPlugin.getThemedImageDescriptor(Images.TourPauses_Disabled));
+
+      notSelectedTooltip = Messages.Tour_Action_ShowTourPauses_Tooltip;
 
       isToggleAction = true;
       _tourChart = tourChart;
