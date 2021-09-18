@@ -4,6 +4,9 @@
 TODO's
 ======
 
+https://adoptium.net/ Temurin
+
+
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
