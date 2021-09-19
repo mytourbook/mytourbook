@@ -1184,6 +1184,97 @@ public class RawDataManager {
       return false;
    }
 
+   /**
+    * @param dialogMessage
+    * @param dialogTitle
+    * @param tourData
+    * @param reImportStatus
+    * @return Returns <code>true</code> when user has canceled the action
+    */
+   private boolean askUser_ForInvalidFiles_DuringReimport(final String dialogTitle,
+                                                          final String dialogMessage,
+                                                          final ReImportStatus reImportStatus) {
+
+      final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+
+            Display.getDefault().getActiveShell(),
+
+            dialogTitle,
+            null,
+
+            dialogMessage,
+
+            MessageDialog.QUESTION,
+
+            0, // default button index
+            new String[] {
+                  IDialogConstants.OK_LABEL,
+                  IDialogConstants.CANCEL_LABEL //
+            });
+
+      final String[] allOptions = new String[] {
+
+            Messages.Import_Data_Dialog_Radio_SelectFile, //           0
+            Messages.Import_Data_Dialog_Radio_SkipFile, //             1
+            Messages.Import_Data_Dialog_Radio_SkipAllInvalidFiles, //  2
+            Messages.Import_Data_Dialog_Radio_CancelReimport //        3
+      };
+
+      dialog.setRadioOptions(allOptions, 0);
+
+      int selectedOption;
+      if (dialog.open() == Window.OK) {
+
+         selectedOption = dialog.getSelectedOption();
+
+      } else {
+
+         // dialog is canceled
+         selectedOption = -1;
+      }
+
+      switch (selectedOption) {
+
+      case 0:
+
+         // select file
+
+         break;
+
+      case 2:
+
+         // skip all invalid files
+
+         reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles = true;
+
+         return true;
+
+      case 3:
+
+         // cancel re-import
+
+         reImportStatus.isCanceled_WholeReimport.set(true);
+
+         return true;
+
+      case 1:
+
+         // skip file - the user doesn't want to look for a new file path for the current tour
+
+      case -1:
+
+         // dialog is canceled with the ESC key
+
+      default:
+
+         reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
+
+         return true;
+      }
+
+      return false;
+   }
+
    public void clearInvalidFilesList() {
       _allInvalidFiles.clear();
    }
@@ -1702,7 +1793,7 @@ public class RawDataManager {
 
             final String dbFilePathName = dbTourData.getImportFilePathName();
 
-            final String message = NLS.bind(Messages.Dialog_ImportData_ReplaceImportFilename_Message,
+            final String message = NLS.bind(Messages.Dialog_ReplaceImportFilename_Message,
                   new Object[] {
                         TourManager.getTourDateTimeShort(dbTourData),
                         importedFilePathName,
@@ -1713,10 +1804,10 @@ public class RawDataManager {
 
             final String[] allOptions = new String[] {
 
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_DoNothing, //          0
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_DoNothingAnymore, //   1
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceThis, //        2
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceAll //          3
+                  Messages.Dialog_ReplaceImportFilename_Radio_DoNothing, //          0
+                  Messages.Dialog_ReplaceImportFilename_Radio_DoNothingAnymore, //   1
+                  Messages.Dialog_ReplaceImportFilename_Radio_ReplaceThis, //        2
+                  Messages.Dialog_ReplaceImportFilename_Radio_ReplaceAll //          3
             };
 
             final int defaultOption = _selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR
@@ -1727,7 +1818,7 @@ public class RawDataManager {
 
             final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
                   Display.getDefault().getActiveShell(),
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Title,
+                  Messages.Dialog_ReplaceImportFilename_Title,
                   null,
                   message,
                   MessageDialog.QUESTION,
@@ -2592,7 +2683,7 @@ public class RawDataManager {
             reason = Messages.Log_Reimport_Tour_Skipped_OtherReasons;
          }
 
-         TourLogManager.subLog_ERROR(NLS.bind(
+         TourLogManager.subLog_INFO(NLS.bind(
                Messages.Log_Reimport_Tour_Skipped,
                oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                reason));
@@ -2724,8 +2815,6 @@ public class RawDataManager {
                                                          final ImportState_Process importState_Process,
                                                          final ReImportStatus reImportStatus) {
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
-
       if (existingImportFilePathName == null) {
 
          // import filepath is not available, in older versions -> the file path name is not saved in the tour
@@ -2734,69 +2823,19 @@ public class RawDataManager {
             return;
          }
 
+//       The file location for the tour "{0}" is not available because the tour was imported in a previous version where the
+//       filename is not saved in the tour.
+//
+//       In the following dialog you can select a file from which the tour "{1}" should be re-imported.
+
          final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-//             The file location for the tour "{0}" is not available because the tour was imported in a previous version where the
-//             filename is not saved in the tour.
-//
-//             In the following dialog you can select a file from which the tour "{1}" should be re-imported.
+         final String dialogTitle = NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort);
+         final String dialogMessage = NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
+               tourDateTimeShort,
+               tourDateTimeShort);
 
-         final int returnValue = new MessageDialog(
-
-               activeShell,
-
-               NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-               null,
-
-               NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
-                     tourDateTimeShort,
-                     tourDateTimeShort),
-
-               MessageDialog.QUESTION,
-
-               0, // default button index
-
-               // define buttons
-               Messages.Import_Data_Dialog_Button_SelectFile,
-               Messages.Import_Data_Dialog_Button_SkipFile,
-               Messages.Import_Data_Dialog_Button_SkipAllInvalidFiles,
-               Messages.Import_Data_Dialog_Button_CancelReimport
-
-         ).open();
-
-         switch (returnValue) {
-
-         case 0:
-
-            // select file
-
-            break;
-
-         case 2:
-
-            // skip all invalid files
-
-            reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles = true;
-            return;
-
-         case 3:
-
-            // cancel re-import
-
-            reImportStatus.isCanceled_WholeReimport.set(true);
-            return;
-
-         case 1:
-
-            // skip file - the user doesn't want to look for a new file path for the current tour
-
-         case -1:
-
-            // dialog is canceled with the ESC key
-
-         default:
-
-            reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
+         if (askUser_ForInvalidFiles_DuringReimport(dialogTitle, dialogMessage, reImportStatus)) {
             return;
          }
 
@@ -2846,62 +2885,10 @@ public class RawDataManager {
 //
 //                The file can be selected at a different location in the following dialog.
 
-            final int returnValue = new MessageDialog(
+            final String dialogTitle = Messages.Dialog_ReimportData_Title;
+            final String dialogMessage = NLS.bind(Messages.Import_Data_Dialog_GetAlternativePath_Message, existingImportFilePathName);
 
-                  activeShell,
-
-                  Messages.Dialog_ReimportData_Title,
-                  null,
-
-                  NLS.bind(
-                        Messages.Import_Data_Dialog_GetAlternativePath_Message,
-                        existingImportFilePathName),
-
-                  MessageDialog.QUESTION,
-
-                  0, // default button index
-
-                  // define buttons
-                  Messages.Import_Data_Dialog_Button_SelectFile,
-                  Messages.Import_Data_Dialog_Button_SkipFile,
-                  Messages.Import_Data_Dialog_Button_SkipAllInvalidFiles,
-                  Messages.Import_Data_Dialog_Button_CancelReimport
-
-            ).open();
-
-            switch (returnValue) {
-
-            case 0:
-
-               // select file
-
-               break;
-
-            case 2:
-
-               // skip all invalid files
-
-               reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles = true;
-               return;
-
-            case 3:
-
-               // cancel re-import
-
-               reImportStatus.isCanceled_WholeReimport.set(true);
-               return;
-
-            case 1:
-
-               // skip file - the user doesn't want to look for a new file path for the current tour
-
-            case -1:
-
-               // dialog is canceled with the ESC key
-
-            default:
-
-               reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
+            if (askUser_ForInvalidFiles_DuringReimport(dialogTitle, dialogMessage, reImportStatus)) {
                return;
             }
          }
@@ -2925,7 +2912,7 @@ public class RawDataManager {
                fileName,
                dataFormat);
 
-         final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
+         final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
          dialog.setText(dialogTitle);
 
          if (existingImportFilePathName != null) {

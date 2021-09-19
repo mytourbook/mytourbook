@@ -787,13 +787,6 @@ public class Messages extends NLS {
    public static String        Dialog_DeleteData_Title;
    public static String        Dialog_ReimportData_Title;
 
-   public static String        Dialog_ImportData_ReplaceImportFilename_Message;
-   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_DoNothing;
-   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_DoNothingAnymore;
-   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceAll;
-   public static String        Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceThis;
-   public static String        Dialog_ImportData_ReplaceImportFilename_Title;
-
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
    public static String        Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
@@ -827,6 +820,13 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourTime;
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
+
+   public static String        Dialog_ReplaceImportFilename_Message;
+   public static String        Dialog_ReplaceImportFilename_Radio_DoNothing;
+   public static String        Dialog_ReplaceImportFilename_Radio_DoNothingAnymore;
+   public static String        Dialog_ReplaceImportFilename_Radio_ReplaceAll;
+   public static String        Dialog_ReplaceImportFilename_Radio_ReplaceThis;
+   public static String        Dialog_ReplaceImportFilename_Title;
 
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
@@ -1039,10 +1039,10 @@ public class Messages extends NLS {
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
-   public static String        Import_Data_Dialog_Button_CancelReimport;
-   public static String        Import_Data_Dialog_Button_SelectFile;
-   public static String        Import_Data_Dialog_Button_SkipAllInvalidFiles;
-   public static String        Import_Data_Dialog_Button_SkipFile;
+   public static String        Import_Data_Dialog_Radio_CancelReimport;
+   public static String        Import_Data_Dialog_Radio_SelectFile;
+   public static String        Import_Data_Dialog_Radio_SkipAllInvalidFiles;
+   public static String        Import_Data_Dialog_Radio_SkipFile;
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
