@@ -19,13 +19,14 @@ import net.tourbook.common.UI;
 
 import org.eclipse.core.expressions.PropertyTester;
 
-public class PropertyTester_IsLinux extends PropertyTester {
+public class PropertyTester_IsLinuxOrOSX extends PropertyTester {
 
-   public PropertyTester_IsLinux() {}
+   public PropertyTester_IsLinuxOrOSX() {}
 
    @Override
    public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
-      return UI.IS_LINUX;
+
+      return UI.IS_LINUX || UI.IS_OSX;
    }
 
 }

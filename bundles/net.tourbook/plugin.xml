@@ -2077,14 +2077,19 @@
             label			="%View_Name_TourMap25"
             mnemonic		="%View_Name_TourMap25_Mnemonic"
          >
+
+<!-- DISABLED FOR NOW, MT is crashing when using Eclipse 21-09 and W10 -> using Eclipse 21-06
+
             <visibleWhen>
                <test
                   forcePluginActivation   ="true"
-                  property                ="net.tourbook.commands.PropertyTester_IsLinux"
+                  property                ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
                   value                   ="true"
                >
                </test>
             </visibleWhen>
+-->
+
          </command>
       
       </menuContribution>
@@ -2099,14 +2104,19 @@
                label			="%View_Name_TourMap25"
                tooltip		="%View_Name_TourMap25_Tooltip"
             >
+            
+<!-- DISABLED FOR NOW, MT is crashing when using Eclipse 21-09 and W10 -> using Eclipse 21-06
+
                <visibleWhen>
                   <test
                      forcePluginActivation   ="true"
-                     property                ="net.tourbook.commands.PropertyTester_IsLinux"
+                     property                ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
                      value                   ="true"
                   >
                   </test>
                </visibleWhen>
+-->
+
             </command>
 
          </toolbar>
@@ -2363,11 +2373,11 @@
       />
       
       <propertyTester
-         id          ="net.tourbook.commands.PropertyTester_IsLinux"
+         id          ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
          namespace   ="net.tourbook.commands.tester"
          properties  ="Is_Linux"
          type        ="java.lang.Object"
-         class       ="net.tourbook.commands.PropertyTester_IsLinux"
+         class       ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
       />
       
    </extension>
