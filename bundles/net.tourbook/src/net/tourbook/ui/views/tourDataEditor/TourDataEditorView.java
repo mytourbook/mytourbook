@@ -2635,10 +2635,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                // ensure that the tour is displayed
                onSelectionChanged((ISelection) eventData);
-
-               final SelectionTourPause tourPauseSelection = (SelectionTourPause) eventData;
-
-               onSelectionChanged_TourPause(tourPauseSelection);
+               onSelectionChanged_TourPause((SelectionTourPause) eventData);
 
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -8086,7 +8083,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Programmatically toggles the row select mode
     *
     * @param enabled
-    *           True to activate the row select mode, false to disactivate it.
+    *           True to activate the row select mode, false to deactivate it.
     */
    public void setRowEditModeEnabled(final boolean enabled) {
 
