@@ -826,6 +826,7 @@ public class TourDatabase {
 
       final HashMap<String, TourTag> allDbTags_ByName = new HashMap<>(getAllTourTags_ByTagName());
 
+      // loop: all tags in the tour -> find tags which are not yet saved
       for (final TourTag tourDataTag : allTourDataTags) {
 
          final long tagId = tourDataTag.getTagId();
@@ -847,7 +848,7 @@ public class TourDatabase {
 
          if (dbTag == null) {
 
-            // create new tag
+            // tag not available -> create a new tag
 
             allNewTags.add(tourDataTag);
 
@@ -903,13 +904,9 @@ public class TourDatabase {
          }
       }
 
-      if (isNewTagSaved) {
-
-         // replace tags in the tour
-
-         allTourDataTags.clear();
-         allTourDataTags.addAll(allAppliedTags);
-      }
+      // replace tags in the tour, either with the old tags and/or with newly created tags
+      allTourDataTags.clear();
+      allTourDataTags.addAll(allAppliedTags);
 
       return isNewTagSaved;
    }
@@ -923,16 +920,21 @@ public class TourDatabase {
       final TourType tourType = tourData.getTourType();
 
       if (tourType == null) {
+
+         // a tour type is not set -> nothing to do
+
          return false;
       }
 
       if (tourType.getTypeId() != ENTITY_IS_NOT_SAVED) {
 
          // tour type is saved
+
          return false;
       }
 
-      TourType newType = null;
+      TourType appliedType = null;
+      boolean isNewTourType = false;
 
       synchronized (TRANSIENT_LOCK) {
 
@@ -947,7 +949,7 @@ public class TourDatabase {
 
             // use found tag
 
-            newType = dbType;
+            appliedType = dbType;
 
          } else {
 
@@ -960,7 +962,8 @@ public class TourDatabase {
 
             if (savedType != null) {
 
-               newType = savedType;
+               appliedType = savedType;
+               isNewTourType = true;
 
                // force reload of the db tour types
                clearTourTypes();
@@ -969,14 +972,8 @@ public class TourDatabase {
          }
       }
 
-      final boolean isNewTourType = newType != null;
-
-      if (isNewTourType) {
-
-         // replace tour type in the tour
-
-         tourData.setTourType(newType);
-      }
+      // replace tour type in the tour
+      tourData.setTourType(appliedType);
 
       return isNewTourType;
    }
