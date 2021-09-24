@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.BufferedWriter;
@@ -3055,7 +3056,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
 
       // set menu for the tag item
-
       final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
       tagContextMenu.addMenuListener(new MenuAdapter() {
          @Override
@@ -3508,16 +3508,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtAltitudeUp = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtAltitudeUp.addModifyListener(_verifyIntValue);
             _txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
-            _txtAltitudeUp.addKeyListener(new KeyListener() {
+            _txtAltitudeUp.addKeyListener(keyPressedAdapter(keyEvent -> _isAltitudeManuallyModified = true));
 
-               @Override
-               public void keyPressed(final KeyEvent e) {
-                  _isAltitudeManuallyModified = true;
-               }
-
-               @Override
-               public void keyReleased(final KeyEvent e) {}
-            });
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeUp);
 
             _lblAltitudeUpUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
@@ -3533,15 +3525,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtAltitudeDown = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtAltitudeDown.addModifyListener(_verifyIntValue);
             _txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
-            _txtAltitudeDown.addKeyListener(new KeyListener() {
-               @Override
-               public void keyPressed(final KeyEvent e) {
-                  _isAltitudeManuallyModified = true;
-               }
-
-               @Override
-               public void keyReleased(final KeyEvent e) {}
-            });
+            _txtAltitudeDown.addKeyListener(keyPressedAdapter(keyEvent -> _isAltitudeManuallyModified = true));
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeDown);
 
             _lblAltitudeDownUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
@@ -4547,7 +4531,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          if (_tab1Container.isDisposed()) {
 
-            // this can occure when view is closed (very early) but not yet visible
+            // this can occur when view is closed (very early) but not yet visible
             return;
          }
 
@@ -5921,7 +5905,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnContainerControls.clear();
 
       /*
-       * Tour MUST be set clean otherwise a Ctrl+W whould "close" the tour editor but closing the
+       * Tour MUST be set clean otherwise a Ctrl+W would "close" the tour editor but closing the
        * app is asking to save the tour!
        */
       setTourClean();
@@ -7364,7 +7348,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _selectionTourId = tourData.getTourId();
 
-         if ((tourData != null) && (currentTourId == _selectionTourId)) {
+         if (currentTourId == _selectionTourId) {
             isCurrentTourSelected = true;
             selectedTourData = tourData;
          }
@@ -8046,7 +8030,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
             && valueIndexEnd == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         // both positons are ignored
+         // both positions are ignored
 
          return;
       }
