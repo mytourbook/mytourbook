@@ -93,6 +93,7 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -2629,6 +2630,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
 
                onSelectionChanged_TourMarker(tourMarkerSelection);
+
+            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+
+               // ensure that the tour is displayed
+               onSelectionChanged((ISelection) eventData);
+               onSelectionChanged_TourPause((SelectionTourPause) eventData);
 
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -6049,7 +6056,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   tourDataModified = true;
                }
 
-               if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
+               if (newTemperatureValue != Float.MIN_VALUE && _serieTemperature != null) {
                   if (isTemperatureValueOffset) {
 
                      //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
@@ -7524,6 +7531,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       selectTimeSlice_InViewer(leftSliderValueIndex, rightSliderValueIndex);
    }
 
+   private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection) {
+
+      final int leftSliderValueIndex = pauseSelection.getSerieIndex();
+
+      selectTimeSlice_InViewer(leftSliderValueIndex, leftSliderValueIndex);
+   }
+
    private void onSelectTab() {
 
       final CTabItem selectedTab = _tabFolder.getSelection();
@@ -8069,7 +8083,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Programmatically toggles the row select mode
     *
     * @param enabled
-    *           True to activate the row select mode, false to disactivate it.
+    *           True to activate the row select mode, false to deactivate it.
     */
    public void setRowEditModeEnabled(final boolean enabled) {
 
