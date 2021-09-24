@@ -8043,23 +8043,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    public void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
-      final Table table = (Table) _timeSlice_Viewer.getControl();
-      final int itemCount = table.getItemCount();
+      if (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+            && valueIndexEnd == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-      // adjust to array bounds
-      final int checkedValueIndex1 = Math.max(0, Math.min(valueIndexStart, itemCount - 1));
-      final int checkedValueIndex2 = Math.max(0, Math.min(valueIndexEnd, itemCount - 1));
+         // both positons are ignored
 
-      if ((valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION)
-            && (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION)) {
          return;
       }
 
+      final Table table = (Table) _timeSlice_Viewer.getControl();
+      final int numItems = table.getItemCount();
+
+      // adjust to array bounds
+      final int checkedValueIndex1 = Math.max(0, Math.min(valueIndexStart, numItems - 1));
+      final int checkedValueIndex2 = Math.max(0, Math.min(valueIndexEnd, numItems - 1));
+
       if (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+
          table.setSelection(checkedValueIndex2);
+
       } else if (valueIndexEnd == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+
          table.setSelection(checkedValueIndex1);
+
       } else {
+
          table.setSelection(checkedValueIndex1, checkedValueIndex2);
       }
 
