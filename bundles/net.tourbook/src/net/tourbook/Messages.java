@@ -2833,6 +2833,7 @@ public class Messages extends NLS {
    public static String        Tour_Tags_Action_SingleExpand_CollapseOthers;
    public static String        Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String        Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;
+   public static String        Tour_Tags_Action_ToggleTagFilter_Tooltip;
    public static String        Tour_Tags_Title_MultipleTours;
    public static String        Tour_Tags_Title_OneTour;
    public static String        Tour_Tag_Filter_Action_Tooltip;
