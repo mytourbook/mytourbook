@@ -1785,6 +1785,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      : 0;
       }
 
+      /**
+       * @param sortColumnId
+       * @return Returns the column widget by it's column id, when column id is not found then the
+       *         first column is returned.
+       */
+      private TableColumn getSortColumn(final String sortColumnId) {
+
+         final TableColumn[] allColumns = _timeSlice_Viewer.getTable().getColumns();
+
+         for (final TableColumn column : allColumns) {
+
+            final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+            if (columnId != null && columnId.equals(sortColumnId)) {
+               return column;
+            }
+         }
+
+         return allColumns[0];
+      }
+
       @Override
       public final boolean isSorterProperty(final Object element, final String property) {
 
@@ -1825,6 +1846,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
          updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
+
+      /**
+       * Set the sort column direction indicator for a column
+       *
+       * @param sortColumnId
+       * @param isAscendingSort
+       */
+      private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+
+         final int direction =
+               sortDirection == TimeSliceComparator.ASCENDING ? SWT.UP
+                     : sortDirection == TimeSliceComparator.DESCENDING ? SWT.DOWN
+                           : SWT.NONE;
+
+         final Table table = _timeSlice_Viewer.getTable();
+         final TableColumn tc = getSortColumn(sortColumnId);
+
+         table.setSortColumn(tc);
+         table.setSortDirection(direction);
       }
    }
 
@@ -6813,27 +6854,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * @param sortColumnId
-    * @return Returns the column widget by it's column id, when column id is not found then the
-    *         first column is returned.
-    */
-   private TableColumn getSortColumn(final String sortColumnId) {
-
-      final TableColumn[] allColumns = _timeSlice_Viewer.getTable().getColumns();
-
-      for (final TableColumn column : allColumns) {
-
-         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
-
-         if (columnId != null && columnId.equals(sortColumnId)) {
-            return column;
-         }
-      }
-
-      return allColumns[0];
-   }
-
-   /**
     * @return Returns {@link TourData} for the tour in the tour data editor or <code>null</code>
     *         when a tour is not in the tour data editor
     */
@@ -8714,26 +8734,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _refTourRange = null;
       }
-   }
-
-   /**
-    * Set the sort column direction indicator for a column
-    *
-    * @param sortColumnId
-    * @param isAscendingSort
-    */
-   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
-
-      final int direction =
-            sortDirection == TimeSliceComparator.ASCENDING ? SWT.UP
-                  : sortDirection == TimeSliceComparator.DESCENDING ? SWT.DOWN
-                        : SWT.NONE;
-
-      final Table table = _timeSlice_Viewer.getTable();
-      final TableColumn tc = getSortColumn(sortColumnId);
-
-      table.setSortColumn(tc);
-      table.setSortDirection(direction);
    }
 
    private void updateUI_Tab_1_Tour() {
