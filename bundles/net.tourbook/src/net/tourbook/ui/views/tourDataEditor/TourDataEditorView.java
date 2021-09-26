@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.BufferedWriter;
@@ -1784,6 +1785,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      : 0;
       }
 
+      /**
+       * @param sortColumnId
+       * @return Returns the column widget by it's column id, when column id is not found then the
+       *         first column is returned.
+       */
+      private TableColumn getSortColumn(final String sortColumnId) {
+
+         final TableColumn[] allColumns = _timeSlice_Viewer.getTable().getColumns();
+
+         for (final TableColumn column : allColumns) {
+
+            final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+            if (columnId != null && columnId.equals(sortColumnId)) {
+               return column;
+            }
+         }
+
+         return allColumns[0];
+      }
+
       @Override
       public final boolean isSorterProperty(final Object element, final String property) {
 
@@ -1824,6 +1846,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
          updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
+
+      /**
+       * Set the sort column direction indicator for a column
+       *
+       * @param sortColumnId
+       * @param isAscendingSort
+       */
+      private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+
+         final int direction =
+               sortDirection == TimeSliceComparator.ASCENDING ? SWT.UP
+                     : sortDirection == TimeSliceComparator.DESCENDING ? SWT.DOWN
+                           : SWT.NONE;
+
+         final Table table = _timeSlice_Viewer.getTable();
+         final TableColumn tc = getSortColumn(sortColumnId);
+
+         table.setSortColumn(tc);
+         table.setSortDirection(direction);
       }
    }
 
@@ -3055,7 +3097,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
 
       // set menu for the tag item
-
       final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
       tagContextMenu.addMenuListener(new MenuAdapter() {
          @Override
@@ -3508,16 +3549,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtAltitudeUp = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtAltitudeUp.addModifyListener(_verifyIntValue);
             _txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
-            _txtAltitudeUp.addKeyListener(new KeyListener() {
+            _txtAltitudeUp.addKeyListener(keyPressedAdapter(keyEvent -> _isAltitudeManuallyModified = true));
 
-               @Override
-               public void keyPressed(final KeyEvent e) {
-                  _isAltitudeManuallyModified = true;
-               }
-
-               @Override
-               public void keyReleased(final KeyEvent e) {}
-            });
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeUp);
 
             _lblAltitudeUpUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
@@ -3533,15 +3566,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtAltitudeDown = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtAltitudeDown.addModifyListener(_verifyIntValue);
             _txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
-            _txtAltitudeDown.addKeyListener(new KeyListener() {
-               @Override
-               public void keyPressed(final KeyEvent e) {
-                  _isAltitudeManuallyModified = true;
-               }
-
-               @Override
-               public void keyReleased(final KeyEvent e) {}
-            });
+            _txtAltitudeDown.addKeyListener(keyPressedAdapter(keyEvent -> _isAltitudeManuallyModified = true));
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeDown);
 
             _lblAltitudeDownUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
@@ -4547,7 +4572,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          if (_tab1Container.isDisposed()) {
 
-            // this can occure when view is closed (very early) but not yet visible
+            // this can occur when view is closed (very early) but not yet visible
             return;
          }
 
@@ -5921,7 +5946,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnContainerControls.clear();
 
       /*
-       * Tour MUST be set clean otherwise a Ctrl+W whould "close" the tour editor but closing the
+       * Tour MUST be set clean otherwise a Ctrl+W would "close" the tour editor but closing the
        * app is asking to save the tour!
        */
       setTourClean();
@@ -6829,27 +6854,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * @param sortColumnId
-    * @return Returns the column widget by it's column id, when column id is not found then the
-    *         first column is returned.
-    */
-   private TableColumn getSortColumn(final String sortColumnId) {
-
-      final TableColumn[] allColumns = _timeSlice_Viewer.getTable().getColumns();
-
-      for (final TableColumn column : allColumns) {
-
-         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
-
-         if (columnId != null && columnId.equals(sortColumnId)) {
-            return column;
-         }
-      }
-
-      return allColumns[0];
-   }
-
-   /**
     * @return Returns {@link TourData} for the tour in the tour data editor or <code>null</code>
     *         when a tour is not in the tour data editor
     */
@@ -7364,7 +7368,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _selectionTourId = tourData.getTourId();
 
-         if ((tourData != null) && (currentTourId == _selectionTourId)) {
+         if (currentTourId == _selectionTourId) {
             isCurrentTourSelected = true;
             selectedTourData = tourData;
          }
@@ -8046,7 +8050,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (valueIndexStart == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
             && valueIndexEnd == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         // both positons are ignored
+         // both positions are ignored
 
          return;
       }
@@ -8730,26 +8734,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _refTourRange = null;
       }
-   }
-
-   /**
-    * Set the sort column direction indicator for a column
-    *
-    * @param sortColumnId
-    * @param isAscendingSort
-    */
-   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
-
-      final int direction =
-            sortDirection == TimeSliceComparator.ASCENDING ? SWT.UP
-                  : sortDirection == TimeSliceComparator.DESCENDING ? SWT.DOWN
-                        : SWT.NONE;
-
-      final Table table = _timeSlice_Viewer.getTable();
-      final TableColumn tc = getSortColumn(sortColumnId);
-
-      table.setSortColumn(tc);
-      table.setSortDirection(direction);
    }
 
    private void updateUI_Tab_1_Tour() {
