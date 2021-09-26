@@ -2167,7 +2167,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                   final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
 
-                  if (currentTime >= pausedTime_Start) {
+                  if (currentTime > pausedTime_Start) {
                      break;
                   }
                }
@@ -2207,7 +2207,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
 
-               if (currentTime >= pausedTime_Start[index]) {
+               if (currentTime > pausedTime_Start[index]) {
                   break;
                }
             }
