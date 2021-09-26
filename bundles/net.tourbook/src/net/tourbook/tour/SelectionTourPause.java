@@ -50,9 +50,7 @@ public class SelectionTourPause implements ISelection {
    public String toString() {
       return "SelectionTourPause [" //$NON-NLS-1$
             + ("_serieIndex=" + _serieIndex) //$NON-NLS-1$
-            +
-            //
-            "]"; //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
    }
 
 }
