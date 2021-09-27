@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -138,7 +138,7 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
       return true;
    }
 
-   public ArrayList<Map3GradientColorProvider> getColorProviders() {
+   public List<Map3GradientColorProvider> getColorProviders() {
       return _colorProviders;
    }
 

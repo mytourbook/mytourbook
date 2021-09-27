@@ -17,6 +17,7 @@ package net.tourbook.map3.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -332,7 +333,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
    private void createUI_10_ColorViewer(final Composite parent) {
 
-      final ArrayList<Map3GradientColorProvider> colorProviders = Map3GradientColorManager
+      final List<Map3GradientColorProvider> colorProviders = Map3GradientColorManager
             .getColorProviders(_graphId);
 
       int tableStyle;
@@ -997,7 +998,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       final MapGraphId graphId = selectedColorProvider.getGraphId();
       final Map3ColorDefinition colorDefinition = Map3GradientColorManager.getColorDefinition(graphId);
 
-      final ArrayList<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
+      final List<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
 
       if (allGraphIdColorProvider.size() < 2) {
 
