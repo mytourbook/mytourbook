@@ -1214,8 +1214,7 @@ public class RawDataManager {
 
             0, // default button index
             IDialogConstants.OK_LABEL,
-            IDialogConstants.CANCEL_LABEL //
-      );
+            IDialogConstants.CANCEL_LABEL);
 
       final String[] allOptions = new String[] {
 
@@ -1835,8 +1834,7 @@ public class RawDataManager {
                   MessageDialog.QUESTION,
                   0, // OK button
                   IDialogConstants.OK_LABEL,
-                  IDialogConstants.CANCEL_LABEL //
-            );
+                  IDialogConstants.CANCEL_LABEL);
 
             dialog.setRadioOptions(allOptions, defaultOption);
 
