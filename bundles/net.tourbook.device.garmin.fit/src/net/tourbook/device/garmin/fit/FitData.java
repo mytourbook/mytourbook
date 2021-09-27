@@ -27,6 +27,7 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
@@ -78,7 +79,7 @@ public class FitData {
 
    private final List<TimeData>          _allTimeData           = new ArrayList<>();
 
-//   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
+   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
    private final List<GearData>          _allGearData           = new ArrayList<>();
    private final List<SwimData>          _allSwimData           = new ArrayList<>();
    private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
@@ -253,6 +254,7 @@ public class FitData {
 
          finalizeTour_Elevation(_tourData);
          finalizeTour_Battery(_tourData);
+         finalizeTour_Sensors(_tourData);
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData, _allGearData);
@@ -304,7 +306,7 @@ public class FitData {
 
       if (tourData.getTourAltUp() == 0 && tourData.getTourAltDown() == 0) {
 
-         _tourData.computeAltitudeUpDown();
+         tourData.computeAltitudeUpDown();
       }
    }
 
@@ -498,6 +500,11 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
+   private void finalizeTour_Sensors(final TourData tourData) {
+      // TODO Auto-generated method stub
+
+   }
+
    private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
@@ -585,9 +592,9 @@ public class FitData {
       return deviceName.toString();
    }
 
-//   public List<DeviceSensorValue> getDeviceSensorValues() {
-//      return _allDeviceSensorValues;
-//   }
+   public List<DeviceSensorValue> getDeviceSensorValues() {
+      return _allDeviceSensorValues;
+   }
 
    public List<GearData> getGearData() {
       return _allGearData;

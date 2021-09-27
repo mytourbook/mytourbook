@@ -37,7 +37,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH-mm-ss"); //$NON-NLS-1$
 
-   private boolean                        _isLogDeviceData    = false;
+   private boolean                        _isLogDeviceData    = true;
 
    public MesgListener_DeviceInfo(final FitData fitData) {
 
