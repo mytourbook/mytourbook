@@ -904,18 +904,9 @@ public class Map3GradientColorManager {
 
       if (xmlColorDefinitions == null) {
 
-         for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
-
-            for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
-
-               final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
-
-               colorProfile.setIsActiveColorProfile(true);
-
-               // set only first default color profile as active
-               break;
-            }
-         }
+         // set only first default color profile as active
+         _map3ColorDefinitions.values().forEach(colorDef -> colorDef.getColorProviders().get(0).getMap3ColorProfile().setIsActiveColorProfile(
+               true));
 
          return;
       }
