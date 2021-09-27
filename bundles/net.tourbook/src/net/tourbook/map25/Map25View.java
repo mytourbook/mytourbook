@@ -43,9 +43,12 @@ import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.IMapView;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
+import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
@@ -94,6 +97,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -104,13 +108,10 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.marker.MarkerInterface;
-import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
@@ -120,7 +121,8 @@ public class Map25View extends ViewPart implements
       IMapBookmarks,
       ICloseOpenedDialogs,
       IMapBookmarkListener,
-      IMapSyncListener {
+      IMapSyncListener,
+      IMapView {
 
 // SET_FORMATTING_OFF
 
@@ -167,7 +169,7 @@ public class Map25View extends ViewPart implements
    //
    private boolean                       _isPartVisible;
    private boolean                       _isShowTour;
-   private boolean                       _isInZoom;
+   // private boolean                       _isInZoom;
    private boolean                       _isShowPhoto;
    //
    private IPartListener2                _partListener;
@@ -178,6 +180,7 @@ public class Map25View extends ViewPart implements
    private ISelection                    _selectionWhenHidden;
    private int                           _lastSelectionHash;
    //
+   private Action_ExportMap_SubMenu      _actionExportMap_SubMenu;
    private ActionMapBookmarks            _actionMapBookmarks;
    private ActionMap25_MapProvider       _actionMapProvider;
    private ActionMap25_Options           _actionMapOptions;
@@ -202,32 +205,32 @@ public class Map25View extends ViewPart implements
    /**
     * contains photos which are displayed in the map
     */
-   private final ArrayList<Photo>        _filteredPhotos = new ArrayList<>();
-   private List<MarkerItem>              _photoItems     = new ArrayList<>();
+   //  private final ArrayList<Photo>        _filteredPhotos = new ArrayList<>();
+   // private List<MarkerItem>              _photoItems     = new ArrayList<>();
 
    private ArrayList<Photo>              _allPhotos      = new ArrayList<>();
    private List<MarkerInterface>         _photo_pts      = new ArrayList<>();
-   private boolean                       _isPhotoFilterActive;
-   private int                           _photoFilterRatingStars;
-   private int                           _photoFilterRatingStarOperator;
+   //  private boolean                       _isPhotoFilterActive;
+   // private int                           _photoFilterRatingStars;
+//   private int                           _photoFilterRatingStarOperator;
 
-   private MarkerSymbol                  _symbol;
-   private float                         _symbolSize     = 20f;
-   private int                           _symbolSizeInt  = 20;
-   private Bitmap                        _bitmapPhoto;
-   private Bitmap                        _bitmapStar;
+   //  private MarkerSymbol                  _symbol;
+   //  private float                         _symbolSize     = 20f;
+   //  private int                           _symbolSizeInt  = 20;
+   //  private Bitmap                        _bitmapPhoto;
+//   private Bitmap                        _bitmapStar;
 
-   private int                           _leftSliderValueIndex;
-   private int                           _rightSliderValueIndex;
-   private int                           _selectedSliderValueIndex;
+   private int     _leftSliderValueIndex;
+   private int     _rightSliderValueIndex;
+   private int     _selectedSliderValueIndex;
    //
-   private int                           _hash_AllPhotos;
-   private int                           _hashTourId;
-   private int                           _hashTourData;
+   private int     _hash_AllPhotos;
+   private int     _hashTourId;
+   private int     _hashTourData;
    //
-   private MapSync                       _mapSynchedWith = MapSync.NONE;
+   private MapSync _mapSynchedWith = MapSync.NONE;
    //
-   private long                          _lastFiredSyncEventTime;
+   private long    _lastFiredSyncEventTime;
 
    // context menu
    private boolean _isContextMenuVisible;
@@ -341,15 +344,11 @@ public class Map25View extends ViewPart implements
       // set state here because opening the context menu is async
       _isContextMenuVisible = true;
 
-      _swtContainer.getDisplay().asyncExec(new Runnable() {
+      _swtContainer.getDisplay().asyncExec(() -> {
 
-         @Override
-         public void run() {
+         final Point screenPoint = _swtContainer.toDisplay(relativeX, relativeY);
 
-            final Point screenPoint = _swtContainer.toDisplay(relativeX, relativeY);
-
-            createContextMenu(screenPoint.x, screenPoint.y);
-         }
+         createContextMenu(screenPoint.x, screenPoint.y);
       });
 
    }
@@ -464,17 +463,13 @@ public class Map25View extends ViewPart implements
    public void actionZoomIn() {
       final Map map25 = _mapApp.getMap();
 
-      map25.post(new Runnable() {
+      map25.post(() -> {
 
-         @Override
-         public void run() {
+         final Animator animator = map25.animator();
 
-            final Animator animator = map25.animator();
-
-            animator.cancel();
-            animator.animateZoom(500, _zoomFactor, 0, 0);
-            map25.updateMap(true);
-         }
+         animator.cancel();
+         animator.animateZoom(500, _zoomFactor, 0, 0);
+         map25.updateMap(true);
       });
 
    }
@@ -482,17 +477,13 @@ public class Map25View extends ViewPart implements
    public void actionZoomOut() {
       final Map map25 = _mapApp.getMap();
 
-      map25.post(new Runnable() {
+      map25.post(() -> {
 
-         @Override
-         public void run() {
+         final Animator animator = map25.animator();
 
-            final Animator animator = map25.animator();
-
-            animator.cancel();
-            animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
-            map25.updateMap(true);
-         }
+         animator.cancel();
+         animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
+         map25.updateMap(true);
       });
 
    }
@@ -510,22 +501,18 @@ public class Map25View extends ViewPart implements
 
       final Map map25 = _mapApp.getMap();
 
-      map25.post(new Runnable() {
+      map25.post(() -> {
 
-         @Override
-         public void run() {
+         final Animator animator = map25.animator();
 
-            final Animator animator = map25.animator();
+         animator.cancel();
+         animator.animateTo(//
+               2000,
+               _allBoundingBox,
+               Easing.Type.SINE_INOUT,
+               Animator.ANIM_MOVE | Animator.ANIM_SCALE);
 
-            animator.cancel();
-            animator.animateTo(//
-                  2000,
-                  _allBoundingBox,
-                  Easing.Type.SINE_INOUT,
-                  Animator.ANIM_MOVE | Animator.ANIM_SCALE);
-
-            map25.updateMap(true);
-         }
+         map25.updateMap(true);
       });
 
    }
@@ -611,17 +598,17 @@ public class Map25View extends ViewPart implements
 
       _tourEventListener = new ITourEventListener() {
          @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         public void tourChanged(final IWorkbenchPart part, final TourEventId tourEventId, final Object eventData) {
 
             if (part == Map25View.this) {
                return;
             }
 
-            if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+            if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 //					resetMap();
 
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 //					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 //					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
@@ -632,22 +619,22 @@ public class Map25View extends ViewPart implements
 //						resetMap();
 //					}
 
-            } else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+            } else if (tourEventId == TourEventId.UPDATE_UI || tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 //					clearView();
 
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
+            } else if (tourEventId == TourEventId.MARKER_SELECTION) {
 
 //					if (eventData instanceof SelectionTourMarker) {
 //
 //						onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
 //					}
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+            } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
                onSelectionChanged((ISelection) eventData);
 
-            } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+            } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
                onSelectionChanged((ISelection) eventData);
             }
@@ -698,6 +685,7 @@ public class Map25View extends ViewPart implements
    private void createActions() {
 
       _actionShowMarker_WithOptions = new ActionMap25_ShowMarker(this, _parent);
+      _actionExportMap_SubMenu = new Action_ExportMap_SubMenu(this);
       _actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
       _actionShowPhotos = new ActionShowPhotos(this);
       //_actionShowPhoto_WithOptions = new ActionShowPhoto_WithConfig();
@@ -762,12 +750,9 @@ public class Map25View extends ViewPart implements
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getCurrent().asyncExec(() -> {
 
 //						hideTourInfo();
-               }
             });
          }
 
@@ -791,12 +776,9 @@ public class Map25View extends ViewPart implements
 
       final Map3ContextMenu swt_awt_ContextMenu = new Map3ContextMenu(display, _swtContextMenu);
 
-      display.asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.asyncExec(() -> {
 //				_mapApp.debugPrint("SWT calling menu"); //$NON-NLS-1$
-            swt_awt_ContextMenu.swtIndirectShowMenu(xScreenPos, yScreenPos);
-         }
+         swt_awt_ContextMenu.swtIndirectShowMenu(xScreenPos, yScreenPos);
       });
    }
 
@@ -1009,6 +991,7 @@ public class Map25View extends ViewPart implements
 // hide separator when only 1 photo action is available -> too much separators
 //      tbm.add(new Separator());
 
+      tbm.add(_actionExportMap_SubMenu);
       tbm.add(_actionMapBookmarks); //should be moved to position like in Map2View
 
       tbm.add(new Separator());
@@ -1071,6 +1054,12 @@ public class Map25View extends ViewPart implements
       //final MapPosition mapPosition =  _mapApp.getMap().getMapPosition();  //only for testing, removing later
 
       return new MapLocation(mapPosition2);
+   }
+
+   @Override
+   public Image getMapViewImage() {
+
+      return MapUtils.getMapViewImage(_parent);
    }
 
    @Override
@@ -1536,23 +1525,19 @@ public class Map25View extends ViewPart implements
 
       if (isSyncWithSlider == false) {
 
-         map25.post(new Runnable() {
+         map25.post(() -> {
 
-            @Override
-            public void run() {
+            // create outside isSynch that data are available when map is zoomed to show the whole tour
+            _allBoundingBox = createBoundingBox(_allGeoPoints);
 
-               // create outside isSynch that data are available when map is zoomed to show the whole tour
-               _allBoundingBox = createBoundingBox(_allGeoPoints);
-
-               if (_mapSynchedWith == MapSync.WITH_TOUR) {
+            if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
 //						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
-                  final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
-                  Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
-               }
-
-               map25.updateMap(true);
+               final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
+               Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
             }
+
+            map25.updateMap(true);
          });
 
       } else {
@@ -1665,26 +1650,23 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_swtContainer.isDisposed()) {
-               return;
-            }
-
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
-            if (tourDataList != null) {
-
-               _allTourData.clear();
-               _allTourData.addAll(tourDataList);
-
-               paintTours_AndUpdateMap();
-            }
-
-            enableActions();
+         // validate widget
+         if (_swtContainer.isDisposed()) {
+            return;
          }
+
+         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
+         if (tourDataList != null) {
+
+            _allTourData.clear();
+            _allTourData.addAll(tourDataList);
+
+            paintTours_AndUpdateMap();
+         }
+
+         enableActions();
       });
    }
 
@@ -1826,17 +1808,14 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      _swtContainer.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _swtContainer.getDisplay().asyncExec(() -> {
 
-            // validate widget
-            if (_swtContainer.isDisposed()) {
-               return;
-            }
-
-            _mapInfoManager.setMapPosition(latitude, longitude, zoomLevel);
+         // validate widget
+         if (_swtContainer.isDisposed()) {
+            return;
          }
+
+         _mapInfoManager.setMapPosition(latitude, longitude, zoomLevel);
       });
    }
 

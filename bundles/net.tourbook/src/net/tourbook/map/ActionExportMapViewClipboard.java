@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package net.tourbook.map;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map.IMapView;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.PngTransfer;
 
 import org.eclipse.jface.action.Action;
@@ -39,19 +39,19 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionExportMapViewClipboard extends Action {
 
-   private Map2View _map2View;
+   private IMapView _mapView;
 
-   public ActionExportMapViewClipboard(final Map2View mapView) {
+   public ActionExportMapViewClipboard(final IMapView mapView) {
 
       super(Messages.Map_Action_Export_Map_View_Clipboard, AS_PUSH_BUTTON);
 
-      _map2View = mapView;
+      _mapView = mapView;
    }
 
    @Override
    public void run() {
 
-      final Image mapViewImage = _map2View.getMapViewImage();
+      final Image mapViewImage = _mapView.getMapViewImage();
       final Clipboard clipboard = new Clipboard(Display.getCurrent());
 
       if (UI.IS_LINUX) {

@@ -68,9 +68,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
+import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapManager;
+import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
@@ -140,6 +143,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -155,19 +159,20 @@ import org.oscim.core.MapPosition;
 /**
  * Display 3-D map with tour tracks.
  */
-public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener {
+public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener, IMapView {
 
    private static final String              GRAPH_LABEL_HEARTBEAT_UNIT             = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
    private static final String              SLIDER_TEXT_ALTITUDE                   = "%.1f %s";                                              //$NON-NLS-1$
+
    private static final String              SLIDER_TEXT_GRADIENT                   = "%.1f %%";                                              //$NON-NLS-1$
    private static final String              SLIDER_TEXT_PACE                       = "%s %s";                                                //$NON-NLS-1$
    private static final String              SLIDER_TEXT_PULSE                      = "%.0f %s";                                              //$NON-NLS-1$
    private static final String              SLIDER_TEXT_SPEED                      = "%.1f %s";                                              //$NON-NLS-1$
-
    public static final String               ID                                     = "net.tourbook.map3.view.Map3ViewId";                    //$NON-NLS-1$
 
    private static final String              STATE_IS_LEGEND_VISIBLE                = "STATE_IS_LEGEND_VISIBLE";                              //$NON-NLS-1$
+
    private static final String              STATE_IS_MARKER_VISIBLE                = "STATE_IS_MARKER_VISIBLE";                              //$NON-NLS-1$
    private static final String              STATE_IS_SYNC_MAP_VIEW_WITH_TOUR       = "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";                     //$NON-NLS-1$
    private static final String              STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER = "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";               //$NON-NLS-1$
@@ -176,19 +181,20 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private static final String              STATE_IS_TRACK_SLIDER_VISIBLE          = "STATE_IS_TRACK_SLIDERVISIBLE";                         //$NON-NLS-1$
    private static final String              STATE_MAP3_VIEW                        = "STATE_MAP3_VIEW";                                      //$NON-NLS-1$
    private static final String              STATE_TOUR_COLOR_ID                    = "STATE_TOUR_COLOR_ID";                                  //$NON-NLS-1$
-
    private static final WorldWindowGLCanvas _wwCanvas                              = Map3Manager.getWWCanvas();
 
    private final IPreferenceStore           _prefStore                             = TourbookPlugin.getPrefStore();
+
    private final IPreferenceStore           _prefStore_Common                      = CommonActivator.getPrefStore();
    private final IDialogSettings            _state                                 = TourbookPlugin.getState(getClass().getCanonicalName());
+   private ActionMap3Color                  _actionMap3Color;
 
    // SET_FORMATTING_ON
 
-   private ActionMap3Color                   _actionMap3Color;
+   private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionOpenPrefDialog              _actionMap3Colors;
    private ActionMapBookmarks                _actionMapBookmarks;
-//	private ActionOpenGLVersions					_actionOpenGLVersions;
+   //	private ActionOpenGLVersions					_actionOpenGLVersions;
    private ActionOpenMap3StatisticsView      _actionOpenMap3StatisticsView;
    private ActionSetTrackSliderPositionLeft  _actionSetTrackSliderLeft;
    private ActionSetTrackSliderPositionRight _actionSetTrackSliderRight;
@@ -248,7 +254,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    //
    private int                            _allTourIdHash;
    private int                            _allTourDataHash;
-
    /**
     * Color id for the currently displayed tour tracks.
     */
@@ -260,19 +265,20 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     * current position for the x-sliders (vertical slider)
     */
    private int        _currentLeftSliderValueIndex;
+
    private int        _currentRightSliderValueIndex;
    private Position   _currentTrackInfoSliderPosition;
    //
    private ITrackPath _currentHoveredTrack;
    private Integer    _currentHoveredTrackPosition;
-
    /*
     * UI controls
     */
-   private Composite _parent;
-   private Composite _mapContainer;
-   private Frame     _awtFrame;
-   private Menu      _swtContextMenu;
+   private Composite  _parent;
+
+   private Composite  _mapContainer;
+   private Frame      _awtFrame;
+   private Menu       _swtContextMenu;
 
    private class Map3ContextMenu extends SWTPopupOverAWT {
 
@@ -835,6 +841,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void createActions(final Composite parent) {
 
+      _actionExportMap_SubMenu = new Action_ExportMap_SubMenu(this);
+
 //		_actionOpenGLVersions = new ActionOpenGLVersions();
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
@@ -1293,6 +1301,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       fillMenuItem(menu, _actionExportTour);
       fillMenuItem(menu, _actionPrintTour);
 
+      (new Separator()).fill(menu, -1);
+      fillMenuItem(menu, _actionExportMap_SubMenu);
+
       enableContextMenuActions();
    }
 
@@ -1418,6 +1429,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
 
       return mapTours;
+   }
+
+   @Override
+   public Image getMapViewImage() {
+
+      return MapUtils.getMapViewImage(_parent);
    }
 
    /**

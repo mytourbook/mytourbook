@@ -23,6 +23,7 @@ import java.util.List;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.IMapView;
 import net.tourbook.map2.Messages;
 import net.tourbook.ui.FileCollisionBehavior;
 
@@ -51,11 +52,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -94,7 +93,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private PixelConverter        _pc;
    private Point                 _shellDefaultSize;
 
-   private Map2View              _map2View;
+   private IMapView              _mapView;
 
    private FileCollisionBehavior _exportState_FileCollisionBehavior;
 
@@ -120,14 +119,14 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private Text      _txtFilePath;
 
-   public DialogMap2ExportViewImage(final Shell parentShell, final Map2View map2View) {
+   public DialogMap2ExportViewImage(final Shell parentShell, final IMapView mapView) {
 
       super(parentShell);
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _map2View = map2View;
+      _mapView = mapView;
    }
 
    @Override
@@ -143,23 +142,20 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      shell.addListener(SWT.Resize, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      shell.addListener(SWT.Resize, event -> {
 
-            // allow resizing the width but not the height
+         // allow resizing the width but not the height
 
-            if (_shellDefaultSize == null) {
-               _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            }
-
-            final Point shellSize = shell.getSize();
-
-            shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
-            shellSize.y = _shellDefaultSize.y;
-
-            shell.setSize(shellSize);
+         if (_shellDefaultSize == null) {
+            _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
          }
+
+         final Point shellSize = shell.getSize();
+
+         shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+         shellSize.y = _shellDefaultSize.y;
+
+         shell.setSize(shellSize);
       });
    }
 
@@ -417,7 +413,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-      final Image mapViewImage = _map2View.getMapViewImage();
+      final Image mapViewImage = _mapView.getMapViewImage();
 
       final ImageLoader loader = new ImageLoader();
 
