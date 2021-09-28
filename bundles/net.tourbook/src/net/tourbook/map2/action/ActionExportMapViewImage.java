@@ -17,7 +17,7 @@ package net.tourbook.map2.action;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.map.DialogMapExportViewImage;
+import net.tourbook.map.DialogMap2ExportViewImage;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 
@@ -42,7 +42,7 @@ public class ActionExportMapViewImage extends Action {
    @Override
    public void run() {
 
-      new DialogMapExportViewImage(Display.getCurrent().getActiveShell(), _map2View).open();
+      new DialogMap2ExportViewImage(Display.getCurrent().getActiveShell(), _map2View).open();
 
    }
 

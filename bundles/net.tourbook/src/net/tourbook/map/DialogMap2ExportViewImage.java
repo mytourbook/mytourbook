@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMapExportViewImage extends TitleAreaDialog {
+public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private static final List<String> DistanceData = List.of("JPEG, JPG", "PNG", "BMP"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -118,7 +118,7 @@ public class DialogMapExportViewImage extends TitleAreaDialog {
 
    private Text      _txtFilePath;
 
-   public DialogMapExportViewImage(final Shell parentShell, final IMapView mapView) {
+   public DialogMap2ExportViewImage(final Shell parentShell, final IMapView mapView) {
 
       super(parentShell);
 
