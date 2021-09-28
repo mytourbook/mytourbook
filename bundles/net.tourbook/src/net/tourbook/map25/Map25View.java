@@ -105,7 +105,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
@@ -584,31 +583,24 @@ public class Map25View extends ViewPart implements
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            onSelectionChanged(selection);
-         }
-      };
+      _postSelectionListener = (workbenchPart, selection) -> onSelectionChanged(selection);
 
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId tourEventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == Map25View.this) {
-               return;
-            }
+         if (workbenchPart == Map25View.this) {
+            return;
+         }
 
-            if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+         if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 //					resetMap();
 
-            } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 //					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 //					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
@@ -619,25 +611,24 @@ public class Map25View extends ViewPart implements
 //						resetMap();
 //					}
 
-            } else if (tourEventId == TourEventId.UPDATE_UI || tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+         } else if (tourEventId == TourEventId.UPDATE_UI || tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 //					clearView();
 
-            } else if (tourEventId == TourEventId.MARKER_SELECTION) {
+         } else if (tourEventId == TourEventId.MARKER_SELECTION) {
 
 //					if (eventData instanceof SelectionTourMarker) {
 //
 //						onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
 //					}
 
-            } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
+            onSelectionChanged((ISelection) eventData);
 
-            } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
-            }
+            onSelectionChanged((ISelection) eventData);
          }
       };
 
