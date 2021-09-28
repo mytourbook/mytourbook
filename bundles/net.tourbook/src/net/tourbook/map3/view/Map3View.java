@@ -68,7 +68,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
-import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
@@ -191,7 +190,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    // SET_FORMATTING_ON
 
-   private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionOpenPrefDialog              _actionMap3Colors;
    private ActionMapBookmarks                _actionMapBookmarks;
    //	private ActionOpenGLVersions					_actionOpenGLVersions;
@@ -841,8 +839,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void createActions(final Composite parent) {
 
-      _actionExportMap_SubMenu = new Action_ExportMap_SubMenu(this);
-
 //		_actionOpenGLVersions = new ActionOpenGLVersions();
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
@@ -1300,9 +1296,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       fillMenuItem(menu, _actionUploadTour);
       fillMenuItem(menu, _actionExportTour);
       fillMenuItem(menu, _actionPrintTour);
-
-      (new Separator()).fill(menu, -1);
-      fillMenuItem(menu, _actionExportMap_SubMenu);
 
       enableContextMenuActions();
    }
