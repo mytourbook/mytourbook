@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map;
+package neet.tourbook.map2.view;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.ui.FileCollisionBehavior;
 
 import org.eclipse.core.runtime.IPath;
@@ -92,7 +93,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private PixelConverter        _pc;
    private Point                 _shellDefaultSize;
 
-   private IMapView              _mapView;
+   private Map2View              _map2View;
 
    private FileCollisionBehavior _exportState_FileCollisionBehavior;
 
@@ -118,14 +119,14 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private Text      _txtFilePath;
 
-   public DialogMap2ExportViewImage(final Shell parentShell, final IMapView mapView) {
+   public DialogMap2ExportViewImage(final Shell parentShell, final Map2View map2View) {
 
       super(parentShell);
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _mapView = mapView;
+      _map2View = map2View;
    }
 
    @Override
@@ -412,7 +413,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-      final Image mapViewImage = _mapView.getMapViewImage();
+      final Image mapViewImage = _map2View.getMapViewImage();
 
       final ImageLoader loader = new ImageLoader();
 
