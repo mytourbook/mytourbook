@@ -17,8 +17,8 @@ package net.tourbook.map2.action;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.map.DialogMap2ExportViewImage;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.DialogMap2ExportViewImage;
 import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
