@@ -13,20 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map;
+package net.tourbook.map2.action;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.map.DialogMapExportViewImage;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionExportMapViewImage extends Action {
 
-   private IMapView _mapView;
+   private Map2View _map2View;
 
-   public ActionExportMapViewImage(final IMapView mapView) {
+   public ActionExportMapViewImage(final Map2View mapView) {
 
       super(Messages.Map_Action_Export_Map_View_Image, AS_PUSH_BUTTON);
 
@@ -34,13 +36,13 @@ public class ActionExportMapViewImage extends Action {
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save));
 
-      _mapView = mapView;
+      _map2View = mapView;
    }
 
    @Override
    public void run() {
 
-      new DialogMapExportViewImage(Display.getCurrent().getActiveShell(), _mapView).open();
+      new DialogMapExportViewImage(Display.getCurrent().getActiveShell(), _map2View).open();
 
    }
 

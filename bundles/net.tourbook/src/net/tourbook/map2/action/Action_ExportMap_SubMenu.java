@@ -13,9 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map;
+package net.tourbook.map2.action;
 
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -33,12 +34,12 @@ public class Action_ExportMap_SubMenu extends Action implements IMenuCreator {
    private ActionExportMapViewImage     _actionExportMapViewImage;
    private ActionExportMapViewClipboard _actionExportMapViewClipboard;
 
-   public Action_ExportMap_SubMenu(final IMapView mapView) {
+   public Action_ExportMap_SubMenu(final Map2View map2View) {
 
       super(Messages.Map_Action_Export_Map_View, AS_DROP_DOWN_MENU);
 
-      _actionExportMapViewImage = new ActionExportMapViewImage(mapView);
-      _actionExportMapViewClipboard = new ActionExportMapViewClipboard(mapView);
+      _actionExportMapViewImage = new ActionExportMapViewImage(map2View);
+      _actionExportMapViewClipboard = new ActionExportMapViewClipboard(map2View);
 
       setMenuCreator(this);
    }
