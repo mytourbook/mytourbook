@@ -1434,7 +1434,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public Image getMapViewImage() {
 
-      return MapUtils.getMapViewImage(_parent);
+      return MapUtils.getMapViewImage(_mapContainer);
    }
 
    /**
