@@ -188,7 +188,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private ActionMap3Color                   _actionMap3Color;
    private ActionOpenPrefDialog              _actionMap3Colors;
    private ActionMapBookmarks                _actionMapBookmarks;
-// private ActionOpenGLVersions              _actionOpenGLVersions;
+//	private ActionOpenGLVersions					_actionOpenGLVersions;
    private ActionOpenMap3StatisticsView      _actionOpenMap3StatisticsView;
    private ActionSetTrackSliderPositionLeft  _actionSetTrackSliderLeft;
    private ActionSetTrackSliderPositionRight _actionSetTrackSliderRight;
@@ -532,35 +532,35 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       /*
        * Statistics
        */
-//    if (_isLogStatistics) {
+//		if (_isLogStatistics) {
 //
-//       _wwCanvas.setPerFrameStatisticsKeys(PerformanceStatistic.ALL_STATISTICS_SET);
-//       _wwStatisticListener = new RenderingListener() {
+//			_wwCanvas.setPerFrameStatisticsKeys(PerformanceStatistic.ALL_STATISTICS_SET);
+//			_wwStatisticListener = new RenderingListener() {
 //
-//          @Override
-//          public void stageChanged(final RenderingEvent event) {
+//				@Override
+//				public void stageChanged(final RenderingEvent event) {
 //
-//             final long now = System.currentTimeMillis();
+//					final long now = System.currentTimeMillis();
 //
-//             final String stage = event.getStage();
+//					final String stage = event.getStage();
 //
-//             if (stage.equals(RenderingEvent.AFTER_BUFFER_SWAP)
-//                   && event.getSource() instanceof WorldWindow
-//                   && now - _statisticLastUpdate > _statisticUpdateInterval) {
+//					if (stage.equals(RenderingEvent.AFTER_BUFFER_SWAP)
+//							&& event.getSource() instanceof WorldWindow
+//							&& now - _statisticLastUpdate > _statisticUpdateInterval) {
 //
-//                EventQueue.invokeLater(new Runnable() {
-//                   public void run() {
-//                      updateStatistics();
-//                   }
-//                });
+//						EventQueue.invokeLater(new Runnable() {
+//							public void run() {
+//								updateStatistics();
+//							}
+//						});
 //
-//                _statisticLastUpdate = now;
-//             }
-//          }
-//       };
+//						_statisticLastUpdate = now;
+//					}
+//				}
+//			};
 //
-//       _wwCanvas.addRenderingListener(_wwStatisticListener);
-//    }
+//			_wwCanvas.addRenderingListener(_wwStatisticListener);
+//		}
    }
 
    private void addPartListener() {
@@ -756,7 +756,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _currentHoveredTrack = null;
       _currentHoveredTrackPosition = null;
 
-//    _postSelectionProvider.clearSelection();
+//		_postSelectionProvider.clearSelection();
 
       _allTours.clear();
    }
@@ -835,7 +835,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void createActions(final Composite parent) {
 
-//    _actionOpenGLVersions = new ActionOpenGLVersions();
+//		_actionOpenGLVersions = new ActionOpenGLVersions();
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
       _actionMap3Color = new ActionMap3Color();
@@ -953,9 +953,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       fillActionBars();
 
       // set selection provider
-//    getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+//		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-//    getViewSite().registerContextMenu(menuManager, selectionProvider)
+//		getViewSite().registerContextMenu(menuManager, selectionProvider)
 
       Map3Manager.setMap3View(this);
 
@@ -1127,7 +1127,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       /*
        * !!! THIS WILL BLOCK THE UI !!!
        */
-//    _awtFrame.dispose();
+//		_awtFrame.dispose();
 
       disposeContextMenu();
 
@@ -1245,7 +1245,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       menuMgr.add(_actionOpenMap3StatisticsView);
 
 // this is NOT working any more :-(((
-//    menuMgr.add(_actionOpenGLVersions);
+//		menuMgr.add(_actionOpenGLVersions);
    }
 
    private void fillContextMenu(final Menu menu) {
@@ -1281,12 +1281,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       fillMenuItem(menu, _actionOpenAdjustAltitudeDialog);
       fillMenuItem(menu, _actionOpenTour);
 
-//    _tagMenuMgr.fillTagMenu(menuMgr);
+//		_tagMenuMgr.fillTagMenu(menuMgr);
 //
-//    // tour type actions
-//    fillMenuItem(menu, new Separator());
-//    fillMenuItem(menu, _actionSetTourType);
-//    TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+//		// tour type actions
+//		fillMenuItem(menu, new Separator());
+//		fillMenuItem(menu, _actionSetTourType);
+//		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       (new Separator()).fill(menu, -1);
       fillMenuItem(menu, _actionUploadTour);
@@ -1886,7 +1886,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          _state.put(STATE_MAP3_VIEW, view.getRestorableState());
       } catch (final Exception e) {
          // this can occur
-//       StatusUtil.log(e);
+//			StatusUtil.log(e);
       }
    }
 
@@ -1963,7 +1963,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final int r = (colorValue & 0xFF) >>> 0;
          final int g = (colorValue & 0xFF00) >>> 8;
          final int b = (colorValue & 0xFF0000) >>> 16;
-//       final int o = (colorValue & 0xFF000000) >>> 24;
+//			final int o = (colorValue & 0xFF000000) >>> 24;
 
          bgColor = new Color(r, g, b, 0xff);
          fgColor = ColorUtil.getContrastColorAWT(r, g, b, 0xff);
@@ -2071,7 +2071,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             setAnnotationPosition(trackPoint, tourData, hoveredPositionIndex);
             setAnnotationColors(tourData, hoveredPositionIndex, trackPoint);
 
-//          final TrackPointLine trackPointLine = tourInfoLayer.getHoveredTrackPointLine();
+//				final TrackPointLine trackPointLine = tourInfoLayer.getHoveredTrackPointLine();
 
             tourInfoLayer.setTrackPointVisible(true);
          }
@@ -2116,43 +2116,43 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       Map3Manager.redrawMap();
    }
 
-   // public static final String ALL                  = "gov.nasa.worldwind.perfstat.All";
+   //	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
 //
-// public static final String FRAME_RATE           = "gov.nasa.worldwind.perfstat.FrameRate";
-// public static final String FRAME_TIME           = "gov.nasa.worldwind.perfstat.FrameTime";
-// public static final String PICK_TIME            = "gov.nasa.worldwind.perfstat.PickTime";
+//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
+//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
+//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
 //
-// public static final String TERRAIN_TILE_COUNT      = "gov.nasa.worldwind.perfstat.TerrainTileCount";
-// public static final String IMAGE_TILE_COUNT     = "gov.nasa.worldwind.perfstat.ImageTileCount";
+//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
+//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
 //
-// public static final String AIRSPACE_GEOMETRY_COUNT = "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
-// public static final String AIRSPACE_VERTEX_COUNT   = "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
+//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
+//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
 //
-// public static final String JVM_HEAP          = "gov.nasa.worldwind.perfstat.JvmHeap";
-// public static final String JVM_HEAP_USED        = "gov.nasa.worldwind.perfstat.JvmHeapUsed";
+//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
+//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
 //
-// public static final String MEMORY_CACHE         = "gov.nasa.worldwind.perfstat.MemoryCache";
-// public static final String TEXTURE_CACHE        = "gov.nasa.worldwind.perfstat.TextureCache";
+//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
+//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
 
-//2013-10-06 10:12:12.317'955 [Map3View]           0  Frame Rate (fps)
-//2013-10-06 10:12:12.317'982 [Map3View]         152  Frame Time (ms)
-//2013-10-06 10:12:12.318'366 [Map3View]           8  Pick Time (ms)
+//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
+//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
+//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
 
-//2013-10-06 10:12:12.318'392 [Map3View]          91  Terrain Tiles
+//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
 
-//2013-10-06 10:12:12.318'169 [Map3View]        6252  Cache Size (Kb): Terrain
-//2013-10-06 10:12:12.318'191 [Map3View]           0  Cache Size (Kb): Placename Tiles
-//2013-10-06 10:12:12.318'214 [Map3View]        1860  Cache Size (Kb): Texture Tiles
-//2013-10-06 10:12:12.318'289 [Map3View]        3870  Cache Size (Kb): Elevation Tiles
-//2013-10-06 10:12:12.318'414 [Map3View]      422617  Texture Cache size (Kb)
+//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
+//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
+//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
+//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
+//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
 
-//2013-10-06 10:12:12.318'007 [Map3View]           2  Blue Marble (WMS) 2004 Tiles
-//2013-10-06 10:12:12.318'044 [Map3View]          35  i-cubed Landsat Tiles
-//2013-10-06 10:12:12.318'069 [Map3View]          84  MS Virtual Earth Aerial Tiles
-//2013-10-06 10:12:12.318'093 [Map3View]          84  Bing Imagery Tiles
+//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
+//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
+//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
+//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
 
-//2013-10-06 10:12:12.318'118 [Map3View]      463659  JVM total memory (Kb)
-//2013-10-06 10:12:12.318'141 [Map3View]      431273  JVM used memory (Kb)
+//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
+//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
    private void showAllTours_Final(final boolean isSyncMapViewWithTour,
                                    final ArrayList<TourMap3Position> allPositions) {
@@ -2358,7 +2358,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
           */
 
          // Send a message to stop all changes to the view's center position.
-//          orbitView.stopMovementOnCenter();
+//				orbitView.stopMovementOnCenter();
 
          // Set the view to center on the track position, while keeping the eye altitude constant.
          try {
@@ -2450,7 +2450,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
 
       // cleanup old tours, this method cannot be used: cleanupOldTours();
-//    _postSelectionProvider.clearSelection();
+//		_postSelectionProvider.clearSelection();
       _currentTrackInfoSliderPosition = null;
 
       _allTours.removeAll(modifiedTours);
@@ -2468,7 +2468,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       final TourData tourData = getSelectedTour();
       if (tourData == null) {
-// ???      trackSliderLayer.setSliderVisible(false);
+// ???		trackSliderLayer.setSliderVisible(false);
          return;
       }
 
