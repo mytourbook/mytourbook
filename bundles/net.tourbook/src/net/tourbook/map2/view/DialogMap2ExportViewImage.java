@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package neet.tourbook.map2.view;
+package net.tourbook.map2.view;
 
 import java.io.File;
 import java.io.IOException;
