@@ -88,6 +88,7 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -982,7 +983,6 @@ public class Map25View extends ViewPart implements
 // hide separator when only 1 photo action is available -> too much separators
 //      tbm.add(new Separator());
 
-      tbm.add(_actionExportMap_SubMenu);
       tbm.add(_actionMapBookmarks); //should be moved to position like in Map2View
 
       tbm.add(new Separator());
@@ -1015,6 +1015,7 @@ public class Map25View extends ViewPart implements
    private void fillContextMenu(final Menu menu) {
 
       MapBookmarkManager.fillContextMenu_RecentBookmarks(menu, this);
+      new ActionContributionItem(_actionExportMap_SubMenu).fill(menu, -1);
 
       enableContextMenuActions();
    }
