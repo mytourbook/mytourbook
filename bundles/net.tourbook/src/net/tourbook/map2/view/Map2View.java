@@ -64,7 +64,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.IMapSyncListener;
-import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
@@ -159,6 +158,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -185,8 +185,7 @@ public class Map2View extends ViewPart implements
       IMapBookmarkListener,
       IMapPositionListener,
       IMapSyncListener,
-      IMapInfoListener,
-      IMapView {
+      IMapInfoListener {
 
 // SET_FORMATTING_OFF
 
@@ -2270,10 +2269,20 @@ public class Map2View extends ViewPart implements
       return new MapLocation(mapPosition, mapZoomLevel);
    }
 
-   @Override
    public Image getMapViewImage() {
 
-      return MapUtils.getMapViewImage(_parent);
+      final Image image = new Image(_parent.getDisplay(),
+            _parent.getSize().x,
+            _parent.getSize().y);
+
+      final GC gc = new GC(image);
+      _parent.print(gc);
+      //This produces the same result
+      //  final GC gc = new GC(_parent);
+      //  gc.copyArea(image, 0, 0);
+      gc.dispose();
+
+      return image;
    }
 
    /**

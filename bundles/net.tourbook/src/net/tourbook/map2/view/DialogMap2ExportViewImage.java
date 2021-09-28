@@ -24,7 +24,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
 import net.tourbook.ui.FileCollisionBehavior;
 
 import org.eclipse.core.runtime.IPath;

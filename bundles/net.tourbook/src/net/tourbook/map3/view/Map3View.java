@@ -69,10 +69,8 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.map.IMapSyncListener;
-import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapManager;
-import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
@@ -142,7 +140,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -158,7 +155,7 @@ import org.oscim.core.MapPosition;
 /**
  * Display 3-D map with tour tracks.
  */
-public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener, IMapView {
+public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener {
 
    private static final String              GRAPH_LABEL_HEARTBEAT_UNIT             = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
@@ -1422,12 +1419,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
 
       return mapTours;
-   }
-
-   @Override
-   public Image getMapViewImage() {
-
-      return MapUtils.getMapViewImage(_mapContainer);
    }
 
    /**
