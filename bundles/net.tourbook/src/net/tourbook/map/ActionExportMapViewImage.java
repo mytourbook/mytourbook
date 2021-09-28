@@ -18,7 +18,6 @@ package net.tourbook.map;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.DialogMap2ExportViewImage;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -41,7 +40,7 @@ public class ActionExportMapViewImage extends Action {
    @Override
    public void run() {
 
-      new DialogMap2ExportViewImage(Display.getCurrent().getActiveShell(), _mapView).open();
+      new DialogMapExportViewImage(Display.getCurrent().getActiveShell(), _mapView).open();
 
    }
 

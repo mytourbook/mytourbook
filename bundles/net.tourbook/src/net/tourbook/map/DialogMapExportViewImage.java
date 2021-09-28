@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.view;
+package net.tourbook.map;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,6 @@ import java.util.List;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.map.IMapView;
 import net.tourbook.map2.Messages;
 import net.tourbook.ui.FileCollisionBehavior;
 
@@ -59,7 +58,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMap2ExportViewImage extends TitleAreaDialog {
+public class DialogMapExportViewImage extends TitleAreaDialog {
 
    private static final List<String> DistanceData = List.of("JPEG, JPG", "PNG", "BMP"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -119,7 +118,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private Text      _txtFilePath;
 
-   public DialogMap2ExportViewImage(final Shell parentShell, final IMapView mapView) {
+   public DialogMapExportViewImage(final Shell parentShell, final IMapView mapView) {
 
       super(parentShell);
 
