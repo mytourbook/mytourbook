@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.tour.photo;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.RatingStars;
@@ -43,7 +42,7 @@ import org.eclipse.swt.widgets.ToolItem;
 /**
  * Photo filter slideout
  */
-public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
+public class SlideoutPhotoFilter extends AdvancedSlideout {
 
    /**
     * <b>THEY MUST BE IN SYNC WITH </b> {@link #_allRatingStar_Labels} and
@@ -90,7 +89,7 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
    private PixelConverter                         _pc;
 
-   private Map2View                               _map2View;
+   private IMapWithPhotos                         _mapWithPhotos;
    private ToolItem                               _toolItem;
 
    /*
@@ -105,14 +104,14 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
    private RatingStars _ratingStars;
 
-   public Slideout_Map2_PhotoFilter(final ToolItem toolItem,
-                                    final Map2View map2View,
-                                    final IDialogSettings state) {
+   public SlideoutPhotoFilter(final ToolItem toolItem,
+                              final IMapWithPhotos mapWithPhotos,
+                              final IDialogSettings state) {
 
       super(toolItem.getParent(), state, new int[] { 220, 100, 220, 100 });
 
       _toolItem = toolItem;
-      _map2View = map2View;
+      _mapWithPhotos = mapWithPhotos;
 
       setTitleText(Messages.Photo_Filter_Title_Map2PhotoFilter);
 
@@ -290,7 +289,7 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
    private void updateMapPhotoFilter() {
 
-      _map2View.photoFilter_UpdateFromSlideout(_selectedRatingStars, _selectedRatingStarOperator);
+      _mapWithPhotos.updatePhotoFilter(_selectedRatingStars, _selectedRatingStarOperator);
    }
 
    private void updateUI() {
@@ -336,8 +335,8 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
          return;
       }
 
-      _lblAllPhotos.setText(Integer.toString(_map2View.getPhotos().size()));
-      _lblFilteredPhotos.setText(Integer.toString(_map2View.getFilteredPhotos().size()));
+      _lblAllPhotos.setText(Integer.toString(_mapWithPhotos.getPhotos().size()));
+      _lblFilteredPhotos.setText(Integer.toString(_mapWithPhotos.getFilteredPhotos().size()));
 
       _containerNumbers.layout();
    }
