@@ -47,7 +47,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -299,6 +298,11 @@ public class TourDatabase {
     */
    private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
 
+   /**
+    * Key is the serial number in UPPERCASE
+    */
+   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNo;
+
    /*
     * Cached distinct fields
     */
@@ -306,7 +310,6 @@ public class TourDatabase {
    private static ConcurrentSkipListSet<String>  _dbTourStartPlace;
    private static ConcurrentSkipListSet<String>  _dbTourEndPlace;
    private static ConcurrentSkipListSet<String>  _dbTourMarkerNames;
-   private static final ReentrantLock            CACHE_LOCK          = new ReentrantLock();
 
    private static final IPreferenceStore         _prefStore          = TourbookPlugin.getPrefStore();
 
@@ -344,6 +347,7 @@ public class TourDatabase {
       _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, updateThreadFactory);
    }
 
+   private static final Object CACHE_LOCK     = new Object();
    private static final Object DB_LOCK        = new Object();
    private static final Object TRANSIENT_LOCK = new Object();
 
@@ -791,36 +795,20 @@ public class TourDatabase {
     */
    private static void checkUnsavedTransientInstances(final TourData tourData) {
 
-      final boolean isNewTag = checkUnsavedTransientInstances_Tags(tourData);
-      final boolean isNewTourType = checkUnsavedTransientInstances_TourType(tourData);
-
-      if (isNewTag) {
-
-         // fire modify event
-
-//         Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
-      }
-
-      if (isNewTourType) {
-
-         // fire modify event
-
-//         Display.getDefault().syncExec(() -> _prefStore.setValue(
-//               ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-//               Math.random()));
-      }
+      checkUnsavedTransientInstances_Tags(tourData);
+      checkUnsavedTransientInstances_TourType(tourData);
    }
 
    /**
     * @param tourData
     * @return Returns <code>true</code> when new tags are created.
     */
-   private static boolean checkUnsavedTransientInstances_Tags(final TourData tourData) {
+   private static void checkUnsavedTransientInstances_Tags(final TourData tourData) {
 
       final Set<TourTag> allTourDataTags = tourData.getTourTags();
 
       if (allTourDataTags.isEmpty()) {
-         return false;
+         return;
       }
 
       final ArrayList<TourTag> allAppliedTags = new ArrayList<>();
@@ -909,15 +897,13 @@ public class TourDatabase {
       // replace tags in the tour, either with the old tags and/or with newly created tags
       allTourDataTags.clear();
       allTourDataTags.addAll(allAppliedTags);
-
-      return isNewTagSaved;
    }
 
    /**
     * @param tourData
     * @return Returns <code>true</code> when a new tour type is created.
     */
-   private static boolean checkUnsavedTransientInstances_TourType(final TourData tourData) {
+   private static void checkUnsavedTransientInstances_TourType(final TourData tourData) {
 
       final TourType tourType = tourData.getTourType();
 
@@ -925,18 +911,17 @@ public class TourDatabase {
 
          // a tour type is not set -> nothing to do
 
-         return false;
+         return;
       }
 
       if (tourType.getTypeId() != ENTITY_IS_NOT_SAVED) {
 
          // tour type is saved
 
-         return false;
+         return;
       }
 
       TourType appliedType = null;
-      boolean isNewTourType = false;
 
       synchronized (TRANSIENT_LOCK) {
 
@@ -965,7 +950,6 @@ public class TourDatabase {
             if (savedType != null) {
 
                appliedType = savedType;
-               isNewTourType = true;
 
                // force reload of the db tour types
                clearTourTypes();
@@ -976,8 +960,6 @@ public class TourDatabase {
 
       // replace tour type in the tour
       tourData.setTourType(appliedType);
-
-      return isNewTourType;
    }
 
    /**
@@ -1508,6 +1490,21 @@ public class TourDatabase {
    }
 
    /**
+    * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is
+    *         the serial number in UPPERCASE
+    */
+   public static Map<String, DeviceSensor> getAllDeviceSensors() {
+
+      if (_allDbDeviceSensors_BySerialNo != null) {
+         return _allDbDeviceSensors_BySerialNo;
+      }
+
+      loadAllDeviceSensors();
+
+      return _allDbDeviceSensors_BySerialNo;
+   }
+
+   /**
     * @return Returns all tour id's without any filter, sorted by tour start date/time
     */
    public static ArrayList<Long> getAllTourIds() {
@@ -1725,18 +1722,13 @@ public class TourDatabase {
 
       if (_dbTourMarkerNames == null) {
 
-         CACHE_LOCK.lock();
-         try {
+         synchronized (CACHE_LOCK) {
 
             // recheck again, another thread could have it created
             if (_dbTourMarkerNames == null) {
 
                _dbTourMarkerNames = getDistinctValues(TourDatabase.TABLE_TOUR_MARKER, "label"); //$NON-NLS-1$
             }
-
-         } finally {
-
-            CACHE_LOCK.unlock();
          }
       }
 
@@ -1754,18 +1746,13 @@ public class TourDatabase {
 
       if (_dbTourEndPlace == null) {
 
-         CACHE_LOCK.lock();
-         try {
+         synchronized (CACHE_LOCK) {
 
             // recheck again, another thread could have it created
             if (_dbTourEndPlace == null) {
 
                _dbTourEndPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourEndPlace"); //$NON-NLS-1$
             }
-
-         } finally {
-
-            CACHE_LOCK.unlock();
          }
       }
 
@@ -1783,18 +1770,13 @@ public class TourDatabase {
 
       if (_dbTourStartPlace == null) {
 
-         CACHE_LOCK.lock();
-         try {
+         synchronized (CACHE_LOCK) {
 
             // recheck again, another thread could have it created
             if (_dbTourStartPlace == null) {
 
                _dbTourStartPlace = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourStartPlace"); //$NON-NLS-1$
             }
-
-         } finally {
-
-            CACHE_LOCK.unlock();
          }
       }
 
@@ -1811,20 +1793,14 @@ public class TourDatabase {
 
       if (_dbTourTitles == null) {
 
-         CACHE_LOCK.lock();
-         try {
+         synchronized (CACHE_LOCK) {
 
             // recheck again, another thread could have it created
             if (_dbTourTitles == null) {
 
                _dbTourTitles = getDistinctValues(TourDatabase.TABLE_TOUR_DATA, "tourTitle"); //$NON-NLS-1$
             }
-
-         } finally {
-
-            CACHE_LOCK.unlock();
          }
-
       }
 
       return _dbTourTitles;
@@ -2548,6 +2524,40 @@ public class TourDatabase {
       }
 
       return false;
+   }
+
+   @SuppressWarnings("unchecked")
+   private static void loadAllDeviceSensors() {
+
+      synchronized (DB_LOCK) {
+
+         // check again, field must be volatile to work correctly
+         if (_allDbDeviceSensors_BySerialNo != null) {
+            return;
+         }
+
+         // create empty list
+         ArrayList<DeviceSensor> allDbDeviceSensors = new ArrayList<>();
+         _allDbDeviceSensors_BySerialNo = new HashMap<>();
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT DeviceSensor" //                      //$NON-NLS-1$
+                  + " FROM DeviceSensor AS DeviceSensor" //       //$NON-NLS-1$
+            );
+
+            allDbDeviceSensors = (ArrayList<DeviceSensor>) emQuery.getResultList();
+
+            for (final DeviceSensor sensor : allDbDeviceSensors) {
+               _allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
+            }
+
+            em.close();
+         }
+      }
    }
 
    private static void loadAllTourTags() {
@@ -3484,8 +3494,19 @@ public class TourDatabase {
 
             // version 46 start
 
-            + "   Label          VARCHAR(" + DeviceSensor.DB_LENGTH_LABEL + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   SerialNumber   VARCHAR(" + DeviceSensor.DB_LENGTH_LABEL + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            private int                 manufacturerNumber;
+//            private String              manufacturerName;
+//
+//            private int                 productNumber;
+//            private String              productName;
+
+            + "   ManufacturerNumber    INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   ProductNumber        INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   ProductName          VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   SerialNumber         VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 46 end
 
@@ -3503,19 +3524,22 @@ public class TourDatabase {
     */
    private void createTable_DeviceSensorValues(final Statement stmt) throws SQLException {
 
-      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR_VALUE + "   (                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR_VALUE + "   (                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR_VALUE, true)
 
-            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_DEVICE_SENSOR + "  BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "                 BIGINT,                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_DEVICE_SENSOR + "        BIGINT,                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 46 start
 
-            + "   TourStartTime           BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
+            + "   TourStartTime                    BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
-            + "   BatteryVoltage_Start    FLOAT,                                       " + NL //$NON-NLS-1$
-            + "   BatteryVoltage_End      FLOAT                                        " + NL //$NON-NLS-1$
+            + "   BatteryVoltage_Start             FLOAT,                              " + NL //$NON-NLS-1$
+            + "   BatteryVoltage_End               FLOAT                               " + NL //$NON-NLS-1$
+
+            + "   CummulatedOperatingTime_Start    BIGINT,                             " + NL //$NON-NLS-1$
+            + "   CummulatedOperatingTime_End      BIGINT                              " + NL //$NON-NLS-1$
 
             // version 46 end
 

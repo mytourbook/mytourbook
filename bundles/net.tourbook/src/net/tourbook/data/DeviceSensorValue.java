@@ -22,6 +22,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import net.tourbook.ui.UI;
 
@@ -30,7 +31,7 @@ import net.tourbook.ui.UI;
 @Entity
 public class DeviceSensorValue {
 
-   private static final String NL = UI.NEW_LINE;
+   private static final String NL           = UI.NEW_LINE;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,11 +42,20 @@ public class DeviceSensorValue {
    private float               batteryVoltage_Start;
    private float               batteryVoltage_End;
 
+   private long                cummulatedOperatingTime_Start;
+   private long                cummulatedOperatingTime_End;
+
    @ManyToOne(optional = false)
    private DeviceSensor        deviceSensor;
 
    @ManyToOne(optional = false)
    private TourData            tourData;
+
+   /**
+    * Is used to identify a device by it's device index according to the FIT "device index" field
+    */
+   @Transient
+   private int                 _deviceIndex = -1;
 
    public DeviceSensorValue() {}
 
@@ -77,6 +87,25 @@ public class DeviceSensorValue {
       return batteryVoltage_Start;
    }
 
+   public long getCummulatedOperatingTime_End() {
+      return cummulatedOperatingTime_End;
+   }
+
+   public long getCummulatedOperatingTime_Start() {
+      return cummulatedOperatingTime_Start;
+   }
+
+   /**
+    * @return Returns the device index or -1 when the index is not yet set
+    */
+   public int getDeviceIndex() {
+      return _deviceIndex;
+   }
+
+   public DeviceSensor getDeviceSensor() {
+      return deviceSensor;
+   }
+
    /**
     * @return Returns the primary key for a {@link DeviceSensorValue} entity
     */
@@ -101,6 +130,18 @@ public class DeviceSensorValue {
       this.batteryVoltage_Start = batteryVoltage_Start;
    }
 
+   public void setCummulatedOperatingTime_End(final long cummulatedOperatingTime_End) {
+      this.cummulatedOperatingTime_End = cummulatedOperatingTime_End;
+   }
+
+   public void setCummulatedOperatingTime_Start(final long cummulatedOperatingTime_Start) {
+      this.cummulatedOperatingTime_Start = cummulatedOperatingTime_Start;
+   }
+
+   public void setDeviceIndex(final int _deviceIndex) {
+      this._deviceIndex = _deviceIndex;
+   }
+
    public void setTourStartTime(final long tourStartTime) {
       this.tourStartTime = tourStartTime;
    }
@@ -108,13 +149,20 @@ public class DeviceSensorValue {
    @Override
    public String toString() {
 
-      return "DeviceSensorValue" + NL //                //$NON-NLS-1$
+      return "DeviceSensorValue" + NL //                                                     //$NON-NLS-1$
 
-            + "[" + NL //                                //$NON-NLS-1$
+            + "[" + NL //                                                                    //$NON-NLS-1$
 
-            + "sensorId    = " + sensorValueId + NL //   //$NON-NLS-1$
-            + "tourData    = " + tourData + NL //        //$NON-NLS-1$
+            + "sensorId                      = " + sensorValueId + NL //                     //$NON-NLS-1$
 
-            + "]" + NL; //                               //$NON-NLS-1$
+            + "batteryVoltage_Start          = " + batteryVoltage_Start + NL //              //$NON-NLS-1$
+            + "batteryVoltage_End            = " + batteryVoltage_End + NL //                //$NON-NLS-1$
+
+            + "cummulatedOperatingTime_Start = " + cummulatedOperatingTime_Start + NL //     //$NON-NLS-1$
+            + "cummulatedOperatingTime_End   = " + cummulatedOperatingTime_End + NL //       //$NON-NLS-1$
+
+            + "tourData                      = " + tourData + NL //                          //$NON-NLS-1$
+
+            + "]" + NL; //                                                                   //$NON-NLS-1$
    }
 }

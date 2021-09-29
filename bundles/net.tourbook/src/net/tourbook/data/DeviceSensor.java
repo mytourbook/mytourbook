@@ -29,19 +29,43 @@ import net.tourbook.ui.UI;
 @Entity
 public class DeviceSensor {
 
-   private static final String NL              = UI.NEW_LINE;
+   private static final String NL             = UI.NEW_LINE;
 
-   public static final int     DB_LENGTH_LABEL = 80;
+   public static final int     DB_LENGTH_NAME = 80;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long                sensorId;
 
-   private String              label           = UI.EMPTY_STRING;
+   private int                 manufacturerNumber;
+   private String              manufacturerName;
 
-   private String              serialNumber    = UI.EMPTY_STRING;
+   private int                 productNumber;
+   private String              productName;
 
+   private String              serialNumber   = UI.EMPTY_STRING;
+
+   /**
+    * Default constructor used in EJB
+    */
    public DeviceSensor() {}
+
+   public DeviceSensor(final int manufacturerNumber,
+                       final String manufacturerName,
+
+                       final int productNumber,
+                       final String productName,
+
+                       final String serialNumber) {
+
+      this.manufacturerNumber = manufacturerNumber;
+      this.manufacturerName = manufacturerName;
+
+      this.productNumber = productNumber;
+      this.productName = productName;
+
+      this.serialNumber = serialNumber;
+   }
 
    @Override
    public boolean equals(final Object obj) {
@@ -63,11 +87,20 @@ public class DeviceSensor {
       return sensorId == other.sensorId;
    }
 
-   /**
-    * @return Returns the name for this sensor
-    */
-   public String getLabel() {
-      return label;
+   public String getManufacturerName() {
+      return manufacturerName;
+   }
+
+   public int getManufacturerNumber() {
+      return manufacturerNumber;
+   }
+
+   public String getProductName() {
+      return productName;
+   }
+
+   public int getProductNumber() {
+      return productNumber;
    }
 
    /**
@@ -86,10 +119,6 @@ public class DeviceSensor {
       return Objects.hash(sensorId);
    }
 
-   public void setLabel(final String label) {
-      this.label = label;
-   }
-
    public void setSerialNumber(final String serialNumber) {
       this.serialNumber = serialNumber;
    }
@@ -101,9 +130,7 @@ public class DeviceSensor {
 
             + "[" + NL //                             //$NON-NLS-1$
 
-            + "label       = " + label + NL //        //$NON-NLS-1$
             + "sensorId    = " + sensorId + NL //     //$NON-NLS-1$
-//            + "tourData    = " + tourData + NL //     //$NON-NLS-1$
 
             + "]" + NL; //                            //$NON-NLS-1$
    }

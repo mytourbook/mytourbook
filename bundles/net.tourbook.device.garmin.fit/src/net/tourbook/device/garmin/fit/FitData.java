@@ -786,4 +786,8 @@ public class FitData {
 
       _timeDiffMS = timeDiffMS;
    }
+
+   public List<DeviceSensorValue> getAllDeviceSensorValues() {
+      return _allDeviceSensorValues;
+   }
 }
