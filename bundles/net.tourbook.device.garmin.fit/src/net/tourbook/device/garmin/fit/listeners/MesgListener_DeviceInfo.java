@@ -356,9 +356,9 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
        */
       final Map<String, DeviceSensor> allDeviceSensors = TourDatabase.getAllDeviceSensors();
 
-      DeviceSensor deviceSensor = allDeviceSensors.get(sensorSerialNumberKey);
+      DeviceSensor sensor = allDeviceSensors.get(sensorSerialNumberKey);
 
-      if (deviceSensor == null) {
+      if (sensor == null) {
 
          /*
           * Sensor manufacturer
@@ -389,7 +389,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             sensorProductName = product.toString();
          }
 
-         deviceSensor = RawDataManager.createDeviceSensor(
+         sensor = RawDataManager.createDeviceSensor(
                manufacturer,
                manufacturerName,
                product,
@@ -421,9 +421,11 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
          // create new sensor value -> set start voltage
 
-         sensorValue = new DeviceSensorValue();
+         sensorValue = new DeviceSensorValue(sensor);
 
          sensorValue.setBatteryVoltage_Start(batteryVoltage);
+
+         fitData.getAllDeviceSensorValues().add(sensorValue);
       }
 
    }

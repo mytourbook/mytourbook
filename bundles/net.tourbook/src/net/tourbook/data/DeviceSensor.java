@@ -126,12 +126,17 @@ public class DeviceSensor {
    @Override
    public String toString() {
 
-      return "DeviceSensor" + NL //$NON-NLS-1$
+      return "DeviceSensor" + NL //                                     //$NON-NLS-1$
 
-            + "[" + NL //                             //$NON-NLS-1$
+            + "[" + NL //                                               //$NON-NLS-1$
 
-            + "sensorId    = " + sensorId + NL //     //$NON-NLS-1$
+            + "sensorId             = " + sensorId + NL //              //$NON-NLS-1$
+            + "manufacturerNumber   = " + manufacturerNumber + NL //    //$NON-NLS-1$
+            + "manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$
+            + "productNumber        = " + productNumber + NL //         //$NON-NLS-1$
+            + "productName          = " + productName + NL //           //$NON-NLS-1$
+            + "serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
 
-            + "]" + NL; //                            //$NON-NLS-1$
+            + "]" + NL; //                                              //$NON-NLS-1$
    }
 }

@@ -59,6 +59,11 @@ public class DeviceSensorValue {
 
    public DeviceSensorValue() {}
 
+   public DeviceSensorValue(final DeviceSensor sensor) {
+
+      deviceSensor = sensor;
+   }
+
    @Override
    public boolean equals(final Object obj) {
 
@@ -154,13 +159,11 @@ public class DeviceSensorValue {
             + "[" + NL //                                                                    //$NON-NLS-1$
 
             + "sensorId                      = " + sensorValueId + NL //                     //$NON-NLS-1$
-
             + "batteryVoltage_Start          = " + batteryVoltage_Start + NL //              //$NON-NLS-1$
             + "batteryVoltage_End            = " + batteryVoltage_End + NL //                //$NON-NLS-1$
-
             + "cummulatedOperatingTime_Start = " + cummulatedOperatingTime_Start + NL //     //$NON-NLS-1$
             + "cummulatedOperatingTime_End   = " + cummulatedOperatingTime_End + NL //       //$NON-NLS-1$
-
+            + "deviceSensor                  = " + deviceSensor + NL //                      //$NON-NLS-1$
             + "tourData                      = " + tourData + NL //                          //$NON-NLS-1$
 
             + "]" + NL; //                                                                   //$NON-NLS-1$

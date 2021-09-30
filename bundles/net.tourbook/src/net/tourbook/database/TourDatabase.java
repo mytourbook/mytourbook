@@ -3490,23 +3490,17 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR, true)
 
-            + "   " + KEY_TOUR + "         BIGINT,                                     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "     BIGINT,                                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 46 start
 
-//            private int                 manufacturerNumber;
-//            private String              manufacturerName;
-//
-//            private int                 productNumber;
-//            private String              productName;
+            + "   ManufacturerNumber   INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   ManufacturerNumber    INTEGER,                                              " + NL //$NON-NLS-1$
-            + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   ProductNumber        INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   ProductName          VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   ProductNumber        INTEGER,                                              " + NL //$NON-NLS-1$
-            + "   ProductName          VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "   SerialNumber         VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SerialNumber         VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")    " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 46 end
 
@@ -3536,7 +3530,7 @@ public class TourDatabase {
             + "   TourStartTime                    BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
             + "   BatteryVoltage_Start             FLOAT,                              " + NL //$NON-NLS-1$
-            + "   BatteryVoltage_End               FLOAT                               " + NL //$NON-NLS-1$
+            + "   BatteryVoltage_End               FLOAT,                              " + NL //$NON-NLS-1$
 
             + "   CummulatedOperatingTime_Start    BIGINT,                             " + NL //$NON-NLS-1$
             + "   CummulatedOperatingTime_End      BIGINT                              " + NL //$NON-NLS-1$
