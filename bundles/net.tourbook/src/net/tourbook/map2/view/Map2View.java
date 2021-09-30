@@ -133,6 +133,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.HoveredValueData;
@@ -185,7 +186,8 @@ public class Map2View extends ViewPart implements
       IMapBookmarkListener,
       IMapPositionListener,
       IMapSyncListener,
-      IMapInfoListener {
+      IMapInfoListener,
+      IMapWithPhotos {
 
 // SET_FORMATTING_OFF
 
@@ -2252,6 +2254,7 @@ public class Map2View extends ViewPart implements
    /**
     * @return Returns a list with all filtered photos
     */
+   @Override
    public ArrayList<Photo> getFilteredPhotos() {
       return _filteredPhotos;
    }
@@ -2366,6 +2369,7 @@ public class Map2View extends ViewPart implements
    /**
     * @return Returns a list with all available photos.
     */
+   @Override
    public ArrayList<Photo> getPhotos() {
       return _allPhotos;
    }
@@ -3439,7 +3443,7 @@ public class Map2View extends ViewPart implements
       updateFilteredPhotos();
    }
 
-   public void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
+   private void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
 
       _photoFilter_RatingStars = filterRatingStars;
       _photoFilter_RatingStar_Operator = ratingstaroperatorsvalues;
@@ -4317,6 +4321,12 @@ public class Map2View extends ViewPart implements
 
       _map.disposeOverlayImageCache();
       _map.paint();
+   }
+
+   @Override
+   public void updatePhotoFilter(final int filterRatingStars, final PhotoRatingStarOperator ratingStarOperatorsValues) {
+
+      photoFilter_UpdateFromSlideout(filterRatingStars, ratingStarOperatorsValues);
    }
 
    void updateTourColorsInToolbar() {
