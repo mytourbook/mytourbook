@@ -441,7 +441,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
+         StatusUtil.logError(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -462,7 +462,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
+         StatusUtil.logError(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -531,7 +531,7 @@ public class WebContentServer {
       } finally {
 
          if (Util.close(outputStream) == false) {
-            StatusUtil.log(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
+            StatusUtil.logError(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
          }
 
          Util.close(replacingOutputStream);
@@ -667,7 +667,7 @@ public class WebContentServer {
       _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("CSS_TAG__IS_THEMED",                      UI.IS_DARK_THEME
+      _cssReplacementValues.put("CSS_TAG__IS_THEMED",                      UI.IS_DARK_THEME                                //$NON-NLS-1$
                                                                               ? ThemeUtil.DARK_THEME_POSTFIX
                                                                               : UI.EMPTY_STRING);
 // SET_FORMATTING_ON

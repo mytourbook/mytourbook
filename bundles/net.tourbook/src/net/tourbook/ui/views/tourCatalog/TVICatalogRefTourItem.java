@@ -160,7 +160,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
       final String sqlYear = isWithYear
 
-            ? " AND TourCompared.startYear=?"
+            ? " AND TourCompared.startYear=?" //$NON-NLS-1$
             : UI.EMPTY_STRING;
 
       final String sql = UI.EMPTY_STRING
@@ -185,7 +185,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
             + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
 
             // get data for a tour
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
             + " ON TourCompared.tourId = TourData.tourId" + NL //                                        //$NON-NLS-1$
 
             // get tag id's

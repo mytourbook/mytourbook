@@ -271,7 +271,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //    //$NON-NLS-1$
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                  //$NON-NLS-1$
 
-               + "WHERE"
+               + "WHERE" + NL //                                                    //$NON-NLS-1$
                + "   StartYear IN (" + yearList + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
                + "   " + sqlAppFilter.getWhereClause() //                           //$NON-NLS-1$
 

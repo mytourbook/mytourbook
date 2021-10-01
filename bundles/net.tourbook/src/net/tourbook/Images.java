@@ -271,6 +271,7 @@ public class Images {
    public static final String Tag                                        = "tag-tag.png";                                         //$NON-NLS-1$
    public static final String Tag_Category                               = "tag-category.png";                                    //$NON-NLS-1$
    public static final String Tag_Root                                   = "tag-tag-root.png";                                    //$NON-NLS-1$
+   public static final String TagFilter_NoTours                          = "tour-tag-filter-no-tags.png";                         //$NON-NLS-1$
    public static final String TagLayout_Flat                             = "tag-layout-flat.png";                                 //$NON-NLS-1$
    public static final String TagLayout_Flat_Disabled                    = "tag-layout-flat-disabled.png";                        //$NON-NLS-1$
    public static final String TagLayout_Hierarchical                     = "tag-layout-hierarchical.png";                         //$NON-NLS-1$

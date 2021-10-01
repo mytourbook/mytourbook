@@ -36,7 +36,7 @@ import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourTypeWrapper;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.osgi.util.NLS;
 import org.xml.sax.Attributes;
@@ -586,7 +586,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
             serieIndex = timeSerie.length - 1;
          }
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
          tourMarker.setLabel(Integer.toString(lapCounter));
          tourMarker.setSerieIndex(serieIndex);

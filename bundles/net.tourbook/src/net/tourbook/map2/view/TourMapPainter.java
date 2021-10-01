@@ -2059,10 +2059,6 @@ public class TourMapPainter extends MapPainter {
    /**
     * create an image for the tour pause
     *
-    * @param device
-    * @param pauseDuration
-    * @param pauseBounds
-    * @return
     */
    private Image drawTourPauses_Image(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
 

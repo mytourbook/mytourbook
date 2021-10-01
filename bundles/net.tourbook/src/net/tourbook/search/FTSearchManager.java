@@ -1093,7 +1093,7 @@ public class FTSearchManager {
 
    private static void logCreateIndex(final String indexStore, final long start) {
 
-      StatusUtil.log(String.format(LOG_CREATE_INDEX,
+      StatusUtil.logInfo(String.format(LOG_CREATE_INDEX,
             indexStore,
             System.currentTimeMillis() - start));
    }
@@ -1370,7 +1370,7 @@ public class FTSearchManager {
       queryResult.allQueryFields = setWithAllQueryFields.toArray(String[]::new);
       queryResult.query = allQueryBuilder.build();
 
-      TourLogManager.log_INFO(Messages.Search_Manager_Log_SearchingToursWith + queryResult.query);
+      TourLogManager.log_INFO(Messages.Search_Manager_Log_SearchingToursWith + UI.SPACE + queryResult.query);
 
       return queryResult;
    }

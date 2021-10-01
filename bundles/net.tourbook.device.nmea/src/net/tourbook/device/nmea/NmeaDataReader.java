@@ -263,7 +263,7 @@ public class NmeaDataReader extends TourbookDevice {
 
 //   Begin of O. Budischewski, 2008.03.20
       if (_isNullCoordinates == true) {
-         TourLogManager.subLog_ERROR(String.format("[NMEA] %s - %s",
+         TourLogManager.subLog_ERROR(String.format("[NMEA] %s - %s", //$NON-NLS-1$
                _importFilePath,
                NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath)));
       }

@@ -1550,17 +1550,6 @@
    </extension>
 
 
-   <extension point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-         id          ="de.byteholder.geoclipse.tester.propertyTester"
-         namespace   ="de.byteholder.geoclipse.tester"
-         properties  ="someProperty"
-         type        ="java.lang.Object"
-         class       ="de.byteholder.geoclipse.tileinfo.TrimPropertyTester"
-      />
-   </extension>
-   
-   
    <extension   point="org.eclipse.ui.views">
 
       <!-- 1. Tour Directories -->
@@ -2082,10 +2071,26 @@
 
       <menuContribution locationURI="menu:m_Map?before=sep_Map" >
                   
-         <command commandId="net.tourbook.map25.command.TourMap25"
-            icon="icons/map25-view.png"
-            label="%View_Name_TourMap25"
-            mnemonic="%View_Name_TourMap25_Mnemonic"/>
+         <command
+            commandId	="net.tourbook.map25.command.TourMap25"
+            icon			="icons/map25-view.png"
+            label			="%View_Name_TourMap25"
+            mnemonic		="%View_Name_TourMap25_Mnemonic"
+         >
+
+<!-- DISABLED FOR NOW, MT is crashing when using Eclipse 21-09 and W10 -> using Eclipse 21-06
+
+            <visibleWhen>
+               <test
+                  forcePluginActivation   ="true"
+                  property                ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
+                  value                   ="true"
+               >
+               </test>
+            </visibleWhen>
+-->
+
+         </command>
       
       </menuContribution>
 
@@ -2094,10 +2099,25 @@
          <toolbar id="mc_tb_Tour">
                   
             <command
-               commandId="net.tourbook.map25.command.TourMap25"
-               icon="icons/map25-view.png"
-               label="%View_Name_TourMap25"
-               tooltip="%View_Name_TourMap25_Tooltip"/>
+               commandId	="net.tourbook.map25.command.TourMap25"
+               icon			="icons/map25-view.png"
+               label			="%View_Name_TourMap25"
+               tooltip		="%View_Name_TourMap25_Tooltip"
+            >
+            
+<!-- DISABLED FOR NOW, MT is crashing when using Eclipse 21-09 and W10 -> using Eclipse 21-06
+
+               <visibleWhen>
+                  <test
+                     forcePluginActivation   ="true"
+                     property                ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
+                     value                   ="true"
+                  >
+                  </test>
+               </visibleWhen>
+-->
+
+            </command>
 
          </toolbar>
       
@@ -2115,17 +2135,17 @@
       <view
          category    ="net.tourbook.category.map"
          class       ="net.tourbook.map25.Map25View"
-         icon="icons/map25-view.png"
-         id="net.tourbook.map25.Map25View"
-         name="%View_Name_TourMap25"
+         icon        ="icons/map25-view.png"
+         id          ="net.tourbook.map25.Map25View"
+         name        ="%View_Name_TourMap25"
       />
 
       <view
          category    ="net.tourbook.category.map"
          class       ="net.tourbook.map25.Map25DebugView"
-         icon="icons/map25-debug-view.png"
-         id="net.tourbook.map25.Map25DebugView"
-         name="%View_Name_TourMap25Debug"
+         icon        ="icons/map25-debug-view.png"
+         id          ="net.tourbook.map25.Map25DebugView"
+         name        ="%View_Name_TourMap25Debug"
       />
    
    </extension>
@@ -2342,6 +2362,25 @@
       
    </extension>
 
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+   
+      <propertyTester
+         id          ="de.byteholder.geoclipse.tester.propertyTester"
+         namespace   ="de.byteholder.geoclipse.tester"
+         properties  ="someProperty"
+         type        ="java.lang.Object"
+         class       ="de.byteholder.geoclipse.tileinfo.TrimPropertyTester"
+      />
+      
+      <propertyTester
+         id          ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
+         namespace   ="net.tourbook.commands.tester"
+         properties  ="Is_Linux"
+         type        ="java.lang.Object"
+         class       ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
+      />
+      
+   </extension>
 
 </plugin>
 

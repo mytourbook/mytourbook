@@ -136,7 +136,7 @@ public class UI {
    public static final String       NEW_LINE1                          = "\n";       //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";     //$NON-NLS-1$
    public static final String       NEW_LINE3                          = "\n\n\n";   //$NON-NLS-1$
-   public static final String       TAB1                               = "\t";
+   public static final String       TAB1                               = "\t";       //$NON-NLS-1$
    public static final String       SLASH                              = "/";        //$NON-NLS-1$
    public static final String       SLASH_WITH_SPACE                   = " / ";      //$NON-NLS-1$
    public static final String       SPACE1                             = " ";        //$NON-NLS-1$
@@ -953,7 +953,7 @@ public class UI {
    private static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
 
       // round to the nearest pixel
-      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
+      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2.0)
             / HORIZONTAL_DIALOG_UNIT_PER_CHAR);
    }
 
@@ -2027,7 +2027,7 @@ public class UI {
 
    public static int scrambleNumbers(final int number) {
 
-      return (int) (RANDOM_GENERATOR.nextFloat() * number);
+      return RANDOM_GENERATOR.nextInt() * number;
    }
 
    public static long scrambleNumbers(final long number) {

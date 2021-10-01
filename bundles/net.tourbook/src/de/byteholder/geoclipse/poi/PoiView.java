@@ -19,10 +19,13 @@
 
 package de.byteholder.geoclipse.poi;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -38,21 +41,17 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -71,7 +70,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class PoiView extends ViewPart implements Observer {
 
-   public final static String            ID                     = "de.byteholder.geoclipse.poi.poiView"; //$NON-NLS-1$
+   public static final String            ID                     = "de.byteholder.geoclipse.poi.poiView"; //$NON-NLS-1$
 
    private static final String           STATE_SEARCHED_QUERIES = "searched.queries";                    //$NON-NLS-1$
 
@@ -88,7 +87,7 @@ public class PoiView extends ViewPart implements Observer {
 
    private TableViewer                   _poiViewer;
    private List<PointOfInterest>         _pois;
-   private ArrayList<String>             _searchHistory         = new ArrayList<>();
+   private List<String>                  _searchHistory         = new ArrayList<>();
 
    private PostSelectionProvider         _postSelectionProvider;
 
@@ -230,17 +229,14 @@ public class PoiView extends ViewPart implements Observer {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _poiViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-               _poiViewer.refresh();
-            }
+            _poiViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _poiViewer.refresh();
          }
       };
 
@@ -305,7 +301,7 @@ public class PoiView extends ViewPart implements Observer {
              */
             _cboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _cboSearchQuery.setVisibleItemCount(30);
-            _cboSearchQuery.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+            _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                // start searching when ENTER is pressed
                onSearchPoi();
             }));
@@ -320,7 +316,7 @@ public class PoiView extends ViewPart implements Observer {
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText(Messages.Poi_View_Button_Search);
-            _btnSearch.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
+            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
          }
       }
 
@@ -359,17 +355,13 @@ public class PoiView extends ViewPart implements Observer {
       _poiViewer.setContentProvider(new ViewContentProvider());
       _poiViewer.setLabelProvider(new ViewLabelProvider());
 
-      _poiViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+      _poiViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
 
-         @Override
-         public void selectionChanged(final SelectionChangedEvent e) {
+         final ISelection selection = selectionChangedEvent.getSelection();
+         final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+         final PointOfInterest selectedPoi = (PointOfInterest) firstElement;
 
-            final ISelection selection = e.getSelection();
-            final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-            final PointOfInterest selectedPoi = (PointOfInterest) firstElement;
-
-            _postSelectionProvider.setSelection(selectedPoi);
-         }
+         _postSelectionProvider.setSelection(selectedPoi);
       });
    }
 
@@ -427,9 +419,7 @@ public class PoiView extends ViewPart implements Observer {
       // restore old used queries
       final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_QUERIES);
       if (stateSearchedQueries != null) {
-         for (final String query : stateSearchedQueries) {
-            _searchHistory.add(query);
-         }
+         _searchHistory = Arrays.asList(stateSearchedQueries);
       }
 
       // update content in the comboviewer
@@ -478,33 +468,30 @@ public class PoiView extends ViewPart implements Observer {
             _pois = searchResult;
          }
 
-         Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().asyncExec(() -> {
 
-               // check if view is closed
-               if (_btnSearch.isDisposed()) {
-                  return;
-               }
-
-               // refresh viewer
-               _poiViewer.setInput(new Object());
-
-               // select first entry, if there is one
-               final Table poiTable = _poiViewer.getTable();
-               if (poiTable.getItemCount() > 0) {
-
-                  final Object firstData = poiTable.getItem(0).getData();
-                  if (firstData instanceof PointOfInterest) {
-
-                     _poiViewer.setSelection(new StructuredSelection(firstData));
-                     setViewerFocus();
-                  }
-               }
-
-               _cboSearchQuery.setEnabled(true);
-               _btnSearch.setEnabled(true);
+            // check if view is closed
+            if (_btnSearch.isDisposed()) {
+               return;
             }
+
+            // refresh viewer
+            _poiViewer.setInput(new Object());
+
+            // select first entry, if there is one
+            final Table poiTable = _poiViewer.getTable();
+            if (poiTable.getItemCount() > 0) {
+
+               final Object firstData = poiTable.getItem(0).getData();
+               if (firstData instanceof PointOfInterest) {
+
+                  _poiViewer.setSelection(new StructuredSelection(firstData));
+                  setViewerFocus();
+               }
+            }
+
+            _cboSearchQuery.setEnabled(true);
+            _btnSearch.setEnabled(true);
          });
 
          if (geoQuery.getException() != null) {

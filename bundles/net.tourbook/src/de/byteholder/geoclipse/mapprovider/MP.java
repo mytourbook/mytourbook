@@ -888,7 +888,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          // check if the old implementation was not correctly transfered to the cache with error tiles
          if (tile.isLoadingError()) {
-            StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
+            StatusUtil.logError("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
                   + tile.getTileKey());
 
             // ensure the error do not occur again for this tile
@@ -911,7 +911,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          // check if the old implementation was not correctly transfered to the cache with error tiles
          if (tile != null) {
-            StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
+            StatusUtil.logError("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
                   + tile.getTileKey());
          }
 

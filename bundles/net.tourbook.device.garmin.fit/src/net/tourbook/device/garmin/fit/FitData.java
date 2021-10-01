@@ -27,7 +27,6 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
@@ -37,7 +36,7 @@ import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -79,7 +78,7 @@ public class FitData {
 
    private final List<TimeData>          _allTimeData           = new ArrayList<>();
 
-   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
+//   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
    private final List<GearData>          _allGearData           = new ArrayList<>();
    private final List<SwimData>          _allSwimData           = new ArrayList<>();
    private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
@@ -586,9 +585,9 @@ public class FitData {
       return deviceName.toString();
    }
 
-   public List<DeviceSensorValue> getDeviceSensorValues() {
-      return _allDeviceSensorValues;
-   }
+//   public List<DeviceSensorValue> getDeviceSensorValues() {
+//      return _allDeviceSensorValues;
+//   }
 
    public List<GearData> getGearData() {
       return _allGearData;
@@ -631,7 +630,7 @@ public class FitData {
 
       final List<TourMarker> tourMarkers = _allTourMarker;
 
-      _current_TourMarker = new TourMarker(_tourData, ChartLabel.MARKER_TYPE_DEVICE);
+      _current_TourMarker = new TourMarker(_tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
       tourMarkers.add(_current_TourMarker);
    }

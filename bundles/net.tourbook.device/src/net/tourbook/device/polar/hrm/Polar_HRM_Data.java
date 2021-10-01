@@ -34,7 +34,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -666,11 +666,11 @@ public class Polar_HRM_Data {
          }
 
          if (markerText == null) {
-            // set lap number as label when label is not definded in the polar data
+            // set lap number as label when label is not defined in the polar data
             markerText = Integer.toString(lapCounter);
          }
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
          tourMarker.setLabel(markerText);
          tourMarker.setSerieIndex(serieIndex);
          tourMarker.setTime(lapRelativeTime, tourData.getTourStartTimeMS() + (lapRelativeTime * 1000));

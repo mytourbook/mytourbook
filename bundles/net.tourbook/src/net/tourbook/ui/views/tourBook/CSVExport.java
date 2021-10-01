@@ -421,8 +421,8 @@ public class CSVExport {
 
       sb.append(String.format(UI.EMPTY_STRING
 
-            + "%04d-%02d-%02d;" // date
-            + "%02d-%02d;" // time
+            + "%04d-%02d-%02d;" //     date                    //$NON-NLS-1$
+            + "%02d-%02d;" //          time                    //$NON-NLS-1$
             ,
 
             tourZonedDateTime.getYear(), //                    // Date (yyyy-mm-dd);
@@ -519,7 +519,7 @@ public class CSVExport {
 
       // Month / Day / Week
       if (isTreeLayout) {
-         
+
          // the column sorting is according to the tree layout
 
          if (isYearSubWeek()) {

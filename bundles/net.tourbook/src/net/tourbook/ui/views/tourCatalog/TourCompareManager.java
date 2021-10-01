@@ -70,7 +70,7 @@ public class TourCompareManager {
 
    private static final String          STATE_REFERENCE_TOUR_VIEW_LAYOUT             = "STATE_REFERENCE_TOUR_VIEW_LAYOUT";           //$NON-NLS-1$
 
-   private static final IDialogSettings _state                                       = TourbookPlugin.getState("TourCompareManager");
+   private static final IDialogSettings _state                                       = TourbookPlugin.getState("TourCompareManager"); //$NON-NLS-1$
 
    private static int                   _referenceTour_ViewLayout;
 

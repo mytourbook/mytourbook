@@ -20,5 +20,9 @@ import java.util.List;
 
 public class ChartPauseConfig {
 
-   public final List<ChartLabel> chartLabels = new ArrayList<>();
+   public boolean                     isShowPauseLabel;
+   public boolean                     isShowPauseTooltip;
+   public int                         pauseTooltipPosition;
+
+   public final List<ChartLabelPause> chartLabelPauses = new ArrayList<>();
 }

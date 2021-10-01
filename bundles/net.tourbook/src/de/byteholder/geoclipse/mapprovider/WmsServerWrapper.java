@@ -30,9 +30,9 @@ public class WmsServerWrapper {
 
    /**
     * Connects to the capability url and returns the wms server or null when connection fails or
-    * when other errors occures. <br>
+    * when other errors occurs. <br>
     * <br>
-    * {@link #getWmsError()} returns the error or <code>null</code> when no error occured
+    * {@link #getWmsError()} returns the error or <code>null</code> when no error occurred
     *
     * @param capsUrl
     * @return Returns a {@link WebMapServer}

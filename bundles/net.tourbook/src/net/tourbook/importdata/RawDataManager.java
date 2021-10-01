@@ -112,31 +112,14 @@ public class RawDataManager {
    private static final String   VALUE_UNIT_K_CALORIES                       = net.tourbook.ui.Messages.Value_Unit_KCalories;
    private static final String   VALUE_UNIT_PULSE                            = net.tourbook.ui.Messages.Value_Unit_Pulse;
 
-   public static final String    LOG_IMPORT_DELETE_TOUR_FILE                 = Messages.Log_Import_DeleteTourFiles;
-   public static final String    LOG_IMPORT_DELETE_TOUR_FILE_END             = Messages.Log_Import_DeleteTourFiles_End;
-   private static final String   LOG_IMPORT_TOUR                             = Messages.Log_Import_Tour;
-   public static final String    LOG_IMPORT_TOUR_IMPORTED                    = Messages.Log_Import_Tour_Imported;
-   private static final String   LOG_IMPORT_TOUR_END                         = Messages.Log_Import_Tour_End;
-   public static final String    LOG_IMPORT_TOURS_IMPORTED_FROM_FILE         = Messages.Log_Import_Tours_Imported_From_File;
-
-   public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
-   public static final String    LOG_DELETE_TOURVALUES_END                   = Messages.Log_Delete_TourValues_End;
-   public static final String    LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA       = Messages.Log_ModifiedTour_Old_Data_Vs_New_Data;
-
-   public static final String    LOG_REIMPORT_PREVIOUS_FILES                 = Messages.Log_Reimport_PreviousFiles;
-   public static final String    LOG_REIMPORT_END                            = Messages.Log_Reimport_PreviousFiles_End;
-   public static final String    LOG_REIMPORT_COMBINED_VALUES                = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Reimport_Text);
-   private static final String   LOG_REIMPORT_MANUAL_TOUR                    = Messages.Log_Reimport_ManualTour;
-   private static final String   LOG_REIMPORT_TOUR_SKIPPED                   = Messages.Log_Reimport_Tour_Skipped;
-
 // SET_FORMATTING_ON
 
    private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
    private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
 
    private static final String           FILE_EXTENSION_FIT               = ".fit";                                                //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";
-   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";
+   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";                                             //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";                                           //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
@@ -656,7 +639,7 @@ public class RawDataManager {
       for (int index = 0; index < previousData.size(); ++index) {
 
          TourLogManager.subLog_INFO(NLS.bind(
-               LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA,
+               Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
                previousData.get(index),
                newData.get(index)));
       }
@@ -1154,10 +1137,11 @@ public class RawDataManager {
       if (actionModifyTourValues_12_Confirm_Dialog(
             toggleState,
             dialogTitle,
-            confirmMessage)//
-      ) {
+            confirmMessage)) {
 
-         String logMessage = isReimport ? LOG_REIMPORT_COMBINED_VALUES : LOG_DELETE_COMBINED_VALUES;
+         String logMessage = isReimport
+               ? NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Reimport_Text)
+               : NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
 
          logMessage = logMessage.concat(String.join(UI.SPACE1, dataToModifyDetails));
 
@@ -1195,6 +1179,97 @@ public class RawDataManager {
             _prefStore.setValue(toggleState, dialog.getToggleState());
             return true;
          }
+      }
+
+      return false;
+   }
+
+   /**
+    * @param dialogMessage
+    * @param dialogTitle
+    * @param tourData
+    * @param reImportStatus
+    * @return Returns <code>true</code> when user has canceled the action
+    */
+   private boolean askUser_ForInvalidFiles_DuringReimport(final String dialogTitle,
+                                                          final String dialogMessage,
+                                                          final ReImportStatus reImportStatus) {
+
+      final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+
+            Display.getDefault().getActiveShell(),
+
+            dialogTitle,
+            null,
+
+            dialogMessage,
+
+            MessageDialog.QUESTION,
+
+            0, // default button index
+            new String[] {
+                  IDialogConstants.OK_LABEL,
+                  IDialogConstants.CANCEL_LABEL //
+            });
+
+      final String[] allOptions = new String[] {
+
+            Messages.Import_Data_Dialog_Radio_SelectFile, //           0
+            Messages.Import_Data_Dialog_Radio_SkipFile, //             1
+            Messages.Import_Data_Dialog_Radio_SkipAllInvalidFiles, //  2
+            Messages.Import_Data_Dialog_Radio_CancelReimport //        3
+      };
+
+      dialog.setRadioOptions(allOptions, 0);
+
+      int selectedOption;
+      if (dialog.open() == Window.OK) {
+
+         selectedOption = dialog.getSelectedOption();
+
+      } else {
+
+         // dialog is canceled
+         selectedOption = -1;
+      }
+
+      switch (selectedOption) {
+
+      case 0:
+
+         // select file
+
+         break;
+
+      case 2:
+
+         // skip all invalid files
+
+         reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles = true;
+
+         return true;
+
+      case 3:
+
+         // cancel re-import
+
+         reImportStatus.isCanceled_WholeReimport.set(true);
+
+         return true;
+
+      case 1:
+
+         // skip file - the user doesn't want to look for a new file path for the current tour
+
+      case -1:
+
+         // dialog is canceled with the ESC key
+
+      default:
+
+         reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
+
+         return true;
       }
 
       return false;
@@ -1491,7 +1566,7 @@ public class RawDataManager {
       } finally {
 
          TourLogManager.log_DEFAULT(String.format(
-               RawDataManager.LOG_DELETE_TOURVALUES_END,
+               Messages.Log_Delete_TourValues_End,
                (System.currentTimeMillis() - start) / 1000.0));
       }
    }
@@ -1718,7 +1793,7 @@ public class RawDataManager {
 
             final String dbFilePathName = dbTourData.getImportFilePathName();
 
-            final String message = NLS.bind(Messages.Dialog_ImportData_ReplaceImportFilename_Message,
+            final String message = NLS.bind(Messages.Dialog_ReplaceImportFilename_Message,
                   new Object[] {
                         TourManager.getTourDateTimeShort(dbTourData),
                         importedFilePathName,
@@ -1729,10 +1804,10 @@ public class RawDataManager {
 
             final String[] allOptions = new String[] {
 
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_DoNothing, //          0
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_DoNothingAnymore, //   1
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceThis, //        2
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Radio_ReplaceAll //          3
+                  Messages.Dialog_ReplaceImportFilename_Radio_DoNothing, //          0
+                  Messages.Dialog_ReplaceImportFilename_Radio_DoNothingAnymore, //   1
+                  Messages.Dialog_ReplaceImportFilename_Radio_ReplaceThis, //        2
+                  Messages.Dialog_ReplaceImportFilename_Radio_ReplaceAll //          3
             };
 
             final int defaultOption = _selectedImportFilenameReplacementOption == ReplaceImportFilenameAction.REPLACE_IMPORT_FILENAME_IN_SAVED_TOUR
@@ -1743,7 +1818,7 @@ public class RawDataManager {
 
             final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
                   Display.getDefault().getActiveShell(),
-                  Messages.Dialog_ImportData_ReplaceImportFilename_Title,
+                  Messages.Dialog_ReplaceImportFilename_Title,
                   null,
                   message,
                   MessageDialog.QUESTION,
@@ -1817,7 +1892,7 @@ public class RawDataManager {
 
          final String message = importState_Process.isEasyImport()
                ? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
-               : RawDataManager.LOG_IMPORT_TOUR;
+               : Messages.Log_Import_Tour;
 
          if (importState_Process.isLog_DEFAULT()) {
             TourLogManager.addLog(TourLogState.DEFAULT, message, css);
@@ -1885,7 +1960,7 @@ public class RawDataManager {
 
                importState_Process.isEasyImport()
                      ? EasyImportManager.LOG_EASY_IMPORT_002_END
-                     : RawDataManager.LOG_IMPORT_TOUR_END,
+                     : Messages.Log_Import_Tour_End,
 
                (System.currentTimeMillis() - start) / 1000.0));
 
@@ -2082,7 +2157,7 @@ public class RawDataManager {
       final long end = System.nanoTime();
 
       final double timeDiff = (end - start) / 1_000_000_000.0;
-      final String importTime = String.format("%5.3f s ∙", timeDiff);
+      final String importTime = String.format(Messages.Log_Import_Part_Time, timeDiff);
 
       if (importState_File.isFileImportedWithValidData) {
 
@@ -2094,15 +2169,17 @@ public class RawDataManager {
             String numTimeSlices = UI.EMPTY_STRING;
 
             if (importedTourData.timeSerie != null) {
-               numTimeSlices = String.format("%,7d # ∙ ", importedTourData.timeSerie.length);
+               numTimeSlices = String.format(Messages.Log_Import_Part_TimeSlices, importedTourData.timeSerie.length);
             }
 
             if (importState_Process.isLog_OK()) {
 
                // {0} ← {1}
-               TourLogManager.subLog_OK(importTime + numTimeSlices + NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+               final String defaultMessage = NLS.bind(Messages.Log_Import_Tour_Imported,
                      importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                     osFilePath));
+                     osFilePath);
+
+               TourLogManager.subLog_OK(importTime + numTimeSlices + defaultMessage);
             }
          }
 
@@ -2111,7 +2188,7 @@ public class RawDataManager {
          // reduce log noise: log only when more than ONE tour is imported from ONE file
          if (importState_Process.isLog_INFO() && numImportedToursFromOneFile > 1) {
 
-            TourLogManager.subLog_INFO(importTime + NLS.bind(LOG_IMPORT_TOURS_IMPORTED_FROM_FILE,
+            TourLogManager.subLog_INFO(importTime + NLS.bind(Messages.Log_Import_Tours_Imported_From_File,
                   numImportedToursFromOneFile,
                   osFilePath));
          }
@@ -2125,7 +2202,7 @@ public class RawDataManager {
          if (importState_File.isImportLogged == false) {
 
             // do default logging
-            TourLogManager.subLog_ERROR(importTime + String.format("[Import failed] %s", osFilePath));
+            TourLogManager.subLog_ERROR(importTime + String.format(Messages.Log_Import_Failed, osFilePath));
          }
       }
 
@@ -2568,7 +2645,7 @@ public class RawDataManager {
          if (importState_Process.isLog_INFO()) {
 
             TourLogManager.subLog_INFO(NLS.bind(
-                  LOG_REIMPORT_MANUAL_TOUR,
+                  Messages.Log_Reimport_ManualTour,
                   oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
          }
 
@@ -2595,6 +2672,10 @@ public class RawDataManager {
          } else if (reImportStatus.isCanceled_Auto_TheFileLocationDialog) {
             reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
 
+            // THIS if() MUST BE BEFORE THE NEXT if() otherwise the wrong message is displayed !
+         } else if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
+            reason = Messages.Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
+
          } else if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog) {
             reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
 
@@ -2602,8 +2683,8 @@ public class RawDataManager {
             reason = Messages.Log_Reimport_Tour_Skipped_OtherReasons;
          }
 
-         TourLogManager.subLog_ERROR(NLS.bind(
-               LOG_REIMPORT_TOUR_SKIPPED,
+         TourLogManager.subLog_INFO(NLS.bind(
+               Messages.Log_Reimport_Tour_Skipped,
                oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                reason));
 
@@ -2643,7 +2724,7 @@ public class RawDataManager {
 
       boolean isFilePathAvailable = false;
 
-      // get import file name which is kept in the tour
+      // get import file name which is saved in the tour
       final String savedImportFilePathName = tourData.getImportFilePathName();
 
       if (savedImportFilePathName == null) {
@@ -2674,11 +2755,11 @@ public class RawDataManager {
          // request file path only when necessary otherwise it would block concurrency
 
          reimportTour_12_RequestFileFromUser(
+               savedImportFilePathName,
+               reimportFilePathName,
                tourData,
                importState_Process,
-               reImportStatus,
-               savedImportFilePathName,
-               reimportFilePathName);
+               reImportStatus);
       }
 
       if (reimportFilePathName[0] == null) {
@@ -2703,11 +2784,11 @@ public class RawDataManager {
       }
    }
 
-   private void reimportTour_12_RequestFileFromUser(final TourData tourData,
+   private void reimportTour_12_RequestFileFromUser(final String inSavedImportFilePathName,
+                                                    final String[] outReimportFilePathName,
+                                                    final TourData tourData,
                                                     final ImportState_Process importState_Process,
-                                                    final ReImportStatus reImportStatus,
-                                                    final String savedImportFilePathName,
-                                                    final String[] outReimportFilePathName) {
+                                                    final ReImportStatus reImportStatus) {
 
       synchronized (this) {
 
@@ -2717,135 +2798,140 @@ public class RawDataManager {
 
          Display.getDefault().syncExec(() -> {
 
-            final Shell activeShell = Display.getDefault().getActiveShell();
+            reimportTour_14_RequestFileFromUser_InUI(
 
-            try {
-
-               if (savedImportFilePathName == null) {
-
-                  // import filepath is not available, in older versions the file path name is not saved in the tour
-
-                  final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
-
-                  final boolean okPressed = MessageDialog.openConfirm(
-                        activeShell,
-                        NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-                        NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
-                              tourDateTimeShort,
-                              tourDateTimeShort));
-
-                  // The user doesn't want to look for a new file path for the current tour
-                  if (!okPressed) {
-
-                     reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
-
-                     return;
-                  }
-
-               } else {
-
-                  // import filepath is available
-
-                  for (final IPath previousReimportFolder : _allPreviousReimportFolders.keySet()) {
-
-                     /*
-                      * Try to use a folder from a previously re-imported tour
-                      */
-
-                     final String oldImportFileName = new org.eclipse.core.runtime.Path(savedImportFilePathName).lastSegment();
-                     final IPath newImportFilePath = previousReimportFolder.append(oldImportFileName);
-
-                     final String newImportFilePathName = newImportFilePath.toOSString();
-                     final File newImportFile = new File(newImportFilePathName);
-                     if (newImportFile.exists()) {
-
-                        // re-import file exists in the same folder
-                        outReimportFilePathName[0] = newImportFilePathName;
-                     }
-                  }
-
-                  if (outReimportFilePathName[0] == null) {
-
-                     //The user doesn't want to look for a new file path for the current tour.
-                     if (importState_Process.isSkipToursWithFileNotFound()) {
-
-                        reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
-
-                        return;
-                     }
-
-                     final boolean okPressed = MessageDialog.openQuestion(
-                           activeShell,
-                           Messages.Dialog_ReimportData_Title,
-                           NLS.bind(
-                                 Messages.Import_Data_Dialog_GetAlternativePath_Message,
-                                 savedImportFilePathName));
-
-                     // The user doesn't want to look for a new file path for the current tour
-                     if (!okPressed) {
-
-                        reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
-
-                        return;
-                     }
-                  }
-               }
-
-               if (outReimportFilePathName[0] == null) {
-
-                  // ask user for the import file location
-
-                  // create dialog title
-                  final String tourDateTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_ML);
-                  final String deviceName = tourData.getDeviceName();
-                  final String dataFormat = deviceName == null ? UI.EMPTY_STRING : deviceName;
-                  final String fileName = savedImportFilePathName == null ? UI.EMPTY_STRING : savedImportFilePathName;
-                  final String dialogTitle = String.format(Messages.Import_Data_Dialog_ReimportFile_Title,
-                        tourDateTime,
-                        fileName,
-                        dataFormat);
-
-                  final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
-                  dialog.setText(dialogTitle);
-
-                  if (savedImportFilePathName != null) {
-
-                     // select file location from the tour
-
-                     final IPath importFilePath = new org.eclipse.core.runtime.Path(savedImportFilePathName);
-                     final String importFileName = importFilePath.lastSegment();
-
-                     dialog.setFileName(importFileName);
-                     dialog.setFilterPath(savedImportFilePathName);
-
-                  } else if (_previousReimportFolder != null) {
-
-                     dialog.setFilterPath(_previousReimportFolder.toOSString());
-                  }
-
-                  outReimportFilePathName[0] = dialog.open();
-               }
-
-            } finally {
-
-               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog
-                     && reImportStatus.isUserAsked_ToCancelWholeReImport == false) {
-
-                  if (MessageDialog.openQuestion(activeShell,
-                        Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                        Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
-
-                     reImportStatus.isCanceled_WholeReimport.set(true);
-
-                  } else {
-
-                     reImportStatus.isUserAsked_ToCancelWholeReImport = true;
-                  }
-               }
-            }
+                  inSavedImportFilePathName,
+                  outReimportFilePathName,
+                  tourData,
+                  importState_Process,
+                  reImportStatus);
          });
+      }
+   }
 
-      } // synchronized
+   private void reimportTour_14_RequestFileFromUser_InUI(final String existingImportFilePathName,
+                                                         final String[] newReimportFilePathName,
+                                                         final TourData tourData,
+                                                         final ImportState_Process importState_Process,
+                                                         final ReImportStatus reImportStatus) {
+
+      if (existingImportFilePathName == null) {
+
+         // import filepath is not available, in older versions -> the file path name is not saved in the tour
+
+         if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
+            return;
+         }
+
+//       The file location for the tour "{0}" is not available because the tour was imported in a previous version where the
+//       filename is not saved in the tour.
+//
+//       In the following dialog you can select a file from which the tour "{1}" should be re-imported.
+
+         final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
+
+         final String dialogTitle = NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort);
+         final String dialogMessage = NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,
+               tourDateTimeShort,
+               tourDateTimeShort);
+
+         if (askUser_ForInvalidFiles_DuringReimport(dialogTitle, dialogMessage, reImportStatus)) {
+            return;
+         }
+
+      } else {
+
+         // import filepath is available
+
+         final String oldImportFileName = new org.eclipse.core.runtime.Path(existingImportFilePathName).lastSegment();
+
+         /*
+          * Try to use a folder from a previously re-imported tour
+          */
+         for (final IPath previousReimportFolder : _allPreviousReimportFolders.keySet()) {
+
+            final IPath newFilePath = previousReimportFolder.append(oldImportFileName);
+            final String newFilePath_OSName = newFilePath.toOSString();
+
+            final File newFile = new File(newFilePath_OSName);
+            if (newFile.exists()) {
+
+               // re-import file exists in the same folder
+               newReimportFilePathName[0] = newFilePath_OSName;
+
+               break;
+            }
+         }
+
+         if (newReimportFilePathName[0] == null) {
+
+            if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
+               return;
+            }
+
+            // The user doesn't want to look for a new file path for the current tour.
+            if (importState_Process.isSkipToursWithFileNotFound()) {
+
+               reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
+
+               return;
+            }
+
+//                The file
+//
+//                "{0}"
+//
+//                is not available in the original location.
+//
+//                The file can be selected at a different location in the following dialog.
+
+            final String dialogTitle = Messages.Dialog_ReimportData_Title;
+            final String dialogMessage = NLS.bind(Messages.Import_Data_Dialog_GetAlternativePath_Message, existingImportFilePathName);
+
+            if (askUser_ForInvalidFiles_DuringReimport(dialogTitle, dialogMessage, reImportStatus)) {
+               return;
+            }
+         }
+      }
+
+      if (newReimportFilePathName[0] == null) {
+
+         // ask user for the import file location
+
+         if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
+            return;
+         }
+
+         // create dialog title
+         final String tourDateTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_ML);
+         final String deviceName = tourData.getDeviceName();
+         final String dataFormat = deviceName == null ? UI.EMPTY_STRING : deviceName;
+         final String fileName = existingImportFilePathName == null ? UI.EMPTY_STRING : existingImportFilePathName;
+         final String dialogTitle = String.format(Messages.Import_Data_Dialog_ReimportFile_Title,
+               tourDateTime,
+               fileName,
+               dataFormat);
+
+         final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
+         dialog.setText(dialogTitle);
+
+         if (existingImportFilePathName != null) {
+
+            // select file location from the tour
+
+            final IPath importFilePath = new org.eclipse.core.runtime.Path(existingImportFilePathName);
+            final String importFileName = importFilePath.lastSegment();
+
+            dialog.setFileName(importFileName);
+            dialog.setFilterPath(existingImportFilePathName);
+
+         } else if (_previousReimportFolder != null) {
+
+            dialog.setFilterPath(_previousReimportFolder.toOSString());
+         }
+
+         newReimportFilePathName[0] = dialog.open();
+      }
    }
 
    private boolean reimportTour_20(final List<TourValueType> tourValueTypes,
@@ -2883,6 +2969,12 @@ public class RawDataManager {
          /*
           * Tour(s) could be re-imported from the file, check if it contains a valid tour
           */
+
+         // create dummy clone BEFORE oldTourData is modified
+         TourData oldTourDataDummyClone = null;
+         if (importState_Process.isLog_INFO()) {
+            oldTourDataDummyClone = createTourDataDummyClone(tourValueTypes, oldTourData);
+         }
 
          TourData updatedTourData = reimportTour_30(
 
@@ -2924,17 +3016,16 @@ public class RawDataManager {
             if (importState_Process.isLog_OK()) {
 
                TourLogManager.subLog_OK(NLS.bind(
-                     LOG_IMPORT_TOUR_IMPORTED,
+                     Messages.Log_Import_Tour_Imported,
                      updatedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                      reimportFileNamePath));
             }
 
             // log the old vs new data comparison
-            if (importState_Process.isLog_INFO()) {
+            if (oldTourDataDummyClone != null) {
 
-               final TourData tourDataDummyClone = createTourDataDummyClone(tourValueTypes, oldTourData);
                for (final TourValueType tourValueType : tourValueTypes) {
-                  displayTourModifiedDataDifferences(tourValueType, tourDataDummyClone, updatedTourData);
+                  displayTourModifiedDataDifferences(tourValueType, oldTourDataDummyClone, updatedTourData);
                }
             }
 
@@ -3109,7 +3200,6 @@ public class RawDataManager {
              */
             newTourData.clearComputedSeries();
 
-            newTourData.computeAltitudeUpDown();
             newTourData.computeTourMovingTime();
             newTourData.computeComputedValues();
 
@@ -3176,8 +3266,11 @@ public class RawDataManager {
       // Elevation
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__ELEVATION)) {
 
-         // re-import altitude only
+         // re-import elevation only
+
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
+         oldTourData.setTourAltUp(reimportedTourData.getTourAltUp());
+         oldTourData.setTourAltDown(reimportedTourData.getTourAltDown());
       }
 
       // Gear
@@ -3744,8 +3837,7 @@ public class RawDataManager {
                      allSavedTourIds.add(replacedTourData.getTourId());
 
                      TourLogManager.subLog_INFO(NLS.bind(
-//                           Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
-                           "[Replaced import file] {0} in tour {1}",
+                           Messages.Log_Import_ReplacedImportFile,
                            importedFilePathName,
                            TourManager.getTourDateTimeShort(replacedTourData)));
 
@@ -3755,8 +3847,7 @@ public class RawDataManager {
                   case DO_NOTHING_AND_DONT_ASK_AGAIN:
 
                      TourLogManager.subLog_INFO(NLS.bind(
-//                           Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
-                           "[Skipped import file] {0} in tour {1}",
+                           Messages.Log_Import_SkippedImportFile,
                            importedFilePathName,
                            TourManager.getTourDateTimeShort(replacedTourData)));
 

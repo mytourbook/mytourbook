@@ -3031,7 +3031,7 @@ public class CalendarProfileManager {
 
          // a profile is not yet created
 
-         StatusUtil.log("Created default profile for calendar properties");//$NON-NLS-1$
+         StatusUtil.logInfo("Created default profile for calendar properties");//$NON-NLS-1$
 
          createProfile_0_AllDefaultDefaultProfiles(_allCalendarProfiles);
 

@@ -232,7 +232,7 @@ public class PrefPagePhotoImageCache extends PreferencePage implements IWorkbenc
                         Integer.toString(imageNo[0]));
                }
 
-               StatusUtil.log(message);
+               StatusUtil.logError(message);
 
                MessageDialog.openInformation(
                      getShell(),

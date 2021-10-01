@@ -878,7 +878,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
 
       TourLogManager.log_DEFAULT(String.format(
-            RawDataManager.LOG_REIMPORT_END,
+            Messages.Log_Reimport_PreviousFiles_End,
             (System.currentTimeMillis() - start) / 1000.0));
 
       doReimport_70_FireModifyEvents(importState_Process);

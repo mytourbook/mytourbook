@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.IMapContextProvider;
@@ -122,6 +124,7 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
@@ -130,6 +133,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.HoveredValueData;
@@ -155,8 +159,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -184,7 +186,8 @@ public class Map2View extends ViewPart implements
       IMapBookmarkListener,
       IMapPositionListener,
       IMapSyncListener,
-      IMapInfoListener {
+      IMapInfoListener,
+      IMapWithPhotos {
 
 // SET_FORMATTING_OFF
 
@@ -1373,6 +1376,10 @@ public class Map2View extends ViewPart implements
                onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
             }
 
+         } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+
+            onSelectionChanged_TourPause((SelectionTourPause) eventData, false);
+
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
             onSelectionChanged((ISelection) eventData, true);
@@ -1709,39 +1716,36 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setActionsEnabled(true);
       _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
-      _map.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
+      _map.addControlListener(controlResizedAdapter(ControlEvent -> {
 
-            /*
-             * Check if the legend size must be adjusted
-             */
-            final Image legendImage = _mapLegend.getImage();
-            if ((legendImage == null) || legendImage.isDisposed()) {
-               return;
-            }
-
-            if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
-               return;
-            }
-
-            /*
-             * Check height
-             */
-            final Rectangle mapBounds = _map.getBounds();
-            final Rectangle legendBounds = legendImage.getBounds();
-
-            final int mapHeight = mapBounds.height;
-            final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
-            final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
-
-            if ((mapHeight < defaultLegendHeight + legendTopMargin)
-                  || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
-
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
-            }
+         /*
+          * Check if the legend size must be adjusted
+          */
+         final Image legendImage = _mapLegend.getImage();
+         if ((legendImage == null) || legendImage.isDisposed()) {
+            return;
          }
-      });
+
+         if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
+            return;
+         }
+
+         /*
+          * Check height
+          */
+         final Rectangle mapBounds = _map.getBounds();
+         final Rectangle legendBounds = legendImage.getBounds();
+
+         final int mapHeight = mapBounds.height;
+         final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
+         final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
+
+         if ((mapHeight < defaultLegendHeight + legendTopMargin)
+               || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
+
+            createLegendImage(_tourPainterConfig.getMapColorProvider());
+         }
+      }));
 
       createActions();
 
@@ -2250,6 +2254,7 @@ public class Map2View extends ViewPart implements
    /**
     * @return Returns a list with all filtered photos
     */
+   @Override
    public ArrayList<Photo> getFilteredPhotos() {
       return _filteredPhotos;
    }
@@ -2364,6 +2369,7 @@ public class Map2View extends ViewPart implements
    /**
     * @return Returns a list with all available photos.
     */
+   @Override
    public ArrayList<Photo> getPhotos() {
       return _allPhotos;
    }
@@ -2974,6 +2980,34 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
+
+      final TourData tourData = pauseSelection.getTourData();
+
+      updateUI_ShowTour(tourData);
+
+      final int leftSliderValueIndex = pauseSelection.getSerieIndex();
+
+      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
+
+         if (isDrawSlider) {
+
+            positionMapTo_0_TourSliders(
+                  tourData,
+                  leftSliderValueIndex,
+                  leftSliderValueIndex,
+                  leftSliderValueIndex,
+                  null);
+
+         } else {
+
+            positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+         }
+
+         keepMapPosition(tourData);
+      }
+   }
+
    private void paintEntireTour() {
 
       // get overlay key for all tours which have valid tour data
@@ -3409,7 +3443,7 @@ public class Map2View extends ViewPart implements
       updateFilteredPhotos();
    }
 
-   public void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
+   private void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
 
       _photoFilter_RatingStars = filterRatingStars;
       _photoFilter_RatingStar_Operator = ratingstaroperatorsvalues;
@@ -4287,6 +4321,12 @@ public class Map2View extends ViewPart implements
 
       _map.disposeOverlayImageCache();
       _map.paint();
+   }
+
+   @Override
+   public void updatePhotoFilter(final int filterRatingStars, final PhotoRatingStarOperator ratingStarOperatorsValues) {
+
+      photoFilter_UpdateFromSlideout(filterRatingStars, ratingStarOperatorsValues);
    }
 
    void updateTourColorsInToolbar() {

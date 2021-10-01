@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -35,12 +37,9 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -59,31 +58,18 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
    private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
 
    private IPropertyChangeListener _defaultChangePropertyListener;
-   private SelectionAdapter        _defaultSelectionListener;
+   private SelectionListener       _defaultSelectionListener;
    private MouseWheelListener      _defaultMouseWheelListener;
 
    {
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
-      };
-
-      _defaultChangePropertyListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onChangeUI();
-         }
-      };
+      _defaultChangePropertyListener = propertyChangeEvent -> onChangeUI();
    }
 
    private PixelConverter        _pc;
