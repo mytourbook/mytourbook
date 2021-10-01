@@ -166,7 +166,7 @@ public class GeoPartTourLoader {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.logError(select);
          net.tourbook.ui.UI.showSQLException(e);
 
       }

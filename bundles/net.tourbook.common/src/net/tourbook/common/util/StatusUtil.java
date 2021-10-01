@@ -87,16 +87,6 @@ public class StatusUtil {
    }
 
    /**
-    * Log message into the status log
-    *
-    * @param message
-    * @param exception
-    */
-   public static void log(final String message) {
-      handleStatus(message, null, StatusManager.LOG, IStatus.ERROR);
-   }
-
-   /**
     * Log exception into the status log
     *
     * @param message

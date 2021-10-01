@@ -1093,7 +1093,7 @@ public class FTSearchManager {
 
    private static void logCreateIndex(final String indexStore, final long start) {
 
-      StatusUtil.log(String.format(LOG_CREATE_INDEX,
+      StatusUtil.logInfo(String.format(LOG_CREATE_INDEX,
             indexStore,
             System.currentTimeMillis() - start));
    }
