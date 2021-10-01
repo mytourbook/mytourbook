@@ -73,7 +73,7 @@ public class IconRequestMgr implements IconRequestHandler {
 
       if (bundleUrl == null) {
 
-         StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+         StatusUtil.logError("File is not available: " + bundleFileName);//$NON-NLS-1$
          return null;
       }
 

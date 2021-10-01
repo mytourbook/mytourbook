@@ -1136,14 +1136,14 @@ public class Map3Manager {
 
                      // check if xml layer is a default ww layer
                      if (wwLayer == null) {
-                        StatusUtil.log(NLS.bind(ERROR_01, xmlChildId));
+                        StatusUtil.logError(NLS.bind(ERROR_01, xmlChildId));
                         continue;
                      }
 
                      final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(xmlChildId);
                      // use untranslated name, this should not occure
                      if (mapDefaultLayer == null) {
-                        StatusUtil.log(NLS.bind(ERROR_02, xmlChildId));
+                        StatusUtil.logError(NLS.bind(ERROR_02, xmlChildId));
                         continue;
                      }
 
@@ -1162,7 +1162,7 @@ public class Map3Manager {
                      tviLayer = _uiCustomLayers.get(xmlChildId);
 
                      if (tviLayer == null) {
-                        StatusUtil.log(NLS.bind(ERROR_03, xmlChildId));
+                        StatusUtil.logError(NLS.bind(ERROR_03, xmlChildId));
                         continue;
                      }
 
@@ -1193,7 +1193,7 @@ public class Map3Manager {
 
                   final DefaultCategory defaultCategory = MapDefaultCategory.getLayer(xmlChildId);
                   if (defaultCategory == null) {
-                     StatusUtil.log(NLS.bind(ERROR_04, xmlChildId));
+                     StatusUtil.logError(NLS.bind(ERROR_04, xmlChildId));
                      continue;
                   }
 

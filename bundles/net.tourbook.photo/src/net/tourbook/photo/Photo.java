@@ -824,7 +824,7 @@ public class Photo {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind(//
+         StatusUtil.logError(NLS.bind(
                "Could not read metadata from image \"{0}\"", //$NON-NLS-1$
                imageFile));
 

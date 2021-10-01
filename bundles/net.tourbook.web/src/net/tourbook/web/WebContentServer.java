@@ -441,7 +441,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
+         StatusUtil.logError(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -462,7 +462,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
+         StatusUtil.logError(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -531,7 +531,7 @@ public class WebContentServer {
       } finally {
 
          if (Util.close(outputStream) == false) {
-            StatusUtil.log(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
+            StatusUtil.logError(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
          }
 
          Util.close(replacingOutputStream);
