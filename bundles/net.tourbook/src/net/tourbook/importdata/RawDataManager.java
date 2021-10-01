@@ -3311,6 +3311,9 @@ public class RawDataManager {
 
          oldTourData.setBattery_Percentage_Start(reimportedTourData.getBattery_Percentage_Start());
          oldTourData.setBattery_Percentage_End(reimportedTourData.getBattery_Percentage_End());
+
+         oldTourData.getDeviceSensorValues().clear();
+         oldTourData.getDeviceSensorValues().addAll(reimportedTourData.getDeviceSensorValues());
       }
 
       // Cadence

@@ -21,7 +21,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
+import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 /**
@@ -33,9 +35,15 @@ public class DeviceSensor {
 
    public static final int     DB_LENGTH_NAME = 80;
 
+   /**
+    * Manually created marker or imported marker create a unique id to identify them, saved marker
+    * are compared with the marker id
+    */
+   private static int          _createCounter = 0;
+
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                sensorId;
+   private long                sensorId       = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    private int                 manufacturerNumber;
    private String              manufacturerName;
@@ -44,6 +52,9 @@ public class DeviceSensor {
    private String              productName;
 
    private String              serialNumber   = UI.EMPTY_STRING;
+
+   @Transient
+   private long                _createId      = 0;
 
    /**
     * Default constructor used in EJB
@@ -58,6 +69,8 @@ public class DeviceSensor {
 
                        final String serialNumber) {
 
+      _createId = ++_createCounter;
+
       this.manufacturerNumber = manufacturerNumber;
       this.manufacturerName = manufacturerName;
 
@@ -69,6 +82,38 @@ public class DeviceSensor {
 
    @Override
    public boolean equals(final Object obj) {
+
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof DeviceSensor)) {
+         return false;
+      }
+
+      final DeviceSensor other = (DeviceSensor) obj;
+
+      if (_createId == 0) {
+
+         // sensor is from the database
+         if (sensorId != other.sensorId) {
+            return false;
+         }
+
+      } else {
+
+         // sensor is create
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   public boolean equals1(final Object obj) {
 
       if (this == obj) {
          return true;
@@ -116,7 +161,8 @@ public class DeviceSensor {
 
    @Override
    public int hashCode() {
-      return Objects.hash(sensorId);
+
+      return Objects.hash(sensorId, _createId);
    }
 
    public void setSerialNumber(final String serialNumber) {

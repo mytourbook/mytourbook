@@ -63,6 +63,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -797,11 +798,111 @@ public class TourDatabase {
 
       checkUnsavedTransientInstances_Tags(tourData);
       checkUnsavedTransientInstances_TourType(tourData);
+      checkUnsavedTransientInstances_Sensors(tourData);
    }
 
    /**
     * @param tourData
-    * @return Returns <code>true</code> when new tags are created.
+    */
+   private static void checkUnsavedTransientInstances_Sensors(final TourData tourData) {
+
+      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
+
+      if (allTourData_SensorValues.isEmpty()) {
+         return;
+      }
+
+      final ArrayList<DeviceSensor> allNewSensors = new ArrayList<>();
+
+      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors());
+
+      // loop: all sensor values in the tour -> find sensors which are not yet saved
+      for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+         final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+         final long sensorId = tourData_Sensor.getSensorId();
+
+         if (sensorId != ENTITY_IS_NOT_SAVED) {
+
+            // sensor is saved
+
+            continue;
+         }
+
+         // sensor is not yet saved
+         // 1. sensor can still be new
+         // 2. sensor is already created but not updated in the not yet saved tour
+
+         final DeviceSensor dbSensor = allDbSensors.get(tourData_Sensor.getSerialNumber().toUpperCase());
+
+         if (dbSensor == null) {
+
+            // sensor not available -> create a new sensor
+
+            allNewSensors.add(tourData_Sensor);
+         }
+      }
+
+      boolean isNewSensorSaved = false;
+
+      if (allNewSensors.size() > 0) {
+
+         // create new sensors
+
+         synchronized (TRANSIENT_LOCK) {
+
+            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors());
+
+            for (final DeviceSensor newSensor : allNewSensors) {
+
+               // check again, sensor list could be updated in another thread
+               final DeviceSensor dbSensor = allDbSensors_InLock.get(newSensor.getSerialNumber().toUpperCase());
+
+               if (dbSensor == null) {
+
+                  // sensor is not yet in db -> create it
+
+                  saveEntity(
+                        newSensor,
+                        ENTITY_IS_NOT_SAVED,
+                        DeviceSensor.class);
+
+                  isNewSensorSaved = true;
+               }
+            }
+
+            if (isNewSensorSaved) {
+
+               /*
+                * Replace sensor in sensor values
+                */
+
+               // force to reload db sensors
+               clearDeviceSensors();
+               TourManager.getInstance().clearTourDataCache();
+
+               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors());
+
+               // loop: all sensor values in the tour -> find sensors which are not yet saved
+               for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+                  final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+                  final String serialNumberKey = tourData_Sensor.getSerialNumber().toUpperCase();
+
+                  final DeviceSensor deviceSensor = allDbSensors_InLock.get(serialNumberKey);
+
+                  tourData_SensorValue.setDeviceSensor(deviceSensor);
+               }
+            }
+         }
+      }
+
+   }
+
+   /**
+    * @param tourData
     */
    private static void checkUnsavedTransientInstances_Tags(final TourData tourData) {
 
@@ -901,7 +1002,6 @@ public class TourDatabase {
 
    /**
     * @param tourData
-    * @return Returns <code>true</code> when a new tour type is created.
     */
    private static void checkUnsavedTransientInstances_TourType(final TourData tourData) {
 
@@ -960,6 +1060,21 @@ public class TourDatabase {
 
       // replace tour type in the tour
       tourData.setTourType(appliedType);
+   }
+
+   /**
+    * Removes all sensors which are loaded from the database so the next time they will be
+    * reloaded.
+    */
+   public static synchronized void clearDeviceSensors() {
+
+      if (_allDbDeviceSensors_BySerialNo != null) {
+
+         _allDbDeviceSensors_BySerialNo.clear();
+         _allDbDeviceSensors_BySerialNo = null;
+      }
+
+      TourTypeImage.setTourTypeImagesDirty();
    }
 
    /**
@@ -3490,8 +3605,6 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR, true)
 
-            + "   " + KEY_TOUR + "     BIGINT,                                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
             // version 46 start
 
             + "   ManufacturerNumber   INTEGER,                                        " + NL //$NON-NLS-1$
@@ -3529,11 +3642,11 @@ public class TourDatabase {
 
             + "   TourStartTime                    BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
-            + "   BatteryVoltage_Start             FLOAT,                              " + NL //$NON-NLS-1$
-            + "   BatteryVoltage_End               FLOAT,                              " + NL //$NON-NLS-1$
+            + "   BatteryVoltage_Start             FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
+            + "   BatteryVoltage_End               FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
 
-            + "   CummulatedOperatingTime_Start    BIGINT,                             " + NL //$NON-NLS-1$
-            + "   CummulatedOperatingTime_End      BIGINT                              " + NL //$NON-NLS-1$
+            + "   CummulatedOperatingTime_Start    BIGINT DEFAULT -1,                  " + NL //$NON-NLS-1$
+            + "   CummulatedOperatingTime_End      BIGINT DEFAULT -1                   " + NL //$NON-NLS-1$
 
             // version 46 end
 

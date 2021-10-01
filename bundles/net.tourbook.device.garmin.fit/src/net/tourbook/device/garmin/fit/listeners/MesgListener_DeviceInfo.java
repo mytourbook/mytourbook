@@ -25,6 +25,7 @@ import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 import com.garmin.fit.SourceType;
 
+import java.util.List;
 import java.util.Map;
 
 import net.tourbook.common.UI;
@@ -354,11 +355,13 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       /*
        * Get sensor
        */
-      final Map<String, DeviceSensor> allDeviceSensors = TourDatabase.getAllDeviceSensors();
+      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors();
 
-      DeviceSensor sensor = allDeviceSensors.get(sensorSerialNumberKey);
+      DeviceSensor sensor = allDbSensors.get(sensorSerialNumberKey);
 
       if (sensor == null) {
+
+         // create sensor
 
          /*
           * Sensor manufacturer
@@ -368,7 +371,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          if (manufacturer != null) {
             manufacturerName = Manufacturer.getStringFromValue(manufacturer);
          }
-         if (manufacturerName.length() == 0) {
+         if (manufacturerName.length() == 0 && manufacturer != null) {
             manufacturerName = manufacturer.toString();
          }
 
@@ -381,37 +384,50 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             sensorProductName = GarminProduct.getStringFromValue(garminProduct);
          }
 
-         if (sensorProductName.length() == 0) {
+         if (sensorProductName.length() == 0 && productName != null) {
             sensorProductName = productName;
          }
 
-         if (sensorProductName.length() == 0) {
+         if (sensorProductName.length() == 0 && product != null) {
             sensorProductName = product.toString();
          }
 
          sensor = RawDataManager.createDeviceSensor(
-               manufacturer,
+               manufacturer == null ? -1 : manufacturer,
                manufacturerName,
-               product,
+               product == null ? -1 : product,
                sensorProductName,
                sensorSerialNumberKey);
       }
+
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getAllDeviceSensorValues();
 
       /*
        * Get sensor value
        */
       DeviceSensorValue sensorValue = null;
-      for (final DeviceSensorValue deviceSensorValue : fitData.getAllDeviceSensorValues()) {
+      for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
 
-         final DeviceSensor deviceSensorFromValue = deviceSensorValue.getDeviceSensor();
+         final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
 
-         if (deviceSensorFromValue.getSerialNumber().equals(sensorSerialNumberKey)) {
+         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
 
             // sensor found in sensor values -> set end voltage
 
-            sensorValue = deviceSensorValue;
+            sensorValue = importedSensorValue;
 
-            sensorValue.setBatteryVoltage_End(batteryVoltage);
+            if (batteryVoltage != null) {
+
+               if (sensorValue.getBatteryVoltage_Start() == -1) {
+
+                  // start is not yet set
+
+                  sensorValue.setBatteryVoltage_Start(batteryVoltage);
+               } else {
+
+                  sensorValue.setBatteryVoltage_End(batteryVoltage);
+               }
+            }
 
             break;
          }
@@ -420,12 +436,13 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       if (sensorValue == null) {
 
          // create new sensor value -> set start voltage
-
          sensorValue = new DeviceSensorValue(sensor);
 
-         sensorValue.setBatteryVoltage_Start(batteryVoltage);
+         allImportedSensorValues.add(sensorValue);
 
-         fitData.getAllDeviceSensorValues().add(sensorValue);
+         if (batteryVoltage != null) {
+            sensorValue.setBatteryVoltage_Start(batteryVoltage);
+         }
       }
 
    }

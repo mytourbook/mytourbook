@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 /**
@@ -31,19 +32,19 @@ import net.tourbook.ui.UI;
 @Entity
 public class DeviceSensorValue {
 
-   private static final String NL           = UI.NEW_LINE;
+   private static final String NL                            = UI.NEW_LINE;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                sensorValueId;
+   private long                sensorValueId                 = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    private long                tourStartTime;
 
-   private float               batteryVoltage_Start;
-   private float               batteryVoltage_End;
+   private float               batteryVoltage_Start          = -1;
+   private float               batteryVoltage_End            = -1;
 
-   private long                cummulatedOperatingTime_Start;
-   private long                cummulatedOperatingTime_End;
+   private long                cummulatedOperatingTime_Start = -1;
+   private long                cummulatedOperatingTime_End   = -1;
 
    @ManyToOne(optional = false)
    private DeviceSensor        deviceSensor;
@@ -55,7 +56,7 @@ public class DeviceSensorValue {
     * Is used to identify a device by it's device index according to the FIT "device index" field
     */
    @Transient
-   private int                 _deviceIndex = -1;
+   private int                 _deviceIndex                  = -1;
 
    public DeviceSensorValue() {}
 
@@ -147,6 +148,14 @@ public class DeviceSensorValue {
       this._deviceIndex = _deviceIndex;
    }
 
+   public void setDeviceSensor(final DeviceSensor deviceSensor) {
+      this.deviceSensor = deviceSensor;
+   }
+
+   public void setTourData(final TourData tourData) {
+      this.tourData = tourData;
+   }
+
    public void setTourStartTime(final long tourStartTime) {
       this.tourStartTime = tourStartTime;
    }
@@ -158,7 +167,7 @@ public class DeviceSensorValue {
 
             + "[" + NL //                                                                    //$NON-NLS-1$
 
-            + "sensorId                      = " + sensorValueId + NL //                     //$NON-NLS-1$
+            + "sensorValueId                 = " + sensorValueId + NL //                     //$NON-NLS-1$
             + "batteryVoltage_Start          = " + batteryVoltage_Start + NL //              //$NON-NLS-1$
             + "batteryVoltage_End            = " + batteryVoltage_End + NL //                //$NON-NLS-1$
             + "cummulatedOperatingTime_Start = " + cummulatedOperatingTime_Start + NL //     //$NON-NLS-1$

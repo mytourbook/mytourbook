@@ -895,7 +895,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
-    * A tour can have multiple sensors
+    * Sensors
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)

@@ -79,15 +79,15 @@ public class FitData {
 
    private final List<TimeData>          _allTimeData           = new ArrayList<>();
 
-   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
    private final List<GearData>          _allGearData           = new ArrayList<>();
    private final List<SwimData>          _allSwimData           = new ArrayList<>();
    private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
-   private List<Long>                    _pausedTime_Start      = new ArrayList<>();
+   private final List<Long>              _pausedTime_Start      = new ArrayList<>();
    private final List<Long>              _pausedTime_End        = new ArrayList<>();
 
    private final List<Long>              _allBatteryTime        = new ArrayList<>();
    private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
+   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
 
    private TimeData                      _current_TimeData;
    private TimeData                      _lastAdded_TimeData;
@@ -501,8 +501,15 @@ public class FitData {
    }
 
    private void finalizeTour_Sensors(final TourData tourData) {
-      // TODO Auto-generated method stub
 
+      for (final DeviceSensorValue deviceSensorValue : _allDeviceSensorValues) {
+         deviceSensorValue.setTourData(tourData);
+      }
+
+      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
+
+      allTourData_SensorValues.clear();
+      allTourData_SensorValues.addAll(_allDeviceSensorValues);this needs to be fixed
    }
 
    private void finalizeTour_Type(final TourData tourData) {
@@ -544,6 +551,10 @@ public class FitData {
             break;
          }
       }
+   }
+
+   public List<DeviceSensorValue> getAllDeviceSensorValues() {
+      return _allDeviceSensorValues;
    }
 
    public List<TimeData> getAllTimeData() {
@@ -785,9 +796,5 @@ public class FitData {
    public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
-   }
-
-   public List<DeviceSensorValue> getAllDeviceSensorValues() {
-      return _allDeviceSensorValues;
    }
 }
