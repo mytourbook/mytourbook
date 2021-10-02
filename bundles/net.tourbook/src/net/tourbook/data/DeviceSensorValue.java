@@ -16,6 +16,7 @@
 package net.tourbook.data;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,35 +33,45 @@ import net.tourbook.ui.UI;
 @Entity
 public class DeviceSensorValue {
 
-   private static final String NL                            = UI.NEW_LINE;
+   private static final String  NL                            = UI.NEW_LINE;
+
+   /**
+    * Create a unique id to identify imported sensor values
+    */
+   private static AtomicInteger _createCounter                = new AtomicInteger();
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                sensorValueId                 = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                 sensorValueId                 = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   private long                tourStartTime;
+   private long                 tourStartTime;
 
-   private float               batteryVoltage_Start          = -1;
-   private float               batteryVoltage_End            = -1;
+   private float                batteryVoltage_Start          = -1;
+   private float                batteryVoltage_End            = -1;
 
-   private long                cummulatedOperatingTime_Start = -1;
-   private long                cummulatedOperatingTime_End   = -1;
-
-   @ManyToOne(optional = false)
-   private DeviceSensor        deviceSensor;
+   private long                 cummulatedOperatingTime_Start = -1;
+   private long                 cummulatedOperatingTime_End   = -1;
 
    @ManyToOne(optional = false)
-   private TourData            tourData;
+   private DeviceSensor         deviceSensor;
+
+   @ManyToOne(optional = false)
+   private TourData             tourData;
 
    /**
     * Is used to identify a device by it's device index according to the FIT "device index" field
     */
    @Transient
-   private int                 _deviceIndex                  = -1;
+   private int                  _deviceIndex                  = -1;
+
+   @Transient
+   private long                 _createId                     = 0;
 
    public DeviceSensorValue() {}
 
    public DeviceSensorValue(final DeviceSensor sensor) {
+
+      _createId = _createCounter.incrementAndGet();
 
       deviceSensor = sensor;
    }
@@ -82,7 +93,22 @@ public class DeviceSensorValue {
 
       final DeviceSensorValue other = (DeviceSensorValue) obj;
 
-      return sensorValueId == other.sensorValueId;
+      if (_createId == 0) {
+
+         // sensor value is from the database
+         if (sensorValueId != other.sensorValueId) {
+            return false;
+         }
+
+      } else {
+
+         // sensor value is create
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
+
+      return true;
    }
 
    public float getBatteryVoltage_End() {

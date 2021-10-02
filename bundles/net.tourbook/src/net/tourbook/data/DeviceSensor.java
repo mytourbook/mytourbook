@@ -16,6 +16,7 @@
 package net.tourbook.data;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,30 +32,29 @@ import net.tourbook.ui.UI;
 @Entity
 public class DeviceSensor {
 
-   private static final String NL             = UI.NEW_LINE;
+   private static final String  NL             = UI.NEW_LINE;
 
-   public static final int     DB_LENGTH_NAME = 80;
+   public static final int      DB_LENGTH_NAME = 80;
 
    /**
-    * Manually created marker or imported marker create a unique id to identify them, saved marker
-    * are compared with the marker id
+    * Create a unique id to identify imported sensors
     */
-   private static int          _createCounter = 0;
+   private static AtomicInteger _createCounter = new AtomicInteger();
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                sensorId       = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                 sensorId       = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   private int                 manufacturerNumber;
-   private String              manufacturerName;
+   private int                  manufacturerNumber;
+   private String               manufacturerName;
 
-   private int                 productNumber;
-   private String              productName;
+   private int                  productNumber;
+   private String               productName;
 
-   private String              serialNumber   = UI.EMPTY_STRING;
+   private String               serialNumber   = UI.EMPTY_STRING;
 
    @Transient
-   private long                _createId      = 0;
+   private long                 _createId      = 0;
 
    /**
     * Default constructor used in EJB
@@ -69,7 +69,7 @@ public class DeviceSensor {
 
                        final String serialNumber) {
 
-      _createId = ++_createCounter;
+      _createId = _createCounter.incrementAndGet();
 
       this.manufacturerNumber = manufacturerNumber;
       this.manufacturerName = manufacturerName;

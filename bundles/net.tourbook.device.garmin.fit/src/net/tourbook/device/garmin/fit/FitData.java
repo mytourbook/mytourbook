@@ -509,7 +509,7 @@ public class FitData {
       final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
 
       allTourData_SensorValues.clear();
-      allTourData_SensorValues.addAll(_allDeviceSensorValues);this needs to be fixed
+      allTourData_SensorValues.addAll(_allDeviceSensorValues);
    }
 
    private void finalizeTour_Type(final TourData tourData) {
