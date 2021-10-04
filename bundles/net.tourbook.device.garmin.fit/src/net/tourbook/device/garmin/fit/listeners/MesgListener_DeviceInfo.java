@@ -53,6 +53,8 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
       super(fitData);
 
+      _isLogDeviceData = false;
+
       if (_isLogDeviceData) {
          logDeviceData_Header();
       }

@@ -32,18 +32,25 @@ import net.tourbook.ui.UI;
 @Entity
 public class DeviceSensor {
 
-   private static final String  NL             = UI.NEW_LINE;
+   private static final String  NL                    = UI.NEW_LINE;
 
-   public static final int      DB_LENGTH_NAME = 80;
+   public static final int      DB_LENGTH_NAME        = 80;
+   public static final int      DB_LENGTH_DESCRIPTION = 32000;
 
    /**
     * Create a unique id to identify imported sensors
     */
-   private static AtomicInteger _createCounter = new AtomicInteger();
+   private static AtomicInteger _createCounter        = new AtomicInteger();
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                 sensorId       = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                 sensorId              = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+   /**
+    * Contains a customer name because the manufacturer and product name are sometimes cryptic
+    */
+   private String               label;
+   private String               description;
 
    private int                  manufacturerNumber;
    private String               manufacturerName;
@@ -51,10 +58,10 @@ public class DeviceSensor {
    private int                  productNumber;
    private String               productName;
 
-   private String               serialNumber   = UI.EMPTY_STRING;
+   private String               serialNumber          = UI.EMPTY_STRING;
 
    @Transient
-   private long                 _createId      = 0;
+   private long                 _createId             = 0;
 
    /**
     * Default constructor used in EJB
@@ -132,6 +139,14 @@ public class DeviceSensor {
       return sensorId == other.sensorId;
    }
 
+   public String getDescription() {
+      return description;
+   }
+
+   public String getLabel() {
+      return label;
+   }
+
    public String getManufacturerName() {
       return manufacturerName;
    }
@@ -163,6 +178,14 @@ public class DeviceSensor {
    public int hashCode() {
 
       return Objects.hash(sensorId, _createId);
+   }
+
+   public void setDescription(final String description) {
+      this.description = description;
+   }
+
+   public void setLabel(final String label) {
+      this.label = label;
    }
 
    public void setSerialNumber(final String serialNumber) {

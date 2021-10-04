@@ -288,7 +288,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
    @Override
    protected String getGridPrefPrefix() {
-      return GRID_TOUR_TIME;
+      return GRID_BATTERY;
    }
 
    @Override

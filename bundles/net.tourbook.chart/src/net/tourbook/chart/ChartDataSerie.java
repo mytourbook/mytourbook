@@ -233,6 +233,11 @@ public abstract class ChartDataSerie {
       return _isForceMinValue;
    }
 
+   /**
+    * Sets the unit for the x-axis, default is {@link #AXIS_UNIT_NUMBER}
+    *
+    * @param axisUnit
+    */
    public void setAxisUnit(final int axisUnit) {
       _axisUnit = axisUnit;
    }

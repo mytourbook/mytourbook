@@ -239,7 +239,17 @@
          id             ="net.tourbook.statistics.graphs.StatisticBattery"
          class          ="net.tourbook.statistics.graphs.StatisticBattery"
          category-data  ="Battery"
-         category-time  ="Day"
+         category-time  ="Other"
+      />
+
+      <!-- SENSOR -->
+
+      <statistic 
+         name           ="%Statistic_Sensor"
+         id             ="net.tourbook.statistics.graphs.StatisticSensor"
+         class          ="net.tourbook.statistics.graphs.StatisticSensor"
+         category-data  ="Sensor"
+         category-time  ="Other"
       />
             
    </extension>

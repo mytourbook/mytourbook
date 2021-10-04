@@ -2928,6 +2928,7 @@ public class TourDatabase {
 
          } catch (final Exception e) {
 
+            StatusUtil.logError("Exception in tour " + TourManager.getTourDateTimeShort(tourData));//$NON-NLS-1$
             StatusUtil.showStatus(Messages.Tour_Database_TourSaveError, e);
 
          } finally {
@@ -3601,19 +3602,19 @@ public class TourDatabase {
     */
    private void createTable_DeviceSensor(final Statement stmt) throws SQLException {
 
-      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR + "   (                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR + "   (                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_DEVICE_SENSOR, true)
 
             // version 46 start
 
-            + "   ManufacturerNumber   INTEGER,                                        " + NL //$NON-NLS-1$
-            + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "   ProductNumber        INTEGER,                                        " + NL //$NON-NLS-1$
-            + "   ProductName          VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "   SerialNumber         VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")    " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Label                VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Description          VARCHAR(" + DeviceSensor.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   ManufacturerNumber   INTEGER,                                                 " + NL //$NON-NLS-1$
+            + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   ProductNumber        INTEGER,                                                 " + NL //$NON-NLS-1$
+            + "   ProductName          VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SerialNumber         VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")             " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 46 end
 
