@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,40 +73,43 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
    private Button                                _btnSortByTime;
 
 //   <attribute name="category-data" use="required">
-//      <annotation>
-//         <documentation>
+//   <annotation>
+//      <documentation>
 //
-//         </documentation>
-//      </annotation>
-//      <simpleType>
-//         <restriction base="string">
-//            <enumeration value="Other"/>
-//            <enumeration value="Summary"/>
-//            <enumeration value="Altitude"/>
-//            <enumeration value="Distance"/>
-//            <enumeration value="Time"/>
-//            <enumeration value="HR"/>
-//            <enumeration value="Training"/>
-//         </restriction>
-//      </simpleType>
-//   </attribute>
-
-//   <attribute name="category-time" use="required">
-//      <annotation>
-//         <documentation>
+//      </documentation>
+//   </annotation>
+//   <simpleType>
+//      <restriction base="string">
+//         <enumeration value="Other"/>
+//         <enumeration value="Altitude"/>
+//         <enumeration value="AthleteData"/>
+//         <enumeration value="Battery"/>
+//         <enumeration value="Distance"/>
+//         <enumeration value="HR"/>
+//         <enumeration value="Sensor"/>
+//         <enumeration value="Summary"/>
+//         <enumeration value="Time"/>
+//         <enumeration value="Training"/>
+//      </restriction>
+//   </simpleType>
+//</attribute>
+//<attribute name="category-time" use="required">
+//   <annotation>
+//      <documentation>
 //
-//         </documentation>
-//      </annotation>
-//      <simpleType>
-//         <restriction base="string">
-//            <enumeration value="Other"/>
-//            <enumeration value="Day"/>
-//            <enumeration value="Week"/>
-//            <enumeration value="Month"/>
-//            <enumeration value="Year"/>
-//         </restriction>
-//      </simpleType>
-//   </attribute>
+//      </documentation>
+//   </annotation>
+//   <simpleType>
+//      <restriction base="string">
+//         <enumeration value="Other"/>
+//         <enumeration value="Day"/>
+//         <enumeration value="Week"/>
+//         <enumeration value="Month"/>
+//         <enumeration value="Year"/>
+//         </enumeration>
+//      </restriction>
+//   </simpleType>
+//</attribute>
 
 // SET_FORMATTING_OFF
    {
@@ -116,6 +119,9 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
       _sortingByCategoryData.put("Time",        20); //$NON-NLS-1$
       _sortingByCategoryData.put("Distance",    21); //$NON-NLS-1$
       _sortingByCategoryData.put("Altitude",    22); //$NON-NLS-1$
+      _sortingByCategoryData.put("AthleteData", 30); //$NON-NLS-1$
+      _sortingByCategoryData.put("Battery",     40); //$NON-NLS-1$
+      _sortingByCategoryData.put("Sensor",      42); //$NON-NLS-1$
       _sortingByCategoryData.put("Other",       99); //$NON-NLS-1$
    }
    {
