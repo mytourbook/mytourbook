@@ -3054,7 +3054,7 @@ public class TourDatabase {
        * data are valid
        */
       if (tourData.getTourPerson() == null) {
-         StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
+         StatusUtil.logInfo("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
          return false;
       }
 
@@ -7461,7 +7461,7 @@ public class TourDatabase {
 
                if (tourData == null) {
 
-                  StatusUtil.log(NLS.bind(
+                  StatusUtil.logError(NLS.bind(
                         "Cannot get tour {0} from database to update the average pulse in the compared tour {1}.", //$NON-NLS-1$
                         tourId,
                         compareId));
@@ -8283,7 +8283,7 @@ public class TourDatabase {
 
                if (tourData == null) {
 
-                  StatusUtil.log(NLS.bind(
+                  StatusUtil.logError(NLS.bind(
                         "Cannot get tour {0} from database to update the recording time in the compared tour {1}.", //$NON-NLS-1$
                         tourId,
                         compareId));

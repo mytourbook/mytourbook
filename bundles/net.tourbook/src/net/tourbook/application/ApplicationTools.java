@@ -225,7 +225,7 @@ public class ApplicationTools {
 
       } finally {
 
-         StatusUtil.log(sb.toString());
+         StatusUtil.logInfo(sb.toString());
       }
    }
 

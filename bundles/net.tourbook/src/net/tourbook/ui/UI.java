@@ -1081,7 +1081,7 @@ public class UI {
                final String sqlExceptionText = Util.getSQLExceptionText(e);
 
                // log also the stacktrace
-               StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+               StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
 
                MessageDialog.openError(
                      Display.getDefault().getActiveShell(),

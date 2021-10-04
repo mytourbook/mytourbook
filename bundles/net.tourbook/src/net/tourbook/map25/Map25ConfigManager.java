@@ -118,9 +118,9 @@ public class Map25ConfigManager {
    private static final String TAG_TRACK       = "Track";      //$NON-NLS-1$
    //
    // outline
-   private static final String TAG_OUTLINE             = "Outline";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_OPACITY    = "opacity";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_WIDTH      = "width";                 //$NON-NLS-1$
+   private static final String TAG_OUTLINE                             = "Outline";               //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_OPACITY                    = "opacity";               //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_WIDTH                      = "width";                 //$NON-NLS-1$
    private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW    = "directionArrow";        //$NON-NLS-1$
    //
    public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
@@ -656,7 +656,7 @@ public class Map25ConfigManager {
 
          // this case should not happen, create a config
 
-         StatusUtil.log("Created default config for marker properties");//$NON-NLS-1$
+         StatusUtil.logInfo("Created default config for marker properties");//$NON-NLS-1$
 
          createDefaults_Markers();
 
@@ -688,7 +688,7 @@ public class Map25ConfigManager {
 
          // this case should not happen, create a config
 
-         StatusUtil.log("Created default config for tour track properties");//$NON-NLS-1$
+         StatusUtil.logInfo("Created default config for tour track properties");//$NON-NLS-1$
 
          createDefaults_Tracks();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import static javax.persistence.FetchType.LAZY;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -50,7 +51,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
     * Manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static int        _createCounter             = 0;
+   private static final AtomicInteger _createCounter             = new AtomicInteger();
 
    /*
     * DON'T USE THE FINAL KEYWORD FOR THE ID otherwise the Id cannot be set.
@@ -116,8 +117,10 @@ public class TourTag implements Cloneable, Comparable<Object> {
    public TourTag() {}
 
    public TourTag(final String tagName) {
+
       name = tagName.trim();
-      _createId = ++_createCounter;
+
+      _createId = _createCounter.incrementAndGet();
    }
 
    @Override
