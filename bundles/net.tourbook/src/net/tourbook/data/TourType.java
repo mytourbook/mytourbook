@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,10 +33,10 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourType implements Comparable<Object> {
 
-   public static final int  DB_LENGTH_NAME                        = 100;
+   public static final int            DB_LENGTH_NAME                        = 100;
 
    /** Width/height of the tour type image. */
-   public static final int  TOUR_TYPE_IMAGE_SIZE                  = 16;
+   public static final int            TOUR_TYPE_IMAGE_SIZE                  = 16;
 
    /**
     * Color which is transparent in the tour type image.
@@ -42,51 +44,51 @@ public class TourType implements Comparable<Object> {
     * The color is used in the easy import view, the previous color looked really ugly with a dark
     * background.
     */
-   public static final RGB  TRANSPARENT_COLOR                     = new RGB(67, 67, 67);
+   public static final RGB            TRANSPARENT_COLOR                     = new RGB(67, 67, 67);
 
-   public static final long IMAGE_KEY_DIALOG_SELECTION            = -2;
-
-   /**
-    * Must be below 0 because a tour type can have a 0 id.
-    */
-   public static final long TOUR_TYPE_IS_NOT_USED                 = -10;
+   public static final long           IMAGE_KEY_DIALOG_SELECTION            = -2;
 
    /**
     * Must be below 0 because a tour type can have a 0 id.
     */
-   public static final long TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA = -20;
+   public static final long           TOUR_TYPE_IS_NOT_USED                 = -10;
+
+   /**
+    * Must be below 0 because a tour type can have a 0 id.
+    */
+   public static final long           TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA = -20;
 
    /**
     * Manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static int       _createCounter                        = 0;
+   private static final AtomicInteger _createCounter                        = new AtomicInteger();
 
    /**
     * Contains the entity id
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long             typeId                                = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       typeId                                = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @Basic(optional = false)
-   private String           name;
+   private String                     name;
 
-   private int              color_Gradient_Bright;
-   private int              color_Gradient_Dark;
+   private int                        color_Gradient_Bright;
+   private int                        color_Gradient_Dark;
 
-   private int              color_Line_LightTheme;
-   private int              color_Line_DarkTheme;
+   private int                        color_Line_LightTheme;
+   private int                        color_Line_DarkTheme;
 
-   private int              color_Text_LightTheme;
-   private int              color_Text_DarkTheme;
+   private int                        color_Text_LightTheme;
+   private int                        color_Text_DarkTheme;
 
    /**
     * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
     * persisted
     */
    @Transient
-   private long             _createId                             = 0;
+   private long                       _createId                             = 0;
 
    /**
     * Default constructor used in ejb
@@ -97,7 +99,7 @@ public class TourType implements Comparable<Object> {
 
       this.name = name;
 
-      _createId = ++_createCounter;
+      _createId = _createCounter.incrementAndGet();
    }
 
    @Override
