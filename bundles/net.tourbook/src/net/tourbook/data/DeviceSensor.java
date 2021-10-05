@@ -49,8 +49,7 @@ public class DeviceSensor {
    /**
     * Contains a customer name because the manufacturer and product name are sometimes cryptic
     */
-   private String               label;
-   private String               description;
+   private String               sensorName;
 
    private int                  manufacturerNumber;
    private String               manufacturerName;
@@ -58,6 +57,7 @@ public class DeviceSensor {
    private int                  productNumber;
    private String               productName;
 
+   private String               description;
    private String               serialNumber          = UI.EMPTY_STRING;
 
    @Transient
@@ -143,10 +143,6 @@ public class DeviceSensor {
       return description;
    }
 
-   public String getLabel() {
-      return label;
-   }
-
    public String getManufacturerName() {
       return manufacturerName;
    }
@@ -170,6 +166,10 @@ public class DeviceSensor {
       return sensorId;
    }
 
+   public String getSensorName() {
+      return sensorName;
+   }
+
    public String getSerialNumber() {
       return serialNumber;
    }
@@ -185,7 +185,7 @@ public class DeviceSensor {
    }
 
    public void setLabel(final String label) {
-      this.label = label;
+      this.sensorName = label;
    }
 
    public void setSerialNumber(final String serialNumber) {
@@ -199,6 +199,7 @@ public class DeviceSensor {
 
             + "[" + NL //                                               //$NON-NLS-1$
 
+            + "sensorName           = " + sensorName + NL //            //$NON-NLS-1$
             + "sensorId             = " + sensorId + NL //              //$NON-NLS-1$
             + "manufacturerNumber   = " + manufacturerNumber + NL //    //$NON-NLS-1$
             + "manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$

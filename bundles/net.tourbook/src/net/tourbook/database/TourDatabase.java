@@ -3608,7 +3608,7 @@ public class TourDatabase {
 
             // version 46 start
 
-            + "   Label                VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SensorName           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   Description          VARCHAR(" + DeviceSensor.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   ManufacturerNumber   INTEGER,                                                 " + NL //$NON-NLS-1$
             + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
