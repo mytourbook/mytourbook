@@ -44,18 +44,16 @@ public class StatisticSensor extends TourbookStatistic {
    private int                      _currentYear;
    private int                      _numberOfYears;
 
-   private Chart                    _chart;
-
-   private StatisticContext         _statContext;
+   private Chart                    _sensorChart;
 
    @Override
    public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
       // chart widget page
-      _chart = new Chart(parent, SWT.FLAT);
-      _chart.setShowZoomActions(true);
-      _chart.setDrawBarChartAtBottom(false);
-      _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+      _sensorChart = new Chart(parent, SWT.FLAT);
+      _sensorChart.setShowZoomActions(true);
+      _sensorChart.setDrawBarChartAtBottom(false);
+      _sensorChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
    }
 
    @Override
@@ -117,35 +115,36 @@ public class StatisticSensor extends TourbookStatistic {
       final int yearDays = TimeTools.getNumberOfDaysWithYear(_currentYear);
       chartModel.setChartMinWidth(yearDays);
 
-      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(_sensorChart, getGridPrefPrefix());
 
       // show the data in the chart
-      _chart.updateChart(chartModel, false, true);
+      _sensorChart.updateChart(chartModel, false, true);
    }
 
    @Override
    public void updateStatistic(final StatisticContext statContext) {
-
-      _statContext = statContext;
 
       _activePerson = statContext.appPerson;
       _activeTourTypeFiler = statContext.appTourTypeFilter;
       _currentYear = statContext.statSelectedYear;
       _numberOfYears = statContext.statNumberOfYears;
 
+      final long sensorId = 0;
+
       _sensorData = _sensorDataProvider.getTourTimeData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
             statContext.statSelectedYear,
             statContext.statNumberOfYears,
-            isDataDirtyWithReset() || statContext.isRefreshData);
+            isDataDirtyWithReset() || statContext.isRefreshData,
+            sensorId);
 
       updateChart();
    }
 
    @Override
    public void updateToolBar() {
-      _chart.fillToolbar(true);
+      _sensorChart.fillToolbar(true);
    }
 
 }

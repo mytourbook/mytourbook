@@ -27,12 +27,12 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandler_OpenView_SensorView extends AbstractHandler implements IElementUpdater {
+public class ActionHandler_OpenView_SensorChartView extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      Util.showView(SensorView.ID, true);
+      Util.showView(SensorChartView.ID, true);
 
       return null;
    }
@@ -41,6 +41,6 @@ public class ActionHandler_OpenView_SensorView extends AbstractHandler implement
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.Sensor);
+      UI.setThemedIcon(uiElement, Images.SensorChart);
    }
 }

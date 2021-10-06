@@ -60,6 +60,16 @@ public class DeviceSensor {
    private String               description;
    private String               serialNumber          = UI.EMPTY_STRING;
 
+   /**
+    * Time in ms when this sensor was first used
+    */
+   private long                 usedStartTime;
+
+   /**
+    * Time in ms when this sensor was last used
+    */
+   private long                 usedEndTime;
+
    @Transient
    private long                 _createId             = 0;
 
@@ -208,5 +218,21 @@ public class DeviceSensor {
             + "serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
 
             + "]" + NL; //                                              //$NON-NLS-1$
+   }
+
+   public long getUsedStartTime() {
+      return usedStartTime;
+   }
+
+   public void setUsedStartTime(long usedStartTime) {
+      this.usedStartTime = usedStartTime;
+   }
+
+   public long getUsedEndTime() {
+      return usedEndTime;
+   }
+
+   public void setUsedEndTime(long usedEndTime) {
+      this.usedEndTime = usedEndTime;
    }
 }

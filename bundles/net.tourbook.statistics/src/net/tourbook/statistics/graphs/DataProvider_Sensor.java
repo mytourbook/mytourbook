@@ -68,7 +68,8 @@ public class DataProvider_Sensor extends DataProvider {
                                             final TourTypeFilter tourTypeFilter,
                                             final int lastYear,
                                             final int numYears,
-                                            final boolean isForceUpdate) {
+                                            final boolean isForceUpdate,
+                                            final long sensorId) {
 
       // don't reload data which are already here
       if (statistic_ActivePerson == person
@@ -92,8 +93,6 @@ public class DataProvider_Sensor extends DataProvider {
 
          statistic_LastYear = lastYear;
          statistic_NumberOfYears = numYears;
-
-         final long sensorId = 5;
 
          final int firstYear = lastYear - numYears;
          final long firstDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2004, 1, 1, 0, 0, 0));

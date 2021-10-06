@@ -3133,7 +3133,9 @@ public class TourDatabase {
 
       saveTour_GeoParts(persistedEntity);
 
-      // update ft index
+      /*
+       * Update ft index
+       */
       final ArrayList<Long> allTourIds = new ArrayList<>();
       allTourIds.add(persistedEntity.getTourId());
 

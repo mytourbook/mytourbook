@@ -576,9 +576,9 @@
             <!-- Sensors -->
             <command
                commandId   ="command.net.tourbook.ui.views.sensors.SensorView"
-               icon        ="icons/tour-marker-all.png"
-               label       ="%View_Name_Sensors"
-               mnemonic    ="%View_Name_Sensors_Mnemonic"/>
+               icon        ="icons/sensor.png"
+               label       ="%View_Name_Sensor"
+               mnemonic    ="%View_Name_Sensor_Mnemonic"/>
 
 
             <!-- Sign Images 
@@ -763,6 +763,12 @@
                label       ="%Command_GeoParts"
                mnemonic    ="%Command_GeoParts_Mnemonic"/>
 
+            <command
+               commandId   ="command.net.tourbook.ui.views.sensors.SensorChartView"
+               icon        ="icons/sensor-chart.png"
+               label       ="%View_Name_SensorChart"
+               mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
+               
             <command
                commandId   ="command.net.tourbook.ui.views.TourChartSmoothingView"
                icon        ="icons/smooth.png"
@@ -1226,9 +1232,13 @@
 
       <command
          id             ="command.net.tourbook.ui.views.sensors.SensorView"
-         name           ="%View_Name_Sensors"
-         defaultHandler ="net.tourbook.ui.views.sensors.ActionHandler_OpenView_SensorView"
-      />
+         name           ="%View_Name_Sensor"
+         defaultHandler ="net.tourbook.ui.views.sensors.ActionHandler_OpenView_SensorView"/>
+
+      <command
+         id             ="command.net.tourbook.ui.views.sensors.SensorChartView"
+         name           ="%View_Name_SensorChart"
+         defaultHandler ="net.tourbook.ui.views.sensors.ActionHandler_OpenView_SensorChartView"/>
 
       <command
          id             ="command.net.tourbook.ui.views.TourMarkerAllView"
@@ -1857,9 +1867,16 @@
          <view
             category    ="net.tourbook.category.Equipment"
             class       ="net.tourbook.ui.views.sensors.SensorView"
-            icon        ="icons/map2-view.png"
+            icon        ="icons/sensor.png"
             id          ="net.tourbook.ui.views.sensors.SensorView.ID"
-            name        ="%View_Name_Sensors"/>
+            name        ="%View_Name_Sensor"/>
+
+         <view
+            category    ="net.tourbook.category.Equipment"
+            class       ="net.tourbook.ui.views.sensors.SensorChartView"
+            icon        ="icons/sensor-chart.png"
+            id          ="net.tourbook.ui.views.sensors.SensorChartView.ID"
+            name        ="%View_Name_SensorChart"/>
 
 
       <!-- 99. System -->    

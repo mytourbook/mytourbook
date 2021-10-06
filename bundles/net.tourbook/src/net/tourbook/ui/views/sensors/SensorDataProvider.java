@@ -27,81 +27,32 @@ import java.time.LocalDateTime;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
-import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.TourTypeFilter;
 
-public class DataProvider_Sensor extends DataProvider {
+public class SensorDataProvider {
 
-   private TourStatisticData_Sensor _sensorData;
+   private static final char        NL = UI.NEW_LINE;
 
-   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
-
-      if (_sensorData == null) {
-         return null;
-      }
-
-      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
-         return statistic_RawStatisticValues;
-      }
-
-      final StringBuilder sb = new StringBuilder();
-
-      // cache values
-      statistic_RawStatisticValues = sb.toString();
-      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
-
-      return statistic_RawStatisticValues;
-   }
 
    /**
     * Retrieve chart data from the database
     *
-    * @param person
-    * @param tourTypeFilter
-    * @param lastYear
-    * @param numYears
-    * @param isForceUpdate
     * @return
     */
-   TourStatisticData_Sensor getTourTimeData(final TourPerson person,
-                                            final TourTypeFilter tourTypeFilter,
-                                            final int lastYear,
-                                            final int numYears,
-                                            final boolean isForceUpdate) {
-
-      // don't reload data which are already here
-      if (statistic_ActivePerson == person
-            && statistic_ActiveTourTypeFilter == tourTypeFilter
-            && statistic_LastYear == lastYear
-            && statistic_NumberOfYears == numYears
-            && isForceUpdate == false) {
-
-         return _sensorData;
-      }
-
-      // reset cached values
-      statistic_RawStatisticValues = null;
+   SensorData getTourTimeData(final long sensorId) {
 
       String sql = null;
 
+      SensorData sensorData = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         statistic_ActivePerson = person;
-         statistic_ActiveTourTypeFilter = tourTypeFilter;
-
-         statistic_LastYear = lastYear;
-         statistic_NumberOfYears = numYears;
-
-         final long sensorId = 5;
-
-         final int firstYear = lastYear - numYears;
-         final long firstDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2004, 1, 1, 0, 0, 0));
-         final long lastDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2021 + 1, 1, 1, 0, 0, 0));
+         final long firstDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2000, 1, 1, 0, 0, 0));
+         final long lastDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2100 + 1, 1, 1, 0, 0, 0));
 
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                             //$NON-NLS-1$
+               + "SELECT" + NL
 
                + "   DEVICESENSOR_SENSORID," + NL //                       1  //$NON-NLS-1$
                + "   TourStartTime," + NL //                               2  //$NON-NLS-1$
@@ -167,16 +118,16 @@ public class DataProvider_Sensor extends DataProvider {
          /*
           * Create external data
           */
-         _sensorData = new TourStatisticData_Sensor();
+         sensorData = new SensorData();
 
-         _sensorData.allXValues = allXValues.toArray();
-         _sensorData.allBatteryVoltage = allBatteryVoltage.toArray();
+         sensorData.allXValues = allXValues.toArray();
+         sensorData.allBatteryVoltage = allBatteryVoltage.toArray();
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       }
 
-      return _sensorData;
+      return sensorData;
    }
 
 }

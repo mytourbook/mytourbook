@@ -15,32 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
-import java.util.Map;
+public class SensorData {
 
-import net.tourbook.Images;
-import net.tourbook.common.util.Util;
-import net.tourbook.ui.UI;
+   public int[]   allXValues;
+   public float[] allBatteryVoltage;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.commands.IElementUpdater;
-import org.eclipse.ui.menus.UIElement;
-
-public class ActionHandler_OpenView_SensorView extends AbstractHandler implements IElementUpdater {
-
-   @Override
-   public Object execute(final ExecutionEvent event) throws ExecutionException {
-
-      Util.showView(SensorView.ID, true);
-
-      return null;
-   }
-
-   @SuppressWarnings("rawtypes")
-   @Override
-   public void updateElement(final UIElement uiElement, final Map parameters) {
-
-      UI.setThemedIcon(uiElement, Images.Sensor);
-   }
 }

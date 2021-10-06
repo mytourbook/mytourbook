@@ -248,20 +248,20 @@ public class Messages extends NLS {
    public static String        ColumnFactory_GearTeeth_Header;
    public static String        ColumnFactory_GearTeeth_Label;
    public static String        ColumnFactory_GearTeeth_Tooltip;
-   
+
    public static String        ColumnFactory_Id_Label;
    public static String        ColumnFactory_Id_Tooltip;
-   
+
    public static String        ColumnFactory_ImportStatus_Header;
    public static String        ColumnFactory_ImportStatus_Label;
    public static String        ColumnFactory_ImportStatus_Tooltip;
-   
+
    public static String        ColumnFactory_InetAddress_Label;
    public static String        ColumnFactory_InetAddress_Url;
-   
+
    public static String        ColumnFactory_Motion_Altimeter;
    public static String        ColumnFactory_Motion_Altimeter_Tooltip;
-   
+
    public static String        ColumnFactory_NumberOfGPSPhotos_Header;
    public static String        ColumnFactory_NumberOfGPSPhotos_Label;
    public static String        ColumnFactory_NumberOfGPSPhotos_Tooltip;
@@ -280,11 +280,11 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
-   
+
    public static String        ColumnFactory_PhotoTimeAdjustment_Header;
    public static String        ColumnFactory_PhotoTimeAdjustment_Label;
    public static String        ColumnFactory_PhotoTimeAdjustment_Tooltip;
-   
+
    public static String        ColumnFactory_Power_Avg_Header;
    public static String        ColumnFactory_Power_Avg_Label;
    public static String        ColumnFactory_Power_Avg_Tooltip;
@@ -328,7 +328,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
    public static String        ColumnFactory_Power_TrainingStressScore_Label;
    public static String        ColumnFactory_Power_TrainingStressScore_Tooltip;
-   
+
    public static String        ColumnFactory_Pulse_RR;
    public static String        ColumnFactory_Pulse_RR_Index;
    public static String        ColumnFactory_Pulse_RR_Index_Tooltip;
@@ -339,7 +339,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_restpulse_label;
    public static String        ColumnFactory_restpulse;
    public static String        ColumnFactory_restpulse_tooltip;
-   
+
    public static String        ColumnFactory_RunDyn_StanceTime_Avg;
    public static String        ColumnFactory_RunDyn_StanceTime_Avg_Header;
    public static String        ColumnFactory_RunDyn_StanceTime_Max;
@@ -361,7 +361,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_RunDyn_VerticalRatio_Avg;
    public static String        ColumnFactory_RunDyn_VerticalRatio_Max;
    public static String        ColumnFactory_RunDyn_VerticalRatio_Min;
-   
+
    public static String        ColumnFactory_Segment_Ascent_Label;
    public static String        ColumnFactory_Segment_Ascent_Tooltip;
    public static String        ColumnFactory_Segment_Descent_Label;
@@ -373,6 +373,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_ProductName;
    public static String        ColumnFactory_Sensor_ProductNumber;
    public static String        ColumnFactory_Sensor_SerialNumber;
+   public static String        ColumnFactory_Sensor_Time_LastUsed;
+   public static String        ColumnFactory_Sensor_Time_FirstUsed;
    public static String        ColumnFactory_SensorName;
    public static String        ColumnFactory_SensorName_Tooltip;
 

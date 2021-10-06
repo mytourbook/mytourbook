@@ -218,6 +218,10 @@ public abstract class TableColumnFactory {
    public static final String             SENSOR_PRODUCT_NUMBER_ID                           = "SENSOR_PRODUCT_NUMBER";                           //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_SERIAL_NUMBER;
    public static final String             SENSOR_SERIAL_NUMBER_ID                            = "SENSOR_SERIAL_NUMBER";                            //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_TIME_FIRST_USED;
+   public static final String             SENSOR_TIME_FIRST_USED_ID                          = "SENSOR_TIME_FIRST_USED";                          //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_TIME_LAST_USED;
+   public static final String             SENSOR_TIME_LAST_USED_ID                           = "SENSOR_TIME_LAST_USED";                           //$NON-NLS-1$
 
    public static final TableColumnFactory STATE_DB_STATUS;
    public static final TableColumnFactory STATE_IMPORT_STATE;
@@ -2831,6 +2835,44 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_SerialNumber);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_SerialNumber);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_TIME_FIRST_USED = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_TIME_FIRST_USED_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_Time_FirstUsed);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_Time_FirstUsed);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_TIME_LAST_USED= new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_TIME_LAST_USED_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_Time_LastUsed);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_Time_LastUsed);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
