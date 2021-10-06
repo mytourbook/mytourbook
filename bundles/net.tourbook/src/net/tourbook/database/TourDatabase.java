@@ -812,7 +812,7 @@ public class TourDatabase {
          return;
       }
 
-      final ArrayList<DeviceSensor> allNewSensors = new ArrayList<>();
+      final ArrayList<DeviceSensor> allNotSavedSensors = new ArrayList<>();
 
       final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors());
 
@@ -840,13 +840,13 @@ public class TourDatabase {
 
             // sensor not available -> create a new sensor
 
-            allNewSensors.add(tourData_Sensor);
+            allNotSavedSensors.add(tourData_Sensor);
          }
       }
 
       boolean isNewSensorSaved = false;
 
-      if (allNewSensors.size() > 0) {
+      if (allNotSavedSensors.size() > 0) {
 
          // create new sensors
 
@@ -854,7 +854,7 @@ public class TourDatabase {
 
             HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors());
 
-            for (final DeviceSensor newSensor : allNewSensors) {
+            for (final DeviceSensor newSensor : allNotSavedSensors) {
 
                // check again, sensor list could be updated in another thread
                final DeviceSensor dbSensor = allDbSensors_InLock.get(newSensor.getSerialNumber().toUpperCase());
@@ -1073,8 +1073,6 @@ public class TourDatabase {
          _allDbDeviceSensors_BySerialNo.clear();
          _allDbDeviceSensors_BySerialNo = null;
       }
-
-      TourTypeImage.setTourTypeImagesDirty();
    }
 
    /**
@@ -2641,7 +2639,6 @@ public class TourDatabase {
       return false;
    }
 
-   @SuppressWarnings("unchecked")
    private static void loadAllDeviceSensors() {
 
       synchronized (DB_LOCK) {
@@ -2651,9 +2648,7 @@ public class TourDatabase {
             return;
          }
 
-         // create empty list
-         ArrayList<DeviceSensor> allDbDeviceSensors = new ArrayList<>();
-         _allDbDeviceSensors_BySerialNo = new HashMap<>();
+         final Map<String, DeviceSensor> allDbDeviceSensors_BySerialNo = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -2664,14 +2659,22 @@ public class TourDatabase {
                   + " FROM DeviceSensor AS DeviceSensor" //       //$NON-NLS-1$
             );
 
-            allDbDeviceSensors = (ArrayList<DeviceSensor>) emQuery.getResultList();
+            final List<?> resultList = emQuery.getResultList();
 
-            for (final DeviceSensor sensor : allDbDeviceSensors) {
-               _allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
+            for (final Object result : resultList) {
+
+               if (result instanceof DeviceSensor) {
+
+                  final DeviceSensor sensor = (DeviceSensor) result;
+
+                  allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
+               }
             }
 
             em.close();
          }
+
+         _allDbDeviceSensors_BySerialNo = allDbDeviceSensors_BySerialNo;
       }
    }
 
@@ -2684,6 +2687,9 @@ public class TourDatabase {
             return;
          }
 
+         final HashMap<Long, TourTag> allTourTags_ByTagId = new HashMap<>();
+         final HashMap<String, TourTag> allTourTags_ByTagName = new HashMap<>();
+
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
 
@@ -2692,9 +2698,6 @@ public class TourDatabase {
                   + "SELECT tourTag" //                                             //$NON-NLS-1$
                   + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //   //$NON-NLS-1$ //$NON-NLS-2$
 
-            _allTourTags_ByTagId = new HashMap<>();
-            _allTourTags_ByTagName = new HashMap<>();
-
             final List<?> resultList = emQuery.getResultList();
             for (final Object result : resultList) {
 
@@ -2702,13 +2705,16 @@ public class TourDatabase {
 
                   final TourTag tourTag = (TourTag) result;
 
-                  _allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
-                  _allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);
+                  allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
+                  allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);
                }
             }
 
             em.close();
          }
+
+         _allTourTags_ByTagId = allTourTags_ByTagId;
+         _allTourTags_ByTagName = allTourTags_ByTagName;
       }
    }
 
@@ -2722,10 +2728,9 @@ public class TourDatabase {
             return;
          }
 
-         // create empty list
-         _allDbTourTypes = new ArrayList<>();
-         _allDbTourTypes_ByName = new HashMap<>();
-         _allDbTourTypes_ById = new HashMap<>();
+         ArrayList<TourType> allDbTourTypes = new ArrayList<>();
+         final HashMap<Long, TourType> allDbTourTypes_ById = new HashMap<>();
+         final HashMap<String, TourType> allDbTourTypes_ByName = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -2736,16 +2741,20 @@ public class TourDatabase {
                   + " FROM TourType AS tourType" //   //$NON-NLS-1$
                   + " ORDER  BY tourType.name"); //   //$NON-NLS-1$
 
-            _allDbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
+            allDbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
 
-            for (final TourType tourType : _allDbTourTypes) {
+            for (final TourType tourType : allDbTourTypes) {
 
-               _allDbTourTypes_ByName.put(tourType.getName().toUpperCase(), tourType);
-               _allDbTourTypes_ById.put(tourType.getTypeId(), tourType);
+               allDbTourTypes_ById.put(tourType.getTypeId(), tourType);
+               allDbTourTypes_ByName.put(tourType.getName().toUpperCase(), tourType);
             }
 
             em.close();
          }
+
+         _allDbTourTypes = allDbTourTypes;
+         _allDbTourTypes_ById = allDbTourTypes_ById;
+         _allDbTourTypes_ByName = allDbTourTypes_ByName;
       }
    }
 
@@ -3012,6 +3021,7 @@ public class TourDatabase {
 
          } catch (final Exception e) {
 
+            StatusUtil.logError("Exception in tour " + TourManager.getTourDateTimeShort(tourData));//$NON-NLS-1$
             StatusUtil.showStatus(e);
 
          } finally {
