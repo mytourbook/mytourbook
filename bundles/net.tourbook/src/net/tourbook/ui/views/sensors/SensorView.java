@@ -23,6 +23,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import net.tourbook.application.TourbookPlugin;
@@ -37,8 +38,12 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.DeviceSensor;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -64,13 +69,13 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -95,6 +100,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
+   private ITourEventListener      _tourPropertyListener;
 
    private PostSelectionProvider   _postSelectionProvider;
 
@@ -103,7 +109,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private ColumnManager           _columnManager;
    private SelectionAdapter        _columnSortListener;
 
-   private List<SensorItem>        _allSensors                     = new ArrayList<>();
+   private List<SensorItem>        _allSensorItems                 = new ArrayList<>();
 
    private MenuManager             _viewerMenuManager;
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
@@ -147,15 +153,21 @@ public class SensorView extends ViewPart implements ITourViewer {
          switch (__sortColumnId) {
 
          case TableColumnFactory.SENSOR_MANUFACTURER_NAME_ID:
-            rc = item1.manufacturerName.compareTo(item2.manufacturerName);
+            rc = item1.sensor.getManufacturerName().compareTo(item2.sensor.getManufacturerName());
             break;
 
          case TableColumnFactory.SENSOR_PRODUCT_NAME_ID:
-            rc = item1.productName.compareTo(item2.productName);
+            rc = item1.sensor.getProductName().compareTo(item2.sensor.getProductName());
             break;
 
          case TableColumnFactory.SENSOR_SERIAL_NUMBER_ID:
-            rc = item1.serialNumber.compareTo(item2.serialNumber);
+            rc = item1.sensor.getSerialNumber().compareTo(item2.sensor.getSerialNumber());
+            break;
+
+         case TableColumnFactory.SENSOR_STATE_BATTERY_VALUES_ID:
+            final int isBatteryValueAvailable1 = item1.isBatteryValuesAvailable ? 1 : 0;
+            final int isBatteryValueAvailable2 = item2.isBatteryValuesAvailable ? 1 : 0;
+            rc = isBatteryValueAvailable1 - isBatteryValueAvailable2;
             break;
 
          case TableColumnFactory.SENSOR_TIME_FIRST_USED_ID:
@@ -168,7 +180,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
          case TableColumnFactory.SENSOR_NAME_ID:
          default:
-            rc = item1.sensorName.compareTo(item2.sensorName);
+            rc = item1.sensor.getSensorName().compareTo(item2.sensor.getSensorName());
          }
 
          // If descending order, flip the direction
@@ -216,7 +228,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       @Override
       public Object[] getElements(final Object inputElement) {
-         return _allSensors.toArray();
+         return _allSensorItems.toArray();
       }
 
       @Override
@@ -225,20 +237,12 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    class SensorItem {
 
-      long   sensorId;
-      String sensorName;
+      DeviceSensor sensor;
 
-      int    manufacturerNumber;
-      String manufacturerName;
+      long         usedFirstTime;
+      long         usedLastTime;
 
-      int    productNumber;
-      String productName;
-
-      String description;
-      String serialNumber;
-
-      long   usedFirstTime;
-      long   usedLastTime;
+      boolean      isBatteryValuesAvailable;
 
       @Override
       public boolean equals(final Object obj) {
@@ -258,7 +262,7 @@ public class SensorView extends ViewPart implements ITourViewer {
             return false;
          }
 
-         return sensorId == other.sensorId;
+         return sensor.getSensorId() == other.sensor.getSensorId();
       }
 
       private SensorView getEnclosingInstance() {
@@ -271,7 +275,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          final int prime = 31;
          int result = 1;
          result = prime * result + getEnclosingInstance().hashCode();
-         result = prime * result + Objects.hash(sensorId);
+         result = prime * result + Objects.hash(sensor.getSensorId());
 
          return result;
       }
@@ -388,6 +392,25 @@ public class SensorView extends ViewPart implements ITourViewer {
       _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
+   private void addTourEventListener() {
+
+      _tourPropertyListener = (part, eventId, eventData) -> {
+
+         if (part == SensorView.this) {
+            return;
+         }
+
+         if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+            // new tours could be imported with new sensors
+
+            reloadViewer();
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourPropertyListener);
+   }
+
    private void createActions() {
 
    }
@@ -421,6 +444,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       addPrefListener();
       addPartListener();
+      addTourEventListener();
 
       // set this view part as selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
@@ -458,17 +482,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      /*
-       * It took a while that the correct listener is set and also the checked item is fired and not
-       * the wrong selection.
-       */
-      table.addListener(SWT.Selection, new Listener() {
-
-         @Override
-         public void handleEvent(final Event event) {
-            onSelect_Sensor(event);
-         }
-      });
+      table.addListener(SWT.Selection, event -> onSensor_Select(event));
 
       /*
        * create table viewer
@@ -526,6 +540,29 @@ public class SensorView extends ViewPart implements ITourViewer {
       defineColumn_SerialNumber();
       defineColumn_Time_FirstUsed();
       defineColumn_Time_LastUsed();
+      defineColumn_BatteryValueState();
+   }
+
+   /**
+    * Column: Battery value state
+    */
+   private void defineColumn_BatteryValueState() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_STATE_BATTERY_VALUES.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.isBatteryValuesAvailable
+                  ? UI.SYMBOL_BOX
+                  : UI.EMPTY_STRING);
+         }
+      });
    }
 
    /**
@@ -542,8 +579,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(sensor.manufacturerName);
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getManufacturerName());
          }
       });
    }
@@ -559,8 +596,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(Integer.toString(sensor.manufacturerNumber));
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(Integer.toString(sensorItem.sensor.getManufacturerNumber()));
          }
       });
    }
@@ -579,8 +616,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(sensor.productName);
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getProductName());
          }
       });
    }
@@ -596,8 +633,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(Integer.toString(sensor.productNumber));
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(Integer.toString(sensorItem.sensor.getProductNumber()));
          }
       });
    }
@@ -613,8 +650,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(sensor.description);
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getDescription());
          }
       });
    }
@@ -633,8 +670,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(sensor.sensorName);
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getSensorName());
          }
       });
    }
@@ -653,8 +690,8 @@ public class SensorView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            final SensorItem sensor = (SensorItem) cell.getElement();
-            cell.setText(sensor.serialNumber);
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getSerialNumber());
          }
       });
    }
@@ -706,6 +743,8 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
+
+      TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
       super.dispose();
    }
@@ -789,69 +828,40 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void loadAllSensors() {
 
-      PreparedStatement statement = null;
+      /*
+       * Create sensor items for all sensors
+       */
+      final Map<Long, DeviceSensor> allDbDeviceSensors = TourDatabase.getAllDeviceSensors_BySensorID();
+      final HashMap<Long, SensorItem> allSensorItems = new HashMap<>();
+
+      for (final DeviceSensor sensor : allDbDeviceSensors.values()) {
+
+         final SensorItem sensorItem = new SensorItem();
+         sensorItem.sensor = sensor;
+
+         allSensorItems.put(sensor.getSensorId(), sensorItem);
+      }
+
       PreparedStatement statementMinMax = null;
-      ResultSet result = null;
       ResultSet resultMinMax = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final HashMap<Long, SensorItem> allSensorItems = new HashMap<>();
-
-         String sql = UI.EMPTY_STRING
-
-               + "SELECT" + NL //                              //$NON-NLS-1$
-
-               + "   sensorId," + NL //                     1  //$NON-NLS-1$
-               + "   sensorName," + NL //                   2  //$NON-NLS-1$
-               + "   manufacturerNumber," + NL //           3  //$NON-NLS-1$
-               + "   manufacturerName," + NL //             4  //$NON-NLS-1$
-               + "   productNumber," + NL //                5  //$NON-NLS-1$
-               + "   productName," + NL //                  6  //$NON-NLS-1$
-               + "   description," + NL //                  7  //$NON-NLS-1$
-               + "   serialNumber" + NL //                  8  //$NON-NLS-1$
-
-               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR + NL //     //$NON-NLS-1$
-         ;
-
-         statement = conn.prepareStatement(sql);
-         result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final SensorItem sensorItem = new SensorItem();
-
-            final long sensorId = result.getLong(1);
-
-// SET_FORMATTING_OFF
-
-            sensorItem.sensorId           =                 sensorId;
-            sensorItem.sensorName         = getCheckedValue(result.getString(2));
-            sensorItem.manufacturerNumber =                 result.getInt(3);
-            sensorItem.manufacturerName   = getCheckedValue(result.getString(4));
-            sensorItem.productNumber      =                 result.getInt(5);
-            sensorItem.productName        = getCheckedValue(result.getString(6));
-            sensorItem.description        = getCheckedValue(result.getString(7));
-            sensorItem.serialNumber       =                 result.getString(8);
-
-// SET_FORMATTING_ON
-
-            allSensorItems.put(sensorId, sensorItem);
-         }
-
          /*
           * Set used start/end time
           */
-         sql = UI.EMPTY_STRING
+         final String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                             //$NON-NLS-1$
+               + "SELECT" + NL //                                                //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SENSORID," + NL //                          //$NON-NLS-1$
-               + "   Min(TOURSTARTTIME)," + NL //                             //$NON-NLS-1$
-               + "   Max(TOURSTARTTIME)" + NL //                              //$NON-NLS-1$
+               + "   DEVICESENSOR_SENSORID," + NL //                          1  //$NON-NLS-1$
+               + "   Min(TourStartTime)," + NL //                             2  //$NON-NLS-1$
+               + "   Max(TourStartTime)," + NL //                             3  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_Start)," + NL //                      4  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_End)" + NL //                         5  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //     //$NON-NLS-1$
-               + "GROUP BY DEVICESENSOR_SENSORID" + NL //                     //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //        //$NON-NLS-1$
+               + "GROUP BY DEVICESENSOR_SENSORID" + NL //                        //$NON-NLS-1$
          ;
 
          statementMinMax = conn.prepareStatement(sql);
@@ -868,13 +878,20 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             } else {
 
-               sensorItem.usedFirstTime = resultMinMax.getLong(2);
-               sensorItem.usedLastTime = resultMinMax.getLong(3);
+               final long dbUsedFirstTime = resultMinMax.getLong(2);
+               final long dbUsedLastTime = resultMinMax.getLong(3);
+               final float dbMaxValue_Start = resultMinMax.getFloat(4);
+               final float dbMaxValue_End = resultMinMax.getFloat(5);
+
+               sensorItem.usedFirstTime = dbUsedFirstTime;
+               sensorItem.usedLastTime = dbUsedLastTime;
+
+               sensorItem.isBatteryValuesAvailable = dbMaxValue_Start > 0 | dbMaxValue_End > 0;
             }
          }
 
-         _allSensors.clear();
-         _allSensors.addAll(allSensorItems.values());
+         _allSensorItems.clear();
+         _allSensorItems.addAll(allSensorItems.values());
 
       } catch (final SQLException e) {
 
@@ -882,23 +899,8 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       } finally {
 
-         Util.closeSql(statement);
          Util.closeSql(statementMinMax);
-         Util.closeSql(result);
          Util.closeSql(resultMinMax);
-      }
-   }
-
-   private void onSelect_Sensor(final Event event) {
-
-      if (_isInUpdate) {
-         return;
-      }
-
-      final IStructuredSelection selection = _sensorViewer.getStructuredSelection();
-
-      if (selection.getFirstElement() != null) {
-         _postSelectionProvider.setSelection(selection);
       }
    }
 
@@ -920,14 +922,52 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void onSensor_DoubleClick() {
 
-//      final TourMarker tourMarker = getSelectedTourMarker();
-//
-//      if (tourMarker == null) {
-//         return;
-//      }
-//
-//      _actionOpenMarkerDialog.setTourMarker(tourMarker);
-//      _actionOpenMarkerDialog.run();
+      final Object firstElement = _sensorViewer.getStructuredSelection().getFirstElement();
+
+      if (firstElement != null) {
+
+         final SensorItem sensorItem = (SensorItem) firstElement;
+
+         final long sensorId = sensorItem.sensor.getSensorId();
+         final DeviceSensor sensor = TourDatabase.getAllDeviceSensors_BySensorID().get(sensorId);
+
+         if (new DialogSensor(_viewerContainer.getShell(), sensor).open() != Window.OK) {
+
+            _sensorViewer.getTable().setFocus();
+
+            return;
+         }
+
+         // update model
+         final DeviceSensor savedSensor = TourDatabase.saveEntity(sensor, sensorId, DeviceSensor.class);
+         sensorItem.sensor = savedSensor;
+
+         // update UI - resort and preserve selection
+         _viewerContainer.setRedraw(false);
+         {
+            // keep selection
+            final ISelection selectionBackup = getViewerSelection();
+            {
+               _sensorViewer.refresh();
+            }
+            updateUI_SelectSensor(selectionBackup);
+         }
+         _viewerContainer.setRedraw(true);
+
+      }
+   }
+
+   private void onSensor_Select(final Event event) {
+
+      if (_isInUpdate) {
+         return;
+      }
+
+      final IStructuredSelection selection = _sensorViewer.getStructuredSelection();
+
+      if (selection.getFirstElement() != null) {
+         _postSelectionProvider.setSelection(selection);
+      }
    }
 
    @Override

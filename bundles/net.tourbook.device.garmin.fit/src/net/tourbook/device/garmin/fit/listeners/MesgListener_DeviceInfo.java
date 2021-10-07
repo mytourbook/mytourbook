@@ -357,7 +357,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       /*
        * Get sensor
        */
-      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors();
+      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySerialNo();
 
       DeviceSensor sensor = allDbSensors.get(sensorSerialNumberKey);
 

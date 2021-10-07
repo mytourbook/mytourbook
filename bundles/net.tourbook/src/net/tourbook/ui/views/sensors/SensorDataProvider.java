@@ -17,22 +17,20 @@ package net.tourbook.ui.views.sensors;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.database.TourDatabase;
 
 public class SensorDataProvider {
 
-   private static final char        NL = UI.NEW_LINE;
-
+   private static final char NL = UI.NEW_LINE;
 
    /**
     * Retrieve chart data from the database
@@ -47,46 +45,45 @@ public class SensorDataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final long firstDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2000, 1, 1, 0, 0, 0));
-         final long lastDateTime = TimeTools.toEpochMilli(LocalDateTime.of(2100 + 1, 1, 1, 0, 0, 0));
-
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL
 
-               + "   DEVICESENSOR_SENSORID," + NL //                       1  //$NON-NLS-1$
-               + "   TourStartTime," + NL //                               2  //$NON-NLS-1$
-               + "   BatteryVoltage_Start," + NL //                        3  //$NON-NLS-1$
-               + "   BatteryVoltage_End" + NL //                           4  //$NON-NLS-1$
+               + "   DEVICESENSOR_SensorID," + NL //                       1  //$NON-NLS-1$
+               + "   TOURDATA_TourID," + NL //                             2  //$NON-NLS-1$
+               + "   TourStartTime," + NL //                               3  //$NON-NLS-1$
+               + "   BatteryVoltage_Start," + NL //                        4  //$NON-NLS-1$
+               + "   BatteryVoltage_End" + NL //                           5  //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //     //$NON-NLS-1$
 
                + "WHERE" + NL //                                              //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SENSORID = ?     AND " + NL //              //$NON-NLS-1$
-               + "   TourStartTime >= ?            AND " + NL //              //$NON-NLS-1$
-               + "   TourStartTime < ?" + NL //                               //$NON-NLS-1$
+               + "   DEVICESENSOR_SensorID = ?" + NL //                       //$NON-NLS-1$
 
                + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
          ;
 
          final TFloatArrayList allBatteryVoltage = new TFloatArrayList();
          final TIntArrayList allXValues = new TIntArrayList();
-         int xValueCounter = 0;
+         final TLongArrayList allTourIds = new TLongArrayList();
+         final TLongArrayList allTourStartTime = new TLongArrayList();
+
+         int numXValue = 0;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
          prepStmt.setLong(1, sensorId);
-         prepStmt.setLong(2, firstDateTime);
-         prepStmt.setLong(3, lastDateTime);
 
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
 // SET_FORMATTING_OFF
 
-            final float dbBatteryVoltage_Start  = result.getFloat(3);
-            final float dbBatteryVoltage_End    = result.getFloat(4);
+            final long dbTourId                 = result.getLong(2);
+            final long dbTourStartTime          = result.getLong(3);
+            final float dbBatteryVoltage_Start  = result.getFloat(4);
+            final float dbBatteryVoltage_End    = result.getFloat(5);
 
 // SET_FORMATTING_ON
 
@@ -96,23 +93,19 @@ public class SensorDataProvider {
             if (isStartAvailable) {
 
                allBatteryVoltage.add(dbBatteryVoltage_Start);
-               allXValues.add(xValueCounter++);
+               allXValues.add(numXValue++);
+
+               allTourIds.add(dbTourId);
+               allTourStartTime.add(dbTourStartTime);
             }
 
             if (isEndAvailable) {
 
                allBatteryVoltage.add(dbBatteryVoltage_End);
-               allXValues.add(xValueCounter++);
+               allXValues.add(numXValue++);
+               allTourIds.add(dbTourId);
+               allTourStartTime.add(dbTourStartTime);
             }
-         }
-
-         // ensure that valid data are set
-         if (allXValues.size() == 0) {
-
-            allBatteryVoltage.add(-1);
-            allBatteryVoltage.add(1);
-            allXValues.add(xValueCounter++);
-            allXValues.add(xValueCounter++);
          }
 
          /*
@@ -122,6 +115,8 @@ public class SensorDataProvider {
 
          sensorData.allXValues = allXValues.toArray();
          sensorData.allBatteryVoltage = allBatteryVoltage.toArray();
+         sensorData.allTourIds = allTourIds.toArray();
+         sensorData.allTourStartTime = allTourStartTime.toArray();
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);

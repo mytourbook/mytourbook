@@ -218,6 +218,8 @@ public abstract class TableColumnFactory {
    public static final String             SENSOR_PRODUCT_NUMBER_ID                           = "SENSOR_PRODUCT_NUMBER";                           //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_SERIAL_NUMBER;
    public static final String             SENSOR_SERIAL_NUMBER_ID                            = "SENSOR_SERIAL_NUMBER";                            //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_STATE_BATTERY_VALUES;
+   public static final String             SENSOR_STATE_BATTERY_VALUES_ID                     = "SENSOR_STATE_BATTERY_VALUES";                     //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_TIME_FIRST_USED;
    public static final String             SENSOR_TIME_FIRST_USED_ID                          = "SENSOR_TIME_FIRST_USED";                          //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_TIME_LAST_USED;
@@ -2718,9 +2720,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_SensorName);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_SensorName);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_SensorName_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_Name);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_Name);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_Name_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2842,6 +2844,26 @@ public abstract class TableColumnFactory {
          }
       };
 
+      SENSOR_STATE_BATTERY_VALUES = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_STATE_BATTERY_VALUES_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_StateBatteryValues);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_StateBatteryValues);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_StateBatteryValues_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
       SENSOR_TIME_FIRST_USED = new TableColumnFactory() {
 
          @Override
@@ -2881,7 +2903,7 @@ public abstract class TableColumnFactory {
       };
 
       /*
-       * State
+       * States
        */
 
       STATE_DB_STATUS = new TableColumnFactory() {

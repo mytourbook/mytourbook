@@ -300,6 +300,11 @@ public class TourDatabase {
    private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
 
    /**
+    * Key is sensor ID
+    */
+   private static volatile Map<Long, DeviceSensor>        _allDbDeviceSensors_BySensorID;
+
+   /**
     * Key is the serial number in UPPERCASE
     */
    private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNo;
@@ -814,7 +819,7 @@ public class TourDatabase {
 
       final ArrayList<DeviceSensor> allNotSavedSensors = new ArrayList<>();
 
-      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors());
+      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors_BySerialNo());
 
       // loop: all sensor values in the tour -> find sensors which are not yet saved
       for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
@@ -852,7 +857,7 @@ public class TourDatabase {
 
          synchronized (TRANSIENT_LOCK) {
 
-            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors());
+            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
 
             for (final DeviceSensor newSensor : allNotSavedSensors) {
 
@@ -882,7 +887,7 @@ public class TourDatabase {
                clearDeviceSensors();
                TourManager.getInstance().clearTourDataCache();
 
-               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors());
+               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
 
                // loop: all sensor values in the tour -> find sensors which are not yet saved
                for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
@@ -1069,9 +1074,13 @@ public class TourDatabase {
    public static synchronized void clearDeviceSensors() {
 
       if (_allDbDeviceSensors_BySerialNo != null) {
-
          _allDbDeviceSensors_BySerialNo.clear();
          _allDbDeviceSensors_BySerialNo = null;
+      }
+
+      if (_allDbDeviceSensors_BySensorID != null) {
+         _allDbDeviceSensors_BySensorID.clear();
+         _allDbDeviceSensors_BySensorID = null;
       }
    }
 
@@ -1604,9 +1613,24 @@ public class TourDatabase {
 
    /**
     * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is
+    *         sensor ID
+    */
+   public static Map<Long, DeviceSensor> getAllDeviceSensors_BySensorID() {
+
+      if (_allDbDeviceSensors_BySensorID != null) {
+         return _allDbDeviceSensors_BySensorID;
+      }
+
+      loadAllDeviceSensors();
+
+      return _allDbDeviceSensors_BySensorID;
+   }
+
+   /**
+    * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is
     *         the serial number in UPPERCASE
     */
-   public static Map<String, DeviceSensor> getAllDeviceSensors() {
+   public static Map<String, DeviceSensor> getAllDeviceSensors_BySerialNo() {
 
       if (_allDbDeviceSensors_BySerialNo != null) {
          return _allDbDeviceSensors_BySerialNo;
@@ -2648,6 +2672,7 @@ public class TourDatabase {
             return;
          }
 
+         final Map<Long, DeviceSensor> allDbDeviceSensors_BySensorID = new HashMap<>();
          final Map<String, DeviceSensor> allDbDeviceSensors_BySerialNo = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -2667,6 +2692,7 @@ public class TourDatabase {
 
                   final DeviceSensor sensor = (DeviceSensor) result;
 
+                  allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
                   allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
                }
             }
@@ -2674,6 +2700,7 @@ public class TourDatabase {
             em.close();
          }
 
+         _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
          _allDbDeviceSensors_BySerialNo = allDbDeviceSensors_BySerialNo;
       }
    }

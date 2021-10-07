@@ -24,15 +24,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 /**
  */
 @Entity
-public class DeviceSensor {
+public class DeviceSensor implements Cloneable {
 
-   private static final String  NL                    = UI.NEW_LINE;
+   private static final char    NL                    = UI.NEW_LINE;
 
    public static final int      DB_LENGTH_NAME        = 80;
    public static final int      DB_LENGTH_DESCRIPTION = 32000;
@@ -51,11 +53,11 @@ public class DeviceSensor {
     */
    private String               sensorName;
 
-   private int                  manufacturerNumber;
    private String               manufacturerName;
+   private int                  manufacturerNumber;
 
-   private int                  productNumber;
    private String               productName;
+   private int                  productNumber;
 
    private String               description;
    private String               serialNumber          = UI.EMPTY_STRING;
@@ -63,11 +65,13 @@ public class DeviceSensor {
    /**
     * Time in ms when this sensor was first used
     */
+   @Transient
    private long                 usedStartTime;
 
    /**
     * Time in ms when this sensor was last used
     */
+   @Transient
    private long                 usedEndTime;
 
    @Transient
@@ -95,6 +99,20 @@ public class DeviceSensor {
       this.productName = productName;
 
       this.serialNumber = serialNumber;
+   }
+
+   @Override
+   public DeviceSensor clone() {
+
+      DeviceSensor newSensor = null;
+
+      try {
+         newSensor = (DeviceSensor) super.clone();
+      } catch (final CloneNotSupportedException e) {
+         e.printStackTrace();
+      }
+
+      return newSensor;
    }
 
    @Override
@@ -150,6 +168,11 @@ public class DeviceSensor {
    }
 
    public String getDescription() {
+
+      if (description == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return description;
    }
 
@@ -177,11 +200,24 @@ public class DeviceSensor {
    }
 
    public String getSensorName() {
+
+      if (sensorName == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return sensorName;
    }
 
    public String getSerialNumber() {
       return serialNumber;
+   }
+
+   public long getUsedEndTime() {
+      return usedEndTime;
+   }
+
+   public long getUsedStartTime() {
+      return usedStartTime;
    }
 
    @Override
@@ -190,16 +226,64 @@ public class DeviceSensor {
       return Objects.hash(sensorId, _createId);
    }
 
+   /**
+    * Checks if VARCHAR fields have the correct length
+    *
+    * @return Returns <code>true</code> when the data are valid and can be saved
+    */
+   public boolean isValidForSave() {
+
+      FIELD_VALIDATION fieldValidation;
+
+      /*
+       * Check: Name
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            sensorName,
+            DB_LENGTH_NAME,
+            Messages.Db_Field_SensorName);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         sensorName = sensorName.substring(0, DB_LENGTH_NAME);
+      }
+
+      /*
+       * Check: Description
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            description,
+            DB_LENGTH_DESCRIPTION,
+            Messages.Db_Field_SensorDescription);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         description = description.substring(0, DB_LENGTH_DESCRIPTION);
+      }
+
+      return true;
+   }
+
    public void setDescription(final String description) {
       this.description = description;
    }
 
-   public void setLabel(final String label) {
+   public void setSensorName(final String label) {
       this.sensorName = label;
    }
 
    public void setSerialNumber(final String serialNumber) {
       this.serialNumber = serialNumber;
+   }
+
+   public void setUsedEndTime(final long usedEndTime) {
+      this.usedEndTime = usedEndTime;
+   }
+
+   public void setUsedStartTime(final long usedStartTime) {
+      this.usedStartTime = usedStartTime;
    }
 
    @Override
@@ -220,19 +304,14 @@ public class DeviceSensor {
             + "]" + NL; //                                              //$NON-NLS-1$
    }
 
-   public long getUsedStartTime() {
-      return usedStartTime;
-   }
+   /**
+    * Updates values from a modified {@link DeviceSensor}
+    *
+    * @param modifiedSensor
+    */
+   public void updateFromModified(final DeviceSensor modifiedSensor) {
 
-   public void setUsedStartTime(long usedStartTime) {
-      this.usedStartTime = usedStartTime;
-   }
-
-   public long getUsedEndTime() {
-      return usedEndTime;
-   }
-
-   public void setUsedEndTime(long usedEndTime) {
-      this.usedEndTime = usedEndTime;
+      sensorName = modifiedSensor.sensorName;
+      description = modifiedSensor.description;
    }
 }

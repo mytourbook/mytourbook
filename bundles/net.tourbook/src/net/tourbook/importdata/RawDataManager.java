@@ -389,7 +389,7 @@ public class RawDataManager {
       /*
        * Check if sensor is still unavailable in the database
        */
-      final DeviceSensor deviceSensor = TourDatabase.getAllDeviceSensors().get(serialNumberKey);
+      final DeviceSensor deviceSensor = TourDatabase.getAllDeviceSensors_BySerialNo().get(serialNumberKey);
       if (deviceSensor != null) {
          return deviceSensor;
       }

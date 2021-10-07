@@ -62,9 +62,12 @@ public class SensorChartView extends ViewPart {
     * UI controls
     */
    private PageBook  _pageBook;
+
    private Composite _pageNoData;
+   private Composite _pageNoBatteryData;
 
    private Chart     _sensorChart;
+
 
    private void addPartListener() {
 
@@ -137,12 +140,15 @@ public class SensorChartView extends ViewPart {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
+      _pageNoData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
+      _pageNoBatteryData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
 
       _sensorChart = new Chart(_pageBook, SWT.FLAT);
+      _sensorChart.setShowSlider(true);
       _sensorChart.setShowZoomActions(true);
-      _sensorChart.setDrawBarChartAtBottom(false);
-      _sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), false);
+      _sensorChart.setMouseMode(false);
+
+      _sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
       _pageBook.showPage(_pageNoData);
    }
@@ -177,15 +183,21 @@ public class SensorChartView extends ViewPart {
 
             // show selected sensor
 
-            _pageBook.showPage(_sensorChart);
-
             final SensorView.SensorItem sensorItem = (SensorView.SensorItem) firstElement;
 
-            final long sensorId = sensorItem.sensorId;
+            final long sensorId = sensorItem.sensor.getSensorId();
 
             final SensorData sensorData = _sensorDataProvider.getTourTimeData(sensorId);
 
-            updateChart(sensorData);
+            if (sensorData.allTourIds.length == 0) {
+
+               _pageBook.showPage(_pageNoBatteryData);
+
+            } else {
+
+               _pageBook.showPage(_sensorChart);
+               updateChart(sensorData);
+            }
          }
       }
    }
