@@ -32,7 +32,8 @@ Experimental
 New
 ===
 
-* 
+* Cloud: Suunto App Integration (Frederic)
+  - Support for multiple accounts
 
 
 Improvements
