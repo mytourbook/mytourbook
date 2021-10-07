@@ -62,6 +62,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
@@ -117,6 +118,19 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    @Override
    public void downloadTours() {
+
+      if (!isReady()) {
+
+         final int returnResult = PreferencesUtil.createPreferenceDialogOn(
+               Display.getCurrent().getActiveShell(),
+               PrefPageSuunto.ID,
+               null,
+               null).open();
+
+         if (returnResult != 0) {// The OK button was not clicked or if the configuration is still not ready
+            return;
+         }
+      }
 
       _numberOfAvailableTours = new int[1];
       final int[] numberOfDownloadedTours = new int[1];
