@@ -72,6 +72,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT_TOOLTIP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_SWITCHPERSONWARNING                = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_SwitchPersonWarning;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE                            = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
@@ -87,6 +88,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    private IPreferenceStore        _prefStore                       = Activator.getDefault().getPreferenceStore();
 
+   private PixelConverter          _pc;
    private final IDialogSettings   _state                           = TourbookPlugin.getState(DialogEasyImportConfig.ID);
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
@@ -152,6 +154,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
+
+      initUI(parent);
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
@@ -280,7 +284,17 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
             _dtFilterSince = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
             _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_dtFilterSince);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterSince);
+         }
+
+         {
+            final Label labelWarning = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+            labelWarning.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_SWITCHPERSONWARNING);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(3, 1)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(labelWarning);
          }
       }
    }
@@ -328,6 +342,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    @Override
    public void init(final IWorkbench workbench) {}
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+   }
 
    @Override
    public boolean okToLeave() {
