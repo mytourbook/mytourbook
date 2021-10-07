@@ -34,6 +34,7 @@ New
 
 * Cloud: Suunto App Integration (Frederic)
   - Support for multiple accounts
+  https://sourceforge.net/p/mytourbook/feature-requests/197/
 
 
 Improvements
