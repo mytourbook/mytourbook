@@ -718,7 +718,7 @@ public class Map3GradientColorManager {
       readColors();
 
       // sort by name
-      _sortedColorDefinitions = new ArrayList<>(_map3ColorDefinitions.values());
+      _sortedColorDefinitions = new ArrayList<>(getColorDefinitions().values());
       Collections.sort(_sortedColorDefinitions);
    }
 
@@ -807,7 +807,8 @@ public class Map3GradientColorManager {
     */
    public static void disposeProfileImages() {
 
-      for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
+      for (final Map3ColorDefinition colorDef : getColorDefinitions().values()) {
+
          for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
 
             final Map3ColorProfile map3ColorProfile = colorProvider.getMap3ColorProfile();
@@ -906,8 +907,17 @@ public class Map3GradientColorManager {
       if (xmlColorDefinitions == null) {
 
          // set only first default color profile as active
-         _map3ColorDefinitions.values().forEach(colorDef -> colorDef.getColorProviders().get(0).getMap3ColorProfile().setIsActiveColorProfile(
-               true));
+         getColorDefinitions().values().forEach(colorDefinition -> {
+
+            final Map3GradientColorProvider firstColorProvider = colorDefinition.getColorProviders().get(0);
+            if (firstColorProvider == null) {
+               return;
+            }
+
+            firstColorProvider.getMap3ColorProfile().setIsActiveColorProfile(true);
+         }
+
+         );
 
          return;
       }
