@@ -24,7 +24,7 @@ public abstract class TourbookCloudUploader {
    private String CLOUD_UPLOADER_ID;
    private String CLOUD_UPLOADER_NAME;
 
-   public TourbookCloudUploader(final String id, final String name) {
+   protected TourbookCloudUploader(final String id, final String name) {
       CLOUD_UPLOADER_ID = id;
       CLOUD_UPLOADER_NAME = name;
    }
