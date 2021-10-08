@@ -15,17 +15,26 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
@@ -61,13 +70,30 @@ public class SensorChartView extends ViewPart {
    /*
     * UI controls
     */
-   private PageBook  _pageBook;
+   private PageBook    _pageBook;
 
-   private Composite _pageNoData;
-   private Composite _pageNoBatteryData;
+   private Composite   _pageNoData;
+   private Composite   _pageNoBatteryData;
 
-   private Chart     _sensorChart;
+   private Chart       _sensorChart;
 
+   private ActionXAxis _actionXAxis;
+
+   private class ActionXAxis extends Action {
+
+      public ActionXAxis() {
+
+         super(Messages.Tour_Action_show_time_on_x_axis, AS_RADIO_BUTTON);
+
+         setToolTipText(Messages.Tour_Action_show_time_on_x_axis_tooltip);
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.XAxis_ShowTime));
+      }
+
+      @Override
+      public void run() {
+         onAction_XAxis();
+      }
+   }
 
    private void addPartListener() {
 
@@ -120,10 +146,18 @@ public class SensorChartView extends ViewPart {
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
+   private void createActions() {
+
+      _actionXAxis = new ActionXAxis();
+
+      fillToolbar();
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
       createUI(parent);
+      createActions();
 
       restoreState();
 
@@ -168,9 +202,43 @@ public class SensorChartView extends ViewPart {
       super.dispose();
    }
 
+   /*
+    * Fill view toolbar
+    */
+   private void fillToolbar() {
+
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_actionXAxis);
+
+      // update that actions are fully created otherwise action enable will fail
+      tbm.update(true);
+   }
+
+   /**
+    * @param tourStartTime
+    * @return Returns the tour start date time with the tour time zone, when not available with the
+    *         default time zone.
+    */
+
+   private ZonedDateTime getTourStartTime(final long tourStartTime) {
+
+      final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
+      final ZoneId tourStartTimeZoneId = TimeTools.getDefaultTimeZone();
+
+      final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+
+      return zonedStartTime;
+   }
+
    private void initUI(final Composite parent) {
 
       _tk = new FormToolkit(parent.getDisplay());
+   }
+
+   private void onAction_XAxis() {
+      // TODO Auto-generated method stub
+
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -221,11 +289,13 @@ public class SensorChartView extends ViewPart {
       final ChartDataModel chartModel = new ChartDataModel(ChartType.LINE);
 
       // set the x-axis
-      final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(sensorData.allXValues));
+      final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(sensorData.allXValues_ByTime));
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
+      xData.setStartDateTime(getTourStartTime(sensorData.firstDateTime));
       chartModel.setXData(xData);
 
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.LINE,
+            ChartType.DOT,
             sensorData.allBatteryVoltage,
             true //
       );
@@ -241,5 +311,4 @@ public class SensorChartView extends ViewPart {
       // show the data in the chart
       _sensorChart.updateChart(chartModel, false, true);
    }
-
 }

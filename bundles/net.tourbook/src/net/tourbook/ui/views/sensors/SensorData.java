@@ -17,11 +17,14 @@ package net.tourbook.ui.views.sensors;
 
 public class SensorData {
 
+   public long    firstDateTime;
+
    public long[]  allTourIds;
    public long[]  allTourStartTime;
 
-   public int[]   allXValues;
-   public float[] allBatteryVoltage;
+   public int[]   allXValues_BySequence;
+   public int[]   allXValues_ByTime;
 
+   public float[] allBatteryVoltage;
 
 }

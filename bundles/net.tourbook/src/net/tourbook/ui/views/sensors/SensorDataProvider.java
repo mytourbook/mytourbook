@@ -65,9 +65,11 @@ public class SensorDataProvider {
          ;
 
          final TFloatArrayList allBatteryVoltage = new TFloatArrayList();
-         final TIntArrayList allXValues = new TIntArrayList();
+         final TIntArrayList allXValues_BySequence = new TIntArrayList();
+         final TIntArrayList allXValues_ByTime = new TIntArrayList();
          final TLongArrayList allTourIds = new TLongArrayList();
          final TLongArrayList allTourStartTime = new TLongArrayList();
+         long firstDateTime = Long.MIN_VALUE;
 
          int numXValue = 0;
 
@@ -93,18 +95,34 @@ public class SensorDataProvider {
             if (isStartAvailable) {
 
                allBatteryVoltage.add(dbBatteryVoltage_Start);
-               allXValues.add(numXValue++);
+               allXValues_BySequence.add(numXValue++);
 
                allTourIds.add(dbTourId);
                allTourStartTime.add(dbTourStartTime);
+
+               if (firstDateTime == Long.MIN_VALUE) {
+                  firstDateTime = dbTourStartTime;
+               }
+
+               final long timeDiff = dbTourStartTime - firstDateTime;
+
+               allXValues_ByTime.add((int) (timeDiff / 1000));
             }
 
             if (isEndAvailable) {
 
                allBatteryVoltage.add(dbBatteryVoltage_End);
-               allXValues.add(numXValue++);
+               allXValues_BySequence.add(numXValue++);
                allTourIds.add(dbTourId);
                allTourStartTime.add(dbTourStartTime);
+
+               if (firstDateTime == Long.MIN_VALUE) {
+                  firstDateTime = dbTourStartTime;
+               }
+
+               final long timeDiff = dbTourStartTime - firstDateTime;
+
+               allXValues_ByTime.add((int) (timeDiff / 1000));
             }
          }
 
@@ -113,7 +131,10 @@ public class SensorDataProvider {
           */
          sensorData = new SensorData();
 
-         sensorData.allXValues = allXValues.toArray();
+         sensorData.firstDateTime = firstDateTime;
+
+         sensorData.allXValues_BySequence = allXValues_BySequence.toArray();
+         sensorData.allXValues_ByTime = allXValues_ByTime.toArray();
          sensorData.allBatteryVoltage = allBatteryVoltage.toArray();
          sensorData.allTourIds = allTourIds.toArray();
          sensorData.allTourStartTime = allTourStartTime.toArray();
