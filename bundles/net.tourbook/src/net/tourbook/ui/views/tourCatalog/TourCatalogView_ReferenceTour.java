@@ -24,9 +24,11 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -43,7 +45,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 
@@ -60,21 +61,58 @@ public class TourCatalogView_ReferenceTour extends TourChartViewPart implements 
 
    private boolean               _isInSelectionChanged;
 
+   private ITourEventListener    _tourEventListener;
+
    /*
     * UI controls
     */
-   private PageBook _pageBook;
-   private Label    _pageNoChart;
+   private PageBook  _pageBook;
+   private Composite _pageNoData;
+
+   private void addTourEventListener() {
+
+      _tourEventListener = new ITourEventListener() {
+
+         @Override
+         public void tourChanged(final IWorkbenchPart part,
+                                 final TourEventId eventId,
+                                 final Object eventData) {
+
+            if (eventId == TourEventId.UPDATE_UI) {
+
+               // ref tour is removed -> hide tour chart and wait until another tour is selected
+
+               _pageBook.showPage(_pageNoData);
+            }
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
 
    @Override
    public void createPartControl(final Composite parent) {
 
       super.createPartControl(parent);
 
+      createUI(parent);
+
+      addTourEventListener();
+
+      _pageBook.showPage(_pageNoData);
+
+      // show current selected tour
+      final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+      if (selection != null) {
+         onSelectionChanged(selection);
+      }
+   }
+
+   private void createUI(final Composite parent) {
+
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoChart = new Label(_pageBook, SWT.NONE);
-      _pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
       _tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart(), _state);
       _tourChart.setShowZoomActions(true);
@@ -112,14 +150,14 @@ public class TourCatalogView_ReferenceTour extends TourChartViewPart implements 
                   TourCatalogView_ReferenceTour.this);
          }
       });
+   }
 
-      _pageBook.showPage(_pageNoChart);
+   @Override
+   public void dispose() {
 
-      // show current selected tour
-      final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-      if (selection != null) {
-         onSelectionChanged(selection);
-      }
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
+      super.dispose();
    }
 
    @Override
@@ -287,8 +325,10 @@ public class TourCatalogView_ReferenceTour extends TourChartViewPart implements 
    public void updateChart() {
 
       if (_tourData == null) {
+         
          _activeRefId = -1;
-         _pageBook.showPage(_pageNoChart);
+         _pageBook.showPage(_pageNoData);
+         
          return;
       }
 

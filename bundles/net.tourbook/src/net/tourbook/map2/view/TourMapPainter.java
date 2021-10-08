@@ -45,6 +45,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.StatusUtil;
@@ -73,7 +74,6 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
@@ -95,7 +95,7 @@ public class TourMapPainter extends MapPainter {
    private static final int                MARKER_MARGIN     = 2;
    private static final int                MARKER_POLE       = 16;
 
-   static final IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore   _prefStore        = TourbookPlugin.getPrefStore();
 
    private static IPropertyChangeListener  _prefChangeListener;
 
@@ -127,21 +127,24 @@ public class TourMapPainter extends MapPainter {
    private static TourPainterConfiguration _tourPaintConfig;
 
    private static final NumberFormat       _nf1              = NumberFormat.getNumberInstance();
+   static {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
-   /*
-    * UI resources
-    */
    private static Color               _bgColor;
-
-   /**
-    * Tour Way Point image
-    */
-   private static Image               _twpImage;
-
    private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
 
-   private float[]                    _dataSerie;
-   private IMapColorProvider          _legendProvider;
+   /*
+    * Static UI resources
+    */
+   private static Image _tourWayPointImage;
+
+   /*
+    * None static fields
+    */
+   private float[]           _dataSerie;
+   private IMapColorProvider _legendProvider;
 
    // painting parameter
    private int     _lineWidth;
@@ -149,11 +152,6 @@ public class TourMapPainter extends MapPainter {
 
    private boolean _isFastPainting;
    private int     _fastPainting_SkippedValues;
-
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
 
    private class LoadCallbackImage implements ILoadCallBack {
 
@@ -766,17 +764,15 @@ public class TourMapPainter extends MapPainter {
       getTourPainterSettings();
 
       // create pref listener
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            final String property = event.getProperty();
+      _prefChangeListener = propertyChangeEvent -> {
 
-            // test if the color or statistic data have changed
-            if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-                  || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
+         final String property = propertyChangeEvent.getProperty();
 
-               getTourPainterSettings();
-            }
+         // test if the color or statistic data have changed
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+               || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
+
+            getTourPainterSettings();
          }
       };
 
@@ -789,8 +785,8 @@ public class TourMapPainter extends MapPainter {
       _tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
       _tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-      _twpImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
-      _twpImageBounds = _twpImage.getBounds();
+      _tourWayPointImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
+      _twpImageBounds = _tourWayPointImage.getBounds();
 
       _isImageAvailable = true;
    }
@@ -801,7 +797,7 @@ public class TourMapPainter extends MapPainter {
       Util.disposeResource(_tourEndMarker);
       Util.disposeResource(_tourStartMarker);
 
-      Util.disposeResource(_twpImage);
+      Util.disposeResource(_tourWayPointImage);
 
       _isImageAvailable = false;
    }
@@ -959,8 +955,9 @@ public class TourMapPainter extends MapPainter {
          _colorCache.dispose();
       }
 
-      if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints ||
-            _tourPaintConfig.isShowTourPauses) {
+      if (_tourPaintConfig.isShowTourMarker
+            || _tourPaintConfig.isShowWayPoints
+            || _tourPaintConfig.isShowTourPauses) {
 
          // draw marker/pauses above the tour
 
@@ -996,6 +993,7 @@ public class TourMapPainter extends MapPainter {
                      tourData,
                      latitudeSerie,
                      longitudeSerie)) {
+
                   ++staticMarkerCounter;
                }
 
@@ -1013,23 +1011,11 @@ public class TourMapPainter extends MapPainter {
                      tourData,
                      latitudeSerie,
                      longitudeSerie)) {
+
                   ++staticPauseCounter;
                }
 
                isContentInTile = isContentInTile || staticPauseCounter > 0;
-            }
-
-            if (_tourPaintConfig.isShowTourPauses) {
-
-               isContentInTile = doPaint_Pauses(
-                     gcTile,
-                     map,
-                     tile,
-                     parts,
-                     isContentInTile,
-                     tourData,
-                     latitudeSerie,
-                     longitudeSerie);
             }
 
             if (_tourPaintConfig.isShowWayPoints) {
@@ -1795,7 +1781,12 @@ public class TourMapPainter extends MapPainter {
       gc.fillRectangle(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
    }
 
-   private void drawTour_40_Dot(final GC gc, final int devX, final int devY, final Color color, final Tile tile, final Long tourId) {
+   private void drawTour_40_Dot(final GC gc,
+                                final int devX,
+                                final int devY,
+                                final Color color,
+                                final Tile tile,
+                                final Long tourId) {
 
       if (color != null) {
          gc.setBackground(color);
@@ -1821,7 +1812,9 @@ public class TourMapPainter extends MapPainter {
          gc.fillOval(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
       }
 
-      // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+      /*
+       * Keep area to detect the hovered tour and enlarge it with a margin to easier hit it
+       */
       final Rectangle hoveredRect = new Rectangle(
             (paintedDevX - Map.EXPANDED_HOVER_SIZE2),
             (paintedDevY - Map.EXPANDED_HOVER_SIZE2),
@@ -1991,78 +1984,6 @@ public class TourMapPainter extends MapPainter {
    }
 
    /**
-    * create an image for the tour pause
-    *
-    * @param device
-    * @param pauseDuration
-    * @param pauseBounds
-    * @return
-    */
-   private Image drawTourPauseImage(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
-
-      final int bannerWidth = pauseBounds.x;
-      final int bannerHeight = pauseBounds.y;
-      final int bannerWidth2 = bannerWidth / 2;
-
-      final int markerImageWidth = pauseBounds.width;
-      final int markerImageHeight = pauseBounds.height;
-
-      final int arcSize = 5;
-
-      final RGB rgbTransparent = Map.getTransparentRGB();
-
-      final ImageData markerImageData = new ImageData(
-            markerImageWidth,
-            markerImageHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
-
-      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
-
-      final Image markerImage = new Image(device, markerImageData);
-      final Rectangle markerImageBounds = markerImage.getBounds();
-
-      final Color transparentColor = new Color(device, rgbTransparent);
-      final Color bannerColor = new Color(device, 0xFF, 0xFF, 0xFF);
-      final Color bannerBorderColor = new Color(device, 0x69, 0xAF, 0x3D);
-
-      final GC gc = new GC(markerImage);
-
-      {
-         // fill transparent color
-         gc.setBackground(transparentColor);
-         gc.fillRectangle(markerImageBounds);
-
-         gc.setBackground(bannerColor);
-         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
-
-         // draw banner border
-         gc.setForeground(bannerBorderColor);
-         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
-
-         // draw text
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
-
-         // draw pole
-         gc.setForeground(bannerBorderColor);
-         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
-         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
-
-         gc.setForeground(bannerColor);
-         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
-      }
-
-      gc.dispose();
-
-      bannerColor.dispose();
-      bannerBorderColor.dispose();
-      transparentColor.dispose();
-
-      return markerImage;
-   }
-
-   /**
     * @param gcTile
     * @param map
     * @param tile
@@ -2117,7 +2038,7 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourPauseImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
+         final Image tourMarkerImage = drawTourPauses_Image(gcTile.getDevice(), pauseDurationText, pauseBounds);
          {
             devX = devMarkerPosX - pauseBounds.width / 2;
             devY = devMarkerPosY - pauseBounds.height;
@@ -2133,6 +2054,81 @@ public class TourMapPainter extends MapPainter {
       }
 
       return isPauseInTile;
+   }
+
+   /**
+    * create an image for the tour pause
+    *
+    */
+   private Image drawTourPauses_Image(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
+
+      final int bannerWidth = pauseBounds.x;
+      final int bannerHeight = pauseBounds.y;
+      final int bannerWidth2 = bannerWidth / 2;
+
+      final int markerImageWidth = pauseBounds.width;
+      final int markerImageHeight = pauseBounds.height;
+
+      final int arcSize = 5;
+
+      final RGB rgbTransparent = Map.getTransparentRGB();
+
+      final ImageData markerImageData = new ImageData(
+            markerImageWidth,
+            markerImageHeight,
+            24,
+            new PaletteData(0xff, 0xff00, 0xff0000));
+
+      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
+
+      final Image markerImage = new Image(device, markerImageData);
+      final Rectangle markerImageBounds = markerImage.getBounds();
+
+      final Color transparentColor = new Color(rgbTransparent);
+      final Color bannerBorderColor = new Color(0x69, 0xAF, 0x3D);
+
+      Color textColor;
+      Color bannerColor;
+
+      if (_tourPaintConfig.isBackgroundDark) {
+
+         textColor = ThemeUtil.getDefaultForegroundColor_Shell();
+         bannerColor = ThemeUtil.getDefaultBackgroundColor_Shell();
+
+      } else {
+
+         textColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+         bannerColor = new Color(0xFF, 0xFF, 0xFF);
+      }
+
+      final GC gc = new GC(markerImage);
+      {
+         // fill transparent color
+         gc.setBackground(transparentColor);
+         gc.fillRectangle(markerImageBounds);
+
+         gc.setBackground(bannerColor);
+         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
+
+         // draw banner border
+         gc.setForeground(bannerBorderColor);
+         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
+
+         // draw text
+         gc.setForeground(textColor);
+         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
+
+         // draw pole
+         gc.setForeground(bannerBorderColor);
+         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
+         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
+
+         gc.setForeground(bannerColor);
+         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
+      }
+      gc.dispose();
+
+      return markerImage;
    }
 
    /**
@@ -2174,7 +2170,7 @@ public class TourMapPainter extends MapPainter {
          devX += devPartOffset;
          devY += devPartOffset;
 
-         gcTile.drawImage(_twpImage, devX, devY);
+         gcTile.drawImage(_tourWayPointImage, devX, devY);
 
 //       gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 //       gc.setLineWidth(1);

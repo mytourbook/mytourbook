@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,28 +25,30 @@ public class MesgListener_Activity extends AbstractMesgListener implements Activ
 
    public MesgListener_Activity(final FitData fitData) {
       super(fitData);
-	}
+   }
 
-	@Override
-	public void onMesg(final ActivityMesg mesg) {
+   @Override
+   public void onMesg(final ActivityMesg mesg) {
 
-		final Integer numSessions = mesg.getNumSessions();
+      final Integer numSessions = mesg.getNumSessions();
 
-		if (numSessions == null || numSessions < 1) {
+      if (numSessions == null || numSessions < 1) {
 
-			final String message = "%s - Invalid number of sessions: %d, expected at least one session."; //$NON-NLS-1$
+         final String message = "[FIT] %s - Invalid number of sessions: %d, expected at least one session."; //$NON-NLS-1$
 
-			TourLogManager.subLog_Info(String.format(
-					message,
-               fitData.getTourTitle(),
-					numSessions));
+         TourLogManager.subLog_INFO(
 
-			/*
-			 * Do not throw an exception because the import can still be successful.
-			 */
+               String.format(
+                     message,
+                     fitData.getTourTitle(),
+                     numSessions));
+
+         /*
+          * Do not throw an exception because the import can still be successful.
+          */
 //			throw new FitDataReaderException(message); //$NON-NLS-1$
-		}
+      }
 
-	}
+   }
 
 }

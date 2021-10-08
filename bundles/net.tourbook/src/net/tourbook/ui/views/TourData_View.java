@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,7 +59,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -270,39 +269,33 @@ public class TourData_View extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
 
-               // update font
+            // update font
 
-               _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
+            _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
 
-               // relayout UI
-               _txtAllFields.pack(true);
-               onResize();
+            // relayout UI
+            _txtAllFields.pack(true);
+            onResize();
 
-            } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+         } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
-               updateUI();
-            }
+            updateUI();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
-            }
+            // measurement system has changed
          }
       };
 
@@ -713,7 +706,7 @@ public class TourData_View extends ViewPart {
          if (firstElement instanceof TVICatalogComparedTour) {
             tourId = ((TVICatalogComparedTour) firstElement).getTourId();
          } else if (firstElement instanceof TVICompareResultComparedTour) {
-            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+            tourId = ((TVICompareResultComparedTour) firstElement).getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ThumbnailStore {
 
-   private static final long   MBYTE                         = 1024 * 1024;
+   private static final long   MBYTE                         = 1024 * 1024L;
 
    static final String         THUMBNAIL_IMAGE_EXTENSION_JPG = "jpg";             //$NON-NLS-1$
    private static final String THUMBNAIL_STORE_OS_PATH       = "thumbnail-store"; //$NON-NLS-1$
@@ -59,10 +59,10 @@ public class ThumbnailStore {
    /*
     * photo image properties saved in a properties file
     */
-   private static final String        PROPERTIES_FILE_EXTENSION = "properties";           //$NON-NLS-1$
+   private static final String        PROPERTIES_FILE_EXTENSION = "properties";                 //$NON-NLS-1$
 //	private static final String			PROPERTIES_FILE_HEADER			= "Image properties ";		//$NON-NLS-1$
-   public static final String         ORIGINAL_IMAGE_WIDTH      = "OriginalImageWidth";   //$NON-NLS-1$
-   public static final String         ORIGINAL_IMAGE_HEIGHT     = "OriginalImageHeight";  //$NON-NLS-1$
+   public static final String         ORIGINAL_IMAGE_WIDTH      = "OriginalImageWidth";         //$NON-NLS-1$
+   public static final String         ORIGINAL_IMAGE_HEIGHT     = "OriginalImageHeight";        //$NON-NLS-1$
 
    private static IPreferenceStore    _prefStore                = PhotoActivator.getPrefStore();
 
@@ -138,7 +138,7 @@ public class ThumbnailStore {
       final int daysToKeepImages = _prefStore.getInt(//
             IPhotoPreferences.PHOTO_THUMBNAIL_STORE_NUMBER_OF_DAYS_TO_KEEP_IMAGES);
 
-      // ckeck if cleanup is done always
+      // check if cleanup is done always
       if (daysToKeepImages == 0) {
 
          doCleanup(Integer.MIN_VALUE, Long.MIN_VALUE, true);
@@ -238,7 +238,7 @@ public class ThumbnailStore {
          final boolean isDeleted = storeFile.delete();
 
          if (isDeleted == false) {
-            StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
+            StatusUtil.logError(NLS.bind("Cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
          }
       }
    }

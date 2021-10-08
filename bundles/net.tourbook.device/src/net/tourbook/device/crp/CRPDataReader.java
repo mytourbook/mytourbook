@@ -18,6 +18,8 @@ package net.tourbook.device.crp;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -26,17 +28,17 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class CRPDataReader extends TourbookDevice {
 
    // plugin constructor
-   public CRPDataReader() {
-      // plugin constructor
-   }
+   public CRPDataReader() {}
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -96,13 +98,12 @@ public class CRPDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       // reset tour data list
       // tourDataList.clear();
@@ -120,12 +121,12 @@ public class CRPDataReader extends TourbookDevice {
 
          final String fileHeader = fileReader.readLine();
          if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
-            return false;
+            return;
          }
 
          String line;
          StringTokenizer tokenLine;
-         final ArrayList<String> trackPoints = new ArrayList<>();
+         final ArrayList<String> allTrackPoints = new ArrayList<>();
 
          tokenLine = new StringTokenizer(fileReader.readLine());
          @SuppressWarnings("unused")
@@ -136,15 +137,17 @@ public class CRPDataReader extends TourbookDevice {
             if (line.equals("***")) { //$NON-NLS-1$
                break;
             }
-            trackPoints.add(line.toString());
+            allTrackPoints.add(line);
          }
 
          // skip line
+         // 4006  568   563   5040  1676  134   162   431   83 68 195   18,0  23,0  0  02:06:00 19,08
          fileReader.readLine();
 
          /*
-          * line: date/time
+          * Line: date/time
           */
+         // 16.06.2004 -  18:53:00 - 02:23:24 - 3  - 2  - Tour 2
          tokenLine = new StringTokenizer(fileReader.readLine());
 
          // tour start date
@@ -155,18 +158,22 @@ public class CRPDataReader extends TourbookDevice {
 
          // tour start time
          final String tourStartTime = tokenLine.nextToken();
+
          final int tourHour = Integer.parseInt(tourStartTime.substring(0, 2));
-         final int tourMin = tourStartTime.length() > 5 //
-               ? Integer.parseInt(tourStartTime.substring(3, 5))
-               : Integer.parseInt(tourStartTime.substring(3));
+         int tourMinute;
+         int tourSecond;
+
+         final boolean isSecondsAvailable = tourStartTime.length() > 5;
+         if (isSecondsAvailable) {
+            tourMinute = Integer.parseInt(tourStartTime.substring(3, 5));
+            tourSecond = Integer.parseInt(tourStartTime.substring(6));
+         } else {
+            tourMinute = Integer.parseInt(tourStartTime.substring(3));
+            tourSecond = 0;
+         }
 
          // elapsed time
-         final String tourRecTimeSt = tokenLine.nextToken();
-         final int tourDeviceTime_Elapsed = Integer.parseInt(tourRecTimeSt.substring(0, 2))
-               * 3600
-               + Integer.parseInt(tourRecTimeSt.substring(3, 5))
-                     * 60
-               + Integer.parseInt(tourRecTimeSt.substring(6));
+         tokenLine.nextToken();
 
          // category
          tokenLine.nextToken();
@@ -185,7 +192,7 @@ public class CRPDataReader extends TourbookDevice {
          fileReader.readLine();
 
          /*
-          * line: interval/mode
+          * Line: interval/mode
           */
          tokenLine = new StringTokenizer(fileReader.readLine());
          final int interval = Integer.parseInt(tokenLine.nextToken());
@@ -208,12 +215,21 @@ public class CRPDataReader extends TourbookDevice {
          }
          tourDesc = tourDesc.trim();
 
+         LocalDateTime dtTrackPoint_Previous = LocalDateTime.of(
+               tourYear,
+               tourMonth,
+               tourDay,
+               tourHour,
+               tourMinute,
+               tourSecond,
+               0);
+
          /*
-          * set tour data
+          * Set tour data
           */
          final TourData tourData = new TourData();
 
-         tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMin, 0);
+         tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
 
          tourData.setTourTitle(tourName);
          tourData.setTourDescription(tourDesc);
@@ -247,7 +263,6 @@ public class CRPDataReader extends TourbookDevice {
          @SuppressWarnings("unused")
          int symbol;
          int temperature;
-         @SuppressWarnings("unused")
          String trackpointTime;
 
          int oldDistance = 0;
@@ -260,20 +275,20 @@ public class CRPDataReader extends TourbookDevice {
          int sumPulse = 0;
          int sumTemperature = 0;
 
-         for (final String trackPoint : trackPoints) {
+         for (final String trackPoint : allTrackPoints) {
 
+            /*
+             * Read track point line
+             */
             tokenLine = new StringTokenizer(trackPoint);
 
             pulse = Integer.parseInt(tokenLine.nextToken());
-            speed = Integer.parseInt(tokenLine.nextToken()); // [0.1 km/h]
-            distance = Integer.parseInt(tokenLine.nextToken()) * 10; // [m]
-            altitude = Integer.parseInt(tokenLine.nextToken()); // [m]
-            color = Integer.parseInt(tokenLine.nextToken()); // [0..4]
-            symbol = Integer.parseInt(tokenLine.nextToken()); // [0..42]
-
-            temperature = Math.round(//
-                  Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [C]
-
+            speed = Integer.parseInt(tokenLine.nextToken()); //            [0.1 km/h]
+            distance = Integer.parseInt(tokenLine.nextToken()) * 10; //    [m]
+            altitude = Integer.parseInt(tokenLine.nextToken()); //         [m]
+            color = Integer.parseInt(tokenLine.nextToken()); //            [0..4]
+            symbol = Integer.parseInt(tokenLine.nextToken()); //           [0..42]
+            temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [C]
             trackpointTime = tokenLine.nextToken();
 
             // get comment for current trackpoint
@@ -282,25 +297,38 @@ public class CRPDataReader extends TourbookDevice {
                comment = tokenLine.nextToken("\t"); //$NON-NLS-1$
             }
 
+            /*
+             * Prepare TimeData
+             */
+            final short altitudeDiff = (short) (altitude - oldAltitude);
+
+            final int trackPoint_Hour = Integer.parseInt(trackpointTime.substring(0, 2));
+            final int trackPoint_Minute = Integer.parseInt(trackpointTime.substring(3, 5));
+            final int trackPoint_Second = Integer.parseInt(trackpointTime.substring(6));
+            final LocalDateTime dtTrackPoint = LocalDateTime.of(
+                  tourYear,
+                  tourMonth,
+                  tourDay,
+                  trackPoint_Hour,
+                  trackPoint_Minute,
+                  trackPoint_Second,
+                  0);
+
+            final long trackpointTimeDiff = Duration.between(dtTrackPoint_Previous, dtTrackPoint).toSeconds();
+            dtTrackPoint_Previous = dtTrackPoint;
+
+            /*
+             * Set TimeData
+             */
             final TimeData timeData = new TimeData();
 
             timeDataList.add(timeData);
 
-            final short altitudeDiff = (short) (altitude - oldAltitude);
             timeData.altitude = altitudeDiff;
             timeData.distance = distance - oldDistance;
             timeData.pulse = pulse;
             timeData.temperature = temperature;
-
-            if (tpIndex == 0) {
-               // first trackpoint
-               timeData.time = 0;
-            } else if (tpIndex == trackPoints.size() - 1) {
-               // last track point
-               timeData.time = tourDeviceTime_Elapsed - tourTime;
-            } else {
-               timeData.time = interval;
-            }
+            timeData.time = (int) trackpointTimeDiff;
 
             // set marker when a comment is set
             if (tpIndex > 0 && comment.length() > 0) {
@@ -308,7 +336,7 @@ public class CRPDataReader extends TourbookDevice {
                timeData.marker = 1;
 
                // create a new marker
-               final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+               final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
                tourMarker.setLabel(comment);
                tourMarker.setTime(tourTime, Long.MIN_VALUE);
                tourMarker.setDistance(timeData.distance);
@@ -390,14 +418,12 @@ public class CRPDataReader extends TourbookDevice {
             tourData.completeTourMarkerWithRelativeTime();
          }
 
-         returnValue = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final Exception e) {
-         e.printStackTrace();
-         return false;
-      }
 
-      return returnValue;
+         e.printStackTrace();
+      }
    }
 
    /**

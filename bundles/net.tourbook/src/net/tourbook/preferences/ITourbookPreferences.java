@@ -137,6 +137,14 @@ public interface ITourbookPreferences {
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE"; //$NON-NLS-1$
 
    /*
+    * Statistic: Athlete's data
+    */
+   public static final String STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE = "STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE = "STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE    = "STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";    //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE    = "STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";    //$NON-NLS-1$
+
+   /*
     * Graphs
     */
    /** All graphs in the visible sequence */
@@ -197,6 +205,10 @@ public interface ITourbookPreferences {
    public static final String GRAPH_MARKER_POINT_SIZE                                     = "GRAPH_MARKER_POINT_SIZE";                                      //$NON-NLS-1$
    public static final String GRAPH_MARKER_SIGN_IMAGE_SIZE                                = "GRAPH_MARKER_SIGN_IMAGE_SIZE";                                 //$NON-NLS-1$
    public static final String GRAPH_MARKER_TOOLTIP_POSITION                               = "GRAPH_MARKER_TOOLTIP_POSITION";                                //$NON-NLS-1$
+
+   public static final String GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP                          = "GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP";                          //$NON-NLS-1$
+   public static final String GRAPH_PAUSES_TOOLTIP_POSITION                               = "GRAPH_PAUSES_TOOLTIP_POSITION";                          //$NON-NLS-1$
+
    // SET_FORMATTING_ON
 
    public static final String GRAPH_PULSE_GRAPH_VALUES              = "GRAPH_PULSE_GRAPH_VALUES";              //$NON-NLS-1$

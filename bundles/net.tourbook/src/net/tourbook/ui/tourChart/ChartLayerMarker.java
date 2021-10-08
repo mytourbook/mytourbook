@@ -36,6 +36,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerMarker implements IChartLayer, IChartOverlay {
@@ -46,7 +47,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 //	private int						SIGN_IMAGE_MAX_SIZE;
 
    private TourChart         _tourChart;
-   private ChartMarkerConfig _cmc;
+   private ChartMarkerConfig _chartMarkerConfig;
 
    private boolean           _isVertical;
 
@@ -54,8 +55,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
    private int               _devYMarker;
    private long              _hoveredEventTime;
 
-   private ChartLabel        _hoveredLabel;
-   private ChartLabel        _tooltipLabel;
+   private ChartLabelMarker  _hoveredLabel;
+   private ChartLabelMarker  _tooltipLabel;
 
    public class LoadImageCallback implements ILoadCallBack {
 
@@ -67,19 +68,15 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          }
 
          // run in UI thread
-         Display.getDefault().syncExec(new Runnable() {
+         Display.getDefault().syncExec(() -> {
 
-            @Override
-            public void run() {
-
-               // ensure chart is still displayed
-               if (_tourChart.getShell().isDisposed()) {
-                  return;
-               }
-
-               // paint image
-               _tourChart.redrawLayer();
+            // ensure chart is still displayed
+            if (_tourChart.getShell().isDisposed()) {
+               return;
             }
+
+            // paint image
+            _tourChart.redrawLayer();
          });
       }
    }
@@ -107,8 +104,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       final int labelHeight2 = labelHeight / 2;
       final int markerPointSize2 = MARKER_POINT_SIZE / 2 + 0;
 
-      final int visualPosition = _cmc.isShowLabelTempPos ? //
-            _cmc.markerLabelTempPos
+      final int visualPosition = _chartMarkerConfig.isShowLabelTempPos ? //
+            _chartMarkerConfig.markerLabelTempPos
             : chartLabel.visualPosition;
 
       switch (visualPosition) {
@@ -197,10 +194,10 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
       final Device display = gc.getDevice();
 
-      final int markerPointSize = _cmc.markerPointSize;
+      final int markerPointSize = _chartMarkerConfig.markerPointSize;
 //		final int markerSignImageSize = _cmc.markerSignImageSize;
-      final int labelOffset = _cmc.markerLabelOffset;
-      final int hoverSize = _cmc.markerHoverSize;
+      final int labelOffset = _chartMarkerConfig.markerLabelOffset;
+      final int hoverSize = _chartMarkerConfig.markerHoverSize;
 
       MARKER_POINT_SIZE = pc.convertVerticalDLUsToPixels(markerPointSize);
       MARKER_HOVER_SIZE = pc.convertVerticalDLUsToPixels(hoverSize);
@@ -233,33 +230,33 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
       final Color editColorFg = display.getSystemColor(SWT.COLOR_WHITE);
       final Color editColorBg = display.getSystemColor(SWT.COLOR_RED);
-      final Color colorDefault = new Color(isDarkTheme ? _cmc.markerColorDefault_Dark : _cmc.markerColorDefault_Light);
-      final Color colorDevice = new Color(isDarkTheme ? _cmc.markerColorDevice_Dark : _cmc.markerColorDevice_Light);
-      final Color colorHidden = new Color(isDarkTheme ? _cmc.markerColorHidden_Dark : _cmc.markerColorHidden_Light);
+      final Color colorDefault = new Color(isDarkTheme ? _chartMarkerConfig.markerColorDefault_Dark : _chartMarkerConfig.markerColorDefault_Light);
+      final Color colorDevice = new Color(isDarkTheme ? _chartMarkerConfig.markerColorDevice_Dark : _chartMarkerConfig.markerColorDevice_Light);
+      final Color colorHidden = new Color(isDarkTheme ? _chartMarkerConfig.markerColorHidden_Dark : _chartMarkerConfig.markerColorHidden_Light);
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
       /*
        * Draw marker point and label
        */
-      for (final ChartLabel chartLabel : _cmc.chartLabels) {
+      for (final ChartLabelMarker chartLabel : _chartMarkerConfig.chartLabelMarkers) {
 
          // check if a marker should be displayed
          if (chartLabel.isVisible == false) {
 
             // check if hidden markers should be displayed
-            if (_cmc.isShowHiddenMarker == false) {
+            if (_chartMarkerConfig.isShowHiddenMarker == false) {
                continue;
             }
          }
 
-         if (_cmc.isShowOnlyWithDescription && chartLabel.isDescription == false) {
+         if (_chartMarkerConfig.isShowOnlyWithDescription && chartLabel.isDescription == false) {
 
             // skip marker which do not have a description
             continue;
          }
 
-         final boolean isEditColor = chartLabel.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT;
+         final boolean isEditColor = chartLabel.visualType != ChartLabelMarker.VISIBLE_TYPE_DEFAULT;
          final boolean isTextBgTransparent = isEditColor == false;
          Color markerColor;
 
@@ -312,9 +309,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          /*
           * Draw marker point
           */
-         if (_cmc.isShowMarkerPoint && MARKER_POINT_SIZE > 0) {
+         if (_chartMarkerConfig.isShowMarkerPoint && MARKER_POINT_SIZE > 0) {
 
-            if (_cmc.isDrawMarkerWithDefaultColor) {
+            if (_chartMarkerConfig.isDrawMarkerWithDefaultColor) {
                gc.setBackground(colorDefault);
             } else {
                gc.setBackground(markerColor);
@@ -331,14 +328,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          /*
           * Draw marker label
           */
-         if (_cmc.isShowMarkerLabel) {
+         if (_chartMarkerConfig.isShowMarkerLabel) {
 
             if (isEditColor) {
                gc.setForeground(editColorFg);
                gc.setBackground(editColorBg);
             } else {
 
-               if (_cmc.isDrawMarkerWithDefaultColor) {
+               if (_chartMarkerConfig.isDrawMarkerWithDefaultColor) {
                   gc.setForeground(colorDefault);
                } else {
                   gc.setForeground(markerColor);
@@ -348,7 +345,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
             final int labelWidth = labelExtend.x;
             final int labelHeight = labelExtend.y;
 
-            adjustLabelPosition(//
+            adjustLabelPosition(
                   chartLabel,
                   devYTop,
                   devYBottom,
@@ -395,8 +392,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                final int devXLabel = _devXMarker;
                int devYLabel = _devYMarker;
 
-               final int visualPosition = _cmc.isShowLabelTempPos ? //
-                     _cmc.markerLabelTempPos
+               final int visualPosition = _chartMarkerConfig.isShowLabelTempPos
+                     ? _chartMarkerConfig.markerLabelTempPos
                      : chartLabel.visualPosition;
 
                switch (visualPosition) {
@@ -430,7 +427,10 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                // draw label vertical
                final Transform tr = new Transform(display);
                {
-                  tr.translate(_devXMarker, _devYMarker);
+                  final int xPos = DPIUtil.autoScaleUp(_devXMarker);
+                  final int yPos = DPIUtil.autoScaleUp(_devYMarker);
+
+                  tr.translate(xPos, yPos);
                   tr.rotate(-90f);
 
                   gc.setTransform(tr);
@@ -487,7 +487,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
          // keep painted positions to identify and paint hovered positions
          chartLabel.devIsVertical = _isVertical;
-         chartLabel.devMarkerPointSize = MARKER_POINT_SIZE;
+         chartLabel.devPointSize = MARKER_POINT_SIZE;
          chartLabel.devHoverSize = MARKER_HOVER_SIZE;
          chartLabel.devYBottom = devYBottom;
          chartLabel.devYTop = devYTop;
@@ -561,7 +561,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
       final TourMarker selectedTourMarker = _tourChart.getSelectedTourMarker();
 
-      ChartLabel selectedLabel = null;
+      ChartLabelMarker selectedLabel = null;
       if (selectedTourMarker != null) {
          selectedLabel = getChartLabel(selectedTourMarker);
       }
@@ -578,7 +578,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          return;
       }
 
-      ChartLabel hoveredLabel = _hoveredLabel;
+      ChartLabelMarker hoveredLabel = _hoveredLabel;
 
       if (hoveredLabel == null) {
          hoveredLabel = _tooltipLabel;
@@ -590,9 +590,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
       final boolean isDarkTheme = UI.isDarkTheme();
-      final Color colorDefault = new Color(isDarkTheme ? _cmc.markerColorDefault_Dark : _cmc.markerColorDefault_Light);
-      final Color colorDevice = new Color(isDarkTheme ? _cmc.markerColorDevice_Dark : _cmc.markerColorDevice_Light);
-      final Color colorHidden = new Color(isDarkTheme ? _cmc.markerColorHidden_Dark : _cmc.markerColorHidden_Light);
+      final Color colorDefault = new Color(isDarkTheme ? _chartMarkerConfig.markerColorDefault_Dark : _chartMarkerConfig.markerColorDefault_Light);
+      final Color colorDevice = new Color(isDarkTheme ? _chartMarkerConfig.markerColorDevice_Dark : _chartMarkerConfig.markerColorDevice_Light);
+      final Color colorHidden = new Color(isDarkTheme ? _chartMarkerConfig.markerColorHidden_Dark : _chartMarkerConfig.markerColorHidden_Light);
 
       if (isHovered && isSelected && hoveredLabel == selectedLabel) {
 
@@ -624,14 +624,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       gc.setClipping((Rectangle) null);
    }
 
-   private void drawOverlay_Label(final ChartLabel chartLabel,
+   private void drawOverlay_Label(final ChartLabelMarker chartLabelMarker,
                                   final GC gc,
                                   final Color colorDefault,
                                   final Color colorDevice,
                                   final Color colorHidden,
                                   final boolean isSelected) {
 
-      if (chartLabel == null) {
+      if (chartLabelMarker == null) {
          return;
       }
 
@@ -646,9 +646,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          final Color selectedColorBg = gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY);
          gc.setBackground(selectedColorBg);
 
-      } else if (chartLabel.isDeviceMarker()) {
+      } else if (chartLabelMarker.isDeviceMarker()) {
          gc.setBackground(colorDevice);
-      } else if (chartLabel.isVisible) {
+      } else if (chartLabelMarker.isVisible) {
          gc.setBackground(colorDefault);
       } else {
          gc.setBackground(colorHidden);
@@ -660,7 +660,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
        */
       final Region region = new Region(gc.getDevice());
 
-      final Rectangle paintedLabel = chartLabel.paintedLabel;
+      final Rectangle paintedLabel = chartLabelMarker.paintedLabel;
       if (paintedLabel != null) {
 
          final int devLabelX = paintedLabel.x - MARKER_HOVER_SIZE;
@@ -671,8 +671,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
          region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
       }
 
-      final int devMarkerX = chartLabel.devXMarker - MARKER_HOVER_SIZE;
-      final int devMarkerY = chartLabel.devYMarker - MARKER_HOVER_SIZE;
+      final int devMarkerX = chartLabelMarker.devXMarker - MARKER_HOVER_SIZE;
+      final int devMarkerY = chartLabelMarker.devYMarker - MARKER_HOVER_SIZE;
       final int devMarkerSize = MARKER_POINT_SIZE + 2 * MARKER_HOVER_SIZE;
 
       region.add(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
@@ -688,9 +688,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       gc.setClipping((Region) null);
    }
 
-   private ChartLabel getChartLabel(final TourMarker tourMarker) {
+   private ChartLabelMarker getChartLabel(final TourMarker tourMarker) {
 
-      for (final ChartLabel chartLabel : _cmc.chartLabels) {
+      for (final ChartLabelMarker chartLabel : _chartMarkerConfig.chartLabelMarkers) {
 
          final Object chartLabelData = chartLabel.data;
 
@@ -727,7 +727,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
     * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
     *         is not hovered.
     */
-   ChartLabel retrieveHoveredLabel(final ChartMouseEvent mouseEvent) {
+   ChartLabelMarker retrieveHoveredLabel(final ChartMouseEvent mouseEvent) {
 
       if (mouseEvent.eventTime == _hoveredEventTime) {
          return _hoveredLabel;
@@ -741,14 +741,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
       return _hoveredLabel;
    }
 
-   private ChartLabel retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
+   private ChartLabelMarker retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
 
       /*
        * Check sign images first, they have a higher priority
        */
-      for (final ChartLabel chartLabel : _cmc.chartLabels) {
+      for (final ChartLabelMarker chartLabelMarker : _chartMarkerConfig.chartLabelMarkers) {
 
-         final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
+         final Rectangle imageBounds = chartLabelMarker.devMarkerSignImageBounds;
          if (imageBounds != null) {
 
             final int devXImage = imageBounds.x;
@@ -762,17 +762,17 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                   && devYMouse < devYImage + imageHeight) {
 
                // marker sign image is hit
-               return chartLabel;
+               return chartLabelMarker;
             }
          }
       }
 
-      for (final ChartLabel chartLabel : _cmc.chartLabels) {
+      for (final ChartLabelMarker chartLabelMarker : _chartMarkerConfig.chartLabelMarkers) {
 
          /*
           * Check sign label
           */
-         final Rectangle paintedLabel = chartLabel.paintedLabel;
+         final Rectangle paintedLabel = chartLabelMarker.paintedLabel;
          if (paintedLabel != null) {
 
             final int devXLabel = paintedLabel.x;
@@ -784,15 +784,15 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                   && devYMouse < devYLabel + paintedLabel.height + MARKER_HOVER_SIZE) {
 
                // horizontal label is hit
-               return chartLabel;
+               return chartLabelMarker;
             }
          }
 
          /*
           * Check marker point
           */
-         final int devXMarker = chartLabel.devXMarker;
-         final int devYMarker = chartLabel.devYMarker;
+         final int devXMarker = chartLabelMarker.devXMarker;
+         final int devYMarker = chartLabelMarker.devYMarker;
 
          if (devXMouse > devXMarker - MARKER_HOVER_SIZE
                && devXMouse < devXMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE
@@ -800,7 +800,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                && devYMouse < devYMarker + MARKER_POINT_SIZE + MARKER_HOVER_SIZE) {
 
             // marker point is hit
-            return chartLabel;
+            return chartLabelMarker;
          }
       }
 
@@ -809,10 +809,10 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
    public void setChartMarkerConfig(final ChartMarkerConfig chartMarkerConfig) {
 
-      _cmc = chartMarkerConfig;
+      _chartMarkerConfig = chartMarkerConfig;
    }
 
-   public void setTooltipLabel(final ChartLabel tooltipLabel) {
+   public void setTooltipLabel(final ChartLabelMarker tooltipLabel) {
 
       if (_tooltipLabel == tooltipLabel) {
          return;

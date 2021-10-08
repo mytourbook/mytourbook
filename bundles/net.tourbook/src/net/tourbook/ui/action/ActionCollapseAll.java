@@ -37,7 +37,6 @@ public class ActionCollapseAll extends Action {
       _treeViewerProvider = treeViewerProvider;
 
       setText(Messages.App_Action_CollapseAll);
-      setToolTipText(Messages.App_Action_CollapseAll_Tooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_CollapseAll));
       setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_CollapseAll_Disabled));

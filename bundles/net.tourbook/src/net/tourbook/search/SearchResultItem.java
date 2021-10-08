@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,35 +15,46 @@
  *******************************************************************************/
 package net.tourbook.search;
 
+import net.tourbook.common.UI;
+
 public class SearchResultItem {
 
-   int    docSource;
+   private static final char NL = UI.NEW_LINE;
 
-   String markerId;
-   String tourId;
+   long                      tourStartTime;
 
-   String title;
-   String description;
-   long   tourStartTime;
+   int                       docSource;
 
-//	float	score;
+   String                    markerId;
+   String                    tourId;
+
+   String                    title;
+   String                    description;
+   String                    locationStart;
+   String                    locationEnd;
+   String                    weather;
+
+//   float   score;
 
    /**
-    * Lucene doc id.
+    * Lucene doc id
     */
    int docId;
 
    @Override
    public String toString() {
-      return "SearchResultItem [" //$NON-NLS-1$
-            + ("tourId=" + tourId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("markerId=" + markerId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("tourStartTime=" + tourStartTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("markerLabel=" + markerLabel + ", ")
-            + ("tourTitle=" + title + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("score=" + score)
-            + "]"; //$NON-NLS-1$
+
+      return UI.EMPTY_STRING
+
+            + "SearchResultItem [" + NL //                  //$NON-NLS-1$
+
+            + "   tourId=" + tourId + NL //                 //$NON-NLS-1$
+            + "   markerId=" + markerId + NL //             //$NON-NLS-1$
+            + "   tourStartTime=" + tourStartTime + NL //   //$NON-NLS-1$
+            + "   tourTitle=" + title + NL //               //$NON-NLS-1$
+            + "   description=" + description + NL //       //$NON-NLS-1$
+
+            + "]"; //                                       //$NON-NLS-1$
    }
 
 }

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Unit tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.tests;singleton:=true
-Bundle-Version: 21.6.1.qualifier
+Bundle-Version: 21.9.0.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  net.tourbook,
  net.tourbook.ext.jars,

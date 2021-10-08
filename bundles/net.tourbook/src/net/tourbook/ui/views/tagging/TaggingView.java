@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import gnu.trove.list.array.TLongArrayList;
 
 import java.text.NumberFormat;
@@ -28,6 +30,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -79,7 +82,6 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -93,11 +95,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -110,10 +109,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
@@ -159,7 +157,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    static final int                  TAG_VIEW_LAYOUT_FLAT                   = 0;
    static final int                  TAG_VIEW_LAYOUT_HIERARCHICAL           = 10;
-   //
+
    private static final NumberFormat _nf0                                   = NumberFormat.getNumberInstance();
    private static final NumberFormat _nf1                                   = NumberFormat.getNumberInstance();
 
@@ -178,6 +176,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private int                                 _tagViewLayout                           = TAG_VIEW_LAYOUT_HIERARCHICAL;
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
+   private TagFilterType                        _tagFilterType                           = TagFilterType.ALL_IS_DISPLAYED;
 
    private boolean                             _isToolTipInTag;
    private boolean                             _isToolTipInTitle;
@@ -210,24 +209,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private MenuManager                         _viewerMenuManager;
    private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
-   private Action_CollapseAll_WithoutSelection _action_CollapseAll_WithoutSelection;
-   private Action_DeleteTag                    _action_DeleteTag;
-   private Action_DeleteTagCategory            _action_DeleteTagCategory;
-   private Action_OnMouseSelect_ExpandCollapse _action_OnMouseSelect_ExpandCollapse;
-   private Action_SingleExpand_CollapseOthers  _action_SingleExpand_CollapseOthers;
+   private ActionRefreshView                   _action_RefreshView;
    private Action_TagLayout                    _action_ToggleTagLayout;
-   private ActionCollapseOthers                _actionCollapseOthers;
-   private ActionEditQuick                     _actionEditQuick;
-   private ActionEditTag                       _actionEditTag;
-   private ActionEditTour                      _actionEditTour;
-   private ActionExpandSelection               _actionExpandSelection;
-   private ActionExport                        _actionExportTour;
-   private ActionMenuSetAllTagStructures       _actionSetAllTagStructures;
-   private ActionMenuSetTagStructure           _actionSetTagStructure;
-   private ActionOpenTour                      _actionOpenTour;
-   private ActionOpenPrefDialog                _actionOpenTagPrefs;
-   private ActionRefreshView                   _actionRefreshView;
-   private ActionSetTourTypeMenu               _actionSetTourType;
+   private Action_TagFilter                    _action_ToggleTagFilter;
+
+   private Action_CollapseAll_WithoutSelection _actionContext_CollapseAll_WithoutSelection;
+   private ActionCollapseOthers                _actionContext_CollapseOthers;
+   private Action_DeleteTag                    _actionContext_DeleteTag;
+   private Action_DeleteTagCategory            _actionContext_DeleteTagCategory;
+   private ActionEditQuick                     _actionContext_EditQuick;
+   private ActionEditTag                       _actionContext_EditTag;
+   private ActionEditTour                      _actionContext_EditTour;
+   private ActionExpandSelection               _actionContext_ExpandSelection;
+   private ActionExport                        _actionContext_ExportTour;
+   private Action_OnMouseSelect_ExpandCollapse _actionContext_OnMouseSelect_ExpandCollapse;
+   private ActionOpenPrefDialog                _actionContext_OpenTagPrefs;
+   private ActionOpenTour                      _actionContext_OpenTour;
+   private ActionMenuSetAllTagStructures       _actionContext_SetAllTagStructures;
+   private ActionMenuSetTagStructure           _actionContext_SetTagStructure;
+   private ActionSetTourTypeMenu               _actionContext_SetTourType;
+   private Action_SingleExpand_CollapseOthers  _actionContext_SingleExpand_CollapseOthers;
 
    private PixelConverter                      _pc;
 
@@ -320,13 +321,30 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
    }
 
+   private class Action_TagFilter extends Action {
+
+      Action_TagFilter() {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Tour_Tags_Action_ToggleTagFilter_Tooltip);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+         onAction_ToggleTagFilter(event);
+      }
+   }
+
    private class Action_TagLayout extends Action {
 
       Action_TagLayout() {
 
          super(Messages.action_tagView_flat_layout, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
       }
 
       @Override
@@ -475,6 +493,69 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          setTagViewTitle(newInput);
       }
+   }
+
+   public class TagFilter extends ViewerFilter {
+
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+
+         if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
+
+            // nothing is filtered
+            return true;
+         }
+
+         // tags are filtered
+
+         if (element instanceof TVITagView_Tag) {
+
+            final TVITagView_Tag tviTag = (TVITagView_Tag) element;
+
+            final boolean hasChildren = tviTag.getFetchedChildren().size() > 0;
+
+            if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasChildren) {
+
+               // tags with tours -> show it
+
+               return true;
+
+            } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasChildren == false) {
+
+               // tags without tours -> show it
+
+               return true;
+
+            } else {
+
+               return false;
+            }
+
+         } else if (element instanceof TVITagView_TagCategory) {
+            
+            // ignore for now a deep inspection of the category items/subitems
+
+            return true;
+         }
+
+         // all other items are not filtered
+         return true;
+      }
+   }
+
+   private enum TagFilterType {
+
+      ALL_IS_DISPLAYED,
+
+      /**
+       * Only tags with tours are displayed
+       */
+      TAGS_WITH_TOURS,
+
+      /**
+       * Only tags without tours are displayed
+       */
+      TAGS_WITHOUT_TOURS
    }
 
    private class TreeContextMenuProvider implements IContextMenuProvider {
@@ -659,26 +740,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void createActions() {
 
-      _action_CollapseAll_WithoutSelection = new Action_CollapseAll_WithoutSelection();
-      _action_DeleteTag = new Action_DeleteTag();
-      _action_DeleteTagCategory = new Action_DeleteTagCategory();
-      _action_OnMouseSelect_ExpandCollapse = new Action_OnMouseSelect_ExpandCollapse();
-      _action_SingleExpand_CollapseOthers = new Action_SingleExpand_CollapseOthers();
+      _actionContext_CollapseAll_WithoutSelection = new Action_CollapseAll_WithoutSelection();
+      _actionContext_CollapseOthers = new ActionCollapseOthers(this);
+      _actionContext_DeleteTag = new Action_DeleteTag();
+      _actionContext_DeleteTagCategory = new Action_DeleteTagCategory();
+      _actionContext_EditQuick = new ActionEditQuick(this);
+      _actionContext_EditTag = new ActionEditTag(this);
+      _actionContext_EditTour = new ActionEditTour(this);
+      _actionContext_ExpandSelection = new ActionExpandSelection(this);
+      _actionContext_ExportTour = new ActionExport(this);
+      _actionContext_OnMouseSelect_ExpandCollapse = new Action_OnMouseSelect_ExpandCollapse();
+      _actionContext_OpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
+      _actionContext_OpenTour = new ActionOpenTour(this);
+      _actionContext_SetAllTagStructures = new ActionMenuSetAllTagStructures(this);
+      _actionContext_SetTagStructure = new ActionMenuSetTagStructure(this);
+      _actionContext_SetTourType = new ActionSetTourTypeMenu(this);
+      _actionContext_SingleExpand_CollapseOthers = new Action_SingleExpand_CollapseOthers();
+
+      _action_RefreshView = new ActionRefreshView(this);
+      _action_ToggleTagFilter = new Action_TagFilter();
       _action_ToggleTagLayout = new Action_TagLayout();
-
-      _actionCollapseOthers = new ActionCollapseOthers(this);
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionExpandSelection = new ActionExpandSelection(this);
-      _actionExportTour = new ActionExport(this);
-      _actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
-      _actionOpenTour = new ActionOpenTour(this);
-      _actionRefreshView = new ActionRefreshView(this);
-      _actionEditTag = new ActionEditTag(this);
-      _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
-      _actionSetTagStructure = new ActionMenuSetTagStructure(this);
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
-
    }
 
    private void createMenuManager() {
@@ -687,14 +768,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
+      _viewerMenuManager.addMenuListener(menuManager -> {
 
-            _tourInfoToolTip.hideToolTip();
+         _tourInfoToolTip.hideToolTip();
 
-            fillContextMenu(manager);
-         }
+         fillContextMenu(menuManager);
       });
    }
 
@@ -761,60 +839,43 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _tagViewer.setContentProvider(new TagContentProvider());
       _tagViewer.setComparer(new TagComparer());
       _tagViewer.setComparator(new TagComparator());
+      _tagViewer.setFilters(new TagFilter());
+
       _tagViewer.setUseHashlookup(true);
 
-      _tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onTagViewer_Selection(event);
-         }
-      });
-
-      _tagViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onTagViewer_DoubleClick();
-         }
-      });
+      _tagViewer.addSelectionChangedListener(selectionChangedEvent -> onTagViewer_Selection(selectionChangedEvent));
+      _tagViewer.addDoubleClickListener(doubleClickEvent -> onTagViewer_DoubleClick());
 
       tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
       tree.addListener(SWT.MouseDown, event -> onTagTree_MouseDown(event));
 
-      tree.addKeyListener(new KeyListener() {
+      tree.addKeyListener(keyPressedAdapter(keyEvent -> {
 
-         @Override
-         public void keyPressed(final KeyEvent e) {
+         _isSelectedWithKeyboard = true;
 
-            _isSelectedWithKeyboard = true;
+         enableActions(true);
 
-            enableActions(true);
+         switch (keyEvent.keyCode) {
 
-            switch (e.keyCode) {
+         case SWT.DEL:
 
-            case SWT.DEL:
+            // delete tag only when the delete button is enabled
+            if (_actionContext_DeleteTag.isEnabled()) {
 
-               // delete tag only when the delete button is enabled
-               if (_action_DeleteTag.isEnabled()) {
+               onAction_DeleteTag();
 
-                  onAction_DeleteTag();
+            } else if (_actionContext_DeleteTagCategory.isEnabled()) {
 
-               } else if (_action_DeleteTagCategory.isEnabled()) {
-
-                  onAction_DeleteTagCategory();
-               }
-
-               break;
-
-            case SWT.F2:
-               onTagViewer_RenameTag();
-               break;
+               onAction_DeleteTagCategory();
             }
-         }
 
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+            break;
+
+         case SWT.F2:
+            onTagViewer_RenameTag();
+            break;
+         }
+      }));
 
       /*
        * the context menu must be created AFTER the viewer is created which is also done after the
@@ -1504,7 +1565,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    void editTag(final Object viewerCellData) {
 
-      _actionEditTag.editTag(viewerCellData);
+      _actionContext_EditTag.editTag(viewerCellData);
    }
 
    private void enableActions(final boolean isIterateTours) {
@@ -1565,54 +1626,54 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _tourDoubleClickState.canEditMarker = isOneTour;
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-      _actionEditTour.setEnabled(isOneTour);
-      _actionOpenTour.setEnabled(isOneTour);
-      _actionEditQuick.setEnabled(isOneTour);
+      _actionContext_EditTour.setEnabled(isOneTour);
+      _actionContext_OpenTour.setEnabled(isOneTour);
+      _actionContext_EditQuick.setEnabled(isOneTour);
 
       // action: set tour type
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      _actionContext_SetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       // enable rename action
       if (selectedItems == 1) {
 
          if (isTagSelected) {
 
-            _actionEditTag.setText(Messages.Action_Tag_Edit);
-            _actionEditTag.setEnabled(true);
+            _actionContext_EditTag.setText(Messages.Action_Tag_Edit);
+            _actionContext_EditTag.setEnabled(true);
 
          } else if (isCategorySelected) {
 
-            _actionEditTag.setText(Messages.Action_TagCategory_Edit);
-            _actionEditTag.setEnabled(true);
+            _actionContext_EditTag.setText(Messages.Action_TagCategory_Edit);
+            _actionContext_EditTag.setEnabled(true);
 
          } else {
-            _actionEditTag.setEnabled(false);
+            _actionContext_EditTag.setEnabled(false);
          }
 
       } else {
-         _actionEditTag.setEnabled(false);
+         _actionContext_EditTag.setEnabled(false);
       }
 
       /*
        * tree expand type can be set if only tags are selected or when an item is selected which is
        * not a category
        */
-      _actionSetTagStructure.setEnabled(isTagSelected || (numItems == 1 && numCategorys == 0));
-      _actionSetAllTagStructures.setEnabled(isItemsAvailable);
-      _action_DeleteTag.setEnabled(isTagSelected);
-      _action_DeleteTagCategory.setEnabled(isCategorySelected);
+      _actionContext_SetTagStructure.setEnabled(isTagSelected || (numItems == 1 && numCategorys == 0));
+      _actionContext_SetAllTagStructures.setEnabled(isItemsAvailable);
+      _actionContext_DeleteTag.setEnabled(isTagSelected);
+      _actionContext_DeleteTagCategory.setEnabled(isCategorySelected);
 
-      _actionExpandSelection.setEnabled(firstElement == null
+      _actionContext_ExpandSelection.setEnabled(firstElement == null
             ? false
             : selectedItems == 1
                   ? firstElementHasChildren
                   : true);
 
-      _actionExportTour.setEnabled(isIteratedTours);
+      _actionContext_ExportTour.setEnabled(isIteratedTours);
 
-      _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
-      _action_CollapseAll_WithoutSelection.setEnabled(isItemsAvailable);
+      _actionContext_CollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+      _actionContext_CollapseAll_WithoutSelection.setEnabled(isItemsAvailable);
 
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
 
@@ -1633,40 +1694,40 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionCollapseOthers);
-      menuMgr.add(_actionExpandSelection);
-      menuMgr.add(_action_CollapseAll_WithoutSelection);
-      menuMgr.add(_action_OnMouseSelect_ExpandCollapse);
-      menuMgr.add(_action_SingleExpand_CollapseOthers);
+      menuMgr.add(_actionContext_CollapseOthers);
+      menuMgr.add(_actionContext_ExpandSelection);
+      menuMgr.add(_actionContext_CollapseAll_WithoutSelection);
+      menuMgr.add(_actionContext_OnMouseSelect_ExpandCollapse);
+      menuMgr.add(_actionContext_SingleExpand_CollapseOthers);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionEditQuick);
-      menuMgr.add(_actionEditTour);
-      menuMgr.add(_actionOpenTour);
+      menuMgr.add(_actionContext_EditQuick);
+      menuMgr.add(_actionContext_EditTour);
+      menuMgr.add(_actionContext_OpenTour);
 
       // add/remove ... tags
       _tagMenuManager.fillTagMenu(menuMgr, true);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionEditTag);
-      menuMgr.add(_actionSetTagStructure);
-      menuMgr.add(_actionSetAllTagStructures);
-      menuMgr.add(_actionOpenTagPrefs);
-      menuMgr.add(_action_DeleteTag);
-      menuMgr.add(_action_DeleteTagCategory);
+      menuMgr.add(_actionContext_EditTag);
+      menuMgr.add(_actionContext_SetTagStructure);
+      menuMgr.add(_actionContext_SetAllTagStructures);
+      menuMgr.add(_actionContext_OpenTagPrefs);
+      menuMgr.add(_actionContext_DeleteTag);
+      menuMgr.add(_actionContext_DeleteTagCategory);
 
       // tour type actions
       menuMgr.add(new Separator());
-      menuMgr.add(_actionSetTourType);
+      menuMgr.add(_actionContext_SetTourType);
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionExportTour);
+      menuMgr.add(_actionContext_ExportTour);
 
       enableActions(true);
 
       // set AFTER the actions are enabled this retrieves the number of tours
-      _actionExportTour.setNumberOfTours(_numIteratedTours);
+      _actionContext_ExportTour.setNumberOfTours(_numIteratedTours);
    }
 
    private void fillToolBar() {
@@ -1678,11 +1739,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       // recreate the toolbar
       tbm.removeAll();
 
-      tbm.add(_actionExpandSelection);
-      tbm.add(_action_CollapseAll_WithoutSelection);
+      tbm.add(_action_ToggleTagFilter);
+      tbm.add(_actionContext_ExpandSelection);
+      tbm.add(_actionContext_CollapseAll_WithoutSelection);
       tbm.add(_action_ToggleTagLayout);
 
-      tbm.add(_actionRefreshView);
+      tbm.add(_action_RefreshView);
 
       tbm.update(true);
    }
@@ -1847,12 +1909,50 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void onAction_OnMouseSelect_ExpandCollapse() {
 
-      _isBehaviour_OnSelect_ExpandCollapse = _action_OnMouseSelect_ExpandCollapse.isChecked();
+      _isBehaviour_OnSelect_ExpandCollapse = _actionContext_OnMouseSelect_ExpandCollapse.isChecked();
    }
 
    private void onAction_SingleExpandCollapseOthers() {
 
-      _isBehaviour_SingleExpand_CollapseOthers = _action_SingleExpand_CollapseOthers.isChecked();
+      _isBehaviour_SingleExpand_CollapseOthers = _actionContext_SingleExpand_CollapseOthers.isChecked();
+   }
+
+   private void onAction_ToggleTagFilter(final Event event) {
+
+      final boolean isForwards = UI.isCtrlKey(event) == false;
+
+      if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
+
+         if (isForwards) {
+            toggleTagFilter_WithTours();
+         } else {
+            toggleTagFilter_NoTours();
+         }
+
+      } else if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS) {
+
+         if (isForwards) {
+            toggleTagFilter_NoTours();
+         } else {
+            toggleTagFilter_ShowAll();
+         }
+
+      } else {
+
+         if (isForwards) {
+            toggleTagFilter_ShowAll();
+         } else {
+            toggleTagFilter_WithTours();
+         }
+      }
+
+      final Tree tree = _tagViewer.getTree();
+      tree.setRedraw(false);
+      {
+         _tagViewer.refresh();
+      }
+      tree.setRedraw(true);
+
    }
 
    private void onAction_ToggleTagLayout() {
@@ -1887,6 +1987,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       if (selectedTreePaths.length == 0) {
          return;
       }
+
       final TreePath selectedTreePath = selectedTreePaths[0];
       if (selectedTreePath == null) {
          return;
@@ -2020,7 +2121,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             // edit tag/category
 
-            _actionEditTag.run();
+            _actionContext_EditTag.run();
          }
       }
    }
@@ -2056,7 +2157,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          // edit tag/category
 
-         _actionEditTag.run();
+         _actionContext_EditTag.run();
       }
    }
 
@@ -2189,11 +2290,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // on mouse select -> expand/collapse
       _isBehaviour_OnSelect_ExpandCollapse = Util.getStateBoolean(_state, STATE_IS_ON_SELECT_EXPAND_COLLAPSE, true);
-      _action_OnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
+      _actionContext_OnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
 
       // single expand -> collapse others
       _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
-      _action_SingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
+      _actionContext_SingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
 
       updateUI_TagLayoutAction();
       updateToolTipState();
@@ -2394,8 +2495,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       // save view layout
       _state.put(MEMENTO_TAG_VIEW_LAYOUT, _tagViewLayout);
 
-      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _action_SingleExpand_CollapseOthers.isChecked());
-      _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _action_OnMouseSelect_ExpandCollapse.isChecked());
+      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionContext_SingleExpand_CollapseOthers.isChecked());
+      _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionContext_OnMouseSelect_ExpandCollapse.isChecked());
 
       saveState_ExpandedItems();
    }
@@ -2490,6 +2591,30 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       setContentDescription(description);
    }
 
+   private void toggleTagFilter_NoTours() {
+
+      _tagFilterType = TagFilterType.TAGS_WITHOUT_TOURS;
+
+      _action_ToggleTagFilter.setChecked(true);
+      _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagFilter_NoTours));
+   }
+
+   private void toggleTagFilter_ShowAll() {
+
+      _tagFilterType = TagFilterType.ALL_IS_DISPLAYED;
+
+      _action_ToggleTagFilter.setChecked(false);
+      _action_ToggleTagFilter.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+   }
+
+   private void toggleTagFilter_WithTours() {
+
+      _tagFilterType = TagFilterType.TAGS_WITH_TOURS;
+
+      _action_ToggleTagFilter.setChecked(true);
+      _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter));
+   }
+
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
@@ -2507,16 +2632,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          // hierarchy is displayed -> show icon/tooltip for flat view
 
          _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
-         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
-         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat_Disabled));
+         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
+         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat_Disabled));
 
       } else {
 
          // flat view is displayed -> show icon/tooltip for hierarchy view
 
          _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
-         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical));
-         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
+         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical));
+         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 

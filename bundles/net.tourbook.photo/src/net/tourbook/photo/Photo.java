@@ -824,7 +824,7 @@ public class Photo {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind(//
+         StatusUtil.logError(NLS.bind(
                "Could not read metadata from image \"{0}\"", //$NON-NLS-1$
                imageFile));
 
@@ -935,6 +935,18 @@ public class Photo {
     */
    public int getPhotoImageWidth() {
       return _photoImageWidth;
+   }
+
+   public long getPhotoTime() {
+
+      if (adjustedTimeTour != Long.MIN_VALUE) {
+
+         return adjustedTimeTour;
+
+      } else {
+
+         return imageExifTime;
+      }
    }
 
    public AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {

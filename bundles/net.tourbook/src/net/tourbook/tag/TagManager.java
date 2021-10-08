@@ -241,7 +241,7 @@ public class TagManager {
 
          for (int tagIndex = 0; tagIndex < allTags.size(); tagIndex++) {
 
-            TourLogManager.logInfo(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
+            TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
                   returnValue_TourData[tagIndex],
                   returnValue_TagCategory[tagIndex],
                   returnValue_TourTag[tagIndex],
@@ -353,7 +353,7 @@ public class TagManager {
 
          // log result
          TourLogManager.showLogView();
-         TourLogManager.logInfo(String.format(Messages.Tag_Manager_LogInfo_DeletedTagCategory,
+         TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTagCategory,
                returnValue_CategoryCategory[0],
                returnValue_TagCategory[0],
                categoryName));
@@ -399,7 +399,7 @@ public class TagManager {
          }
 
       } catch (final SQLException e) {
-         StatusUtil.log(sql);
+         StatusUtil.logError(sql);
          UI.showSQLException(e);
       }
 
@@ -467,7 +467,7 @@ public class TagManager {
          }
 
       } catch (final SQLException e) {
-         StatusUtil.log(sql);
+         StatusUtil.logError(sql);
          UI.showSQLException(e);
       } finally {
          Util.closeSql(statement);

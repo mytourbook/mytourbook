@@ -103,7 +103,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
@@ -792,12 +792,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private boolean               hasGeoData;
 
+   // ############################################# BATTERY #############################################
+
+   /**
+    * Battery start/end values are used for the statistic views,
+    *
+    * -1 indicate that the value is not yet set
+    */
+   private short                 battery_Percentage_Start      = -1;
+   private short                 battery_Percentage_End        = -1;
+
     /*
      * The geo bound values are in microdegrees (degrees * 10^6).
      */
 
-//   private int                 latitudeMinE6;                        // db-version 35
-//   private int                 latitudeMaxE6;                        // db-version 35
+//   private int                 latitudeMinE6;                      // db-version 35
+//   private int                 latitudeMaxE6;                      // db-version 35
 //   private int                 longitudeMinE6;                     // db-version 35
 //   private int                 longitudeMaxE6;                     // db-version 35
 
@@ -845,14 +855,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Basic(optional = false)
    private SerieData                   serieData;
 
+   // ############################################# ASSOCIATED ENTITIES #############################################
+
    /**
     * Photos for this tour
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
-
-   // ############################################# ASSOCIATED ENTITIES #############################################
 
    /**
     * Tour marker
@@ -883,6 +893,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
    private Set<TourTag>                tourTags                            = new HashSet<>();
+
+//   /**
+//    * Device sensor values
+//    */
+//   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+//   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+//   private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
 
 //   /**
 //    * SharedMarker
@@ -1628,6 +1645,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public int[]         swim_Time;
+
    /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
@@ -1637,6 +1655,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private float[]      _swim_LengthType_UI;
+
    /**
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
@@ -1645,6 +1664,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private float[]      _swim_Strokes_UI;
+
    /**
     * Swimming data: Stroke style is defined in {@link SwimStroke} e.g. freestyle, breaststroke...
     * Contains {@link Short#MIN_VALUE} when value is not set.
@@ -1654,6 +1674,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private float[]      _swim_StrokeStyle_UI;
+
    /**
     * Swimming data: Swimming cadence in strokes/min. Contains {@link Short#MIN_VALUE} when value is
     * not set.
@@ -1697,16 +1718,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * A timer pause is a device event triggered by the user.
     */
    @Transient
-   private long[]           pausedTime_Start;
+   private long[]       pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
     * A timer pause is a device event triggered by the user.
     */
    @Transient
-   private long[]           pausedTime_End;
+   private long[]       pausedTime_End;
 
-   // SET_FORMATTING_ON
+   /**
+    * Containing the battery time in seconds, relative to the tour start time
+    *
+    * @since after 21.6
+    */
+   @Transient
+   private int[]         battery_Time;
+
+   /**
+    * Containing the battery percentage value
+    *
+    * @since after 21.6
+    */
+   @Transient
+   private short[]       battery_Percentage;
+
+
+// SET_FORMATTING_ON
 
    public TourData() {}
 
@@ -2107,6 +2145,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _tourWorldPosition.clear();
    }
 
+   /**
+    * This clone() method is cloning only a part of the tour, e.g. {@link #serieData} is not cloned
+    */
    @Override
    public Object clone() throws CloneNotSupportedException {
 
@@ -2514,7 +2555,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (_isImportedMTTour) {
          // use imported value
-         prefDPTolerance = dpTolerance / 10;
+         prefDPTolerance = dpTolerance / 10f;
       } else {
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
@@ -2553,7 +2594,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (_isImportedMTTour) {
          // use imported value
-         prefDPTolerance = dpTolerance / 10;
+         prefDPTolerance = dpTolerance / 10f;
       } else {
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
@@ -2850,9 +2891,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final DPPoint[] dpPoints = new DPPoint[serieLength];
       for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
 
+         final int valueIndex = serieIndex + valueIndexLeft;
+
+         if (valueIndex >= distanceSerie.length) {
+
+            StatusUtil.logError(String.format(
+
+                  "[TourData.computeAvg_Altitude()] valueIndex=%d is larger than the distanceSerie.length=%d", //$NON-NLS-1$
+
+                  valueIndex,
+                  distanceSerie.length));
+
+            return Float.MAX_VALUE;
+         }
+
          dpPoints[serieIndex] = new DPPoint(
-               distanceSerie[serieIndex + valueIndexLeft],
-               altitudeSerie[serieIndex + valueIndexLeft],
+
+               distanceSerie[valueIndex],
+               altitudeSerie[valueIndex],
+
                serieIndex);
       }
 
@@ -2900,11 +2957,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * distance.
     *
     * @return
-    *         If successful, the average elevation change of a given tour, 0 otherwise.
+    *         If successful, the average elevation change (in m/km) of a given tour, 0 otherwise.
     */
    private void computeAvg_AltitudeChange() {
 
-      avgAltitudeChange = tourDistance <= 0f ? 0 : (int) ((tourAltUp + tourAltDown) / (tourDistance / 1000f));
+      avgAltitudeChange = Math.round(UI.computeAverageElevationChange(tourAltUp + tourAltDown, tourDistance));
    }
 
    private void computeAvg_Cadence() {
@@ -3429,7 +3486,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return false;
       }
 
-      if (breakTimeSerie == null) {
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
+      if (!isPaceAndSpeedFromRecordedTime && breakTimeSerie == null) {
          getBreakTime();
       }
 
@@ -3445,11 +3504,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float cadence = cadenceSerie[serieIndex];
          final int time = timeSerie[serieIndex];
 
-         final int timeDiff = time - prevTime;
+         int timeDiff = time - prevTime;
          prevTime = time;
 
-         // check if a break occurred, break time is ignored
-         if (breakTimeSerie != null) {
+         // Check if the user has selected to use the recorded time instead of
+         // the moving time.
+         if (isPaceAndSpeedFromRecordedTime) {
+
+            // Check if a pause occurred. Pauses time is ignored.
+            final int pausedTime = getPausedTime(serieIndex - 1, serieIndex);
+            if (pausedTime > 0 && timeDiff >= pausedTime) {
+               timeDiff = Math.max(0, timeDiff - pausedTime);
+            }
+         }
+         // Check if a break occurred, break time is ignored
+         else if (breakTimeSerie != null) {
 
             /*
              * break time requires distance data, so it's possible that break time data are not
@@ -4290,7 +4359,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          computeDataSeries_Smoothed();
       }
 
-      // double check was necessary because this case occured but it should not
+      // double check was necessary because this case occurred but it should not
       if (altitudeSerieSmoothed == null) {
          return;
       }
@@ -5095,7 +5164,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (serieData.powerSerie != null) {
 
-         if (isPowerSerieFromDevice & isDataSerieWithContent(serieData.powerSerie)) {
+         if (isPowerSerieFromDevice && isDataSerieWithContent(serieData.powerSerie)) {
             serieData.powerSerie20 = convertDataSeries_ToFloat(serieData.powerSerie, 0);
          }
 
@@ -5178,86 +5247,97 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /**
        * Approach waypoint time to the nearest time slice time
        */
-      for (int timeDiffRange = 0; timeDiffRange < 10; timeDiffRange++) {
+      for (double maxGeoDiff = MAX_GEO_DIFF; maxGeoDiff <= 1;) {
 
-         final int timeDiffRangeMS = timeDiffRange * 1000;
+         for (int timeDiffRange = 0; timeDiffRange < 1000;) {
 
-         final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
+            final int timeDiffRangeMS = timeDiffRange * 1000;
 
-         for (final TourWayPoint wp : remainingWayPoints) {
+            final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<>();
 
-            final long wpTime = wp.getTime();
-            final double wpLat = wp.getLatitude();
-            final double wpLon = wp.getLongitude();
+            for (final TourWayPoint wp : remainingWayPoints) {
 
-            for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+               final long wpTime = wp.getTime();
+               final double wpLat = wp.getLatitude();
+               final double wpLon = wp.getLongitude();
 
-               final int relativeTime = timeSerie[serieIndex];
-               final long tourTime = tourStartTime + relativeTime * 1000;
+               for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-               // get absolute time diff
-               long timeDiff = tourTime - wpTime;
-               if (timeDiff < 0) {
-                  timeDiff = -timeDiff;
-               }
+                  final int relativeTime = timeSerie[serieIndex];
+                  final long tourTime = tourStartTime + relativeTime * 1000;
 
-               if (timeDiff <= timeDiffRangeMS) {
-
-                  final double tourLat = latitudeSerie[serieIndex];
-                  final double tourLon = longitudeSerie[serieIndex];
-
-                  double latDiff = tourLat - wpLat;
-                  double lonDiff = tourLon - wpLon;
-
-                  if (latDiff < 0) {
-                     latDiff = -latDiff;
-                  }
-                  if (lonDiff < 0) {
-                     lonDiff = -lonDiff;
+                  // get absolute time diff
+                  long timeDiff = tourTime - wpTime;
+                  if (timeDiff < 0) {
+                     timeDiff = -timeDiff;
                   }
 
-                  if (latDiff < MAX_GEO_DIFF && lonDiff < MAX_GEO_DIFF) {
+                  if (timeDiff <= timeDiffRangeMS) {
 
-                     // time and position is the same
+                     final double tourLat = latitudeSerie[serieIndex];
+                     final double tourLon = longitudeSerie[serieIndex];
 
-                     final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+                     double latDiff = tourLat - wpLat;
+                     double lonDiff = tourLon - wpLon;
 
-                     tourMarker.setSerieIndex(serieIndex);
-                     tourMarker.setTime(relativeTime, wpTime);
-
-                     tourMarker.setLatitude(wpLat);
-                     tourMarker.setLongitude(wpLon);
-
-                     tourMarker.setDescription(wp.getDescription());
-                     tourMarker.setLabel(wp.getName());
-
-                     tourMarker.setUrlAddress(wp.getUrlAddress());
-                     tourMarker.setUrlText(wp.getUrlText());
-
-                     final float altitude = wp.getAltitude();
-                     if (altitude != Float.MIN_VALUE) {
-                        tourMarker.setAltitude(altitude);
+                     if (latDiff < 0) {
+                        latDiff = -latDiff;
+                     }
+                     if (lonDiff < 0) {
+                        lonDiff = -lonDiff;
                      }
 
-                     tourMarkers.add(tourMarker);
+                     if (latDiff < maxGeoDiff && lonDiff < maxGeoDiff) {
 
-                     removedWayPoints.add(wp);
-                     allRemovedWayPoints.add(wp);
+                        // time and position is the same
 
-                     break;
+                        final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_CUSTOM);
+
+                        tourMarker.setSerieIndex(serieIndex);
+                        tourMarker.setTime(relativeTime, wpTime);
+
+                        tourMarker.setLatitude(wpLat);
+                        tourMarker.setLongitude(wpLon);
+
+                        tourMarker.setDescription(wp.getDescription());
+                        tourMarker.setLabel(wp.getName());
+
+                        tourMarker.setUrlAddress(wp.getUrlAddress());
+                        tourMarker.setUrlText(wp.getUrlText());
+
+                        final float altitude = wp.getAltitude();
+                        if (altitude != Float.MIN_VALUE) {
+                           tourMarker.setAltitude(altitude);
+                        }
+
+                        tourMarkers.add(tourMarker);
+
+                        removedWayPoints.add(wp);
+                        allRemovedWayPoints.add(wp);
+
+                        break;
+                     }
                   }
                }
             }
+
+            remainingWayPoints.removeAll(removedWayPoints);
+
+            if (remainingWayPoints.isEmpty()) {
+
+               // all waypoints are converted
+
+               break;
+            }
+
+            if (timeDiffRange < 100) {
+               timeDiffRange += 10;
+            } else {
+               timeDiffRange += 100;
+            }
          }
 
-         remainingWayPoints.removeAll(removedWayPoints);
-
-         if (remainingWayPoints.isEmpty()) {
-
-            // all waypoints are converted
-
-            break;
-         }
+         maxGeoDiff *= 10;
       }
 
       // collapse waypoints
@@ -6659,7 +6739,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                                  final float distanceAbsolute) {
 
       // create a new marker
-      final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
+      final TourMarker tourMarker = new TourMarker(this, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
       /*
        * ??? timeData.marker was added until version 14.9 but I have no idea why this was added ???
@@ -7044,6 +7124,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return avgTemperature;
    }
 
+   public short[] getBattery_Percentage() {
+      return battery_Percentage;
+   }
+
+   public short getBattery_Percentage_End() {
+      return battery_Percentage_End;
+   }
+
+   public short getBattery_Percentage_Start() {
+      return battery_Percentage_Start;
+   }
+
+   /**
+    * @return Returns battery time in seconds, relative to the tour start time
+    */
+   public int[] getBattery_Time() {
+      return battery_Time;
+   }
+
    /**
     * @return Returns the body fat.
     */
@@ -7314,11 +7413,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns device name which is displayed in the tour editor info tab
     */
    public String getDeviceName() {
+
       if ((devicePluginId != null) && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
+
          return Messages.tour_data_label_manually_created_tour;
+
       } else if ((devicePluginName == null) || (devicePluginName.length() == 0)) {
+
          return UI.EMPTY_STRING;
+
       } else {
+
          return devicePluginName;
       }
    }
@@ -7779,7 +7884,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int totalPausedTime = 0;
 
-      if (timeSerie == null || pausedTime_Start == null) {
+      if (timeSerie == null || pausedTime_Start == null ||
+            startIndex < 0 || endIndex < 0 || startIndex == endIndex ||
+            startIndex > timeSerie.length || endIndex > timeSerie.length) {
          return totalPausedTime;
       }
 
@@ -8458,6 +8565,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns SRTM metric or imperial data serie depending on the active measurement or
     *         <code>null</code> when SRTM data serie is not available
     */
+   @JsonIgnore
    public float[] getSRTMSerie() {
 
       if (latitudeSerie == null) {
@@ -9540,6 +9648,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // currently only surfing data can be made visible/hidden
       visibleDataPointSerie      = serieData.visiblePoints_Surfing;
 
+      // battery
+      battery_Percentage         = serieData.battery_Percentage;
+      battery_Time               = serieData.battery_Time;
+
 // SET_FORMATTING_ON
    }
 
@@ -9580,11 +9692,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.powerSerie20 = powerSerie;
       }
 
-      serieData.latitudeE6      = convertDataSeries_ToE6(latitudeSerie);
-      serieData.longitudeE6     = convertDataSeries_ToE6(longitudeSerie);
+      serieData.latitudeE6          = convertDataSeries_ToE6(latitudeSerie);
+      serieData.longitudeE6         = convertDataSeries_ToE6(longitudeSerie);
 
-
-      serieData.gears         = gearSerie;
+      serieData.gears               = gearSerie;
 
       serieData.pulseTimes          = pulseTime_Milliseconds;
       serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
@@ -9608,7 +9719,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.cadenceSerie20 = null;
       }
 
+      // surfing
       serieData.visiblePoints_Surfing        = visiblePoints_ForSurfing;
+
+      // battery
+      serieData.battery_Percentage           = battery_Percentage;
+      serieData.battery_Time                 = battery_Time;
 
 // SET_FORMATTING_ON
 
@@ -9717,6 +9833,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.avgTemperature = avgTemperature;
    }
 
+   public void setBattery_Percentage(final short[] battery_Percentage) {
+      this.battery_Percentage = battery_Percentage;
+   }
+
+   public void setBattery_Percentage_End(final short battery_Percentage_End) {
+      this.battery_Percentage_End = battery_Percentage_End;
+   }
+
+   public void setBattery_Percentage_Start(final short battery_Percentage_Start) {
+      this.battery_Percentage_Start = battery_Percentage_Start;
+   }
+
+   public void setBattery_Time(final int[] battery_Time) {
+      this.battery_Time = battery_Time;
+   }
+
    /**
     * @param bodyFat
     *           Sets the body fat.
@@ -9802,6 +9934,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.deviceModeName = deviceModeName;
    }
 
+   /**
+    * Set {@link #devicePluginName}
+    *
+    * @param deviceName
+    */
    public void setDeviceName(final String deviceName) {
       devicePluginName = deviceName;
    }
@@ -11085,7 +11222,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          /**
           * !!!! <br>
           * Way point must be cloned because the entity could be saved within different tour data
-          * instances, otherwise hibernate exceptions occure this also sets the createId. <br>
+          * instances, otherwise hibernate exceptions occur this also sets the createId. <br>
           * !!!!
           */
          final TourWayPoint clonedWP = tourWayPoint.clone(this);
@@ -11199,17 +11336,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Override
    public String toString() {
 
-      return "TourData [" + NL //                                                                  //$NON-NLS-1$
+      return "TourData [" + NL //                                                                     //$NON-NLS-1$
 
-            + "start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //       //$NON-NLS-1$
+            + "start    = " + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //     //$NON-NLS-1$
             + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + "tourId=" + tourId + NL //                                                           //$NON-NLS-1$
+            + "tourId   = " + tourId + NL //                                                          //$NON-NLS-1$
 
-            + "object=" + super.toString() + NL //                                                 //$NON-NLS-1$
-            + "identityHashCode=" + System.identityHashCode(this) + NL //                          //$NON-NLS-1$
+//            + "object   = " + super.toString() + NL //                                              //$NON-NLS-1$
+//            + "identityHashCode=" + System.identityHashCode(this) + NL //                           //$NON-NLS-1$
 
-//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                    //$NON-NLS-1$
+//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                       //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

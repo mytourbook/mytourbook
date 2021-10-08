@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>21.6.1-SNAPSHOT</version>
+                                             <version>21.9.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>
@@ -63,8 +63,8 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.19</id>                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2021-03</url>
+         <id>eclipse.platform.4.20</id>                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2021-06</url>
       </repository>   
 
       <repository>

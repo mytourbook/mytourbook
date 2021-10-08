@@ -53,7 +53,6 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
-import net.tourbook.map2.Messages;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionShowPhotos;
@@ -1603,6 +1602,8 @@ public class Map25View extends ViewPart implements
       // other layers
       _mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
       _mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
+      //handling S3DB like building, not used layer will be removed in map25app
+      _mapApp.getLayer_S3DB().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
 
       _mapApp.getLayer_MapBookmark().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE, true));
 

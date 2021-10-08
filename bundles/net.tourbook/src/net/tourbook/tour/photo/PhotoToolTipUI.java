@@ -160,7 +160,11 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    private class ActionToggleGalleryOrientation extends Action {
 
       public ActionToggleGalleryOrientation() {
+
          super(null, Action.AS_PUSH_BUTTON);
+
+         // an image must be set otherwise the toolbar icons can be too small, this happens not allways :-(
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
       }
 
       @Override

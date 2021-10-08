@@ -100,7 +100,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Table;
@@ -1941,11 +1940,13 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       if (_isBehaviourSingleExpandedOthersCollapse) {
 
+         final Tree tree = _tagViewer.getTree();
+
          /*
-          * run async because this is doing a reselection which cannot be done within the current
+          * Run async because this is doing a reselection which cannot be done within the current
           * selection event
           */
-         Display.getCurrent().asyncExec(new Runnable() {
+         tree.getDisplay().asyncExec(new Runnable() {
 
             private long               __expandRunnableCounter = ++_expandRunnableCounter;
 
@@ -1958,6 +1959,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
                // check if a newer expand event occurred
                if (__expandRunnableCounter != _expandRunnableCounter) {
+                  return;
+               }
+
+               if (tree.isDisposed()) {
                   return;
                }
 
@@ -2049,8 +2054,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    }
 
    private void onTagCloud_Delete() {
-
-      // TODO Auto-generated method stub
 
       final TagCloud selectedTagCloud = (TagCloud) _tagCloudViewer.getStructuredSelection().getFirstElement();
 

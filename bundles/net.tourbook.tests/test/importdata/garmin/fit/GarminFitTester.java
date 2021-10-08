@@ -21,6 +21,8 @@ import java.util.HashMap;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -61,7 +63,12 @@ public class GarminFitTester {
       final String filePath = IMPORT_FILE_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".fit").toAbsolutePath().toString(); //$NON-NLS-1$
-		fitDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
+      fitDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -77,7 +84,12 @@ public class GarminFitTester {
       final String filePath = IMPORT_FILE_PATH + "1-30-21 3-47 PM"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".fit").toAbsolutePath().toString(); //$NON-NLS-1$
-		fitDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours, false);
+      fitDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

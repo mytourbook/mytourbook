@@ -301,6 +301,12 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          timeData.runDyn_VerticalRatio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
       }
 
+      final Float batterySoc = mesg.getBatterySoc();
+      if (batterySoc != null) {
+//         System.out.println((System.currentTimeMillis() + " battery Soc: " + batterySoc));
+         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+
       setRecord_DeveloperData(mesg, timeData);
    }
 

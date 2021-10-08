@@ -43,6 +43,7 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.graphics.Rectangle;
@@ -581,7 +582,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    public boolean isDeviceMarker() {
 
-      return type == ChartLabel.MARKER_TYPE_DEVICE;
+      return type == ChartLabelMarker.MARKER_TYPE_DEVICE;
    }
 
    /**

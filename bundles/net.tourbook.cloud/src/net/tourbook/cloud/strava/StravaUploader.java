@@ -55,7 +55,6 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourLogState;
 
 import org.apache.http.HttpHeaders;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -282,7 +281,10 @@ public class StravaUploader extends TourbookCloudUploader {
 
       if (StringUtils.hasContent(activityUpload.getError())) {
 
-         TourLogManager.logError(NLS.bind(Messages.Log_UploadToursToStrava_004_UploadError, activityUpload.getTourDate(), activityUpload.getError()));
+         TourLogManager.log_ERROR(NLS.bind(
+               Messages.Log_UploadToursToStrava_004_UploadError,
+               activityUpload.getTourDate(),
+               activityUpload.getError()));
 
       } else {
 
@@ -290,18 +292,18 @@ public class StravaUploader extends TourbookCloudUploader {
 
          if (StringUtils.hasContent(activityUpload.getName())) {
 
-            TourLogManager.addLog(TourLogState.IMPORT_OK,
-                  NLS.bind(Messages.Log_UploadToursToStrava_003_ActivityLink,
-                        activityUpload.getTourDate(),
-                        activityUpload.getId()));
+            TourLogManager.log_OK(NLS.bind(
+                  Messages.Log_UploadToursToStrava_003_ActivityLink,
+                  activityUpload.getTourDate(),
+                  activityUpload.getId()));
          } else {
 
-            TourLogManager.addLog(TourLogState.IMPORT_OK,
-                  NLS.bind(Messages.Log_UploadToursToStrava_003_UploadStatus,
-                        new Object[] {
-                              activityUpload.getTourDate(),
-                              activityUpload.getId(),
-                              activityUpload.getStatus() }));
+            TourLogManager.log_OK(NLS.bind(
+                  Messages.Log_UploadToursToStrava_003_UploadStatus,
+                  new Object[] {
+                        activityUpload.getTourDate(),
+                        activityUpload.getId(),
+                        activityUpload.getStatus() }));
          }
       }
 
@@ -326,7 +328,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          final String tourDate = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
 
-         TourLogManager.logError(NLS.bind(Messages.Log_UploadToursToStrava_002_NoTourTitle, tourDate));
+         TourLogManager.log_ERROR(NLS.bind(Messages.Log_UploadToursToStrava_002_NoTourTitle, tourDate));
          monitor.worked(2);
 
       } else {
@@ -439,7 +441,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   numberOfTours * 2);
 
             if (!getValidTokens()) {
-               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
+               TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
                return;
             }
 
@@ -483,11 +485,11 @@ public class StravaUploader extends TourbookCloudUploader {
          final long start = System.currentTimeMillis();
 
          TourLogManager.showLogView();
-         TourLogManager.logTitle(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
+         TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
-         TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+         TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),

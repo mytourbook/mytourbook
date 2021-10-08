@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,15 +35,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.ui.UI;
+import net.tourbook.tour.TourManager;
+import net.tourbook.web.WEB;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -65,6 +71,7 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.Builder;
@@ -80,6 +87,7 @@ import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.apache.lucene.search.suggest.analyzing.FreeTextSuggester;
+import org.apache.lucene.search.uhighlight.DefaultPassageFormatter;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
@@ -89,48 +97,60 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class FTSearchManager {
 
-   private static final String             LUCENE_INDEX_FOLDER_NAME      = "lucene-index";                 //$NON-NLS-1$
+   private static final String                  LUCENE_INDEX_FOLDER_NAME         = "lucene-index";                 //$NON-NLS-1$
 
-   private static final String             SEARCH_FIELD_DESCRIPTION      = "description";                  //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_DOC_SOURCE_INDEX = "docSource_Index";              //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_DOC_SOURCE_SAVED = "docSource_Saved";              //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_MARKER_ID        = "markerID";                     //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_TITLE            = "title";                        //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_TOUR_ID          = "tourID";                       //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_TIME             = "time";                         //$NON-NLS-1$
-   private static final String             SEARCH_FIELD_WAYPOINT_ID      = "wayPointID";                   //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_DESCRIPTION         = "description";                  //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_DOC_SOURCE_INDEX    = "docSource_Index";              //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_DOC_SOURCE_SAVED    = "docSource_Saved";              //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_MARKER_ID           = "markerID";                     //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TITLE               = "title";                        //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_ID             = "tourID";                       //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_LOCATION_START = "startLocation";                //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_LOCATION_END   = "endLocation";                  //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_WEATHER        = "weather";                      //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TIME                = "time";                         //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                   //$NON-NLS-1$
 
-   private static final String             LOG_CREATE_INDEX              = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
+   private static final String                  LOG_CREATE_INDEX                 = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
 
-   static final int                        DOC_SOURCE_TOUR               = 1;
-   static final int                        DOC_SOURCE_TOUR_MARKER        = 2;
-   static final int                        DOC_SOURCE_WAY_POINT          = 3;
+   private static final IPreferenceStore        _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private static final List<LookupResult> _emptyProposal                = new ArrayList<>();
+   static final int                             DOC_SOURCE_TOUR                  = 1;
+   static final int                             DOC_SOURCE_TOUR_MARKER           = 2;
+   static final int                             DOC_SOURCE_WAY_POINT             = 3;
 
-   private static Lookup                   _suggester;
+   private static final List<LookupResult>      _emptyProposal                   = new ArrayList<>();
 
-   private static IndexReader              _indexReader;
-   private static IndexSearcher            _indexSearcher;
-   private static FSDirectory              _infixStore;
+   private static Lookup                        _suggester;
 
-   private static TopDocs                  _topDocs;
-   private static String                   _topDocsSearchText;
+   private static IndexReader                   _indexReader;
+   private static IndexSearcher                 _indexSearcher;
+   private static FSDirectory                   _infixStore;
 
-   private static boolean                  _isShowContentAll;
-   private static boolean                  _isShowContentMarker;
-   private static boolean                  _isShowContentTour;
-   private static boolean                  _isShowContentWaypoint;
-   private static boolean                  _isSortDateAscending          = false;                          // -> sort descending
+   private static TopDocs                       _topDocs;
 
-   private static FieldType                fieldType_Int;
-   private static FieldType                fieldType_Long;
+   private static final DefaultPassageFormatter _highlightFormatter;
+
+   private static boolean                       _isSearch_All;
+   private static boolean                       _isSearch_Marker;
+   private static boolean                       _isSearch_Tour;
+   private static boolean                       _isSearch_Tour_LocationStart;
+   private static boolean                       _isSearch_Tour_LocationEnd;
+   private static boolean                       _isSearch_Tour_Weather;
+   private static boolean                       _isSearch_Waypoint;
+   private static boolean                       _isShow_TitleDescription;
+   private static boolean                       _isSort_DateAscending            = false;                          // -> sort descending
+
+   private static final FieldType               fieldType_Int;
+   private static final FieldType               fieldType_Long;
 
    static {
 
@@ -143,6 +163,28 @@ public class FTSearchManager {
       fieldType_Long.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
       fieldType_Long.setDocValuesType(DocValuesType.NUMERIC);
       fieldType_Long.freeze();
+
+      final String graphMarker_ColorDevice = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE;
+
+      final String cssHighlighterColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDevice));
+
+      /*
+       * Create custom formatter for the highlighter, the default highlighter displays the
+       * highlighted text with bold face
+       */
+      _highlightFormatter = new DefaultPassageFormatter(
+
+            // pre tag: highlight a hit with another color
+            "<span style='color:" + cssHighlighterColor + ";'>", //$NON-NLS-1$ //$NON-NLS-2$
+
+            // post tag
+            "</span>", //$NON-NLS-1$
+
+            "... ", //$NON-NLS-1$
+
+            false);
    }
 
    /**
@@ -179,8 +221,13 @@ public class FTSearchManager {
          __liveDocs = (__indexReader.leaves().size() > 0) ? MultiFields.getLiveDocs(__indexReader) : null;
 
          __fieldsToLoad = new HashSet<>();
+
          __fieldsToLoad.add(SEARCH_FIELD_TITLE);
          __fieldsToLoad.add(SEARCH_FIELD_DESCRIPTION);
+
+         __fieldsToLoad.add(SEARCH_FIELD_TOUR_LOCATION_START);
+         __fieldsToLoad.add(SEARCH_FIELD_TOUR_LOCATION_END);
+         __fieldsToLoad.add(SEARCH_FIELD_TOUR_WEATHER);
 
          __fieldNames = new ArrayList<>(__fieldsToLoad);
          __fieldCount = __fieldNames.size();
@@ -231,7 +278,7 @@ public class FTSearchManager {
                   continue;
                }
 
-               final BytesRef tempFieldValue = fieldVal.stringValue() != null //
+               final BytesRef tempFieldValue = fieldVal.stringValue() != null
                      ? new BytesRef(fieldVal.stringValue())
                      : fieldVal.binaryValue();
 
@@ -273,6 +320,13 @@ public class FTSearchManager {
 
          fieldsData = Long.valueOf(value);
       }
+   }
+
+   private static class QueryResult {
+
+      public Query    query;
+
+      public String[] allQueryFields;
    }
 
    public static void closeIndexReaderSuggester() {
@@ -328,88 +382,6 @@ public class FTSearchManager {
       }
    }
 
-   private static Document createDoc_Marker(final long markerId,
-                                            final long tourId,
-                                            final String title,
-                                            final String description,
-                                            final long time) throws IOException {
-
-      final Document doc = new Document();
-
-      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER));
-      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
-
-      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR_MARKER));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
-
-      if (title != null) {
-         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
-      }
-
-      if (description != null) {
-         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
-      }
-
-      return doc;
-   }
-
-   private static Document createDoc_Tour(final long tourId,
-                                          final String title,
-                                          final String description,
-                                          final long time) throws IOException {
-
-      final Document doc = new Document();
-
-      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR));
-      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
-
-      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
-
-      if (title != null) {
-         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
-      }
-
-      if (description != null) {
-         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
-      }
-
-      return doc;
-   }
-
-   private static Document createDoc_WayPoint(final long dbWayPointId,
-                                              final long tourId,
-                                              final String title,
-                                              final String description,
-                                              final long time) throws IOException {
-
-      final Document doc = new Document();
-
-      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT));
-      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
-
-      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_WAY_POINT));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
-      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_WAYPOINT_ID, dbWayPointId));
-
-      if (time != 0) {
-         doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
-      }
-
-      if (title != null) {
-         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
-      }
-
-      if (description != null) {
-         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
-      }
-
-      return doc;
-   }
-
    private static IndexableField createField_WithIndexOptions_Int(final String fieldName, final int value) {
 
       return new FieldWithOptions_Int(fieldName, fieldType_Int, value);
@@ -436,7 +408,156 @@ public class FTSearchManager {
       return fieldType;
    }
 
-   private static void createStores_TourData(final Connection conn, final IProgressMonitor monitor)
+   private static Document createLuceneDoc_Marker(final long markerId,
+                                                  final long tourId,
+                                                  final String title,
+                                                  final String description,
+                                                  final long time) throws IOException {
+
+      final Document doc = new Document();
+
+      // create a field to identify a tour marker
+      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER));
+
+      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
+
+      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR_MARKER));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_MARKER_ID, markerId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
+
+      if (title != null) {
+         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
+      }
+
+      if (description != null) {
+         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
+
+      return doc;
+   }
+
+   private static Document createLuceneDoc_Tour(final long tourId,
+                                                final long time,
+                                                final String title,
+                                                final String description,
+                                                final String startPlace,
+                                                final String endPlace,
+                                                final String weather) throws IOException {
+
+      final Document doc = new Document();
+
+      // create a field to identify a tour
+      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR));
+
+      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
+
+      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_TOUR));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
+
+      if (title != null) {
+         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
+      }
+
+      if (description != null) {
+         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
+
+      if (startPlace != null) {
+         doc.add(new Field(SEARCH_FIELD_TOUR_LOCATION_START, startPlace, createFieldType_Text()));
+      }
+
+      if (endPlace != null) {
+         doc.add(new Field(SEARCH_FIELD_TOUR_LOCATION_END, endPlace, createFieldType_Text()));
+      }
+
+      if (weather != null) {
+         doc.add(new Field(SEARCH_FIELD_TOUR_WEATHER, weather, createFieldType_Text()));
+      }
+
+      return doc;
+   }
+
+   private static Document createLuceneDoc_WayPoint(final long dbWayPointId,
+                                                    final long tourId,
+                                                    final String title,
+                                                    final String description,
+                                                    final long time) throws IOException {
+
+      final Document doc = new Document();
+
+      // create a field to identify a waypoint
+      doc.add(new IntPoint(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT));
+
+      doc.add(new LongPoint(SEARCH_FIELD_TOUR_ID, tourId));
+
+      doc.add(createField_WithIndexOptions_Int(SEARCH_FIELD_DOC_SOURCE_SAVED, DOC_SOURCE_WAY_POINT));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TOUR_ID, tourId));
+      doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_WAYPOINT_ID, dbWayPointId));
+
+      if (time != 0) {
+         doc.add(createField_WithIndexOptions_Long(SEARCH_FIELD_TIME, time));
+      }
+
+      if (title != null) {
+         doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
+      }
+
+      if (description != null) {
+         doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
+      }
+
+      return doc;
+   }
+
+   /**
+    * Create max passages for the highlighter
+    * <p>
+    * "If no highlights were found for a document, the first maxPassages from the field will
+    * be returned."
+    * <p>
+    * {@link org.apache.lucene.search.uhighlight.UnifiedHighlighter.highlightFields(String[],
+    * Query, TopDocs) }
+    *
+    * @param numQueryFields
+    */
+   private static int[] createMaxPassages(final int numQueryFields) {
+
+      final int allMaxPassages[] = new int[numQueryFields];
+
+      Arrays.fill(allMaxPassages, 1);
+
+      return allMaxPassages;
+   }
+
+   private static MultiFieldQueryParser createMultiFieldQueryParser(final Analyzer analyzer,
+                                                                    final String[] allQueryFields) {
+
+      final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(allQueryFields, analyzer);
+
+      queryParser.setAllowLeadingWildcard(true);
+
+      return queryParser;
+   }
+
+   private static Query createQuery_Tour() {
+
+      return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
+   }
+
+   private static Query createQuery_TourMarker() {
+
+      return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
+   }
+
+   private static Query createQuery_Waypoint() {
+
+      return IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
+   }
+
+   private static void createStore_TourData(final Connection conn,
+                                            final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -455,16 +576,19 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = UI.EMPTY_STRING //
-               //
-               + "SELECT" //$NON-NLS-1$
-               //
-               + " tourId," //				1 //$NON-NLS-1$
-               + " tourTitle," //			2 //$NON-NLS-1$
-               + " tourDescription," //	3 //$NON-NLS-1$
-               + " tourStartTime" //		4 //$NON-NLS-1$
-               //
-               + (" FROM " + tableName); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" //                 //$NON-NLS-1$
+
+               + " tourId," //            1  //$NON-NLS-1$
+               + " tourStartTime," //     2  //$NON-NLS-1$
+               + " tourTitle," //         3  //$NON-NLS-1$
+               + " tourDescription," //   4  //$NON-NLS-1$
+               + " tourStartPlace," //    5  //$NON-NLS-1$
+               + " tourEndPlace," //      6  //$NON-NLS-1$
+               + " weather" //            7  //$NON-NLS-1$
+
+               + " FROM " + tableName; //    //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          final ResultSet rs = stmt.executeQuery();
@@ -474,29 +598,47 @@ public class FTSearchManager {
 
          while (rs.next()) {
 
-            final long dbTourId = rs.getLong(1);
-            final String dbTitle = rs.getString(2);
-            final String dbDescription = rs.getString(3);
-            final Long dbTourStartTime = rs.getLong(4);
+// SET_FORMATTING_OFF
 
-            final Document tourDoc = createDoc_Tour(dbTourId, dbTitle, dbDescription, dbTourStartTime);
+            final long   dbTourId         = rs.getLong(1);
+            final Long   dbTourStartTime  = rs.getLong(2);
+            final String dbTitle          = rs.getString(3);
+            final String dbDescription    = rs.getString(4);
+            final String dbStartPlace     = rs.getString(5);
+            final String dbEndPlace       = rs.getString(6);
+            final String dbWeather        = rs.getString(7);
+
+// SET_FORMATTING_ON
+
+            final Document tourDoc = createLuceneDoc_Tour(
+
+                  dbTourId,
+                  dbTourStartTime,
+                  dbTitle,
+                  dbDescription,
+                  dbStartPlace,
+                  dbEndPlace,
+                  dbWeather);
+
             indexWriter.addDocument(tourDoc);
 
             createdDocuments++;
 
             /*
-             * Update monitor every 1/20 seconds
+             * Update monitor every 1/5 seconds
              */
             final long now = System.currentTimeMillis();
 
-            if (now > lastUpdateTime + 50) {
+            if (now > lastUpdateTime + 200) {
                lastUpdateTime = now;
                monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
             }
          }
 
       } catch (final IOException e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
 
          closeIndexWriterAndStore(indexStore, indexWriter);
@@ -507,7 +649,7 @@ public class FTSearchManager {
       }
    }
 
-   private static void createStores_TourMarker(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourMarker(final Connection conn, final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -526,17 +668,17 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = UI.EMPTY_STRING //
-               //
-               + "SELECT" //$NON-NLS-1$
-               //
-               + " markerId," //					     	1 //$NON-NLS-1$
-               + (TourDatabase.KEY_TOUR + ",") //  2 //$NON-NLS-1$
-               + " label," //                      3 //$NON-NLS-1$
-               + " description," //                4 //$NON-NLS-1$
-               + " tourTime" //                    5 //$NON-NLS-1$
-               //
-               + (" FROM " + tableName); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" //                             //$NON-NLS-1$
+
+               + " markerId," //                      1  //$NON-NLS-1$
+               + TourDatabase.KEY_TOUR + "," //       2  //$NON-NLS-1$
+               + " label," //                         3  //$NON-NLS-1$
+               + " description," //                   4  //$NON-NLS-1$
+               + " tourTime" //                       5  //$NON-NLS-1$
+
+               + " FROM " + tableName; //                //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          final ResultSet rs = stmt.executeQuery();
@@ -552,7 +694,13 @@ public class FTSearchManager {
             final String dbDescription = rs.getString(4);
             final long dbTourTime = rs.getLong(5);
 
-            final Document markerDoc = createDoc_Marker(dbMarkerId, dbTourId, dbLabel, dbDescription, dbTourTime);
+            final Document markerDoc = createLuceneDoc_Marker(
+                  dbMarkerId,
+                  dbTourId,
+                  dbLabel,
+                  dbDescription,
+                  dbTourTime);
+
             indexWriter.addDocument(markerDoc);
 
             createdDocuments++;
@@ -580,7 +728,7 @@ public class FTSearchManager {
       }
    }
 
-   private static void createStores_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
+   private static void createStore_TourWaypoint(final Connection conn, final IProgressMonitor monitor)
          throws SQLException {
 
       final long start = System.currentTimeMillis();
@@ -599,17 +747,17 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = UI.EMPTY_STRING //
-               //
-               + "SELECT" //$NON-NLS-1$
-               //
-               + (" " + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$ //$NON-NLS-2$
-               + (TourDatabase.KEY_TOUR + ",") //						2 //$NON-NLS-1$
-               + " name," //											3 //$NON-NLS-1$
-               + " description," //									4 //$NON-NLS-1$
-               + " time" //											5 //$NON-NLS-1$
-               //
-               + (" FROM " + tableName); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" //                                         //$NON-NLS-1$
+
+               + " " + TourDatabase.ENTITY_ID_WAY_POINT + "," //  1  //$NON-NLS-1$ //$NON-NLS-2$
+               + " " + TourDatabase.KEY_TOUR + "," //             2  //$NON-NLS-1$ //$NON-NLS-2$
+               + " name," //                                      3  //$NON-NLS-1$
+               + " description," //                               4  //$NON-NLS-1$
+               + " time" //                                       5  //$NON-NLS-1$
+
+               + " FROM " + tableName; //                            //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          final ResultSet rs = stmt.executeQuery();
@@ -625,17 +773,24 @@ public class FTSearchManager {
             final String dbDescription = rs.getString(4);
             final long dbTourTime = rs.getLong(5);
 
-            final Document wayPointDoc = createDoc_WayPoint(dbWayPointId, dbTourId, dbLabel, dbDescription, dbTourTime);
+            final Document wayPointDoc = createLuceneDoc_WayPoint(
+
+                  dbWayPointId,
+                  dbTourId,
+                  dbLabel,
+                  dbDescription,
+                  dbTourTime);
+
             indexWriter.addDocument(wayPointDoc);
 
             createdDocuments++;
 
             /*
-             * Update monitor every 1/20 seconds
+             * Update monitor every 1/5 seconds
              */
             final long now = System.currentTimeMillis();
 
-            if (now > lastUpdateTime + 50) {
+            if (now > lastUpdateTime + 200) {
                lastUpdateTime = now;
                monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
             }
@@ -654,11 +809,79 @@ public class FTSearchManager {
    }
 
    /**
+    * Split all tour id's into smaller parts because of this limit
+    *
+    * <pre>
+    * org.apache.lucene.search.BooleanQuery$TooManyClauses: maxClauseCount is set to 1024
+    * at org.apache.lucene.search.BooleanQuery$Builder.add(BooleanQuery.java:114)
+    * at org.apache.lucene.search.BooleanQuery$Builder.add(BooleanQuery.java:127)
+    * at net.tourbook.search.FTSearchManager.updateIndex(FTSearchManager.java:1751)
+    * </pre>
+    */
+   private static List<List<Long>> createTourIdParts(final List<Long> allTourIDs) {
+
+      final ArrayList<Long> allTourIds_List = new ArrayList<>();
+
+      for (final long tourId : allTourIDs) {
+         allTourIds_List.add(tourId);
+      }
+
+      final int maxClauseCount = BooleanQuery.getMaxClauseCount() - 1;
+
+      final List<List<Long>> allPartitionedTourIDs = ListUtils.partition(allTourIds_List, maxClauseCount);
+
+      return allPartitionedTourIDs;
+   }
+
+   /**
+    * Deletes the fulltext search index, this is useful when the index has new fields.
+    */
+   public static void deleteIndex() {
+
+      setupIndexReader();
+
+      FSDirectory indexStore_TourData = null;
+      FSDirectory indexStore_Marker = null;
+      FSDirectory indexStore_WayPoint = null;
+
+      IndexWriter indexWriter_TourData = null;
+      IndexWriter indexWriter_Marker = null;
+      IndexWriter indexWriter_WayPoint = null;
+
+      try {
+
+         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
+         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
+         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
+
+         indexWriter_TourData.deleteAll();
+         indexWriter_Marker.deleteAll();
+         indexWriter_WayPoint.deleteAll();
+
+      } catch (final IOException e) {
+
+         StatusUtil.showStatus(e);
+
+      } finally {
+
+         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
+      }
+
+      closeIndexReaderSuggester();
+   }
+
+   /**
     * Remove tour from ft index when tour is deleted.
     *
     * @param tourId
     */
-   public static void deleteFromIndex(final long tourId) {
+   public static void deleteTourFromIndex(final long tourId) {
 
       setupIndexReader();
 
@@ -698,7 +921,9 @@ public class FTSearchManager {
          indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
 
       } catch (final IOException e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
 
          closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
@@ -746,11 +971,11 @@ public class FTSearchManager {
 
          // this occures when an old index exists -> delete index
 
-         TourLogManager.logError(e.getMessage());
+         TourLogManager.log_ERROR(e.getMessage());
 
          final java.nio.file.Path rootPath = getLuceneIndexRootPath();
 
-         TourLogManager.logInfo(String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString()));
+         TourLogManager.log_INFO(String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString()));
 
          Files.walkFileTree(rootPath, new SimpleFileVisitor<java.nio.file.Path>() {
 
@@ -771,7 +996,7 @@ public class FTSearchManager {
             }
          });
 
-         TourLogManager.logInfo(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
+         TourLogManager.log_INFO(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
 
          indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
       }
@@ -834,6 +1059,7 @@ public class FTSearchManager {
          return suggestions;
 
       } catch (final Exception e) {
+
          return _emptyProposal;
       }
    }
@@ -867,7 +1093,7 @@ public class FTSearchManager {
 
    private static void logCreateIndex(final String indexStore, final long start) {
 
-      StatusUtil.log(String.format(LOG_CREATE_INDEX, //
+      StatusUtil.logInfo(String.format(LOG_CREATE_INDEX,
             indexStore,
             System.currentTimeMillis() - start));
    }
@@ -884,14 +1110,14 @@ public class FTSearchManager {
 
    /**
     * @param searchText
-    * @param searchFrom
-    * @param searchTo
+    * @param searchFromIndex
+    * @param searchToIndex
     * @param searchResult
     * @return
     */
    private static void search(final String searchText,
-                              final int searchFrom,
-                              final int searchTo,
+                              final int searchFromIndex,
+                              final int searchToIndex,
                               final SearchResult searchResult) {
 
       try {
@@ -902,135 +1128,251 @@ public class FTSearchManager {
 
          if (maxDoc == 0) {
 
-            // there are 0 documents
+            // there are 0 documents in the ft index
 
             searchResult.totalHits = 0;
 
             return;
          }
 
-         final String[] queryFields = {
-               //
-               SEARCH_FIELD_TITLE,
-               SEARCH_FIELD_DESCRIPTION,
-               //
-         };
-
-         final int maxPassages[] = new int[queryFields.length];
-         Arrays.fill(maxPassages, 1);
-
          final Analyzer analyzer = getAnalyzer();
+         QueryResult queryResult;
 
-         final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
-         queryParser.setAllowLeadingWildcard(true);
+         /*
+          * Set sorting
+          */
+         final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSort_DateAscending == false);
+         final Sort ftSorting = new Sort(sortByTime);
 
-         final Query textQuery = queryParser.parse(searchText);
+         if (_isSearch_All) {
 
-         if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
+            // no filtering
 
-            // this is a new search
+            queryResult = search_10_Search_All(searchText, analyzer);
 
-            /*
-             * Set sorting
-             */
-            final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
-            final Sort sort = new Sort(sortByTime);
+         } else {
 
-            if (_isShowContentAll) {
+            // search in selected fields/indices
 
-               // no filtering
-               _topDocs = _indexSearcher.search(textQuery, maxDoc, sort);
-
-            } else {
-
-               // filter by content
-
-               /*
-                * Query text/marker/waypoint with OR
-                */
-               final Builder orQueryBuilder = new BooleanQuery.Builder();
-
-               if (_isShowContentTour) {
-
-                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR);
-
-                  orQueryBuilder.add(query, Occur.SHOULD);
-               }
-
-               if (_isShowContentMarker) {
-
-                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_TOUR_MARKER);
-
-                  orQueryBuilder.add(query, Occur.SHOULD);
-               }
-
-               if (_isShowContentWaypoint) {
-
-                  final Query query = IntPoint.newExactQuery(SEARCH_FIELD_DOC_SOURCE_INDEX, DOC_SOURCE_WAY_POINT);
-
-                  orQueryBuilder.add(query, Occur.SHOULD);
-               }
-
-               final BooleanQuery orQuery = orQueryBuilder.build();
-
-               final Builder andQueryBuilder = new BooleanQuery.Builder()
-
-                     // add search text
-                     .add(textQuery, Occur.MUST)
-
-                     // add tour text/marker/waypoint
-                     .add(orQuery, Occur.MUST)
-
-               ;
-
-               final BooleanQuery andQuery = andQueryBuilder.build();
-
-               _topDocs = _indexSearcher.search(andQuery, maxDoc, sort);
-            }
-
-            _topDocsSearchText = searchText;
+            queryResult = search_20_Search_Parts(searchText, analyzer);
          }
+
+         _topDocs = _indexSearcher.search(queryResult.query, maxDoc, ftSorting);
 
          searchResult.totalHits = _topDocs.totalHits;
 
          /**
-          * Get doc id's only for the current page.
+          * Get doc id's only for the current page
           * <p>
-          * It is very cheap to query the doc id's but very expensive to retrieve the documents.
+          * It is very cheap to query the doc id's but very expensive to retrieve the documents
+          * <p>
+          * -> only necessary docs are retrieved
           */
-         final int docStartIndex = searchFrom;
-         int docEndIndex = searchTo;
+         final int docStartIndex = searchFromIndex;
+         int docEndIndex = searchToIndex;
 
-         final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
-         final int scoreSize = scoreDocs.length;
+         final ScoreDoc[] allScoreDocs = _topDocs.scoreDocs;
+         final int scoreSize = allScoreDocs.length;
 
          if (docEndIndex >= scoreSize) {
             docEndIndex = scoreSize - 1;
          }
 
-         final int resultSize = docEndIndex - docStartIndex + 1;
-         final int docids[] = new int[resultSize];
+         final int numSearchResultItems = docEndIndex - docStartIndex + 1;
+         final int allDocIds[] = new int[numSearchResultItems];
 
-         for (int docIndex = 0; docIndex < resultSize; docIndex++) {
-            docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
+         for (int docIndex = 0; docIndex < numSearchResultItems; docIndex++) {
+            allDocIds[docIndex] = allScoreDocs[docStartIndex + docIndex].doc;
          }
 
-         // this can occure: field 'description' was indexed without offsets, cannot highlight
+         /**
+          * Highlight hits in the search result
+          * <p>
+          * This occurred: field 'description' was indexed without offsets -> cannot highlight
+          */
+         final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, analyzer);
 
-         final UnifiedHighlighter highlighter = new UnifiedHighlighter(_indexSearcher, getAnalyzer());
+         highlighter.setFormatter(_highlightFormatter);
 
-         final Map<String, String[]> highlights = highlighter.highlightFields(
-               queryFields,
-               textQuery,
-               docids,
-               maxPassages);
+         final Map<String, String[]> highlightedSearchResults = highlighter.highlightFields(
+               queryResult.allQueryFields,
+               queryResult.query,
+               allDocIds,
+               createMaxPassages(queryResult.allQueryFields.length));
 
-         search_CreateResult(highlights, _indexReader, searchResult, docids, docStartIndex);
+         search_90_CreateResult(
+               highlightedSearchResults,
+               _indexReader,
+               searchResult,
+               allDocIds,
+               docStartIndex);
 
       } catch (final Exception e) {
+
          StatusUtil.showStatus(e);
+
          searchResult.error = e.getMessage();
       }
+   }
+
+   /**
+    * Create a {@link Query} for all fields
+    *
+    * @param searchText
+    * @param analyzer
+    * @return
+    * @throws ParseException
+    */
+   private static QueryResult search_10_Search_All(final String searchText, final Analyzer analyzer) throws ParseException {
+
+      final String[] allQueryFields = {
+
+            SEARCH_FIELD_TITLE,
+            SEARCH_FIELD_DESCRIPTION,
+
+            SEARCH_FIELD_TOUR_LOCATION_START,
+            SEARCH_FIELD_TOUR_LOCATION_END,
+            SEARCH_FIELD_TOUR_WEATHER
+      };
+
+      final Query query = createMultiFieldQueryParser(analyzer, allQueryFields).parse(searchText);
+
+      // create return values
+      final QueryResult queryResult = new QueryResult();
+
+      queryResult.allQueryFields = allQueryFields;
+      queryResult.query = query;
+
+      return queryResult;
+   }
+
+   /**
+    * Query text/marker/waypoint with OR
+    *
+    * @param analyzer
+    * @throws ParseException
+    */
+   private static QueryResult search_20_Search_Parts(final String searchText, final Analyzer analyzer) throws ParseException {
+
+      Builder tourQueryBuilder = null;
+      Builder markerQueryBuilder = null;
+      Builder waypointQueryBuilder = null;
+
+      final ArrayList<String> allTourQueryFields = new ArrayList<>();
+      final ArrayList<String> allMarkerQueryFields = new ArrayList<>();
+      final ArrayList<String> allWaypointQueryFields = new ArrayList<>();
+
+      if (_isSearch_Tour) {
+
+         // search in tour: title/description
+
+         allTourQueryFields.add(SEARCH_FIELD_TITLE);
+         allTourQueryFields.add(SEARCH_FIELD_DESCRIPTION);
+      }
+
+      if (_isSearch_Tour_LocationStart) {
+
+         allTourQueryFields.add(SEARCH_FIELD_TOUR_LOCATION_START);
+      }
+
+      if (_isSearch_Tour_LocationEnd) {
+
+         allTourQueryFields.add(SEARCH_FIELD_TOUR_LOCATION_END);
+      }
+
+      if (_isSearch_Tour_Weather) {
+
+         allTourQueryFields.add(SEARCH_FIELD_TOUR_WEATHER);
+      }
+
+      if (_isSearch_Marker) {
+
+         // search in marker: title/description
+
+         allMarkerQueryFields.add(SEARCH_FIELD_TITLE);
+         allMarkerQueryFields.add(SEARCH_FIELD_DESCRIPTION);
+      }
+
+      if (_isSearch_Waypoint) {
+
+         // search in waypoint: title/description
+
+         allWaypointQueryFields.add(SEARCH_FIELD_TITLE);
+         allWaypointQueryFields.add(SEARCH_FIELD_DESCRIPTION);
+      }
+
+      if (allTourQueryFields.size() > 0) {
+
+         // search in tours
+
+         final String[] allQueryFields = allTourQueryFields.toArray(String[]::new);
+
+         final MultiFieldQueryParser field_QueryParser = createMultiFieldQueryParser(analyzer, allQueryFields);
+         final Query query_Fields = field_QueryParser.parse(searchText);
+
+         tourQueryBuilder = new BooleanQuery.Builder();
+         tourQueryBuilder.add(createQuery_Tour(), Occur.MUST);
+         tourQueryBuilder.add(query_Fields, Occur.MUST);
+      }
+
+      if (allMarkerQueryFields.size() > 0) {
+
+         // search in tour markers
+
+         final String[] allQueryFields = allMarkerQueryFields.toArray(String[]::new);
+
+         final MultiFieldQueryParser field_QueryParser = createMultiFieldQueryParser(analyzer, allQueryFields);
+         final Query query_Fields = field_QueryParser.parse(searchText);
+
+         markerQueryBuilder = new BooleanQuery.Builder();
+         markerQueryBuilder.add(createQuery_TourMarker(), Occur.MUST);
+         markerQueryBuilder.add(query_Fields, Occur.MUST);
+      }
+
+      if (allWaypointQueryFields.size() > 0) {
+
+         // search in waypoints
+
+         final String[] allQueryFields = allWaypointQueryFields.toArray(String[]::new);
+
+         final MultiFieldQueryParser field_QueryParser = createMultiFieldQueryParser(analyzer, allQueryFields);
+         final Query query_Fields = field_QueryParser.parse(searchText);
+
+         waypointQueryBuilder = new BooleanQuery.Builder();
+         waypointQueryBuilder.add(createQuery_Waypoint(), Occur.MUST);
+         waypointQueryBuilder.add(query_Fields, Occur.MUST);
+      }
+
+      /*
+       * Create return values
+       */
+      final Builder allQueryBuilder = new BooleanQuery.Builder();
+
+      if (tourQueryBuilder != null) {
+         allQueryBuilder.add(tourQueryBuilder.build(), Occur.SHOULD);
+      }
+
+      if (markerQueryBuilder != null) {
+         allQueryBuilder.add(markerQueryBuilder.build(), Occur.SHOULD);
+      }
+
+      if (waypointQueryBuilder != null) {
+         allQueryBuilder.add(waypointQueryBuilder.build(), Occur.SHOULD);
+      }
+
+      final HashSet<String> setWithAllQueryFields = new HashSet<>();
+      setWithAllQueryFields.addAll(allTourQueryFields);
+      setWithAllQueryFields.addAll(allMarkerQueryFields);
+      setWithAllQueryFields.addAll(allWaypointQueryFields);
+
+      final QueryResult queryResult = new QueryResult();
+
+      queryResult.allQueryFields = setWithAllQueryFields.toArray(String[]::new);
+      queryResult.query = allQueryBuilder.build();
+
+      TourLogManager.log_INFO(Messages.Search_Manager_Log_SearchingToursWith + UI.SPACE + queryResult.query);
+
+      return queryResult;
    }
 
    /**
@@ -1044,11 +1386,11 @@ public class FTSearchManager {
     * @param docids2
     * @throws IOException
     */
-   private static void search_CreateResult(final Map<String, String[]> highlights,
-                                           final IndexReader indexReader,
-                                           final SearchResult searchResult,
-                                           final int[] docids,
-                                           final int docStartIndex) throws IOException {
+   private static void search_90_CreateResult(final Map<String, String[]> highlights,
+                                              final IndexReader indexReader,
+                                              final SearchResult searchResult,
+                                              final int[] docids,
+                                              final int docStartIndex) throws IOException {
 
       if (highlights.isEmpty()) {
          return;
@@ -1062,54 +1404,81 @@ public class FTSearchManager {
          return;
       }
 
-      final int numberOfHits = firstHit.getValue().length;
+      final int numHits = firstHit.getValue().length;
 
       // create result items
-      final SearchResultItem[] resultItems = new SearchResultItem[numberOfHits];
-      final ArrayList<SearchResultItem> searchResultItems = searchResult.items;
+//      final SearchResultItem[] resultItems = new SearchResultItem[numHits];
+      final ArrayList<SearchResultItem> allSearchResultItems = searchResult.allItems;
 
-      for (int hitIndex = 0; hitIndex < numberOfHits; hitIndex++) {
+      for (int hitIndex = 0; hitIndex < numHits; hitIndex++) {
 
          final SearchResultItem resultItem = new SearchResultItem();
 
-         resultItems[hitIndex] = resultItem;
+//         resultItems[hitIndex] = resultItem;
 
-         searchResultItems.add(resultItem);
+         allSearchResultItems.add(resultItem);
       }
 
       boolean isDocRead = false;
-      final Set<String> fieldsToLoad = new HashSet<>();
-      fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
-      fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
-      fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
-      fieldsToLoad.add(SEARCH_FIELD_WAYPOINT_ID);
-      fieldsToLoad.add(SEARCH_FIELD_TIME);
+      final Set<String> fieldsToLoadFromDocument = new HashSet<>();
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_DOC_SOURCE_SAVED);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_TOUR_ID);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_MARKER_ID);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_WAYPOINT_ID);
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_TIME);
+
+      if (_isSearch_Tour == false && _isShow_TitleDescription) {
+
+         /*
+          * Tour title/description is not in the snippets (it is not searched for, load these fields
+          * also from the document when it should be displayed
+          */
+
+         fieldsToLoadFromDocument.add(SEARCH_FIELD_DESCRIPTION);
+         fieldsToLoadFromDocument.add(SEARCH_FIELD_TITLE);
+      }
 
       for (final Entry<String, String[]> field : fields) {
 
          final String fieldName = field.getKey();
-         final String[] snippets = field.getValue();
+         final String[] allSnippets = field.getValue();
 
-         for (int hitIndex = 0; hitIndex < snippets.length; hitIndex++) {
+         for (int hitIndex = 0; hitIndex < allSnippets.length; hitIndex++) {
 
-            final SearchResultItem resultItem = resultItems[hitIndex];
-            final String snippet = snippets[hitIndex];
+//            final SearchResultItem resultItem = resultItems[hitIndex];
+            final SearchResultItem resultItem = allSearchResultItems.get(hitIndex);
 
-            switch (fieldName) {
+            final String snippet = allSnippets[hitIndex];
+            if (snippet != null) {
 
-            case SEARCH_FIELD_DESCRIPTION:
-               resultItem.description = snippet;
-               break;
+               switch (fieldName) {
 
-            case SEARCH_FIELD_TITLE:
-               resultItem.title = snippet;
-               break;
+               case SEARCH_FIELD_DESCRIPTION:
+                  resultItem.description = snippet;
+                  break;
+
+               case SEARCH_FIELD_TITLE:
+                  resultItem.title = snippet;
+                  break;
+
+               case SEARCH_FIELD_TOUR_LOCATION_START:
+                  resultItem.locationStart = snippet;
+                  break;
+
+               case SEARCH_FIELD_TOUR_LOCATION_END:
+                  resultItem.locationEnd = snippet;
+                  break;
+
+               case SEARCH_FIELD_TOUR_WEATHER:
+                  resultItem.weather = snippet;
+                  break;
+               }
             }
 
             if (isDocRead == false) {
 
                final int docId = docids[hitIndex];
-               final Document doc = indexReader.document(docId, fieldsToLoad);
+               final Document doc = indexReader.document(docId, fieldsToLoadFromDocument);
 
                resultItem.docId = docId;
                // resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
@@ -1119,6 +1488,27 @@ public class FTSearchManager {
                   final String docFieldName = indexField.name();
 
                   switch (docFieldName) {
+
+                  case SEARCH_FIELD_DESCRIPTION:
+
+                     if (resultItem.description == null) {
+
+                        String description = indexField.stringValue();
+                        description = WEB.convertHTML_LineBreaks(description);
+
+                        resultItem.description = description;
+                     }
+
+                     break;
+
+                  case SEARCH_FIELD_TITLE:
+
+                     if (resultItem.title == null) {
+                        resultItem.title = indexField.stringValue();
+                     }
+
+                     break;
+
                   case SEARCH_FIELD_DOC_SOURCE_SAVED:
                      resultItem.docSource = indexField.numericValue().intValue();
                      break;
@@ -1148,7 +1538,15 @@ public class FTSearchManager {
       }
    }
 
-   public static SearchResult searchByPosition(final String searchText, final int searchPosFrom, final int searchPosTo) {
+   /**
+    * @param searchText
+    * @param searchPosFrom
+    * @param searchPosTo
+    * @return Returns {@link SearchResult}
+    */
+   public static SearchResult searchByPosition(final String searchText,
+                                               final int searchPosFrom,
+                                               final int searchPosTo) {
 
       final SearchResult searchResult = new SearchResult();
 
@@ -1157,22 +1555,34 @@ public class FTSearchManager {
       return searchResult;
    }
 
-   static void setSearchOptions(final boolean isShowContentAll,
-                                final boolean isShowContentMarker,
-                                final boolean isShowContentTour,
-                                final boolean isShowContentWaypoint,
-                                final boolean isSortDateAscending) {
+   static void setSearchOptions(final boolean isSearch_All,
+                                final boolean isSearch_Marker,
+                                final boolean isSearch_Tour,
+                                final boolean isSearch_Tour_LocationStart,
+                                final boolean isSearch_Tour_LocationEnd,
+                                final boolean isSearch_Tour_Weather,
+                                final boolean isSearch_Waypoint,
+                                final boolean isSort_DateAscending,
+                                final boolean isShow_TitleDescription) {
+// SET_FORMATTING_OFF
 
-      _isShowContentAll = isShowContentAll;
-      _isShowContentMarker = isShowContentMarker;
-      _isShowContentTour = isShowContentTour;
-      _isShowContentWaypoint = isShowContentWaypoint;
+      _isSearch_All                 = isSearch_All;
+      _isSearch_Marker              = isSearch_Marker;
+      _isSearch_Tour                = isSearch_Tour;
+      _isSearch_Tour_LocationStart  = isSearch_Tour_LocationStart;
+      _isSearch_Tour_LocationEnd    = isSearch_Tour_LocationEnd;
+      _isSearch_Tour_Weather        = isSearch_Tour_Weather;
+      _isSearch_Waypoint            = isSearch_Waypoint;
 
-      _isSortDateAscending = isSortDateAscending;
+      _isSort_DateAscending         = isSort_DateAscending;
+
+      _isShow_TitleDescription      = isShow_TitleDescription;
+
+// SET_FORMATTING_ON
    }
 
    /**
-    * Create FT index.
+    * Create FT index
     *
     * @param conn
     * @param monitor
@@ -1184,37 +1594,35 @@ public class FTSearchManager {
          return;
       }
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> {
 
-            try {
+         try {
 
-               final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-                  @Override
-                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
+               @Override
+               public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                     InterruptedException {
 
-                     monitor.subTask(Messages.Database_Monitor_SetupLucene);
+                  monitor.subTask(Messages.Database_Monitor_SetupLucene);
 
-                     try (Connection conn = TourDatabase.getInstance().getConnection()) {
+                  try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-                        createStores_TourData(conn, monitor);
-                        createStores_TourMarker(conn, monitor);
-                        createStores_TourWayPoint(conn, monitor);
+                     createStore_TourData(conn, monitor);
+                     createStore_TourMarker(conn, monitor);
+                     createStore_TourWaypoint(conn, monitor);
 
-                     } catch (final SQLException e) {
-                        UI.showSQLException(e);
-                     }
+                  } catch (final SQLException e) {
+
+                     net.tourbook.ui.UI.showSQLException(e);
                   }
-               };
+               }
+            };
 
-               new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
+            new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
-            } catch (final InvocationTargetException | InterruptedException e) {
-               StatusUtil.log(e);
-            }
+         } catch (final InvocationTargetException | InterruptedException e) {
+            StatusUtil.log(e);
          }
       });
    }
@@ -1225,15 +1633,12 @@ public class FTSearchManager {
    private static void setupIndexReader() {
 
       if (_indexReader != null) {
+
          // index reader is initialized
          return;
       }
 
       setupIndex();
-
-      IndexReader indexReader1 = null;
-      IndexReader indexReader2 = null;
-      IndexReader indexReader3 = null;
 
       try {
 
@@ -1241,15 +1646,16 @@ public class FTSearchManager {
          final FSDirectory tourMarkerIndex = openStore(TourDatabase.TABLE_TOUR_MARKER);
          final FSDirectory tourWayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
 
-         indexReader1 = DirectoryReader.open(tourDataIndex);
-         indexReader2 = DirectoryReader.open(tourMarkerIndex);
-         indexReader3 = DirectoryReader.open(tourWayPoint);
+         final IndexReader indexReader1 = DirectoryReader.open(tourDataIndex);
+         final IndexReader indexReader2 = DirectoryReader.open(tourMarkerIndex);
+         final IndexReader indexReader3 = DirectoryReader.open(tourWayPoint);
 
          _indexReader = new MultiReader(indexReader1, indexReader2, indexReader3);
 
          _indexSearcher = new IndexSearcher(_indexReader);
 
       } catch (final Exception e) {
+
          StatusUtil.showStatus(e);
       }
    }
@@ -1282,41 +1688,32 @@ public class FTSearchManager {
 
       final Lookup suggester[] = new FreeTextSuggester[1];
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> BusyIndicator.showWhile(Display.getDefault(), () -> {
 
-            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-               @Override
-               public void run() {
+         try {
 
-                  try {
+            final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
 
-                     final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
+            final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
-                     final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
+            suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
 
-                     suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
+            try {
+               suggester[0].build(inputIterator);
+            } catch (final IllegalArgumentException e1) {
 
-                     try {
-                        suggester[0].build(inputIterator);
-                     } catch (final IllegalArgumentException e) {
+               // java.lang.IllegalArgumentException: need at least one suggestion
 
-                        // java.lang.IllegalArgumentException: need at least one suggestion
+               /*
+                * This exception can occure when there are documents available but do not
+                * contain any content which the suggester can use.
+                */
+            }
 
-                        /*
-                         * This exception can occure when there are documents available but do not
-                         * contain any content which the suggester can use.
-                         */
-                     }
-
-                  } catch (final Exception e) {
-                     StatusUtil.showStatus(e);
-                  }
-               }
-            });
+         } catch (final Exception e2) {
+            StatusUtil.showStatus(e2);
          }
-      });
+      }));
 
       return suggester[0];
    }
@@ -1326,19 +1723,162 @@ public class FTSearchManager {
     * tours and their markers/waypoints are deleted and recreated, however it is fast enought for a
     * few thousand items otherwise it would be more complex.
     *
-    * @param modifiedTours
+    * @param allTourIDs
     */
-   public static void updateIndex(final ArrayList<TourData> modifiedTours) {
+   public static void updateIndex(final List<Long> allTourIDs) {
 
-      setupIndexReader();
+      final long start = System.nanoTime();
 
-      FSDirectory indexStore_TourData = null;
-      FSDirectory indexStore_Marker = null;
-      FSDirectory indexStore_WayPoint = null;
+      final int numAllTourIDs = allTourIDs.size();
 
-      IndexWriter indexWriter_TourData = null;
-      IndexWriter indexWriter_Marker = null;
-      IndexWriter indexWriter_WayPoint = null;
+      final FSDirectory[] indexStore_TourData = { null };
+      final FSDirectory[] indexStore_Marker = { null };
+      final FSDirectory[] indexStore_WayPoint = { null };
+
+      // these values MUST be final
+      final IndexWriter[] indexWriter_TourData = { null };
+      final IndexWriter[] indexWriter_Marker = { null };
+      final IndexWriter[] indexWriter_WayPoint = { null };
+
+      final boolean[] isIndexClosed = { false };
+
+      try {
+
+         setupIndexReader();
+
+         indexStore_TourData[0] = openStore(TourDatabase.TABLE_TOUR_DATA);
+         indexStore_Marker[0] = openStore(TourDatabase.TABLE_TOUR_MARKER);
+         indexStore_WayPoint[0] = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+         indexWriter_TourData[0] = new IndexWriter(indexStore_TourData[0], getIndexWriterConfig());
+         indexWriter_Marker[0] = new IndexWriter(indexStore_Marker[0], getIndexWriterConfig());
+         indexWriter_WayPoint[0] = new IndexWriter(indexStore_WayPoint[0], getIndexWriterConfig());
+
+         if (numAllTourIDs < 5) {
+
+            // run without progress monitor
+
+            for (final List<Long> tourIDPart : createTourIdParts(allTourIDs)) {
+
+               updateIndex_10_Parts(
+                     tourIDPart,
+                     indexWriter_TourData[0],
+                     indexWriter_Marker[0],
+                     indexWriter_WayPoint[0],
+
+                     // monitor parameters
+                     null,
+                     0,
+                     null);
+            }
+
+         } else {
+
+            Display.getDefault().syncExec(() -> {
+
+               try {
+
+                  final IRunnableWithProgress runnable = (monitor) -> {
+
+                     monitor.beginTask(Messages.Search_Manager_Log_UpdatedFTIndex_Title, numAllTourIDs);
+
+                     try {
+
+                        final int[] numWorked = { 0 };
+
+                        for (final List<Long> tourIDPart : createTourIdParts(allTourIDs)) {
+
+                           updateIndex_10_Parts(
+
+                                 tourIDPart,
+
+                                 indexWriter_TourData[0],
+                                 indexWriter_Marker[0],
+                                 indexWriter_WayPoint[0],
+
+                                 // monitor parameters
+                                 monitor,
+                                 numAllTourIDs,
+                                 numWorked);
+                        }
+
+                     } catch (final IOException e) {
+
+                        StatusUtil.showStatus(e);
+
+                     } finally {
+
+                        updateIndex_20_ClosingStores(
+
+                              indexStore_TourData[0],
+                              indexStore_Marker[0],
+                              indexStore_WayPoint[0],
+                              indexWriter_TourData[0],
+                              indexWriter_Marker[0],
+                              indexWriter_WayPoint[0],
+                              monitor);
+
+                        isIndexClosed[0] = true;
+                     }
+                  };
+
+                  new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
+
+               } catch (final InvocationTargetException | InterruptedException e) {
+
+                  StatusUtil.showStatus(e);
+               }
+            });
+         }
+
+      } catch (final IOException e) {
+
+         StatusUtil.showStatus(e);
+
+      } finally {
+
+         if (isIndexClosed[0] == false) {
+
+            updateIndex_20_ClosingStores(
+
+                  indexStore_TourData[0],
+                  indexStore_Marker[0],
+                  indexStore_WayPoint[0],
+                  indexWriter_TourData[0],
+                  indexWriter_Marker[0],
+                  indexWriter_WayPoint[0],
+                  null);
+         }
+      }
+
+      closeIndexReaderSuggester();
+
+      final long end = System.nanoTime();
+      final float timeDiff = (end - start) / 1_000_000_000.0f;
+
+      // reduce logging
+      if (numAllTourIDs > 1) {
+
+         TourLogManager.subLog_DEFAULT(String.format(Messages.Search_Manager_Log_UpdatedFTIndex_Final,
+
+               numAllTourIDs,
+               timeDiff));
+      }
+   }
+
+   private static void updateIndex_10_Parts(final List<Long> allTourIDParts,
+                                            final IndexWriter indexWriter_TourData,
+                                            final IndexWriter indexWriter_Marker,
+                                            final IndexWriter indexWriter_WayPoint,
+
+                                            // monitor parameters
+                                            final IProgressMonitor monitor,
+                                            final int numTourIDs,
+                                            final int[] numWorked
+
+   ) throws IOException {
+
+      long lastUpdateTime = System.currentTimeMillis();
 
       final Builder deleteDoc_TourData = new BooleanQuery.Builder();
       final Builder deleteDoc_Marker = new BooleanQuery.Builder();
@@ -1348,19 +1888,28 @@ public class FTSearchManager {
       final ArrayList<Document> newDoc_Marker = new ArrayList<>();
       final ArrayList<Document> newDoc_WayPoint = new ArrayList<>();
 
-      try {
+      for (final Long tourId : allTourIDParts) {
 
-         indexStore_TourData = openStore(TourDatabase.TABLE_TOUR_DATA);
-         indexStore_Marker = openStore(TourDatabase.TABLE_TOUR_MARKER);
-         indexStore_WayPoint = openStore(TourDatabase.TABLE_TOUR_WAYPOINT);
+         if (monitor != null) {
 
-         indexWriter_TourData = new IndexWriter(indexStore_TourData, getIndexWriterConfig());
-         indexWriter_Marker = new IndexWriter(indexStore_Marker, getIndexWriterConfig());
-         indexWriter_WayPoint = new IndexWriter(indexStore_WayPoint, getIndexWriterConfig());
+            final long now = System.currentTimeMillis();
 
-         for (final TourData tourData : modifiedTours) {
+            if (now > lastUpdateTime + 500) {
 
-            final long tourId = tourData.getTourId();
+               lastUpdateTime = now;
+
+               monitor.subTask(String.format(Messages.Search_Manager_SubTask_LoadingTours,
+                     numWorked[0],
+                     numTourIDs));
+            }
+
+            numWorked[0]++;
+            monitor.worked(1);
+         }
+
+         final TourData tourData = TourManager.getTour(tourId);
+
+         if (tourData != null) {
 
             /*
              * Delete existing tour, marker and waypoint
@@ -1374,16 +1923,19 @@ public class FTSearchManager {
             /*
              * Recreate tour, marker and waypoint
              */
-            final Document tourDoc = createDoc_Tour(tourId,
+            final Document tourDoc = createLuceneDoc_Tour(tourId,
+                  tourData.getTourStartTimeMS(),
                   tourData.getTourTitle(),
                   tourData.getTourDescription(),
-                  tourData.getTourStartTimeMS());
+                  tourData.getTourStartPlace(),
+                  tourData.getTourEndPlace(),
+                  tourData.getWeather());
 
             newDoc_TourData.add(tourDoc);
 
             for (final TourMarker tourMarker : tourData.getTourMarkers()) {
 
-               final Document markerDoc = createDoc_Marker(
+               final Document markerDoc = createLuceneDoc_Marker(
                      tourMarker.getMarkerId(),
                      tourId,
                      tourMarker.getLabel(),
@@ -1395,7 +1947,7 @@ public class FTSearchManager {
 
             for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
 
-               final Document wayPointDoc = createDoc_WayPoint(
+               final Document wayPointDoc = createLuceneDoc_WayPoint(
                      wayPoint.getWayPointId(),
                      tourId,
                      wayPoint.getName(),
@@ -1405,30 +1957,60 @@ public class FTSearchManager {
                newDoc_WayPoint.add(wayPointDoc);
             }
          }
-
-         indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
-         indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
-         indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
-
-         for (final Document document : newDoc_TourData) {
-            indexWriter_TourData.addDocument(document);
-         }
-         for (final Document document : newDoc_Marker) {
-            indexWriter_Marker.addDocument(document);
-         }
-         for (final Document document : newDoc_WayPoint) {
-            indexWriter_WayPoint.addDocument(document);
-         }
-
-      } catch (final IOException e) {
-         StatusUtil.showStatus(e);
-      } finally {
-
-         closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
-         closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
-         closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
       }
 
-      closeIndexReaderSuggester();
+      if (monitor != null) {
+         monitor.subTask(Messages.Search_Manager_SubTask_UpdatingIndex);
+      }
+
+      indexWriter_TourData.deleteDocuments(deleteDoc_TourData.build());
+      indexWriter_Marker.deleteDocuments(deleteDoc_Marker.build());
+      indexWriter_WayPoint.deleteDocuments(deleteDoc_WayPoint.build());
+
+      for (final Document document : newDoc_TourData) {
+         indexWriter_TourData.addDocument(document);
+      }
+      for (final Document document : newDoc_Marker) {
+         indexWriter_Marker.addDocument(document);
+      }
+      for (final Document document : newDoc_WayPoint) {
+         indexWriter_WayPoint.addDocument(document);
+      }
+   }
+
+   /**
+    * This is a time consuming task which can have a duration of several seconds when using
+    * many tours
+    *
+    * @param indexStore_TourData
+    * @param indexStore_Marker
+    * @param indexStore_WayPoint
+    * @param indexWriter_TourData
+    * @param indexWriter_Marker
+    * @param indexWriter_WayPoint
+    * @param monitor
+    */
+   private static void updateIndex_20_ClosingStores(final FSDirectory indexStore_TourData,
+                                                    final FSDirectory indexStore_Marker,
+                                                    final FSDirectory indexStore_WayPoint,
+                                                    final IndexWriter indexWriter_TourData,
+                                                    final IndexWriter indexWriter_Marker,
+                                                    final IndexWriter indexWriter_WayPoint,
+                                                    final IProgressMonitor monitor) {
+
+      if (monitor != null) {
+         monitor.subTask(Messages.Search_Manager_SubTask_ClosingFTIndexStore_Tours);
+      }
+      closeIndexWriterAndStore(indexStore_TourData, indexWriter_TourData);
+
+      if (monitor != null) {
+         monitor.subTask(Messages.Search_Manager_SubTask_ClosingFTIndexStore_Markers);
+      }
+      closeIndexWriterAndStore(indexStore_Marker, indexWriter_Marker);
+
+      if (monitor != null) {
+         monitor.subTask(Messages.Search_Manager_SubTask_ClosingFTIndexStore_Waypoints);
+      }
+      closeIndexWriterAndStore(indexStore_WayPoint, indexWriter_WayPoint);
    }
 }

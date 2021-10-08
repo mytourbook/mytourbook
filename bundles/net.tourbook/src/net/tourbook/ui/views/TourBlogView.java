@@ -714,10 +714,7 @@ public class TourBlogView extends ViewPart {
 
          } catch (final Exception e) {
 
-            /*
-             * Use WebKit browser, this is necessary for Linux when default browser fails however
-             * the XULrunner needs to be installed.
-             */
+            // use WebKit browser for Linux when default browser fails
             _browser = new Browser(parent, SWT.WEBKIT);
          }
 
@@ -1063,7 +1060,7 @@ public class TourBlogView extends ViewPart {
          if (firstElement instanceof TVICatalogComparedTour) {
             tourId = ((TVICatalogComparedTour) firstElement).getTourId();
          } else if (firstElement instanceof TVICompareResultComparedTour) {
-            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+            tourId = ((TVICompareResultComparedTour) firstElement).getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

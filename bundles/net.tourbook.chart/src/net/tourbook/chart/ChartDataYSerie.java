@@ -42,18 +42,18 @@ public class ChartDataYSerie extends ChartDataSerie {
    public static final String     YDATA_INFO                        = "yDataInfo";                //$NON-NLS-1$
 
    public static final int        FILL_METHOD_NO                    = 0;
-
    public static final int        FILL_METHOD_FILL_BOTTOM           = 1;
-
    public static final int        FILL_METHOD_FILL_ZERO             = 2;
-
    public static final int        FILL_METHOD_FILL_BOTTOM_NO_BORDER = 3;
    public static final int        FILL_METHOD_CUSTOM                = 100;
+
    public static final int        BAR_DRAW_METHOD_BOTTOM            = 200;
+
    /**
     * Slider label format: n.1
     */
    public static final int        SLIDER_LABEL_FORMAT_DEFAULT       = 0;
+
    /**
     * Slider label format: mm:ss
     */
@@ -79,7 +79,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    private int                    _graphFillMethod                  = FILL_METHOD_FILL_BOTTOM;
 
-   private boolean                _isShowYSlider                    = false;
+   private boolean                _isShowYSlider;
 
    /**
     * This value is set when a y-slider is dragged
@@ -88,8 +88,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    /**
     * <p>
-    * true: the direction is from bottom to top by increasing number <br>
-    * false: the direction is from top to bottom by increasing number
+    * <code>true</code>: The direction is from bottom to top by increasing number <br>
+    * <code>false</code>: The direction is from top to bottom by increasing number
     */
    private boolean                _yAxisDirection                   = true;
 
@@ -222,9 +222,11 @@ public class ChartDataYSerie extends ChartDataSerie {
     * @return Returns the valueColors.
     */
    public int[][] getColorsIndex() {
+
       if (_colorIndex == null || _colorIndex.length == 0 || _colorIndex[0] == null || _colorIndex[0].length == 0) {
          setAllValueColors(0);
       }
+
       return _colorIndex;
    }
 
@@ -759,10 +761,10 @@ public class ChartDataYSerie extends ChartDataSerie {
    }
 
    /**
-    * set the direction for the y axis <code>
-    * true: the direction is from bottom to top by increasing number
-    * false: the direction is from top to bottom by increasing number
-    * </code>
+    * Set the direction for the y axis
+    * <p>
+    * <code>true</code>: The direction is from bottom to top by increasing number<br>
+    * <code>false</code>: The direction is from top to bottom by increasing number
     *
     * @param axisDirection
     */

@@ -167,6 +167,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private LabelLayerMT              _layer_Label;
    private MarkerLayer               _layer_Marker;
    private BitmapTileLayer           _layer_HillShading;
+   private ItemizedLayer             _layer_Photo;
    private BitmapTileLayer           _layer_Satellite;
    private MapScaleBarLayer          _layer_ScaleBar;
    private SliderLocation_Layer      _layer_SliderLocation;
@@ -193,7 +194,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerToolkit             _markertoolkit;
    private MarkerMode                _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
-   private ItemizedLayer             _layer_Photo;
    private boolean                   _isPhotoClustered          = true;
    private boolean                   _isPhotoShowTitle          = true;
 
@@ -1428,7 +1428,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
 //    // Buildings or S3DB  Block I
       _layer_S3DB_Building = new S3DBLayer(mMap, _layer_BaseMap, true); //this is working with subtheme  switching, but no online buildings anymore
-      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, false); // building is not working with online maps, so deactvated also the shadow
+      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true); // building is not working with online maps, so deactvated also the shadow
 
       if (_isOfflineMap) {
 //			// S3DB
@@ -1437,14 +1437,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_S3DB_Building.setColored(true);
          debugPrint(" map25: " + "################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$ //$NON-NLS-2$
          //_layer_BaseMap.setTheme(_mf_IRenderTheme); //again??
-         //layers.remove(_layer_Building);
+         layers.remove(_layer_Building);
          layers.add(_layer_S3DB_Building);
       } else {
          // building
 
          _layer_Building.setEnabled(true);
          debugPrint(" map25: " + "################ setupMap_Layers:Building Layer "); //$NON-NLS-1$ //$NON-NLS-2$
-         //layers.remove(_layer_S3DB_Building);
+         layers.remove(_layer_S3DB_Building);
          layers.add(_layer_Building);
       }
 
@@ -1452,17 +1452,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
       _layer_Label.setEnabled(false);
       layers.add(_layer_Label);
-
-      //Photos
-      _phototoolkit = new PhotoToolkit();
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
-      } else {
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
-      }
-      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
-      _layer_Photo.setEnabled(false);
-      layers.add(_layer_Photo);
 
       // MapBookmarks
       //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
@@ -1482,6 +1471,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Marker = new MarkerLayer(mMap, this);
       _layer_Marker.setEnabled(false);
       layers.add(_layer_Marker);
+
+      //Photos
+      _phototoolkit = new PhotoToolkit();
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
+      } else {
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
+      }
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
+      _layer_Photo.setEnabled(false);
+      layers.add(_layer_Photo);
 
       // slider location
       _layer_SliderLocation = new SliderLocation_Layer(mMap);

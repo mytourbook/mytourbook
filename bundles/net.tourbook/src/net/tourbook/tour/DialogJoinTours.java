@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,11 +41,9 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -55,8 +53,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -67,10 +63,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -236,38 +230,30 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       shell.setText(Messages.Dialog_JoinTours_DlgArea_Title);
 
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
+      shell.addDisposeListener(disposeEvent -> onDispose());
+
+      shell.addListener(SWT.Resize, event -> {
+
+         // allow resizing the width but not the height
+
+         if (_shellDefaultSize == null) {
+            _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
          }
-      });
 
-      shell.addListener(SWT.Resize, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+         final Point shellSize = shell.getSize();
 
-            // allow resizing the width but not the height
-
-            if (_shellDefaultSize == null) {
-               _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            }
-
-            final Point shellSize = shell.getSize();
-
-            /*
-             * this is not working, the shell is flickering when the shell size is below min size
-             * and I found no way to prevent a resize :-(
-             */
+         /*
+          * this is not working, the shell is flickering when the shell size is below min size
+          * and I found no way to prevent a resize :-(
+          */
 //            if (shellSize.x < _shellDefaultSize.x) {
 //               event.doit = false;
 //            }
 
-            shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
-            shellSize.y = _shellDefaultSize.y;
+         shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+         shellSize.y = _shellDefaultSize.y;
 
-            shell.setSize(shellSize);
-         }
+         shell.setSize(shellSize);
       });
    }
 
@@ -323,16 +309,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       final MenuManager menuMgr = new MenuManager();
 
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+      menuMgr.addMenuListener(menuManager -> {
 
-            final Set<TourTag> joinedTourTags = _joinedTourData.getTourTags();
-            final boolean isTagInTour = joinedTourTags != null && !joinedTourTags.isEmpty();
+         final Set<TourTag> joinedTourTags = _joinedTourData.getTourTags();
+         final boolean isTagInTour = joinedTourTags != null && !joinedTourTags.isEmpty();
 
-            _tagMenuMgr.fillTagMenu(menuMgr, false);
-            _tagMenuMgr.enableTagActions(true, isTagInTour, joinedTourTags);
-         }
+         _tagMenuMgr.fillTagMenu(menuManager, false);
+         _tagMenuMgr.enableTagActions(true, isTagInTour, joinedTourTags);
       });
 
       // set menu for the tag item
@@ -363,17 +346,14 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       final MenuManager typeMenuMgr = new MenuManager();
 
       typeMenuMgr.setRemoveAllWhenShown(true);
-      typeMenuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+      typeMenuMgr.addMenuListener(menuManager -> {
 
-            // set menu items
+         // set menu items
 
-            ActionSetTourTypeMenu.fillMenu(menuMgr, DialogJoinTours.this, false);
+         ActionSetTourTypeMenu.fillMenu(menuManager, DialogJoinTours.this, false);
 
-            menuMgr.add(new Separator());
-            menuMgr.add(_actionOpenTourTypePrefs);
-         }
+         menuManager.add(new Separator());
+         menuManager.add(_actionOpenTourTypePrefs);
       });
 
       // set menu for the tag item
@@ -1246,7 +1226,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
                final int joinMarkerIndex = joinedTourStartIndex + tourMarkerIndex;
 
-               final TourMarker tourMarker = new TourMarker(_joinedTourData, ChartLabel.MARKER_TYPE_CUSTOM);
+               final TourMarker tourMarker = new TourMarker(_joinedTourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
 
                tourMarker.setSerieIndex(joinMarkerIndex);
                tourMarker.setLabel(markerLabel);

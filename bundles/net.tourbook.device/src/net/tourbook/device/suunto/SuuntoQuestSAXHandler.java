@@ -159,8 +159,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    public SuuntoQuestSAXHandler(final TourbookDevice deviceDataReader,
                                 final String importFileName,
                                 final Map<Long, TourData> alreadyImportedTours,
-                                final Map<Long, TourData> newlyImportedTours,
-                                final boolean isReimport) {
+                                final Map<Long, TourData> newlyImportedTours) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -202,7 +201,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInCadence //
+      if (_isInCadence
             || _isInActivity
             || _isInCalories
             || _isInDistance
@@ -216,7 +215,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             || _isInWeight
             || _isInWeightUnit
             || _isInTime
-      //
+      
       ) {
          _characters.append(chars, startIndex, length);
       }
@@ -422,7 +421,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             final float milliSeconds = (float) (time - timeInSeconds * 1000) / 1000;
             _markerData.relativeTime = timeInSeconds + Math.round(milliSeconds);
          } catch (final ParseException e) {
-            TourLogManager.logError(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
+            TourLogManager.log_ERROR(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
          }
 
          //If existing, we need to use the previous marker relative time

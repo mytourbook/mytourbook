@@ -1,77 +1,57 @@
-21.next.0                                                 Day.Month 2021
+21.next.0                                                 ?.Month 2021
 
 
 TODO's
 ======
 
-* Mac OS          - Remove it https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/#3ace
+https://adoptium.net/ Temurin
+
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
 
-* Tour Search     - Test Edge browser if the tour selection in the result list is working with the mouse
-                  - Implement workaround: Select tour with an action in the context menu
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
-* Compare Tours by Elevation
-               - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
-
-* Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                 Need to check how to apply it to all projects, must maybe be done with the already existing ant script
-
-               - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                 mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-* Tour modification (Frederic) 
-               - Use multi-threading (ThreadPoolExecutor)
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                 
 
 Issues
 ======
 
 *  
 
+
+Experimental
+============
+
+* 
+
   
 New
 ===
 
-*
+* 
 
 
 Improvements
 ============
 
-* 2D Map
-  - Enable/disable map dimming, moved map dimming parameters into "2D Map Options" slideout
-  - Legend units and scale colors depend on the map dim level
-  
-
-* Tour Chart
-  - Show value of the hovered graph point  
-  - Set the default graphs in the graph slideout, previously it could be set only in the pref dialog
-  - Show values in the value point tooltip with the correct color when using the dark theme  
-
-
-* Tour Data Editor
-  - New action to delete time sliced and adjust the tour start time
-    This can be helpfull when a GPS device had no connection at the tour start and the tour start time is totally wrong.
-    The author had a tour whose tour start time was postponed 19 hours until the GPS signal was received
-    
-* Tour Search
-  - New action in the context menu to select a tour with the mouse. 
-    Selecting a tour with the mouse was not working anymore (since a while) when using the embedded browser in MyTourbook    
-    https://sourceforge.net/p/mytourbook/discussion/622811/thread/745a5ebd1b/#227a/ede2
+* 
 
 
 Changes  
 =======
 
-* Strava Upload (Frederic)
- - Enhanced the tour type comparison when mapping tour types to Strava activity types
-    
+* 
+
 
 Bugfix
 ======
 
 * 
+
 
 Translation    
 ===========
@@ -86,5 +66,5 @@ Translation
 System   
 ======
 
-* Eclipse 2021-?
-* FIT SDK 21.53
+* Eclipse 2021-09
+* FIT SDK 21.60

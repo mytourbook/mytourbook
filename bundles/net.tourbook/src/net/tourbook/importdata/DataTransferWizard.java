@@ -18,6 +18,7 @@ package net.tourbook.importdata;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
@@ -98,7 +99,7 @@ public class DataTransferWizard extends Wizard {
       }
 
       /*
-       * get port name
+       * Get port name
        */
       final int selectedComPort = comboPorts.getSelectionIndex();
       if (selectedComPort == -1) {
@@ -108,51 +109,61 @@ public class DataTransferWizard extends Wizard {
       final String portName = comboPorts.getItem(selectedComPort);
 
       /*
-       * when the Cancel button is pressed multiple times, the app calls this function each time
+       * When the Cancel button is pressed multiple times, the app calls this function each time
        */
       if (_runnableReceiveData != null) {
          return false;
       }
 
       /*
-       * set the device which is used to read the data
+       * Set the device which is used to read the data
        */
       _importDevice = _dataTransferWizardPage.getSelectedDevice();
       if (_importDevice == null) {
          return false;
       }
 
-      final RawDataManager rawDataManager = RawDataManager.getInstance();
-      rawDataManager.setImportCanceled(false);
-      rawDataManager.setImportId();
 
       /*
-       * receive data from the device
+       * Receive data from the device
        */
       try {
+
          _runnableReceiveData = _importDevice.createImportRunnable(portName, _receivedFiles);
+
          getContainer().run(true, true, _runnableReceiveData);
+
       } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       }
 
       if (_receivedFiles.isEmpty() || _importDevice.isImportCanceled()) {
+
          // data has not been received or the user canceled the import
          return true;
       }
 
+      final RawDataManager rawDataManager = RawDataManager.getInstance();
+
       final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
+      final ImportState_Process importState_Process = new ImportState_Process();
 
       // import received files
       for (final File inFile : _receivedFiles) {
-         rawDataManager.importRawData(
-               inFile,
-               _dataTransferWizardPage._pathEditor.getStringValue(),
-               _importDevice.buildNewFileNames,
-               fileCollision,
-               true,
-               false);
+
+         rawDataManager.importTours_FromOneFile(
+
+               inFile, //                                                  importFile
+               _dataTransferWizardPage._pathEditor.getStringValue(), //    destinationPath
+               fileCollision, //                                           fileCollision
+               _importDevice.isBuildNewFileNames, //                       isBuildNewFileNames
+               true, //                                                    isTourDisplayedInImportView
+               new HashMap<>(),
+               importState_Process //
+         );
       }
+
+      importState_Process.runPostProcess();
 
       rawDataManager.updateTourData_InImportView_FromDb(null);
 

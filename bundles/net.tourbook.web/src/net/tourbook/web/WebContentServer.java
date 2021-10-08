@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -64,36 +63,52 @@ public class WebContentServer {
    private static boolean LOG_HEADER = false;
 
    // logs: xhr
-   public static boolean       LOG_XHR                     = false;
+   public static boolean       LOG_XHR                      = false;
 
-   private static boolean      IS_LOGGING                  = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
+   private static boolean      IS_LOGGING                   = LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 
-   private static final String MTHTML_DOJO_SEARCH          = "DOJO_SEARCH";                               //$NON-NLS-1$
-   private static final String MTHTML_LOCALE               = "LOCALE";                                    //$NON-NLS-1$
+   private static final String MTHTML_CUSTOM_JS             = "CUSTOM_JS";                                 //$NON-NLS-1$
+   private static final String MTHTML_DOJO_SEARCH           = "DOJO_SEARCH";                               //$NON-NLS-1$
+   private static final String MTHTML_LOCALE                = "LOCALE";                                    //$NON-NLS-1$
 
-   private static final String MTHTML_MESSAGE_LOADING      = "MESSAGE_LOADING";                           //$NON-NLS-1$
-   private static final String MTHTML_MESSAGE_SEARCH_TITLE = "MESSAGE_SEARCH_TITLE";                      //$NON-NLS-1$
+   private static final String MTHTML_MESSAGE_LOADING       = "MESSAGE_LOADING";                           //$NON-NLS-1$
+   private static final String MTHTML_MESSAGE_SEARCH_TITLE  = "MESSAGE_SEARCH_TITLE";                      //$NON-NLS-1$
 
-   private static final String SEARCH_CSS                  = "search.css";                                //$NON-NLS-1$
+   private static final String SEARCH_CSS                   = "search.css";                                //$NON-NLS-1$
 
-   private static final String ROOT_FILE_PATH_NAME         = "/";                                         //$NON-NLS-1$
-   private static final String URI_INNER_PROTOCOL_FILE     = "/file:";                                    //$NON-NLS-1$
-   private static final String REQUEST_PATH_TOURBOOK       = "/tourbook";                                 //$NON-NLS-1$
+   private static final String ROOT_FILE_PATH_NAME          = "/";                                         //$NON-NLS-1$
+   private static final String URI_INNER_PROTOCOL_FILE      = "/file:";                                    //$NON-NLS-1$
+   private static final String REQUEST_PATH_TOURBOOK        = "/tourbook";                                 //$NON-NLS-1$
 
-   private static final String XHR_HEADER_KEY              = "X-requested-with";                          //$NON-NLS-1$
-   private static final String XHR_HEADER_VALUE            = "XMLHttpRequest";                            //$NON-NLS-1$
+   private static final String XHR_HEADER_KEY               = "X-requested-with";                          //$NON-NLS-1$
+   private static final String XHR_HEADER_VALUE             = "XMLHttpRequest";                            //$NON-NLS-1$
 
-   private static final String ICON_RESOURCE_REQUEST       = "/$MT-ICON$/";                               //$NON-NLS-1$
-   private static final String CSS_TAG__IS_THEMED          = "$CSS_TAG__IS_THEMED$";                      //$NON-NLS-1$
+   private static final String ICON_RESOURCE_REQUEST        = "/$MT-ICON$/";                               //$NON-NLS-1$
 
-   private static final String DOJO_ROOT                   = "/dojo/";                                    //$NON-NLS-1$
-   private static final String DOJO_DIJIT                  = "/dijit/";                                   //$NON-NLS-1$
-   private static final String DOJO_DGRID                  = "/dgrid/";                                   //$NON-NLS-1$
-   private static final String DOJO_DSTORE                 = "/dstore/";                                  //$NON-NLS-1$
-   private static final String DOJO_PUT_SELECTOR           = "/put-selector/";                            //$NON-NLS-1$
-   private static final String DOJO_XSTYLE                 = "/xstyle/";                                  //$NON-NLS-1$
+   /**
+    * A § character is used as identifier, otherwise when using a $ character it would fail as it
+    * tries to replace it in the output stream. The § character must be kept in the filepath until
+    * it is resolved in the webserver -> Complicated stuff with all these replacements but it is
+    * very flexible :-)
+    */
+   private static final String ICON_RESOURCE_REQUEST_COMMON = "/§MT-ICON-COMMON§/";                        //$NON-NLS-1$
 
-   public static final String             SERVER_URL;
+   private static final String CSS_TAG__IS_THEMED           = "$CSS_TAG__IS_THEMED$";                      //$NON-NLS-1$
+
+   private static final String DOJO_ROOT                    = "/dojo/";                                    //$NON-NLS-1$
+   private static final String DOJO_DIJIT                   = "/dijit/";                                   //$NON-NLS-1$
+   private static final String DOJO_DGRID                   = "/dgrid/";                                   //$NON-NLS-1$
+   private static final String DOJO_DSTORE                  = "/dstore/";                                  //$NON-NLS-1$
+   private static final String DOJO_PUT_SELECTOR            = "/put-selector/";                            //$NON-NLS-1$
+   private static final String DOJO_XSTYLE                  = "/xstyle/";                                  //$NON-NLS-1$
+
+   public static final String  SERVER_URL;
+
+   /**
+    * Is <code>true</code> when an external browser is used, <code>false</code> when the embeddet IE
+    * browser is used.
+    */
+   private static boolean      _isUsingEmbeddedBrowser;
 
    //
    private static Map<String, XHRHandler> _allXHRHandler           = new HashMap<>();
@@ -106,8 +121,8 @@ public class WebContentServer {
    private static HttpServer              _server;
    private static final int               _serverPort;
 
-   private static InetSocketAddress       inetAddress;
    private static IconRequestHandler      _iconRequestHandler;
+   private static InetSocketAddress       _inetAddress;
 
    static {
 
@@ -118,7 +133,7 @@ public class WebContentServer {
       }
 
       final InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
-      inetAddress = new InetSocketAddress(loopbackAddress, _serverPort);
+      _inetAddress = new InetSocketAddress(loopbackAddress, _serverPort);
 
       SERVER_URL = WEB.PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
 
@@ -159,6 +174,7 @@ public class WebContentServer {
             ? UI.EMPTY_STRING
 
                   // DEBUG build
+
                   + "   <link rel='stylesheet' href='mt-dojo.css'>" + NL //                  //$NON-NLS-1$
                   + "   <link rel='stylesheet' href='search.css'>" + NL //                   //$NON-NLS-1$
 
@@ -177,8 +193,6 @@ public class WebContentServer {
                   + "   <script src='/tourbook/search/SearchApp.js.jgz'></script>" + NL //   //$NON-NLS-1$
       ;
 
-//      dojoSearch += cssFont;
-
       /*
        * Get valid locale, invalid locale will cause errors of not supported Dojo files.
        */
@@ -193,8 +207,9 @@ public class WebContentServer {
       }
 
       /*
-       * Text replacements for common messages.
+       * Tags which are replaced when HTML page is loaded
        */
+      _mtHtmlReplacementValues.put(MTHTML_CUSTOM_JS, createCustomJS());
       _mtHtmlReplacementValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
       _mtHtmlReplacementValues.put(MTHTML_LOCALE, dojoLocale);
 
@@ -209,8 +224,6 @@ public class WebContentServer {
          e.printStackTrace();
       }
    }
-
-   private String[] set;
 
    private static class DefaultHandler implements HttpHandler {
 
@@ -228,6 +241,18 @@ public class WebContentServer {
    public static XHRHandler addXHRHandler(final String xhrKey, final XHRHandler xhrHandler) {
 
       return _allXHRHandler.put(xhrKey, xhrHandler);
+   }
+
+   private static String createCustomJS() {
+
+      final String js = UI.EMPTY_STRING
+
+            + "<script>" + NL //$NON-NLS-1$
+            + "   var mt_IsUsingEmbeddedBrowser = " + Boolean.toString(_isUsingEmbeddedBrowser) + NL //$NON-NLS-1$
+            + "</script>" + NL //$NON-NLS-1$
+      ;
+
+      return js;
    }
 
    private static void handle(final HttpExchange httpExchange) {
@@ -253,17 +278,23 @@ public class WebContentServer {
          final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
 
          final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
+         final boolean isIconCommonRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST_COMMON);
+
+         final int iconRequestLength = isIconCommonRequest
+               ? ICON_RESOURCE_REQUEST_COMMON.length()
+               : ICON_RESOURCE_REQUEST.length();
 
          boolean isDojoRequest = false;
 
          if (WEB.IS_DEBUG
+
                && (requestUriPath.startsWith(DOJO_ROOT)
                      || requestUriPath.startsWith(DOJO_DIJIT)
                      || requestUriPath.startsWith(DOJO_DGRID)
                      || requestUriPath.startsWith(DOJO_DSTORE)
-                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
+                     || requestUriPath.startsWith(DOJO_PUT_SELECTOR)
+                     || requestUriPath.startsWith(DOJO_XSTYLE))) {
 
-         ) {
             isDojoRequest = true;
             requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
          }
@@ -272,9 +303,11 @@ public class WebContentServer {
           * Log request
           */
          if (isDojoRequest) {
+
             if (LOG_DOJO) {
                log.append(requestUriPath);
             }
+
          } else if (isXHR) {
 
             if (LOG_XHR) {
@@ -295,22 +328,23 @@ public class WebContentServer {
          /*
           * Handle request
           */
-         if (isIconRequest) {
+         if (isIconRequest || isIconCommonRequest) {
 
-            String iconFilename = requestUriPath.substring(
-                  ICON_RESOURCE_REQUEST.length(),
-                  requestUriPath.length());
+            // remove icon marker
+            String iconFilename = requestUriPath.substring(iconRequestLength, requestUriPath.length());
 
             // replace themed marker
             if (iconFilename.contains(CSS_TAG__IS_THEMED)) {
 
-               iconFilename = iconFilename.replace(CSS_TAG__IS_THEMED,
-                     UI.IS_DARK_THEME
-                           ? ThemeUtil.DARK_THEME_POSTFIX
-                           : UI.EMPTY_STRING);
+               final CharSequence themePostfix = UI.IS_DARK_THEME
+
+                     ? ThemeUtil.DARK_THEME_POSTFIX
+                     : UI.EMPTY_STRING;
+
+               iconFilename = iconFilename.replace(CSS_TAG__IS_THEMED, themePostfix);
             }
 
-            handle_Icon(httpExchange, iconFilename, log);
+            handle_Icon(httpExchange, iconFilename, log, isIconCommonRequest);
 
          } else if (isXHR) {
 
@@ -407,7 +441,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
+         StatusUtil.logError(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -428,7 +462,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath()); //$NON-NLS-1$
+         StatusUtil.logError(response + " " + file.getPath()); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -467,11 +501,13 @@ public class WebContentServer {
 
             // replace values in search.css file
 
-//            // for debugging - START
+// for debugging - START
+
 //            _cssReplacementValues.clear();
 //            _cssReplacementValues = null;
 //            setupCssReplacements();
-//            // for debugging - END
+
+// for debugging - END
 
             replacingOutputStream = new ReplacingOutputStream(outputStream, _cssReplacementValues);
 
@@ -495,21 +531,27 @@ public class WebContentServer {
       } finally {
 
          if (Util.close(outputStream) == false) {
-            StatusUtil.log(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
+            StatusUtil.logError(String.format("File: '%s'", file.toString())); //$NON-NLS-1$
          }
 
          Util.close(replacingOutputStream);
       }
    }
 
-   private static void handle_Icon(final HttpExchange httpExchange, final String iconFilename, final StringBuilder log) {
+   private static void handle_Icon(final HttpExchange httpExchange,
+                                   final String iconFilename,
+                                   final StringBuilder log,
+                                   final boolean isIconCommonRequest) {
 
       try {
 
          if (_iconRequestHandler == null) {
+
             StatusUtil.logError("IconRequestHandler is not set for " + iconFilename); //$NON-NLS-1$
+
          } else {
-            _iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log);
+
+            _iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log, isIconCommonRequest);
          }
 
       } catch (final Exception e) {
@@ -584,7 +626,15 @@ public class WebContentServer {
    }
 
    public static void setIconRequestHandler(final IconRequestHandler iconRequestHandler) {
+
       _iconRequestHandler = iconRequestHandler;
+   }
+
+   public static void setIsUsingEmbeddedBrowser(final boolean isUsingEmbeddedBrowser) {
+
+      _isUsingEmbeddedBrowser = isUsingEmbeddedBrowser;
+
+      _mtHtmlReplacementValues.put(MTHTML_CUSTOM_JS, createCustomJS());
    }
 
    private static void setupCssReplacements() {
@@ -597,7 +647,7 @@ public class WebContentServer {
 
 // SET_FORMATTING_OFF
 
-      _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");           //$NON-NLS-1$
+      _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       _cssReplacementValues.put("BODY__COLOR",                             ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
       _cssReplacementValues.put("BODY__BACKGROUND_COLOR",                  ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
       _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.IS_DARK_THEME                                //$NON-NLS-1$
@@ -607,19 +657,19 @@ public class WebContentServer {
       _cssReplacementValues.put("DRGID_CONTENT__COLOR",                    ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
       _cssReplacementValues.put("DRGID_CONTENT__BACKGROUND_COLOR",         ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
 
-      _cssReplacementValues.put("DRGID_ROW__BACKGROUND_COLOR",             UI.IS_DARK_THEME ? "444" : "eee");        //$NON-NLS-1$
-      _cssReplacementValues.put("DRGID_SELECTED__BACKGROUND_COLOR",        UI.IS_DARK_THEME ? "555" : "ddd");        //$NON-NLS-1$
-      _cssReplacementValues.put("DRGID_SELECTED_HOVER__BACKGROUND_COLOR",  UI.IS_DARK_THEME ? "666" : "ccc");        //$NON-NLS-1$
+      _cssReplacementValues.put("DRGID_ROW__BACKGROUND_COLOR",             UI.IS_DARK_THEME ? "444" : "eee");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DRGID_SELECTED__BACKGROUND_COLOR",        UI.IS_DARK_THEME ? "555" : "ddd");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DRGID_SELECTED_HOVER__BACKGROUND_COLOR",  UI.IS_DARK_THEME ? "666" : "ccc");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__COLOR",               UI.IS_DARK_THEME ? "ddd" : "666");        //$NON-NLS-1$
-      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__BACKGROUND_COLOR",    UI.IS_DARK_THEME ? "666" : "ddd");        //$NON-NLS-1$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__COLOR",               UI.IS_DARK_THEME ? "ddd" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__BACKGROUND_COLOR",    UI.IS_DARK_THEME ? "666" : "ddd");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");     //$NON-NLS-1$
-      _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");        //$NON-NLS-1$
+      _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-//      _cssReplacementValues.put("",  UI.IS_DARK_THEME ? "" : "");        //$NON-NLS-1$
-
-
+      _cssReplacementValues.put("CSS_TAG__IS_THEMED",                      UI.IS_DARK_THEME                                //$NON-NLS-1$
+                                                                              ? ThemeUtil.DARK_THEME_POSTFIX
+                                                                              : UI.EMPTY_STRING);
 // SET_FORMATTING_ON
 
    }
@@ -634,7 +684,7 @@ public class WebContentServer {
 
       try {
 
-         _server = HttpServer.create(inetAddress, 0);
+         _server = HttpServer.create(_inetAddress, 0);
 
          final HttpContext context = _server.createContext("/", new DefaultHandler());//$NON-NLS-1$
 
@@ -663,11 +713,6 @@ public class WebContentServer {
 
          StatusUtil.logInfo("Stopped WebContentServer " + SERVER_URL);//$NON-NLS-1$
       }
-   }
-
-   @Override
-   public String toString() {
-      return "WebContentServer [set=" + Arrays.toString(set) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 }

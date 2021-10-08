@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -33,144 +32,108 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourTypeWrapper;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Collects all data from a fit file
  */
 public class FitData {
 
-   private static final Integer   DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
+   private static final Integer          DEFAULT_MESSAGE_INDEX  = Integer.valueOf(0);
 
-   private IPreferenceStore       _prefStore            = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore              _prefStore             = Activator.getDefault().getPreferenceStore();
 
-   private boolean                _isIgnoreLastMarker;
-   private boolean                _isSetLastMarker;
-   private boolean                _isFitImportTourType;
-   private String                 _fitImportTourTypeMode;
-   private int                    _lastMarkerTimeSlices;
+   private boolean                       _isIgnoreLastMarker;
+   private boolean                       _isSetLastMarker;
+   private boolean                       _isFitImportTourType;
+   private String                        _fitImportTourTypeMode;
+   private int                           _lastMarkerTimeSlices;
 
-   public boolean                 isComputeAveragePower;
+   public boolean                        isComputeAveragePower;
 
-   private FitDataReader          _fitDataReader;
-   private String                 _importFilePathName;
+   private FitDataReader                 _fitDataReader;
+   private String                        _importFilePathName;
 
-   private Map<Long, TourData>    _alreadyImportedTours;
-   private Map<Long, TourData>    _newlyImportedTours;
+   private Map<Long, TourData>           _alreadyImportedTours;
+   private Map<Long, TourData>           _newlyImportedTours;
 
-   private TourData               _tourData             = new TourData();
+   private TourData                      _tourData              = new TourData();
 
-   private String                 _deviceId;
-   private String                 _manufacturer;
-   private String                 _garminProduct;
-   private String                 _softwareVersion;
+   private String                        _deviceId;
+   private String                        _manufacturer;
+   private String                        _garminProduct;
+   private String                        _softwareVersion;
 
-   private String                 _sessionIndex;
-   private ZonedDateTime          _sessionStartTime;
+   private String                        _sessionIndex;
+   private ZonedDateTime                 _sessionStartTime;
 
-   private String                 _sportName            = UI.EMPTY_STRING;
-   private String                 _profileName          = UI.EMPTY_STRING;
+   private String                        _sportName             = UI.EMPTY_STRING;
+   private String                        _profileName           = UI.EMPTY_STRING;
 
-   private final List<TimeData>   _allTimeData          = new ArrayList<>();
+   private final List<TimeData>          _allTimeData           = new ArrayList<>();
 
-   private final List<GearData>   _allGearData          = new ArrayList<>();
-   private final List<SwimData>   _allSwimData          = new ArrayList<>();
-   private final List<TourMarker> _allTourMarker        = new ArrayList<>();
-   private List<Long>             _pausedTime_Start     = new ArrayList<>();
-   private final List<Long>       _pausedTime_End       = new ArrayList<>();
+//   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
+   private final List<GearData>          _allGearData           = new ArrayList<>();
+   private final List<SwimData>          _allSwimData           = new ArrayList<>();
+   private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
+   private List<Long>                    _pausedTime_Start      = new ArrayList<>();
+   private final List<Long>              _pausedTime_End        = new ArrayList<>();
 
-   private TimeData               _current_TimeData;
-   private TimeData               _lastAdded_TimeData;
-   private TimeData               _previous_TimeData;
+   private final List<Long>              _allBatteryTime        = new ArrayList<>();
+   private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
 
-   private TourMarker             _current_TourMarker;
-   private long                   _timeDiffMS;
+   private TimeData                      _current_TimeData;
+   private TimeData                      _lastAdded_TimeData;
+   private TimeData                      _previous_TimeData;
+
+   private TourMarker                    _current_TourMarker;
+   private long                          _timeDiffMS;
+
+   private ImportState_Process           _importState_Process;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
                   final Map<Long, TourData> alreadyImportedTours,
-                  final Map<Long, TourData> newlyImportedTours) {
+                  final Map<Long, TourData> newlyImportedTours,
+                  final ImportState_Process importState_Process) {
 
-      this._fitDataReader = fitDataReader;
-      this._importFilePathName = importFilePath;
-      this._alreadyImportedTours = alreadyImportedTours;
-      this._newlyImportedTours = newlyImportedTours;
+      _fitDataReader = fitDataReader;
+      _importFilePathName = importFilePath;
+      _alreadyImportedTours = alreadyImportedTours;
+      _newlyImportedTours = newlyImportedTours;
+      _importState_Process = importState_Process;
 
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
       _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
       _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-
    }
 
    /**
+    * Creates a tour type when it do not yet exist for the provided label
+    *
     * @param tourData
     * @param parsedTourTypeLabel
-    * @return <code>true</code> when a new {@link TourType} is created
     */
-   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
+   private void applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
 
-      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
-      TourType tourType = null;
-      TourType newSavedTourType = null;
-
-      // do not add tours when label string is blank
-      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
-
-         // find tour type in existing tour types
-         for (final TourType mapTourType : tourTypeMap) {
-            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
-               tourType = mapTourType;
-               break;
-            }
-         }
-
-         if (tourType == null) {
-
-            // create new tour type
-
-            final TourType newTourType = new TourType(parsedTourTypeLabel);
-
-            final TourTypeColorDefinition newColorDef = new TourTypeColorDefinition(newTourType,
-                  Long.toString(newTourType.getTypeId()),
-                  newTourType.getName());
-
-            newTourType.setColor_Gradient_Bright(newColorDef.getGradientBright_Default());
-            newTourType.setColor_Gradient_Dark(newColorDef.getGradientDark_Default());
-
-            newTourType.setColor_Line(newColorDef.getLineColor_Default_Light(), newColorDef.getLineColor_Default_Dark());
-            newTourType.setColor_Text(newColorDef.getTextColor_Default_Light(), newColorDef.getTextColor_Default_Dark());
-
-            // save new entity
-            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-            if (newSavedTourType != null) {
-
-               tourType = newSavedTourType;
-
-               TourDatabase.clearTourTypes();
-               TourManager.getInstance().clearTourDataCache();
-
-               // Update Tour Type (Filter) list UI
-               Display.getDefault().syncExec(() ->
-               // fire modify event
-               TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
-            }
-         }
-
-         tourData.setTourType(tourType);
+      // ignore empty tour type label
+      if (UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
+         return;
       }
 
-      return newSavedTourType != null;
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(tourData, parsedTourTypeLabel);
+
+      if (tourTypeWrapper != null && tourTypeWrapper.isNewTourType) {
+         _importState_Process.isCreated_NewTourType().set(true);
+      }
    }
 
    public void finalizeTour() {
@@ -204,7 +167,10 @@ public class FitData {
 
          recordStartTime = _sessionStartTime.toInstant().toEpochMilli();
 
-         TourLogManager.logError("There are no time data, using session date/time");//$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format(
+               "[FIT] %s - There are no time data, using session date/time %s", //$NON-NLS-1$
+               _importFilePathName,
+               TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
 
       } else {
 
@@ -212,7 +178,10 @@ public class FitData {
 
          recordStartTime = TimeTools.now().toEpochSecond();
 
-         TourLogManager.logError("There are no time data and there is no session date/time");//$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format(
+               "[FIT] %s - There are no time data and there is no session date/time, using %s", //$NON-NLS-1$
+               _importFilePathName,
+               TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_S)));
       }
 
       if (_sessionStartTime != null) {
@@ -221,16 +190,18 @@ public class FitData {
 
          if (recordStartTime != sessionStartTime) {
 
-            final String message =
-                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+// too much noise
 
-            TourLogManager.subLog_Info(
-                  String.format(
-                        message,
-                        _importFilePathName,
-                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
-                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
-                        (recordStartTime - sessionStartTime) / 1000));
+//            final String message =
+//                  "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+//
+//            TourLogManager.subLog_Info(
+//                  String.format(
+//                        message,
+//                        _importFilePathName,
+//                        TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
+//                        TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
+//                        (recordStartTime - sessionStartTime) / 1000));
          }
       }
 
@@ -269,9 +240,10 @@ public class FitData {
          _tourData.computeComputedValues();
          _tourData.computeAltimeterGradientSerie();
 
-         // In the case where the power was retrieved from a developer field,
-         // the fit file didn't contain the average power and we need
-         // to compute it ourselves.
+         /*
+          * In the case where the power was retrieved from a developer field, the fit file didn't
+          * contain the average power and we need to compute it ourselves.
+          */
          if (isComputeAveragePower) {
             final float[] powerSerie = _tourData.getPowerSerie();
             if (powerSerie != null) {
@@ -280,6 +252,7 @@ public class FitData {
          }
 
          finalizeTour_Elevation(_tourData);
+         finalizeTour_Battery(_tourData);
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData, _allGearData);
@@ -287,8 +260,38 @@ public class FitData {
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
-         finalizeTour_Type();
+         finalizeTour_Type(_tourData);
       }
+   }
+
+   private void finalizeTour_Battery(final TourData tourData) {
+
+      final int numBatteryItems = _allBatteryTime.size();
+
+      if (numBatteryItems == 0) {
+         return;
+      }
+
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int[] allBatteryTime = new int[numBatteryItems];
+      final short[] allBatteryPercentage = new short[numBatteryItems];
+
+      for (int serieIndex = 0; serieIndex < numBatteryItems; serieIndex++) {
+
+         // convert absolute time --> relative time
+         final long absoluteTime = _allBatteryTime.get(serieIndex);
+         final int relativeTime = (int) (absoluteTime - tourStartTime);
+
+         allBatteryPercentage[serieIndex] = _allBatteryPercentage.get(serieIndex);
+         allBatteryTime[serieIndex] = relativeTime;
+      }
+
+      tourData.setBattery_Time(allBatteryTime);
+      tourData.setBattery_Percentage(allBatteryPercentage);
+
+      tourData.setBattery_Percentage_Start(allBatteryPercentage[0]);
+      tourData.setBattery_Percentage_End(allBatteryPercentage[numBatteryItems - 1]);
    }
 
    /**
@@ -495,7 +498,7 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-   private void finalizeTour_Type() {
+   private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
       if (_isFitImportTourType) {
@@ -504,20 +507,20 @@ public class FitData {
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
 
-            applyTour_Type(_tourData, _sportName);
+            applyTour_Type(tourData, _sportName);
             break;
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
 
-            applyTour_Type(_tourData, _profileName);
+            applyTour_Type(tourData, _profileName);
             break;
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
 
             if (!UI.EMPTY_STRING.equals(_profileName)) {
-               applyTour_Type(_tourData, _profileName);
+               applyTour_Type(tourData, _profileName);
             } else {
-               applyTour_Type(_tourData, _sportName);
+               applyTour_Type(tourData, _sportName);
             }
             break;
 
@@ -530,7 +533,7 @@ public class FitData {
                spacerText = UI.DASH_WITH_SPACE;
             }
 
-            applyTour_Type(_tourData, _sportName + spacerText + _profileName);
+            applyTour_Type(tourData, _sportName + spacerText + _profileName);
             break;
          }
       }
@@ -538,6 +541,14 @@ public class FitData {
 
    public List<TimeData> getAllTimeData() {
       return _allTimeData;
+   }
+
+   public List<Short> getBattery_Percentage() {
+      return _allBatteryPercentage;
+   }
+
+   public List<Long> getBattery_Time() {
+      return _allBatteryTime;
    }
 
    public TimeData getCurrent_TimeData() {
@@ -574,8 +585,16 @@ public class FitData {
       return deviceName.toString();
    }
 
+//   public List<DeviceSensorValue> getDeviceSensorValues() {
+//      return _allDeviceSensorValues;
+//   }
+
    public List<GearData> getGearData() {
       return _allGearData;
+   }
+
+   public String getImportFilePathName() {
+      return _importFilePathName;
    }
 
    public TimeData getLastAdded_TimeData() {
@@ -611,7 +630,7 @@ public class FitData {
 
       final List<TourMarker> tourMarkers = _allTourMarker;
 
-      _current_TourMarker = new TourMarker(_tourData, ChartLabel.MARKER_TYPE_DEVICE);
+      _current_TourMarker = new TourMarker(_tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
       tourMarkers.add(_current_TourMarker);
    }

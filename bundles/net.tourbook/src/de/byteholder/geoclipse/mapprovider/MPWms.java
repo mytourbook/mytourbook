@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -98,19 +97,19 @@ public class MPWms extends MP implements ITileLoader {
 
       final MPWms clonedMp = (MPWms) super.clone();
 
-      clonedMp._mtLayers = cloneMtLayer(clonedMp, _mtLayers);
-      clonedMp._mtLayersReverse = cloneMtLayer(clonedMp, _mtLayersReverse);
+      clonedMp._mtLayers = cloneMtLayer(_mtLayers);
+      clonedMp._mtLayersReverse = cloneMtLayer(_mtLayersReverse);
 
 //		if (fMtLayers != null) {
 //			mapProvider.initializeLayers();
 //		}
 
-      clonedMp._offlineLayers = cloneOfflineLayer(clonedMp, _offlineLayers);
+      clonedMp._offlineLayers = cloneOfflineLayer(_offlineLayers);
 
       return clonedMp;
    }
 
-   private ArrayList<MtLayer> cloneMtLayer(final MPWms mapProvider, final ArrayList<MtLayer> allMtLayers)
+   private ArrayList<MtLayer> cloneMtLayer(final ArrayList<MtLayer> allMtLayers)
          throws CloneNotSupportedException {
 
       if (allMtLayers == null) {
@@ -127,8 +126,7 @@ public class MPWms extends MP implements ITileLoader {
       return newMtLayers;
    }
 
-   private ArrayList<LayerOfflineData> cloneOfflineLayer(final MPWms mapProvider,
-                                                         final ArrayList<LayerOfflineData> offlineDataList)
+   private ArrayList<LayerOfflineData> cloneOfflineLayer(final ArrayList<LayerOfflineData> offlineDataList)
          throws CloneNotSupportedException {
 
       if (offlineDataList == null) {
@@ -332,13 +330,13 @@ public class MPWms extends MP implements ITileLoader {
 
       } catch (final IOException e) {
          throw new GeoException(NLS.bind(//
-               Messages.DBG036_Wms_Server_Error_IoExeption,
+               Messages.DBG036_Wms_Server_Error_IoException,
                e.getMessage(),
                finalUrl), e);
 
       } catch (final ServiceException e) {
          throw new GeoException(NLS.bind(//
-               Messages.DBG037_Wms_Server_Error_ServiceExeption,
+               Messages.DBG037_Wms_Server_Error_ServiceException,
                e.getMessage(),
                finalUrl), e);
 
@@ -395,42 +393,34 @@ public class MPWms extends MP implements ITileLoader {
       _mtLayersReverse.clear();
       _mtLayersReverse.addAll(_mtLayers);
 
-      Collections.sort(_mtLayersReverse, new Comparator<MtLayer>() {
+      Collections.sort(_mtLayersReverse, (mtLayer1, mtLayer2) -> {
 
-         @Override
-         public int compare(final MtLayer mt1, final MtLayer mt2) {
+         if (mtLayer1.getPositionIndex() == -1 || mtLayer2.getPositionIndex() == -1) {
 
-            if (mt1.getPositionIndex() == -1 || mt2.getPositionIndex() == -1) {
+            // sort by name
+            return mtLayer1.getGeoLayer().compareTo(mtLayer2.getGeoLayer());
 
-               // sort by name
-               return mt1.getGeoLayer().compareTo(mt2.getGeoLayer());
+         } else {
 
-            } else {
-
-               // sort by position
-               return -mt1.getPositionIndex() - -mt2.getPositionIndex();
-            }
+            // sort by position
+            return -mtLayer1.getPositionIndex() - -mtLayer2.getPositionIndex();
          }
       });
 
       /*
        * sort none reverse layers, this sorting is used when the custom tile key is created
        */
-      Collections.sort(_mtLayers, new Comparator<MtLayer>() {
+      Collections.sort(_mtLayers, (mtLayer1, mtLayer2) -> {
 
-         @Override
-         public int compare(final MtLayer mt1, final MtLayer mt2) {
+         if (mtLayer1.getPositionIndex() == -1 || mtLayer2.getPositionIndex() == -1) {
 
-            if (mt1.getPositionIndex() == -1 || mt2.getPositionIndex() == -1) {
+            // sort by name
+            return mtLayer1.getGeoLayer().compareTo(mtLayer2.getGeoLayer());
 
-               // sort by name
-               return mt1.getGeoLayer().compareTo(mt2.getGeoLayer());
+         } else {
 
-            } else {
-
-               // sort by position
-               return mt1.getPositionIndex() - mt2.getPositionIndex();
-            }
+            // sort by position
+            return mtLayer1.getPositionIndex() - mtLayer2.getPositionIndex();
          }
       });
    }

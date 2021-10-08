@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 21.6.1.qualifier
+Bundle-Version: 21.9.0.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-11
@@ -91,6 +91,8 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.photo.internal.gallery.MT20,
  net.tourbook.web,
  net.tourbook.web.preferences,
+ org.apache.commons.collections4,
+ org.apache.commons.lang3.text,
  org.eclipse.e4.core.services.events,
  org.geotools.ows,
  org.geotools.ows.wms,

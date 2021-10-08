@@ -43,6 +43,7 @@ import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.StatusLineManager;
@@ -64,6 +65,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -134,6 +136,8 @@ public class UI {
    public static final String       NEW_LINE1                          = "\n";       //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";     //$NON-NLS-1$
    public static final String       NEW_LINE3                          = "\n\n\n";   //$NON-NLS-1$
+   public static final String       TAB1                               = "\t";       //$NON-NLS-1$
+   public static final String       SLASH                              = "/";        //$NON-NLS-1$
    public static final String       SLASH_WITH_SPACE                   = " / ";      //$NON-NLS-1$
    public static final String       SPACE1                             = " ";        //$NON-NLS-1$
    public static final String       SPACE2                             = "  ";       //$NON-NLS-1$
@@ -252,24 +256,35 @@ public class UI {
    /**
     * On Linux an async selection event is fired since e4
     */
-   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2"; //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";   //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";   //$NON-NLS-1$
 
-   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                 //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                   //$NON-NLS-1$
 
-   public static final String  UTF_8                          = "UTF-8";                   //$NON-NLS-1$
-   public static final String  UTF_16                         = "UTF-16";                  //$NON-NLS-1$
-   public static final String  ISO_8859_1                     = "ISO-8859-1";              //$NON-NLS-1$
+   public static final String  TIME_ZONE_UTC                  = "UTC";                       //$NON-NLS-1$
+
+   public static final String  UTF_8                          = "UTF-8";                     //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                    //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";                //$NON-NLS-1$
 
    public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";               //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                 //$NON-NLS-1$
+
+   private static final String NUMBER_FORMAT_1F               = "%.1f";                      //$NON-NLS-1$
+   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ"; //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
     */
    public static final int     DEFAULT_DESCRIPTION_WIDTH      = 350;
    public static final int     DEFAULT_FIELD_WIDTH            = 40;
+
+   /**
+    * The opacity can be set in SWT from 0...255 but no user want's so many steps. In the UI the
+    * user can select this max opacity value which will be converted into 255 when appied.
+    */
+   public static final int     MAX_OPACITY                    = 10;
 
    /**
     * Convert Joule in Calorie
@@ -522,7 +537,7 @@ public class UI {
    private static StringBuilder        _formatterSB               = new StringBuilder();
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
-   private static FontMetrics          _fontMetrics;
+   private static FontMetrics          _dialogFont_Metrics;
 
 // SET_FORMATTING_OFF
 
@@ -733,7 +748,7 @@ public class UI {
    private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
    /**
-    * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
+    * When <code>true</code> then data in the UI are scrambled. This is used to create anonymous
     * screenshots.
     * <p>
     * Commandline parameter: <code>-DscrambleData</code>
@@ -841,6 +856,38 @@ public class UI {
       spinner.setSelection(oldValue + valueAdjustment);
    }
 
+   /**
+    * Computes the average elevation change with given values of total elevation
+    * change and total distance.
+    *
+    * @return
+    *         If successful, the average elevation change in the current
+    *         measurement system, 0 otherwise.
+    */
+   public static float computeAverageElevationChange(final float totalElevationChange,
+                                                     final float distance) {
+
+      if (Math.signum(distance) == 0) {
+         return 0;
+      }
+
+      return totalElevationChange / (distance / 1000f);
+   }
+
+   /**
+    * @param averageElevationChange
+    *           In m/km
+    * @return Returns the average elevation change in the current measurement system.
+    */
+   public static float convertAverageElevationChangeFromMetric(final float averageElevationChange) {
+
+      if (UNIT_IS_ELEVATION_METER) {
+         return averageElevationChange;
+      }
+
+      return averageElevationChange * UNIT_VALUE_DISTANCE / UNIT_VALUE_ELEVATION;
+   }
+
    public static float convertBodyHeightFromMetric(final float height) {
       if (UNIT_IS_ELEVATION_METER) {
          return height;
@@ -906,7 +953,7 @@ public class UI {
    private static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
 
       // round to the nearest pixel
-      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
+      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2.0)
             / HORIZONTAL_DIALOG_UNIT_PER_CHAR);
    }
 
@@ -931,7 +978,28 @@ public class UI {
          return dlus * 4;
       }
 
-      return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
+      return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Convert opacity value into 0...255 where 255 corresponds with {@link #MAX_OPACITY}
+    * <p>
+    * The tooltip should display
+    *
+    * <pre>
+    * 0 = transparent ... max = opaque
+    * </pre>
+    *
+    * that {@link #MAX_OPACITY} could be adjusted or customized by the user.
+    *
+    * @param opacity
+    * @return
+    */
+   public static int convertOpacity(final float opacity) {
+
+      final float opacityConverted = opacity / MAX_OPACITY * 0xff;
+
+      return (int) Math.min(0xff, opacityConverted);
    }
 
    /**
@@ -1248,7 +1316,7 @@ public class UI {
     * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
     *
     * @param time
-    *           ini seconds
+    *           in seconds
     * @return
     */
    public static String format_hh_mm_ss(final long time) {
@@ -1461,6 +1529,14 @@ public class UI {
       final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
+   }
+
+   public static FontMetrics getDialogFontMetrics() {
+
+      // ensure that font metrics are setup
+      setupUI_FontMetrics();
+
+      return _dialogFont_Metrics;
    }
 
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
@@ -1736,7 +1812,7 @@ public class UI {
    }
 
    /**
-    * Opens the control context menu, the menue is aligned below the control to the right side
+    * Opens the control context menu, the menu is aligned below the control to the right side
     *
     * @param control
     *           Controls which menu is opened
@@ -1951,7 +2027,7 @@ public class UI {
 
    public static int scrambleNumbers(final int number) {
 
-      return (int) (RANDOM_GENERATOR.nextFloat() * number);
+      return RANDOM_GENERATOR.nextInt() * number;
    }
 
    public static long scrambleNumbers(final long number) {
@@ -2043,7 +2119,7 @@ public class UI {
    }
 
    /**
-    * Update colors for all decendants.
+    * Update colors for all descendants.
     *
     * @param child
     * @param bgColor
@@ -2304,26 +2380,22 @@ public class UI {
 
    private static boolean setupUI_FontMetrics() {
 
-      if (_fontMetrics != null) {
+      if (_dialogFont_Metrics != null) {
          return true;
       }
 
       // Compute and keep a font metric
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
-
-      if (activeShell == null) {
-
-         // this can occure when called too early
-         return false;
-      }
-
-      final GC gc = new GC(activeShell);
+      final Display display = Display.getDefault();
+      final Shell shell = new Shell(display);
+      final GC gc = new GC(shell);
       {
          gc.setFont(JFaceResources.getDialogFont());
-         _fontMetrics = gc.getFontMetrics();
+
+         _dialogFont_Metrics = gc.getFontMetrics();
       }
       gc.dispose();
+      shell.dispose();
 
       return true;
    }
@@ -2461,6 +2533,40 @@ public class UI {
       }
 
       return shortedText;
+   }
+
+   /**
+    * Show worked values in progress monitor with the format
+    *
+    * <pre>
+    * {0} / {1} - {2} % - {3} Δ
+    * </pre>
+    *
+    * @param monitor
+    * @param numWorked
+    * @param numAll
+    * @param numLastWorked
+    */
+   public static void showWorkedInProgressMonitor(final IProgressMonitor monitor,
+                                                  final int numWorked,
+                                                  final int numAll,
+                                                  final int numLastWorked) {
+
+      final long numDiff = numWorked - numLastWorked;
+
+      final String percentValue = numAll == 0
+
+            ? UI.EMPTY_STRING
+            : String.format(NUMBER_FORMAT_1F, (float) numWorked / numAll * 100.0);
+
+      // "{0} / {1} - {2} % - {3} Δ"
+      monitor.subTask(NLS.bind(SUB_TASK_PROGRESS,
+            new Object[] {
+                  numWorked,
+                  numAll,
+                  percentValue,
+                  numDiff,
+            }));
    }
 
    /**
@@ -2826,6 +2932,7 @@ public class UI {
          }
       };
    }
+
 }
 
 //this conversion is not working for all png images, found SWT2Dutil.java

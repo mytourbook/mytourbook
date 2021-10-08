@@ -78,7 +78,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
       final long start = System.currentTimeMillis();
 
       TourLogManager.showLogView();
-      TourLogManager.logTitle(NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
+      TourLogManager.log_TITLE(NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
 
       boolean isTaskDone = false;
       try (Connection sqlConnection = TourDatabase.getInstance().getConnection()) {
@@ -89,7 +89,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
          SQL.showException(e);
       } finally {
 
-         TourLogManager.logTitle(String.format(Messages.Log_ComputeCadenceZonesTimes_002_End, (System.currentTimeMillis() - start) / 1000.0));
+         TourLogManager.log_TITLE(String.format(Messages.Log_ComputeCadenceZonesTimes_002_End, (System.currentTimeMillis() - start) / 1000.0));
 
          if (isTaskDone) {
 

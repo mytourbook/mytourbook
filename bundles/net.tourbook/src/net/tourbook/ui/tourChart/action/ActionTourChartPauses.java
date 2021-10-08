@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,28 +18,48 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.ui.tourChart.SlideoutTourChartPauses;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ToolBar;
 
-public class ActionTourChartPauses extends Action {
+public class ActionTourChartPauses extends ActionToolbarSlideout {
 
    private TourChart _tourChart;
+   private Control   _ownerControl;
 
-   public ActionTourChartPauses(final TourChart tourChart) {
+   public ActionTourChartPauses(final TourChart tourChart, final Control ownerControl) {
 
-      super(null, AS_CHECK_BOX);
+      super(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses),
+            TourbookPlugin.getThemedImageDescriptor(Images.TourPauses_Disabled));
 
-      setToolTipText(Messages.Tour_Action_ShowTourPauses_Tooltip);
+      notSelectedTooltip = Messages.Tour_Action_ShowTourPauses_Tooltip;
 
+      isToggleAction = true;
       _tourChart = tourChart;
-
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled));
+      _ownerControl = ownerControl;
    }
 
    @Override
-   public void run() {
-      _tourChart.actionShowTourPauses(isChecked());
+   protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+      return new SlideoutTourChartPauses(_ownerControl, toolbar, _tourChart);
+   }
+
+   @Override
+   protected void onBeforeOpenSlideout() {
+
+      _tourChart.closeOpenedDialogs(this);
+   }
+
+   @Override
+   protected void onSelect() {
+
+      super.onSelect();
+
+      _tourChart.updateUI_Pauses();
    }
 }

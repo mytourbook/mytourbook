@@ -78,7 +78,6 @@ Messages //
 
    var SearchApp = declare('tourbook.search.SearchApp', [],
    {
-
       createUI : function() {
 
          this.createUI_Actions();
@@ -308,14 +307,13 @@ Messages //
          }, 'domGrid');
          
          var contextMenu_RowData
-         var isSelectionFromContextMenu
 
          /**
           * @callback
           */
-         var selectionCallback = function(evt) {
+         var selectionCallback = function(event) {
 
-            var selectedItems = [];
+            var selectedItems = []
 
             for (var rowId in grid.selection) {
 
@@ -323,28 +321,11 @@ Messages //
 
                selectedItems.push(row.data);
             }
-            
+
             if (selectedItems.length === 0) {
-
-               // IE is not setting a selection with the mouse in the embedded browser, 
-               // -> workaround: get selected tour from the context menu event,
-               //                this works for a single tour but not for multiple tours
                
-               if (isSelectionFromContextMenu && contextMenu_RowData) {
-
-                  // select row programatically
-                  grid.select(contextMenu_RowData.id)
-                  
-                  return
-                  
-               } else {
-                  
-                  // nothing to do
-               }
-               
-               isSelectionFromContextMenu = false
-
-               return;
+               // nothing to do
+               return
             }
 
             var jsonSelectedItems = JSON.stringify(selectedItems);
@@ -367,20 +348,48 @@ Messages //
 
          // fire an event when tour, marker or waypoint is selected in the UI
          // fire the event also when multiple items are selected and one is deselected !!!
-         grid.on('dgrid-select', selectionCallback);
-         grid.on('dgrid-deselect', selectionCallback);
+         grid.on('dgrid-select',    selectionCallback)
+         grid.on('dgrid-deselect',  selectionCallback)
+
+         grid.on('.dgrid-row:click', function (event) {
+
+            if (mt_IsUsingEmbeddedBrowser === false) {
+               
+               // external browser is used -> this needs no hack
+
+               return
+            }
+
+            /**
+             * The embedded browser IE is used and is not fireing the "dgrid-select" event since a while,
+             * however it is fireing this event
+             */
+
+            if (event.ctrlKey == false) {
+
+               // there is no multiple selection -> clear previous selection
+               // -> supporting the shiftKey is too complicated
+               // -> Ctrl-A for all is still working
+               
+               grid.clearSelection()
+            }
+
+
+            var row = grid.row(event)
+
+            // this is calling selectionCallback()
+            grid.select(row.id)
+         })
 
          /**
           * Context menu, is defined declaratively.
           */
          
-         var actionEditMarker 	= registry.byId('domAction_EditMarker')
-         var actionEditTour     = registry.byId('domAction_EditTour')
-         var actionSelectTour   = registry.byId('domAction_SelectTour')
+         var actionEditMarker = registry.byId('domAction_EditMarker')
+         var actionEditTour   = registry.byId('domAction_EditTour')
 
          actionEditMarker.set('label', Messages.Search_App_Action_EditMarker)
          actionEditTour.set  ('label', Messages.Search_App_Action_EditTour)
-         actionSelectTour.set('label', Messages.Search_App_Action_SelectTour)
 
          /*
           * Setup context menu action
@@ -402,7 +411,6 @@ Messages //
 
             actionEditMarker.set('disabled', !isMarker)
             actionEditTour.set  ('disabled', !isTour)
-            actionSelectTour.set('disabled', !isTour)
          });
 
          /*
@@ -414,20 +422,8 @@ Messages //
             SearchApp.action(actionUrl);
          }
 
-         var onSelectTour = function() {
-
-            // deselect selection which was selected previously with the keyboard
-            // otherwise this selection workaround is not working !
-            grid.clearSelection()
-            
-            isSelectionFromContextMenu = true
-
-            selectionCallback()
-         }
-         
          actionEditMarker.on('click', runUrlAction)
          actionEditTour.on  ('click', runUrlAction)
-         actionSelectTour.on('click', onSelectTour)
 
          return grid;
       },
@@ -519,7 +515,6 @@ Messages //
 
       xhr(SearchMgr.XHR_SEARCH_HANDLER,
       {
-
          handleAs : 'json',
          preventCache : true,
          timeout : SearchMgr.XHR_TIMEOUT,

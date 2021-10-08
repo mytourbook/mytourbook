@@ -34,6 +34,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -362,20 +363,21 @@ public class ChartComponentAxis extends Canvas {
 //					labelExtend = gc.textExtent(yTitle);
 //				}
 
-            final int xPos = labelExtend.y / 2;
-            final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
+            int xPos = labelExtend.y / 2;
+            int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
-            final Color fgColor = new Color(yData.getRgbText()[0]);
-            gc.setForeground(fgColor);
+            gc.setForeground(new Color(yData.getRgbGraph_Text()));
 
             final Transform tr = new Transform(_display);
             {
+               xPos = DPIUtil.autoScaleUp(xPos);
+               yPos = DPIUtil.autoScaleUp(yPos);
+
                tr.translate(xPos, yPos);
                tr.rotate(-90f);
 
                gc.setTransform(tr);
                gc.drawText(yTitle, 0, 0, true);
-
                gc.setTransform(null);
             }
             tr.dispose();

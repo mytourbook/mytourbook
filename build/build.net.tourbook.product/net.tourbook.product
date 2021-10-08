@@ -3,7 +3,7 @@
 
 <product 
 
-   version           ="21.6.1.qualifier" 
+   version           ="21.9.0.qualifier" 
 
    name              ="MyTourbook Product" 
    id                ="net.tourbook.product" 
@@ -75,10 +75,13 @@
       <macosx icon            ="../../bundles/net.tourbook/icons/application/mac/tourbook128.icns"/>
       <win useIco="false">
          <bmp
-            winSmallHigh      ="../../bundles/net.tourbook/icons/application/win/tourbook16-32.bmp"
-            winMediumHigh     ="../../bundles/net.tourbook/icons/application/win/tourbook32-32.bmp"
-            winLargeHigh      ="../../bundles/net.tourbook/icons/application/win/tourbook48-32.bmp"
-         />
+            winSmallHigh		="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-16px-32bit.bmp"
+            winSmallLow			="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-16px-8bit.bmp"
+            winMediumHigh		="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-32px-32bit.bmp"
+            winMediumLow		="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-32px-8bit.bmp"
+            winLargeHigh		="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-48px-32bit.bmp"
+            winLargeLow			="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-48px-8bit.bmp"
+            winExtraLargeHigh	="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-256px-32bit.bmp"/>
       </win>
    </launcher>
 
@@ -114,5 +117,12 @@
       <plugin id="org.eclipse.equinox.simpleconfigurator"   autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.update.configurator"          autoStart="true" startLevel="4" />
    </configurations>
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
 
 </product>

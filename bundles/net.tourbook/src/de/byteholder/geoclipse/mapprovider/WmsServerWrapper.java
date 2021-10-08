@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -30,9 +30,9 @@ public class WmsServerWrapper {
 
    /**
     * Connects to the capability url and returns the wms server or null when connection fails or
-    * when other errors occures. <br>
+    * when other errors occurs. <br>
     * <br>
-    * {@link #getWmsError()} returns the error or <code>null</code> when no error occured
+    * {@link #getWmsError()} returns the error or <code>null</code> when no error occurred
     *
     * @param capsUrl
     * @return Returns a {@link WebMapServer}
@@ -44,48 +44,45 @@ public class WmsServerWrapper {
 
       final WebMapServer[] wmsServer = { null };
       final Exception[] exception = { null };
-      final String message[] = { null };
+      final String[] message = { null };
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            try {
+         try {
 
-               wmsServer[0] = new WebMapServer(new URL(capsUrl));
+            wmsServer[0] = new WebMapServer(new URL(capsUrl));
 
-            } catch (final MalformedURLException e) {
+         } catch (final MalformedURLException e) {
 
-               exception[0] = e;
-               message[0] = NLS.bind(Messages.DBG028_Wms_Server_Error_MalformedUrl, e.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG028_Wms_Server_Error_MalformedUrl, e.getMessage(), capsUrl);
 
-            } catch (final FileNotFoundException e) {
+         } catch (final FileNotFoundException e) {
 
-               exception[0] = e;
-               message[0] = NLS.bind(Messages.DBG029_Wms_Server_Error_FileNotFound, e.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG029_Wms_Server_Error_FileNotFound, e.getMessage(), capsUrl);
 
-            } catch (final UnknownHostException e) {
+         } catch (final UnknownHostException e) {
 
-               exception[0] = e;
-               message[0] = NLS.bind(
-                     Messages.DBG030_Wms_Server_Error_CannotConnectToServer,
-                     e.getMessage(),
-                     capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(
+                  Messages.DBG030_Wms_Server_Error_CannotConnectToServer,
+                  e.getMessage(),
+                  capsUrl);
 
-            } catch (final IOException e) {
+         } catch (final IOException e) {
 
-               exception[0] = e;
-               message[0] = NLS.bind(Messages.DBG031_Wms_Server_Error_IoExeption, e.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG031_Wms_Server_Error_IoException, e.getMessage(), capsUrl);
 
-            } catch (final ServiceException e) {
+         } catch (final ServiceException e) {
 
-               exception[0] = e;
-               message[0] = NLS.bind(Messages.DBG032_Wms_Server_Error_ServiceExeption, e.getMessage(), capsUrl);
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG032_Wms_Server_Error_ServiceException, e.getMessage(), capsUrl);
 
-            } catch (final Exception e) {
-               exception[0] = e;
-               message[0] = NLS.bind(Messages.DBG033_Wms_Server_Error_OtherExeption, e.getMessage(), capsUrl);
-            }
+         } catch (final Exception e) {
+            exception[0] = e;
+            message[0] = NLS.bind(Messages.DBG033_Wms_Server_Error_OtherException, e.getMessage(), capsUrl);
          }
       });
 

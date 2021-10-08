@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -188,19 +188,23 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "tourDeviceTime_Paused, " //                        87    //$NON-NLS-1$
 
             // computed break time
-            + "(tourDeviceTime_Elapsed - tourComputedTime_Moving) " // 88    //$NON-NLS-1$
+            + "(tourDeviceTime_Elapsed - tourComputedTime_Moving), " // 88    //$NON-NLS-1$
+
+            // -------- BATTERY -----------
+            + "Battery_Percentage_Start, " //                     89    //$NON-NLS-1$
+            + "Battery_Percentage_End " //                        90    //$NON-NLS-1$
 
       ;
 
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 89;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 91;
+
+      /////////////////////////////////////////////////////////////////////////
+      // -------- JOINT TABLES, they are added at the end --------------
+      /////////////////////////////////////////////////////////////////////////
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
-            /////////////////////////////////////////////////////////////////////////
-            // -------- JOINT TABLES, they are added at the end --------------
-            /////////////////////////////////////////////////////////////////////////
-
-            + "jTdataTtag.TourTag_tagId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
-            + "Tmarker.markerId " //                              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
+            + "jTdataTtag.TourTag_tagId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
+            + "Tmarker.markerId " //                              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
@@ -291,7 +295,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    }
 
-   protected final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   protected static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    //
    //
    TourBookView tourBookView;
@@ -430,7 +434,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    String col_ImportFileName;
    String col_ImportFilePath;
-   String col_DeviceName;
+   //
+   // ----------- DEVICE ---------
+   //
+   short  colBatterySoC_Start;
+   short  colBatterySoC_End;
+   String colDeviceName;
 
    TVITourBookItem(final TourBookView view) {
 
@@ -597,6 +606,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colTourDeviceTime_Paused               = result.getLong(87);
       tourItem.colTourComputedTime_Break              = result.getLong(88);
 
+      // -------- BATTERY -----------
+
+      tourItem.colBatterySoC_Start                    = result.getShort(89);
+      tourItem.colBatterySoC_End                      = result.getShort(90);
+
 // SET_FORMATTING_ON
 
       // -----------------------------------------------
@@ -616,7 +630,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       dbDeviceName = dbDeviceName == null ? UI.EMPTY_STRING : dbDeviceName;
       dbFirmwareVersion = dbFirmwareVersion == null ? UI.EMPTY_STRING : dbFirmwareVersion;
 
-      final String deviceName = dbFirmwareVersion.length() == 0//
+      final String deviceName = dbFirmwareVersion.length() == 0
             ? dbDeviceName
             : dbDeviceName
                   + UI.SPACE
@@ -624,7 +638,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
                   + dbFirmwareVersion
                   + UI.SYMBOL_BRACKET_RIGHT;
 
-      tourItem.col_DeviceName = deviceName;
+      tourItem.colDeviceName = deviceName;
 
       // -----------------------------------------------
 
@@ -647,7 +661,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final long time = isPaceAndSpeedFromRecordedTime ? dbRecordedTime : dbMovingTime;
       tourItem.colAvgSpeed = time == 0 ? 0 : 3.6f * dbDistance / time;
-      tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000 / dbDistance;
+      tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000f / dbDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourItem.scrambleData();
@@ -671,7 +685,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       // VERY IMPORTANT !
       // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
       // Indeed, we can't do a mean average as we need to do a distance-weighted average.
-      colAltitude_AvgChange            = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
+      colAltitude_AvgChange            = UI.computeAverageElevationChange(colAltitudeUp + colAltitudeDown, colTourDistance);
 
       colCounter                       = result.getLong(startIndex + 5);
 
@@ -712,8 +726,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTemperature_Min               = result.getFloat(startIndex + 25);
       colTemperature_Max               = result.getFloat(startIndex + 26);
 
-      colTourDeviceTime_Recorded       =  result.getLong(startIndex + 27);
-      colTourDeviceTime_Paused         =  result.getLong(startIndex + 28);
+      colTourDeviceTime_Recorded       = result.getLong(startIndex + 27);
+      colTourDeviceTime_Paused         = result.getLong(startIndex + 28);
 
 // SET_FORMATTING_ON
 

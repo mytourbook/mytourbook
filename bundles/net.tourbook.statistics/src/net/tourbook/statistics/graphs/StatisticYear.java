@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,6 +71,8 @@ public abstract class StatisticYear extends TourbookStatistic {
    private boolean                  _isSynchScaleEnabled;
 
    private int                      _barOrderStart;
+   private ChartDataYSerie          _athleteBodyWeight_YData;
+   private ChartDataYSerie          _athleteBodyFat_YData;
 
    public boolean canTourBeVisible() {
       return false;
@@ -177,8 +179,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -191,21 +192,38 @@ public abstract class StatisticYear extends TourbookStatistic {
     */
    void createYData_AthleteBodyFat(final ChartDataModel chartDataModel) {
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      double visibleMinValue = 0;
+      double visibleMaxValue = 0;
+
+      // If the user has switched from a statistic to another, we need to retrieve
+      // the last min/max values and not the ones from the preference store that can
+      // be in this case outdated.
+      if (_athleteBodyFat_YData != null) {
+
+         visibleMinValue = _athleteBodyFat_YData.getVisibleMinValue();
+         visibleMaxValue = _athleteBodyFat_YData.getVisibleMaxValue();
+      } else {
+
+         visibleMinValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
+         visibleMaxValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE);
+      }
+
+      _athleteBodyFat_YData = new ChartDataYSerie(
             ChartType.BAR,
             _statisticData_Year.athleteBodyFat_Low,
             _statisticData_Year.athleteBodyFat_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
-      yData.setUnitLabel(UI.UNIT_PERCENT);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setShowYSlider(true);
+      _athleteBodyFat_YData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
+      _athleteBodyFat_YData.setUnitLabel(UI.UNIT_PERCENT);
+      _athleteBodyFat_YData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      _athleteBodyFat_YData.setVisibleMinValue(visibleMinValue);
+      _athleteBodyFat_YData.setVisibleMaxValue(visibleMaxValue);
+      _athleteBodyFat_YData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(_athleteBodyFat_YData, GraphColorManager.PREF_GRAPH_BODYFAT);
+      StatisticServices.setTourTypeColorIndex(_athleteBodyFat_YData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
-      chartDataModel.addYData(yData);
+      chartDataModel.addYData(_athleteBodyFat_YData);
    }
 
    /**
@@ -215,21 +233,38 @@ public abstract class StatisticYear extends TourbookStatistic {
     */
    void createYData_AthleteBodyWeight(final ChartDataModel chartDataModel) {
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      double visibleMinValue = 0;
+      double visibleMaxValue = 0;
+
+      // If the user has switched from a statistic to another, we need to retrieve
+      // the last min/max values and not the ones from the preference store that can
+      // be in this case outdated.
+      if (_athleteBodyWeight_YData != null) {
+
+         visibleMinValue = _athleteBodyWeight_YData.getVisibleMinValue();
+         visibleMaxValue = _athleteBodyWeight_YData.getVisibleMaxValue();
+      } else {
+
+         visibleMinValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
+         visibleMaxValue = _prefStore.getDouble(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE) * UI.UNIT_VALUE_WEIGHT;
+      }
+
+      _athleteBodyWeight_YData = new ChartDataYSerie(
             ChartType.BAR,
             _statisticData_Year.athleteBodyWeight_Low,
             _statisticData_Year.athleteBodyWeight_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
-      yData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setShowYSlider(true);
+      _athleteBodyWeight_YData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
+      _athleteBodyWeight_YData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
+      _athleteBodyWeight_YData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      _athleteBodyWeight_YData.setVisibleMinValue(visibleMinValue);
+      _athleteBodyWeight_YData.setVisibleMaxValue(visibleMaxValue);
+      _athleteBodyWeight_YData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(_athleteBodyWeight_YData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
+      StatisticServices.setTourTypeColorIndex(_athleteBodyWeight_YData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
-      chartDataModel.addYData(yData);
+      chartDataModel.addYData(_athleteBodyWeight_YData);
    }
 
    /**
@@ -251,8 +286,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setValueDivisor(1000);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -276,8 +310,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       _yData_Duration.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
       _yData_Duration.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColorIndex(_yData_Duration, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(_yData_Duration);
@@ -301,8 +334,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Year.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
@@ -362,6 +394,20 @@ public abstract class StatisticYear extends TourbookStatistic {
    public void saveState(final IDialogSettings state) {
 
       state.put(getBarOrderingStateKey(), _barOrderStart);
+
+      if (_athleteBodyWeight_YData != null) {
+
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE,
+               _athleteBodyWeight_YData.getVisibleMinValue() / UI.UNIT_VALUE_WEIGHT);
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE,
+               _athleteBodyWeight_YData.getVisibleMaxValue() / UI.UNIT_VALUE_WEIGHT);
+      }
+
+      if (_athleteBodyFat_YData != null) {
+
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, _athleteBodyFat_YData.getVisibleMinValue());
+         _prefStore.setValue(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, _athleteBodyFat_YData.getVisibleMaxValue());
+      }
    }
 
    @Override

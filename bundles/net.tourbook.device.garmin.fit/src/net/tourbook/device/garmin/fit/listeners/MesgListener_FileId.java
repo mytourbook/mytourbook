@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,11 +40,14 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
 
       if (type == null) {
 
-         TourLogManager.logError("Garmin file type is not defined");//$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format("[FIT] %s - Garmin file type is not defined", //$NON-NLS-1$
+               fitData.getImportFilePathName()));
 
       } else if (type != File.ACTIVITY) {
 
-         TourLogManager.logError("Garmin file type is not an ACTIVITY, it is " + type.name());//$NON-NLS-1$
+         TourLogManager.subLog_INFO(String.format("[FIT] %s - Garmin file type is not an ACTIVITY, it is %s", //$NON-NLS-1$
+               fitData.getImportFilePathName(),
+               type.name()));
       }
 
       /*
@@ -52,8 +55,12 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
        */
       final Long serialNumber = mesg.getSerialNumber();
       if (serialNumber == null) {
-         TourLogManager.logError("File serial number is missing, device id cannot not be set");//$NON-NLS-1$
+
+         TourLogManager.subLog_INFO(String.format("[FIT] %s - File serial number is missing, device id cannot not be set", //$NON-NLS-1$
+               fitData.getImportFilePathName()));
+
       } else {
+
          fitData.setDeviceId(serialNumber.toString());
       }
 

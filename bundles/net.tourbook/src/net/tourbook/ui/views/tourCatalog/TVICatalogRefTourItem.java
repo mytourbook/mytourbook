@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,11 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import net.tourbook.common.util.TreeViewerItem;
@@ -30,15 +32,23 @@ import net.tourbook.ui.UI;
  */
 public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
-   String label;
-   long   refId;
+   String      label;
+   long        refId;
 
-   float  yearMapMinValue = Float.MIN_VALUE;
-   float  yearMapMaxValue;
+   float       yearMapMinValue = Float.MIN_VALUE;
+   float       yearMapMaxValue;
 
-   int    tourCounter;
+   /**
+    * Number of tours
+    */
+   int         numTours;
 
-   public TVICatalogRefTourItem(final TVICatalogRootItem parentItem) {
+   private int _viewLayout;
+
+   public TVICatalogRefTourItem(final TVICatalogRootItem parentItem, final int viewLayout) {
+
+      _viewLayout = viewLayout;
+
       setParentItem(parentItem);
    }
 
@@ -66,38 +76,56 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
+      if (_viewLayout == TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES) {
+
+         // fetch compared tour items
+
+         fetchComparedTours(this, children, -1);
+
+      } else {
+
+         // fetch year items
+
+         fetchChildren_WithYearCategories(children);
+      }
+   }
+
+   private void fetchChildren_WithYearCategories(final ArrayList<TreeViewerItem> children) {
+
       /**
-       * derby does not support expression in "GROUP BY" statements, this is a workaround found
+       * Derby does not support expression in "GROUP BY" statements, this is a workaround found
        * here: http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300
        * .1147889647479.JavaMail.jira@brutus%3E <br>
        * <code>
-       * 	String subSQLString = "(SELECT YEAR(tourDate)\n"
-       * 		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
-       * 		+ (" WHERE "
-       * 				+ TourDatabase.TABLE_TOUR_REFERENCE
-       * 				+ "_generatedId="
-       * 				+ refId + "\n")
-       * 		+ ")";
+       *    String subSQLString = "(SELECT YEAR(tourDate)\n"
+       *       + ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
+       *       + (" WHERE "
+       *             + TourDatabase.TABLE_TOUR_REFERENCE
+       *             + "_generatedId="
+       *             + refId + "\n")
+       *       + ")";
        *
-       * 	String sqlString = "SELECT years FROM \n"
-       * 		+ subSQLString
-       * 		+ (" REFYEARS(years) GROUP BY years");
+       *    String sqlString = "SELECT years FROM \n"
+       *       + subSQLString
+       *       + (" REFYEARS(years) GROUP BY years");
        * </code>
        */
 
-      final StringBuilder sb = new StringBuilder();
+      final String sql = UI.EMPTY_STRING
 
-      sb.append("SELECT"); //$NON-NLS-1$
-      sb.append(" startYear,"); //$NON-NLS-1$
-      sb.append(" SUM(1)"); //$NON-NLS-1$
+            + "SELECT" + NL //                                       //$NON-NLS-1$
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
-      sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
-      sb.append(" GROUP BY startYear"); //$NON-NLS-1$
+            + " StartYear," + NL //                                  //$NON-NLS-1$
+            + " SUM(1)" + NL //                                      //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //    //$NON-NLS-1$
+            + " WHERE refTourId=?" + NL //                           //$NON-NLS-1$
+            + " GROUP BY startYear" + NL //                          //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, refId);
 
          final ResultSet result = statement.executeQuery();
@@ -108,9 +136,144 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
             yearItem.refId = refId;
             yearItem.year = result.getInt(1);
-            yearItem.tourCounter = result.getInt(2);
+            yearItem.numTours = result.getInt(2);
 
-            tourCounter = result.getInt(2);
+            numTours = result.getInt(2);
+         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+   }
+
+   /**
+    * @param parentItem
+    * @param children
+    * @param year
+    *           Fetch compared tours for this year or for all years when <code>year == -1</code>
+    */
+   void fetchComparedTours(final TreeViewerItem parentItem,
+                           final ArrayList<TreeViewerItem> children,
+                           final int year) {
+
+      final boolean isWithYear = year != -1;
+
+      final String sqlYear = isWithYear
+
+            ? " AND TourCompared.startYear=?" //$NON-NLS-1$
+            : UI.EMPTY_STRING;
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                 //$NON-NLS-1$
+
+            + " TourCompared.comparedId," + NL //              1 //$NON-NLS-1$
+            + " TourCompared.tourId," + NL //                  2 //$NON-NLS-1$
+            + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
+            + " TourCompared.avgPulse," + NL //                4 //$NON-NLS-1$
+            + " TourCompared.tourSpeed," + NL //               5 //$NON-NLS-1$
+            + " TourCompared.startIndex," + NL //              6 //$NON-NLS-1$
+            + " TourCompared.endIndex," + NL //                7 //$NON-NLS-1$
+
+            + " TourData.tourTitle," + NL //                   8 //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //             9 //$NON-NLS-1$
+
+            + " jTdataTtag.TourTag_tagId," + NL //             10 //$NON-NLS-1$
+
+            + " TourCompared.tourDeviceTime_Elapsed" + NL //   11 //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+
+            // get data for a tour
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourCompared.tourId = TourData.tourId" + NL //                                        //$NON-NLS-1$
+
+            // get tag id's
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
+
+            + " WHERE TourCompared.refTourId=?" + sqlYear + NL //                                        //$NON-NLS-1$
+            + " ORDER BY TourCompared.tourDate" + NL //                                                  //$NON-NLS-1$
+      ;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+         statement.setLong(1, refId);
+
+         if (isWithYear) {
+            statement.setInt(2, year);
+         }
+
+         final ResultSet result = statement.executeQuery();
+
+         long lastTourId = -1;
+         ArrayList<Long> tagIds = null;
+
+         while (result.next()) {
+
+            final long tourId = result.getLong(2);
+            final Object resultTagId = result.getObject(10);
+
+            if (tourId == lastTourId) {
+
+               // get tags from outer join
+
+               if (resultTagId instanceof Long) {
+                  tagIds.add((Long) resultTagId);
+               }
+
+            } else {
+
+               // new tour is in the resultset
+
+               final TVICatalogComparedTour tourItem = new TVICatalogComparedTour(parentItem);
+               children.add(tourItem);
+
+               tourItem.refId = refId;
+
+               tourItem.compareId = result.getLong(1);
+               tourItem.setTourId(tourId);
+
+               final Date tourDate = result.getDate(3);
+
+               tourItem.avgPulse = result.getFloat(4);
+               tourItem.tourSpeed = result.getFloat(5);
+               tourItem.tourDeviceTime_Elapsed = result.getInt(11);
+
+               tourItem.startIndex = result.getInt(6);
+               tourItem.endIndex = result.getInt(7);
+
+               tourItem.tourTitle = result.getString(8);
+               final Object tourTypeId = result.getObject(9);
+
+               // tour date
+               if (tourDate != null) {
+
+                  final LocalDate localDate = tourDate.toLocalDate();
+
+                  tourItem.tourDate = localDate;
+                  tourItem.year = localDate.getYear();
+               }
+
+               // tour type
+               tourItem.tourTypeId = tourTypeId == null
+                     ? TourDatabase.ENTITY_IS_NOT_SAVED
+                     : (Long) tourTypeId;
+
+               // tour tags
+               if (resultTagId instanceof Long) {
+
+                  if (tourItem.tagIds != null) {
+                     tourItem.tagIds.clear();
+                  }
+
+                  tourItem.tagIds = tagIds = new ArrayList<>();
+                  tagIds.add((Long) resultTagId);
+               }
+            }
+
+            lastTourId = tourId;
          }
 
       } catch (final SQLException e) {
@@ -140,6 +303,26 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
       if (unfetchedParentChildren != null) {
          unfetchedParentChildren.remove(this);
       }
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "TVICatalogRefTourItem" + NL //                        //$NON-NLS-1$
+
+            + "[" + NL //                                            //$NON-NLS-1$
+
+            + "label             = " + label + NL //                 //$NON-NLS-1$
+            + "refId             = " + refId + NL //                 //$NON-NLS-1$
+            + "yearMapMinValue   = " + yearMapMinValue + NL //       //$NON-NLS-1$
+            + "yearMapMaxValue   = " + yearMapMaxValue + NL //       //$NON-NLS-1$
+            + "tourCounter       = " + numTours + NL //              //$NON-NLS-1$
+
+            + "]" + NL //                                            //$NON-NLS-1$
+
+      ;
    }
 
 }

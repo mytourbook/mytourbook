@@ -33,7 +33,7 @@ public class ActionShowTourInfoInMap extends Action {
 		_mapView = mapView;
 
 		setText(Messages.Map_Action_ShowTourInfoInMap);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ToolTip_TourInfo));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourInfo));
 	}
 
 	@Override

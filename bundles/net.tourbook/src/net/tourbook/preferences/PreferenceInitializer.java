@@ -29,6 +29,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.DialogSetTimeZone;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartMarkerToolTip;
+import net.tourbook.ui.tourChart.ChartPauseToolTip;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 
@@ -135,6 +136,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE, true);
 
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
+
       /*
        * Graph preferences
        */
@@ -205,6 +211,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       //tour pauses
       store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE,      true);
+      store.setDefault(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP,      true);
+      store.setDefault(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION,    ChartPauseToolTip.DEFAULT_TOOLTIP_POSITION);
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,       new RGB(0x60, 0x60, 0x60));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK,  new RGB(0xd0, 0xd0, 0xd0));

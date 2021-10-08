@@ -769,7 +769,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.BODY_PULSE_MAX_ID:                     return "maxPulse";               //$NON-NLS-1$
       case TableColumnFactory.BODY_PERSON_ID:                        return "tourPerson_personId";    //$NON-NLS-1$
       case TableColumnFactory.BODY_RESTPULSE_ID:                     return "restPulse";              //$NON-NLS-1$
-      case TableColumnFactory.BODY_WEIGHT_ID:                        return "bodyWeight";            //$NON-NLS-1$
+      case TableColumnFactory.BODY_WEIGHT_ID:                        return "bodyWeight";             //$NON-NLS-1$
 
       /*
        * DATA
@@ -783,8 +783,10 @@ public class NatTable_DataLoader {
       /*
        * DEVICE
        */
-      case TableColumnFactory.DEVICE_DISTANCE_ID:                    return "startDistance";          //$NON-NLS-1$
-      case TableColumnFactory.DEVICE_NAME_ID:                        return "devicePluginName";       //$NON-NLS-1$
+      case TableColumnFactory.DEVICE_BATTERY_SOC_START_ID:           return "battery_Percentage_Start";  //$NON-NLS-1$
+      case TableColumnFactory.DEVICE_BATTERY_SOC_END_ID:             return "battery_Percentage_End";    //$NON-NLS-1$
+      case TableColumnFactory.DEVICE_DISTANCE_ID:                    return "startDistance";             //$NON-NLS-1$
+      case TableColumnFactory.DEVICE_NAME_ID:                        return "devicePluginName";          //$NON-NLS-1$
 
       /*
        * ELEVATION
@@ -873,8 +875,8 @@ public class NatTable_DataLoader {
       /*
        * TOUR
        */
-      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "tourStartPlace";                              //$NON-NLS-1$
-      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "tourEndPlace";                                //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "COALESCE(tourStartPlace, '')";                //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "COALESCE(tourEndPlace, '')";                  //$NON-NLS-1$
       case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;

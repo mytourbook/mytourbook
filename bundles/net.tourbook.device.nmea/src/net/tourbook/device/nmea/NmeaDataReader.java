@@ -29,6 +29,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -162,15 +164,16 @@ public class NmeaDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final Map<Long, TourData> alreadyImportedTours,
-                                    final Map<Long, TourData> newlyImportedTours,
-                                    final boolean isReimport) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       // immediately bail out if the file format is not correct.
       if (!validateRawData(importFilePath)) {
-         return false;
+         return;
       }
 
 //   Begin of O. Budischewski, 2008.03.19
@@ -260,11 +263,15 @@ public class NmeaDataReader extends TourbookDevice {
 
 //   Begin of O. Budischewski, 2008.03.20
       if (_isNullCoordinates == true) {
-         TourLogManager.logError(NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath));
+         TourLogManager.subLog_ERROR(String.format("[NMEA] %s - %s", //$NON-NLS-1$
+               _importFilePath,
+               NLS.bind(Messages.NMEA_Null_Coords_message, _importFilePath)));
       }
 //   End of O. Budischewski, 2008.03.20
 
-      return setTourData();
+      final boolean isImported = setTourData();
+
+      importState_File.isFileImportedWithValidData = isImported;
    }
 
    private boolean setTourData() {

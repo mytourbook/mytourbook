@@ -39,10 +39,18 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Images;
@@ -83,8 +91,10 @@ import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.ImportConfig;
-import net.tourbook.importdata.ImportDeviceState;
 import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.ImportState_Easy;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
@@ -139,7 +149,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -294,8 +303,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static String                 HREF_ACTION_OLD_UI;
    private static String                 HREF_ACTION_SERIAL_PORT_CONFIGURED;
    private static String                 HREF_ACTION_SERIAL_PORT_DIRECTLY;
-
    private static String                 HREF_ACTION_SETUP_EASY_IMPORT;
+   //
    static {
 
       HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
@@ -306,9 +315,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
       HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
    }
-   private static boolean               _isStopWatchingStoresThread;
-   public static volatile ReentrantLock THREAD_WATCHER_LOCK = new ReentrantLock();
    //
+   private static boolean                      _isStopWatchingStoresThread;
+   public static volatile ReentrantLock        THREAD_WATCHER_LOCK = new ReentrantLock();
+   //
+   private static ThreadPoolExecutor           _saveTour_Executor;
+   private static ArrayBlockingQueue<TourData> _saveTour_Queue     = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch               _saveTour_CountDownLatch;
+
+   static {
+
+      final ThreadFactory threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Saving imported tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _saveTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+   }
    //
    private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore         _prefStore_Common               = CommonActivator.getPrefStore();
@@ -407,7 +435,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private boolean                       _isBrowserCompleted;
    private boolean                       _isInUIStartup;
    private boolean                       _isInUpdate;
-   private boolean                       _isNewUI;
+   private boolean                       _isEasyImportUI;
 
    /**
     * When <code>false</code> then the background WatchStores task must set it valid. Only when it
@@ -544,7 +572,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // do a 2nd sorting by date/time
          if (result == 0) {
-            result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+
+            result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS()
+                  ? 1
+                  : -1;
          }
 
          // if descending order, flip the direction
@@ -810,7 +841,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    void actionSaveTour(final TourPerson person) {
 
-      doSaveTour(person);
+      TourLogManager.addLog(
+
+            TourLogState.DEFAULT,
+
+            Messages.Log_Tour_SaveTours,
+
+            TourLogView.CSS_LOG_TITLE);
+
+      saveImportedTours(getAnySelectedTours(), person);
    }
 
    private void addPartListener() {
@@ -873,49 +912,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-               if (_isPartVisible) {
-                  updateViewerPersonData();
-               } else {
-                  // keep new active person until the view is visible
-                  _newActivePerson = TourbookPlugin.getActivePerson();
-               }
-
-            } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
-
-               _actionSaveTour.resetPeopleList();
-
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-               // tour type images can have been changed
-               disposeConfigImages();
-
-               // update tour type in the raw data
-               _rawDataMgr.updateTourData_InImportView_FromDb(null);
-
-               _tourViewer.refresh();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
-
-               updateToolTipState();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-               _tourViewer.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tourViewer.getTable().redraw();
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            if (_isPartVisible) {
+               updateViewerPersonData();
+            } else {
+               // keep new active person until the view is visible
+               _newActivePerson = TourbookPlugin.getActivePerson();
             }
+
+         } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+            _actionSaveTour.resetPeopleList();
+
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+            // tour type images can have been changed
+            disposeConfigImages();
+
+            // update tour type in the raw data
+            _rawDataMgr.updateTourData_InImportView_FromDb(null);
+
+            _tourViewer.refresh();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+            updateToolTipState();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+            _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+            _tourViewer.refresh();
+
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _tourViewer.getTable().redraw();
          }
       };
 
@@ -924,23 +960,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Common preferences
        */
-      _prefChangeListener_Common = new IPropertyChangeListener() {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+            recreateViewer();
 
-               recreateViewer();
+         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            // measurement system has changed
 
-               // measurement system has changed
-
-               recreateViewer();
-            }
+            recreateViewer();
          }
       };
 
@@ -966,55 +998,53 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-            if (part == RawDataView.this) {
-               return;
+         if (part == RawDataView.this) {
+            return;
+         }
+         if (_isInUpdate) {
+            return;
+         }
+
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            // update modified tours
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
+
+               // update model
+               _rawDataMgr.updateTourDataModel(modifiedTours);
+
+               // update viewer
+               _tourViewer.update(modifiedTours.toArray(), null);
+
+               // remove old selection, old selection can have the same tour but with old data
+               _postSelectionProvider.clearSelection();
             }
-            if (_isInUpdate) {
-               return;
+
+         } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+            // save imported file names
+            final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+
+            _state.put(STATE_IMPORTED_FILENAMES, importedFiles.keySet().toArray(String[]::new));
+
+            if (!RawDataManager.isReimportingActive() &&
+                  !RawDataManager.isDeleteValuesActive()) {
+
+               /*
+                * Re-import files because computed values could be changed, e.g. elevation gain
+                */
+
+               reimportAllImportFiles(false);
             }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-               // update modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            _rawDataMgr.updateTourData_InImportView_FromDb(null);
 
-                  // update model
-                  _rawDataMgr.updateTourDataModel(modifiedTours);
-
-                  // update viewer
-                  _tourViewer.update(modifiedTours.toArray(), null);
-
-                  // remove old selection, old selection can have the same tour but with old data
-                  _postSelectionProvider.clearSelection();
-               }
-
-            } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
-               // save imported file names
-               final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-               _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
-
-               if (!RawDataManager.isReimportingActive() &&
-                     !RawDataManager.isDeleteValuesActive()) {
-
-                  /*
-                   * Re-import files because computed values could be changed, e.g. elevation gain
-                   */
-
-                  reimportAllImportFiles(false);
-               }
-
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
-
-               _rawDataMgr.updateTourData_InImportView_FromDb(null);
-
-               reloadViewer();
-            }
+            reloadViewer();
          }
       };
       TourManager.getInstance().addTourEventListener(_tourEventListener);
@@ -1022,28 +1052,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void createActions() {
 
-      _actionEditImportPreferences = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+// SET_FORMATTING_OFF
 
-      _actionClearView = new ActionClearView(this);
-      _actionDeleteTourFile = new ActionDeleteTourFiles(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionExportTour = new ActionExport(this);
-      _actionJoinTours = new ActionJoinTours(this);
-      _actionMergeIntoTour = new ActionMergeIntoMenu(this);
-      _actionMergeTour = new ActionMergeTour(this);
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-      _actionOpenTourLogView = new ActionOpenTourLogView();
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-      _actionOpenTour = new ActionOpenTour(this);
-      _actionReimport_Tours = new ActionReimportTours(this);
-      _actionRemoveTour = new ActionRemoveTour(this);
-      _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
-      _actionSaveTour = new ActionSaveTourInDatabase(this, false);
-      _actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-      _actionSetupImport = new ActionSetupImport(this);
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
-      _actionUploadTour = new ActionUpload(this);
+      _actionEditImportPreferences     = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+
+      _actionClearView                 = new ActionClearView(this);
+      _actionDeleteTourFile            = new ActionDeleteTourFiles(this);
+      _actionEditTour                  = new ActionEditTour(this);
+      _actionEditQuick                 = new ActionEditQuick(this);
+      _actionExportTour                = new ActionExport(this);
+      _actionJoinTours                 = new ActionJoinTours(this);
+      _actionMergeIntoTour             = new ActionMergeIntoMenu(this);
+      _actionMergeTour                 = new ActionMergeTour(this);
+      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this);
+      _actionOpenTourLogView           = new ActionOpenTourLogView();
+      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, true);
+      _actionOpenTour                  = new ActionOpenTour(this);
+      _actionReimport_Tours            = new ActionReimportTours(this);
+      _actionRemoveTour                = new ActionRemoveTour(this);
+      _actionRemoveToursWhenClosed     = new ActionRemoveToursWhenClosed();
+      _actionSaveTour                  = new ActionSaveTourInDatabase(this, false);
+      _actionSaveTourWithPerson        = new ActionSaveTourInDatabase(this, true);
+      _actionSetupImport               = new ActionSetupImport(this);
+      _actionSetTourType               = new ActionSetTourTypeMenu(this);
+      _actionUploadTour                = new ActionUpload(this);
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -1088,7 +1122,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   + "}" + NL; //                                                          //$NON-NLS-1$
 
          } catch (IOException | URISyntaxException e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
 
@@ -1756,7 +1790,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (allImportLauncher.isEmpty() || allImportConfigs.isEmpty()) {
 
          // this case should not happen
-         TourLogManager.logEx(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+         TourLogManager.log_EXCEPTION_WithStacktrace(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
 
          return;
       }
@@ -2321,7 +2355,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
       } catch (final IOException | URISyntaxException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
@@ -3431,7 +3465,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final String fileNamePath = '"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"';
          notDeletedFiles.add(fileNamePath);
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileNamePath);
+         TourLogManager.subLog_ERROR(fileNamePath);
       }
    }
 
@@ -3479,106 +3513,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _isDeviceStateValid = false;
       updateUI_2_Dashboard();
-   }
-
-   private void doSaveTour(final TourPerson person) {
-
-      final ArrayList<TourData> selectedTours = getAnySelectedTours();
-
-      runEasyImport_099_SaveTour(person, selectedTours, false);
-   }
-
-   /**
-    * @param tourData
-    *           {@link TourData} which is not yet saved.
-    * @param person
-    *           Person for which the tour is being saved.
-    * @param savedTours
-    *           The saved tour is added to this list.
-    */
-   private void doSaveTour_OneTour(final TourData tourData,
-                                   final TourPerson person,
-                                   final ArrayList<TourData> savedTours) {
-
-      // workaround for hibernate problems
-      if (tourData.isTourDeleted) {
-         return;
-      }
-
-      if (tourData.getTourPerson() != null) {
-
-         /*
-          * tour is already saved, resaving cannot be done in the import view it can be done in the
-          * tour editor
-          */
-         return;
-      }
-
-      // a saved tour needs a person
-      tourData.setTourPerson(person);
-
-      // set weight from person
-      if (RawDataManager.isSetBodyWeight()) {
-         tourData.setBodyWeight(person.getWeight());
-      }
-
-      tourData.setTourBike(person.getTourBike());
-
-      final TourData savedTour = TourDatabase.saveTour(tourData, true);
-
-      if (savedTour != null) {
-
-         savedTours.add(savedTour);
-
-         // update fields which are not saved but used in the UI and easy setup
-         savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
-         savedTour.isTourFileMoved = tourData.isTourFileMoved;
-         savedTour.isBackupImportFile = tourData.isBackupImportFile;
-         savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
-      }
-   }
-
-   /**
-    * After tours are saved, the internal structures and ui viewers must be updated
-    *
-    * @param savedTours
-    *           contains the saved {@link TourData}
-    */
-   private void doSaveTour_PostActions(final ArrayList<TourData> savedTours) {
-
-      // update viewer, fire selection event
-      if (savedTours.isEmpty()) {
-         return;
-      }
-
-      final ArrayList<Long> savedToursIds = new ArrayList<>();
-
-      // update raw data map with the saved tour data
-      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
-      for (final TourData tourData : savedTours) {
-
-         final Long tourId = tourData.getTourId();
-
-         rawDataMap.put(tourId, tourData);
-         savedToursIds.add(tourId);
-      }
-
-      /*
-       * the selection provider can contain old tour data which conflicts with the tour data in the
-       * tour data editor
-       */
-      _postSelectionProvider.clearSelection();
-
-      // update import viewer
-      reloadViewer();
-
-      enableActions();
-
-      /*
-       * notify all views, it is not checked if the tour data editor is dirty because newly saved
-       * tours can not be modified in the tour data editor
-       */
-      TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
    }
 
    private void enableActions() {
@@ -3866,6 +3800,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return selectedTourData;
    }
 
+   private ArrayList<Long> getAllTourIds(final ArrayList<TourData> allTourData) {
+
+      final ArrayList<Long> allTourIds = new ArrayList<>(allTourData.size());
+
+      for (final TourData tourData : allTourData) {
+         allTourIds.add(tourData.getTourId());
+      }
+
+      return allTourIds;
+   }
+
+   /**
+    * @return Returns all tours which are selected in the import view
+    */
    private ArrayList<TourData> getAnySelectedTours() {
 
       final ArrayList<TourData> selectedTours = new ArrayList<>();
@@ -4020,7 +3968,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    @Override
    public Set<Long> getSelectedTourIDs() {
-      final Set<Long> tourIds = new HashSet<>();
+
+      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
       for (final Object viewItem : selectedTours) {
@@ -4287,6 +4236,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
          onSelectUI_Old();
+
       } else {
 
          //We look for the cloud downloader that matches
@@ -4375,8 +4325,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void onSelectUI_New() {
 
-      _isNewUI = true;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
+      _isEasyImportUI = true;
+      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
 
       updateUI_1_TopPage(true);
 
@@ -4387,8 +4337,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       resetEasyImport();
 
-      _isNewUI = false;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
+      _isEasyImportUI = false;
+      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
 
       updateUI_1_TopPage(true);
    }
@@ -4425,9 +4375,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /**
     * Update {@link TourData} from the database for all imported tours, displays a progress dialog.
     *
-    * @param canCancelable
+    * @param canCancelProcess
     */
-   private void reimportAllImportFiles(final boolean canCancelable) {
+   private void reimportAllImportFiles(final boolean canCancelProcess) {
 
       final String[] prevImportedFiles = _state.getArray(STATE_IMPORTED_FILENAMES);
       if ((prevImportedFiles == null) || (prevImportedFiles.length == 0)) {
@@ -4437,7 +4387,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // Log re-import
       TourLogManager.addLog(
             TourLogState.DEFAULT,
-            RawDataManager.LOG_REIMPORT_PREVIOUS_FILES,
+            Messages.Log_Reimport_PreviousFiles,
             TourLogView.CSS_LOG_TITLE);
 
       final long start = System.currentTimeMillis();
@@ -4449,27 +4399,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                true,
-               canCancelable,
-               new IRunnableWithProgress() {
+               canCancelProcess,
 
-                  @Override
-                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
+               monitor -> {
 
-                     reimportAllImportFiles_Runnable(monitor, prevImportedFiles, canCancelable);
-                  }
+                  final ImportState_Process importState_Process = new ImportState_Process();
+
+                  reimportAllImportFiles_Runnable(
+                        monitor,
+                        prevImportedFiles,
+                        canCancelProcess,
+                        importState_Process);
+
+                  importState_Process.runPostProcess();
                });
 
       } catch (final Exception e) {
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
       } finally {
 
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(//
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_REIMPORT_END, time));
+         TourLogManager.log_DEFAULT(String.format(
+               Messages.Log_Reimport_PreviousFiles_End,
+               (System.currentTimeMillis() - start) / 1000.0));
       }
    }
 
@@ -4478,11 +4431,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     *
     * @param monitor
     * @param importedFiles
-    * @param canCancelable
+    * @param canCancelProcess
+    * @param importState_Process
     */
    private void reimportAllImportFiles_Runnable(final IProgressMonitor monitor,
                                                 final String[] importedFiles,
-                                                final boolean canCancelable) {
+                                                final boolean canCancelProcess,
+                                                final ImportState_Process importState_Process) {
 
       int workedDone = 0;
       final int workedAll = importedFiles.length;
@@ -4494,77 +4449,93 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<String> notImportedFiles = new ArrayList<>();
 
       _rawDataMgr.getImportedTours().clear();
-      _rawDataMgr.setImportId();
 
-      int importedFileCounter = 0;
+      int numImportedFiles = 0;
 
       // loop: import all files
       for (final String fileName : importedFiles) {
 
          if (monitor != null) {
             monitor.worked(1);
-            monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
+            monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask,
                   new Object[] { workedDone++, workedAll, fileName }));
          }
 
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true, true);
+            final ImportState_File importState_File = _rawDataMgr.importTours_FromOneFile(
 
-            if (isImported) {
-               TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
-               importedFileCounter++;
+                  file, //                         importFile
+                  null, //                         destinationPath
+                  null, //                         fileCollision
+                  false, //                        isBuildNewFileNames
+                  true, //                         isTourDisplayedInImportView
+                  new HashMap<>(),
+                  importState_Process //
+            );
+
+            if (importState_File.isFileImportedWithValidData) {
+
+               TourLogManager.subLog_OK(fileName);
+               numImportedFiles++;
+
             } else {
-               TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileName);
+
+               if (importState_File.isImportLogged == false) {
+
+                  // do default logging
+
+                  TourLogManager.subLog_ERROR(fileName);
+               }
+
                notImportedFiles.add(fileName);
             }
          }
 
-         if (canCancelable && monitor.isCanceled()) {
+         if (canCancelProcess && monitor.isCanceled()) {
+
             // stop importing but process imported tours
+
             break;
          }
       }
 
-      if (importedFileCounter > 0) {
+      if (numImportedFiles > 0) {
 
          _rawDataMgr.updateTourData_InImportView_FromDb(monitor);
 
-         Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().asyncExec(() -> {
 
-               reloadViewer();
+            reloadViewer();
 
-               /*
-                * restore selected tour
-                */
-               final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
+            /*
+             * Restore selected tour
+             */
+            final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
 
-               if (viewerIndices != null) {
+            if (viewerIndices != null) {
 
-                  final ArrayList<Object> viewerTourData = new ArrayList<>();
+               final ArrayList<Object> viewerTourData = new ArrayList<>();
 
-                  for (final String viewerIndex : viewerIndices) {
+               for (final String viewerIndex : viewerIndices) {
 
-                     Object tourData = null;
+                  Object tourData = null;
 
-                     try {
-                        final int index = Integer.parseInt(viewerIndex);
-                        tourData = _tourViewer.getElementAt(index);
-                     } catch (final NumberFormatException e) {
-                        // just ignore
-                     }
-
-                     if (tourData != null) {
-                        viewerTourData.add(tourData);
-                     }
+                  try {
+                     final int index = Integer.parseInt(viewerIndex);
+                     tourData = _tourViewer.getElementAt(index);
+                  } catch (final NumberFormatException e) {
+                     // just ignore
                   }
 
-                  if (viewerTourData.size() > 0) {
-                     _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
+                  if (tourData != null) {
+                     viewerTourData.add(tourData);
                   }
+               }
+
+               if (viewerTourData.size() > 0) {
+                  _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
                }
             }
          });
@@ -4629,7 +4600,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void restoreState() {
 
-      _isNewUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
+      _isEasyImportUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
 
       _actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
             _state,
@@ -4665,7 +4636,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // restore: is checksum validation
       final boolean isValidation = _state.getBoolean(STATE_IS_CHECKSUM_VALIDATION);
-      _rawDataMgr.setIsChecksumValidation(isValidation);
+      _rawDataMgr.setIsHAC4_5_ChecksumValidation(isValidation);
 
       updateToolTipState();
 
@@ -4740,7 +4711,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Run easy import
        */
-      ImportDeviceState importState = null;
+      ImportState_Easy importState_Easy = null;
+
+      final ImportState_Process importState_Process = new ImportState_Process()
+
+            .setIsEasyImport(true)
+
+      ;
+
+      if (easyConfig.isLogDetails == false) {
+
+         // disable logging, the default is to log details
+
+         importState_Process
+
+               .setIsLog_DEFAULT(false)
+               .setIsLog_INFO(false)
+               .setIsLog_OK(false)
+
+         ;
+      }
 
       if (RawDataManager.isAutoOpenImportLog()) {
          TourLogManager.showLogView();
@@ -4751,7 +4741,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // disable state update during import, this causes lots of problems !!!
          _isUpdateDeviceState = false;
 
-         importState = EasyImportManager.getInstance().runImport(importLauncher);
+         importState_Easy = EasyImportManager.getInstance().runImport(importLauncher, importState_Process);
 
       } finally {
 
@@ -4764,15 +4754,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
       final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
 
+      final boolean isIgnoreInvalidFile = RawDataManager.isIgnoreInvalidFile();
+
       try {
 
          // stop all other actions when canceled
-         if (importState.isImportCanceled) {
+         if (importState_Easy.isImportCanceled) {
             return;
          }
 
          // open import config dialog to solve problems
-         if (importState.isOpenSetup) {
+         if (importState_Easy.isOpenSetup) {
 
             _parent.getDisplay().asyncExec(() -> action_Easy_SetupImport(0));
 
@@ -4807,11 +4799,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
          if (importLauncher.isSaveTour) {
 
-            importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours, true);
+            importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours);
 
          } else {
 
-            importedAndSavedTours = _rawDataMgr.getImportedTourList();
+            importedAndSavedTours = _rawDataMgr.getImportedTours_AsList();
          }
 
          /*
@@ -4821,7 +4813,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            final ArrayList<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
+            final String[] invalidFilesSet = _rawDataMgr.getInvalidFilesList().keySet().toArray(String[]::new);
+
+            final String[] invalidFiles = isIgnoreInvalidFile
+                  ? invalidFilesSet
+                  : null;
 
             runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
@@ -4831,7 +4827,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
          if (importConfig.isTurnOffWatching) {
 
-            TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
+            TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
 
             setWatcher_Off();
          }
@@ -4839,16 +4835,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          /*
           * Log import end
           */
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               String.format(EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END, time));
+         TourLogManager.log_DEFAULT(String.format(
+               EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END,
+               (System.currentTimeMillis() - start) / 1000.0));
 
       } finally {
 
          // update viewer when required
 
-         if (importState.isUpdateImportViewer) {
+         Display.getDefault().asyncExec(() -> {
+            importState_Process.runPostProcess();
+         });
+
+         if (importState_Easy.isUpdateImportViewer) {
 
             _tourViewer.update(importedToursCollection.toArray(), null);
 
@@ -4856,7 +4855,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
-      if (RawDataManager.isIgnoreInvalidFile()) {
+      if (isIgnoreInvalidFile) {
          _rawDataMgr.clearInvalidFilesList();
       }
    }
@@ -4870,7 +4869,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
 
       final int ilLastMarkerDistance = importLauncher.lastMarkerDistance;
 
@@ -4905,7 +4904,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             lastMarker.setLabel(lastMarkerText);
 
-            TourLogManager.addSubLog(TourLogState.DEFAULT, TourManager.getTourDateTimeShort(tourData));
+            TourLogManager.subLog_DEFAULT(TourManager.getTourDateTimeShort(tourData));
          }
       }
    }
@@ -4917,13 +4916,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final float temperature = UI.convertTemperatureFromMetric(avgMinimumTemperature);
       final int durationTime = importLauncher.temperatureAdjustmentDuration;
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            NLS.bind(EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
-                  new Object[] {
-                        getDurationText(importLauncher),
-                        _nf1.format(temperature),
-                        UI.UNIT_LABEL_TEMPERATURE }));
+      TourLogManager.log_DEFAULT(NLS.bind(
+            EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
+            new Object[] {
+                  getDurationText(importLauncher),
+                  _nf1.format(temperature),
+                  UI.UNIT_LABEL_TEMPERATURE }));
 
       for (final TourData tourData : importedTours) {
 
@@ -4932,7 +4930,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.subLog_Info(String.format(
+            TourLogManager.subLog_INFO(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -4948,78 +4946,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void runEasyImport_006_RetrieveWeatherData(final ImportLauncher importLauncher,
                                                       final ArrayList<TourData> importedTours) {
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            NLS.bind(EasyImportManager.LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA,
-                  new Object[] {
-                        getDurationText(importLauncher),
-                        UI.UNIT_LABEL_TEMPERATURE }));
+      TourLogManager.log_DEFAULT(NLS.bind(
+            EasyImportManager.LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA,
+            new Object[] {
+                  getDurationText(importLauncher),
+                  UI.UNIT_LABEL_TEMPERATURE }));
 
       for (final TourData tourData : importedTours) {
          TourManager.retrieveWeatherData(tourData);
       }
    }
 
-   /**
-    * @param person
-    * @param selectedTours
-    * @param isEasyImport
-    * @return Returns list with saved tours.
-    */
-   private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person,
-                                                          final ArrayList<TourData> selectedTours,
-                                                          final boolean isEasyImport) {
+   private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {
 
-      final String css = isEasyImport //
-            ? UI.EMPTY_STRING
-            : TourLogView.CSS_LOG_TITLE;
-      final String message = isEasyImport //
-            ? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
-            : TourLogManager.LOG_TOUR_SAVE_TOURS;
+      // "99. Save tours"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR);
 
-      TourLogManager.addLog(TourLogState.DEFAULT, message, css);
-
-      final ArrayList<TourData> savedTours = new ArrayList<>();
-
-      final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-         @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-            int saveCounter = 0;
-            final int selectionSize = selectedTours.size();
-
-            monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, selectionSize);
-
-            // loop: all selected tours, selected tours can already be saved
-            for (final TourData tourData : selectedTours) {
-
-               monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
-
-               doSaveTour_OneTour(tourData, person, savedTours);
-
-               TourLogManager.addSubLog(
-                     TourLogState.TOUR_SAVED,
-                     String.format(
-                           TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
-                           tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                           tourData.getImportFilePathNameText()));
-
-               monitor.worked(1);
-            }
-         }
-      };
-
-      try {
-
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
-
-      } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
-      }
-
-      doSaveTour_PostActions(savedTours);
-
-      return savedTours;
+      return saveImportedTours(importedTours, person);
    }
 
    /**
@@ -5030,7 +4973,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
                                                   final ArrayList<TourData> allTourData,
-                                                  final ArrayList<String> invalidFiles,
+                                                  final String[] invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always then tour files are deleted
@@ -5042,7 +4985,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String message = isEasyImport
             ? EasyImportManager.LOG_EASY_IMPORT_100_DELETE_TOUR_FILES
-            : RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE;
+            : Messages.Log_Import_DeleteTourFiles;
 
       TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
@@ -5073,7 +5016,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             int saveCounter = 0;
 
             int selectionSize = allTourData.size();
-            selectionSize += invalidFiles != null ? invalidFiles.size() : 0;
+            selectionSize += invalidFiles != null ? invalidFiles.length : 0;
 
             monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
 
@@ -5151,7 +5094,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       // show delete state in UI
@@ -5160,11 +5103,295 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Log deleted files
        */
-      final String logText = String.format(
-            RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE_END,
+      TourLogManager.log_DEFAULT(String.format(
+            Messages.Log_Import_DeleteTourFiles_End,
             deletedFiles.size(),
-            notDeletedFiles.size());
-      TourLogManager.addLog(TourLogState.DEFAULT, logText);
+            notDeletedFiles.size()));
+   }
+
+   /**
+    * Save imported tours
+    *
+    * @param allTourData
+    * @param person
+    * @return Returns saved {@link TourData}
+    */
+   private ArrayList<TourData> saveImportedTours(final ArrayList<TourData> allTourData, final TourPerson person) {
+
+      final int numTours = allTourData.size();
+      final ArrayList<TourData> allSavedTours = new ArrayList<>();
+
+      if (numTours == 0) {
+
+         // nothing to do
+
+         return allSavedTours;
+      }
+
+      final long start = System.currentTimeMillis();
+
+      /*
+       * Check if new tour tags / types were created, when yes the UI must be updated afterwards
+       * otherwise e.g. new tour types are not available in the tour type filter !!!
+       */
+      boolean isNewTourType = false;
+      boolean isNewTourTags = false;
+      for (final TourData tourData : allTourData) {
+
+         /*
+          * Check tour type
+          */
+         final TourType tourType = tourData.getTourType();
+         if (tourType != null) {
+
+            if (tourType.getTypeId() == -1) {
+               isNewTourType = true;
+            }
+         }
+
+         /*
+          * Check tour tags
+          */
+         for (final TourTag tourTag : tourData.getTourTags()) {
+
+            if (tourTag.getTagId() == -1) {
+               isNewTourTags = true;
+               break;
+            }
+         }
+      }
+
+      /*
+       * Setup concurrency
+       */
+      _saveTour_CountDownLatch = new CountDownLatch(numTours);
+      _saveTour_Queue.clear();
+
+      final ArrayBlockingQueue<TourData> allSavedToursConcurrent = new ArrayBlockingQueue<>(numTours);
+
+      final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            final AtomicInteger numSavedTours = new AtomicInteger();
+
+            final long startTime = System.currentTimeMillis();
+            long lastUpdateTime = startTime;
+
+            monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, numTours);
+
+            // loop: all selected tours, selected tours can already be saved
+            for (final TourData tourData : allTourData) {
+
+               final long currentTime = System.currentTimeMillis();
+               final long timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > 500) {
+
+                  lastUpdateTime = currentTime;
+
+                  monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, numSavedTours.get(), numTours));
+               }
+
+               saveImportedTours_10_Concurrent(
+                     tourData,
+                     person,
+                     allSavedToursConcurrent,
+                     monitor,
+                     numSavedTours);
+            }
+
+            // wait until all re-imports are performed
+            _saveTour_CountDownLatch.await();
+         }
+      };
+
+      try {
+
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+
+      } catch (final Exception e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+
+      } finally {
+
+         // get all saved tour data
+         allSavedToursConcurrent.drainTo(allSavedTours);
+
+         TourLogManager.subLog_DEFAULT(String.format(Messages.Log_Tour_SaveTours_End,
+               allSavedTours.size(),
+               (System.currentTimeMillis() - start) / 1000.0));
+
+         // update e.g. fulltext index
+         TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(getAllTourIds(allSavedTours));
+
+         saveImportedTours_30_PostActions(allSavedTours, isNewTourType, isNewTourTags);
+      }
+
+      return allSavedTours;
+   }
+
+   private void saveImportedTours_10_Concurrent(final TourData tourData,
+                                                final TourPerson person,
+                                                final ArrayBlockingQueue<TourData> allSavedToursConcurrent,
+                                                final IProgressMonitor monitor,
+                                                final AtomicInteger numSavedTours) {
+
+      // workaround for hibernate problems
+      if (tourData.isTourDeleted) {
+         monitor.worked(1);
+         numSavedTours.getAndIncrement();
+         _saveTour_CountDownLatch.countDown();
+
+         return;
+      }
+
+      if (tourData.getTourPerson() != null) {
+
+         /*
+          * Tour is already saved, resaving cannot be done in the import view it can be done in the
+          * tour editor
+          */
+         monitor.worked(1);
+         numSavedTours.getAndIncrement();
+         _saveTour_CountDownLatch.countDown();
+
+         return;
+      }
+
+      try {
+
+         // put tour data into the queue AND wait when it is full
+
+         _saveTour_Queue.put(tourData);
+
+      } catch (final InterruptedException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _saveTour_Executor.submit(() -> {
+
+         try {
+
+            // get last added tour
+            final TourData queueItem_TourData = _saveTour_Queue.poll();
+
+            if (queueItem_TourData != null) {
+
+               saveImportedTours_20_Concurrent_OneTour(tourData, person, allSavedToursConcurrent);
+            }
+
+//            TourLogManager.addSubLog(TourLogState.TOUR_SAVED,
+//                  String.format(TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
+//                        tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+//                        tourData.getImportFilePathNameText()));
+
+         } finally {
+
+            monitor.worked(1);
+            numSavedTours.getAndIncrement();
+
+            _saveTour_CountDownLatch.countDown();
+         }
+      });
+   }
+
+   /**
+    * @param tourData
+    *           {@link TourData} which is not yet saved.
+    * @param person
+    *           Person for which the tour is being saved.
+    * @param allSavedTours
+    *           The saved tour is added to this list.
+    */
+   private void saveImportedTours_20_Concurrent_OneTour(final TourData tourData,
+                                                        final TourPerson person,
+                                                        final ArrayBlockingQueue<TourData> allSavedTours) {
+
+      // a saved tour needs a person
+      tourData.setTourPerson(person);
+
+      // set weight from person
+      if (RawDataManager.isSetBodyWeight()) {
+         tourData.setBodyWeight(person.getWeight());
+      }
+
+      tourData.setTourBike(person.getTourBike());
+
+      final TourData savedTour = TourDatabase.saveTour_Concurrent(tourData, true);
+
+      if (savedTour != null) {
+
+         allSavedTours.add(savedTour);
+
+         // update fields which are not saved but used in the UI and easy setup
+         savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
+         savedTour.isTourFileMoved = tourData.isTourFileMoved;
+         savedTour.isBackupImportFile = tourData.isBackupImportFile;
+         savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
+      }
+   }
+
+   /**
+    * After tours are saved, the internal structures and ui viewers must be updated
+    *
+    * @param savedTours
+    *           contains the saved {@link TourData}
+    * @param isNewTourTags
+    * @param isNewTourType
+    */
+   private void saveImportedTours_30_PostActions(final ArrayList<TourData> savedTours,
+                                                 final boolean isNewTourType,
+                                                 final boolean isNewTourTags) {
+
+      // update viewer, fire selection event
+      if (savedTours.isEmpty()) {
+         return;
+      }
+
+      final ArrayList<Long> savedToursIds = new ArrayList<>();
+
+      // update raw data map with the saved tour data
+      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
+      for (final TourData tourData : savedTours) {
+
+         final Long tourId = tourData.getTourId();
+
+         rawDataMap.put(tourId, tourData);
+         savedToursIds.add(tourId);
+      }
+
+      /*
+       * The selection provider can contain old tour data which conflicts with the tour data in the
+       * tour data editor
+       */
+      _postSelectionProvider.clearSelection();
+
+      // update import viewer
+      reloadViewer();
+
+      enableActions();
+
+      if (isNewTourType) {
+
+         TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+      }
+
+      if (isNewTourTags) {
+
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+      }
+
+      /*
+       * Notify all views, it is not checked if the tour data editor is dirty because newly saved
+       * tours can not be modified in the tour data editor
+       */
+      TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
    }
 
    @PersistState
@@ -5186,8 +5413,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isRemoveToursWhenClosed) {
          stateImportedFiles = new String[] {};
       } else {
-         final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-         stateImportedFiles = importedFiles.toArray(new String[importedFiles.size()]);
+         final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+         stateImportedFiles = importedFiles.keySet().toArray(String[]::new);
+
       }
       _state.put(STATE_IMPORTED_FILENAMES, stateImportedFiles);
       _state.put(STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED, isRemoveToursWhenClosed);
@@ -5246,7 +5474,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else {
 
-         if (_isNewUI) {
+         if (_isEasyImportUI) {
 
             if (_browser != null) {
                _browser.setFocus();
@@ -5285,7 +5513,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                _watchingStoresThread.join();
             }
          } catch (final InterruptedException e) {
-            TourLogManager.logEx(e);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
    }
@@ -5407,7 +5635,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   THREAD_WATCHER_LOCK.lock();
                   _folderWatcher.close();
                } catch (final IOException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                } finally {
                   _watchingFolderThread.interrupt(); // (rtdog) CancelWatchfolders
                   THREAD_WATCHER_LOCK.unlock();
@@ -5543,7 +5771,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          } catch (final InterruptedException | ClosedWatchServiceException e3) {
             // no-op
          } catch (final Exception e4) {
-            TourLogManager.logEx(e4);
+            TourLogManager.log_EXCEPTION_WithStacktrace(e4);
          } finally {
 
             try {
@@ -5555,7 +5783,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   folderWatcher.close();
                }
             } catch (final Exception e5) {
-               TourLogManager.logEx(e5);
+               TourLogManager.log_EXCEPTION_WithStacktrace(e5);
             }
          }
       };
@@ -5579,7 +5807,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-                  final int waitingTime = 30000; // in ms
+                  final int waitingTime = 10000; // in ms
 
                   THREAD_WATCHER_LOCK.lock();
                   _watchingStoresThread.interrupt();
@@ -5593,7 +5821,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   }
 
                } catch (final InterruptedException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                } finally {
                   _watchingStoresThread = null;
                }
@@ -5603,7 +5831,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
    }
@@ -5657,7 +5885,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   }
                   // interrupt();
                } catch (final Exception e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                }
 
             }
@@ -5674,10 +5902,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    /**
     * Keep live update values, other values MUST already have been set.
@@ -5692,11 +5917,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // run animation only when it was modified
          _isRunDashboardAnimation = true;
       }
+
       easyConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
       easyConfig.animationDuration = modifiedConfig.animationDuration;
 
       easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
       easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
+      easyConfig.isLogDetails = modifiedConfig.isLogDetails;
       easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
       easyConfig.stateToolTipDisplayAbsoluteFilePath = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
       easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;
@@ -5735,7 +5962,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * flickering when the view toolbar is first drawn on the left side of the view !!!
           */
 
-         if (_isNewUI) {
+         if (_isEasyImportUI) {
 
             _parent.getDisplay().asyncExec(new Runnable() {
                @Override
@@ -5846,7 +6073,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (!isSuccess) {
          System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
                + ("\tupdateDOM_DeviceState: " + isSuccess + js)); //$NON-NLS-1$
-         // TODO remove SYSTEM.OUT.PRINTLN
       }
    }
 

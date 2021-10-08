@@ -1017,7 +1017,7 @@ public class TrainingView extends ViewPart {
          } else if (firstElement instanceof TVICompareResultComparedTour) {
 
             final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
+            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
             updateUI_20(tourData);
          }
 
@@ -1387,11 +1387,11 @@ public class TrainingView extends ViewPart {
       yData.setYTitle(Messages.App_Label_H_MM);
 
       yData.setColorIndex(new int[][] { colorIndex });
-      yData.setRgbLine(allRgbLine);
-      yData.setRgbText(new RGB[] { rgbTextColor });
-      yData.setRgbGradient_Bright(allRgbBright);
-      yData.setRgbGradient_Dark(allRgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      yData.setRgbBar_Gradient_Bright(allRgbBright);
+      yData.setRgbBar_Gradient_Dark(allRgbDark);
+      yData.setRgbBar_Line(allRgbLine);
+
+      yData.setRgbGraph_Text(rgbTextColor);
 
       chartDataModel.addYData(yData);
 

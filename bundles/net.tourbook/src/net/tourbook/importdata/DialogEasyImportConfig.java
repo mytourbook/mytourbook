@@ -243,8 +243,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Composite            _pageTourType_OneForAll;
    private Composite            _pageTourType_BySpeed;
    //
-   private Button               _chkDash_DisplayAbsoluteFilePath;
-   private Button               _chkDash_LiveUpdate;
+   private Button               _chkOptions_DisplayAbsoluteFilePath;
+   private Button               _chkOptions_LiveUpdate;
+   private Button               _chkOptions_LogDetails;
    private Button               _chkIC_CreateBackup;
    private Button               _chkIC_DeleteDeviceFiles;
    private Button               _chkIC_ImportFiles;
@@ -637,16 +638,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
     */
    private void cloneEasyConfig(final EasyConfig easyConfig) {
 
+// SET_FORMATTING_OFF
+
       _dialogEasyConfig = new EasyConfig();
 
-      _dialogEasyConfig.animationCrazinessFactor = easyConfig.animationCrazinessFactor;
-      _dialogEasyConfig.animationDuration = easyConfig.animationDuration;
-      _dialogEasyConfig.backgroundOpacity = easyConfig.backgroundOpacity;
-      _dialogEasyConfig.isLiveUpdate = easyConfig.isLiveUpdate;
-      _dialogEasyConfig.numHorizontalTiles = easyConfig.numHorizontalTiles;
-      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = easyConfig.stateToolTipDisplayAbsoluteFilePath;
-      _dialogEasyConfig.stateToolTipWidth = easyConfig.stateToolTipWidth;
-      _dialogEasyConfig.tileSize = easyConfig.tileSize;
+      _dialogEasyConfig.animationCrazinessFactor               = easyConfig.animationCrazinessFactor;
+      _dialogEasyConfig.animationDuration                      = easyConfig.animationDuration;
+      _dialogEasyConfig.backgroundOpacity                      = easyConfig.backgroundOpacity;
+      _dialogEasyConfig.isLiveUpdate                           = easyConfig.isLiveUpdate;
+      _dialogEasyConfig.isLogDetails                           = easyConfig.isLogDetails;
+      _dialogEasyConfig.numHorizontalTiles                     = easyConfig.numHorizontalTiles;
+      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath    = easyConfig.stateToolTipDisplayAbsoluteFilePath;
+      _dialogEasyConfig.stateToolTipWidth                      = easyConfig.stateToolTipWidth;
+      _dialogEasyConfig.tileSize                               = easyConfig.tileSize;
+
+// SET_FORMATTING_ON      
 
       final ImportConfig activeImportConfig = easyConfig.getActiveImportConfig();
 
@@ -778,8 +784,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void createUI(final Composite parent) {
 
-      CTabItem tabDashboard;
-
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().applyTo(container);
@@ -792,17 +796,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             // tab: config
             final CTabItem tabConfig = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabConfig.setText(Messages.Dialog_ImportConfig_Tab_Configuration);
-            tabConfig.setControl(createUI_200_ImportActions(_tabFolderEasy));
+            tabConfig.setControl(createUI_200_Tab_ImportActions(_tabFolderEasy));
 
             // tab: launcher
             final CTabItem tabLauncher = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabLauncher.setText(Messages.Dialog_ImportConfig_Tab_Launcher);
-            tabLauncher.setControl(createUI_500_IL_ImportLauncher(_tabFolderEasy));
+            tabLauncher.setControl(createUI_500_Tab_IL_ImportLauncher(_tabFolderEasy));
 
-            // tab: dashboard
-            tabDashboard = new CTabItem(_tabFolderEasy, SWT.NONE);
-            tabDashboard.setText(Messages.Dialog_ImportConfig_Tab_Dashboard);
-            tabDashboard.setControl(createUI_900_Dashboard(_tabFolderEasy));
+            // tab: options
+            final CTabItem tabOptions = new CTabItem(_tabFolderEasy, SWT.NONE);
+            tabOptions.setText(Messages.Dialog_ImportConfig_Tab_Options);
+            tabOptions.setControl(createUI_900_Tab_Options(_tabFolderEasy));
          }
       }
 
@@ -821,7 +825,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       });
    }
 
-   private Composite createUI_200_ImportActions(final Composite parent) {
+   private Composite createUI_200_Tab_ImportActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -1140,8 +1144,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          createUI_250_IC_Name(group);
-         createUI_252_IC_BackupFolder(group);
-         createUI_254_IC_DeviceFileFolder(group);
+         createUI_252_IC_1_BackupFolder(group);
+         createUI_254_IC_2_DeviceFileFolder(group);
          createUI_270_IC_3_99_Actions(group);
          createUI_280_IC_100(group);
       }
@@ -1172,7 +1176,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_252_IC_BackupFolder(final Composite parent) {
+   private void createUI_252_IC_1_BackupFolder(final Composite parent) {
 
       {
          /*
@@ -1234,9 +1238,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: browse...
           */
          _btnIC_SelectBackupFolder = new Button(container, SWT.PUSH);
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_btnIC_SelectBackupFolder);
          _btnIC_SelectBackupFolder.setText(Messages.app_btn_browse);
          _btnIC_SelectBackupFolder.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1244,6 +1245,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                onSelect_IC_Folder_Backup();
             }
          });
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_btnIC_SelectBackupFolder);
          setButtonLayoutData(_btnIC_SelectBackupFolder);
       }
 
@@ -1267,7 +1271,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_254_IC_DeviceFileFolder(final Composite parent) {
+   private void createUI_254_IC_2_DeviceFileFolder(final Composite parent) {
 
       final ModifyListener deviceTypeListener = modifyEvent -> onSelectDevice();
 
@@ -1492,7 +1496,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private Composite createUI_500_IL_ImportLauncher(final Composite parent) {
+   private Composite createUI_500_Tab_IL_ImportLauncher(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -2424,7 +2428,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private Composite createUI_900_Dashboard(final Composite parent) {
+   private Composite createUI_900_Tab_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -2436,7 +2440,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          createUI_902_Dashboard(container);
-         createUI_904_Actions(container);
+         createUI_990_Actions(container);
       }
 
       return container;
@@ -2451,213 +2455,231 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
+         createUI_910_Tiles(container);
+         createUI_920_StateTooltip(container);
+         createUI_930_Dashboard(container);
+         createUI_940_TourLog(container);
+      }
+   }
+
+   private void createUI_910_Tiles(final Composite parent) {
+
+      /*
+       * Group: Tiles
+       */
+      final Group groupTiles = new Group(parent, SWT.NONE);
+      groupTiles.setText(Messages.Dialog_ImportConfig_Group_Tiles);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupTiles);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(groupTiles);
+      {
+         /*
+          * Tile size
+          */
+         // label
+         Label label = new Label(groupTiles, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_ConfigTileSize);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_ConfigTileSize_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_TileSize = new Spinner(groupTiles, SWT.BORDER);
+         _spinnerDash_TileSize.setMaximum(EasyConfig.TILE_SIZE_MAX);
+         _spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
+         _spinnerDash_TileSize.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_TileSize);
+
+         // label: px
+         label = new Label(groupTiles, SWT.NONE);
+         label.setText(CSS_PX);
+      }
+      {
+         /*
+          * Number of columns
+          */
+         // label
+         final Label label = new Label(groupTiles, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_ImportColumns);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportColumns_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_NumHTiles = new Spinner(groupTiles, SWT.BORDER);
+         _spinnerDash_NumHTiles.setMaximum(EasyConfig.HORIZONTAL_TILES_MAX);
+         _spinnerDash_NumHTiles.setMinimum(EasyConfig.HORIZONTAL_TILES_MIN);
+         _spinnerDash_NumHTiles.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_NumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_NumHTiles);
+
+         // fill 3rd column
+         new Label(groupTiles, SWT.NONE);
+      }
+   }
+
+   private void createUI_920_StateTooltip(final Composite parent) {
+
+      /*
+       * Group: State Tooltip
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ImportConfig_Group_StateTooltip);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
          {
             /*
-             * Group: Tiles
+             * Width
              */
-            final Group groupTiles = new Group(container, SWT.NONE);
-            groupTiles.setText(Messages.Dialog_ImportConfig_Group_Tiles);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupTiles);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(groupTiles);
-            {
-               /*
-                * Tile size
-                */
-               // label
-               Label label = new Label(groupTiles, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_ConfigTileSize);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_ConfigTileSize_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               _firstColumnControls.add(label);
+            // label
+            Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
+            GridDataFactory.fillDefaults().applyTo(label);
+            _firstColumnControls.add(label);
 
-               // spinner
-               _spinnerDash_TileSize = new Spinner(groupTiles, SWT.BORDER);
-               _spinnerDash_TileSize.setMaximum(EasyConfig.TILE_SIZE_MAX);
-               _spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
-               _spinnerDash_TileSize.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_TileSize);
+            // spinner
+            _spinnerDash_StateTooltipWidth = new Spinner(group, SWT.BORDER);
+            _spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
+            _spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
+            _spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
+            _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerDash_StateTooltipWidth);
 
-               // label: px
-               label = new Label(groupTiles, SWT.NONE);
-               label.setText(CSS_PX);
-            }
-            {
-               /*
-                * Number of columns
-                */
-               // label
-               final Label label = new Label(groupTiles, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_ImportColumns);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportColumns_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_NumHTiles = new Spinner(groupTiles, SWT.BORDER);
-               _spinnerDash_NumHTiles.setMaximum(EasyConfig.HORIZONTAL_TILES_MAX);
-               _spinnerDash_NumHTiles.setMinimum(EasyConfig.HORIZONTAL_TILES_MIN);
-               _spinnerDash_NumHTiles.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_NumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_NumHTiles);
-
-               // fill 3rd column
-               new Label(groupTiles, SWT.NONE);
-            }
+            // label: px
+            label = new Label(group, SWT.NONE);
+            label.setText(CSS_PX);
          }
          {
             /*
-             * Group: State Tooltip
+             * Display absolute file path
              */
-            final Group groupStateTooltip = new Group(container, SWT.NONE);
-            groupStateTooltip.setText(Messages.Dialog_ImportConfig_Group_StateTooltip);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupStateTooltip);
+            // Checkbox
+            _chkOptions_DisplayAbsoluteFilePath = new Button(group, SWT.CHECK);
+            _chkOptions_DisplayAbsoluteFilePath.setText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath);
+            _chkOptions_DisplayAbsoluteFilePath.setToolTipText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip);
+            _chkOptions_DisplayAbsoluteFilePath.addSelectionListener(_liveUpdateListener);
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(groupStateTooltip);
-            {
-               {
-                  /*
-                   * Width
-                   */
-                  // label
-                  Label label = new Label(groupStateTooltip, SWT.NONE);
-                  label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
-                  GridDataFactory.fillDefaults().applyTo(label);
-                  _firstColumnControls.add(label);
-
-                  // spinner
-                  _spinnerDash_StateTooltipWidth = new Spinner(groupStateTooltip, SWT.BORDER);
-                  _spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
-                  _spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
-                  _spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
-                  _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
-                  GridDataFactory.fillDefaults().applyTo(_spinnerDash_StateTooltipWidth);
-
-                  // label: px
-                  label = new Label(groupStateTooltip, SWT.NONE);
-                  label.setText(CSS_PX);
-               }
-               {
-                  /*
-                   * Display absolute file path
-                   */
-                  // Checkbox
-                  _chkDash_DisplayAbsoluteFilePath = new Button(groupStateTooltip, SWT.CHECK);
-                  _chkDash_DisplayAbsoluteFilePath.setText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath);
-                  _chkDash_DisplayAbsoluteFilePath.setToolTipText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip);
-                  _chkDash_DisplayAbsoluteFilePath.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        doLiveUpdate();
-                     }
-                  });
-                  GridDataFactory.fillDefaults()
-                        .span(3, 1)
-                        .applyTo(_chkDash_DisplayAbsoluteFilePath);
-               }
-            }
-         }
-         {
-            /*
-             * Group: State Tooltip
-             */
-            final Group groupDashboard = new Group(container, SWT.NONE);
-            groupDashboard.setText(Messages.Dialog_ImportConfig_Group_Dashboard);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupDashboard);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(groupDashboard);
-            {
-               /*
-                * Animation duration
-                */
-               // label
-               Label label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               _firstColumnControls.add(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_AnimationDuration = new Spinner(groupDashboard, SWT.BORDER);
-               _spinnerDash_AnimationDuration.setMaximum(EasyConfig.ANIMATION_DURATION_MAX);
-               _spinnerDash_AnimationDuration.setMinimum(EasyConfig.ANIMATION_DURATION_MIN);
-               _spinnerDash_AnimationDuration.setDigits(1);
-               _spinnerDash_AnimationDuration.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_AnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_AnimationDuration);
-
-               // label
-               label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.App_Unit_Seconds_Small);
-            }
-            {
-               /*
-                * Animation crazy factor
-                */
-               // label
-               final Label label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_AnimationCrazinessFactor = new Spinner(groupDashboard, SWT.BORDER);
-               _spinnerDash_AnimationCrazinessFactor.setMaximum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
-               _spinnerDash_AnimationCrazinessFactor.setMinimum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
-               _spinnerDash_AnimationCrazinessFactor.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_AnimationCrazinessFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_AnimationCrazinessFactor);
-
-               // fill 3rd column
-               new Label(groupDashboard, SWT.NONE);
-            }
-            {
-               /*
-                * Background opacity
-                */
-               // label
-               final Label label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_BgOpacity = new Spinner(groupDashboard, SWT.BORDER);
-               _spinnerDash_BgOpacity.setMaximum(EasyConfig.BACKGROUND_OPACITY_MAX);
-               _spinnerDash_BgOpacity.setMinimum(EasyConfig.BACKGROUND_OPACITY_MIN);
-               _spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_BgOpacity);
-
-               // fill 3rd column
-               new Label(groupDashboard, SWT.NONE);
-            }
+                  .span(3, 1)
+                  .applyTo(_chkOptions_DisplayAbsoluteFilePath);
          }
       }
    }
 
-   private void createUI_904_Actions(final Composite parent) {
+   private void createUI_930_Dashboard(final Composite parent) {
+
+      /*
+       * Group: State Tooltip
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ImportConfig_Group_Dashboard);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
+         /*
+          * Animation duration
+          */
+         // label
+         Label label = new Label(group, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         _firstColumnControls.add(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_AnimationDuration = new Spinner(group, SWT.BORDER);
+         _spinnerDash_AnimationDuration.setMaximum(EasyConfig.ANIMATION_DURATION_MAX);
+         _spinnerDash_AnimationDuration.setMinimum(EasyConfig.ANIMATION_DURATION_MIN);
+         _spinnerDash_AnimationDuration.setDigits(1);
+         _spinnerDash_AnimationDuration.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_AnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_AnimationDuration);
+
+         // label
+         label = new Label(group, SWT.NONE);
+         label.setText(Messages.App_Unit_Seconds_Small);
+      }
+      {
+         /*
+          * Animation crazy factor
+          */
+         // label
+         final Label label = new Label(group, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_AnimationCrazinessFactor = new Spinner(group, SWT.BORDER);
+         _spinnerDash_AnimationCrazinessFactor.setMaximum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
+         _spinnerDash_AnimationCrazinessFactor.setMinimum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
+         _spinnerDash_AnimationCrazinessFactor.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_AnimationCrazinessFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_AnimationCrazinessFactor);
+
+         // fill 3rd column
+         new Label(group, SWT.NONE);
+      }
+      {
+         /*
+          * Background opacity
+          */
+         // label
+         final Label label = new Label(group, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_BgOpacity = new Spinner(group, SWT.BORDER);
+         _spinnerDash_BgOpacity.setMaximum(EasyConfig.BACKGROUND_OPACITY_MAX);
+         _spinnerDash_BgOpacity.setMinimum(EasyConfig.BACKGROUND_OPACITY_MIN);
+         _spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_BgOpacity);
+
+         // fill 3rd column
+         new Label(group, SWT.NONE);
+      }
+   }
+
+   private void createUI_940_TourLog(final Composite parent) {
+
+      {
+         /*
+          * Checkbox: Log Details
+          */
+         _chkOptions_LogDetails = new Button(parent, SWT.CHECK);
+         _chkOptions_LogDetails.setText(Messages.Tour_Log_Checkbox_LogDetails);
+         _chkOptions_LogDetails.addSelectionListener(_liveUpdateListener);
+         GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkOptions_LogDetails);
+      }
+   }
+
+   private void createUI_990_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -2668,15 +2690,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             /*
              * Checkbox: live update
              */
-            _chkDash_LiveUpdate = new Button(container, SWT.CHECK);
-            _chkDash_LiveUpdate.setText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate);
-            _chkDash_LiveUpdate.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip);
-            _chkDash_LiveUpdate.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  doLiveUpdate();
-               }
-            });
+            _chkOptions_LiveUpdate = new Button(container, SWT.CHECK);
+            _chkOptions_LiveUpdate.setText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate);
+            _chkOptions_LiveUpdate.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip);
+            _chkOptions_LiveUpdate.addSelectionListener(_liveUpdateListener);
          }
          {
             /*
@@ -3169,11 +3186,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    }
 
    /**
-    * Do live update for this feature.
+    * Do live update for this feature
     */
    private void doLiveUpdate() {
 
-      final boolean isLiveUpdate = _chkDash_LiveUpdate.getSelection();
+      final boolean isLiveUpdate = _chkOptions_LiveUpdate.getSelection();
       if (isLiveUpdate) {
 
          update_Model_From_UI_LiveUpdateValues();
@@ -3982,7 +3999,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void onSelect_IC_Folder_Backup() {
 
-      final String filterOSPath = _backupHistoryItems.getOSPath(//
+      final String filterOSPath = _backupHistoryItems.getOSPath(
             _comboIC_BackupFolder.getText(),
             _selectedIC.getBackupFolder());
 
@@ -4222,7 +4239,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    @Override
    public void resetToDefaults() {
 
-      _chkDash_LiveUpdate.setSelection(EasyConfig.LIVE_UPDATE_DEFAULT);
+      _chkOptions_LiveUpdate.setSelection(EasyConfig.IS_LIVE_UPDATE_DEFAULT);
+      _chkOptions_LogDetails.setSelection(EasyConfig.IS_LOG_DETAILS_DEFAULT);
 
       _spinnerDash_AnimationCrazinessFactor.setSelection(EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT);
       _spinnerDash_AnimationDuration.setSelection(EasyConfig.ANIMATION_DURATION_DEFAULT);
@@ -4309,17 +4327,23 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       // ensure that the selected also has the focus, these are 2 different things
       ilTable.setSelection(ilTable.getSelectionIndex());
 
+// SET_FORMATTING_OFF
+
       /*
        * Dashboard
        */
-      _chkDash_LiveUpdate.setSelection(_dialogEasyConfig.isLiveUpdate);
-      _spinnerDash_AnimationCrazinessFactor.setSelection(_dialogEasyConfig.animationCrazinessFactor);
-      _spinnerDash_AnimationDuration.setSelection(_dialogEasyConfig.animationDuration);
-      _spinnerDash_BgOpacity.setSelection(_dialogEasyConfig.backgroundOpacity);
-      _spinnerDash_NumHTiles.setSelection(_dialogEasyConfig.numHorizontalTiles);
-      _chkDash_DisplayAbsoluteFilePath.setSelection(_dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath);
-      _spinnerDash_StateTooltipWidth.setSelection(_dialogEasyConfig.stateToolTipWidth);
-      _spinnerDash_TileSize.setSelection(_dialogEasyConfig.tileSize);
+      _chkOptions_DisplayAbsoluteFilePath    .setSelection(_dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath);
+      _chkOptions_LiveUpdate                 .setSelection(_dialogEasyConfig.isLiveUpdate);
+      _chkOptions_LogDetails                 .setSelection(_dialogEasyConfig.isLogDetails);
+
+      _spinnerDash_AnimationCrazinessFactor  .setSelection(_dialogEasyConfig.animationCrazinessFactor);
+      _spinnerDash_AnimationDuration         .setSelection(_dialogEasyConfig.animationDuration);
+      _spinnerDash_BgOpacity                 .setSelection(_dialogEasyConfig.backgroundOpacity);
+      _spinnerDash_NumHTiles                 .setSelection(_dialogEasyConfig.numHorizontalTiles);
+      _spinnerDash_StateTooltipWidth         .setSelection(_dialogEasyConfig.stateToolTipWidth);
+      _spinnerDash_TileSize                  .setSelection(_dialogEasyConfig.tileSize);
+
+// SET_FORMATTING_ON
    }
 
    private void saveState() {
@@ -4452,13 +4476,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void update_Model_From_UI_LiveUpdateValues() {
 
-      _dialogEasyConfig.isLiveUpdate = _chkDash_LiveUpdate.getSelection();
+      _dialogEasyConfig.isLiveUpdate = _chkOptions_LiveUpdate.getSelection();
+      _dialogEasyConfig.isLogDetails = _chkOptions_LogDetails.getSelection();
 
       _dialogEasyConfig.animationCrazinessFactor = _spinnerDash_AnimationCrazinessFactor.getSelection();
       _dialogEasyConfig.animationDuration = _spinnerDash_AnimationDuration.getSelection();
       _dialogEasyConfig.backgroundOpacity = _spinnerDash_BgOpacity.getSelection();
       _dialogEasyConfig.numHorizontalTiles = _spinnerDash_NumHTiles.getSelection();
-      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = _chkDash_DisplayAbsoluteFilePath.getSelection();
+      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = _chkOptions_DisplayAbsoluteFilePath.getSelection();
       _dialogEasyConfig.stateToolTipWidth = _spinnerDash_StateTooltipWidth.getSelection();
       _dialogEasyConfig.tileSize = _spinnerDash_TileSize.getSelection();
    }
