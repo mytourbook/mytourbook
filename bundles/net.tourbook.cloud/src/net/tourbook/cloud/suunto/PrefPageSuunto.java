@@ -119,34 +119,34 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       enableControls();
 
-      _prefChangeListener = event ->
+      _prefChangeListener = event -> {
 
-      Display.getDefault().syncExec(() -> {
+         Display.getDefault().syncExec(() -> {
 
-         final String selectedPersonId = getSelectedPersonId();
+            final String selectedPersonId = getSelectedPersonId();
 
-         if (!event.getProperty().equals(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId))) {
-            return;
-         }
+            if (!event.getProperty().equals(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId))) {
+               return;
+            }
 
-         if (!event.getOldValue().equals(event.getNewValue())) {
+            if (!event.getOldValue().equals(event.getNewValue())) {
 
-            _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
-            _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
-                  _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-                  _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
-            _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+               _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+               _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
+                     _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
+                     _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+               _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
-            _group.redraw();
+               _group.redraw();
 
-            enableControls();
-         }
+               enableControls();
+            }
 
-         if (_server != null) {
-            _server.stopCallBackServer();
-         }
-      });
-
+            if (_server != null) {
+               _server.stopCallBackServer();
+            }
+         });
+      };
    }
 
    private Composite createUI() {
@@ -176,10 +176,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
           * Drop down menu to select a user
           */
          _comboPeopleList = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboPeopleList.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            final String personId = getSelectedPersonId();
-            restoreAccountInformation(personId);
-         }));
+         _comboPeopleList.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectPerson()));
          GridDataFactory.fillDefaults().applyTo(_comboPeopleList);
 
          /*
@@ -388,6 +385,14 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          setErrorMessage(null);
          _comboDownloadFolderPath.setText(selectedDirectoryName);
       }
+   }
+
+   private void onSelectPerson() {
+
+      final String personId = getSelectedPersonId();
+      restoreAccountInformation(personId);
+
+      enableControls();
    }
 
    @Override
