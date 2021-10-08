@@ -28,6 +28,7 @@ import java.util.List;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
+import net.tourbook.cloud.PreferenceInitializer;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.LocalHostServer;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
@@ -120,34 +121,34 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       enableControls();
 
-      _prefChangeListener = event -> {
+      _prefChangeListener = event ->
 
-         if (!event.getProperty().equals(Preferences.getSuuntoAccessToken_Active_Person_String())) {
+      Display.getDefault().syncExec(() -> {
+
+         if (!event.getProperty().equals(Preferences.getPerson_SuuntoAccessToken_String(getSelectedPersonId()))) {
             return;
          }
 
-         Display.getDefault().syncExec(() -> {
+         if (!event.getOldValue().equals(event.getNewValue())) {
 
-            if (!event.getOldValue().equals(event.getNewValue())) {
+            final String selectedPersonId = _prefStore.getString(Preferences.SUUNTO_SELECTED_PERSON_ID);
 
-               final String selectedPersonId = _prefStore.getString(Preferences.SUUNTO_SELECTED_PERSON_ID);
+            _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(getSelectedPersonId())));
+            _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
+                  _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
+                  _prefStore.getInt(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+            _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
-               _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String()));
-               _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
-                     _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-                     _prefStore.getInt(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
-               _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+            _group.redraw();
 
-               _group.redraw();
+            enableControls();
+         }
 
-               enableControls();
-            }
+         if (_server != null) {
+            _server.stopCallBackServer();
+         }
+      });
 
-            if (_server != null) {
-               _server.stopCallBackServer();
-            }
-         });
-      };
    }
 
    private Composite createUI() {
@@ -370,7 +371,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          _server.stopCallBackServer();
       }
 
-      final SuuntoTokensRetrievalHandler tokensRetrievalHandler = new SuuntoTokensRetrievalHandler();
+      final SuuntoTokensRetrievalHandler tokensRetrievalHandler = new SuuntoTokensRetrievalHandler(getSelectedPersonId());
       _server = new LocalHostServer(CALLBACK_PORT, "Suunto", _prefChangeListener); //$NON-NLS-1$
       final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
@@ -424,6 +425,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    @Override
    protected void performDefaults() {
 
+      // Restore the default values for the "All People" UI
       _comboPeopleList.select(_prefStore.getDefaultInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
 
       final String selectedPersonId = _prefStore.getDefaultString(Preferences.SUUNTO_SELECTED_PERSON_ID);
@@ -438,6 +440,26 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       setFilterSinceDate(_prefStore.getDefaultLong(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(selectedPersonId)));
 
       enableControls();
+
+      // Restore the default values in the preferences for each person. Otherwise,
+      // those values will reappear when selecting another person
+      final List<TourPerson> tourPeopleList = PersonManager.getTourPeople();
+      final List<String> tourPersonIds = new ArrayList<>();
+
+      // This empty string represents "All people"
+      tourPersonIds.add(UI.EMPTY_STRING);
+      tourPeopleList.forEach(tourPerson -> tourPersonIds.add(String.valueOf(tourPerson.getPersonId())));
+
+      for (final String tourPersonId : tourPersonIds) {
+
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
+         _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0);
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
+         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_SINCE_DATE);
+      }
 
       super.performDefaults();
    }
@@ -455,8 +477,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(personId), _labelRefreshToken_Value.getText());
 
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), UI.EMPTY_STRING);
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), UI.EMPTY_STRING);
+            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), 0L);
+            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), 0);
          }
 
          if (_server != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,8 +30,8 @@ public abstract class Tokens {
       return expires_at;
    }
 
-   public long getExpires_in() {
-      return expires_in;
+   public int getExpires_in() {
+      return (int) expires_in;
    }
 
    public String getRefresh_token() {
