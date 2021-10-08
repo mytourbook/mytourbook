@@ -64,7 +64,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
          store.setDefault(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
          store.setDefault(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
-         store.setDefault(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0);
+         store.setDefault(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
          store.setDefault(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
          store.setDefault(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
          store.setDefault(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);

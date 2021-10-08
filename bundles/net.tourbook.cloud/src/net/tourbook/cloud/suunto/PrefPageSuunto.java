@@ -136,7 +136,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(getSelectedPersonId())));
             _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
                   _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-                  _prefStore.getInt(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+                  _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
             _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
             _group.redraw();
@@ -454,7 +454,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
          _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
          _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
-         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0);
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
          _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
          _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
          _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
@@ -478,7 +478,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
             _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), 0L);
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), 0);
+            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), 0L);
          }
 
          if (_server != null) {
@@ -518,7 +518,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
             _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-            _prefStore.getInt(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+            _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
       _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
       _comboDownloadFolderPath.setText(_prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
