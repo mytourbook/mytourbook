@@ -557,7 +557,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       }
 
       if (_galleryFont == null) {
-         StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
+         StatusUtil.logError("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
          _galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
       }
    }

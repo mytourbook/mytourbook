@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.cloud.messages";       //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.cloud.messages";                        //$NON-NLS-1$
 
    public static String        Html_Text_CloseBrowser;
    public static String        Log_CloudAction_End;
@@ -29,7 +29,10 @@ public class Messages extends NLS {
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
    public static String        PrefPage_CloudConnectivity_Group_CloudAccount;
    public static String        PrefPage_CloudConnectivity_Label_ExpiresAt;
+   public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
+   public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
    public static String        PrefPage_CloudConnectivity_Label_RefreshToken;
+   public static String        PrefPage_CloudConnectivity_Label_SwitchPersonWarning;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Message;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Title;
    public static String        PrefPage_CloudConnectivity_Label_WebPage;

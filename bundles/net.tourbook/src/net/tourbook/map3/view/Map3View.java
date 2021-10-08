@@ -40,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -908,7 +909,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
-            Display.getCurrent().asyncExec(() -> hideTourInfo());
+            Display.getCurrent().asyncExec(Map3View.this::hideTourInfo);
          }
 
          @Override
@@ -1319,7 +1320,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       });
    }
 
-   public ArrayList<TourData> getAllTours() {
+   public List<TourData> getAllTours() {
       return _allTours;
    }
 

@@ -157,7 +157,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.logError(select);
          net.tourbook.ui.UI.showSQLException(e);
 
       }
@@ -299,7 +299,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.logError(select);
          net.tourbook.ui.UI.showSQLException(e);
       }
 
@@ -355,7 +355,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.logError(select);
          net.tourbook.ui.UI.showSQLException(e);
 
       }
@@ -710,7 +710,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(sql);
+         StatusUtil.logError(sql);
          net.tourbook.ui.UI.showSQLException(e);
 
       }
@@ -874,7 +874,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(sql);
+         StatusUtil.logError(sql);
          net.tourbook.ui.UI.showSQLException(e);
 
       } finally {

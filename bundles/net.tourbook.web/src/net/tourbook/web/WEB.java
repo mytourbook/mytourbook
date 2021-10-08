@@ -347,7 +347,7 @@ public class WEB {
       final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
 
       if (bundleUrl == null) {
-         StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+         StatusUtil.logError("File is not available: " + bundleFileName);//$NON-NLS-1$
          return null;
       }
 
@@ -409,7 +409,7 @@ public class WEB {
       final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
 
       if (bundleUrl == null) {
-         StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+         StatusUtil.logError("File is not available: " + bundleFileName);//$NON-NLS-1$
          return null;
       }
 
@@ -722,7 +722,7 @@ public class WEB {
       if (contentType == null) {
 
          contentType = CONTENT_TYPE_UNKNOWN;
-         StatusUtil.log("Content type is unknow for " + file);//$NON-NLS-1$
+         StatusUtil.logError("Content type is unknow for " + file);//$NON-NLS-1$
       }
 
       final Headers responseHeaders = httpExchange.getResponseHeaders();

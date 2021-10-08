@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.ImageLoader;
  */
 public class PngTransfer extends ByteArrayTransfer {
 
-   private static final String IMAGE_PNG = "image/png"; //$NON-NLS-1$
+   private static final String IMAGE_PNG = "image/png";            //$NON-NLS-1$
    private static final int    ID        = registerType(IMAGE_PNG);
 
    private static PngTransfer  _instance = new PngTransfer();
@@ -41,7 +41,7 @@ public class PngTransfer extends ByteArrayTransfer {
 
    @Override
    protected void javaToNative(final Object object, final TransferData transferData) {
-      if (object == null || !(object instanceof ImageData)) {
+      if (!(object instanceof ImageData)) {
          return;
       }
 

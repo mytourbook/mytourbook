@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -733,7 +734,7 @@ public class Map3GradientColorManager {
 
       for (final Map3ColorDefinition colorDefinition : colorDefinitions) {
 
-         final ArrayList<Map3GradientColorProvider> colorProviders = colorDefinition.getColorProviders();
+         final List<Map3GradientColorProvider> colorProviders = colorDefinition.getColorProviders();
 
          final MapGraphId graphId = colorDefinition.getGraphId();
 
@@ -820,7 +821,7 @@ public class Map3GradientColorManager {
 
       Map3GradientColorProvider activeColorProvider = null;
 
-      final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(graphId);
+      final List<Map3GradientColorProvider> colorProviders = getColorProviders(graphId);
 
       for (final Map3GradientColorProvider colorProvider : colorProviders) {
          if (colorProvider.getMap3ColorProfile().isActiveColorProfile()) {
@@ -869,7 +870,7 @@ public class Map3GradientColorManager {
     * @param graphId
     * @return Returns all color profiles for the requested {@link MapGraphId}.
     */
-   public static ArrayList<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
+   public static List<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
 
       return getColorDefinition(graphId).getColorProviders();
    }
@@ -904,18 +905,9 @@ public class Map3GradientColorManager {
 
       if (xmlColorDefinitions == null) {
 
-         for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
-
-            for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
-
-               final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
-
-               colorProfile.setIsActiveColorProfile(true);
-
-               // set only first default color profile as active
-               break;
-            }
-         }
+         // set only first default color profile as active
+         _map3ColorDefinitions.values().forEach(colorDef -> colorDef.getColorProviders().get(0).getMap3ColorProfile().setIsActiveColorProfile(
+               true));
 
          return;
       }
@@ -923,7 +915,7 @@ public class Map3GradientColorManager {
       // replace existing color providers with loaded color providers
       for (final Map3ColorDefinition xmlColorDef : xmlColorDefinitions) {
 
-         final ArrayList<Map3GradientColorProvider> xmlColorProvider = xmlColorDef.getColorProviders();
+         final List<Map3GradientColorProvider> xmlColorProvider = xmlColorDef.getColorProviders();
          if (xmlColorProvider.size() > 0) {
 
             final MapGraphId xmlGraphId = xmlColorDef.getGraphId();
@@ -936,7 +928,7 @@ public class Map3GradientColorManager {
       // ensure that only one color provider for each graph id is active
       for (final Map3ColorDefinition colorDef : getColorDefinitions().values()) {
 
-         final ArrayList<Map3GradientColorProvider> colorProviders = colorDef.getColorProviders();
+         final List<Map3GradientColorProvider> colorProviders = colorDef.getColorProviders();
 
          Map3GradientColorProvider activeColorProvider = null;
 
@@ -1117,7 +1109,7 @@ public class Map3GradientColorManager {
       final MapGraphId modifiedGraphId = modifiedColorProvider.getGraphId();
 
       // remove old profile
-      final ArrayList<Map3GradientColorProvider> allOriginalProviders = getColorProviders(originalGraphId);
+      final List<Map3GradientColorProvider> allOriginalProviders = getColorProviders(originalGraphId);
 
       // add new/modified profile
       if (originalGraphId == modifiedGraphId) {
@@ -1250,7 +1242,7 @@ public class Map3GradientColorManager {
     */
    public static void setActiveColorProvider(final Map3GradientColorProvider activeColorProvider) {
 
-      final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(activeColorProvider.getGraphId());
+      final List<Map3GradientColorProvider> colorProviders = getColorProviders(activeColorProvider.getGraphId());
 
       for (final Map3GradientColorProvider colorProvider : colorProviders) {
 
