@@ -73,7 +73,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT_TOOLTIP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_SWITCHPERSONWARNING                = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_SwitchPersonWarning;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE                            = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
@@ -89,7 +88,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    private IPreferenceStore        _prefStore                       = Activator.getDefault().getPreferenceStore();
 
-   private PixelConverter          _pc;
    private final IDialogSettings   _state                           = TourbookPlugin.getState(DialogEasyImportConfig.ID);
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
@@ -125,15 +123,15 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       Display.getDefault().syncExec(() -> {
 
-         if (!event.getProperty().equals(Preferences.getPerson_SuuntoAccessToken_String(getSelectedPersonId()))) {
+         final String selectedPersonId = getSelectedPersonId();
+
+         if (!event.getProperty().equals(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId))) {
             return;
          }
 
          if (!event.getOldValue().equals(event.getNewValue())) {
 
-            final String selectedPersonId = _prefStore.getString(Preferences.SUUNTO_SELECTED_PERSON_ID);
-
-            _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(getSelectedPersonId())));
+            _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
             _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
                   _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
                   _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
@@ -155,8 +153,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
-
-      initUI(parent);
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
@@ -287,16 +283,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterSince);
          }
-
-         {
-            final Label labelWarning = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-            labelWarning.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_SWITCHPERSONWARNING);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .span(3, 1)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                  .applyTo(labelWarning);
-         }
       }
    }
 
@@ -343,12 +329,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    @Override
    public void init(final IWorkbench workbench) {}
-
-   private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
-
-   }
 
    @Override
    public boolean okToLeave() {
