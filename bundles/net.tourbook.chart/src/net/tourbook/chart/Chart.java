@@ -402,7 +402,9 @@ public class Chart extends ViewForm {
 
       // check if this is slider context
       final boolean isSliderContext = leftSlider != null || rightSlider != null;
-      final boolean showOnlySliderContext = isSliderContext && _chartContextProvider.showOnlySliderContextMenu();
+      final boolean showOnlySliderContext = isSliderContext
+            && _chartContextProvider != null
+            && _chartContextProvider.showOnlySliderContextMenu();
 
       if (_chartContextProvider != null && showOnlySliderContext == false && _isTopMenuPosition) {
          _chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
