@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
@@ -65,7 +66,10 @@ public class SensorChartView extends ViewPart {
 
    private FormToolkit            _tk;
 
+   private SensorData             _sensorData;
    private SensorDataProvider     _sensorDataProvider = new SensorDataProvider();
+
+   private long                   _selectedTourId;
 
    /*
     * UI controls
@@ -177,14 +181,51 @@ public class SensorChartView extends ViewPart {
       _pageNoData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
       _pageNoBatteryData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
 
-      _sensorChart = new Chart(_pageBook, SWT.FLAT);
-      _sensorChart.setShowSlider(true);
-      _sensorChart.setShowZoomActions(true);
-      _sensorChart.setMouseMode(false);
-
-      _sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+      _sensorChart = createUI_10_Chart();
 
       _pageBook.showPage(_pageNoData);
+   }
+
+   private Chart createUI_10_Chart() {
+
+      final Chart sensorChart = new Chart(_pageBook, SWT.FLAT);
+      sensorChart.setShowZoomActions(true);
+      sensorChart.setMouseMode(false);
+
+      sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+
+      sensorChart.addBarSelectionListener(new IBarSelectionListener() {
+         @Override
+         public void selectionChanged(final int serieIndex, int valueIndex) {
+
+            final long[] tourIds = _sensorData.allTourIds;
+
+            if (tourIds != null && tourIds.length > 0) {
+
+               if (valueIndex >= tourIds.length) {
+                  valueIndex = tourIds.length - 1;
+               }
+
+               _selectedTourId = tourIds[valueIndex];
+//               _tourInfoToolTipProvider.setTourId(_selectedTourId);
+//
+//               _batteryDataProvider.setSelectedTourId(_selectedTourId);
+//
+//               // don't fire an event when preferences are updated
+//               if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
+//                  return;
+//               }
+//
+//               // this view can be inactive -> selection is not fired with the SelectionProvider interface
+//               TourManager.fireEventWithCustomData(
+//                     TourEventId.TOUR_SELECTION,
+//                     new SelectionTourId(_selectedTourId),
+//                     viewSite.getPart());
+            }
+         }
+      });
+
+      return sensorChart;
    }
 
    @Override
@@ -255,16 +296,16 @@ public class SensorChartView extends ViewPart {
 
             final long sensorId = sensorItem.sensor.getSensorId();
 
-            final SensorData sensorData = _sensorDataProvider.getTourTimeData(sensorId);
+            _sensorData = _sensorDataProvider.getTourTimeData(sensorId);
 
-            if (sensorData.allTourIds.length == 0) {
+            if (_sensorData.allTourIds.length == 0) {
 
                _pageBook.showPage(_pageNoBatteryData);
 
             } else {
 
                _pageBook.showPage(_sensorChart);
-               updateChart(sensorData);
+               updateChart(_sensorData);
             }
          }
       }
@@ -286,7 +327,7 @@ public class SensorChartView extends ViewPart {
 
    private void updateChart(final SensorData sensorData) {
 
-      final ChartDataModel chartModel = new ChartDataModel(ChartType.LINE);
+      final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
       // set the x-axis
       final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(sensorData.allXValues_ByTime));
@@ -294,19 +335,20 @@ public class SensorChartView extends ViewPart {
       xData.setStartDateTime(getTourStartTime(sensorData.firstDateTime));
       chartModel.setXData(xData);
 
+      // set  bar low/high data
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.DOT,
-            sensorData.allBatteryVoltage,
-            true //
-      );
+            ChartType.BAR,
+            sensorData.allBatteryVoltage_End,
+            sensorData.allBatteryVoltage_Start);
 
       yData.setYTitle("Sensor Battery");
       yData.setUnitLabel("Volt");
-
       yData.setShowYSlider(true);
-      yData.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 
       chartModel.addYData(yData);
+
+      // set dummy title that the history labels are not truncated
+      chartModel.setTitle(UI.EMPTY_STRING);
 
       // show the data in the chart
       _sensorChart.updateChart(chartModel, false, true);

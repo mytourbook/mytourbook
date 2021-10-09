@@ -1402,8 +1402,9 @@ public class ChartComponents extends Composite {
       int devYTop = _devMarginTop + _devXTitleBarHeight;
 
       if (isChartStacked) {
-         // each chart has its own drawing rectangle which are stacked on
-         // top of each other
+
+         // each chart has its own drawing rectangle which are stacked on top of each other
+
          devYTop += (currentGraph * (devGraphHeight + devSliderBarHeight))
                + ((currentGraph - 1) * _graphVerticalDistance);
 
@@ -1607,7 +1608,7 @@ public class ChartComponents extends Composite {
 
          final double descaledValue = (double) scaledValue / valueScaling;
 
-         final String unitLabel = net.tourbook.chart.Util.formatValue(//
+         final String unitLabel = net.tourbook.chart.Util.formatValue(
                (float) descaledValue,
                unitType,
                valueDivisor,

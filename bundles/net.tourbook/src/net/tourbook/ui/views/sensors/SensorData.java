@@ -25,6 +25,7 @@ public class SensorData {
    public int[]   allXValues_BySequence;
    public int[]   allXValues_ByTime;
 
-   public float[] allBatteryVoltage;
+   public float[] allBatteryVoltage_Start;
+   public float[] allBatteryVoltage_End;
 
 }

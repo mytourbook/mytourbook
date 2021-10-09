@@ -162,8 +162,6 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
                _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-               _batteryDataProvider.setSelectedTourId(_selectedTourId);
-
                // don't fire an event when preferences are updated
                if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
                   return;
@@ -189,8 +187,6 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
                _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
-
-               _batteryDataProvider.setSelectedTourId(_selectedTourId);
 
                ActionEditQuick.doAction(StatisticBattery.this);
             }
@@ -443,14 +439,9 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       // set the bar low/high data
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            Util.convertShortToFloat(_batteryData.allBatteryPercentage_End), //
-            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start) //
-      );
-//      final ChartDataYSerie yData = new ChartDataYSerie(
-//            ChartType.LINE,
-//            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start),
-//            true //
-//      );
+            Util.convertShortToFloat(_batteryData.allBatteryPercentage_End),
+            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start));
+
       yData.setYTitle(Messages.LABEL_GRAPH_BATTERY);
       yData.setUnitLabel(UI.SYMBOL_PERCENTAGE);
       yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);

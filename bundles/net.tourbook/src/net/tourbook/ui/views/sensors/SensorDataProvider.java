@@ -64,7 +64,8 @@ public class SensorDataProvider {
                + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
          ;
 
-         final TFloatArrayList allBatteryVoltage = new TFloatArrayList();
+         final TFloatArrayList allBatteryVoltage_Start = new TFloatArrayList();
+         final TFloatArrayList allBatteryVoltage_End = new TFloatArrayList();
          final TIntArrayList allXValues_BySequence = new TIntArrayList();
          final TIntArrayList allXValues_ByTime = new TIntArrayList();
          final TLongArrayList allTourIds = new TLongArrayList();
@@ -92,30 +93,36 @@ public class SensorDataProvider {
             final boolean isStartAvailable = dbBatteryVoltage_Start > 0;
             final boolean isEndAvailable = dbBatteryVoltage_End > 0;
 
-            if (isStartAvailable) {
+            if (isStartAvailable && isEndAvailable) {
 
-               allBatteryVoltage.add(dbBatteryVoltage_Start);
-               allXValues_BySequence.add(numXValue++);
+               allBatteryVoltage_Start.add(dbBatteryVoltage_Start);
+               allBatteryVoltage_End.add(dbBatteryVoltage_End);
 
-               allTourIds.add(dbTourId);
-               allTourStartTime.add(dbTourStartTime);
+            } else if (isStartAvailable) {
 
-               if (firstDateTime == Long.MIN_VALUE) {
-                  firstDateTime = dbTourStartTime;
-               }
+               allBatteryVoltage_Start.add(dbBatteryVoltage_Start);
+               allBatteryVoltage_End.add(dbBatteryVoltage_Start);
 
-               final long timeDiff = dbTourStartTime - firstDateTime;
+            } else if (isEndAvailable) {
 
-               allXValues_ByTime.add((int) (timeDiff / 1000));
+               allBatteryVoltage_Start.add(dbBatteryVoltage_End);
+               allBatteryVoltage_End.add(dbBatteryVoltage_End);
+
+            } else {
+
+//               allBatteryVoltage_Start.add(0f);
+//               allBatteryVoltage_End.add(0f);
             }
 
-            if (isEndAvailable) {
+            if (isStartAvailable || isEndAvailable) {
 
-               allBatteryVoltage.add(dbBatteryVoltage_End);
                allXValues_BySequence.add(numXValue++);
                allTourIds.add(dbTourId);
                allTourStartTime.add(dbTourStartTime);
 
+               /*
+                * Set x-axis time
+                */
                if (firstDateTime == Long.MIN_VALUE) {
                   firstDateTime = dbTourStartTime;
                }
@@ -135,7 +142,10 @@ public class SensorDataProvider {
 
          sensorData.allXValues_BySequence = allXValues_BySequence.toArray();
          sensorData.allXValues_ByTime = allXValues_ByTime.toArray();
-         sensorData.allBatteryVoltage = allBatteryVoltage.toArray();
+
+         sensorData.allBatteryVoltage_Start = allBatteryVoltage_Start.toArray();
+         sensorData.allBatteryVoltage_End = allBatteryVoltage_End.toArray();
+
          sensorData.allTourIds = allTourIds.toArray();
          sensorData.allTourStartTime = allTourStartTime.toArray();
 

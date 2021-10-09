@@ -41,8 +41,6 @@ import net.tourbook.ui.TourTypeFilter;
 
 public class DataProvider_Battery extends DataProvider {
 
-   private Long                      _selectedTourId;
-
    private TourStatisticData_Battery _batteryData;
 
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
@@ -154,10 +152,6 @@ public class DataProvider_Battery extends DataProvider {
       statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
-   }
-
-   public Long getSelectedTourId() {
-      return _selectedTourId;
    }
 
    /**
@@ -428,7 +422,4 @@ public class DataProvider_Battery extends DataProvider {
       return _batteryData;
    }
 
-   void setSelectedTourId(final Long selectedTourId) {
-      _selectedTourId = selectedTourId;
-   }
 }
