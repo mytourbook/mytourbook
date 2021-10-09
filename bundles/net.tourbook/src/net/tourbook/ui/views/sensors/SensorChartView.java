@@ -348,7 +348,7 @@ public class SensorChartView extends ViewPart {
       chartModel.addYData(yData);
 
       // set dummy title that the history labels are not truncated
-      chartModel.setTitle(UI.EMPTY_STRING);
+      chartModel.setTitle(UI.SPACE);
 
       // show the data in the chart
       _sensorChart.updateChart(chartModel, false, true);

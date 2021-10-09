@@ -1612,7 +1612,9 @@ public class ChartComponents extends Composite {
                (float) descaledValue,
                unitType,
                valueDivisor,
-               false);
+               false,
+               graphUnit);
+
          final boolean isMajorValue = descaledValue % majorValue == 0;
 
          units.add(new ChartUnit((float) descaledValue, unitLabel, isMajorValue));
@@ -1784,7 +1786,7 @@ public class ChartComponents extends Composite {
       // loop: create unit label for all units
       while (graphValue <= graphMaxValue) {
 
-         final String unitLabel = net.tourbook.chart.Util.formatValue(graphValue, unitType, valueDivisor, false);
+         final String unitLabel = net.tourbook.chart.Util.formatValue(graphValue, unitType, valueDivisor, false, -1);
          final boolean isMajorValue = graphValue % majorValue == 0;
 
          unitList.add(new ChartUnit(graphValue, unitLabel, isMajorValue));

@@ -5839,7 +5839,7 @@ public class ChartComponentGraph extends Canvas {
             final String unitLabel = yData.getUnitLabel();
 
             // create the slider text
-            labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
+            labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true, 0.01));
             if (unitLabel.length() > 0) {
                labelText.append(UI.SPACE);
                labelText.append(unitLabel);
