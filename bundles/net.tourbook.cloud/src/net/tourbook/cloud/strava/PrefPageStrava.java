@@ -35,13 +35,16 @@ import net.tourbook.web.WEB;
 import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -49,7 +52,10 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageStrava extends PreferencePage implements IWorkbenchPreferencePage {
+
+   //todo fb
+   //create a tab "Tour Type Mapping"
 
    //SET_FORMATTING_OFF
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
@@ -58,6 +64,12 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
+
+   /*
+    * Contains the tab folder index
+    */
+   public static final int         TAB_FOLDER_CLOUDACCOUNT    = 0;
+   public static final int         TAB_FOLDER_TOURTYPEMAPPING = 1;
 
    public static final String      ID                  = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
    public static final int         CALLBACK_PORT       = 4918;
@@ -76,6 +88,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
+   private CTabFolder _tabFolder;
+
    private Label _labelAccessToken;
    private Label _labelAccessToken_Value;
    private Label _labelAthleteName;
@@ -101,47 +115,104 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    }
 
    @Override
-   protected void createFieldEditors() {
+   protected Control createContents(final Composite parent) {
 
-      createUI();
+      // initUI(parent);
+
+      final Composite container = createUI(parent);
 
       restoreState();
 
-      _prefChangeListener = event -> {
-
-         if (event.getProperty().equals(Preferences.STRAVA_ACCESSTOKEN)) {
-
-            Display.getDefault().syncExec(() -> {
-
-               if (!event.getOldValue().equals(event.getNewValue())) {
-
-                  _labelAccessToken_Value.setText(_prefStore.getString(Preferences.STRAVA_ACCESSTOKEN));
-                  _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.STRAVA_REFRESHTOKEN));
-                  _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-                  _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
-
-                  _labelAthleteName_Value.setText(_prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME));
-                  _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
-                  _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
-
-                  updateTokensInformationGroup();
-               }
-
-               if (_server != null) {
-                  _server.stopCallBackServer();
-               }
-            });
-         }
-      };
+      return container;
    }
 
-   private void createUI() {
+//   protected void createFieldEditors() {
+//
+//      createUI();
+//
+//      restoreState();
+//
+//      _prefChangeListener = event -> {
+//
+//         if (event.getProperty().equals(Preferences.STRAVA_ACCESSTOKEN)) {
+//
+//            Display.getDefault().syncExec(() -> {
+//
+//               if (!event.getOldValue().equals(event.getNewValue())) {
+//
+//                  _labelAccessToken_Value.setText(_prefStore.getString(Preferences.STRAVA_ACCESSTOKEN));
+//                  _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.STRAVA_REFRESHTOKEN));
+//                  _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
+//                  _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
+//
+//                  _labelAthleteName_Value.setText(_prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME));
+//                  _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
+//                  _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
+//
+//                  updateTokensInformationGroup();
+//               }
+//
+//               if (_server != null) {
+//                  _server.stopCallBackServer();
+//               }
+//            });
+//         }
+//      };
 
-      final Composite parent = getFieldEditorParent();
+
+//}
+
+   private void createUI(final Composite parent) {
+
+      // final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
 
-      createUI_10_Connect(parent);
-      createUI_20_AccountInformation(parent);
+//      createUI_10_Connect(parent);
+//      createUI_20_AccountInformation(parent);
+
+      /*
+       * tab folder: computed values
+       */
+      _tabFolder = new CTabFolder(container, SWT.TOP);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .applyTo(_tabFolder);
+      {
+
+         final CTabItem tabSmoothing = new CTabItem(_tabFolder, SWT.NONE);
+         tabSmoothing.setControl(createUI_10_Smoothing(_tabFolder));
+         tabSmoothing.setText(Messages.Compute_Values_Group_Smoothing);
+
+//         final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
+//         tabBreakTime.setControl(createUI_50_BreakTime(_tabFolder));
+//         tabBreakTime.setText(Messages.Compute_BreakTime_Group_BreakTime);
+//
+//         final CTabItem tabPaceSpeed = new CTabItem(_tabFolder, SWT.NONE);
+//         tabPaceSpeed.setControl(createUI_60_PaceSpeed(_tabFolder));
+//         tabPaceSpeed.setText(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay);
+//
+//         final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
+//         tabElevation.setControl(createUI_70_ElevationGain(_tabFolder));
+//         tabElevation.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
+//
+//         final CTabItem tabItemCadenceZones = new CTabItem(_tabFolder, SWT.NONE);
+//         tabItemCadenceZones.setControl(createUI_80_CadenceZones(_tabFolder));
+//         tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
+//
+//         final CTabItem tabHrZone = new CTabItem(_tabFolder, SWT.NONE);
+//         tabHrZone.setControl(createUI_90_HrZone(_tabFolder));
+//         tabHrZone.setText(Messages.Compute_HrZone_Group);
+
+         /**
+          * 4.8.2009 week no/year is currently disabled because a new field in the db is
+          * required which holds the year of the week<br>
+          * <br>
+          * all plugins must be adjusted which set's the week number of a tour
+          */
+//       createUIWeek(container);
+      }
+
+      return _tabFolder;
    }
 
    private void createUI_10_Connect(final Composite parent) {
@@ -163,6 +234,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          buttonConnect.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(buttonConnect);
       }
+
    }
 
    private void createUI_20_AccountInformation(final Composite parent) {
