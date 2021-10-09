@@ -230,6 +230,9 @@ public class StravaUploader extends TourbookCloudUploader {
       if (tourType != null) {
          useActivityType = true;
          activityName = tourType.getName();
+
+         //TODO FB getStravaActivityTypeFromTourTypeName()
+         //gets the mapped strava activity type from the MT tour type name
       }
       _tourExporter.setUseActivityType(useActivityType);
       _tourExporter.setActivityType(activityName);

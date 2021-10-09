@@ -121,11 +121,12 @@ public class PrefPageStrava extends PreferencePage implements IWorkbenchPreferen
 
       // initUI(parent);
 
-      final Composite container = createUI(parent);
+      //final Composite container =
+      createUI(parent);
 
       restoreState();
 
-      return container;
+      return parent;
    }
 
 //   protected void createFieldEditors() {
@@ -175,15 +176,15 @@ public class PrefPageStrava extends PreferencePage implements IWorkbenchPreferen
       /*
        * tab folder: computed values
        */
-      _tabFolder = new CTabFolder(container, SWT.TOP);
+      _tabFolder = new CTabFolder(parent, SWT.TOP);
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(_tabFolder);
       {
 
          final CTabItem tabSmoothing = new CTabItem(_tabFolder, SWT.NONE);
-         tabSmoothing.setControl(createUI_10_Smoothing(_tabFolder));
-         tabSmoothing.setText(Messages.Compute_Values_Group_Smoothing);
+         //tabSmoothing.setControl(createUI_10_Smoothing(_tabFolder));
+         tabSmoothing.setText("Messages.Compute_Values_Group_Smoothing");
 
 //         final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
 //         tabBreakTime.setControl(createUI_50_BreakTime(_tabFolder));
@@ -214,7 +215,7 @@ public class PrefPageStrava extends PreferencePage implements IWorkbenchPreferen
 //       createUIWeek(container);
       }
 
-      return _tabFolder;
+      //  return _tabFolder;
    }
 
    private void createUI_10_Connect(final Composite parent) {
