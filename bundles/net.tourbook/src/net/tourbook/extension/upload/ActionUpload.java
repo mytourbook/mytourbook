@@ -92,9 +92,9 @@ public class ActionUpload extends Action implements IMenuCreator {
     * @param tourProvider
     * @param isAddMode
     * @param isSaveTour
-    *           when <code>true</code> the tour will be saved and a {@link TourManager#TOUR_CHANGED}
-    *           event is fired, otherwise the {@link TourData} from the tour provider is only
-    *           updated
+    *           when <code>true</code> the tour will be saved and a
+    *           {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
+    *           {@link TourData} from the tour provider is only updated
     */
    public ActionUpload(final ITourProvider tourProvider) {
 
@@ -120,7 +120,9 @@ public class ActionUpload extends Action implements IMenuCreator {
          return;
       }
 
-      _tourbookCloudUploaders.forEach(tourbookCloudUploader -> _uploadTourActions.add(new ActionUploadTour(tourbookCloudUploader)));
+      _tourbookCloudUploaders.forEach(
+            tourbookCloudUploader -> _uploadTourActions.add(
+                  new ActionUploadTour(tourbookCloudUploader)));
    }
 
    @Override
@@ -211,7 +213,8 @@ public class ActionUpload extends Action implements IMenuCreator {
    @Override
    public void setEnabled(final boolean enabled) {
 
-      _uploadTourActions.forEach(actionUploadTour -> actionUploadTour.setEnabled(actionUploadTour.isVendorReady()));
+      _uploadTourActions.forEach(actionUploadTour -> actionUploadTour.setEnabled(
+            enabled && actionUploadTour.isVendorReady()));
 
       super.setEnabled(enabled);
    }

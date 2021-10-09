@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,9 +48,8 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
-      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-
       final Shell shell = Display.getCurrent().getActiveShell();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
       if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
@@ -62,28 +61,26 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            final ArrayList<TourData> modifiedTours = new ArrayList<>();
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            for (final TourData tour : selectedTours) {
+         final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
-               final boolean isDataRetrieved = TourManager.retrieveWeatherData(tour);
+         for (final TourData tour : selectedTours) {
 
-               if (isDataRetrieved) {
-                  modifiedTours.add(tour);
-               }
+            final boolean isDataRetrieved = TourManager.retrieveWeatherData(tour);
+
+            if (isDataRetrieved) {
+               modifiedTours.add(tour);
             }
+         }
 
-            if (modifiedTours.size() > 0) {
-               TourManager.saveModifiedTours(modifiedTours);
-            } else {
-               MessageDialog.openInformation(
-                     shell,
-                     Messages.Dialog_RetrieveWeather_Dialog_Title,
-                     Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
-            }
+         if (modifiedTours.size() > 0) {
+            TourManager.saveModifiedTours(modifiedTours);
+         } else {
+            MessageDialog.openInformation(
+                  shell,
+                  Messages.Dialog_RetrieveWeather_Dialog_Title,
+                  Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
          }
       });
    }

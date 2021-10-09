@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
@@ -41,7 +41,7 @@ public class MapUtils {
     * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
     *         when data are not available
     */
-   public static boolean configureColorProvider(final ArrayList<TourData> allTourData,
+   public static boolean configureColorProvider(final List<TourData> allTourData,
                                                 final IGradientColorProvider colorProvider,
                                                 final ColorProviderConfig config,
                                                 final int legendHeight) {
