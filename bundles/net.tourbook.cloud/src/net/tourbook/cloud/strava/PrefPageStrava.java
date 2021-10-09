@@ -57,6 +57,8 @@ public class PrefPageStrava extends PreferencePage implements IWorkbenchPreferen
    //todo fb
    //create a tab "Tour Type Mapping"
 
+   //See => {@link PrefPageComputedValues}
+
    //SET_FORMATTING_OFF
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
