@@ -2801,15 +2801,16 @@ public class RawDataManager {
             return;
          }
 
-         Display.getDefault().syncExec(() ->
+         Display.getDefault().syncExec(() -> {
 
-         reimportTour_14_RequestFileFromUser_InUI(
+            reimportTour_14_RequestFileFromUser_InUI(
 
-               inSavedImportFilePathName,
-               outReimportFilePathName,
-               tourData,
-               importState_Process,
-               reImportStatus));
+                  inSavedImportFilePathName,
+                  outReimportFilePathName,
+                  tourData,
+                  importState_Process,
+                  reImportStatus);
+         });
       }
    }
 

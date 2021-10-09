@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,10 +65,10 @@ public class Map3GradientColorManager {
     * Default colors are defined in the UI and then replaced with created code from
     * {@link #createCodeForDefaultColors(ArrayList)}.
     */
-   private static HashMap<MapGraphId, Map3ColorDefinition> _map3ColorDefinitions           = new HashMap<>();
+   private static EnumMap<MapGraphId, Map3ColorDefinition> _map3ColorDefinitions           = new EnumMap<>(MapGraphId.class);
    private static ArrayList<Map3ColorDefinition>           _sortedColorDefinitions;
 
-   private static HashMap<MapGraphId, Map3ColorProfile>    DEFAULT_PROFILES                = new HashMap<>();
+   private static EnumMap<MapGraphId, Map3ColorProfile>    DEFAULT_PROFILES                = new EnumMap<>(MapGraphId.class);
 
    private static final Map3ColorProfile                   DEFAULT_PROFILE;
 
@@ -718,7 +718,7 @@ public class Map3GradientColorManager {
       readColors();
 
       // sort by name
-      _sortedColorDefinitions = new ArrayList<>(_map3ColorDefinitions.values());
+      _sortedColorDefinitions = new ArrayList<>(getColorDefinitions().values());
       Collections.sort(_sortedColorDefinitions);
    }
 
@@ -807,7 +807,8 @@ public class Map3GradientColorManager {
     */
    public static void disposeProfileImages() {
 
-      for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
+      for (final Map3ColorDefinition colorDef : getColorDefinitions().values()) {
+
          for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
 
             final Map3ColorProfile map3ColorProfile = colorProvider.getMap3ColorProfile();
@@ -844,7 +845,7 @@ public class Map3GradientColorManager {
 
    public static Map3ColorDefinition getColorDefinition(final MapGraphId graphId) {
 
-      final HashMap<MapGraphId, Map3ColorDefinition> mapColorDefinitions = getColorDefinitions();
+      final EnumMap<MapGraphId, Map3ColorDefinition> mapColorDefinitions = getColorDefinitions();
 
       final Map3ColorDefinition colorDef = mapColorDefinitions.get(graphId);
 
@@ -861,7 +862,7 @@ public class Map3GradientColorManager {
    /**
     * @return Returns color definitions which are defined for a 3D map.
     */
-   private static HashMap<MapGraphId, Map3ColorDefinition> getColorDefinitions() {
+   private static EnumMap<MapGraphId, Map3ColorDefinition> getColorDefinitions() {
 
       return _map3ColorDefinitions;
    }
@@ -906,8 +907,17 @@ public class Map3GradientColorManager {
       if (xmlColorDefinitions == null) {
 
          // set only first default color profile as active
-         _map3ColorDefinitions.values().forEach(colorDef -> colorDef.getColorProviders().get(0).getMap3ColorProfile().setIsActiveColorProfile(
-               true));
+         getColorDefinitions().values().forEach(colorDefinition -> {
+
+            final Map3GradientColorProvider firstColorProvider = colorDefinition.getColorProviders().get(0);
+            if (firstColorProvider == null) {
+               return;
+            }
+
+            firstColorProvider.getMap3ColorProfile().setIsActiveColorProfile(true);
+         }
+
+         );
 
          return;
       }

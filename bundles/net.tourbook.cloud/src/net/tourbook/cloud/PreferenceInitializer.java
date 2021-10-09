@@ -27,6 +27,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+   //This is the date (01/26/2021) that Suunto forced the users to switch to Suunto App.
+   public static long SUUNTO_FILTER_SINCE_DATE = 1611619200000L;
+
    @Override
    public void initializeDefaultPreferences() {
 
@@ -54,19 +57,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       final List<String> tourPersonIds = new ArrayList<>();
 
       // This empty string represents "All people"
-      tourPersonIds.add("");
+      tourPersonIds.add(UI.EMPTY_STRING);
       tourPeopleList.forEach(tourPerson -> tourPersonIds.add(String.valueOf(tourPerson.getPersonId())));
 
       for (final String tourPersonId : tourPersonIds) {
 
          store.setDefault(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
          store.setDefault(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
-         store.setDefault(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0);
-         store.setDefault(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0);
+         store.setDefault(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
+         store.setDefault(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
          store.setDefault(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
          store.setDefault(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
-         //This is the date (01/26/2021) that Suunto forced the users to switch to Suunto App.
-         store.setDefault(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), 1611619200000L);
+         store.setDefault(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), SUUNTO_FILTER_SINCE_DATE);
       }
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -26,6 +28,7 @@ import java.time.Duration;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.web.WEB;
 
@@ -37,16 +40,12 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -91,18 +90,13 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       {
          {
             /*
-             * Use the weather retrieval feature
+             * Checkbox: Use the weather retrieval feature
              */
-            // checkbox
             _chkWeatherRetrieval = new Button(container, SWT.CHECK);
             _chkWeatherRetrieval.setText(Messages.Pref_Weather_Checkbox_UseRetrieval);
             _chkWeatherRetrieval.setToolTipText(Messages.Pref_Weather_Checkbox_UseRetrieval_Tooltip);
-            _chkWeatherRetrieval.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectCheckWeatherRetrieval();
-               }
-            });
+            _chkWeatherRetrieval.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onSelectCheckWeatherRetrieval()));
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkWeatherRetrieval);
          }
          {
@@ -134,12 +128,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             final Link linkApiSignup = new Link(container, SWT.PUSH);
             linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
             linkApiSignup.setEnabled(true);
-            linkApiSignup.addListener(SWT.Selection, new Listener() {
-               @Override
-               public void handleEvent(final Event event) {
-                  WEB.openUrl(Messages.External_Link_Weather_ApiSignup);
-               }
-            });
+            linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(Messages.External_Link_Weather_ApiSignup));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(defaultHIndent, 0)
@@ -151,12 +140,8 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
              */
             _btnTestConnection = new Button(container, SWT.NONE);
             _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
-            _btnTestConnection.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onCheckConnection();
-               }
-            });
+            _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onCheckConnection()));
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.BEGINNING, SWT.FILL)
@@ -187,37 +172,35 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
     */
    private void onCheckConnection() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            try {
+         try {
 
-               final HttpRequest request = HttpRequest.newBuilder(URI.create(HistoricalWeatherRetriever.getApiUrl() + _textApiKey.getText())).GET()
-                     .build();
+            final HttpRequest request = HttpRequest.newBuilder(URI.create(HistoricalWeatherRetriever.getApiUrl() + _textApiKey.getText())).GET()
+                  .build();
 
-               final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+            final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 
-               final int statusCode = response.statusCode();
-               final String responseMessage = response.body();
+            final int statusCode = response.statusCode();
+            final String responseMessage = response.body();
 
-               final String message = statusCode == HttpURLConnection.HTTP_OK
-                     ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, HistoricalWeatherRetriever.getBaseApiUrl())
-                     : NLS.bind(
-                           Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
-                           new Object[] {
-                                 HistoricalWeatherRetriever.getBaseApiUrl(),
-                                 statusCode,
-                                 responseMessage });
+            final String message = statusCode == HttpURLConnection.HTTP_OK
+                  ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, HistoricalWeatherRetriever.getBaseApiUrl())
+                  : NLS.bind(
+                        Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
+                        new Object[] {
+                              HistoricalWeatherRetriever.getBaseApiUrl(),
+                              statusCode,
+                              responseMessage });
 
-               MessageDialog.openInformation(
-                     Display.getCurrent().getActiveShell(),
-                     Messages.Pref_Weather_CheckHTTPConnection_Message,
-                     message);
+            MessageDialog.openInformation(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Pref_Weather_CheckHTTPConnection_Message,
+                  message);
 
-            } catch (final IOException | InterruptedException e) {
-               e.printStackTrace();
-            }
+         } catch (final IOException | InterruptedException e) {
+            StatusUtil.log(e);
+            Thread.currentThread().interrupt();
          }
       });
    }

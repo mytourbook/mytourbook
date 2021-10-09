@@ -28,6 +28,7 @@ import java.util.List;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
+import net.tourbook.cloud.PreferenceInitializer;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.LocalHostServer;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
@@ -72,7 +73,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT_TOOLTIP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_SWITCHPERSONWARNING                = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_SwitchPersonWarning;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE                            = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
@@ -88,7 +88,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    private IPreferenceStore        _prefStore                       = Activator.getDefault().getPreferenceStore();
 
-   private PixelConverter          _pc;
    private final IDialogSettings   _state                           = TourbookPlugin.getState(DialogEasyImportConfig.ID);
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
@@ -122,20 +121,20 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       _prefChangeListener = event -> {
 
-         if (!event.getProperty().equals(Preferences.getSuuntoAccessToken_Active_Person_String())) {
-            return;
-         }
-
          Display.getDefault().syncExec(() -> {
+
+            final String selectedPersonId = getSelectedPersonId();
+
+            if (!event.getProperty().equals(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId))) {
+               return;
+            }
 
             if (!event.getOldValue().equals(event.getNewValue())) {
 
-               final String selectedPersonId = _prefStore.getString(Preferences.SUUNTO_SELECTED_PERSON_ID);
-
-               _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String()));
+               _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
                _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
                      _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-                     _prefStore.getInt(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+                     _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
                _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
                _group.redraw();
@@ -154,8 +153,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
-
-      initUI(parent);
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
@@ -179,10 +176,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
           * Drop down menu to select a user
           */
          _comboPeopleList = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboPeopleList.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            final String personId = getSelectedPersonId();
-            restoreAccountInformation(personId);
-         }));
+         _comboPeopleList.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectPerson()));
          GridDataFactory.fillDefaults().applyTo(_comboPeopleList);
 
          /*
@@ -286,16 +280,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterSince);
          }
-
-         {
-            final Label labelWarning = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-            labelWarning.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_SWITCHPERSONWARNING);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .span(3, 1)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                  .applyTo(labelWarning);
-         }
       }
    }
 
@@ -343,12 +327,6 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    @Override
    public void init(final IWorkbench workbench) {}
 
-   private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
-
-   }
-
    @Override
    public boolean okToLeave() {
 
@@ -370,7 +348,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          _server.stopCallBackServer();
       }
 
-      final SuuntoTokensRetrievalHandler tokensRetrievalHandler = new SuuntoTokensRetrievalHandler();
+      final SuuntoTokensRetrievalHandler tokensRetrievalHandler = new SuuntoTokensRetrievalHandler(getSelectedPersonId());
       _server = new LocalHostServer(CALLBACK_PORT, "Suunto", _prefChangeListener); //$NON-NLS-1$
       final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
@@ -409,6 +387,14 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       }
    }
 
+   private void onSelectPerson() {
+
+      final String personId = getSelectedPersonId();
+      restoreAccountInformation(personId);
+
+      enableControls();
+   }
+
    @Override
    public boolean performCancel() {
 
@@ -424,6 +410,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    @Override
    protected void performDefaults() {
 
+      // Restore the default values for the "All People" UI
       _comboPeopleList.select(_prefStore.getDefaultInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
 
       final String selectedPersonId = _prefStore.getDefaultString(Preferences.SUUNTO_SELECTED_PERSON_ID);
@@ -438,6 +425,26 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       setFilterSinceDate(_prefStore.getDefaultLong(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(selectedPersonId)));
 
       enableControls();
+
+      // Restore the default values in the preferences for each person. Otherwise,
+      // those values will reappear when selecting another person
+      final List<TourPerson> tourPeopleList = PersonManager.getTourPeople();
+      final List<String> tourPersonIds = new ArrayList<>();
+
+      // This empty string represents "All people"
+      tourPersonIds.add(UI.EMPTY_STRING);
+      tourPeopleList.forEach(tourPerson -> tourPersonIds.add(String.valueOf(tourPerson.getPersonId())));
+
+      for (final String tourPersonId : tourPersonIds) {
+
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
+         _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
+         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_SINCE_DATE);
+      }
 
       super.performDefaults();
    }
@@ -455,8 +462,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(personId), _labelRefreshToken_Value.getText());
 
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), UI.EMPTY_STRING);
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), UI.EMPTY_STRING);
+            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), 0L);
+            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), 0L);
          }
 
          if (_server != null) {
@@ -496,7 +503,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
             _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-            _prefStore.getInt(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+            _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
       _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
       _comboDownloadFolderPath.setText(_prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
