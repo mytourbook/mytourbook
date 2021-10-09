@@ -2259,10 +2259,6 @@ public class Map2View extends ViewPart implements
       return _filteredPhotos;
    }
 
-   public Composite getMainComposite() {
-      return _parent;
-   }
-
    public Map getMap() {
       return _map;
    }

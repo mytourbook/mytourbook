@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -580,6 +579,13 @@ public class RawDataManager {
       /**
        * Time slices
        */
+      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
+
+         previousData.add(oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE + oldTourData.getBattery_Percentage_End()
+               + UI.UNIT_VOLT);
+         newData.add(newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE + newTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
+      }
+
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
 
          previousData.add(
@@ -1266,10 +1272,8 @@ public class RawDataManager {
             MessageDialog.QUESTION,
 
             0, // default button index
-            new String[] {
-                  IDialogConstants.OK_LABEL,
-                  IDialogConstants.CANCEL_LABEL //
-            });
+            IDialogConstants.OK_LABEL,
+            IDialogConstants.CANCEL_LABEL);
 
       final String[] allOptions = new String[] {
 
@@ -1376,6 +1380,12 @@ public class RawDataManager {
             /*
              * Time slice values
              */
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
+
+               tourDataDummyClone.setBattery_Percentage_Start(oldTourData.getBattery_Percentage_Start());
+               tourDataDummyClone.setBattery_Percentage_End(oldTourData.getBattery_Percentage_End());
+            }
+
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
 
                tourDataDummyClone.setAvgCadence(oldTourData.getAvgCadence());
@@ -1882,10 +1892,8 @@ public class RawDataManager {
                   message,
                   MessageDialog.QUESTION,
                   0, // OK button
-                  new String[] {
-                        IDialogConstants.OK_LABEL,
-                        IDialogConstants.CANCEL_LABEL //
-                  });
+                  IDialogConstants.OK_LABEL,
+                  IDialogConstants.CANCEL_LABEL);
 
             dialog.setRadioOptions(allOptions, defaultOption);
 
@@ -1978,39 +1986,36 @@ public class RawDataManager {
          /*
           * Resort files by extension priority
           */
-         Collections.sort(allImportFilePaths, new Comparator<>() {
-            @Override
-            public int compare(final ImportFile importFilePath1, final ImportFile importFilePath2) {
+         Collections.sort(allImportFilePaths, (importFilePath1, importFilePath2) -> {
 
-               final String file1Extension = importFilePath1.filePath.getFileExtension();
-               final String file2Extension = importFilePath2.filePath.getFileExtension();
+            final String file1Extension = importFilePath1.filePath.getFileExtension();
+            final String file2Extension = importFilePath2.filePath.getFileExtension();
 
-               int rc = 0;
+            int rc = 0;
 
-               if (file1Extension != null
-                     && file1Extension.length() > 0
-                     && file2Extension != null
-                     && file2Extension.length() > 0) {
+            if (file1Extension != null
+                  && file1Extension.length() > 0
+                  && file2Extension != null
+                  && file2Extension.length() > 0) {
 
-                  final TourbookDevice file1Device = _allDevices_ByExtension.get(file1Extension.toLowerCase());
-                  final TourbookDevice file2Device = _allDevices_ByExtension.get(file2Extension.toLowerCase());
+               final TourbookDevice file1Device = _allDevices_ByExtension.get(file1Extension.toLowerCase());
+               final TourbookDevice file2Device = _allDevices_ByExtension.get(file2Extension.toLowerCase());
 
-                  if (file1Device != null && file2Device != null) {
-                     rc = file1Device.extensionSortPriority - file2Device.extensionSortPriority;
-                  }
-
-               } else {
-
-                  // sort invalid files to the end
-                  rc = Integer.MAX_VALUE;
+               if (file1Device != null && file2Device != null) {
+                  rc = file1Device.extensionSortPriority - file2Device.extensionSortPriority;
                }
 
-               return rc > 0
-                     ? 1
-                     : rc < 0
-                           ? -1
-                           : 0;
+            } else {
+
+               // sort invalid files to the end
+               rc = Integer.MAX_VALUE;
             }
+
+            return rc > 0
+                  ? 1
+                  : rc < 0
+                        ? -1
+                        : 0;
          });
 
          importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);

@@ -222,15 +222,15 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    }
 
    private String getAccessToken() {
-      return _prefStore.getString(Preferences.SUUNTO_ACCESSTOKEN);
+      return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
    }
 
    private String getDownloadFolder() {
-      return _prefStore.getString(Preferences.SUUNTO_WORKOUT_DOWNLOAD_FOLDER);
+      return _prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String());
    }
 
    private String getRefreshToken() {
-      return _prefStore.getString(Preferences.SUUNTO_REFRESHTOKEN);
+      return _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String());
    }
 
    @Override
@@ -281,7 +281,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private Workouts retrieveWorkoutsList() {
 
-      final var sinceDateFilter = _prefStore.getLong(Preferences.SUUNTO_WORKOUT_FILTER_SINCE_DATE);
+      final var sinceDateFilter = _prefStore.getLong(Preferences.getSuuntoWorkoutFilterSinceDate_Active_Person_String());
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=" + sinceDateFilter))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
@@ -330,7 +330,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          fileName = contentDisposition.get().replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
-      final Path filePath = Paths.get(_prefStore.getString(Preferences.SUUNTO_WORKOUT_DOWNLOAD_FOLDER), StringUtils.sanitizeFileName(fileName));
+      final Path filePath = Paths.get(_prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String()),
+            StringUtils.sanitizeFileName(fileName));
       workoutDownload.setAbsoluteFilePath(filePath.toAbsolutePath().toString());
 
       if (filePath.toFile().exists()) {

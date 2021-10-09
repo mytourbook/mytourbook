@@ -44,7 +44,12 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
 
-   protected SuuntoTokensRetrievalHandler() {}
+   private String                  _selectedPersonId;
+
+   protected SuuntoTokensRetrievalHandler(final String selectedPersonId) {
+
+      _selectedPersonId = selectedPersonId;
+   }
 
    public static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
@@ -86,19 +91,20 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
    public static boolean getValidTokens() {
 
       if (!OAuth2Utils.isAccessTokenExpired(
-            _prefStore.getLong(Preferences.SUUNTO_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
-                  Preferences.SUUNTO_ACCESSTOKEN_EXPIRES_IN) * 1000)) {
+            _prefStore.getLong(Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String()) + _prefStore.getLong(
+                  Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String()) * 1000)) {
          return true;
       }
 
-      final SuuntoTokens newTokens = getTokens(UI.EMPTY_STRING, true, _prefStore.getString(Preferences.SUUNTO_REFRESHTOKEN));
+      final SuuntoTokens newTokens = getTokens(UI.EMPTY_STRING, true, _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String()));
 
       boolean isTokenValid = false;
       if (newTokens != null) {
-         _prefStore.setValue(Preferences.SUUNTO_ACCESSTOKEN_EXPIRES_IN, newTokens.getExpires_in());
-         _prefStore.setValue(Preferences.SUUNTO_REFRESHTOKEN, newTokens.getRefresh_token());
-         _prefStore.setValue(Preferences.SUUNTO_ACCESSTOKEN_ISSUE_DATETIME, System.currentTimeMillis());
-         _prefStore.setValue(Preferences.SUUNTO_ACCESSTOKEN, newTokens.getAccess_token());
+
+         _prefStore.setValue(Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String(), newTokens.getExpires_in());
+         _prefStore.setValue(Preferences.getSuuntoRefreshToken_Active_Person_String(), newTokens.getRefresh_token());
+         _prefStore.setValue(Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(), System.currentTimeMillis());
+         _prefStore.setValue(Preferences.getSuuntoAccessToken_Active_Person_String(), newTokens.getAccess_token());
          isTokenValid = true;
       }
 
@@ -120,8 +126,8 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
       if (!(tokens instanceof SuuntoTokens) || StringUtils.isNullOrEmpty(tokens.getAccess_token())) {
 
-         final String currentAccessToken = _prefStore.getString(Preferences.SUUNTO_ACCESSTOKEN);
-         _prefStore.firePropertyChangeEvent(Preferences.SUUNTO_ACCESSTOKEN,
+         final String currentAccessToken = _prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(_selectedPersonId));
+         _prefStore.firePropertyChangeEvent(Preferences.getPerson_SuuntoAccessToken_String(_selectedPersonId),
                currentAccessToken,
                currentAccessToken);
          return;
@@ -129,11 +135,11 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
       final SuuntoTokens suuntoTokens = (SuuntoTokens) tokens;
 
-      _prefStore.setValue(Preferences.SUUNTO_ACCESSTOKEN_EXPIRES_IN, suuntoTokens.getExpires_in());
-      _prefStore.setValue(Preferences.SUUNTO_REFRESHTOKEN, suuntoTokens.getRefresh_token());
-      _prefStore.setValue(Preferences.SUUNTO_ACCESSTOKEN_ISSUE_DATETIME, System.currentTimeMillis());
+      _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(_selectedPersonId), suuntoTokens.getExpires_in());
+      _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(_selectedPersonId), suuntoTokens.getRefresh_token());
+      _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(_selectedPersonId), System.currentTimeMillis());
 
       //Setting it last so that we trigger the preference change when everything is ready
-      _prefStore.setValue(Preferences.SUUNTO_ACCESSTOKEN, suuntoTokens.getAccess_token());
+      _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(_selectedPersonId), suuntoTokens.getAccess_token());
    }
 }
