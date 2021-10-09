@@ -20,7 +20,8 @@ import net.tourbook.common.time.TimeTools;
 
 public class OAuth2Utils {
 
-   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime, final int accessTokenExpiresIn) {
+   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime,
+                                                         final long accessTokenExpiresIn) {
 
       final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
 

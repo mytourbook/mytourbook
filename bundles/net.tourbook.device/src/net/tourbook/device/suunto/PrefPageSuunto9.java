@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.suunto;
 
+import java.util.Arrays;
+
 import net.tourbook.device.Activator;
 import net.tourbook.device.IPreferences;
 
@@ -122,17 +124,13 @@ public class PrefPageSuunto9 extends FieldEditorPreferencePage implements IWorkb
       /*
        * Fill-up the altitude data choices
        */
-      for (final String altitudeDataType : AltitudeData) {
-         _comboAltitudeDataSource.add(altitudeDataType);
-      }
+      Arrays.asList(AltitudeData).forEach(altitudeDataType -> _comboAltitudeDataSource.add(altitudeDataType));
       _comboAltitudeDataSource.select(_prefStore.getInt(IPreferences.SUUNTO9_ALTITUDE_DATA_SOURCE));
 
       /*
        * Fill-up the distance data choices
        */
-      for (final String distanceDataType : DistanceData) {
-         _comboDistanceDataSource.add(distanceDataType);
-      }
+      Arrays.asList(DistanceData).forEach(distanceDataType -> _comboDistanceDataSource.add(distanceDataType));
       _comboDistanceDataSource.select(_prefStore.getInt(IPreferences.SUUNTO9_DISTANCE_DATA_SOURCE));
    }
 
