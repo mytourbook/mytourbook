@@ -9466,42 +9466,50 @@ public class ChartComponentGraph extends Canvas {
 
       final double[] xValues = xValueSerie[0];
       final double lastXValue = xValues[xValues.length - 1];
-      final double valueVisibleArea = lastXValue / _graphZoomRatio;
+      final double xValueVisibleArea = lastXValue / _graphZoomRatio;
 
-      final double valueLeftBorder = lastXValue * _zoomRatioLeftBorder;
-      double valueRightBorder = valueLeftBorder + valueVisibleArea;
+      final double xValue_LeftBorder = lastXValue * _zoomRatioLeftBorder;
+      double xValue_RightBorder = xValue_LeftBorder + xValueVisibleArea;
 
       // make sure right is higher than left
-      if (valueLeftBorder >= valueRightBorder) {
-         valueRightBorder = valueLeftBorder + 1;
+      if (xValue_LeftBorder >= xValue_RightBorder) {
+         xValue_RightBorder = xValue_LeftBorder + 1;
       }
 
       /*
-       * get value index for the left and right border of the visible area
+       * Get value index for the left and right border of the visible area
        */
-      int xValueIndexLeft = 0;
+      int xValueIndex_Left = 0;
       for (int serieIndex = 0; serieIndex < xValues.length; serieIndex++) {
 
          final double xValue = xValues[serieIndex];
 
-         if (xValue == valueLeftBorder) {
-            xValueIndexLeft = serieIndex;
+         if (xValue == xValue_LeftBorder) {
+
+            xValueIndex_Left = serieIndex;
+
             break;
          }
 
-         if (xValue > valueLeftBorder) {
-            xValueIndexLeft = serieIndex == 0
+         if (xValue > xValue_LeftBorder) {
+
+            xValueIndex_Left = serieIndex == 0
+
                   ? 0
 
                   // get index from last invisible value
                   : serieIndex - 1;
+
             break;
          }
       }
 
-      int xValueIndexRight = xValueIndexLeft;
-      for (; xValueIndexRight < xValues.length; xValueIndexRight++) {
-         if (xValues[xValueIndexRight] > valueRightBorder) {
+      /*
+       * Get value index for the right border of the visible area
+       */
+      int xValueIndex_Right = xValueIndex_Left;
+      for (; xValueIndex_Right < xValues.length; xValueIndex_Right++) {
+         if (xValues[xValueIndex_Right] > xValue_RightBorder) {
             break;
          }
       }
@@ -9511,13 +9519,13 @@ public class ChartComponentGraph extends Canvas {
        */
       // ensure array bounds
       final int xValuesLastIndex = xValues.length - 1;
-      xValueIndexLeft = Math.min(xValueIndexLeft, xValuesLastIndex);
-      xValueIndexLeft = Math.max(xValueIndexLeft, 0);
-      xValueIndexRight = Math.min(xValueIndexRight, xValuesLastIndex);
-      xValueIndexRight = Math.max(xValueIndexRight, 0);
+      xValueIndex_Left = Math.min(xValueIndex_Left, xValuesLastIndex);
+      xValueIndex_Left = Math.max(xValueIndex_Left, 0);
+      xValueIndex_Right = Math.min(xValueIndex_Right, xValuesLastIndex);
+      xValueIndex_Right = Math.max(xValueIndex_Right, 0);
 
-      xData.setVisibleMinValue(xValues[xValueIndexLeft]);
-      xData.setVisibleMaxValue(xValues[xValueIndexRight]);
+      xData.setVisibleMinValue(xValues[xValueIndex_Left]);
+      xData.setVisibleMaxValue(xValues[xValueIndex_Right]);
 
       /*
        * Get min/max value for each y-data serie to fill the visible area with the chart
@@ -9526,59 +9534,80 @@ public class ChartComponentGraph extends Canvas {
 
          final boolean isIgnoreMinMaxZero = yData.isIgnoreMinMaxZero();
 
-         final float[][] yValueSeries = yData.getHighValuesFloat();
-         final float[] yValues = yValueSeries[0];
+         final float[][] yValueSeries_High = yData.getHighValuesFloat();
+         final float[][] yValueSeries_Low = yData.getLowValuesFloat();
+
+         final float[] yValues = yValueSeries_High[0];
 
          // ensure array bounds
          final int yValuesLastIndex = yValues.length - 1;
-         xValueIndexLeft = Math.min(xValueIndexLeft, yValuesLastIndex);
-         xValueIndexLeft = Math.max(xValueIndexLeft, 0);
-         xValueIndexRight = Math.min(xValueIndexRight, yValuesLastIndex);
-         xValueIndexRight = Math.max(xValueIndexRight, 0);
+         xValueIndex_Left = Math.min(xValueIndex_Left, yValuesLastIndex);
+         xValueIndex_Left = Math.max(xValueIndex_Left, 0);
+         xValueIndex_Right = Math.min(xValueIndex_Right, yValuesLastIndex);
+         xValueIndex_Right = Math.max(xValueIndex_Right, 0);
 
          // set dummy value
          float dataMinValue = Float.MIN_VALUE;
          float dataMaxValue = Float.MIN_VALUE;
 
-         for (final float[] yValueSerie : yValueSeries) {
+         // loop: max and min values (when available)
+         for (int yValueSerieIndex = 0; yValueSerieIndex < 2; yValueSerieIndex++) {
 
-            if (yValueSerie == null) {
-               continue;
+            float[][] yValueSeries = null;
+
+            if (yValueSerieIndex == 0) {
+
+               yValueSeries = yValueSeries_High;
+
+            } else if (yValueSerieIndex == 1 && yValueSeries_Low != null) {
+
+               yValueSeries = yValueSeries_Low;
+
+            } else {
+
+               break;
             }
 
-            for (int valueIndex = xValueIndexLeft; valueIndex <= xValueIndexRight; valueIndex++) {
+            for (final float[] yValueSerie : yValueSeries) {
 
-               final float yValue = yValueSerie[valueIndex];
-
-               if (yValue != yValue) {
-                  // ignore NaN
+               if (yValueSerie == null) {
                   continue;
                }
 
-               if (yValue == Float.POSITIVE_INFINITY) {
-                  // ignore infinity
-                  continue;
-               }
+               for (int valueIndex = xValueIndex_Left; valueIndex <= xValueIndex_Right; valueIndex++) {
 
-               if (isIgnoreMinMaxZero && (yValue > -FLOAT_ZERO && yValue < FLOAT_ZERO)) {
-                  // value is zero (almost) -> ignore
-                  continue;
-               }
+                  final float yValue = yValueSerie[valueIndex];
 
-               if (dataMinValue == Float.MIN_VALUE) {
-
-                  // setup first value
-                  dataMinValue = dataMaxValue = yValue;
-
-               } else {
-
-                  // check subsequent values
-
-                  if (yValue < dataMinValue) {
-                     dataMinValue = yValue;
+                  if (yValue != yValue) {
+                     // ignore NaN
+                     continue;
                   }
-                  if (yValue > dataMaxValue) {
-                     dataMaxValue = yValue;
+
+                  if (yValue == Float.POSITIVE_INFINITY) {
+                     // ignore infinity
+                     continue;
+                  }
+
+                  if (isIgnoreMinMaxZero && (yValue > -FLOAT_ZERO && yValue < FLOAT_ZERO)) {
+                     // value is zero (almost) -> ignore
+                     continue;
+                  }
+
+                  if (dataMinValue == Float.MIN_VALUE) {
+
+                     // setup first value
+                     dataMinValue = dataMaxValue = yValue;
+
+                  } else {
+
+                     // check subsequent values
+
+                     if (yValue < dataMinValue) {
+                        dataMinValue = yValue;
+                     }
+                     if (yValue > dataMaxValue) {
+                        dataMaxValue = yValue;
+                     }
                   }
                }
             }
@@ -9586,7 +9615,8 @@ public class ChartComponentGraph extends Canvas {
 
          if (dataMinValue == Float.MIN_VALUE) {
 
-            // a valid value is not found
+            // a valid value is not found -> set defaults
+
             dataMinValue = 0;
             dataMaxValue = 1;
          }

@@ -76,6 +76,25 @@ public class DeviceSensorValue {
       deviceSensor = sensor;
    }
 
+   /**
+    * Ensure that the start value is larger than the end value, it happend that they are reverted.
+    */
+   private void checkBatteryVoltage_StartEnd() {
+
+      final float start = batteryVoltage_Start;
+      final float end = batteryVoltage_End;
+
+      if (start == -1 || end == -1) {
+         return;
+      }
+
+      if (end > start) {
+
+         batteryVoltage_Start = end;
+         batteryVoltage_End = start;
+      }
+   }
+
    @Override
    public boolean equals(final Object obj) {
 
@@ -155,11 +174,17 @@ public class DeviceSensorValue {
    }
 
    public void setBatteryVoltage_End(final float batteryVoltage_End) {
+
       this.batteryVoltage_End = batteryVoltage_End;
+
+      checkBatteryVoltage_StartEnd();
    }
 
    public void setBatteryVoltage_Start(final float batteryVoltage_Start) {
+
       this.batteryVoltage_Start = batteryVoltage_Start;
+
+      checkBatteryVoltage_StartEnd();
    }
 
    public void setCummulatedOperatingTime_End(final long cummulatedOperatingTime_End) {

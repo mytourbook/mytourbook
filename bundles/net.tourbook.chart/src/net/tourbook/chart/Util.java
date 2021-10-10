@@ -298,7 +298,7 @@ public class Util {
 
                   valueText = _nf2.format(divValue);
 
-                  // truncate tailing 0
+                  // truncate trailing 0
 
                   final int numCharacters = valueText.length();
 
