@@ -89,6 +89,7 @@ public class TileImageLoader implements Runnable {
       try {
 
          boolean isSaveImage = false;
+         boolean isLoadingImage = false;
 
          final MP mp = tile.getMP();
          final TileImageCache tileImageCache = mp.getTileImageCache();
@@ -174,10 +175,7 @@ public class TileImageLoader implements Runnable {
 
                      } catch (final FileNotFoundException e) {
 
-                        loadingError = NLS.bind(
-                              Messages.DBG052_Loading_Error_FileNotFoundException,
-                              tile.getUrl(),
-                              e.getMessage());
+                        loadingError = NLS.bind(Messages.DBG052_Loading_Error_FileNotFoundException, tile.getUrl(), e.getMessage());
 
                         // this is hidden because it can happen very often
                         // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
@@ -185,10 +183,7 @@ public class TileImageLoader implements Runnable {
 
                      } catch (final UnknownHostException e) {
 
-                        loadingError = NLS.bind(
-                              Messages.DBG053_Loading_Error_UnknownHostException,
-                              tile.getUrl(),
-                              e.getMessage());
+                        loadingError = NLS.bind(Messages.DBG053_Loading_Error_UnknownHostException, tile.getUrl(), e.getMessage());
 
                         // this is hidden because it can happen very often
                         // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
@@ -196,10 +191,7 @@ public class TileImageLoader implements Runnable {
 
                      } catch (final Exception e) {
 
-                        loadingError = NLS.bind(//
-                              Messages.DBG054_Loading_Error_FromUrl,
-                              tile.getUrl(),
-                              e.getMessage());
+                        loadingError = NLS.bind(Messages.DBG054_Loading_Error_FromUrl, tile.getUrl(), e.getMessage());
 
                         // this is hidden because it can happen very often
                         // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
@@ -207,6 +199,7 @@ public class TileImageLoader implements Runnable {
                      }
                   }
 
+                  isLoadingImage = true;
                   final ImageData[] loadedImageData = new ImageLoader().load(inputStream);
 
                   if (loadedImageData != null && loadedImageData.length > 0) {
@@ -216,9 +209,19 @@ public class TileImageLoader implements Runnable {
                } catch (final Exception e) {
 
                   /*
-                   * exception occurs when loading the image, don't remove them from the
+                   * Exception occurs when loading the image, don't remove them from the
                    * loading list, so that the tiles don't get reloaded
                    */
+
+                  if (isLoadingImage) {
+
+                     /*
+                      * Log only when images are loaded to debug this issue
+                      * https://github.com/wolfgang-ch/mytourbook/issues/317
+                      */
+
+                     StatusUtil.logError("Cannot load image from: " + tile.getUrl());//$NON-NLS-1$
+                  }
 
                   try {
                      if (inputStream != null) {
@@ -259,7 +262,7 @@ public class TileImageLoader implements Runnable {
          }
 
          /**
-          * tile image is loaded from a url or from an offline file, is painted or is not
+          * Tile image is loaded from a url or from an offline file, is painted or is not
           * available
           */
 
@@ -274,10 +277,9 @@ public class TileImageLoader implements Runnable {
 
             // image data is empty, set error
 
-            tile
-                  .setLoadingError(loadingError == null
-                        ? Messages.DBG051_Loading_Error_EmptyImageData
-                        : loadingError);
+            tile.setLoadingError(loadingError == null
+                  ? Messages.DBG051_Loading_Error_EmptyImageData
+                  : loadingError);
 
             isSetupImage = false;
          }
