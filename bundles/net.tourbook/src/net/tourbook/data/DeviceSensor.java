@@ -63,6 +63,13 @@ public class DeviceSensor implements Cloneable {
    private String               serialNumber          = UI.EMPTY_STRING;
 
    /**
+    * Serial number as long value, when parsing fails of {@link #serialNumber}, then
+    * {@link Long#MIN_VALUE} is set.
+    */
+   @Transient
+   private long                 _serialNumberLong     = Long.MAX_VALUE;
+
+   /**
     * Time in ms when this sensor was first used
     */
    @Transient
@@ -210,6 +217,27 @@ public class DeviceSensor implements Cloneable {
 
    public String getSerialNumber() {
       return serialNumber;
+   }
+
+   /**
+    * @return Returns serial number as long value or {@link Long#MIN_VALUE} when parsing as long
+    *         fails.
+    */
+   public long getSerialNumberAsLong() {
+
+      if (_serialNumberLong != Long.MAX_VALUE) {
+         return _serialNumberLong;
+      }
+
+      try {
+
+         _serialNumberLong = Long.parseLong(serialNumber);
+
+      } catch (final NumberFormatException e) {
+         _serialNumberLong = Long.MIN_VALUE;
+      }
+
+      return _serialNumberLong;
    }
 
    public long getUsedEndTime() {

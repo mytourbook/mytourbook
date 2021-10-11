@@ -161,13 +161,31 @@ public class SensorView extends ViewPart implements ITourViewer {
             break;
 
          case TableColumnFactory.SENSOR_SERIAL_NUMBER_ID:
-            rc = item1.sensor.getSerialNumber().compareTo(item2.sensor.getSerialNumber());
+
+            final long serialNumber1AsLong = item1.sensor.getSerialNumberAsLong();
+            final long serialNumber2AsLong = item2.sensor.getSerialNumberAsLong();
+
+            if (serialNumber1AsLong != Long.MIN_VALUE && serialNumber2AsLong != Long.MIN_VALUE) {
+
+               // first sort as number
+
+               rc = serialNumber1AsLong - serialNumber2AsLong;
+
+            } else {
+
+               // secondly sord as string
+
+               rc = item1.sensor.getSerialNumber().compareTo(item2.sensor.getSerialNumber());
+            }
+
             break;
 
          case TableColumnFactory.SENSOR_STATE_BATTERY_VALUES_ID:
+
             final int isBatteryValueAvailable1 = item1.isBatteryValuesAvailable ? 1 : 0;
             final int isBatteryValueAvailable2 = item2.isBatteryValuesAvailable ? 1 : 0;
             rc = isBatteryValueAvailable1 - isBatteryValueAvailable2;
+
             break;
 
          case TableColumnFactory.SENSOR_TIME_FIRST_USED_ID:
@@ -181,6 +199,16 @@ public class SensorView extends ViewPart implements ITourViewer {
          case TableColumnFactory.SENSOR_NAME_ID:
          default:
             rc = item1.sensor.getSensorName().compareTo(item2.sensor.getSensorName());
+         }
+
+         // 2nd sort by manufacturer name
+         if (rc == 0) {
+            rc = item1.sensor.getManufacturerName().compareTo(item2.sensor.getManufacturerName());
+         }
+
+         // 3nd sort by product name
+         if (rc == 0) {
+            rc = item1.sensor.getProductName().compareTo(item2.sensor.getProductName());
          }
 
          // If descending order, flip the direction
