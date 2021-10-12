@@ -56,6 +56,9 @@ public class PrefPageStrava extends PreferencePage implements IWorkbenchPreferen
 
    //todo fb
    //create a tab "Tour Type Mapping"
+   //even better=> create a default tour type filter "Strava Running", "Strava Hiking" etc... and let the users add their own activities in it
+
+   //if at upload time a tour type is in several strava tour filters, than raise an error dialog
 
    //See => {@link PrefPageComputedValues}
 
