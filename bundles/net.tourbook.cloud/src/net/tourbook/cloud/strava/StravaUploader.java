@@ -79,6 +79,10 @@ public class StravaUploader extends TourbookCloudUploader {
 
    //todo fb remove this list and use the main one here
    // {@link DialogExportTours} StravaActivityTypes
+   
+   //Add a checkbox "Send description" by default is checked
+   
+   
    // Source : https://support.strava.com/hc/en-us/articles/216919407-Supported-Activity-Types-on-Strava
    private static final List<String> StravaActivityTypes = List.of(
          "Ride", //$NON-NLS-1$
