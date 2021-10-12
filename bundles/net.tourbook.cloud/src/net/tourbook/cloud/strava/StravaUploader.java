@@ -77,6 +77,8 @@ public class StravaUploader extends TourbookCloudUploader {
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
+   //todo fb remove this list and use the main one here
+   // {@link DialogExportTours} StravaActivityTypes
    // Source : https://support.strava.com/hc/en-us/articles/216919407-Supported-Activity-Types-on-Strava
    private static final List<String> StravaActivityTypes = List.of(
          "Ride", //$NON-NLS-1$
