@@ -18,6 +18,7 @@ package net.tourbook.extension.upload;
 import java.util.List;
 
 import net.tourbook.data.TourData;
+import net.tourbook.ui.TourTypeFilter;
 
 public abstract class TourbookCloudUploader {
 
@@ -29,9 +30,20 @@ public abstract class TourbookCloudUploader {
       CLOUD_UPLOADER_NAME = name;
    }
 
+   public String getId() {
+      return CLOUD_UPLOADER_ID;
+   }
+
    public String getName() {
       return CLOUD_UPLOADER_NAME;
    }
+
+   public abstract List<TourTypeFilter> getTourTypeFilters() ;
+//   {
+//      //TourTypeFilter.FILTER_TYPE_SYSTEM
+//
+//      return null;
+//   }
 
    protected abstract boolean isReady();
 

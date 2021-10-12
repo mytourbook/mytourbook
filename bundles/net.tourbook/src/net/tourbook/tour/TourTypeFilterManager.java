@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,6 +35,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.upload.CloudUploaderManager;
+import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
@@ -102,6 +105,8 @@ public class TourTypeFilterManager {
             Messages.Action_TourType_ModifyTourTypeFilter,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
    }
+
+   private List<TourbookCloudUploader> _cloudUploadersList       = CloudUploaderManager.getCloudUploaderList();
 
    private static class ActionTTFilter extends Action {
 
@@ -260,6 +265,7 @@ public class TourTypeFilterManager {
    public static ArrayList<TourTypeFilter> readTourTypeFilters() {
 
       final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
+      filterList.addAll(CloudUploaderManager.getCloudTourTypeFilters());
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       final ArrayList<?> tourTypesNotDisplayed = (ArrayList<?>) tourTypes.clone();

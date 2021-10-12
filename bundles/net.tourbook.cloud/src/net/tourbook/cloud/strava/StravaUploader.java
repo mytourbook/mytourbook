@@ -55,6 +55,8 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TourTypeFilterSet;
 
 import org.apache.http.HttpHeaders;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -254,6 +256,19 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private String getRefreshToken() {
       return _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN);
+   }
+
+   @Override
+   public List<TourTypeFilter> getTourTypeFilters() {
+      final List<TourTypeFilter> stravaTourTypeFilters = new ArrayList<>();
+
+      final TourTypeFilterSet Riding = new TourTypeFilterSet();
+      Riding.setName("Strava: Riding");
+
+      final TourTypeFilter tourTypeFilter = new TourTypeFilter(Riding);
+
+      stravaTourTypeFilters.add(tourTypeFilter);
+      return stravaTourTypeFilters;
    }
 
    private boolean getValidTokens() {
