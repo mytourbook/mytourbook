@@ -428,7 +428,8 @@ public class SensorView extends ViewPart implements ITourViewer {
             return;
          }
 
-         if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+         if (eventId == TourEventId.UPDATE_UI
+               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
             // new tours could be imported with new sensors
 
