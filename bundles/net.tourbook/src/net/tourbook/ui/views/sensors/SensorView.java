@@ -75,7 +75,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -90,6 +89,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private static final char       NL                              = UI.NEW_LINE;
 
+   private static final String     STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
    private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
    private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
@@ -114,7 +114,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private MenuManager             _viewerMenuManager;
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private boolean                 _isInUpdate;
+   private boolean                 _isInUIUpdate;
 
    private final NumberFormat      _nf1                            = NumberFormat.getNumberInstance();
    private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
@@ -503,7 +503,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private void createUI_10_MarkerViewer(final Composite parent) {
 
       /*
-       * create table
+       * Create table
        */
       final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -511,10 +511,8 @@ public class SensorView extends ViewPart implements ITourViewer {
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      table.addListener(SWT.Selection, event -> onSensor_Select(event));
-
       /*
-       * create table viewer
+       * Create table viewer
        */
       _sensorViewer = new TableViewer(table);
 
@@ -524,6 +522,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.setContentProvider(new SensorContentProvider());
       _sensorViewer.setComparator(_markerComparator);
 
+      _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
       _sensorViewer.addDoubleClickListener(new IDoubleClickListener() {
          @Override
          public void doubleClick(final DoubleClickEvent event) {
@@ -850,7 +849,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _columnSortListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            onSelect_SortColumn(e);
+            onColumn_Select(e);
          }
       };
    }
@@ -933,7 +932,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onSelect_SortColumn(final SelectionEvent e) {
+   private void onColumn_Select(final SelectionEvent e) {
 
       _viewerContainer.setRedraw(false);
       {
@@ -986,9 +985,9 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onSensor_Select(final Event event) {
+   private void onSensor_Select() {
 
-      if (_isInUpdate) {
+      if (_isInUIUpdate) {
          return;
       }
 
@@ -1056,25 +1055,47 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void restoreState_WithUI() {
 
-//      /*
-//       * select marker item
-//       */
-//      final long stateMarkerId = Util.getStateLong(_state, //
-//            STATE_SELECTED_MARKER_ITEM,
-//            TourDatabase.ENTITY_IS_NOT_SAVED);
-//
-//      if (stateMarkerId != TourDatabase.ENTITY_IS_NOT_SAVED) {
-//
-//         // select marker item by it's ID
-//         for (final TourMarkerItem markerItem : _allSensors) {
-//            if (markerItem.markerId == stateMarkerId) {
-//
-//               updateUI_SelectTourMarker(new StructuredSelection(markerItem), null);
-//
-//               return;
-//            }
-//         }
-//      }
+      /*
+       * Restore selected sensor
+       */
+      final String[] allViewerIndices = _state.getArray(STATE_SELECTED_SENSOR_INDICES);
+
+      if (allViewerIndices != null) {
+
+         final ArrayList<Object> allSensors = new ArrayList<>();
+
+         for (final String viewerIndex : allViewerIndices) {
+
+            Object sensor = null;
+
+            try {
+               final int index = Integer.parseInt(viewerIndex);
+               sensor = _sensorViewer.getElementAt(index);
+            } catch (final NumberFormatException e) {
+               // just ignore
+            }
+
+            if (sensor != null) {
+               allSensors.add(sensor);
+            }
+         }
+
+         if (allSensors.size() > 0) {
+
+            _viewerContainer.getDisplay().timerExec(
+
+                  /*
+                   * When this value is too small, then the chart axis could not be painted
+                   * correctly with the dark theme during the app startup
+                   */
+                  500,
+
+                  () -> {
+
+                     _sensorViewer.setSelection(new StructuredSelection(allSensors.toArray()), true);
+                  });
+         }
+      }
 
       enableActions();
    }
@@ -1087,18 +1108,8 @@ public class SensorView extends ViewPart implements ITourViewer {
       _state.put(STATE_SORT_COLUMN_ID, _markerComparator.__sortColumnId);
       _state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
 
-      /*
-       * selected marker item
-       */
-//      long markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-//      final StructuredSelection selection = getViewerSelection();
-//      final Object firstItem = selection.getFirstElement();
-//
-//      if (firstItem instanceof TourMarkerItem) {
-//         final TourMarkerItem markerItem = (TourMarkerItem) firstItem;
-//         markerId = markerItem.markerId;
-//      }
-//      _state.put(STATE_SELECTED_MARKER_ITEM, markerId);
+      // keep selected tours
+      Util.setState(_state, STATE_SELECTED_SENSOR_INDICES, _sensorViewer.getTable().getSelectionIndices());
    }
 
    @Override
@@ -1117,14 +1128,14 @@ public class SensorView extends ViewPart implements ITourViewer {
     */
    private void updateUI_SelectSensor(final ISelection selection) {
 
-      _isInUpdate = true;
+      _isInUIUpdate = true;
       {
          _sensorViewer.setSelection(selection, true);
 
          final Table table = _sensorViewer.getTable();
          table.showSelection();
       }
-      _isInUpdate = false;
+      _isInUIUpdate = false;
    }
 
    /**
@@ -1144,10 +1155,10 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void updateUI_SetViewerInput() {
 
-      _isInUpdate = true;
+      _isInUIUpdate = true;
       {
          _sensorViewer.setInput(new Object[0]);
       }
-      _isInUpdate = false;
+      _isInUIUpdate = false;
    }
 }

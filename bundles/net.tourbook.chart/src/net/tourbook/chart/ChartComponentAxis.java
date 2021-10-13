@@ -103,15 +103,12 @@ public class ChartComponentAxis extends Canvas {
 
       addPaintListener(paintEvent -> onPaint(paintEvent.gc));
 
-      addMouseListener(MouseListener.mouseDoubleClickAdapter(
-            mouseEvent -> _componentGraph.onMouseDoubleClick(mouseEvent)));
-      addMouseListener(MouseListener.mouseDownAdapter(
-            mouseEvent -> onMouseDown()));
+      addMouseListener(MouseListener.mouseDoubleClickAdapter(mouseEvent -> _componentGraph.onMouseDoubleClick(mouseEvent)));
+      addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown()));
 
       addMouseMoveListener(this::onMouseMove);
 
       addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(this::onMouseEnter));
-
       addMouseTrackListener(MouseTrackListener.mouseExitAdapter(this::onMouseExit));
 
       addControlListener(controlResizedAdapter(controlEvent -> _clientArea = getClientArea()));
@@ -181,20 +178,28 @@ public class ChartComponentAxis extends Canvas {
             ? ThemeUtil.getDarkestBackgroundColor()
             : _chart.getBackgroundColor();
 
-      // draw into the image
-      final GC gc = new GC(_axisImage);
-      {
-         gc.setBackground(backgroundColor);
-         gc.fillRectangle(_axisImage.getBounds());
+      if (backgroundColor == null) {
 
-         draw_10_ZoomMarker(gc, axisRect);
-         draw_20_YUnits(gc, axisRect);
+         // this happened during app startup with dark theme
 
-         if (_tourInfoIconToolTipProvider != null) {
-            _tourInfoIconToolTipProvider.paint(gc, axisRect);
+      } else {
+
+         // draw into the image
+
+         final GC gc = new GC(_axisImage);
+         {
+            gc.setBackground(backgroundColor);
+            gc.fillRectangle(_axisImage.getBounds());
+
+            draw_10_ZoomMarker(gc, axisRect);
+            draw_20_YUnits(gc, axisRect);
+
+            if (_tourInfoIconToolTipProvider != null) {
+               _tourInfoIconToolTipProvider.paint(gc, axisRect);
+            }
          }
+         gc.dispose();
       }
-      gc.dispose();
 
       _isAxisModified = false;
    }

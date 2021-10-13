@@ -58,6 +58,7 @@ public class GraphColorManager {
    public static final String  PREF_GRAPH_GRADIENT                     = "gradient";                   //$NON-NLS-1$
    public static final String  PREF_GRAPH_PACE                         = "pace";                       //$NON-NLS-1$
    public static final String  PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SENSOR                       = "Sensor";                     //$NON-NLS-1$
    public static final String  PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
    public static final String  PREF_GRAPH_TEMPTERATURE                 = "tempterature";               //$NON-NLS-1$
    public static final String  PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
@@ -631,6 +632,19 @@ public class GraphColorManager {
             new RGB(0xd, 0xaa, 0xff),
             new RGB(0xd, 0xaa, 0xff),
             new RGB(0xd, 0xaa, 0xff),
+
+            null));
+
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_SENSOR,
+
+            Messages.Graph_Label_Sensor,
+
+            new RGB(0xc0, 0xc0, 0xc0),
+            new RGB(0xff, 0x42, 0xb8),
+            new RGB(0xff, 0x42, 0xb8),
+            new RGB(0xff, 0x42, 0xb8),
+            new RGB(0xf0, 0x0, 0x96),
+            new RGB(0xff, 0x6c, 0xc8),
 
             null));
 

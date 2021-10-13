@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -31,11 +32,13 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.DelayedBarSelection_TourToolTip;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
@@ -48,11 +51,13 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -75,6 +80,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private IPartListener2                  _partListener;
    private PostSelectionProvider           _postSelectionProvider;
    private ISelectionListener              _postSelectionListener;
+   private IPropertyChangeListener         _prefChangeListener;
 
    private FormToolkit                     _tk;
 
@@ -147,6 +153,27 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       getViewSite().getPage().addPartListener(_partListener);
    }
 
+   private void addPrefListener() {
+
+      _prefChangeListener = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         /*
+          * Create a new chart configuration when the colors has changed
+          */
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+            if (_sensorData != null) {
+
+               updateChart(_sensorData);
+            }
+         }
+      };
+
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
+
    /**
     * listen for events when a tour is selected
     */
@@ -181,8 +208,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       restoreState();
 
-      addSelectionListener();
       addPartListener();
+      addPrefListener();
+      addSelectionListener();
 
       // set this view part as selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
@@ -305,6 +333,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          _tk.dispose();
       }
 
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
 
@@ -425,6 +455,25 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void updateChart(final SensorData sensorData) {
 
+      /*
+       * Create sensor colors
+       */
+      final GraphColorManager colorMgr = GraphColorManager.getInstance();
+
+      final RGB rgbLine = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getLineColor_Active_Themed();
+      final RGB rgbText = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getTextColor_Active_Themed();
+      final RGB rgbGradientBright = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientBright_Active();
+      final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
+
+      final int numValues = sensorData.allXValues_ByTime.length;
+      final RGB[] allRGBLine = new RGB[numValues];
+      final RGB[] allRGBGradientBright = new RGB[numValues];
+      final RGB[] allRGBGradientDark = new RGB[numValues];
+
+      Arrays.fill(allRGBLine, rgbLine);
+      Arrays.fill(allRGBGradientBright, rgbGradientBright);
+      Arrays.fill(allRGBGradientDark, rgbGradientDark);
+
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
       // set the x-axis
@@ -442,6 +491,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       yData.setYTitle("Sensor Battery");
       yData.setUnitLabel("Volt");
       yData.setShowYSlider(true);
+
+      yData.setRgbGraph_Line(rgbLine);
+      yData.setRgbGraph_Text(rgbText);
+      yData.setRgbBar_Line(allRGBLine);
+      yData.setRgbBar_Gradient_Bright(allRGBGradientBright);
+      yData.setRgbBar_Gradient_Dark(allRGBGradientDark);
 
       chartModel.addYData(yData);
 
