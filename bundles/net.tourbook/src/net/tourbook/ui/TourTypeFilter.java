@@ -322,8 +322,6 @@ public class TourTypeFilter {
     * @return Returns the filterset when the filter type {@link TourTypeFilter#getFilterType()}
     *         returns {@link TourTypeFilter#FILTER_TYPE_TOURTYPE_SET}
     */
-   //TODO FB
-   //calls this to map those to the correct strva activity
    public TourTypeFilterSet getTourTypeSet() {
       return _tourTypeSet;
    }
