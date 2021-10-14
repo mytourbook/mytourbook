@@ -49,7 +49,7 @@ public class CloudDownloaderManager {
    }
 
    /**
-    * Read and collects all the extensions that implement {@link TourbookCloudDownloader}.
+    * Reads and collects all the extensions that implement {@link TourbookCloudDownloader}.
     *
     * @param extensionPointName
     *           The extension point name

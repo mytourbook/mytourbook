@@ -64,7 +64,7 @@ public class CloudUploaderManager {
    }
 
    /**
-    * Read and collects all the extensions that implement {@link TourbookCloudUploader}.
+    * Reads and collects all the extensions that implement {@link TourbookCloudUploader}.
     *
     * @param extensionPointName
     *           The extension point name
