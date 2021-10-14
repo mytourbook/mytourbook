@@ -36,7 +36,6 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.upload.CloudUploaderManager;
-import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
@@ -105,8 +104,6 @@ public class TourTypeFilterManager {
             Messages.Action_TourType_ModifyTourTypeFilter,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
    }
-
-   private List<TourbookCloudUploader> _cloudUploadersList       = CloudUploaderManager.getCloudUploaderList();
 
    private static class ActionTTFilter extends Action {
 
@@ -267,9 +264,10 @@ public class TourTypeFilterManager {
       final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
 
       final List<TourTypeFilter> toto = CloudUploaderManager.getCloudTourTypeFilters();
-      toto.forEach(tourTypeFilter ->{
-         if(!filterList.contains(tourTypeFilter))
-         {
+      toto.forEach(tourTypeFilter -> {
+
+         if (filterList.stream().noneMatch(
+               filter -> filter.getFilterName().equals(tourTypeFilter.getFilterName()))) {
             filterList.add(tourTypeFilter);
          }
       });
