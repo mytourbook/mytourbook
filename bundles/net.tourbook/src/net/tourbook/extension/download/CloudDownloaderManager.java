@@ -34,7 +34,7 @@ public class CloudDownloaderManager {
 
       getCloudDownloaderList();
 
-      _cloudDownloadersList.forEach(cd -> cloudDownloaderIds.add(cd.getId()));
+      _cloudDownloadersList.forEach(cloudDownloader -> cloudDownloaderIds.add(cloudDownloader.getId()));
 
       return cloudDownloaderIds;
    }
@@ -47,7 +47,6 @@ public class CloudDownloaderManager {
 
       return _cloudDownloadersList;
    }
-
 
    /**
     * Read and collects all the extensions that implement {@link TourbookCloudDownloader}.
@@ -64,26 +63,27 @@ public class CloudDownloaderManager {
             .getExtensionRegistry()
             .getExtensionPoint("net.tourbook", extensionPointName); //$NON-NLS-1$
 
-      if (extPoint != null) {
+      if (extPoint == null) {
+         return cloudDownloadersList;
+      }
 
-         for (final IExtension extension : extPoint.getExtensions()) {
+      for (final IExtension extension : extPoint.getExtensions()) {
 
-            for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+         for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-               if (configElement.getName().equalsIgnoreCase(extensionPointName)) {
+            if (configElement.getName().equalsIgnoreCase(extensionPointName)) {
 
-                  Object object;
-                  try {
+               Object object;
+               try {
 
-                     object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+                  object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                     if (object instanceof TourbookCloudDownloader) {
-                        cloudDownloadersList.add((TourbookCloudDownloader) object);
-                     }
-
-                  } catch (final CoreException e) {
-                     e.printStackTrace();
+                  if (object instanceof TourbookCloudDownloader) {
+                     cloudDownloadersList.add((TourbookCloudDownloader) object);
                   }
+
+               } catch (final CoreException e) {
+                  e.printStackTrace();
                }
             }
          }

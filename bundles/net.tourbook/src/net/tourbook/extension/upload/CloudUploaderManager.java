@@ -37,7 +37,8 @@ public class CloudUploaderManager {
       }
 
       final List<TourTypeFilter> cloudTourTypeFilters = new ArrayList<>();
-      _cloudUploadersList.forEach(tourbookCloudUploader -> cloudTourTypeFilters.addAll(tourbookCloudUploader.getTourTypeFilters()));
+      _cloudUploadersList.forEach(
+            tourbookCloudUploader -> cloudTourTypeFilters.addAll(tourbookCloudUploader.getTourTypeFilters()));
 
       return cloudTourTypeFilters;
    }
@@ -48,7 +49,7 @@ public class CloudUploaderManager {
 
       getCloudUploaderList();
 
-      _cloudUploadersList.forEach(cd -> cloudUploaderIds.add(cd.getId()));
+      _cloudUploadersList.forEach(cloudUploader -> cloudUploaderIds.add(cloudUploader.getId()));
 
       return cloudUploaderIds;
    }
