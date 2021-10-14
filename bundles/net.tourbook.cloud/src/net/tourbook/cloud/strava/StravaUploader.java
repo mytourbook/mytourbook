@@ -57,6 +57,7 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 
@@ -72,14 +73,16 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   private static final String     LOG_CLOUDACTION_END             = net.tourbook.cloud.Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS   = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static final String     StravaBaseUrl                 = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
+   private static final String     StravaBaseUrl                   = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
 
-   private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+   private static HttpClient       _httpClient                     = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static IPreferenceStore _prefStore                      = Activator.getDefault().getPreferenceStore();
+   private static TourExporter     _tourExporter                   = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+
+   private String                  STRAVA_TOURTYPEFILTERSET_PREFIX = super.getId().toLowerCase() + UI.SYMBOL_COLON;
 
    public StravaUploader() {
 
@@ -209,16 +212,15 @@ public class StravaUploader extends TourbookCloudUploader {
       final TourType tourType = tourData.getTourType();
 
       boolean useActivityType = false;
-      String activityName = UI.EMPTY_STRING;
       if (tourType != null) {
-         useActivityType = true;
-         activityName = tourType.getName();
 
-         //TODO FB getStravaActivityTypeFromTourTypeName()
-         //gets the mapped strava activity type from the MT tour type name
+         useActivityType = true;
+
+         final List<String> stravaActivityName = getStravaActivityNamesFromTourTypeName(tourType);
+
+         _tourExporter.setUseActivityType(useActivityType);
+         _tourExporter.setActivityType(stravaActivityName.get(0));
       }
-      _tourExporter.setUseActivityType(useActivityType);
-      _tourExporter.setActivityType(activityName);
 
       _tourExporter.export(absoluteTourFilePath);
 
@@ -235,6 +237,44 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private String getRefreshToken() {
       return _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN);
+   }
+
+   /**
+    * //gets the mapped strava activity type from the MT tour type name
+    *
+    * @param tourType
+    */
+   private List<String> getStravaActivityNamesFromTourTypeName(final TourType tourType) {
+
+      final List<TourTypeFilter> tourTypeFilters = TourTypeFilterManager.readTourTypeFilters();
+
+      final List<String> matchingStravaActivityNames = new ArrayList<>();
+
+      tourTypeFilters.forEach(tourTypeFilter -> {
+
+         final TourTypeFilterSet tourTypeSet = tourTypeFilter.getTourTypeSet();
+
+         if (tourTypeSet != null &&
+               tourTypeSet.getName().toLowerCase().startsWith(STRAVA_TOURTYPEFILTERSET_PREFIX)) {
+
+            for (final Object tourTypeItem : tourTypeSet.getTourTypes()) {
+
+               if (!(tourTypeItem instanceof TourType)) {
+                  continue;
+               }
+
+               if (((TourType) tourTypeItem).getName().equals(tourType.getName())) {
+
+                  String name = tourTypeSet.getName();
+                  final int activityNameIndex = name.toLowerCase().lastIndexOf(STRAVA_TOURTYPEFILTERSET_PREFIX);
+                  name = name.substring(activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length()).trim();
+                  matchingStravaActivityNames.add(name);
+               }
+            }
+         }
+      });
+
+      return matchingStravaActivityNames;
    }
 
    @Override
