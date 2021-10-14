@@ -257,7 +257,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkSendDescription = new Button(group, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkSendDescription);
 
-            _chkSendDescription.setText("Send the tour &description");
+            _chkSendDescription.setText(Messages.PrefPage_UploadConfiguration_Button_SendDescription);
          }
          {
             /*
@@ -266,8 +266,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
             _chkUseTourTypeMapping.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckUseTourTypeMapping()));
-            _chkUseTourTypeMapping.setText("Use tour type mapping");
-            //toolip "This will give the possibility to map one or multiple tour type for each Strava activities
+            _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
+            _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
          }
 
       }
