@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
@@ -265,11 +266,9 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
              */
             _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
-            _chkUseTourTypeMapping.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckUseTourTypeMapping()));
             _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
             _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
          }
-
       }
    }
 
@@ -301,20 +300,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       return super.okToLeave();
    }
 
-   private void onCheckUseTourTypeMapping() {
-
-      if (MessageDialog.openQuestion(
-            Display.getDefault().getActiveShell(),
-            "Messages.pref_cache_message_box_title",
-            "Messages.pref_cache_message_box_text")) {
-
-         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
-
-         //todo fb Whne unchecked, "YOu have unchecked blablabla, you can now delete all the Strava tour type filters in the
-         //Tour Type filter preference page  <==== make it clickable to go to the preference page
-      }
-   }
-
+   //todo fb Whne unchecked, "YOu have unchecked blablabla, you can now delete all the Strava tour type filters in the
+   //Tour Type filter preference page  <==== make it clickable to go to the preference page
    /**
     * When the user clicks on the "Authorize" button, a browser is opened
     * so that the user can allow the MyTourbook Strava app to have access
@@ -378,6 +365,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       updateTokensInformationGroup();
 
       _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
 
       super.performDefaults();
    }
@@ -395,6 +383,40 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, _accessTokenExpiresAt);
 
          _prefStore.setValue(Preferences.STRAVA_SENDDESCRIPTION, _chkSendDescription.getSelection());
+
+         final boolean prefUseTourTypeMapping = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING);
+         final boolean currentUseTourTypeMapping = _chkUseTourTypeMapping.getSelection();
+         _prefStore.setValue(Preferences.STRAVA_USETOURTYPEMAPPING, currentUseTourTypeMapping);
+         if (prefUseTourTypeMapping != currentUseTourTypeMapping) {
+
+            final Shell activeShell = Display.getDefault().getActiveShell();
+            if (currentUseTourTypeMapping) {
+
+               //If the user has just activated the tour type mapping, a restart
+               //is needed in order for the Strava tour type filters to be created.
+               if (MessageDialog.openQuestion(
+                     activeShell,
+                     "Messages.pref_cache_message_box_title",
+                     "Messages.pref_cache_message_box_text")) {
+
+                  Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+
+               }
+            } else {
+
+               //If the user has just deactivated the tour type mapping, we need
+               //to let them know that they can safely remove all the Strava tour
+               //type filters from the filter list.
+               MessageDialog.openInformation(
+                     activeShell,
+                     "Messages.App_Dialog_FirstStartup_Title",
+                     "Messages.App_Dialog_FirstStartup_Message");
+
+               //todo fb Whne unchecked, "YOu have unchecked blablabla, you can now delete all the Strava tour type filters in the
+               //Tour Type filter preference page  <==== make it clickable to go to the preference page
+
+            }
+         }
 
          if (_server != null) {
             _server.stopCallBackServer();
@@ -415,6 +437,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
       _chkSendDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkUseTourTypeMapping.setSelection(_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
 
       updateTokensInformationGroup();
    }
