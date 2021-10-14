@@ -217,6 +217,8 @@ public class StravaUploader extends TourbookCloudUploader {
          useActivityType = true;
 
          final List<String> stravaActivityName = getStravaActivityNamesFromTourType(tourType);
+         //todo fb if multiple raise an error
+         //if none found use ride by default
 
          _tourExporter.setUseActivityType(useActivityType);
          _tourExporter.setActivityType(stravaActivityName.get(0));
