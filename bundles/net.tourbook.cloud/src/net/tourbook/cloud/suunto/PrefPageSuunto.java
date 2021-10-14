@@ -67,12 +67,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    //todo fb
 
-   // string for the new group
    // if current user has no token, check if "all people" has a token, if not then open the prefs
 
    //SET_FORMATTING_OFF
    private static final String PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE                         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_DOWNLOADCONFIGURATION              = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_DownloadConfiguration;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN                        = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT                          = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
@@ -247,7 +247,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      _groupCloudAccount.setText("Download Configuration");
+      group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_DOWNLOADCONFIGURATION);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
          {
