@@ -82,11 +82,12 @@ public class StravaUploader extends TourbookCloudUploader {
    private static IPreferenceStore _prefStore                      = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter                   = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
-   private String                  STRAVA_TOURTYPEFILTERSET_PREFIX = super.getId().toLowerCase() + UI.SYMBOL_COLON;
+   private static String           CLOUD_UPLOADER_ID               = "Strava";
+   private String                  STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
 
    public StravaUploader() {
 
-      super("STRAVA", Messages.VendorName_Strava); //$NON-NLS-1$
+      super(CLOUD_UPLOADER_ID, Messages.VendorName_Strava);
 
       _tourExporter.setUseDescription(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
 
@@ -190,10 +191,9 @@ public class StravaUploader extends TourbookCloudUploader {
 
       Arrays.asList(DialogExportTour.StravaActivityTypes).forEach(
             stravaActivityType -> {
-               final TourTypeFilterSet Riding = new TourTypeFilterSet();
-               Riding.setName("Strava: " + stravaActivityType);
-               final TourTypeFilter tourTypeFilter = new TourTypeFilter(Riding);
-               stravaTourTypeFilters.add(tourTypeFilter);
+               final TourTypeFilterSet tourTypeFilterSet = new TourTypeFilterSet();
+               tourTypeFilterSet.setName(CLOUD_UPLOADER_ID + stravaActivityType);
+               stravaTourTypeFilters.add(new TourTypeFilter(tourTypeFilterSet));
             });
 
       return stravaTourTypeFilters;
@@ -216,7 +216,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          useActivityType = true;
 
-         final List<String> stravaActivityName = getStravaActivityNamesFromTourTypeName(tourType);
+         final List<String> stravaActivityName = getStravaActivityNamesFromTourType(tourType);
 
          _tourExporter.setUseActivityType(useActivityType);
          _tourExporter.setActivityType(stravaActivityName.get(0));
@@ -240,11 +240,11 @@ public class StravaUploader extends TourbookCloudUploader {
    }
 
    /**
-    * //gets the mapped strava activity type from the MT tour type name
+    * Returns the Strava activity name from a given tour type
     *
     * @param tourType
     */
-   private List<String> getStravaActivityNamesFromTourTypeName(final TourType tourType) {
+   private List<String> getStravaActivityNamesFromTourType(final TourType tourType) {
 
       final List<TourTypeFilter> tourTypeFilters = TourTypeFilterManager.readTourTypeFilters();
 
@@ -255,7 +255,7 @@ public class StravaUploader extends TourbookCloudUploader {
          final TourTypeFilterSet tourTypeSet = tourTypeFilter.getTourTypeSet();
 
          if (tourTypeSet != null &&
-               tourTypeSet.getName().toLowerCase().startsWith(STRAVA_TOURTYPEFILTERSET_PREFIX)) {
+               tourTypeSet.getName().toLowerCase().startsWith(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase())) {
 
             for (final Object tourTypeItem : tourTypeSet.getTourTypes()) {
 
@@ -266,8 +266,10 @@ public class StravaUploader extends TourbookCloudUploader {
                if (((TourType) tourTypeItem).getName().equals(tourType.getName())) {
 
                   String name = tourTypeSet.getName();
-                  final int activityNameIndex = name.toLowerCase().lastIndexOf(STRAVA_TOURTYPEFILTERSET_PREFIX);
-                  name = name.substring(activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length()).trim();
+                  final int activityNameIndex =
+                        name.toLowerCase().lastIndexOf(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase());
+                  name = name.substring(
+                        activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length()).trim();
                   matchingStravaActivityNames.add(name);
                }
             }
@@ -280,9 +282,10 @@ public class StravaUploader extends TourbookCloudUploader {
    @Override
    public List<TourTypeFilter> getTourTypeFilters() {
 
-      final List<TourTypeFilter> stravaTourTypeFilters = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)
-            ? createStravaTourTypeFilters()
-            : new ArrayList<>();
+      final List<TourTypeFilter> stravaTourTypeFilters =
+            _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)
+                  ? createStravaTourTypeFilters()
+                  : new ArrayList<>();
 
       return stravaTourTypeFilters;
    }

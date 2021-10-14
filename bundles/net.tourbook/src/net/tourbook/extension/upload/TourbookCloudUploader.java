@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ public abstract class TourbookCloudUploader {
    private String CLOUD_UPLOADER_NAME;
 
    protected TourbookCloudUploader(final String id, final String name) {
+
       CLOUD_UPLOADER_ID = id;
       CLOUD_UPLOADER_NAME = name;
    }
@@ -38,12 +39,7 @@ public abstract class TourbookCloudUploader {
       return CLOUD_UPLOADER_NAME;
    }
 
-   public abstract List<TourTypeFilter> getTourTypeFilters() ;
-//   {
-//      //TourTypeFilter.FILTER_TYPE_SYSTEM
-//
-//      return null;
-//   }
+   public abstract List<TourTypeFilter> getTourTypeFilters();
 
    protected abstract boolean isReady();
 
