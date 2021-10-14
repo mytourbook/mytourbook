@@ -393,7 +393,6 @@
             class       ="net.tourbook.preferences.PrefPageTourTypes"
             category    ="net.tourbook.preferences.PrefPageTourTypeFilter"
          />
-         
 
       <!--
          Statistics
