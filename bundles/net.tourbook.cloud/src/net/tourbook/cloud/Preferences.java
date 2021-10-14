@@ -39,6 +39,7 @@ public final class Preferences {
    public static final String STRAVA_ATHLETEID              = "STRAVA_ATHLETEID";              //$NON-NLS-1$
    public static final String STRAVA_ATHLETEFULLNAME        = "STRAVA_ATHLETEFULLNAME";        //$NON-NLS-1$
    public static final String STRAVA_SENDDESCRIPTION        = "STRAVA_SENDDESCRIPTION";        //$NON-NLS-1$
+   public static final String STRAVA_USEACTIVITYNAMEMAPPING = "STRAVA_USEACTIVITYNAMEMAPPING"; //$NON-NLS-1$
 
    /*
     * Suunto preferences

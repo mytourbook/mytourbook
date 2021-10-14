@@ -33,6 +33,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -48,6 +49,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -94,6 +96,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Label  _labelRefreshToken;
    private Label  _labelRefreshToken_Value;
    private Button _chkSendDescription;
+   private Button _chkUseTourTypeMapping;
 
    private Link   _linkAthleteWebPage;
 
@@ -253,8 +256,19 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkSendDescription = new Button(group, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkSendDescription);
 
-            _chkSendDescription.setText("Send the tour description");
+            _chkSendDescription.setText("Send the tour &description");
          }
+         {
+            /*
+             * Checkbox: Send the tour description
+             */
+            _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
+            GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
+            _chkUseTourTypeMapping.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckUseTourTypeMapping()));
+            _chkUseTourTypeMapping.setText("Use the tour type mapping");
+            //toolip "This will give the possibility to map one or multiple tour type for each Strava activities
+         }
+
       }
    }
 
@@ -284,6 +298,17 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       }
 
       return super.okToLeave();
+   }
+
+   private void onCheckUseTourTypeMapping() {
+
+      if (MessageDialog.openQuestion(
+            Display.getDefault().getActiveShell(),
+            "Messages.pref_cache_message_box_title",
+            "Messages.pref_cache_message_box_text")) {
+
+         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+      }
    }
 
    /**

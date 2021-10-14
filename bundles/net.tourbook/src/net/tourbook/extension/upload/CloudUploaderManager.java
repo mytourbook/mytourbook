@@ -77,26 +77,27 @@ public class CloudUploaderManager {
             .getExtensionRegistry()
             .getExtensionPoint("net.tourbook", extensionPointName); //$NON-NLS-1$
 
-      if (extPoint != null) {
+      if (extPoint == null) {
+         return cloudUploadersList;
+      }
 
-         for (final IExtension extension : extPoint.getExtensions()) {
+      for (final IExtension extension : extPoint.getExtensions()) {
 
-            for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+         for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-               if (configElement.getName().equalsIgnoreCase(extensionPointName)) {
+            if (configElement.getName().equalsIgnoreCase(extensionPointName)) {
 
-                  Object object;
-                  try {
+               Object object;
+               try {
 
-                     object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+                  object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                     if (object instanceof TourbookCloudUploader) {
-                        cloudUploadersList.add((TourbookCloudUploader) object);
-                     }
-
-                  } catch (final CoreException e) {
-                     e.printStackTrace();
+                  if (object instanceof TourbookCloudUploader) {
+                     cloudUploadersList.add((TourbookCloudUploader) object);
                   }
+
+               } catch (final CoreException e) {
+                  e.printStackTrace();
                }
             }
          }
