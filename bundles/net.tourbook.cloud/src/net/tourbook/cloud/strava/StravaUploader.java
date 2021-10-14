@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
+import net.tourbook.export.DialogExportTour;
 import net.tourbook.export.ExportTourTCX;
 import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
@@ -78,47 +80,6 @@ public class StravaUploader extends TourbookCloudUploader {
    private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
-
-   //todo fb remove this list and use the main one here
-   // {@link DialogExportTours} StravaActivityTypes
-
-   //Add a checkbox "Send description" by default is checked
-
-   // Source : https://support.strava.com/hc/en-us/articles/216919407-Supported-Activity-Types-on-Strava
-   private static final List<String> StravaActivityTypes = List.of(
-         "Ride", //$NON-NLS-1$
-         "Run", //$NON-NLS-1$
-         "Swim", //$NON-NLS-1$
-         "Walk", //$NON-NLS-1$
-         "Hike", //$NON-NLS-1$
-         "Alpine Ski", //$NON-NLS-1$
-         "Backcountry Ski", //$NON-NLS-1$
-         "Canoe", //$NON-NLS-1$
-         "Crossfit", //$NON-NLS-1$
-         "E-Bike Ride", //$NON-NLS-1$
-         "Elliptical", //$NON-NLS-1$
-         "Handcycle", //$NON-NLS-1$
-         "Ice Skate", //$NON-NLS-1$
-         "Inline Skate", //$NON-NLS-1$
-         "Kayak", //$NON-NLS-1$
-         "Kitesurf Session", //$NON-NLS-1$
-         "Nordic Ski", //$NON-NLS-1$
-         "Rock Climb", //$NON-NLS-1$
-         "Roller Ski", //$NON-NLS-1$
-         "Row", //$NON-NLS-1$
-         "Snowboard", //$NON-NLS-1$
-         "Snowshoe", //$NON-NLS-1$
-         "Stair Stepper", //$NON-NLS-1$
-         "Stand Up Paddle", //$NON-NLS-1$
-         "Surf", //$NON-NLS-1$
-         "Virtual Ride", //$NON-NLS-1$
-         "Virtual Run", //$NON-NLS-1$
-         "Weight Training", //$NON-NLS-1$
-         "Windsurf Session", //$NON-NLS-1$
-         "Wheelchair", //$NON-NLS-1$
-         "Workout", //$NON-NLS-1$
-         "Yoga" //$NON-NLS-1$
-   );
 
    public StravaUploader() {
 
@@ -220,6 +181,21 @@ public class StravaUploader extends TourbookCloudUploader {
       monitor.worked(1);
    }
 
+   private List<TourTypeFilter> createStravaTourTypeFilters() {
+
+      final List<TourTypeFilter> stravaTourTypeFilters = new ArrayList<>();
+
+      Arrays.asList(DialogExportTour.StravaActivityTypes).forEach(
+            stravaActivityType -> {
+               final TourTypeFilterSet Riding = new TourTypeFilterSet();
+               Riding.setName("Strava: " + stravaActivityType);
+               final TourTypeFilter tourTypeFilter = new TourTypeFilter(Riding);
+               stravaTourTypeFilters.add(tourTypeFilter);
+            });
+
+      return stravaTourTypeFilters;
+   }
+
    private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
 
       tourFiles.keySet().forEach(tourFilePath -> FilesUtils.deleteIfExists(Paths.get(
@@ -263,14 +239,9 @@ public class StravaUploader extends TourbookCloudUploader {
 
    @Override
    public List<TourTypeFilter> getTourTypeFilters() {
-      final List<TourTypeFilter> stravaTourTypeFilters = new ArrayList<>();
 
-      final TourTypeFilterSet Riding = new TourTypeFilterSet();
-      Riding.setName("Strava: Riding");
+      final List<TourTypeFilter> stravaTourTypeFilters = createStravaTourTypeFilters();
 
-      final TourTypeFilter tourTypeFilter = new TourTypeFilter(Riding);
-
-      stravaTourTypeFilters.add(tourTypeFilter);
       return stravaTourTypeFilters;
    }
 
@@ -339,10 +310,12 @@ public class StravaUploader extends TourbookCloudUploader {
             ? manualTour.getTourType().getName()
             : UI.EMPTY_STRING;
 
-      return StravaActivityTypes.stream().filter(
+      final String[] StravaActivityTypes = DialogExportTour.StravaActivityTypes;
+
+      return Arrays.stream(StravaActivityTypes).filter(
             stravaActivityType -> tourTypeName.toLowerCase().startsWith(stravaActivityType.toLowerCase()))
             .findFirst()
-            .orElse(StravaActivityTypes.get(0));
+            .orElse(StravaActivityTypes[0]);
    }
 
    private void processManualTour(final IProgressMonitor monitor, final List<TourData> manualTours, final TourData tourData) {

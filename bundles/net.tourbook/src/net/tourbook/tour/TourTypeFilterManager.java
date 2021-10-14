@@ -265,7 +265,14 @@ public class TourTypeFilterManager {
    public static ArrayList<TourTypeFilter> readTourTypeFilters() {
 
       final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
-      filterList.addAll(CloudUploaderManager.getCloudTourTypeFilters());
+
+      final List<TourTypeFilter> toto = CloudUploaderManager.getCloudTourTypeFilters();
+      toto.forEach(tourTypeFilter ->{
+         if(!filterList.contains(tourTypeFilter))
+         {
+            filterList.add(tourTypeFilter);
+         }
+      });
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       final ArrayList<?> tourTypesNotDisplayed = (ArrayList<?>) tourTypes.clone();
