@@ -325,30 +325,30 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
       // SET_FORMATTING_OFF
 
-      final DateTime       timestamp            = mesg.getTimestamp();
+//    final DateTime       timestamp            = mesg.getTimestamp();
 
       final Integer        manufacturer         = mesg.getManufacturer();
       final Integer        product              = mesg.getProduct();
       final String         productName          = mesg.getProductName();
       final Integer        garminProduct        = mesg.getGarminProduct();
-      final String         descriptor           = mesg.getDescriptor();
+//    final String         descriptor           = mesg.getDescriptor();
 
-      final Short          batteryStatus        = mesg.getBatteryStatus();
+//    final Short          batteryStatus        = mesg.getBatteryStatus();
       final Float          batteryVoltage       = mesg.getBatteryVoltage();
-      final Long           cumOperatingTime     = mesg.getCumOperatingTime();
+//    final Long           cumOperatingTime     = mesg.getCumOperatingTime();
 
-      final Short          deviceIndex          = mesg.getDeviceIndex();
-      final Short          hardwareVersion      = mesg.getHardwareVersion();
-      final Float          softwareVersion      = mesg.getSoftwareVersion();
-
-      final AntNetwork     antNetwork           = mesg.getAntNetwork();
-      final Short          antDeviceType        = mesg.getAntDeviceType();
-      final Integer        antDeviceNumber      = mesg.getAntDeviceNumber();
-      final Short          antplusDeviceType    = mesg.getAntplusDeviceType();
-      final Short          antTransmissionType  = mesg.getAntTransmissionType();
-
-      final SourceType     sourceType           = mesg.getSourceType();
-      final BodyLocation   sensorPosition       = mesg.getSensorPosition();
+//    final Short          deviceIndex          = mesg.getDeviceIndex();
+//    final Short          hardwareVersion      = mesg.getHardwareVersion();
+//    final Float          softwareVersion      = mesg.getSoftwareVersion();
+//
+//    final AntNetwork     antNetwork           = mesg.getAntNetwork();
+//    final Short          antDeviceType        = mesg.getAntDeviceType();
+//    final Integer        antDeviceNumber      = mesg.getAntDeviceNumber();
+//    final Short          antplusDeviceType    = mesg.getAntplusDeviceType();
+//    final Short          antTransmissionType  = mesg.getAntTransmissionType();
+//
+//    final SourceType     sourceType           = mesg.getSourceType();
+//    final BodyLocation   sensorPosition       = mesg.getSensorPosition();
 
 // SET_FORMATTING_ON
 
@@ -425,6 +425,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                   // start is not yet set
 
                   sensorValue.setBatteryVoltage_Start(batteryVoltage);
+
                } else {
 
                   sensorValue.setBatteryVoltage_End(batteryVoltage);

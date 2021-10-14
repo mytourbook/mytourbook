@@ -32,7 +32,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 
 /**
@@ -2319,10 +2318,10 @@ public class ChartComponents extends Composite {
 
       switch (event.keyCode) {
       case SWT.ARROW_RIGHT:
-         selectedIndex[0] = componentGraph.selectBarItemNext();
+         selectedIndex[0] = componentGraph.selectBarItem_Next();
          break;
       case SWT.ARROW_LEFT:
-         selectedIndex[0] = componentGraph.selectBarItemPrevious();
+         selectedIndex[0] = componentGraph.selectBarItem_Previous();
          break;
       }
 
@@ -2332,8 +2331,7 @@ public class ChartComponents extends Composite {
          /*
           * delay the change event when the key down was pressed several times
           */
-         final Display display = Display.getCurrent();
-         display.asyncExec(() -> display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
+         getDisplay().asyncExec(() -> getDisplay().timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
 
             final int __runnableKeyDownCounter = _keyDownCounter[0];
 
@@ -2566,7 +2564,7 @@ public class ChartComponents extends Composite {
        */
       if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 
-         componentGraph.moveXSlider(//
+         componentGraph.moveXSlider(
                leftSlider,
                0,
                isCenterSliderPosition,
@@ -2576,7 +2574,7 @@ public class ChartComponents extends Composite {
 
       } else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         componentGraph.moveXSlider(//
+         componentGraph.moveXSlider(
                leftSlider,
                slider1ValueIndex,
                isCenterSliderPosition,
@@ -2605,7 +2603,7 @@ public class ChartComponents extends Composite {
          // move right slider
          if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 
-            componentGraph.moveXSlider(//
+            componentGraph.moveXSlider(
                   rightSlider,
                   xValues.length - 1,
                   isCenterSliderPosition,
@@ -2615,7 +2613,7 @@ public class ChartComponents extends Composite {
 
          } else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-            componentGraph.moveXSlider(//
+            componentGraph.moveXSlider(
                   rightSlider,
                   slider2ValueIndex,
                   isCenterSliderPosition,

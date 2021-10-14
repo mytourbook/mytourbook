@@ -206,6 +206,9 @@ public class DeviceSensor implements Cloneable {
       return sensorId;
    }
 
+   /**
+    * @return Returns the sensor name or an empty string when not available
+    */
    public String getSensorName() {
 
       if (sensorName == null) {

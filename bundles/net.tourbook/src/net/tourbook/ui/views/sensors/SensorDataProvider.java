@@ -30,7 +30,9 @@ import net.tourbook.database.TourDatabase;
 
 public class SensorDataProvider {
 
-   private static final char NL = UI.NEW_LINE;
+   private static final char  NL                  = UI.NEW_LINE;
+
+   private static final float START_END_MIN_VALUE = 0.00001f;
 
    /**
     * Retrieve chart data from the database
@@ -95,17 +97,27 @@ public class SensorDataProvider {
 
             if (isStartAvailable && isEndAvailable) {
 
-               allBatteryVoltage_Start.add(dbBatteryVoltage_Start);
+               /*
+                * Ensure that start and end values are not the same, otherwise they are not visible
+                * and this can happen when only one of them is available or the start end values
+                * have not changed
+                */
+               float startEndMinDiff = 0;
+               if (dbBatteryVoltage_Start - dbBatteryVoltage_End < 0.01) {
+                  startEndMinDiff = START_END_MIN_VALUE;
+               }
+
+               allBatteryVoltage_Start.add(dbBatteryVoltage_Start + startEndMinDiff);
                allBatteryVoltage_End.add(dbBatteryVoltage_End);
 
             } else if (isStartAvailable) {
 
-               allBatteryVoltage_Start.add(dbBatteryVoltage_Start);
+               allBatteryVoltage_Start.add(dbBatteryVoltage_Start + START_END_MIN_VALUE);
                allBatteryVoltage_End.add(dbBatteryVoltage_Start);
 
             } else if (isEndAvailable) {
 
-               allBatteryVoltage_Start.add(dbBatteryVoltage_End);
+               allBatteryVoltage_Start.add(dbBatteryVoltage_End + START_END_MIN_VALUE);
                allBatteryVoltage_End.add(dbBatteryVoltage_End);
 
             } else {

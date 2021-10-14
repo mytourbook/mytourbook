@@ -424,38 +424,49 @@ public class Chart extends ViewForm {
                                              final int hoveredBarSerieIndex,
                                              final int hoveredBarValueIndex) {
 
+      /*
+       * Mouse wheel action
+       */
+      // set text for mouse wheel mode
+      final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_MODE);
+      if (_mouseMode.equals(MOUSE_MODE_SLIDER)) {
+
+         // mouse mode: slider
+         actionMouseMode.setText(Messages.Action_mouse_mode_zoom);
+
+      } else {
+
+         // mouse mode: zoom
+         actionMouseMode.setText(Messages.Action_mouse_mode_slider);
+      }
+
       if (_chartDataModel.getChartType() == ChartType.BAR) {
 
          /*
-          * create menu for bar charts
+          * Create menu for bar charts
           */
 
          // get the context provider from the data model
-         final IChartContextProvider barChartContextProvider = (IChartContextProvider) _chartDataModel
-               .getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
+         final IChartContextProvider barChartContextProvider =
+               (IChartContextProvider) _chartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
 
          if (barChartContextProvider != null) {
             barChartContextProvider.fillBarChartContextMenu(menuMgr, hoveredBarSerieIndex, hoveredBarValueIndex);
          }
 
+         if (_isShowZoomActions) {
+
+            menuMgr.add(new Separator());
+            menuMgr.add(actionMouseMode);
+            menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH));
+         }
+
       } else {
 
          /*
-          * create menu for line charts
+          * Create menu for line charts
           */
 
-         // set text for mouse wheel mode
-         final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_MODE);
-         if (_mouseMode.equals(MOUSE_MODE_SLIDER)) {
-
-            // mouse mode: slider
-            actionMouseMode.setText(Messages.Action_mouse_mode_zoom);
-
-         } else {
-
-            // mouse mode: zoom
-            actionMouseMode.setText(Messages.Action_mouse_mode_slider);
-         }
 
          // fill slider context menu
          if (_chartContextProvider != null) {

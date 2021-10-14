@@ -502,12 +502,18 @@ public class FitData {
 
    private void finalizeTour_Sensors(final TourData tourData) {
 
+      /*
+       * Set tour info into the sensor values
+       */
       for (final DeviceSensorValue deviceSensorValue : _allDeviceSensorValues) {
 
          deviceSensorValue.setTourStartTime(tourData.getTourStartTimeMS());
          deviceSensorValue.setTourData(tourData);
       }
 
+      /*
+       * Set sensor values into tour data
+       */
       final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
 
       allTourData_SensorValues.clear();

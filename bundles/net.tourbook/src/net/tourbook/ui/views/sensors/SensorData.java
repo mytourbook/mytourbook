@@ -15,17 +15,21 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
+import net.tourbook.data.DeviceSensor;
+
 public class SensorData {
 
-   public long    firstDateTime;
+   public long         firstDateTime;
 
-   public long[]  allTourIds;
-   public long[]  allTourStartTime;
+   public long[]       allTourIds;
+   public long[]       allTourStartTime;
 
-   public int[]   allXValues_BySequence;
-   public int[]   allXValues_ByTime;
+   public int[]        allXValues_BySequence;
+   public int[]        allXValues_ByTime;
 
-   public float[] allBatteryVoltage_Start;
-   public float[] allBatteryVoltage_End;
+   public float[]      allBatteryVoltage_Start;
+   public float[]      allBatteryVoltage_End;
+
+   public DeviceSensor sensor;
 
 }

@@ -8491,7 +8491,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * select the next bar item
     */
-   int selectBarItemNext() {
+   int selectBarItem_Next() {
 
       int selectedIndex = Chart.NO_BAR_SELECTION;
 
@@ -8529,6 +8529,8 @@ public class ChartComponentGraph extends Canvas {
 
       _selectedBarItems[selectedIndex] = true;
 
+      setChartPosition(selectedIndex);
+
       redrawSelection();
 
       return selectedIndex;
@@ -8537,7 +8539,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * select the previous bar item
     */
-   int selectBarItemPrevious() {
+   int selectBarItem_Previous() {
 
       int selectedIndex = Chart.NO_BAR_SELECTION;
 
@@ -8576,6 +8578,8 @@ public class ChartComponentGraph extends Canvas {
       }
 
       _selectedBarItems[selectedIndex] = true;
+
+      setChartPosition(selectedIndex);
 
       redrawSelection();
 
@@ -8707,6 +8711,41 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
+    * Move slider to the valueIndex position.
+    *
+    * @param valueIndex
+    */
+   private void setChartPosition(int valueIndex) {
+
+      final ChartDataXSerie xData = getXData();
+
+      if (xData == null) {
+         return;
+      }
+
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final int xValueLastIndex = xValues.length - 1;
+
+      // adjust the slider index to the array bounds
+      valueIndex = valueIndex < 0
+            ? 0
+            : valueIndex > xValueLastIndex
+                  ? xValueLastIndex
+                  : valueIndex;
+
+      final double xValue = xValues[valueIndex];
+      final double lastXValue = xValues[xValueLastIndex];
+      final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
+
+      final boolean isSetKeyCenterZoomPosition = true;
+      _zoomRatioCenterKey = isSetKeyCenterZoomPosition ? xxDevLinePos / _xxDevGraphWidth : 0;
+
+      setChartPosition((long) xxDevLinePos);
+
+      _isSliderDirty = true;
+   }
+
+   /**
     * Move a zoomed chart to a new position
     *
     * @param xxDevNewPosition
@@ -8767,7 +8806,9 @@ public class ChartComponentGraph extends Canvas {
 
       final ChartType chartType = chartDataModel.getChartType();
 
-      if (chartType == ChartType.LINE || chartType == ChartType.LINE_WITH_BARS) {
+      if (chartType == ChartType.LINE
+            || chartType == ChartType.LINE_WITH_BARS
+            || chartType == ChartType.BAR) {
 
          final boolean isMouseModeSlider = _chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER);
 

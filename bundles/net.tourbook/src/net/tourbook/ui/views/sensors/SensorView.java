@@ -184,6 +184,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             final int isBatteryValueAvailable1 = item1.isBatteryValuesAvailable ? 1 : 0;
             final int isBatteryValueAvailable2 = item2.isBatteryValuesAvailable ? 1 : 0;
+
             rc = isBatteryValueAvailable1 - isBatteryValueAvailable2;
 
             break;
@@ -201,12 +202,17 @@ public class SensorView extends ViewPart implements ITourViewer {
             rc = item1.sensor.getSensorName().compareTo(item2.sensor.getSensorName());
          }
 
-         // 2nd sort by manufacturer name
+         // 2nd sort by sensor custom name
+         if (rc == 0) {
+            rc = item1.sensor.getSensorName().compareTo(item2.sensor.getSensorName());
+         }
+
+         // 3nd sort by manufacturer name
          if (rc == 0) {
             rc = item1.sensor.getManufacturerName().compareTo(item2.sensor.getManufacturerName());
          }
 
-         // 3nd sort by product name
+         // 4nd sort by product name
          if (rc == 0) {
             rc = item1.sensor.getProductName().compareTo(item2.sensor.getProductName());
          }

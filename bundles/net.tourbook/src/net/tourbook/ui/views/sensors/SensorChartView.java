@@ -21,7 +21,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -32,11 +31,12 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.DelayedBarSelection_TourToolTip;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
@@ -47,8 +47,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -74,11 +72,13 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    public static final String              ID                       = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
 
+   private static final String             STATE_SELECTED_TOUR_ID   = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
+
    private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
    private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
 
    private IPartListener2                  _partListener;
-   private PostSelectionProvider           _postSelectionProvider;
+//   private PostSelectionProvider           _postSelectionProvider;
    private ISelectionListener              _postSelectionListener;
    private IPropertyChangeListener         _prefChangeListener;
 
@@ -88,8 +88,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private SensorDataProvider              _sensorDataProvider      = new SensorDataProvider();
 
    private Long                            _selectedTourId;
-
-   private ActionXAxis                     _actionXAxis;
 
    private DelayedBarSelection_TourToolTip _tourToolTip;
    private TourInfoIconToolTipProvider     _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
@@ -104,22 +102,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private Composite _pageNoBatteryData;
 
    private Chart     _sensorChart;
-
-   private class ActionXAxis extends Action {
-
-      public ActionXAxis() {
-
-         super(Messages.Tour_Action_show_time_on_x_axis, AS_RADIO_BUTTON);
-
-         setToolTipText(Messages.Tour_Action_show_time_on_x_axis_tooltip);
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.XAxis_ShowTime));
-      }
-
-      @Override
-      public void run() {
-         onAction_XAxis();
-      }
-   }
 
    private void addPartListener() {
 
@@ -195,8 +177,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void createActions() {
 
-      _actionXAxis = new ActionXAxis();
-
       fillToolbar();
    }
 
@@ -213,7 +193,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       addSelectionListener();
 
       // set this view part as selection provider
-      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+//      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
    }
 
    /**
@@ -346,12 +326,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
     */
    private void fillToolbar() {
 
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(_actionXAxis);
-
-      // update that actions are fully created otherwise action enable will fail
-      tbm.update(true);
+//      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+//
+//      // update that actions are fully created otherwise action enable will fail
+//      tbm.update(true);
    }
 
    @Override
@@ -389,11 +367,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _tk = new FormToolkit(parent.getDisplay());
    }
 
-   private void onAction_XAxis() {
-      // TODO Auto-generated method stub
-
-   }
-
    private void onSelectionChanged(final ISelection selection) {
 
       if (selection instanceof StructuredSelection) {
@@ -410,6 +383,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
             _sensorData = _sensorDataProvider.getTourTimeData(sensorId);
 
+            _sensorData.sensor = sensorItem.sensor;
+
             if (_sensorData.allTourIds.length == 0) {
 
                _pageBook.showPage(_pageNoBatteryData);
@@ -425,13 +400,87 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void restoreState() {
 
+      _selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOUR_ID, -1);
+
+      /*
+       * Select tour even when tour ID == -1 because this will set the selected bar selection flags
+       */
+      selectTour(_selectedTourId);
    }
 
    private void saveState() {
 
+      final ISelection selection = _sensorChart.getSelection();
+
+      if (_sensorData != null
+            && _sensorData.allTourIds != null
+            && _sensorData.allTourIds.length > 0
+            && selection instanceof SelectionBarChart) {
+
+         final long selectedTourId = _sensorData.allTourIds[((SelectionBarChart) selection).valueIndex];
+
+         _state.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
+      }
    }
 
-   private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+   /**
+    * @param tourId
+    *           Tour ID to select, can also be an invalid value, then the first tour is selected
+    * @return
+    */
+   private boolean selectTour(final Long tourId) {
+
+      if (_sensorData == null
+            || tourId == null) {
+         return false;
+      }
+
+      final long[] allTourIds = _sensorData.allTourIds;
+      final int numTours = allTourIds.length;
+
+      if (numTours == 0) {
+
+         _selectedTourId = null;
+         _tourInfoToolTipProvider.setTourId(-1);
+
+         return false;
+      }
+
+      final boolean[] allSelectedBars = new boolean[numTours];
+
+      boolean isTourSelected = false;
+
+      // find the tour which has the same tourId as the selected tour
+      for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+
+         if (allTourIds[tourIndex] == tourId) {
+
+            allSelectedBars[tourIndex] = true;
+            isTourSelected = true;
+
+            _selectedTourId = tourId;
+            _tourInfoToolTipProvider.setTourId(_selectedTourId);
+
+            break;
+         }
+      }
+
+      if (isTourSelected == false) {
+
+         // select first tour
+
+         allSelectedBars[0] = true;
+
+         _selectedTourId = allTourIds[0];
+         _tourInfoToolTipProvider.setTourId(_selectedTourId);
+      }
+
+      _sensorChart.setSelectedBars(allSelectedBars);
+
+      return isTourSelected;
+   }
+
+   private void setChartProviders(final ChartDataModel chartModel) {
 
       final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
 
@@ -476,19 +525,29 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
-      // set the x-axis
+      final DeviceSensor sensor = sensorData.sensor;
+      String sensorName = sensor.getSensorName();
+      if (sensorName.length() == 0) {
+         sensorName = sensor.getManufacturerName() + UI.DASH_WITH_SPACE + sensor.getProductName();
+      }
+
+      /*
+       * Set x-axis values
+       */
       final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(sensorData.allXValues_ByTime));
       xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
       xData.setStartDateTime(getTourStartTime(sensorData.firstDateTime));
       chartModel.setXData(xData);
 
-      // set  bar low/high data
+      /*
+       * Set y-axis values
+       */
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             sensorData.allBatteryVoltage_End,
             sensorData.allBatteryVoltage_Start);
 
-      yData.setYTitle("Sensor Battery");
+      yData.setYTitle("Sensor Battery  ·  " + sensorName);
       yData.setUnitLabel("Volt");
       yData.setShowYSlider(true);
 
@@ -503,9 +562,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       // set dummy title that the history labels are not truncated
       chartModel.setTitle(UI.SPACE);
 
-      setChartProviders(_sensorChart, chartModel);
+      setChartProviders(chartModel);
 
       // show the data in the chart
       _sensorChart.updateChart(chartModel, false, true);
+
+      // try to select the previously selected tour
+      selectTour(_selectedTourId);
    }
 }
