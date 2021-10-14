@@ -394,13 +394,6 @@
             category    ="net.tourbook.preferences.PrefPageTourTypeFilter"
          />
          
-            <page
-            name		="%Pref_Page_TourType_StravaActivities"
-            id          ="net.tourbook.preferences.PrefPageTourTypeStravaActivities"
-            class       ="net.tourbook.preferences.PrefPageTourTypes"
-            category    ="net.tourbook.preferences.PrefPageTourTypeFilter"
-         />
-
 
       <!--
          Statistics
