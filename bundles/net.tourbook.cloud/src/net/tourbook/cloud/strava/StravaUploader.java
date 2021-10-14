@@ -280,11 +280,9 @@ public class StravaUploader extends TourbookCloudUploader {
    @Override
    public List<TourTypeFilter> getTourTypeFilters() {
 
-      final List<TourTypeFilter> stravaTourTypeFilters = _prefStore.getBoolean(Preferences.STRAVA_USEACTIVITYNAMEMAPPING)
+      final List<TourTypeFilter> stravaTourTypeFilters = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)
             ? createStravaTourTypeFilters()
             : new ArrayList<>();
-
-      //TODO FB but when the uncheck it, how can we remove them? do we ask to remove them manually?
 
       return stravaTourTypeFilters;
    }

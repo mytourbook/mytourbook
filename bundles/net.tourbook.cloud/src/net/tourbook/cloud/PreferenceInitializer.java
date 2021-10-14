@@ -46,7 +46,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(Preferences.STRAVA_ATHLETEID, UI.EMPTY_STRING);
       store.setDefault(Preferences.STRAVA_ATHLETEFULLNAME, UI.EMPTY_STRING);
       store.setDefault(Preferences.STRAVA_SENDDESCRIPTION, true);
-      store.setDefault(Preferences.STRAVA_USEACTIVITYNAMEMAPPING, false);
+      store.setDefault(Preferences.STRAVA_USETOURTYPEMAPPING, false);
 
       initializeDefaultSuuntoPreferences(store);
       store.setDefault(Preferences.SUUNTO_SELECTED_PERSON_INDEX, 0);

@@ -265,7 +265,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
             _chkUseTourTypeMapping.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckUseTourTypeMapping()));
-            _chkUseTourTypeMapping.setText("Use the tour type mapping");
+            _chkUseTourTypeMapping.setText("Use tour type mapping");
             //toolip "This will give the possibility to map one or multiple tour type for each Strava activities
          }
 
@@ -308,6 +308,9 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             "Messages.pref_cache_message_box_text")) {
 
          Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+
+         //todo fb Whne unchecked, "YOu have unchecked blablabla, you can now delete all the Strava tour type filters in the
+         //Tour Type filter preference page  <==== make it clickable to go to the preference page
       }
    }
 
