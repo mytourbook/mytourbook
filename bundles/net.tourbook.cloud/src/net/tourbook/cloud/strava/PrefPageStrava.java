@@ -54,9 +54,6 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb
-   //if at upload time a tour type is in several strava tour filters, than raise an error dialog
-
    //SET_FORMATTING_OFF
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURUPLOAD   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_TourUpload;
@@ -424,10 +421,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
                      activeShell,
                      Messages.Dialog_UseTourTypeMappingModified_Title,
                      Messages.Dialog_UseTourTypeMappingDeactivated_Message);
-
-               //todo fb Whne unchecked, "YOu have unchecked blablabla, you can now delete all the Strava tour type filters in the
-               //Tour Type filter preference page  <==== make it clickable to go to the preference page
-
             }
          }
 
