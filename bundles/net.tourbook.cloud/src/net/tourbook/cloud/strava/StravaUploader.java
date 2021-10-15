@@ -82,7 +82,7 @@ public class StravaUploader extends TourbookCloudUploader {
    private static IPreferenceStore _prefStore                      = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter                   = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
-   private static String           CLOUD_UPLOADER_ID               = "Strava";
+   private static String           CLOUD_UPLOADER_ID               = "Strava";                                                             //$NON-NLS-1$
    private String                  STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
 
    public StravaUploader() {
@@ -220,18 +220,18 @@ public class StravaUploader extends TourbookCloudUploader {
          boolean useActivityType = false;
          if (tourType != null) {
 
-            final List<String> stravaActivityName = getStravaActivityNamesFromTourType(tourType);
+            final List<String> stravaActivityNames = getStravaActivityNamesFromTourType(tourType);
 
-            useActivityType = stravaActivityName.size() == 1;
+            useActivityType = stravaActivityNames.size() == 1;
 
-            if (stravaActivityName.size() > 1) {
-               //todo fb if multiple log an error
-               //if none found use ride by default
+            if (stravaActivityNames.size() > 1) {
+
                TourLogManager.log_ERROR(NLS.bind(
-                     Messages.Log_UploadToursToStrava_004_UploadError,
-                     TourManager.getTourDateTimeShort(tourData),
-                     "The tour type " + tourType.getName()
-                           + " was found to be mapped to several Strava activity types. The upload for the file djdjef was cancelled."));
+                     Messages.Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes,
+                     new Object[] {
+                           TourManager.getTourDateTimeShort(tourData),
+                           tourType.getName(),
+                           String.join(UI.COMMA_SPACE, stravaActivityNames) }));
 
                return UI.EMPTY_STRING;
             }
@@ -239,7 +239,7 @@ public class StravaUploader extends TourbookCloudUploader {
             _tourExporter.setUseActivityType(useActivityType);
 
             if (useActivityType) {
-               _tourExporter.setActivityType(stravaActivityName.get(0));
+               _tourExporter.setActivityType(stravaActivityNames.get(0));
             }
          }
       }
@@ -291,7 +291,8 @@ public class StravaUploader extends TourbookCloudUploader {
                   final int activityNameIndex =
                         name.toLowerCase().lastIndexOf(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase());
                   name = name.substring(
-                        activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length()).trim();
+                        activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length())
+                        .trim();
                   matchingStravaActivityNames.add(name);
                }
             }
