@@ -65,10 +65,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb
-
-   // if current user has no token, check if "all people" has a token, if not then open the prefs
-
    //SET_FORMATTING_OFF
    private static final String PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE                         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
