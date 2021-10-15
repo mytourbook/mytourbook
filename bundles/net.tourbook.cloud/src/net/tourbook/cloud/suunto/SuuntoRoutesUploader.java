@@ -39,7 +39,6 @@ import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -50,6 +49,7 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.apache.http.HttpHeaders;
@@ -280,7 +280,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
             for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
 
                final TourData tourData = selectedTours.get(index);
-               final String tourStartTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+               final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
 
                if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
 
