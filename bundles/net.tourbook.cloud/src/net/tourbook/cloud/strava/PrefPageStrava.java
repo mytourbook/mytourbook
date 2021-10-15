@@ -63,12 +63,12 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    //See => {@link PrefPageComputedValues}
 
    //SET_FORMATTING_OFF
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT        = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_UPLOADCONFIGURATION = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_UploadConfiguration;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN        = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT          = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE            = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURUPLOAD   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_TourUpload;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
    public static final String      ID                  = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
@@ -121,6 +121,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       restoreState();
 
+      enableControls();
+
       _prefChangeListener = event -> {
 
          if (event.getProperty().equals(Preferences.STRAVA_ACCESSTOKEN)) {
@@ -138,7 +140,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
                   _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
                   _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
 
-                  updateTokensInformationGroup();
+                  enableControls();
                }
                if (_server != null) {
                   _server.stopCallBackServer();
@@ -248,7 +250,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_UPLOADCONFIGURATION);
+      group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURUPLOAD);
       GridLayoutFactory.swtDefaults().applyTo(group);
       {
          {
@@ -278,6 +280,24 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       Util.disposeResource(_imageStravaConnect);
 
       super.dispose();
+   }
+
+   private void enableControls() {
+
+      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) && StringUtils.hasContent(_labelRefreshToken_Value
+            .getText());
+
+      _labelAthleteName_Value.setEnabled(isAuthorized);
+      _labelAthleteWebPage.setEnabled(isAuthorized);
+      _linkAthleteWebPage.setEnabled(isAuthorized);
+      _labelAthleteName.setEnabled(isAuthorized);
+      _labelAccessToken.setEnabled(isAuthorized);
+      _labelRefreshToken.setEnabled(isAuthorized);
+      _labelRefreshToken_Value.setEnabled(isAuthorized);
+      _labelExpiresAt_Value.setEnabled(isAuthorized);
+      _labelExpiresAt.setEnabled(isAuthorized);
+      _chkSendDescription.setEnabled(isAuthorized);
+      _chkUseTourTypeMapping.setEnabled(isAuthorized);
    }
 
    private String getLocalExpireAtDateTime() {
@@ -360,10 +380,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
       _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
-      updateTokensInformationGroup();
-
       _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
+
+      enableControls();
 
       super.performDefaults();
    }
@@ -436,23 +456,5 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       _chkSendDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
-
-      updateTokensInformationGroup();
-   }
-
-   private void updateTokensInformationGroup() {
-
-      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) && StringUtils.hasContent(_labelRefreshToken_Value
-            .getText());
-
-      _labelAthleteName_Value.setEnabled(isAuthorized);
-      _labelAthleteWebPage.setEnabled(isAuthorized);
-      _linkAthleteWebPage.setEnabled(isAuthorized);
-      _labelAthleteName.setEnabled(isAuthorized);
-      _labelAccessToken.setEnabled(isAuthorized);
-      _labelRefreshToken.setEnabled(isAuthorized);
-      _labelRefreshToken_Value.setEnabled(isAuthorized);
-      _labelExpiresAt_Value.setEnabled(isAuthorized);
-      _labelExpiresAt.setEnabled(isAuthorized);
    }
 }
