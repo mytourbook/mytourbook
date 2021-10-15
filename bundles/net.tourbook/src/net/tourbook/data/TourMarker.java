@@ -875,8 +875,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       _visibleType = visibleType;
    }
 
+   /**
+    * This method is called in the MT UI in the "Tour Data" view
+    */
    @Override
    public String toString() {
+
       return "TourMarker [" //$NON-NLS-1$
 //            + ("markerId=" + markerId + ", ")
 //            + ("tourData=" + tourData + ", ")

@@ -211,21 +211,25 @@ public class DeviceSensorValue {
       this.tourStartTime = tourStartTime;
    }
 
+   /**
+    * This method is called in the MT UI in the "Tour Data" view
+    */
    @Override
    public String toString() {
 
       return "DeviceSensorValue" + NL //                                                     //$NON-NLS-1$
 
-            + "[" + NL //                                                                    //$NON-NLS-1$
+//            + "[" + NL //                                                                    //$NON-NLS-1$
 
-            + "sensorValueId                 = " + sensorValueId + NL //                     //$NON-NLS-1$
-            + "batteryVoltage_Start          = " + batteryVoltage_Start + NL //              //$NON-NLS-1$
-            + "batteryVoltage_End            = " + batteryVoltage_End + NL //                //$NON-NLS-1$
-            + "cummulatedOperatingTime_Start = " + cummulatedOperatingTime_Start + NL //     //$NON-NLS-1$
-            + "cummulatedOperatingTime_End   = " + cummulatedOperatingTime_End + NL //       //$NON-NLS-1$
-            + "deviceSensor                  = " + deviceSensor + NL //                      //$NON-NLS-1$
-            + "tourData                      = " + tourData + NL //                          //$NON-NLS-1$
+            + "   sensorValueId                 = " + sensorValueId + NL //                     //$NON-NLS-1$
+            + "   batteryVoltage_Start          = " + batteryVoltage_Start + NL //              //$NON-NLS-1$
+            + "   batteryVoltage_End            = " + batteryVoltage_End + NL //                //$NON-NLS-1$
+            + "   cummulatedOperatingTime_Start = " + cummulatedOperatingTime_Start + NL //     //$NON-NLS-1$
+            + "   cummulatedOperatingTime_End   = " + cummulatedOperatingTime_End + NL //       //$NON-NLS-1$
+            + "   deviceSensor                  = " + deviceSensor + NL //                      //$NON-NLS-1$
+//            + "   tourData                      = " + tourData + NL //                          //$NON-NLS-1$
 
-            + "]" + NL; //                                                                   //$NON-NLS-1$
+//            + "]" + NL //                                                                   //$NON-NLS-1$
+      ;
    }
 }

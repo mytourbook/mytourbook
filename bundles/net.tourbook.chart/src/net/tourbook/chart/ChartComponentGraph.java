@@ -171,7 +171,7 @@ public class ChartComponentGraph extends Canvas {
    private double                      _zoomRatioLeftBorder;
 
    /**
-    * ratio where the mouse was double clicked, this position is used to zoom the chart with the
+    * Ratio where the mouse was double clicked, this position is used to zoom the chart with the
     * mouse
     */
    private double                      _zoomRatioCenter;
@@ -179,7 +179,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * This zoom ratio is used when zooming the next time with the keyboard, when 0 this is ignored.
     */
-   private double                      _zoomRatioCenterKey;
+   private double                      _zoomRatioCenter_WithKeyboard;
 
    /**
     * when the slider is dragged and the mouse up event occurs, the graph is zoomed to the sliders
@@ -7147,14 +7147,14 @@ public class ChartComponentGraph extends Canvas {
     * @param isCenterSliderPosition
     * @param isMoveChartToShowSlider
     * @param isFireEvent
-    * @param isSetKeyCenterZoomPosition
+    * @param isCenterZoomPosition
     */
    void moveXSlider(final ChartXSlider xSlider,
                     int valueIndex,
                     final boolean isCenterSliderPosition,
                     final boolean isMoveChartToShowSlider,
                     final boolean isFireEvent,
-                    final boolean isSetKeyCenterZoomPosition) {
+                    final boolean isCenterZoomPosition) {
 
       final ChartDataXSerie xData = getXData();
 
@@ -7179,7 +7179,9 @@ public class ChartComponentGraph extends Canvas {
       xSlider.setValueIndex(valueIndex);
       xSlider.moveToXXDevPosition(xxDevLinePos, true, true, false, isFireEvent);
 
-      _zoomRatioCenterKey = isSetKeyCenterZoomPosition ? xxDevLinePos / _xxDevGraphWidth : 0;
+      _zoomRatioCenter_WithKeyboard = isCenterZoomPosition
+            ? xxDevLinePos / _xxDevGraphWidth
+            : 0;
 
       setChartPosition(xSlider, isCenterSliderPosition, isMoveChartToShowSlider, 15);
 
@@ -7274,8 +7276,8 @@ public class ChartComponentGraph extends Canvas {
             case '+':
 
                // overwrite zoom ratio
-               if (_zoomRatioCenterKey != 0) {
-                  _zoomRatioCenter = _zoomRatioCenterKey;
+               if (_zoomRatioCenter_WithKeyboard != 0) {
+                  _zoomRatioCenter = _zoomRatioCenter_WithKeyboard;
                }
 
                _chart.onExecuteZoomIn(accelerator);
@@ -7285,8 +7287,8 @@ public class ChartComponentGraph extends Canvas {
             case '-':
 
                // overwrite zoom ratio
-               if (_zoomRatioCenterKey != 0) {
-                  _zoomRatioCenter = _zoomRatioCenterKey;
+               if (_zoomRatioCenter_WithKeyboard != 0) {
+                  _zoomRatioCenter = _zoomRatioCenter_WithKeyboard;
                }
                _chart.onExecuteZoomOut(true, accelerator);
 
@@ -8710,14 +8712,21 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * Move slider to the valueIndex position.
+    * Move chart to the valueIndex position.
     *
     * @param valueIndex
     */
    private void setChartPosition(int valueIndex) {
 
-      final ChartDataXSerie xData = getXData();
+      final boolean isCenterPosition = false;
+      final double borderOffset = 15;
 
+      if (_graphZoomRatio == 1) {
+         // chart is not zoomed, nothing to do
+         return;
+      }
+
+      final ChartDataXSerie xData = getXData();
       if (xData == null) {
          return;
       }
@@ -8725,7 +8734,7 @@ public class ChartComponentGraph extends Canvas {
       final double[] xValues = xData.getHighValuesDouble()[0];
       final int xValueLastIndex = xValues.length - 1;
 
-      // adjust the slider index to the array bounds
+      // adjust the value index to the array bounds
       valueIndex = valueIndex < 0
             ? 0
             : valueIndex > xValueLastIndex
@@ -8733,15 +8742,69 @@ public class ChartComponentGraph extends Canvas {
                   : valueIndex;
 
       final double xValue = xValues[valueIndex];
-      final double lastXValue = xValues[xValueLastIndex];
-      final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
+      final double xValueMax = xValues[xValueLastIndex];
 
-      final boolean isSetKeyCenterZoomPosition = true;
-      _zoomRatioCenterKey = isSetKeyCenterZoomPosition ? xxDevLinePos / _xxDevGraphWidth : 0;
+      final double xxDev_XValuePos = _xxDevGraphWidth * xValue / xValueMax;
 
-      setChartPosition((long) xxDevLinePos);
+      final int devXViewPortWidth = getDevVisibleChartWidth();
+      final long xxDevCenter = (long) (xxDev_XValuePos - devXViewPortWidth / 2);
 
-      _isSliderDirty = true;
+      double xxDevOffset = xxDev_XValuePos;
+
+      if (isCenterPosition) {
+
+         xxDevOffset = xxDevCenter;
+
+      } else {
+
+         /*
+          * Check if the value index is in the visible area
+          */
+         if (xxDev_XValuePos < _xxDevViewPortLeftBorder + borderOffset) {
+
+            xxDevOffset = xxDev_XValuePos + 1 - borderOffset;
+
+         } else if (xxDev_XValuePos > _xxDevViewPortLeftBorder + devXViewPortWidth - borderOffset) {
+
+            xxDevOffset = xxDev_XValuePos - devXViewPortWidth + borderOffset;
+         }
+      }
+
+      if (xxDevOffset != xxDev_XValuePos) {
+
+         /*
+          * Value index is not visible
+          */
+
+         // check left border
+         xxDevOffset = Math.max(xxDevOffset, 0);
+
+         // check right border
+         xxDevOffset = Math.min(xxDevOffset, _xxDevGraphWidth - devXViewPortWidth);
+
+         _zoomRatioLeftBorder = xxDevOffset / _xxDevGraphWidth;
+
+         /*
+          * Reposition the mouse zoom position
+          */
+         final double xOffsetMouse = _xxDevViewPortLeftBorder + devXViewPortWidth / 2;
+         _zoomRatioCenter = xOffsetMouse / _xxDevGraphWidth;
+
+         updateVisibleMinMaxValues();
+
+         /*
+          * Prevent to display the old chart image
+          */
+         _isChartDirty = true;
+
+         _chartComponents.onResize();
+      }
+
+      /*
+       * Set position where the double click occurred, this position will be used when the chart is
+       * zoomed
+       */
+      _zoomRatioCenter = xxDev_XValuePos / _xxDevGraphWidth;
    }
 
    /**

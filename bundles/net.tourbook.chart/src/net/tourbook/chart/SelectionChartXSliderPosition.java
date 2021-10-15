@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ public class SelectionChartXSliderPosition implements ISelection {
     * When <code>true</code> the zoom position is set to the center of the chart that the next zoom
     * starts from the center of the sliders.
     */
-   private boolean         _isCenterZoomPositionWithKey;
+   private boolean         _isCenterZoomPosition;
 
    private Object          _customData;
 
@@ -120,8 +120,8 @@ public class SelectionChartXSliderPosition implements ISelection {
       return _isCenterSliderPosition;
    }
 
-   public boolean isCenterZoomPositionWithKey() {
-      return _isCenterZoomPositionWithKey;
+   public boolean isCenterZoomPosition() {
+      return _isCenterZoomPosition;
    }
 
    @Override
@@ -140,8 +140,8 @@ public class SelectionChartXSliderPosition implements ISelection {
       _isCenterSliderPosition = isCenterSliderPosition;
    }
 
-   public void setCenterZoomPositionWithKey(final boolean isCenterZoomPositionWithKey) {
-      _isCenterZoomPositionWithKey = isCenterZoomPositionWithKey;
+   public void setCenterZoomPosition(final boolean isCenterZoomPosition) {
+      _isCenterZoomPosition = isCenterZoomPosition;
    }
 
    public void setChart(final Chart chart) {

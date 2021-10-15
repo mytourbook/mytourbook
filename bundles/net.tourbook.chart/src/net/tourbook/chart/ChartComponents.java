@@ -2556,7 +2556,7 @@ public class ChartComponents extends Composite {
 
       final double[] xValues = _chartDataModel.getXData()._highValuesDouble[0];
       final boolean isCenterSliderPosition = sliderPosition.isCenterSliderPosition();
-      final boolean isCenterZoomPosition = sliderPosition.isCenterZoomPositionWithKey();
+      final boolean isCenterZoomPosition = sliderPosition.isCenterZoomPosition();
       final boolean isMoveChartToShowSlider = sliderPosition.isMoveChartToShowSlider();
 
       /*

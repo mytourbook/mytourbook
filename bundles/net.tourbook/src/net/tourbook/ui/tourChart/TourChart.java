@@ -3711,7 +3711,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final boolean isMoveChartToShowSlider = _selectedSegmenterSegment_2 == null;
 
-      selectSegmenterSegments(//
+      selectSegmenterSegments(
             _selectedSegmenterSegment_1,
             _selectedSegmenterSegment_2,
             isMoveChartToShowSlider);
@@ -4295,7 +4295,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          final boolean isMoveChartToShowSlider = _selectedSegmenterSegment_2 == null;
 
-         selectSegmenterSegments(//
+         selectSegmenterSegments(
                _selectedSegmenterSegment_1,
                _selectedSegmenterSegment_2,
                isMoveChartToShowSlider);
@@ -4362,7 +4362,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       selectionSliderPosition.setCustomData(selectedSegments);
       selectionSliderPosition.setMoveChartToShowSlider(isMoveChartToShowSlider);
-      selectionSliderPosition.setCenterZoomPositionWithKey(true);
+      selectionSliderPosition.setCenterZoomPosition(true);
 
       /*
        * Set x slider position in the chart but do not fire an event because the event would be
