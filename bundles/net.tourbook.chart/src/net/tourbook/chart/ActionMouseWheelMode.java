@@ -35,6 +35,7 @@ public class ActionMouseWheelMode extends Action {
    }
 
    public MouseWheelMode getMouseWheelMode() {
+
       return _mouseWheelMode;
    }
 
@@ -52,7 +53,7 @@ public class ActionMouseWheelMode extends Action {
       _chart.onExecuteMouseWheelMode(_mouseWheelMode);
    }
 
-   public void setIconImage() {
+   private void setIconImage() {
 
       setImageDescriptor(_mouseWheelMode == MouseWheelMode.Zoom
 
@@ -61,7 +62,10 @@ public class ActionMouseWheelMode extends Action {
    }
 
    public void setMouseWheelMode(final MouseWheelMode mouseWheelMode) {
+
       _mouseWheelMode = mouseWheelMode;
+
+      setIconImage();
    }
 
 }

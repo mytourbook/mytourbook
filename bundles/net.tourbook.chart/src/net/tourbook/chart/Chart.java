@@ -1261,6 +1261,7 @@ public class Chart extends ViewForm {
     *           toolbar will be filled when the chart is updated
     */
    public void setToolBarManager(final IToolBarManager toolbarMgr, final boolean isFillToolbar) {
+
       _toolbarMgr = toolbarMgr;
       _isFillToolbar = isFillToolbar;
    }
@@ -1460,7 +1461,8 @@ public class Chart extends ViewForm {
    private void updateUI_MouseWheelMode() {
 
       if (_action_MouseWheelMode != null) {
-         _action_MouseWheelMode.setChecked(_mouseWheelMode.equals(MouseWheelMode.Selection));
+
+         _action_MouseWheelMode.setMouseWheelMode(_mouseWheelMode);
       }
    }
 

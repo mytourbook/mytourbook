@@ -68,19 +68,19 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Shows the selected sensor in a chart
+ * Shows battery values of a sensor in a chart
  */
 public class SensorChartView extends ViewPart implements ITourProvider {
 
    public static final String              ID                       = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
 
+   private static final String             STATE_MOUSE_WHEEL_MODE   = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
    private static final String             STATE_SELECTED_TOUR_ID   = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
 
    private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
    private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
 
    private IPartListener2                  _partListener;
-//   private PostSelectionProvider           _postSelectionProvider;
    private ISelectionListener              _postSelectionListener;
    private IPropertyChangeListener         _prefChangeListener;
 
@@ -192,14 +192,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       createUI(parent);
       createActions();
 
-      restoreState();
-
       addPartListener();
       addPrefListener();
       addSelectionListener();
 
-      // set this view part as selection provider
-//      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      restoreState();
    }
 
    /**
@@ -264,9 +261,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private Chart createUI_10_Chart() {
 
       final Chart sensorChart = new Chart(_pageBook, SWT.FLAT);
-      sensorChart.setShowZoomActions(true);
-      sensorChart.setMouseWheelMode(MouseWheelMode.Selection);
 
+      sensorChart.setShowZoomActions(true);
       sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
       sensorChart.addBarSelectionListener((serieIndex, valueIndex) -> {
@@ -425,6 +421,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
        * Select tour even when tour ID == -1 because this will set the selected bar selection flags
        */
       selectTour(_selectedTourId);
+
+      // mouse wheel mode
+      final Enum<MouseWheelMode> mouseWheelMode = Util.getStateEnum(_state, STATE_MOUSE_WHEEL_MODE, MouseWheelMode.Selection);
+      _sensorChart.getAction_MouseWheelMode().setMouseWheelMode((MouseWheelMode) mouseWheelMode);
    }
 
    private void saveState() {
@@ -440,6 +440,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
          _state.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
       }
+
+      // mouse wheel mode
+      final MouseWheelMode mouseWheelMode = _sensorChart.getAction_MouseWheelMode().getMouseWheelMode();
+      Util.setStateEnum(_state, STATE_MOUSE_WHEEL_MODE, mouseWheelMode);
    }
 
    /**
