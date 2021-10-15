@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-   private static final String                       ACTION_ID_MOUSE_MODE             = "ACTION_ID_MOUSE_MODE";             //$NON-NLS-1$
+   private static final String                       ACTION_ID_MOUSE_WHEEL_MODE       = "ACTION_ID_MOUSE_WHEEL_MODE";       //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_LEFT_SLIDER_HERE  = "ACTION_ID_MOVE_LEFT_SLIDER_HERE";  //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
@@ -281,7 +281,7 @@ public class Chart extends ViewForm {
 
       _allChartActions = new HashMap<>();
 
-      _allChartActions.put(ACTION_ID_MOUSE_MODE, new ActionMouseMode(this));
+      _allChartActions.put(ACTION_ID_MOUSE_WHEEL_MODE, new ActionMouseWheelMode(this));
       _allChartActions.put(ACTION_ID_MOVE_LEFT_SLIDER_HERE, new ActionMoveLeftSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_RIGHT_SLIDER_HERE, new ActionMoveRightSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_SLIDERS_TO_BORDER, new ActionMoveSlidersToBorder(this));
@@ -382,7 +382,7 @@ public class Chart extends ViewForm {
       // fit to graph is always enabled because the y-slider can change the chart
       _allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(true);
 
-      _allChartActions.get(ACTION_ID_MOUSE_MODE).setEnabled(true);
+      _allChartActions.get(ACTION_ID_MOUSE_WHEEL_MODE).setEnabled(true);
       _allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE).setEnabled(true);
       _allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE).setEnabled(true);
       _allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
@@ -428,7 +428,7 @@ public class Chart extends ViewForm {
        * Mouse wheel action
        */
       // set text for mouse wheel mode
-      final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_MODE);
+      final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_WHEEL_MODE);
       if (_mouseMode.equals(MOUSE_MODE_SLIDER)) {
 
          // mouse mode: slider
@@ -466,7 +466,6 @@ public class Chart extends ViewForm {
          /*
           * Create menu for line charts
           */
-
 
          // fill slider context menu
          if (_chartContextProvider != null) {
@@ -824,8 +823,8 @@ public class Chart extends ViewForm {
       return _chartComponents.devSliderBarHeight != 0;
    }
 
-   void onExecuteMouseMode(final boolean isChecked) {
-      setMouseMode(isChecked);
+   void onExecuteMouseWheelMode(final boolean isChecked) {
+      setMouseWheelMode(isChecked);
    }
 
    void onExecuteMoveLeftSliderHere() {
@@ -1152,23 +1151,6 @@ public class Chart extends ViewForm {
       _chartComponents.getChartComponentGraph().setLineSelectionPainter(lineSelectionPainter);
    }
 
-   /**
-    * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
-    * this is the default
-    *
-    * @param isChecked
-    */
-   public void setMouseMode(final boolean isChecked) {
-
-      _mouseMode = isChecked ? MOUSE_MODE_SLIDER : MOUSE_MODE_ZOOM;
-
-      updateMouseModeUIState();
-
-      final Point devMouse = this.toControl(getDisplay().getCursorLocation());
-      _chartComponents.getChartComponentGraph().setCursorStyle(devMouse.y);
-
-   }
-
    public void setMouseMode(final Object newMouseMode) {
 
       if (newMouseMode instanceof String) {
@@ -1177,6 +1159,23 @@ public class Chart extends ViewForm {
 
          updateMouseModeUIState();
       }
+   }
+
+   /**
+    * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
+    * this is the default
+    *
+    * @param isChecked
+    */
+   public void setMouseWheelMode(final boolean isChecked) {
+
+      _mouseMode = isChecked ? MOUSE_MODE_SLIDER : MOUSE_MODE_ZOOM;
+
+      updateMouseModeUIState();
+
+      final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+      _chartComponents.getChartComponentGraph().setCursorStyle(devMouse.y);
+
    }
 
    /**
@@ -1440,7 +1439,7 @@ public class Chart extends ViewForm {
    private void updateMouseModeUIState() {
 
       if (_allChartActions != null) {
-         _allChartActions.get(ACTION_ID_MOUSE_MODE).setChecked(_mouseMode.equals(MOUSE_MODE_SLIDER));
+         _allChartActions.get(ACTION_ID_MOUSE_WHEEL_MODE).setChecked(_mouseMode.equals(MOUSE_MODE_SLIDER));
       }
    }
 

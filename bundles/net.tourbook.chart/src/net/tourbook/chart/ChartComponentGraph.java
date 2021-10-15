@@ -7444,12 +7444,12 @@ public class ChartComponentGraph extends Canvas {
             if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
 
                // switch to mouse zoom mode
-               _chart.setMouseMode(false);
+               _chart.setMouseWheelMode(false);
 
             } else {
 
                // switch to mouse slider mode
-               _chart.setMouseMode(true);
+               _chart.setMouseWheelMode(true);
             }
 
          } else {
@@ -7457,7 +7457,7 @@ public class ChartComponentGraph extends Canvas {
             if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
 
                // switch to mouse zoom mode
-               _chart.setMouseMode(false);
+               _chart.setMouseWheelMode(false);
             }
 
             // mouse mode: zoom chart

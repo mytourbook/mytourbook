@@ -259,7 +259,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       final Chart sensorChart = new Chart(_pageBook, SWT.FLAT);
       sensorChart.setShowZoomActions(true);
-      sensorChart.setMouseMode(true);
+      sensorChart.setMouseWheelMode(true);
 
       sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 

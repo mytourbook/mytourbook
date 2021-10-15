@@ -5149,8 +5149,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    @Override
-   public void setMouseMode(final boolean isChecked) {
-      super.setMouseMode(isChecked);
+   public void setMouseWheelMode(final boolean isChecked) {
+      super.setMouseWheelMode(isChecked);
       enableZoomOptions();
    }
 
@@ -6002,7 +6002,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        */
       if (_isMouseModeSet == false) {
          _isMouseModeSet = true;
-         setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
+         setMouseWheelMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
       }
 
       _tourInfoIconTooltipProvider.setTourData(_tourData);
