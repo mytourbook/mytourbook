@@ -19,22 +19,49 @@ import org.eclipse.jface.action.Action;
 
 public class ActionMouseWheelMode extends Action {
 
-   private Chart _chart;
+   private Chart          _chart;
+
+   private MouseWheelMode _mouseWheelMode = MouseWheelMode.Zoom;
 
    public ActionMouseWheelMode(final Chart chart) {
 
-      super(Messages.Action_mouse_mode, Action.AS_CHECK_BOX);
+      super(Messages.Action_mouse_mode, Action.AS_PUSH_BUTTON);
 
       _chart = chart;
 
       setToolTipText(Messages.Action_mouse_mode_tooltip);
 
-      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseMode));
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Zoom));
+   }
+
+   public MouseWheelMode getMouseWheelMode() {
+      return _mouseWheelMode;
    }
 
    @Override
    public void run() {
-      _chart.onExecuteMouseWheelMode(isChecked());
+
+      // toogle mode
+      _mouseWheelMode = _mouseWheelMode == MouseWheelMode.Zoom
+
+            ? MouseWheelMode.Selection
+            : MouseWheelMode.Zoom;
+
+      setIconImage();
+
+      _chart.onExecuteMouseWheelMode(_mouseWheelMode);
+   }
+
+   public void setIconImage() {
+
+      setImageDescriptor(_mouseWheelMode == MouseWheelMode.Zoom
+
+            ? ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Zoom)
+            : ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Selection));
+   }
+
+   public void setMouseWheelMode(final MouseWheelMode mouseWheelMode) {
+      _mouseWheelMode = mouseWheelMode;
    }
 
 }

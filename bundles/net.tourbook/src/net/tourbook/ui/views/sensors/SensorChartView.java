@@ -31,6 +31,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.DelayedBarSelection_TourToolTip;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
@@ -47,6 +48,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -83,6 +85,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private IPropertyChangeListener         _prefChangeListener;
 
    private FormToolkit                     _tk;
+
+   private boolean                         _isChartDisplayed;
 
    private SensorData                      _sensorData;
    private SensorDataProvider              _sensorDataProvider      = new SensorDataProvider();
@@ -177,6 +181,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void createActions() {
 
+      _sensorChart.createChartActions();
+
       fillToolbar();
    }
 
@@ -259,7 +265,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       final Chart sensorChart = new Chart(_pageBook, SWT.FLAT);
       sensorChart.setShowZoomActions(true);
-      sensorChart.setMouseWheelMode(true);
+      sensorChart.setMouseWheelMode(MouseWheelMode.Selection);
 
       sensorChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
@@ -321,15 +327,22 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       super.dispose();
    }
 
+   private void enableActions() {
+
+      _sensorChart.getAction_MouseWheelMode().setEnabled(_isChartDisplayed);
+   }
+
    /*
     * Fill view toolbar
     */
    private void fillToolbar() {
 
-//      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-//
-//      // update that actions are fully created otherwise action enable will fail
-//      tbm.update(true);
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_sensorChart.getAction_MouseWheelMode());
+
+      // update that actions are fully created otherwise action enable will fail
+      tbm.update(true);
    }
 
    @Override
@@ -387,9 +400,15 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
             if (_sensorData.allTourIds.length == 0) {
 
+               _isChartDisplayed = false;
+               enableActions();
+
                _pageBook.showPage(_pageNoBatteryData);
 
             } else {
+
+               _isChartDisplayed = true;
+               enableActions();
 
                _pageBook.showPage(_sensorChart);
                updateChart(_sensorData);

@@ -16,8 +16,8 @@
 package net.tourbook.preferences;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringToArrayConverter;
@@ -238,7 +238,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 
       // mouse modus: zoom tour chart
-      store.setDefault(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
+      store.setDefault(ITourbookPreferences.GRAPH_MOUSE_MODE, MouseWheelMode.Zoom.name());
 
       // move sliders to border when zoomed
       store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);

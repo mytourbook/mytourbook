@@ -521,8 +521,7 @@ public class ChartComponentGraph extends Canvas {
       addListener();
       createContextMenu();
 
-      final Point devMouse = this.toControl(display.getCursorLocation());
-      setCursorStyle(devMouse.y);
+      setCursorStyle();
    }
 
    /**
@@ -7402,7 +7401,7 @@ public class ChartComponentGraph extends Canvas {
          moveXSlider(_selectedXSlider, valueIndex, false, true, true, false);
 
          redraw();
-         setCursorStyle(event.y);
+         setCursorStyle();
       }
    }
 
@@ -7441,23 +7440,23 @@ public class ChartComponentGraph extends Canvas {
 
             // toggle mouse mode
 
-            if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+            if (_chart.getMouseWheelMode().equals(MouseWheelMode.Selection)) {
 
                // switch to mouse zoom mode
-               _chart.setMouseWheelMode(false);
+               _chart.setMouseWheelMode(MouseWheelMode.Zoom);
 
             } else {
 
                // switch to mouse slider mode
-               _chart.setMouseWheelMode(true);
+               _chart.setMouseWheelMode(MouseWheelMode.Selection);
             }
 
          } else {
 
-            if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+            if (_chart.getMouseWheelMode().equals(MouseWheelMode.Selection)) {
 
                // switch to mouse zoom mode
-               _chart.setMouseWheelMode(false);
+               _chart.setMouseWheelMode(MouseWheelMode.Zoom);
             }
 
             // mouse mode: zoom chart
@@ -7683,7 +7682,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      setCursorStyle(devYMouse);
+      setCursorStyle();
    }
 
    /**
@@ -7760,7 +7759,7 @@ public class ChartComponentGraph extends Canvas {
          isRedraw = true;
       }
 
-      setCursorStyle(event.y);
+      setCursorStyle();
 
       if (isRedraw) {
          redraw();
@@ -7974,13 +7973,13 @@ public class ChartComponentGraph extends Canvas {
                _isHoveredBarDirty = true;
                isRedraw = true;
 
-               setCursorStyle(devYMouse);
+               setCursorStyle();
 
             } else {
 
                canShowHoveredValueTooltip = true;
 
-               setCursorStyle(devYMouse);
+               setCursorStyle();
             }
          }
       }
@@ -8301,7 +8300,7 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      setCursorStyle(devYMouse);
+      setCursorStyle();
    }
 
    void onMouseWheel(final Event event, final boolean isEventFromAxis, final boolean isLeftAxis) {
@@ -8310,7 +8309,7 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+      if (_chart.getMouseWheelMode().equals(MouseWheelMode.Selection)) {
 
          // mouse mode: move slider
 
@@ -8797,7 +8796,7 @@ public class ChartComponentGraph extends Canvas {
       _zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
    }
 
-   void setCursorStyle(final int devYMouse) {
+   void setCursorStyle() {
 
       final ChartDataModel chartDataModel = _chart.getChartDataModel();
       if (chartDataModel == null) {
@@ -8810,7 +8809,7 @@ public class ChartComponentGraph extends Canvas {
             || chartType == ChartType.LINE_WITH_BARS
             || chartType == ChartType.BAR) {
 
-         final boolean isMouseModeSlider = _chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER);
+         final boolean isMouseModeSlider = _chart.getMouseWheelMode().equals(MouseWheelMode.Selection);
 
          if (_xSliderDragged != null) {
 

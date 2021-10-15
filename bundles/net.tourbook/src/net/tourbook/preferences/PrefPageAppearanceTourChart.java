@@ -20,9 +20,10 @@ import java.util.HashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -1010,7 +1011,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       _chkMoveSlidersWhenZoomed.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
 
       // zoom options
-      if (_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
+      final String prefMouseWheelMode = _prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE);
+      final Enum<MouseWheelMode> mouseWheelMode = Util.getEnumValue(prefMouseWheelMode, MouseWheelMode.Zoom);
+
+      if (mouseWheelMode.equals(MouseWheelMode.Selection)) {
          _rdoMouseModeSlider.setSelection(true);
       } else {
          _rdoMouseModeZoom.setSelection(true);
@@ -1085,9 +1089,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
       // mouse wheel mode
       if (_rdoMouseModeSlider.getSelection()) {
-         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
+         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, MouseWheelMode.Selection.name());
       } else {
-         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
+         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, MouseWheelMode.Zoom.name());
       }
 
       // zoom options

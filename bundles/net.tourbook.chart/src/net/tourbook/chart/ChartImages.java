@@ -39,7 +39,8 @@ public class ChartImages {
    public static final String CursorMode_Slider_Move        = "cursor-mode-slider-move.png";          //$NON-NLS-1$
    public static final String CursorMode_Zoom               = "cursor-mode-zoom.png";                 //$NON-NLS-1$
 
-   public static final String MouseMode                     = "mouse-mode.png";                       //$NON-NLS-1$
+   public static final String MouseWheelMode_Selection      = "mouse-wheel-mode-selection.png";       //$NON-NLS-1$
+   public static final String MouseWheelMode_Zoom           = "mouse-wheel-mode-zoom.png";            //$NON-NLS-1$
 
    public static final String Zoom_FitToWindow              = "zoom-fit-to-window.png";               //$NON-NLS-1$
    public static final String Zoom_FitToWindow_Disabled     = "zoom-fit-to-window-disabled.png";      //$NON-NLS-1$

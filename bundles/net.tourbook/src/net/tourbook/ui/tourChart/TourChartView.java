@@ -23,9 +23,11 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.IHoveredValueListener;
 import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.photo.IPhotoEventListener;
@@ -219,7 +221,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
             } else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-               _tourChart.setMouseMode(event.getNewValue());
+               final Object newValue = event.getNewValue();
+               final Enum<MouseWheelMode> enumValue = Util.getEnumValue((String) newValue, MouseWheelMode.Zoom);
+
+               _tourChart.setMouseWheelMode((MouseWheelMode) enumValue);
             }
          }
       };
