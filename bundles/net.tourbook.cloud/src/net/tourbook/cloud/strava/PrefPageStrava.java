@@ -148,7 +148,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       GridLayoutFactory.fillDefaults().applyTo(parent);
       createUI_10_Connect(parent);
       createUI_20_AccountInformation(parent);
-      createUI_30_UploadConfiguration(parent);
+      createUI_30_TourUpload(parent);
    }
 
    private void createUI_10_Connect(final Composite parent) {
@@ -238,7 +238,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       }
    }
 
-   private void createUI_30_UploadConfiguration(final Composite parent) {
+   private void createUI_30_TourUpload(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);

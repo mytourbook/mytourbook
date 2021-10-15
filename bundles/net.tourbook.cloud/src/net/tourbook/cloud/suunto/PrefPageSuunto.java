@@ -157,7 +157,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
-      createUI_30_DownloadConfiguration(parent);
+      createUI_30_TourDownload(parent);
 
       return parent;
    }
@@ -239,7 +239,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       }
    }
 
-   private void createUI_30_DownloadConfiguration(final Composite parent) {
+   private void createUI_30_TourDownload(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
