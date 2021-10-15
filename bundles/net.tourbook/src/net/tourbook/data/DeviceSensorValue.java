@@ -45,6 +45,7 @@ public class DeviceSensorValue {
    private long                 sensorValueId                 = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    private long                 tourStartTime;
+   private long                 tourEndTime;
 
    private float                batteryVoltage_Start          = -1;
    private float                batteryVoltage_End            = -1;
@@ -164,6 +165,10 @@ public class DeviceSensorValue {
       return sensorValueId;
    }
 
+   public long getTourEndTime() {
+      return tourEndTime;
+   }
+
    public long getTourStartTime() {
       return tourStartTime;
    }
@@ -205,6 +210,10 @@ public class DeviceSensorValue {
 
    public void setTourData(final TourData tourData) {
       this.tourData = tourData;
+   }
+
+   public void setTourEndTime(final long tourEndTime) {
+      this.tourEndTime = tourEndTime;
    }
 
    public void setTourStartTime(final long tourStartTime) {

@@ -390,7 +390,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
             final long sensorId = sensorItem.sensor.getSensorId();
 
-            _sensorData = _sensorDataProvider.getTourTimeData(sensorId);
+            _sensorData = _sensorDataProvider.getData(sensorId);
 
             _sensorData.sensor = sensorItem.sensor;
 
@@ -563,24 +563,50 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       chartModel.setXData(xData);
 
       /*
-       * Set y-axis values
+       * Set y-axis values: Voltage
        */
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
             ChartType.BAR,
             sensorData.allBatteryVoltage_End,
             sensorData.allBatteryVoltage_Start);
 
-      yData.setYTitle("Sensor Battery  ·  " + sensorName);
-      yData.setUnitLabel("Volt");
-      yData.setShowYSlider(true);
+      yDataVoltage.setYTitle("Battery  ·  " + sensorName);
+      yDataVoltage.setUnitLabel("Volt");
+      yDataVoltage.setShowYSlider(true);
 
-      yData.setRgbGraph_Line(rgbLine);
-      yData.setRgbGraph_Text(rgbText);
-      yData.setRgbBar_Line(allRGBLine);
-      yData.setRgbBar_Gradient_Bright(allRGBGradientBright);
-      yData.setRgbBar_Gradient_Dark(allRGBGradientDark);
+      yDataVoltage.setRgbGraph_Line(rgbLine);
+      yDataVoltage.setRgbGraph_Text(rgbText);
+      yDataVoltage.setRgbBar_Line(allRGBLine);
+      yDataVoltage.setRgbBar_Gradient_Bright(allRGBGradientBright);
+      yDataVoltage.setRgbBar_Gradient_Dark(allRGBGradientDark);
 
-      chartModel.addYData(yData);
+      chartModel.addYData(yDataVoltage);
+
+//    DISABLE: Is not very valueable
+//          
+//      /*
+//       * Set y-axis values: Battery health
+//       */
+//      final ChartDataYSerie yData_Performance = new ChartDataYSerie(
+//            ChartType.DOT,
+//            sensorData.allBatteryPerformance,
+//            true);
+//
+//      yData_Performance.setYTitle("Battery Health");
+//      yData_Performance.setUnitLabel("Volt Diff / Tour Duration");
+//      yData_Performance.setShowYSlider(true);
+//
+//      yData_Performance.setRgbGraph_Line(rgbLine);
+//      yData_Performance.setRgbGraph_Text(rgbText);
+//      yData_Performance.setRgbBar_Line(allRGBLine);
+//      yData_Performance.setRgbBar_Gradient_Bright(allRGBGradientBright);
+//      yData_Performance.setRgbBar_Gradient_Dark(allRGBGradientDark);
+//
+//      chartModel.addYData(yData_Performance);
+
+      /*
+       * Setup other properties
+       */
 
       // set dummy title that the history labels are not truncated
       chartModel.setTitle(UI.SPACE);

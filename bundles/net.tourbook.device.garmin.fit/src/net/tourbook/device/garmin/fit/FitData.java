@@ -508,6 +508,8 @@ public class FitData {
       for (final DeviceSensorValue deviceSensorValue : _allDeviceSensorValues) {
 
          deviceSensorValue.setTourStartTime(tourData.getTourStartTimeMS());
+         deviceSensorValue.setTourEndTime(tourData.getTourEndTimeMS());
+
          deviceSensorValue.setTourData(tourData);
       }
 

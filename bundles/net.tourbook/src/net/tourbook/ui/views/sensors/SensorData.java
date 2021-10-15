@@ -30,6 +30,8 @@ public class SensorData {
    public float[]      allBatteryVoltage_Start;
    public float[]      allBatteryVoltage_End;
 
+//   public float[]      allBatteryPerformance;
+
    public DeviceSensor sensor;
 
 }

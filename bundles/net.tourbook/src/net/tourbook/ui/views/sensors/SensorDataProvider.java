@@ -39,7 +39,7 @@ public class SensorDataProvider {
     *
     * @return
     */
-   SensorData getTourTimeData(final long sensorId) {
+   SensorData getData(final long sensorId) {
 
       String sql = null;
 
@@ -54,8 +54,9 @@ public class SensorDataProvider {
                + "   DEVICESENSOR_SensorID," + NL //                       1  //$NON-NLS-1$
                + "   TOURDATA_TourID," + NL //                             2  //$NON-NLS-1$
                + "   TourStartTime," + NL //                               3  //$NON-NLS-1$
-               + "   BatteryVoltage_Start," + NL //                        4  //$NON-NLS-1$
-               + "   BatteryVoltage_End" + NL //                           5  //$NON-NLS-1$
+               + "   TourEndTime," + NL //                                 4  //$NON-NLS-1$
+               + "   BatteryVoltage_Start," + NL //                        5  //$NON-NLS-1$
+               + "   BatteryVoltage_End" + NL //                           6  //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //     //$NON-NLS-1$
 
@@ -68,6 +69,7 @@ public class SensorDataProvider {
 
          final TFloatArrayList allBatteryVoltage_Start = new TFloatArrayList();
          final TFloatArrayList allBatteryVoltage_End = new TFloatArrayList();
+//         final TFloatArrayList allBatteryHealth = new TFloatArrayList();
          final TIntArrayList allXValues_BySequence = new TIntArrayList();
          final TIntArrayList allXValues_ByTime = new TIntArrayList();
          final TLongArrayList allTourIds = new TLongArrayList();
@@ -87,13 +89,17 @@ public class SensorDataProvider {
 
             final long dbTourId                 = result.getLong(2);
             final long dbTourStartTime          = result.getLong(3);
-            final float dbBatteryVoltage_Start  = result.getFloat(4);
-            final float dbBatteryVoltage_End    = result.getFloat(5);
+            final long dbTourEndTime            = result.getLong(4);
+            final float dbBatteryVoltage_Start  = result.getFloat(5);
+            final float dbBatteryVoltage_End    = result.getFloat(6);
 
 // SET_FORMATTING_ON
 
             final boolean isStartAvailable = dbBatteryVoltage_Start > 0;
             final boolean isEndAvailable = dbBatteryVoltage_End > 0;
+
+            // tour duration in seconds
+            final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
 
             if (isStartAvailable && isEndAvailable) {
 
@@ -103,27 +109,35 @@ public class SensorDataProvider {
                 * have not changed
                 */
                float startEndMinDiff = 0;
-               if (dbBatteryVoltage_Start - dbBatteryVoltage_End < 0.01) {
+               final float voltageDiff = dbBatteryVoltage_Start - dbBatteryVoltage_End;
+               if (voltageDiff < 0.01) {
                   startEndMinDiff = START_END_MIN_VALUE;
                }
 
                allBatteryVoltage_Start.add(dbBatteryVoltage_Start + startEndMinDiff);
                allBatteryVoltage_End.add(dbBatteryVoltage_End);
 
+               final float batteryHealth = voltageDiff * 1_000_000 / tourDuration;
+
+//               allBatteryHealth.add(batteryHealth);
+
             } else if (isStartAvailable) {
 
                allBatteryVoltage_Start.add(dbBatteryVoltage_Start + START_END_MIN_VALUE);
                allBatteryVoltage_End.add(dbBatteryVoltage_Start);
+
+//               allBatteryHealth.add(0);
 
             } else if (isEndAvailable) {
 
                allBatteryVoltage_Start.add(dbBatteryVoltage_End + START_END_MIN_VALUE);
                allBatteryVoltage_End.add(dbBatteryVoltage_End);
 
+//               allBatteryHealth.add(0);
+
             } else {
 
-//               allBatteryVoltage_Start.add(0f);
-//               allBatteryVoltage_End.add(0f);
+               // ignored for now
             }
 
             if (isStartAvailable || isEndAvailable) {
@@ -139,9 +153,9 @@ public class SensorDataProvider {
                   firstDateTime = dbTourStartTime;
                }
 
-               final long timeDiff = dbTourStartTime - firstDateTime;
+               final long relativeTimeDiffInMS = dbTourStartTime - firstDateTime;
 
-               allXValues_ByTime.add((int) (timeDiff / 1000));
+               allXValues_ByTime.add((int) (relativeTimeDiffInMS / 1000));
             }
          }
 
@@ -157,6 +171,8 @@ public class SensorDataProvider {
 
          sensorData.allBatteryVoltage_Start = allBatteryVoltage_Start.toArray();
          sensorData.allBatteryVoltage_End = allBatteryVoltage_End.toArray();
+
+//         sensorData.allBatteryPerformance = allBatteryPerformance.toArray();
 
          sensorData.allTourIds = allTourIds.toArray();
          sensorData.allTourStartTime = allTourStartTime.toArray();

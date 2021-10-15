@@ -3681,6 +3681,7 @@ public class TourDatabase {
             // version 46 start
 
             + "   TourStartTime                    BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
+            + "   TourEndTime                      BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
             + "   BatteryVoltage_Start             FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
             + "   BatteryVoltage_End               FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
