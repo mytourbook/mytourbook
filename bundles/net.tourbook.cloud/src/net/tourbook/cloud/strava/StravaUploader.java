@@ -45,7 +45,6 @@ import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -57,6 +56,7 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
@@ -178,7 +178,11 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "tcx"); //$NON-NLS-1$
 
-      toursWithTimeSeries.put(exportTcxGzFile(tourData, absoluteTourFilePath), tourData);
+      final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
+      if (StringUtils.hasContent(exportedTcxGzFile)) {
+
+         toursWithTimeSeries.put(exportedTcxGzFile, tourData);
+      }
 
       FilesUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
@@ -192,7 +196,7 @@ public class StravaUploader extends TourbookCloudUploader {
       Arrays.asList(DialogExportTour.StravaActivityTypes).forEach(
             stravaActivityType -> {
                final TourTypeFilterSet tourTypeFilterSet = new TourTypeFilterSet();
-               tourTypeFilterSet.setName(CLOUD_UPLOADER_ID + stravaActivityType);
+               tourTypeFilterSet.setName(STRAVA_TOURTYPEFILTERSET_PREFIX + stravaActivityType);
                stravaTourTypeFilters.add(new TourTypeFilter(tourTypeFilterSet));
             });
 
@@ -209,19 +213,35 @@ public class StravaUploader extends TourbookCloudUploader {
 
       _tourExporter.useTourData(tourData);
 
-      final TourType tourType = tourData.getTourType();
+      if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
 
-      boolean useActivityType = false;
-      if (tourType != null) {
+         final TourType tourType = tourData.getTourType();
 
-         useActivityType = true;
+         boolean useActivityType = false;
+         if (tourType != null) {
 
-         final List<String> stravaActivityName = getStravaActivityNamesFromTourType(tourType);
-         //todo fb if multiple raise an error
-         //if none found use ride by default
+            final List<String> stravaActivityName = getStravaActivityNamesFromTourType(tourType);
 
-         _tourExporter.setUseActivityType(useActivityType);
-         _tourExporter.setActivityType(stravaActivityName.get(0));
+            useActivityType = stravaActivityName.size() == 1;
+
+            if (stravaActivityName.size() > 1) {
+               //todo fb if multiple log an error
+               //if none found use ride by default
+               TourLogManager.log_ERROR(NLS.bind(
+                     Messages.Log_UploadToursToStrava_004_UploadError,
+                     TourManager.getTourDateTimeShort(tourData),
+                     "The tour type " + tourType.getName()
+                           + " was found to be mapped to several Strava activity types. The upload for the file djdjef was cancelled."));
+
+               return UI.EMPTY_STRING;
+            }
+
+            _tourExporter.setUseActivityType(useActivityType);
+
+            if (useActivityType) {
+               _tourExporter.setActivityType(stravaActivityName.get(0));
+            }
+         }
       }
 
       _tourExporter.export(absoluteTourFilePath);
@@ -369,7 +389,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       if (StringUtils.isNullOrEmpty(tourData.getTourTitle())) {
 
-         final String tourDate = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+         final String tourDate = TourManager.getTourDateTimeShort(tourData);
 
          TourLogManager.log_ERROR(NLS.bind(Messages.Log_UploadToursToStrava_002_NoTourTitle, tourDate));
          monitor.worked(2);
@@ -383,7 +403,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private CompletableFuture<ActivityUpload> sendAsyncRequest(final TourData tour, final HttpRequest request) {
 
-      final String tourDate = tour.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+      final String tourDate = TourManager.getTourDateTimeShort(tour);
 
       final CompletableFuture<ActivityUpload> activityUpload = _httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(name -> convertResponseToUpload(name, tourDate))
