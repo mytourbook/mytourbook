@@ -256,7 +256,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             /*
-             * Checkbox: Send the tour description
+             * Checkbox: Use tour type mapping
              */
             _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
