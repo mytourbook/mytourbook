@@ -173,8 +173,8 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -343,7 +343,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private TableViewer                    _tourViewer;
    private TableViewerTourInfoToolTip     _tourInfoToolTip;
    private ColumnManager                  _columnManager;
-   private SelectionAdapter               _columnSortListener;
+   private SelectionListener              _columnSortListener;
    private TableColumnDefinition          _timeZoneOffsetColDef;
    private ImportComparator               _importComparator;
    //
@@ -3168,7 +3168,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = (TourData) cell.getElement();
 
-            cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Date_S));
+            cell.setText(TourManager.getTourDateShort(tourData));
          }
       });
 
@@ -3210,7 +3210,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             } else {
 
-               cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_S));
+               cell.setText(TourManager.getTourTimeShort(tourData));
             }
          }
       });
@@ -4066,12 +4066,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       createResources_Web();
 
       _importComparator = new ImportComparator();
-      _columnSortListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelect_SortColumn(e);
-         }
-      };
+      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
    /**

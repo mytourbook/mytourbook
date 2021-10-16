@@ -38,6 +38,8 @@ public final class Preferences {
    public static final String STRAVA_ACCESSTOKEN_EXPIRES_AT = "STRAVA_ACCESSTOKEN_EXPIRES_AT"; //$NON-NLS-1$
    public static final String STRAVA_ATHLETEID              = "STRAVA_ATHLETEID";              //$NON-NLS-1$
    public static final String STRAVA_ATHLETEFULLNAME        = "STRAVA_ATHLETEFULLNAME";        //$NON-NLS-1$
+   public static final String STRAVA_SENDDESCRIPTION        = "STRAVA_SENDDESCRIPTION";        //$NON-NLS-1$
+   public static final String STRAVA_USETOURTYPEMAPPING     = "STRAVA_USETOURTYPEMAPPING";     //$NON-NLS-1$
 
    /*
     * Suunto preferences

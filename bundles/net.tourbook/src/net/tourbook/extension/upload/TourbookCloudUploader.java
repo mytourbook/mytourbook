@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.extension.upload;
 import java.util.List;
 
 import net.tourbook.data.TourData;
+import net.tourbook.ui.TourTypeFilter;
 
 public abstract class TourbookCloudUploader {
 
@@ -25,13 +26,20 @@ public abstract class TourbookCloudUploader {
    private String CLOUD_UPLOADER_NAME;
 
    protected TourbookCloudUploader(final String id, final String name) {
+
       CLOUD_UPLOADER_ID = id;
       CLOUD_UPLOADER_NAME = name;
+   }
+
+   public String getId() {
+      return CLOUD_UPLOADER_ID;
    }
 
    public String getName() {
       return CLOUD_UPLOADER_NAME;
    }
+
+   public abstract List<TourTypeFilter> getTourTypeFilters();
 
    protected abstract boolean isReady();
 
