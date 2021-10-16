@@ -89,7 +89,7 @@ public class SensorDataProvider {
 
             final long dbTourId                 = result.getLong(2);
             final long dbTourStartTime          = result.getLong(3);
-            final long dbTourEndTime            = result.getLong(4);
+//            final long dbTourEndTime            = result.getLong(4);
             final float dbBatteryVoltage_Start  = result.getFloat(5);
             final float dbBatteryVoltage_End    = result.getFloat(6);
 
@@ -99,7 +99,7 @@ public class SensorDataProvider {
             final boolean isEndAvailable = dbBatteryVoltage_End > 0;
 
             // tour duration in seconds
-            final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
+//            final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
 
             if (isStartAvailable && isEndAvailable) {
 
@@ -117,7 +117,7 @@ public class SensorDataProvider {
                allBatteryVoltage_Start.add(dbBatteryVoltage_Start + startEndMinDiff);
                allBatteryVoltage_End.add(dbBatteryVoltage_End);
 
-               final float batteryHealth = voltageDiff * 1_000_000 / tourDuration;
+//               final float batteryHealth = voltageDiff * 1_000_000 / tourDuration;
 
 //               allBatteryHealth.add(batteryHealth);
 
