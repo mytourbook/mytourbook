@@ -68,6 +68,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    //SET_FORMATTING_OFF
    private static final String PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE                         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURDOWNLOAD                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_TourDownload;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN                        = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT                          = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
@@ -96,7 +97,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
-   private Group    _group;
+   private Group    _groupCloudAccount;
    private Label    _labelAccessToken;
    private Label    _labelAccessToken_Value;
    private Label    _labelExpiresAt;
@@ -137,7 +138,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
                      _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
                _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
-               _group.redraw();
+               _groupCloudAccount.redraw();
 
                enableControls();
             }
@@ -156,7 +157,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
-      createUI_30_Misc(parent);
+      createUI_30_TourDownload(parent);
 
       return parent;
    }
@@ -194,17 +195,17 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final PixelConverter pc = new PixelConverter(parent);
 
-      _group = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
+      _groupCloudAccount = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupCloudAccount);
+      _groupCloudAccount.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupCloudAccount);
       {
          {
-            final Label labelWebPage = new Label(_group, SWT.NONE);
+            final Label labelWebPage = new Label(_groupCloudAccount, SWT.NONE);
             labelWebPage.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE);
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
-            final Link linkWebPage = new Link(_group, SWT.NONE);
+            final Link linkWebPage = new Link(_groupCloudAccount, SWT.NONE);
             linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
@@ -212,40 +213,41 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
-            _labelAccessToken = new Label(_group, SWT.NONE);
+            _labelAccessToken = new Label(_groupCloudAccount, SWT.NONE);
             _labelAccessToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
-            _labelAccessToken_Value = new Label(_group, SWT.WRAP);
+            _labelAccessToken_Value = new Label(_groupCloudAccount, SWT.WRAP);
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelAccessToken_Value);
          }
          {
-            _labelRefreshToken = new Label(_group, SWT.NONE);
+            _labelRefreshToken = new Label(_groupCloudAccount, SWT.NONE);
             _labelRefreshToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
-            _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
+            _labelRefreshToken_Value = new Label(_groupCloudAccount, SWT.WRAP);
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
          }
          {
-            _labelExpiresAt = new Label(_group, SWT.NONE);
+            _labelExpiresAt = new Label(_groupCloudAccount, SWT.NONE);
             _labelExpiresAt.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
-            _labelExpiresAt_Value = new Label(_group, SWT.NONE);
+            _labelExpiresAt_Value = new Label(_groupCloudAccount, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
       }
    }
 
-   private void createUI_30_Misc(final Composite parent) {
+   private void createUI_30_TourDownload(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURDOWNLOAD);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
          {
-            _labelDownloadFolder = new Label(container, SWT.NONE);
+            _labelDownloadFolder = new Label(group, SWT.NONE);
             _labelDownloadFolder.setText(Messages.PrefPage_SuuntoWorkouts_Label_FolderPath);
             _labelDownloadFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_labelDownloadFolder);
@@ -253,12 +255,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             /*
              * combo: path
              */
-            _comboDownloadFolderPath = new Combo(container, SWT.SINGLE | SWT.BORDER);
+            _comboDownloadFolderPath = new Combo(group, SWT.SINGLE | SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboDownloadFolderPath);
             _comboDownloadFolderPath.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
             _comboDownloadFolderPath.setEnabled(false);
 
-            _btnSelectFolder = new Button(container, SWT.PUSH);
+            _btnSelectFolder = new Button(group, SWT.PUSH);
             _btnSelectFolder.setText(APP_BTN_BROWSE);
             _btnSelectFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
             _btnSelectFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectBrowseDirectory()));
@@ -269,14 +271,14 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             /*
              * Checkbox: Use a "since" date filter
              */
-            _chkUseDateFilter = new Button(container, SWT.CHECK);
+            _chkUseDateFilter = new Button(group, SWT.CHECK);
             _chkUseDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter);
             _chkUseDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseDateFilter);
             _chkUseDateFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _dtFilterSince.setEnabled(_chkUseDateFilter
                   .getSelection())));
 
-            _dtFilterSince = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+            _dtFilterSince = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
             _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterSince);
          }

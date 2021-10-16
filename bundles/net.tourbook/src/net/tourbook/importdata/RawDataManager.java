@@ -1728,7 +1728,7 @@ public class RawDataManager {
       final TourData saveTourData = TourManager.saveModifiedTour(tourData, false);
 
       TourLogManager.showLogView();
-      TourLogManager.subLog_OK(saveTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S));
+      TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(saveTourData));
 
       for (final TourValueType tourValueType : tourValueTypes) {
          displayTourModifiedDataDifferences(tourValueType, clonedTourData, saveTourData);
@@ -2181,7 +2181,7 @@ public class RawDataManager {
 
                // {0} ← {1}
                final String defaultMessage = NLS.bind(Messages.Log_Import_Tour_Imported,
-                     importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                     TourManager.getTourDateTimeShort(importedTourData),
                      osFilePath);
 
                TourLogManager.subLog_OK(importTime + numTimeSlices + defaultMessage);
@@ -2651,7 +2651,7 @@ public class RawDataManager {
 
             TourLogManager.subLog_INFO(NLS.bind(
                   Messages.Log_Reimport_ManualTour,
-                  oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
+                  TourManager.getTourDateTimeShort(oldTourData)));
          }
 
          return false;
@@ -2690,7 +2690,7 @@ public class RawDataManager {
 
          TourLogManager.subLog_INFO(NLS.bind(
                Messages.Log_Reimport_Tour_Skipped,
-               oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+               TourManager.getTourDateTimeShort(oldTourData),
                reason));
 
       } else {
@@ -3022,7 +3022,7 @@ public class RawDataManager {
 
                TourLogManager.subLog_OK(NLS.bind(
                      Messages.Log_Import_Tour_Imported,
-                     updatedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                     TourManager.getTourDateTimeShort(updatedTourData),
                      reimportFileNamePath));
             }
 

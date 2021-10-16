@@ -13,10 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.extension.download;
+package net.tourbook.extension.upload;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -24,47 +26,60 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 
-public class CloudDownloaderManager {
+public class CloudUploaderManager {
 
-   private static List<TourbookCloudDownloader> _cloudDownloadersList;
+   private static List<TourbookCloudUploader> _cloudUploadersList;
 
-   public static List<String> getCloudDownloaderIds() {
+   public static List<TourTypeFilter> getCloudTourTypeFilters() {
 
-      final ArrayList<String> cloudDownloaderIds = new ArrayList<>();
-
-      getCloudDownloaderList();
-
-      _cloudDownloadersList.forEach(cloudDownloader -> cloudDownloaderIds.add(cloudDownloader.getId()));
-
-      return cloudDownloaderIds;
-   }
-
-   public static List<TourbookCloudDownloader> getCloudDownloaderList() {
-
-      if (_cloudDownloadersList == null) {
-         _cloudDownloadersList = readCloudDownloadersExtensions("cloudDownloader"); //$NON-NLS-1$
+      if (_cloudUploadersList == null) {
+         getCloudUploaderList();
       }
 
-      return _cloudDownloadersList;
+      final List<TourTypeFilter> cloudTourTypeFilters = new ArrayList<>();
+      _cloudUploadersList.forEach(
+            tourbookCloudUploader -> cloudTourTypeFilters.addAll(tourbookCloudUploader.getTourTypeFilters()));
+
+      return cloudTourTypeFilters;
+   }
+
+   public static List<String> getCloudUploaderIds() {
+
+      final ArrayList<String> cloudUploaderIds = new ArrayList<>();
+
+      getCloudUploaderList();
+
+      _cloudUploadersList.forEach(cloudUploader -> cloudUploaderIds.add(cloudUploader.getId()));
+
+      return cloudUploaderIds;
+   }
+
+   public static List<TourbookCloudUploader> getCloudUploaderList() {
+
+      if (_cloudUploadersList == null) {
+         _cloudUploadersList = readCloudUploadersExtensions("cloudUploader"); //$NON-NLS-1$
+      }
+
+      return _cloudUploadersList;
    }
 
    /**
-    * Reads and collects all the extensions that implement {@link TourbookCloudDownloader}.
+    * Reads and collects all the extensions that implement {@link TourbookCloudUploader}.
     *
     * @param extensionPointName
     *           The extension point name
-    * @return The list of {@link TourbookCloudDownloader}.
+    * @return The list of {@link TourbookCloudUploader}.
     */
-   private static ArrayList<TourbookCloudDownloader> readCloudDownloadersExtensions(final String extensionPointName) {
+   private static List<TourbookCloudUploader> readCloudUploadersExtensions(final String extensionPointName) {
 
-      final ArrayList<TourbookCloudDownloader> cloudDownloadersList = new ArrayList<>();
+      final List<TourbookCloudUploader> cloudUploadersList = new ArrayList<>();
 
       final IExtensionPoint extPoint = Platform
             .getExtensionRegistry()
             .getExtensionPoint("net.tourbook", extensionPointName); //$NON-NLS-1$
 
       if (extPoint == null) {
-         return cloudDownloadersList;
+         return cloudUploadersList;
       }
 
       for (final IExtension extension : extPoint.getExtensions()) {
@@ -78,8 +93,8 @@ public class CloudDownloaderManager {
 
                   object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                  if (object instanceof TourbookCloudDownloader) {
-                     cloudDownloadersList.add((TourbookCloudDownloader) object);
+                  if (object instanceof TourbookCloudUploader) {
+                     cloudUploadersList.add((TourbookCloudUploader) object);
                   }
 
                } catch (final CoreException e) {
@@ -89,6 +104,6 @@ public class CloudDownloaderManager {
          }
       }
 
-      return cloudDownloadersList;
+      return cloudUploadersList;
    }
 }
