@@ -90,8 +90,6 @@ public class StravaUploader extends TourbookCloudUploader {
 
       super(CLOUD_UPLOADER_ID, Messages.VendorName_Strava);
 
-      _tourExporter.setUseDescription(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
-
       VelocityService.init();
    }
 
