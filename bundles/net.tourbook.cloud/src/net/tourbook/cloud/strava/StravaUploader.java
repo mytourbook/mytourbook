@@ -215,15 +215,16 @@ public class StravaUploader extends TourbookCloudUploader {
       return gzipFile(absoluteTourFilePath);
    }
 
-   private void extracted(final List<TourData> selectedTours,
-                          final int numberOfTours,
-                          final IProgressMonitor monitor,
-                          final Map<String, TourData> toursWithTimeSeries,
-                          final Map<TourData, String> manualTours) {
+   private void processTours(final List<TourData> selectedTours,
+                             final IProgressMonitor monitor,
+                             final Map<String, TourData> toursWithTimeSeries,
+                             final Map<TourData, String> manualTours) {
 
-      for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
+      for (final TourData tourData : selectedTours) {
 
-         final TourData tourData = selectedTours.get(index);
+         if (monitor.isCanceled()) {
+            return;
+         }
 
          final String stravaActivityName = DialogExportTour.StravaActivityTypes[0];
          if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
@@ -523,7 +524,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final Map<TourData, String> manualTours = new HashMap<>();
-            extracted(selectedTours, numberOfTours, monitor, toursWithTimeSeries, manualTours);
+            processTours(selectedTours, monitor, toursWithTimeSeries, manualTours);
 
             if (monitor.isCanceled()) {
                deleteTemporaryTourFiles(toursWithTimeSeries);

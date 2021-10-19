@@ -36,19 +36,12 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -63,7 +56,6 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -126,13 +118,10 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            if (event.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-               updateViewers();
-            }
+         if (propertyChangeEvent.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+            updateViewers();
          }
       };
 
@@ -252,19 +241,9 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
       });
 
-      _filterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectFilter();
-         }
-      });
+      _filterViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectFilter());
 
-      _filterViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onRenameFilterSet();
-         }
-      });
+      _filterViewer.addDoubleClickListener(doubleClickEvent -> onRenameFilterSet());
 
       /*
        * set drag adapter
@@ -451,36 +430,23 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
       });
 
-      _tourTypeViewer.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
-            _isModified = true;
-         }
-      });
+      _tourTypeViewer.addCheckStateListener(checkStateChangedEvent -> _isModified = true);
 
-      _tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectTourType();
-         }
-      });
+      _tourTypeViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectTourType());
 
-      _tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+      _tourTypeViewer.addDoubleClickListener(doubleClickEvent -> {
 
-            /*
-             * invert check state
-             */
-            final TourType tourType = (TourType) ((StructuredSelection) _tourTypeViewer.getSelection())
-                  .getFirstElement();
+         /*
+          * invert check state
+          */
+         final TourType tourType = (TourType) ((StructuredSelection) _tourTypeViewer.getSelection())
+               .getFirstElement();
 
-            final boolean isChecked = _tourTypeViewer.getChecked(tourType);
+         final boolean isChecked = _tourTypeViewer.getChecked(tourType);
 
-            _tourTypeViewer.setChecked(tourType, !isChecked);
+         _tourTypeViewer.setChecked(tourType, !isChecked);
 
 //				getSelectedTourTypes();
-         }
       });
    }
 
@@ -632,12 +598,9 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          }
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeProperty();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeProperty();
       };
    }
 
@@ -870,9 +833,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
    @Override
    public boolean performOk() {
 
-      saveState();
-
-      return true;
+      return isValid();
    }
 
    private void restoreState() {
