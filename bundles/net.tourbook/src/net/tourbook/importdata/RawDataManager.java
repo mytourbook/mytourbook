@@ -114,6 +114,25 @@ public class RawDataManager {
 
 // SET_FORMATTING_ON
 
+   /**
+    * This can be useful that the logged import events have a defined sequence instead of
+    * randomly when multiple threads are used.
+    */
+   private static final String SYS_PROP__SINGLE_THREAD_TOUR_IMPORT = "singleThreadTourImport";                                       //$NON-NLS-1$
+   private static boolean      _isSingleThreadTourImport           = System.getProperty(SYS_PROP__SINGLE_THREAD_TOUR_IMPORT) != null;
+
+   static {
+
+      if (_isSingleThreadTourImport) {
+
+         Util.logSystemProperty_IsEnabled(
+
+               RawDataManager.class,
+               SYS_PROP__SINGLE_THREAD_TOUR_IMPORT,
+               "Single thread tour import/re-import"); //$NON-NLS-1$
+      }
+   }
+
    private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
    private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
 
@@ -231,8 +250,11 @@ public class RawDataManager {
    private static final DeviceData               _deviceData        = new DeviceData();
    //
    private static ThreadPoolExecutor             _importTour_Executor;
-   private static ArrayBlockingQueue<ImportFile> _importTour_Queue  = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static CountDownLatch                 _importTour_CountDownLatch;
+   private static ArrayBlockingQueue<ImportFile> _importTour_Queue  = new ArrayBlockingQueue<>(
+         _isSingleThreadTourImport
+               ? 1
+               : Util.NUMBER_OF_PROCESSORS);
 
    private static ThreadPoolExecutor             _loadingTour_Executor;
    private static ArrayBlockingQueue<TourData>   _loadingTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
@@ -250,7 +272,11 @@ public class RawDataManager {
          return thread;
       };
 
-      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, importThreadFactory);
+      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
+            _isSingleThreadTourImport
+                  ? 1
+                  : Util.NUMBER_OF_PROCESSORS,
+            importThreadFactory);
 
       final ThreadFactory loadingThreadFactory = runnable -> {
 
@@ -820,6 +846,10 @@ public class RawDataManager {
 
    public static boolean isSetBodyWeight() {
       return _importState_IsSetBodyWeight;
+   }
+
+   public static boolean isSingleThreadTourImport() {
+      return _isSingleThreadTourImport;
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
