@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.map.UI;
 
 import net.tourbook.Messages;
@@ -26,8 +28,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -37,7 +38,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private SelectionAdapter       _defaultSelectionListener;
+   private SelectionListener      _defaultSelectionListener;
 
    /*
     * UI controls
@@ -57,7 +58,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    @Override
    public void createUI(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       final Group group = new Group(parent, SWT.NONE);
 //      group.setText(Messages.Pref_Graphs_Group_Grid);
@@ -175,14 +176,9 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
       _rdoDuration_PausedTime.setEnabled(isShowDuration);
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
    }
 
    private void onChangeUI() {
@@ -191,13 +187,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
 
       enableControls();
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-
-            saveState();
-         }
-      });
+      Display.getCurrent().asyncExec(this::saveState);
    }
 
    @Override
