@@ -32,7 +32,7 @@ import de.byteholder.gpx.PointOfInterest;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -429,7 +429,7 @@ public class Map2View extends ViewPart implements
    private boolean                           _isMapSyncWith_Tour;
    private boolean                           _isMapSyncWith_ValuePoint;
    //
-   private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
+   private EnumMap<MapGraphId, Action>       _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
    private ActionTourColor                   _actionTourColor_Elevation;
    private ActionTourColor                   _actionTourColor_Gradient;
    private ActionTourColor                   _actionTourColor_Pulse;
@@ -469,7 +469,7 @@ public class Map2View extends ViewPart implements
    private ActionZoomLevelAdjustment         _actionZoomLevelAdjustment;
    //
    private ActionSyncMap                     _actionMap2_SyncMap;
-   private HashMap<MapSyncId, Action>        _allSyncMap_Actions   = new HashMap<>();
+   private EnumMap<MapSyncId, Action>        _allSyncMap_Actions   = new EnumMap<>(MapSyncId.class);
    private ActionSyncMapWith_Photo           _actionSyncMapWith_Photo;
    private ActionSyncMapWith_Slider_One      _actionSyncMapWith_Slider_One;
    private ActionSyncMapWith_Slider_Centered _actionSyncMapWith_Slider_Centered;
@@ -2973,6 +2973,8 @@ public class Map2View extends ViewPart implements
          }
 
          keepMapPosition(tourData);
+         //todo fb
+         // highlightMarker();
       }
    }
 
@@ -3001,6 +3003,8 @@ public class Map2View extends ViewPart implements
          }
 
          keepMapPosition(tourData);
+         //todo fb
+         // highlightPause();
       }
    }
 
