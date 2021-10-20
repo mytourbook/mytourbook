@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomOut extends Action {
 
-	private IMapDefaultActions	_mapActionProvider;
+   private IMapDefaultActions _mapActionProvider;
 
-	public ActionZoomOut(final IMapDefaultActions mapActionProvider) {
+   public ActionZoomOut(final IMapDefaultActions mapActionProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_mapActionProvider = mapActionProvider;
+      _mapActionProvider = mapActionProvider;
 
-		setToolTipText(Messages.Map_Action_ZoomOut_Tooltip);
+      setToolTipText(Messages.Map_Action_ZoomOut_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_mapActionProvider.actionZoomOut();
-	}
+   @Override
+   public void run() {
+      _mapActionProvider.actionZoomOut();
+   }
 
 }

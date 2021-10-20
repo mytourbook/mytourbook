@@ -20,16 +20,15 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ISliderMoveListener;
-import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.form.SashBottomFixedForm;
 import net.tourbook.common.form.SashLeftFixedForm;
@@ -38,7 +37,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -56,14 +55,10 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -75,18 +70,15 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -139,7 +131,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    private ModifyListener           _defaultModifyListener;
    private MouseWheelListener       _defaultMouseWheelListener;
-   private SelectionAdapter         _defaultSelectionAdapter;
+   private SelectionListener        _defaultSelectionListener;
 
    private boolean                  _isOkPressed;
    private boolean                  _isInCreateUI;
@@ -206,29 +198,18 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
 
-      _defaultSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeMarkerUI();
-         }
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeMarkerUI());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeMarkerUI();
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeMarkerUI();
+      _defaultModifyListener = modifyEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
-      };
-
-      _defaultModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onChangeMarkerUI();
-         }
+         onChangeMarkerUI();
       };
    }
 
@@ -468,13 +449,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       shell.setText(Messages.Dlg_TourMarker_Dlg_title);
 
-      shell.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            dispose();
-         }
-      });
+      shell.addDisposeListener(disposeEvent -> dispose());
    }
 
    @Override
@@ -697,22 +672,14 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
       _markerViewer.setComparator(new MarkerViewerComparator());
 
-      _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            final StructuredSelection selection = (StructuredSelection) event.getSelection();
-            if (selection != null) {
-               onSelectMarker((TourMarker) selection.getFirstElement());
-            }
+      _markerViewer.addSelectionChangedListener(selectionChangedEvent -> {
+         final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
+         if (selection != null) {
+            onSelectMarker((TourMarker) selection.getFirstElement());
          }
       });
 
-      _markerViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            _comboMarkerName.setFocus();
-         }
-      });
+      _markerViewer.addDoubleClickListener(doubleClickEvent -> _comboMarkerName.setFocus());
 
       return layoutContainer;
    }
@@ -847,7 +814,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             {
                _comboLabelPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
                _comboLabelPosition.setVisibleItemCount(20);
-               _comboLabelPosition.addSelectionListener(_defaultSelectionAdapter);
+               _comboLabelPosition.addSelectionListener(_defaultSelectionListener);
             }
 
             /*
@@ -879,7 +846,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                   _spinLabelOffsetX.setMinimum(-OFFSET_MAX);
                   _spinLabelOffsetX.setMaximum(OFFSET_MAX);
                   _spinLabelOffsetX.setPageIncrement(OFFSET_PAGE_INCREMENT);
-                  _spinLabelOffsetX.addSelectionListener(_defaultSelectionAdapter);
+                  _spinLabelOffsetX.addSelectionListener(_defaultSelectionListener);
                   _spinLabelOffsetX.addMouseWheelListener(_defaultMouseWheelListener);
                }
 
@@ -900,7 +867,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                   _spinLabelOffsetY.setMinimum(-OFFSET_MAX);
                   _spinLabelOffsetY.setMaximum(OFFSET_MAX);
                   _spinLabelOffsetY.setPageIncrement(OFFSET_PAGE_INCREMENT);
-                  _spinLabelOffsetY.addSelectionListener(_defaultSelectionAdapter);
+                  _spinLabelOffsetY.addSelectionListener(_defaultSelectionListener);
                   _spinLabelOffsetY.addMouseWheelListener(_defaultMouseWheelListener);
                }
             }
@@ -1030,25 +997,17 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _tourChart.addTourMarkerSelectionListener(this);
       _tourChart.addTourMarkerModifyListener(this);
-      _tourChart.addSliderMoveListener(new ISliderMoveListener() {
-         @Override
-         public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+      _tourChart.addSliderMoveListener(selectionChartInfo -> {
 
-            if (_isInCreateUI) {
-               return;
-            }
-
-            TourManager.fireEventWithCustomData(TourEventId.SLIDER_POSITION_CHANGED, chartInfoSelection, null);
+         if (_isInCreateUI) {
+            return;
          }
+
+         TourManager.fireEventWithCustomData(TourEventId.SLIDER_POSITION_CHANGED, selectionChartInfo, null);
       });
 
       // set title
-      _tourChart.addDataModelListener(new IDataModelListener() {
-         @Override
-         public void dataModelChanged(final ChartDataModel changedChartDataModel) {
-            changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
-         }
-      });
+      _tourChart.addDataModelListener(chartDataModel -> chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData)));
 
       final TourChartConfiguration chartConfig = TourManager.createDefaultTourChartConfig();
       _tourChart.updateTourChart(_tourData, chartConfig, false);
@@ -1193,7 +1152,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                cell.setText(_nf3.format(markerDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
             }
 
-            if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+            if (tourMarker.getType() == ChartLabelMarker.MARKER_TYPE_DEVICE) {
                cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
             }
          }
@@ -1421,7 +1380,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       /*
        * Marker names combo
        */
-      final TreeSet<String> dbTitles = TourDatabase.getAllTourMarkerNames();
+      final ConcurrentSkipListSet<String> dbTitles = TourDatabase.getCachedFields_AllTourMarkerNames();
       for (final String title : dbTitles) {
          _comboMarkerName.add(title);
       }
@@ -1456,7 +1415,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
 
-      _imagePaste = TourbookPlugin.getImageDescriptor(Images.App_Paste).createImage();
+      _imagePaste = CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy).createImage();
 
       restoreState_Viewer();
    }
@@ -1556,7 +1515,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          return;
       }
 
-      _selectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_DEFAULT);
+      _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_DEFAULT);
    }
 
    private void saveState() {
@@ -1655,7 +1614,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          if (isTourMarker) {
 
             // make the marker more visible by setting another type
-            _selectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_TYPE_EDIT);
+            _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_TYPE_EDIT);
          }
 
          _chkVisibility.setSelection(isTourMarker ? _selectedTourMarker.isMarkerVisible() : false);

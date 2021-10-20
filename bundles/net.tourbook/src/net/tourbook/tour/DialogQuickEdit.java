@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,11 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -38,14 +40,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -63,8 +58,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private static final String      GRAPH_LABEL_HEARTBEAT_UNIT     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String      VALUE_UNIT_K_CALORIES          = net.tourbook.ui.Messages.Value_Unit_KCalories;
 
-   private final boolean            _isOSX                         = UI.IS_OSX;
-   private final boolean            _isLinux                       = UI.IS_LINUX;
+   private static final boolean     _isOSX                         = UI.IS_OSX;
+   private static final boolean     _isLinux                       = UI.IS_LINUX;
 
    private final TourData           _tourData;
 
@@ -116,12 +111,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private MouseWheelListener _mouseWheelListener;
    {
-      _mouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            Util.adjustSpinnerValueOnMouseScroll(event);
-         }
-      };
+      _mouseWheelListener = Util::adjustSpinnerValueOnMouseScroll;
    }
 
    public DialogQuickEdit(final Shell parentShell, final TourData tourData) {
@@ -145,12 +135,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       shell.setText(Messages.dialog_quick_edit_dialog_title);
 
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      shell.addDisposeListener(disposeEvent -> onDispose());
    }
 
    @Override
@@ -291,7 +276,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_comboTitle);
 
             // fill combobox
-            final TreeSet<String> dbTitles = TourDatabase.getAllTourTitles();
+            final ConcurrentSkipListSet<String> dbTitles = TourDatabase.getCachedFields_AllTourTitles();
             for (final String title : dbTitles) {
                _comboTitle.add(title);
             }
@@ -341,7 +326,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_comboLocation_Start);
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
             for (final String string : arr) {
                if (string != null) {
                   _comboLocation_Start.add(string);
@@ -368,7 +353,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_comboLocation_End);
 
             // fill combobox
-            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceEnds();
             for (final String string : arr) {
                if (string != null) {
                   _comboLocation_End.add(string);
@@ -582,33 +567,24 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _spinWeather_Wind_SpeedValue.setMaximum(120);
             _spinWeather_Wind_SpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
 
-            _spinWeather_Wind_SpeedValue.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindSpeed_Value();
+            _spinWeather_Wind_SpeedValue.addModifyListener(modifyEvent -> {
+               if (_isUpdateUI) {
+                  return;
                }
+               onSelect_WindSpeed_Value();
             });
-            _spinWeather_Wind_SpeedValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindSpeed_Value();
+            _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
                }
-            });
-            _spinWeather_Wind_SpeedValue.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindSpeed_Value();
+               onSelect_WindSpeed_Value();
+            }));
+            _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isUpdateUI) {
+                  return;
                }
+               onSelect_WindSpeed_Value();
             });
 
             // label: km/h, mi/h
@@ -624,16 +600,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _tk.adapt(_comboWeather_Wind_SpeedText, true, false);
             _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
-            _comboWeather_Wind_SpeedText.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindSpeed_Text();
+            _comboWeather_Wind_SpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
                }
-            });
+               onSelect_WindSpeed_Text();
+            }));
 
             // fill combobox
             for (final String speedText : IWeather.windSpeedText) {
@@ -659,16 +631,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .align(SWT.BEGINNING, SWT.FILL)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .applyTo(_comboWeather_Wind_DirectionText);
-            _comboWeather_Wind_DirectionText.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindDirection_Text();
+            _comboWeather_Wind_DirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
                }
-            });
+               onSelect_WindDirection_Text();
+            }));
 
             // fill combobox
             for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
@@ -690,33 +658,24 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinWeather_Wind_DirectionValue);
 
-            _spinWeather_Wind_DirectionValue.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindDirection_Value();
+            _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
+               if (_isUpdateUI) {
+                  return;
                }
+               onSelect_WindDirection_Value();
             });
-            _spinWeather_Wind_DirectionValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindDirection_Value();
+            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
                }
-            });
-            _spinWeather_Wind_DirectionValue.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  if (_isUpdateUI) {
-                     return;
-                  }
-                  onSelect_WindDirection_Value();
+               onSelect_WindDirection_Value();
+            }));
+            _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isUpdateUI) {
+                  return;
                }
+               onSelect_WindDirection_Value();
             });
 
             // label: direction unit = degree
@@ -752,40 +711,31 @@ public class DialogQuickEdit extends TitleAreaDialog {
                .applyTo(_spinWeather_Temperature_Avg);
          _spinWeather_Temperature_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
 
-         // the min/max temperature has a large range because fahrenheit has bigger values than celcius
+         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
          _spinWeather_Temperature_Avg.setMinimum(-600);
          _spinWeather_Temperature_Avg.setMaximum(1500);
 
-         _spinWeather_Temperature_Avg.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
+         _spinWeather_Temperature_Avg.addModifyListener(modifyEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
+            _isTemperatureManuallyModified = true;
          });
-         _spinWeather_Temperature_Avg.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
+         _spinWeather_Temperature_Avg.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
-         });
-         _spinWeather_Temperature_Avg.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               if (_isUpdateUI) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
+            _isTemperatureManuallyModified = true;
+         }));
+         _spinWeather_Temperature_Avg.addMouseWheelListener(mouseEvent -> {
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            if (_isUpdateUI) {
+               return;
             }
+            _isTemperatureManuallyModified = true;
          });
 
-         // label: celcius, fahrenheit
+         // label: celsius, fahrenheit
          label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
 
          /*
@@ -814,12 +764,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _tk.adapt(_comboWeather_Clouds, true, false);
          _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
          _comboWeather_Clouds.setVisibleItemCount(10);
-         _comboWeather_Clouds.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               displayCloudIcon();
-            }
-         });
+         _comboWeather_Clouds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
 
          // fill combobox
          for (final String cloudText : IWeather.cloudText) {

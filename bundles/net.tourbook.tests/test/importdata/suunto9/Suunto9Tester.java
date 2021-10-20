@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,10 @@ import java.util.Map.Entry;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.device.suunto.Suunto9DeviceDataReader;
+import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -42,14 +44,14 @@ class Suunto9Tester {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static Suunto9DeviceDataReader deviceDataReader;
+   private static Suunto9_DeviceDataReader deviceDataReader;
 
    @BeforeAll
    static void initAll() {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new Suunto9DeviceDataReader();
+      deviceDataReader = new Suunto9_DeviceDataReader();
    }
 
    /**
@@ -60,7 +62,7 @@ class Suunto9Tester {
    private TourData getLastTourDataImported() {
       Field field = null;
       try {
-         field = Suunto9DeviceDataReader.class.getDeclaredField("_processedActivities"); //$NON-NLS-1$
+         field = Suunto9_DeviceDataReader.class.getDeclaredField("_processedActivities"); //$NON-NLS-1$
          field.setAccessible(true);
 
          @SuppressWarnings("unchecked")
@@ -93,7 +95,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -108,7 +115,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "Original-1536723722706_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -123,7 +135,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "1549250450458_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -138,7 +155,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "1555291925128_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -179,9 +201,26 @@ class Suunto9Tester {
 
       // ORDER 1 - 2 - 3
 
-      deviceDataReader.processDeviceData(maxWell1FilePath, deviceData, alreadyImportedTours, newlyImportedTours);
-      deviceDataReader.processDeviceData(maxWell2FilePath, deviceData, alreadyImportedTours, newlyImportedTours);
-      deviceDataReader.processDeviceData(maxWell3FilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(maxWell1FilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
+
+      deviceDataReader.processDeviceData(maxWell2FilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
+
+      deviceDataReader.processDeviceData(maxWell3FilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData entry = getLastTourDataImported();
       Comparison.compareTourDataAgainstControl(entry, controlDocumentPath);
@@ -196,7 +235,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -211,7 +255,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -226,7 +275,12 @@ class Suunto9Tester {
       final String filePath = IMPORT_FILE_PATH + "1594598677631_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process().setIsJUnitTest(true));
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

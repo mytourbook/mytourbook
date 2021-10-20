@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,24 +24,24 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowPOI extends Action {
 
-	private final Map2View	_mapView;
+   private final Map2View _mapView;
 
-	public ActionShowPOI(final Map2View mapView) {
+   public ActionShowPOI(final Map2View mapView) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		_mapView = mapView;
+      _mapView = mapView;
 
-		setText(Messages.Map_Action_POI);
-		setToolTipText(Messages.Map_Action_POI_Tooltip);
+      setText(Messages.Map_Action_POI);
+      setToolTipText(Messages.Map_Action_POI_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Show_POI));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.POI_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Show_POI));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.POI_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_mapView.actionPOI();
-	}
+   @Override
+   public void run() {
+      _mapView.actionPOI();
+   }
 
 }

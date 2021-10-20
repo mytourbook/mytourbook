@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.Map;
@@ -45,7 +46,6 @@ import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.MapProvider_InfoToolTip;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.Separator;
@@ -55,7 +55,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -63,11 +62,8 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -86,11 +82,8 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -114,6 +107,8 @@ import org.eclipse.swt.widgets.Widget;
  * 2D Map provider slideout
  */
 public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITourViewer, IMapProviderListener {
+
+// SET_FORMATTING_OFF
 
    private static final String MAP_ACTION_MANAGE_MAP_PROVIDERS                = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
 
@@ -147,7 +142,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
    private static final IPreferenceStore    _prefStore                         = TourbookPlugin.getPrefStore();
 
-   private static IDialogSettings           _state;
+   private static IDialogSettings           _state_MapProvider;
 
    private ActionOpenMapProviderPreferences _action_ManageMapProviders;
    private Action                           _action_MapProvider_Next;
@@ -391,13 +386,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
     * @param map2View
     * @param map2State
     */
-   public Slideout_Map2_MapProvider(final ToolItem toolItem, final Map2View map2View, final IDialogSettings state) {
+   public Slideout_Map2_MapProvider(final ToolItem toolItem, final Map2View map2View, final IDialogSettings state_MapProvider) {
 
-      super(toolItem.getParent(), state, new int[] { 325, 400, 325, 400 });
+      super(toolItem.getParent(), state_MapProvider, new int[] { 325, 400, 325, 400 });
 
       _toolItem = toolItem;
       _map2View = map2View;
-      _state = state;
+      _state_MapProvider = state_MapProvider;
 
       setTitleText(Messages.Slideout_Map2Provider_Label_Title);
 
@@ -470,8 +465,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark));
-         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark_Disabled));
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Blue));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Blue_Disabled));
          _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
       }
       {
@@ -485,8 +480,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark));
-         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark_Disabled));
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue_Disabled));
          _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
       }
    }
@@ -500,7 +495,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       createActions();
 
       // define all columns for the viewer
-      _columnManager = new ColumnManager(this, _state);
+      _columnManager = new ColumnManager(this, _state_MapProvider);
       defineAllColumns();
 
       createUI(parent);
@@ -613,48 +608,32 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is critical
        * for performance that these methods be as efficient as possible.
        */
-      final Listener paintListener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      final Listener paintListener = event -> {
 
-            if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-               onPaint_Viewer(event);
-            }
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+            onPaint_Viewer(event);
          }
       };
       table.addListener(SWT.MeasureItem, paintListener);
       table.addListener(SWT.PaintItem, paintListener);
 
-      table.addControlListener(new ControlListener() {
+      table.addControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsVisible()));
 
-         @Override
-         public void controlMoved(final ControlEvent e) {}
+      table.addMouseWheelListener(mouseEvent -> {
 
-         @Override
-         public void controlResized(final ControlEvent e) {
-            setWidth_ForColumn_IsVisible();
-         }
-      });
+         final boolean isCtrlKey = UI.isCtrlKey(mouseEvent);
 
-      table.addMouseWheelListener(new MouseWheelListener() {
+         if (isCtrlKey) {
 
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+            /*
+             * Select next/previous mp but only when ctrl key is pressed, so that vertical
+             * scrolling do not select another mp
+             */
 
-            final boolean isCtrlKey = UI.isCtrlKey(event);
-
-            if (isCtrlKey) {
-
-               /*
-                * Select next/previous mp but only when ctrl key is pressed, so that vertical
-                * scrolling do not select another mp
-                */
-
-               if (event.count < 0) {
-                  onSelect_MapProvider_Next();
-               } else {
-                  onSelect_MapProvider_Previous();
-               }
+            if (mouseEvent.count < 0) {
+               onSelect_MapProvider_Next();
+            } else {
+               onSelect_MapProvider_Previous();
             }
          }
       });
@@ -691,28 +670,11 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       _mpViewer.setUseHashlookup(true);
 
-      _mpViewer.setContentProvider(new IStructuredContentProvider() {
+      _mpViewer.setContentProvider((IStructuredContentProvider) inputElement -> _allMapProvider.toArray());
 
-         @Override
-         public Object[] getElements(final Object inputElement) {
-            return _allMapProvider.toArray();
-         }
-      });
+      _mpViewer.addSelectionChangedListener(this::onSelect_MapProvider);
 
-      _mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_MapProvider(event);
-         }
-      });
-
-      _mpViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            _action_ManageMapProviders.run();
-         }
-      });
+      _mpViewer.addDoubleClickListener(doubleClickEvent -> _action_ManageMapProviders.run());
 
       _mpViewer.setFilters(new ViewerFilter() {
 
@@ -993,7 +955,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             _btnHideUnhideMP.setText(Messages.Slideout_Map2Provider_Button_UnhideMP);
             _btnHideUnhideMP.setToolTipText(Messages.Slideout_Map2Provider_Button_UnhideMP_Tooltip);
 
-            _btnHideUnhideMP.addSelectionListener(widgetSelectedAdapter(event -> action_HideUnhideMapProvider()));
+            _btnHideUnhideMP.addSelectionListener(widgetSelectedAdapter(selectionEvent -> action_HideUnhideMapProvider()));
 
             UI.setButtonLayoutData(_btnHideUnhideMP);
          }
@@ -1301,7 +1263,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
       _imageNo = CommonActivator.getImageDescriptor(CommonImages.App_No).createImage();
 
-      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
+      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
    @Override
@@ -1552,7 +1514,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
    private void restoreState() {
 
-      _isShowHiddenMapProvider = Util.getStateBoolean(_state, STATE_IS_SHOW_HIDDEN_MAP_PROVIDER, true);
+      _isShowHiddenMapProvider = Util.getStateBoolean(_state_MapProvider, STATE_IS_SHOW_HIDDEN_MAP_PROVIDER, true);
 
       /*
        * Check all map providers which are defined in the pref store
@@ -1596,8 +1558,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    private void restoreState_BeforeUI() {
 
       // update sorting comparator
-      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER_NAME);
-      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.ASCENDING);
+      final String sortColumnId = Util.getStateString(_state_MapProvider, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER_NAME);
+      final int sortDirection = Util.getStateInt(_state_MapProvider, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.ASCENDING);
 
       _mpComparator.__sortColumnId = sortColumnId;
       _mpComparator.__sortDirection = sortDirection;
@@ -1606,12 +1568,12 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    @Override
    protected void saveState() {
 
-      _state.put(STATE_IS_SHOW_HIDDEN_MAP_PROVIDER, _isShowHiddenMapProvider);
+      _state_MapProvider.put(STATE_IS_SHOW_HIDDEN_MAP_PROVIDER, _isShowHiddenMapProvider);
 
-      _state.put(STATE_SORT_COLUMN_ID, _mpComparator.__sortColumnId);
-      _state.put(STATE_SORT_COLUMN_DIRECTION, _mpComparator.__sortDirection);
+      _state_MapProvider.put(STATE_SORT_COLUMN_ID, _mpComparator.__sortColumnId);
+      _state_MapProvider.put(STATE_SORT_COLUMN_DIRECTION, _mpComparator.__sortDirection);
 
-      _columnManager.saveState(_state);
+      _columnManager.saveState(_state_MapProvider);
 
       super.saveState();
    }
@@ -1623,7 +1585,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    }
 
    /**
-    * Save the ckeck state and order of the map providers
+    * Save the check state and order of the map providers
     */
    private void saveState_MapProviders_SortOrder() {
 
@@ -1725,9 +1687,11 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       map.setMapProvider(mp);
 
       // set map dim level
-      final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-      final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
-      map.setDimLevel(_map2View.getMapDimLevel(), dimColor);
+      final IDialogSettings state_Map2 = Map2View.getState();
+      final boolean isMapDimmed = Util.getStateBoolean(state_Map2, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
+      final int mapDimValue = Util.getStateInt(state_Map2, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
+      final RGB mapDimColor = Util.getStateRGB(state_Map2, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
+      map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, _map2View.isBackgroundDark());
    }
 
    private void setWidth_ForColumn_IsVisible() {

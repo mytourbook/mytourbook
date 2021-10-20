@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,9 @@ public class ActionEditQuick extends Action {
    public ActionEditQuick(final ITourProvider tourProvider) {
 
       setText(Messages.app_action_quick_edit);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Edit));
+
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
 
       _tourProvider = tourProvider;
    }

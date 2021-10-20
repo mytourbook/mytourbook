@@ -44,7 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Web tools.
+ * Web tools
  */
 public class WEB {
 
@@ -100,6 +100,7 @@ public class WEB {
          ? WEB_CONTENT_DEVELOPMENT_FOLDER
          : WEB_CONTENT_RELEASE_FOLDER;
 
+   private static final char            NL                                       = UI.NEW_LINE;
    private static final String          URL_SPACE                                = " ";                                       //$NON-NLS-1$
    private static final String          URL_SPACE_REPLACEMENT                    = "%20";                                     //$NON-NLS-1$
    private static final String          URL_SQB_OPEN                             = "\\[";                                     //$NON-NLS-1$
@@ -160,6 +161,38 @@ public class WEB {
    public static final int              STATE_BODY_FONT_SIZE_MIN                 = 1;
    public static final int              STATE_BODY_FONT_SIZE_MAX                 = 100;
 
+   /*
+    * Tags which are replaced in the css file to support the dark mode
+    */
+   public static final String CSS_TAG__BODY__COLOR                        = "$BODY_COLOR$";                         //$NON-NLS-1$
+   public static final String CSS_TAG__BODY__BACKGROUND_COLOR             = "$BODY_BACKGROUND_COLOR$";              //$NON-NLS-1$
+   public static final String CSS_TAG__A_LINK__COLOR                      = "$A_LINK__COLOR$";                      //$NON-NLS-1$
+   public static final String CSS_TAG__A_VISITED__COLOR                   = "$A_VISITED__COLOR$";                   //$NON-NLS-1$
+   public static final String CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR = "$ACTION_CONTAINER__BACKGROUND_COLOR$"; //$NON-NLS-1$
+
+   public static final String CSS_TAG__BODY_SCROLLBAR                     = "$BODY_SCROLLBAR$";                     //$NON-NLS-1$
+   public static final String CSS_CONTENT__BODY_SCROLLBAR__DARK           = UI.EMPTY_STRING
+
+         + "   scrollbar-face-color:         #4d4d4d;" + NL                                                         //$NON-NLS-1$
+         + "   scrollbar-shadow-color:       #4d4d4d;" + NL                                                         //$NON-NLS-1$
+         + "   scrollbar-track-color:        #292929;" + NL                                                         //$NON-NLS-1$
+         + "   scrollbar-highlight-color:    #8f8;" + NL                                                            //$NON-NLS-1$
+         + "   scrollbar-arrow-color:        #888;" + NL                                                            //$NON-NLS-1$
+         + "   scrollbar-3dlight-color:      #000;" + NL                                                            //$NON-NLS-1$
+         + "   scrollbar-darkshadow-color:   #000;" + NL                                                            //$NON-NLS-1$
+   ;
+
+   /**
+    * Converts <code><br></code> into Java newline.
+    *
+    * @param text
+    * @return
+    */
+   public static String convertHTML_Into_JavaLineBreaks(final String text) {
+
+      return text.replaceAll(HTML_ELEMENT_BR, UI.NEW_LINE1);
+   }
+
    /**
     * Converts Java newline into HTML newline.
     *
@@ -180,6 +213,24 @@ public class WEB {
    public static String convertJS_LineBreaks(final String text) {
 
       return text.replaceAll("\\r\\n|\\r|\\n", "\\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
+    * Create scrollbar CSS for the dark mode
+    */
+   public static String createCSS_Scrollbar() {
+
+      final String darkThemeScrollbar = UI.EMPTY_STRING
+
+            + "body" + NL //                          //$NON-NLS-1$
+            + "{" + NL //                             //$NON-NLS-1$
+            + CSS_CONTENT__BODY_SCROLLBAR__DARK
+            + "}" + NL //                             //$NON-NLS-1$
+      ;
+
+      return UI.IS_DARK_THEME
+            ? darkThemeScrollbar
+            : UI.EMPTY_STRING;
    }
 
    /**
@@ -296,7 +347,7 @@ public class WEB {
       final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
 
       if (bundleUrl == null) {
-         StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+         StatusUtil.logError("File is not available: " + bundleFileName);//$NON-NLS-1$
          return null;
       }
 
@@ -358,7 +409,7 @@ public class WEB {
       final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
 
       if (bundleUrl == null) {
-         StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+         StatusUtil.logError("File is not available: " + bundleFileName);//$NON-NLS-1$
          return null;
       }
 
@@ -671,7 +722,7 @@ public class WEB {
       if (contentType == null) {
 
          contentType = CONTENT_TYPE_UNKNOWN;
-         StatusUtil.log("Content type is unknow for " + file);//$NON-NLS-1$
+         StatusUtil.logError("Content type is unknow for " + file);//$NON-NLS-1$
       }
 
       final Headers responseHeaders = httpExchange.getResponseHeaders();

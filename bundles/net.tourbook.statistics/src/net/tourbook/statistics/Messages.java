@@ -22,6 +22,7 @@ public class Messages extends NLS {
    private static final String BUNDLE_NAME = "net.tourbook.statistics.messages"; //$NON-NLS-1$
 
    public static String        LABEL_GRAPH_ALTITUDE;
+   public static String        LABEL_GRAPH_BATTERY;
    public static String        LABEL_GRAPH_BODY_FAT;
    public static String        LABEL_GRAPH_BODY_WEIGHT;
    public static String        LABEL_GRAPH_DAYTIME;
@@ -42,6 +43,8 @@ public class Messages extends NLS {
 
    public static String        Statistic_Label_Invers;
 
+   public static String        Statistic_Value_BatterySoC_End;
+   public static String        Statistic_Value_BatterySoC_Start;
    public static String        Statistic_Value_Date_Day_Header1;
    public static String        Statistic_Value_Date_FirstDay_Header1;
    public static String        Statistic_Value_Date_FirstDay_Header2;

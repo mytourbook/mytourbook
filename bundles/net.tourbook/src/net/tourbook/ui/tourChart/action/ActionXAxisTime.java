@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionXAxisTime extends Action {
 
-   private TourChart fTourChart;
+   private TourChart _tourChart;
 
    public ActionXAxisTime(final TourChart tourChart) {
 
       super(Messages.Tour_Action_show_time_on_x_axis, AS_RADIO_BUTTON);
 
-      fTourChart = tourChart;
+      _tourChart = tourChart;
 
       setToolTipText(Messages.Tour_Action_show_time_on_x_axis_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.XAxis_ShowTime));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.XAxis_ShowTime));
 
       setChecked(tourChart.getTourChartConfig().isShowTimeOnXAxis);
    }
 
    @Override
    public void run() {
-      fTourChart.actionXAxisTime(isChecked());
+      _tourChart.actionXAxisTime(isChecked());
    }
 
 }

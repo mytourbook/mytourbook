@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -109,6 +109,11 @@ public enum TourEventId {
     * A tour marker is selected, event data contain a {@link SelectionTourMarker}.
     */
    MARKER_SELECTION,
+
+   /**
+    * A tour pause is selected, event data contain a {@link SelectionTourPause}.
+    */
+   PAUSE_SELECTION,
 
    /**
     * Show geo grid in the map, event data contains {@link TourGeoFilterItem}

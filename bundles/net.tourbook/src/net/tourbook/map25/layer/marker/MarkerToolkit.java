@@ -351,6 +351,26 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return _bitmapStar;
    }
 
+   public Bitmap drawTrackArrow(final int bitmapArrowSize, final int arrowColor) {
+      //final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      final Bitmap bitmapTrackArrow = CanvasAdapter.newBitmap(bitmapArrowSize, bitmapArrowSize, 0);
+      final float bitmapArrowSizeF = bitmapArrowSize - 1;
+      final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
+      defaultMarkerCanvas.setBitmap(bitmapTrackArrow);
+      final Paint trackArrowPainter = CanvasAdapter.newPaint();
+      trackArrowPainter.setStyle(Paint.Style.STROKE);
+      trackArrowPainter.setStrokeWidth(6);
+      trackArrowPainter.setColor(arrowColor);
+
+      defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1f, bitmapArrowSizeF, trackArrowPainter);
+      //defaultMarkerCanvas.drawLine(1f, bitmapArrowSizeF, 1f, 1f, trackArrowPainter); //looks better when  arrow is open
+      defaultMarkerCanvas.drawLine(1f, 1f, bitmapArrowSizeF, bitmapArrowSizeF / 2, trackArrowPainter);
+      defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1, bitmapArrowSizeF / 2, trackArrowPainter);
+
+
+      return bitmapTrackArrow;
+   }
+
    public void loadConfig () {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       _fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import static org.eclipse.swt.events.FocusListener.focusGainedAdapter;
+import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
+
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -22,6 +25,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -46,23 +50,26 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class StatisticValuesView extends ViewPart {
 
-   public static final String                 ID                             = "net.tourbook.statistic.StatisticValuesView";            //$NON-NLS-1$
+   public static final String                 ID                             = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
 
-   private static final String                STATE_IS_GROUP_VALUES          = "STATE_IS_GROUP_VALUES";                                 //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_CSV_FORMAT       = "STATE_IS_SHOW_CSV_FORMAT";                              //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_ZERO_VALUES      = "STATE_IS_SHOW_ZERO_VALUES";                             //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_SEQUENCE_NUMBERS = "STATE_IS_SHOW_SEQUENCE_NUMBERS";                        //$NON-NLS-1$
+   private static final String                STATE_IS_GROUP_VALUES          = "STATE_IS_GROUP_VALUES";                      //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_CSV_FORMAT       = "STATE_IS_SHOW_CSV_FORMAT";                   //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_ZERO_VALUES      = "STATE_IS_SHOW_ZERO_VALUES";                  //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_SEQUENCE_NUMBERS = "STATE_IS_SHOW_SEQUENCE_NUMBERS";             //$NON-NLS-1$
 
    private static final IPreferenceStore      _prefStore                     = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore      _prefStore_Common              = CommonActivator.getPrefStore();
    private static final IDialogSettings       _state                         = TourbookPlugin.getState(ID);
 
+   private IPartListener2                     _partListener;
    private IPropertyChangeListener            _prefChangeListener;
    private IPropertyChangeListener            _prefChangeListener_Common;
 
@@ -109,8 +116,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override
@@ -127,8 +134,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_GroupValues_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.GroupValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.GroupValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GroupValues));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GroupValues_Disabled));
       }
 
       @Override
@@ -147,7 +154,7 @@ public class StatisticValuesView extends ViewPart {
          setToolTipText(Messages.Tour_StatisticValues_Action_CSVFormat_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.CSVFormat_Disabled));
       }
 
       @Override
@@ -172,7 +179,7 @@ public class StatisticValuesView extends ViewPart {
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowSequenceNumbers_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_SequenceNumber));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_SequenceNumber_Disabled));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_SequenceNumber_Disabled));
       }
 
       @Override
@@ -191,7 +198,7 @@ public class StatisticValuesView extends ViewPart {
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowZeroValued_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZeroValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZeroValues_Disabled));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ZeroValues_Disabled));
       }
 
       @Override
@@ -199,6 +206,46 @@ public class StatisticValuesView extends ViewPart {
          enableActions();
          updateUI();
       }
+   }
+
+   private void addPartListener() {
+
+      _partListener = new IPartListener2() {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == StatisticValuesView.this) {
+               fixThemedColors();
+            }
+         }
+
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == StatisticValuesView.this) {
+               fixThemedColors();
+            }
+         }
+
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+      getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
@@ -217,6 +264,7 @@ public class StatisticValuesView extends ViewPart {
 
                // ensure the font is valid, this case occurred in Ubuntu
                if (logFont != null) {
+
                   _txtStatValues.setFont(logFont);
                }
 
@@ -279,7 +327,7 @@ public class StatisticValuesView extends ViewPart {
    private void createActions() {
 
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.Tour_StatisticValues_Action_OpenPreferences_Tooltip, PrefPageAppearance.ID, ID);
-      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions));
+      _action_PrefDialog.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
       _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
 
       _action_CopyIntoClipboard = new Action_CopyStatValuesIntoClipboard();
@@ -299,6 +347,7 @@ public class StatisticValuesView extends ViewPart {
       createUI(parent);
       createActions();
 
+      addPartListener();
       addTourEventListener();
       addPrefListener();
 
@@ -322,6 +371,8 @@ public class StatisticValuesView extends ViewPart {
       {
          createUI_10_Container(_pageContent);
       }
+
+      fixThemedColors();
    }
 
    private void createUI_10_Container(final Composite parent) {
@@ -334,12 +385,16 @@ public class StatisticValuesView extends ViewPart {
          _txtStatValues = new StyledText(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
          _txtStatValues.setFont(net.tourbook.ui.UI.getLogFont());
          _txtStatValues.setTabs(1);
+         _txtStatValues.addFocusListener(focusLostAdapter(focusEvent -> fixThemedColors()));
+         _txtStatValues.addFocusListener(focusGainedAdapter(focusEvent -> fixThemedColors()));
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_txtStatValues);
       }
    }
 
    @Override
    public void dispose() {
+
+      getViewSite().getPage().removePartListener(_partListener);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -389,6 +444,18 @@ public class StatisticValuesView extends ViewPart {
 
       // setup actions
       tbm.update(true);
+   }
+
+   private void fixThemedColors() {
+
+      _pageBook.getDisplay().asyncExec(() -> {
+
+         if (_pageBook.isDisposed()) {
+            return;
+         }
+
+         _txtStatValues.setBackground(ThemeUtil.getDarkestBackgroundColor());
+      });
    }
 
    private void initUI() {
@@ -484,6 +551,8 @@ public class StatisticValuesView extends ViewPart {
          _txtStatValues.setHorizontalIndex(hIndex);
       }
       _txtStatValues.setRedraw(true);
+
+      fixThemedColors();
    }
 
 }

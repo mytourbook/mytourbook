@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,6 @@ import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
@@ -30,7 +29,9 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.srtm.Messages;
+import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,150 +42,158 @@ import org.eclipse.swt.widgets.Display;
 
 public class HTTPDownloader {
 
-	public static final void get(final String urlBase, final String remoteFileName, final String localFilePathName)
-			throws Exception {
+   public final void get(final String baseUrl,
+                         final String remoteFileName,
+                         final String localFilePathName)
+         throws Exception {
 
-		final TileInfoManager tileInfoMgr = TileInfoManager.getInstance();
-		final long[] numWritten = new long[1];
+      final TileInfoManager tileInfoMgr = TileInfoManager.getInstance();
+      final long[] numBytes_Written = new long[1];
 
-		if (Display.getCurrent() != null) {
+      if (Display.getCurrent() != null) {
 
-			/*
-			 * display info in the status line when this is running in the UI thread because the
-			 * download will be blocking the UI thread until the download is finished
-			 */
-			tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteFileName, -99);
-		}
+         /*
+          * Display info in the status line when this is running in the UI thread because the
+          * download will be blocking the UI thread until the download is finished
+          */
+         tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteFileName, -99);
+      }
 
-		final Job monitorJob = new Job(Messages.job_name_downloadMonitor) {
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
+      final Job monitorJob = new Job(Messages.job_name_downloadMonitor) {
+         @Override
+         protected IStatus run(final IProgressMonitor monitor) {
 
-				tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_LOADING_MONITOR, remoteFileName, numWritten[0]);
+            tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_LOADING_MONITOR, remoteFileName, numBytes_Written[0]);
 
-				// update every 200ms
-				this.schedule(200);
+            // update every 500ms
+            this.schedule(500);
 
-				return Status.OK_STATUS;
-			}
-		};
+            return Status.OK_STATUS;
+         }
+      };
 
-		final String jobName = remoteFileName + " - " + Messages.job_name_httpDownload; //$NON-NLS-1$
+      final String jobName = remoteFileName + UI.DASH_WITH_SPACE + Messages.job_name_httpDownload;
 
-		final Job downloadJob = new Job(jobName) {
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
+      final Job downloadJob = new Job(jobName) {
+         @Override
+         protected IStatus run(final IProgressMonitor monitor) {
 
-				tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteFileName, 0);
+            tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteFileName, 0);
 
-				final String address = urlBase + remoteFileName;
+            InputStream inputStream = null;
 
-				System.out.println("load " + address); //$NON-NLS-1$
-				OutputStream outputStream = null;
-				InputStream inputStream = null;
+            try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePathName))) {
 
-				try {
+               long startTime = System.currentTimeMillis();
 
-					final URL url = new URL(address);
-					outputStream = new BufferedOutputStream(new FileOutputStream(localFilePathName));
+               monitor.beginTask(jobName, IProgressMonitor.UNKNOWN);
 
-					final URLConnection urlConnection = url.openConnection();
-					inputStream = urlConnection.getInputStream();
+               final String resourceUrl = baseUrl + remoteFileName;
 
-					final byte[] buffer = new byte[1024];
-					int numRead;
+               // show log in log view that a download durting tour import is visible
+               TourLogManager.log_INFO(NLS.bind(Messages.Log_SRTM_DownloadingResource, resourceUrl));
 
-					long startTime = System.currentTimeMillis();
+               System.out.println(HTTPDownloader.class.getCanonicalName() + " - downloading: " + resourceUrl); //$NON-NLS-1$
 
-					monitor.beginTask(jobName, IProgressMonitor.UNKNOWN);
+               inputStream = getInputStream(resourceUrl);
 
-					while ((numRead = inputStream.read(buffer)) != -1) {
+               final byte[] buffer = new byte[1024];
+               int numBytes_Read;
 
-						outputStream.write(buffer, 0, numRead);
-						numWritten[0] += numRead;
+               while ((numBytes_Read = inputStream.read(buffer)) != -1) {
 
-						// show number of received bytes
-						final long currentTime = System.currentTimeMillis();
-						if (currentTime > startTime + 1000) {
+                  outputStream.write(buffer, 0, numBytes_Read);
+                  numBytes_Written[0] += numBytes_Read;
 
-							startTime = currentTime;
+                  // show number of received bytes every second
+                  final long currentTime = System.currentTimeMillis();
+                  if (currentTime > startTime + 1000) {
 
-                     monitor.setTaskName(UI.EMPTY_STRING + numWritten[0]);
-						}
-					}
+                     startTime = currentTime;
 
-					System.out.println("# Bytes localName = " + numWritten); //$NON-NLS-1$
+                     monitor.setTaskName(UI.EMPTY_STRING + numBytes_Written[0]);
+                  }
+               }
 
-				} catch (final UnknownHostException e) {
+               System.out.println(HTTPDownloader.class.getCanonicalName() + " - # Bytes localName = " + numBytes_Written[0]); //$NON-NLS-1$
 
-					return new Status(
-							IStatus.ERROR,
-							TourbookPlugin.PLUGIN_ID,
-							IStatus.ERROR, //
-							NLS.bind(Messages.error_message_cannotConnectToServer, urlBase),
-							e);
+            } catch (final UnknownHostException e) {
 
-				} catch (final SocketTimeoutException e) {
+               return new Status(
+                     IStatus.ERROR,
+                     TourbookPlugin.PLUGIN_ID,
+                     IStatus.ERROR,
+                     NLS.bind(Messages.error_message_cannotConnectToServer, baseUrl),
+                     e);
 
-					return new Status(
-							IStatus.ERROR,
-							TourbookPlugin.PLUGIN_ID,
-							IStatus.ERROR, //
-							NLS.bind(Messages.error_message_timeoutWhenConnectingToServer, urlBase),
-							e);
-//				} catch (final FileNotFoundException e) {
-//					return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, //
-//							NLS.bind(Messages.error_message_fileNotFoundException, address),
-//							e);
-				} catch (final Exception e) {
+            } catch (final SocketTimeoutException e) {
 
-					return new Status(IStatus.ERROR, TourbookPlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
+               return new Status(
+                     IStatus.ERROR,
+                     TourbookPlugin.PLUGIN_ID,
+                     IStatus.ERROR,
+                     NLS.bind(Messages.error_message_timeoutWhenConnectingToServer, baseUrl),
+                     e);
 
-				} finally {
+            } catch (final Exception e) {
 
-					try {
-						if (inputStream != null) {
-							inputStream.close();
-						}
-						if (outputStream != null) {
-							outputStream.close();
-						}
-					} catch (final IOException e) {
-						e.printStackTrace();
-					}
+               return new Status(
+                     IStatus.ERROR,
+                     TourbookPlugin.PLUGIN_ID,
+                     IStatus.ERROR,
+                     e.getMessage(),
+                     e);
 
-					tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_END_LOADING, remoteFileName, 0);
-				}
+            } finally {
 
-				System.out.println("get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               Util.close(inputStream);
 
-				return Status.OK_STATUS;
-			}
-		};
+               tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_END_LOADING, remoteFileName, 0);
+            }
 
-		monitorJob.schedule();
-		downloadJob.schedule();
+            System.out.println(HTTPDownloader.class.getCanonicalName() + " - get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		// wait until the download job is finished
-		try {
-			downloadJob.join();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
+            return Status.OK_STATUS;
+         }
+      };
 
-		// stop monitor job
-		try {
-			monitorJob.cancel();
-			monitorJob.join();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
+      monitorJob.schedule();
+      downloadJob.schedule();
 
-		// throw exception when it occured during the download
-		final Exception e = (Exception) downloadJob.getResult().getException();
-		if (e != null) {
-//			throw (e);
-		}
+      // wait until the download job is finished
+      try {
+         downloadJob.join();
+      } catch (final InterruptedException e) {
+         e.printStackTrace();
+         Thread.currentThread().interrupt();
+      }
 
-	}
+      // stop monitor job
+      try {
+         monitorJob.cancel();
+         monitorJob.join();
+      } catch (final InterruptedException e) {
+         e.printStackTrace();
+         Thread.currentThread().interrupt();
+      }
+
+      // throw exception when it occured during the download
+      final IStatus result = downloadJob.getResult();
+      if (result != null) {
+         final Exception e = (Exception) result.getException();
+         if (e != null) {
+            throw (e);
+         }
+      }
+
+   }
+
+   protected InputStream getInputStream(final String urlAddress) throws Exception {
+
+      final URL url = new URL(urlAddress);
+      final URLConnection urlConnection = url.openConnection();
+      final InputStream inputStream = urlConnection.getInputStream();
+
+      return inputStream;
+   }
 }

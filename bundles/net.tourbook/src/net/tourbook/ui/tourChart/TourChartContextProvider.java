@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,9 +55,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-   private final ITourChartViewer _tourChartViewer;
+   private final ITourChartViewer           _tourChartViewer;
 
-//	private ActionConvertIntoSharedMarker		_actionConvertIntoSharedMarker;
    private ActionCreateRefTour              _actionCreateRefTour;
    private ActionCreateMarkerFromSlider     _actionCreateMarkerFromSlider;
    private ActionCreateMarkerFromSlider     _actionCreateMarkerFromSliderLeft;
@@ -74,12 +73,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private ActionSetTourTypeMenu            _actionSetTourType;
    private ActionSetMarkerVisible           _actionSetMarkerVisible;
    private ActionSetMarkerLabelPositionMenu _actionSetMarkerPosition;
-//	private ActionSetMarkerImageMenu			_actionSetMarkerSignMenu;
 
-   private TagMenuManager _tagMenuMgr;
+   private TagMenuManager                   _tagMenuMgr;
 
-   private ChartXSlider   _leftSlider;
-   private ChartXSlider   _rightSlider;
+   private ChartXSlider                     _leftSlider;
+   private ChartXSlider                     _rightSlider;
 
    /**
     * Provides a context menu for a tour chart
@@ -125,8 +123,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionDeleteMarker = new ActionDeleteMarker(tourChart);
       _actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
       _actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
-//		_actionSetMarkerSignMenu = new ActionSetMarkerImageMenu(tourChart);
-//		_actionConvertIntoSharedMarker = new ActionConvertIntoSharedMarker(tourChart);
 
       _actionExportTour = new ActionExport(this);
 
@@ -158,6 +154,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       final TourChart tourChart = _tourChartViewer.getTourChart();
 
       tourChart.hideMarkerTooltip();
+      tourChart.hidePauseTooltip();
 
       /*
        * Check if a marker is hovered
@@ -206,7 +203,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       menuMgr.add(_actionPrefDialog);
 
       // set slider position in export action
-      _actionExportTour.setTourRange(//
+      _actionExportTour.setTourRange(
             tourChart.getLeftSlider().getValuesIndex(),
             tourChart.getRightSlider().getValuesIndex());
 
@@ -232,7 +229,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenTour.setEnabled(isTourSaved);
       _actionExportTour.setEnabled(true);
 
-      _tagMenuMgr.enableTagActions(//
+      _tagMenuMgr.enableTagActions(
             isTourSaved,
             isTourSaved && tourTags.size() > 0,
             tourTags);
@@ -250,18 +247,14 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenMarkerDialog.setTourMarker(tourMarker);
       _actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
       _actionSetMarkerPosition.setTourMarker(tourMarker);
-//		_actionSetMarkerSignMenu.setTourMarker(tourMarker);
-//		_actionConvertIntoSharedMarker.setTourMarker(tourMarker);
 
       // fill actions
       menuMgr.add(_actionSetMarkerPosition);
       menuMgr.add(_actionSetMarkerVisible);
       menuMgr.add(_actionDeleteMarker);
-//		menuMgr.add(_actionSetMarkerSignMenu);
       menuMgr.add(_actionOpenMarkerDialog);
 
       menuMgr.add(new Separator());
-//		menuMgr.add(_actionConvertIntoSharedMarker);
 
       /*
        * enable actions
@@ -276,12 +269,10 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
          //isGeoTour = true;
       }
 
-//		_actionConvertIntoSharedMarker.setEnabled(isTourSaved && isGeoTour);
       _actionDeleteMarker.setEnabled(isTourSaved);
       _actionOpenMarkerDialog.setEnabled(isTourSaved);
       _actionSetMarkerVisible.setEnabled(isTourSaved);
       _actionSetMarkerPosition.setEnabled(isTourSaved);
-//		_actionSetMarkerSignMenu.setEnabled(isTourSaved);
    }
 
    @Override
@@ -364,7 +355,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    @Override
    public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
 
-      _tagMenuMgr.onShowMenu(//
+      _tagMenuMgr.onShowMenu(
             menuEvent,
             menuParentControl,
             Display.getCurrent().getCursorLocation(),

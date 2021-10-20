@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ public class TVIWizardCompareTour extends TVIWizardCompareItem {
    long tourTypeId;
 
    public TVIWizardCompareTour(final TVIWizardCompareItem parentItem) {
+
       setParentItem(parentItem);
    }
 
@@ -36,10 +37,27 @@ public class TVIWizardCompareTour extends TVIWizardCompareItem {
    protected void fetchChildren() {}
 
    /**
-    * tour items do not have children
+    * Tour items do not have children
     */
    @Override
    public boolean hasChildren() {
       return false;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TVIWizardCompareTour [\n" //$NON-NLS-1$
+
+            + "tourId         =" + tourId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "tourYear       =" + tourYear + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "tourMonth      =" + tourMonth + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "tourDay        =" + tourDay + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "colDistance    =" + colDistance + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "colElapsedTime =" + colElapsedTime + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "colAltitudeUp  =" + colAltitudeUp + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+//            + "tourTypeId     =" + tourTypeId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]\n"; //$NON-NLS-1$
    }
 }

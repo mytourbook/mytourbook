@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,7 @@ public class Action_Property_MoveUp extends Action {
       _filterProperty = filterProperty;
 
       setToolTipText(Messages.Slideout_TourFilter_Action_MovePropertyUp_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue));
    }
 
    @Override

@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>21.3.0-SNAPSHOT</version>
+                                             <version>21.9.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>
@@ -63,14 +63,25 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.17</id>                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2020-09</url>
+         <id>eclipse.platform.4.20</id>                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2021-06</url>
       </repository>   
 
+      <repository>
+         <id>eclipse.nattable.2.0</id>                                  <layout>p2</layout>
+         <url>http://download.eclipse.org/nattable/releases/2.0.0/repository</url>
+      </repository>   
+
+
+
+      <!-- Repo for Chromium is/was not supported in Eclipse
+      
       <repository>
          <id>com.make.chromium.cef</id>                                 <layout>p2</layout>
          <url>http://dl.maketechnology.io/chromium-cef/rls/repository</url>
       </repository>   
+      
+      -->
    
       <!-- 
       

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,6 +75,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -101,8 +103,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -176,7 +176,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private ZonedDateTime             _today                     = TimeTools.now();
 
    private Font                      _fontItalic;
-   private Color[]                   _hrZoneColors;
 
    /**
     * Is <code>true</code> when a tour in the tour editor is modified.
@@ -193,7 +192,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Button               _btnSavePerson;
    private Button               _btnCancel;
 
-   private TabFolder            _tabFolderPerson;
+   private CTabFolder           _tabFolderPerson;
    private Text                 _txtFirstName;
    private Text                 _txtLastName;
    private Combo                _cboSportComputer;
@@ -507,9 +506,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Composite createUI(final Composite parent) {
 
       _prefPageContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-//				.grab(true, true)
-            .applyTo(_prefPageContainer);
+      GridDataFactory.fillDefaults().applyTo(_prefPageContainer);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_prefPageContainer);
       {
 
@@ -517,9 +514,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          label.setText(Messages.Pref_People_Title);
 
          final Composite innerContainer = new Composite(_prefPageContainer, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .grab(true, true)
-               .applyTo(innerContainer);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(innerContainer);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
          {
             createUI_10_People_Viewer(innerContainer);
@@ -542,8 +537,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
          final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults().grab(true, false).hint(350, SWT.DEFAULT).applyTo(label);
          label.setText(Messages.Pref_App_Label_TourEditorIsModified);
+         GridDataFactory.fillDefaults().grab(true, false).hint(350, SWT.DEFAULT).applyTo(label);
       }
 
       return container;
@@ -555,7 +550,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       layoutContainer.setLayout(tableLayout);
-      GridDataFactory.fillDefaults() //
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .hint(convertWidthInCharsToPixels(30), convertHeightInCharsToPixels(5))
             .applyTo(layoutContainer);
@@ -568,7 +563,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
 
       table.setHeaderVisible(true);
-      table.setLinesVisible(true);
 
       _peopleViewer = new TableViewer(table);
       defineAllColumns(tableLayout);
@@ -616,9 +610,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private void createUI_20_People_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-//				.grab(false, true)
-            .applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
@@ -668,24 +660,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    private void createUI_30_Person_Folder(final Composite parent) {
 
-      _tabFolderPerson = new TabFolder(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      _tabFolderPerson = new CTabFolder(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(_tabFolderPerson);
       {
          // tab: person
-         final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
+         final CTabItem tabItemDetails = new CTabItem(_tabFolderPerson, SWT.NONE);
          tabItemDetails.setText(Messages.Pref_People_Tab_Person);
          tabItemDetails.setControl(createUI_50_Tab_Person(_tabFolderPerson));
 
          // tab: hr zone
-         final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
+         final CTabItem tabItemHRZone = new CTabItem(_tabFolderPerson, SWT.NONE);
          tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
          tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
 
          // tab: data transfer
-         final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
+         final CTabItem tabItemDataTransfer = new CTabItem(_tabFolderPerson, SWT.NONE);
          tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
          tabItemDataTransfer.setControl(createUI_90_Tab_DataTransfer(_tabFolderPerson));
       }
@@ -694,7 +686,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Control createUI_50_Tab_Person(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
 //				.grab(true, false)
             .applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
@@ -721,11 +713,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_first_name);
 
       _txtFirstName = new Text(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults()//
+      _txtFirstName.addModifyListener(_defaultModifyListener);
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(_txtFirstName);
-      _txtFirstName.addModifyListener(_defaultModifyListener);
    }
 
    /**
@@ -737,11 +729,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_last_name);
 
       _txtLastName = new Text(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults()//
+      _txtLastName.addModifyListener(_defaultModifyListener);
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(_txtLastName);
-      _txtLastName.addModifyListener(_defaultModifyListener);
    }
 
    /**
@@ -756,16 +748,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_Birthday);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(2, 1)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
 
          _dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_dtBirthday);
          _dtBirthday.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -791,12 +780,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //					onModifyHrZones();
             }
          });
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_dtBirthday);
 
          /*
           * label: age
           */
          _lblAgePerson = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_lblAgePerson);
       }
@@ -813,7 +805,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       // radio
       final Composite containerGender = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(2, 1)
             .applyTo(containerGender);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
@@ -837,21 +829,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_weight);
 
       final Composite containerWeight = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .applyTo(containerWeight);
+      GridDataFactory.fillDefaults().applyTo(containerWeight);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
       {
          // spinner: weight
          _spinnerWeight = new Spinner(containerWeight, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_spinnerWidth, SWT.DEFAULT)
-               .applyTo(_spinnerWeight);
          _spinnerWeight.setDigits(1);
          _spinnerWeight.setMinimum(0);
          _spinnerWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
          _spinnerWeight.addSelectionListener(_defaultSelectionListener);
          _spinnerWeight.addMouseWheelListener(_defaultMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerWeight);
 
          // label: unit
          label = new Label(containerWeight, SWT.NONE);
@@ -871,19 +862,16 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_height);
 
       final Composite containerHeight = new Composite(parent, SWT.NONE);
-
-      GridDataFactory.fillDefaults() //
-            .applyTo(containerHeight);
+      GridDataFactory.fillDefaults().applyTo(containerHeight);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(containerHeight);
-
       {
          // spinner: height
          _spinnerHeight = new Spinner(containerHeight, SWT.BORDER);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_spinnerHeight);
          _spinnerHeight.addSelectionListener(_defaultSelectionListener);
          _spinnerHeight.addMouseWheelListener(_defaultMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_spinnerHeight);
 
          // label: unit
          label = new Label(containerHeight, SWT.NONE);
@@ -932,7 +920,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Control createUI_60_Tab_HRZone(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults()//
+      GridLayoutFactory.swtDefaults()
             .numColumns(1)
             .extendedMargins(0, 0, 7, 0)
             .applyTo(container);
@@ -968,21 +956,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_RestingHR);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
 //				.span(2, 1)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          // spinner: weight
          _spinnerRestingHR = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_spinnerWidth, SWT.DEFAULT)
-               .applyTo(_spinnerRestingHR);
          _spinnerRestingHR.setMinimum(10);
          _spinnerRestingHR.setMaximum(200);
          _spinnerRestingHR.addSelectionListener(_defaultSelectionListener);
          _spinnerRestingHR.addMouseWheelListener(_defaultMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerRestingHR);
 
          // label: unit
          label = new Label(container, SWT.NONE);
@@ -990,7 +978,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       final Composite containerAge = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.END, SWT.FILL)
             .applyTo(containerAge);
@@ -1001,17 +989,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           * label: age
           */
          label = new Label(containerAge, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         label.setText(Messages.Pref_People_Label_Age);
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.END, SWT.CENTER)
                .applyTo(label);
-         label.setText(Messages.Pref_People_Label_Age);
 
          /*
           * label: age years
           */
          _lblAgeHr = new Label(containerAge, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
 //					.hint(convertHeightInCharsToPixels(4), SWT.DEFAULT)
                .grab(true, true)
                .align(SWT.END, SWT.CENTER)
@@ -1028,7 +1016,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       label.setText(Messages.Pref_People_Label_MaxHR);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(container);
@@ -1038,10 +1026,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           * spinner: hr max
           */
          _spinnerMaxHR = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_spinnerWidth, SWT.DEFAULT)
-               .applyTo(_spinnerMaxHR);
          _spinnerMaxHR.setMinimum(HEART_BEAT_MIN);
          _spinnerMaxHR.setMaximum(HEART_BEAT_MAX);
          _spinnerMaxHR.addSelectionListener(new SelectionAdapter() {
@@ -1057,6 +1041,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                updateUIOnModifiedHrZones();
             }
          });
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+//					.hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerMaxHR);
 
          /*
           * label: unit
@@ -1068,11 +1056,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           * combo: formula to compute hr max
           */
          _cboHrMaxFormula = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-         GridDataFactory.fillDefaults() //
-               .grab(true, false)
-               .indent(5, 0)
-               .hint(50, SWT.DEFAULT)
-               .applyTo(_cboHrMaxFormula);
          _cboHrMaxFormula.setVisibleItemCount(20);
          _cboHrMaxFormula.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1080,6 +1063,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                updateUIOnModifiedHrZones();
             }
          });
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .indent(5, 0)
+               .hint(50, SWT.DEFAULT)
+               .applyTo(_cboHrMaxFormula);
 
          // fill combobox
          final String[] hrMaxFormulaNames = TrainingManager.HRMaxFormulaNames;
@@ -1092,7 +1080,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private void createUI_70_HrZone(final Composite parent) {
 
       final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(hrZoneContainer);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(hrZoneContainer);
@@ -1108,10 +1096,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                      | SWT.H_SCROLL
 //					| SWT.BORDER
          );
-         GridDataFactory.fillDefaults()//
-               .grab(true, true)
-               .hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
-               .applyTo(_hrZoneScrolledContainer);
 //			_hrZoneScrolledContainer.setAlwaysShowScrollBars(true);
          _hrZoneScrolledContainer.setExpandVertical(true);
          _hrZoneScrolledContainer.setExpandHorizontal(true);
@@ -1125,6 +1109,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                }
             }
          });
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
+               .applyTo(_hrZoneScrolledContainer);
       }
    }
 
@@ -1139,7 +1127,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final int comboWidth = (int) (UI.IS_OSX || UI.IS_LINUX ? comboSize.x * 1.3 : comboSize.x);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .indent(0, 20)
             .grab(true, false)
             .applyTo(container);
@@ -1150,8 +1138,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           * button: compute speed values for all tours
           */
          _btnComputeHrZonesForAllTours = new Button(container, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .applyTo(_btnComputeHrZonesForAllTours);
          _btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
          _btnComputeHrZonesForAllTours.setToolTipText(Messages.Pref_People_Button_HrZones_ComputeAllTours_Tooltip);
          _btnComputeHrZonesForAllTours.addSelectionListener(new SelectionAdapter() {
@@ -1167,15 +1153,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                }
             }
          });
+         GridDataFactory.fillDefaults().applyTo(_btnComputeHrZonesForAllTours);
 
          /*
           * button: edit hr zones
           */
          _btnModifyHrZones = new Button(container, SWT.PUSH);
-         GridDataFactory.fillDefaults()//
-               .grab(true, false)
-               .align(SWT.END, SWT.FILL)
-               .applyTo(_btnModifyHrZones);
          _btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
          _btnModifyHrZones.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1183,14 +1166,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                onEditHrZones();
             }
          });
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.END, SWT.FILL)
+               .applyTo(_btnModifyHrZones);
 
          /*
           * combo: formula to compute hr max
           */
          _cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-         GridDataFactory.fillDefaults() //
-               .hint(comboWidth, SWT.DEFAULT)
-               .applyTo(_cboTemplate);
          _cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
          _cboTemplate.setVisibleItemCount(20);
          _cboTemplate.addSelectionListener(new SelectionAdapter() {
@@ -1199,6 +1183,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                onCreateHrZonesFromTemplate();
             }
          });
+         GridDataFactory.fillDefaults()
+               .hint(comboWidth, SWT.DEFAULT)
+               .applyTo(_cboTemplate);
 
          // fill combobox
          for (final String hrZoneTemplate : TrainingManager.HR_ZONE_TEMPLATES) {
@@ -1223,7 +1210,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       // hr zone container
       final Composite innerContainer = new Composite(_hrZoneScrolledContainer, SWT.NONE);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(10)
 //				.extendedMargins(0, 5, 0, 0)
             .spacing(2, 2)
@@ -1272,32 +1259,23 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
        * label: zone
        */
       label = new Label(parent, SWT.NONE);
+      label.setFont(_fontItalic);
+      label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
+      label.addMouseListener(_hrZoneMouseListener);
       GridDataFactory.fillDefaults().grab(true, false)
 //				.hint(250, SWT.DEFAULT)
             .align(SWT.FILL, SWT.BOTTOM)
             .indent(5, 0)
             .applyTo(label);
-      label.setFont(_fontItalic);
-      label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
-      label.addMouseListener(_hrZoneMouseListener);
 
       /*
        * label: min pulse
        */
       label = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).span(8, 1).applyTo(label);
       label.setFont(_fontItalic);
       label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
       label.addMouseListener(_hrZoneMouseListener);
-//
-//		/*
-//		 * label: min pulse
-//		 */
-//		label = new Label(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).span(4, 1).applyTo(label);
-//		label.setFont(_fontItalic);
-//		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
-//		label.addMouseListener(_hrZoneMouseListener);
+      GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).span(8, 1).applyTo(label);
    }
 
    private void createUI_84_HrZone_Fields(final Composite parent,
@@ -1311,9 +1289,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       // get sorted hr zones
-      final ArrayList<TourPersonHRZone> hrZones = new ArrayList<>(currentPerson.getHrZonesSorted());
-      final int hrZoneSize = hrZones.size();
-      Collections.sort(hrZones);
+      final ArrayList<TourPersonHRZone> allHrZones = new ArrayList<>(currentPerson.getHrZonesSorted());
+      final int numHrZones = allHrZones.size();
+      Collections.sort(allHrZones);
 
       final HrZoneContext hrZoneMinMaxBpm = currentPerson.getHrZoneContext(
             hrMaxFormulaKey,
@@ -1322,121 +1300,140 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _today);
 
       // init hr zone colors
-      final Display display = parent.getDisplay();
-      disposeHrZoneColors();
-      _hrZoneColors = new Color[hrZoneSize];
+      final Label[] allHrZoneColorLabel = new Label[numHrZones];
 
-      for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+      for (int zoneIndex = 0; zoneIndex < numHrZones; zoneIndex++) {
 
-         final TourPersonHRZone hrZone = hrZones.get(zoneIndex);
+         final TourPersonHRZone hrZone = allHrZones.get(zoneIndex);
 
          final int zoneMinValue = hrZone.getZoneMinValue();
          final int zoneMaxValue = hrZone.getZoneMaxValue();
 
-         final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
+         {
+            /*
+             * label: color
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(UI.EMPTY_STRING);
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
 
-         /*
-          * label: color
-          */
-         Label label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
-         label.setText(UI.EMPTY_STRING);
-         label.setBackground(hrZoneColor);
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: hr zone name
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .indent(5, 0)
-               .applyTo(label);
-         label.setText(hrZone.getNameLong());
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: min pulse %
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(10, 0).applyTo(label);
-         label.setText(zoneMinValue == Integer.MIN_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMinValue));
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: ...
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
-//			label.setText(zoneMaxValue == Integer.MAX_VALUE ? UI.EMPTY_STRING : UI.SYMBOL_DASH);
-         label.setText(UI.SYMBOL_DASH);
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: max pulse %
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.END, SWT.FILL)
-//					.indent(10, 0)
-               .applyTo(label);
-         label.setText(zoneMaxValue == Integer.MAX_VALUE //
-               ? Messages.App_Label_max
-               : Integer.toString(zoneMaxValue));
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: %
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-         label.setText(UI.SYMBOL_PERCENTAGE);
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: min pulse bpm
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(15, 0).applyTo(label);
-         label.setText(zoneMinValue == Integer.MIN_VALUE //
-               ? UI.EMPTY_STRING
-               : Integer.toString((int) hrZoneMinMaxBpm.zoneMinBpm[zoneIndex]));
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: ...
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
-         label.setText(UI.SYMBOL_DASH);
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: max pulse bpm
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.END, SWT.FILL)
-//					.indent(10, 0)
-               .applyTo(label);
-         label.setText(zoneMaxValue == Integer.MAX_VALUE //
-               ? Messages.App_Label_max
-               : Integer.toString((int) hrZoneMinMaxBpm.zoneMaxBpm[zoneIndex]));
-         label.addMouseListener(_hrZoneMouseListener);
-
-         /*
-          * label: bpm
-          */
-         label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-         label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
-         label.addMouseListener(_hrZoneMouseListener);
+            allHrZoneColorLabel[zoneIndex] = label;
+         }
+         {
+            /*
+             * label: hr zone name
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(hrZone.getNameLong());
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults()
+                  .indent(5, 0)
+                  .applyTo(label);
+         }
+         {
+            /*
+             * label: min pulse %
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(zoneMinValue == Integer.MIN_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMinValue));
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(10, 0).applyTo(label);
+         }
+         {
+            /*
+             * label: ...
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(UI.SYMBOL_DASH);
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+         }
+         {
+            /*
+             * label: max pulse %
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(zoneMaxValue == Integer.MAX_VALUE //
+                  ? Messages.App_Label_max
+                  : Integer.toString(zoneMaxValue));
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(label);
+         }
+         {
+            /*
+             * label: %
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(UI.SYMBOL_PERCENTAGE);
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         }
+         {
+            /*
+             * label: min pulse bpm
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(zoneMinValue == Integer.MIN_VALUE //
+                  ? UI.EMPTY_STRING
+                  : Integer.toString((int) hrZoneMinMaxBpm.zoneMinBpm[zoneIndex]));
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(15, 0).applyTo(label);
+         }
+         {
+            /*
+             * label: ...
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(UI.SYMBOL_DASH);
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+         }
+         {
+            /*
+             * label: max pulse bpm
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(zoneMaxValue == Integer.MAX_VALUE //
+                  ? Messages.App_Label_max
+                  : Integer.toString((int) hrZoneMinMaxBpm.zoneMaxBpm[zoneIndex]));
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(label);
+         }
+         {
+            /*
+             * label: bpm
+             */
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+            label.addMouseListener(_hrZoneMouseListener);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         }
       }
+
+      // must be run async -> dark theme is overwriting it
+      parent.getDisplay().asyncExec(() -> {
+
+         for (int zoneIndex = 0; zoneIndex < allHrZoneColorLabel.length; zoneIndex++) {
+
+            final Label label = allHrZoneColorLabel[zoneIndex];
+
+            final TourPersonHRZone hrZone = allHrZones.get(zoneIndex);
+            final Color hrZoneColor = new Color(hrZone.getColor());
+
+            label.setBackground(hrZoneColor);
+         }
+      });
    }
 
    private Control createUI_90_Tab_DataTransfer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
 //				.grab(true, false)
             .applyTo(container);
       {
@@ -1444,12 +1441,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           * label: info
           */
          final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults()//
+         label.setText(Messages.Pref_People_Label_DataTransfer);
+         GridDataFactory.fillDefaults()
                .span(3, 1)
 //					.indent(0, 15)
                .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(label);
-         label.setText(Messages.Pref_People_Label_DataTransfer);
 
          createUI_92_Field_SportComputer(container);
          createUI_94_Field_RawDataPath(container);
@@ -1475,14 +1472,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       // label
       final Label label = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
       label.setText(Messages.Pref_People_Label_device);
+      GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
 
       // combo
       _cboSportComputer = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
-      GridDataFactory.swtDefaults().indent(0, 15).applyTo(_cboSportComputer);
       _cboSportComputer.setVisibleItemCount(20);
       _cboSportComputer.addSelectionListener(_defaultSelectionListener);
+      GridDataFactory.swtDefaults().indent(0, 15).applyTo(_cboSportComputer);
 
       // spacer
       new Label(parent, SWT.NONE);
@@ -1640,8 +1637,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    @Override
    public void dispose() {
 
-      disposeHrZoneColors();
-
       if (_prefChangeListener != null) {
          _prefStore.removePropertyChangeListener(_prefChangeListener);
       }
@@ -1652,17 +1647,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       super.dispose();
-   }
-
-   private void disposeHrZoneColors() {
-
-      if (_hrZoneColors == null) {
-         return;
-      }
-
-      for (final Color hrZoneColor : _hrZoneColors) {
-         hrZoneColor.dispose();
-      }
    }
 
    private void enableActions() {
@@ -1810,7 +1794,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final String transferPath = _rawDataPathEditor.getStringValue().trim();
 
-         if (!StringUtils.isNullOrEmpty(transferPath) && Util.isDirectory(transferPath) == false) {
+         if (StringUtils.hasContent(transferPath) && Util.isDirectory(transferPath) == false) {
 
             setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 

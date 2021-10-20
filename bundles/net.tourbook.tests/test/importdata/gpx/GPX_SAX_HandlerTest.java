@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,9 +29,11 @@ import javax.xml.parsers.SAXParser;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.device.garmin.GarminDeviceDataReader;
+import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.tour.TourManager;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -50,16 +52,16 @@ import utils.Initializer;
  */
 class GPX_SAX_HandlerTest {
 
-   private static SAXParser               parser;
-   private static DeviceData              deviceData;
-   private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
-   private static GarminDeviceDataReader  deviceDataReader;
+   private static SAXParser                  parser;
+   private static DeviceData                 deviceData;
+   private static HashMap<Long, TourData>    newlyImportedTours;
+   private static HashMap<Long, TourData>    alreadyImportedTours;
+   private static GarminTCX_DeviceDataReader deviceDataReader;
 
    /**
     * Resource path to GPX file, generally available from net.tourbook Plugin in test/net.tourbook
     */
-   public static final String             IMPORT_FILE_PATH = "/importdata/gpx/files/test.gpx"; //$NON-NLS-1$
+   public static final String                IMPORT_FILE_PATH = "/importdata/gpx/files/test.gpx"; //$NON-NLS-1$
 
    @BeforeAll
    static void initAll() {
@@ -67,7 +69,7 @@ class GPX_SAX_HandlerTest {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new GarminDeviceDataReader();
+      deviceDataReader = new GarminTCX_DeviceDataReader();
    }
 
    /**
@@ -83,11 +85,16 @@ class GPX_SAX_HandlerTest {
       final InputStream gpx = GPX_SAX_HandlerTest.class.getResourceAsStream(IMPORT_FILE_PATH);
 
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            deviceDataReader,
+
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
-            newlyImportedTours);
+            newlyImportedTours,
+
+            new ImportState_File(),
+            new ImportState_Process(),
+
+            deviceDataReader);
 
       parser.parse(gpx, handler);
 

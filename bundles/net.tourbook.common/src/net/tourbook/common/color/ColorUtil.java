@@ -17,10 +17,35 @@ package net.tourbook.common.color;
 
 import java.awt.Color;
 
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.RGB;
 
 public class ColorUtil {
+
+   /**
+    * Converts SWT color into AWT color
+    *
+    * @param swtColor
+    * @return
+    */
+   public static Color convertSWTColor_into_AWTColor(final org.eclipse.swt.graphics.Color swtColor) {
+
+      return new Color(swtColor.getRed(), swtColor.getGreen(), swtColor.getBlue());
+   }
+
+   /**
+    * Splits an integer color values in it's red, green and blue components.
+    *
+    * @param rgbValue
+    * @return Returns a {@link RGB} from an integer color value
+    */
+   public static RGB createRGB(final int rgbValue) {
+
+      final int red = (rgbValue & 0xFF0000) >>> 16;
+      final int green = (rgbValue & 0xFF00) >>> 8;
+      final int blue = (rgbValue & 0xFF) >>> 0;
+
+      return new RGB(red, green, blue);
+   }
 
    /**
     * @param color
@@ -30,12 +55,23 @@ public class ColorUtil {
     */
    public static int getARGB(final RGB color, final int alpha) {
 
-      final int graphColor = ((color.blue & 0xFF) << 0) //
+      final int graphColor = ((color.blue & 0xFF) << 0)
             | ((color.green & 0xFF) << 8)
             | ((color.red & 0xFF) << 16)
             | ((alpha) << 24);
 
       return graphColor;
+   }
+
+   /**
+    * @param rgb
+    * @return Returns an integer value from a {@link RGB}
+    */
+   public static int getColorValue(final RGB rgb) {
+
+      return ((rgb.blue & 0xFF) << 0)
+            | ((rgb.green & 0xFF) << 8)
+            | ((rgb.red & 0xFF) << 16);
    }
 
    public static RGB getComplimentColor(final RGB color) {
@@ -53,13 +89,13 @@ public class ColorUtil {
             (int) (blue * darker));
    }
 
-   public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final int rgbValue) {
+   public static org.eclipse.swt.graphics.Color getContrastColor(final int rgbValue) {
 
       final byte blue = (byte) ((rgbValue & 0xFF0000) >> 16);
       final byte green = (byte) ((rgbValue & 0xFF00) >> 8);
       final byte red = (byte) ((rgbValue & 0xFF) >> 0);
 
-      return getContrastColor(device, red & 0xFF, green & 0xFF, blue & 0xFF);
+      return getContrastColor(red & 0xFF, green & 0xFF, blue & 0xFF);
    }
 
    /**
@@ -70,23 +106,22 @@ public class ColorUtil {
     * @param blue
     * @return Returns white or black that contrasts with the background color.
     */
-   public static org.eclipse.swt.graphics.Color getContrastColor(final Device display,
-                                                                 final int red,
+   public static org.eclipse.swt.graphics.Color getContrastColor(final int red,
                                                                  final int green,
                                                                  final int blue) {
 
       final int yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
 
       if (yiq >= 128) {
-         return new org.eclipse.swt.graphics.Color(display, 0, 0, 0);
+         return new org.eclipse.swt.graphics.Color(0, 0, 0);
       } else {
-         return new org.eclipse.swt.graphics.Color(display, 0xff, 0xff, 0xff);
+         return new org.eclipse.swt.graphics.Color(0xff, 0xff, 0xff);
       }
    }
 
-   public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final RGB rgb) {
+   public static org.eclipse.swt.graphics.Color getContrastColor(final RGB rgb) {
 
-      return getContrastColor(device, rgb.red, rgb.green, rgb.blue);
+      return getContrastColor(rgb.red, rgb.green, rgb.blue);
    }
 
    /**
@@ -135,5 +170,20 @@ public class ColorUtil {
    public static RGB getContrastRGB(final RGB rgb) {
 
       return getContrastRGB(rgb.red, rgb.green, rgb.blue);
+   }
+
+   /**
+    * Converts a percentage value to a transparency value: 0 to 255
+    *
+    * @param percentageValue
+    * @return
+    */
+   public static int getTransparencyFromPercentage(final int percentageValue) {
+
+      final int opacity = 0xff * percentageValue / 100;
+
+      //This occurred where 303 was returned. Not sure how it is possible and how
+      //to reproduce it but to avoid this, we bound the returned value
+      return Math.min(255, opacity);
    }
 }

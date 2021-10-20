@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,13 +27,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -42,29 +44,29 @@ import org.eclipse.osgi.util.NLS;
 
 public class HAC5DeviceDataReader extends TourbookDevice {
 
-   private static final int  HAC5_HARDWARE_ID       = 0x03;
+   private static final int HAC5_HARDWARE_ID       = 0x03;
 
    /**
     * position in the file which skips the header (AFRO..) and the raw data begins
     */
-   public static final int   OFFSET_RAWDATA         = 6;
+   public static final int  OFFSET_RAWDATA         = 6;
 
-   private static final int  OFFSET_TOUR_DATA_START = 0x0800;
-   private static final int  OFFSET_TOUR_DATA_END   = 0x10000;
+   private static final int OFFSET_TOUR_DATA_START = 0x0800;
+   private static final int OFFSET_TOUR_DATA_END   = 0x10000;
 
-   private static final int  RECORD_LENGTH          = 0x10;
-
-   private GregorianCalendar _fileDate;
+   private static final int RECORD_LENGTH          = 0x10;
 
    private class StartBlock {
+
       public int month;
       public int day;
       public int hour;
       public int minute;
    }
 
-   // plugin constructor
-   public HAC5DeviceDataReader() {}
+   public HAC5DeviceDataReader() {
+      // plugin constructor
+   }
 
    /**
     * Adjust the offset for the DD record so it's within the tour data area
@@ -186,12 +188,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
-
-      boolean returnValue = false;
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       final byte[] recordBuffer = new byte[RECORD_LENGTH];
 
@@ -203,20 +205,23 @@ public class HAC5DeviceDataReader extends TourbookDevice {
       int firstTourDay = 1;
       int firstTourMonth = 1;
 
+      GregorianCalendar fileDate = null;
+
       try {
+
          final File fileRaw = new File(importFilePath);
          file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
          final long lastModified = fileRaw.lastModified();
 
          /*
-          * get the year, because the year is not saved in the raw data file, the modified year
+          * Get the year, because the year is not saved in the raw data file, the modified year
           * of the file is used
           */
-         _fileDate = new GregorianCalendar();
-         _fileDate.setTime(new Date(lastModified));
+         fileDate = new GregorianCalendar();
+         fileDate.setTime(new Date(lastModified));
 
-         int tourYear = _fileDate.get(Calendar.YEAR);
+         int tourYear = fileDate.get(Calendar.YEAR);
          if (importYear != RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED) {
             tourYear = importYear;
          }
@@ -245,7 +250,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetDDRecord);
             file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xDD) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -256,7 +261,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
             file.read(recordBuffer);
             if ((recordBuffer[0] & 0xFF) != 0xAA) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -265,7 +270,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
              */
             final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
             if (offsetDDRecordInAARecord != offsetDDRecord) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -504,7 +509,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
              * after the first implementation)
              */
             if (offsetDDRecord == initialOffsetDDRecord) {
-               returnValue = true;
+               importState_File.isFileImportedWithValidData = true;
                break;
             }
 
@@ -519,9 +524,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
                   // second loop has not yet ended
                   checkedOffset2 = offsetDDRecord;
                } else {
-                  StatusUtil
-                        .showStatus(new Exception(NLS.bind(Messages.Import_Error_EndlessLoop, importFilePath)));
-                  returnValue = true;
+                  StatusUtil.showStatus(new Exception(NLS.bind(Messages.Import_Error_EndlessLoop, importFilePath)));
+                  importState_File.isFileImportedWithValidData = true;
                   break;
                }
             }
@@ -531,7 +535,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
          e.printStackTrace();
-         returnValue = false;
+         importState_File.isFileImportedWithValidData = false;
       } finally {
          if (file != null) {
             try {
@@ -542,13 +546,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
          }
       }
 
-      if (returnValue) {
-         deviceData.transferYear = (short) _fileDate.get(Calendar.YEAR);
+      if (importState_File.isFileImportedWithValidData) {
+
+         deviceData.transferYear = (short) fileDate.get(Calendar.YEAR);
          deviceData.transferMonth = (short) firstTourMonth;
          deviceData.transferDay = (short) firstTourDay;
       }
-
-      return returnValue;
    }
 
    /**

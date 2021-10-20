@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,8 @@ import java.util.Set;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.IAdvancedMenuForActions;
@@ -80,7 +82,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          super(Messages.Action_Tag_AutoOpenCancel);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

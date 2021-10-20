@@ -23,8 +23,11 @@ import javax.xml.parsers.SAXParser;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
-import net.tourbook.device.sporttracks.FitLogSAXHandler;
+import net.tourbook.device.sporttracks.FitLog_SAXHandler;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -51,19 +54,27 @@ public class FitLogTester {
       deviceDataReader = new FitLogDeviceDataReader();
    }
 
+   @AfterEach
+   void tearDown() {
+      newlyImportedTours.clear();
+      alreadyImportedTours.clear();
+   }
+
    @Test
    void testImportTimothyLake() throws SAXException, IOException {
-      final String filePathWithoutExtension = IMPORT_PATH +
-            "TimothyLake"; //$NON-NLS-1$
+
+      final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlog"; //$NON-NLS-1$
       final InputStream fitLogFile = FitLogTester.class.getResourceAsStream(importFilePath);
 
-      final FitLogSAXHandler handler = new FitLogSAXHandler(
-            deviceDataReader,
+      final FitLog_SAXHandler handler = new FitLog_SAXHandler(
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
-            false);
+            false,
+            new ImportState_File(),
+            new ImportState_Process(),
+            deviceDataReader);
 
       parser.parse(fitLogFile, handler);
 

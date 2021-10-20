@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.training;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -31,7 +31,7 @@ public class ActionEditHrZones extends Action {
 
       setToolTipText(Messages.Training_Action_EditHrZones_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
 
       _trainingView = trainingView;
    }

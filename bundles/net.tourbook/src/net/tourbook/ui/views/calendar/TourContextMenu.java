@@ -36,7 +36,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
+import net.tourbook.ui.action.ActionSetElevationValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
@@ -66,7 +66,7 @@ public class TourContextMenu {
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
    private ActionMergeTour                            _actionMergeTour;
    private ActionPrint                                _actionPrintTour;
-   private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
+   private ActionSetElevationValuesFromSRTM           _actionSetElevationFromSRTM;
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionUpload                               _actionUploadTour;
@@ -86,7 +86,7 @@ public class TourContextMenu {
       _actionMergeTour = new ActionMergeTour(tourProvider);
       _actionJoinTours = new ActionJoinTours(tourProvider);
       _actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
-      _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(tourProvider);
+      _actionSetElevationFromSRTM = new ActionSetElevationValuesFromSRTM(tourProvider);
       _actionSetOtherPerson = new ActionSetPerson(tourProvider);
 
       _actionSetTourType = new ActionSetTourTypeMenu(tourProvider);
@@ -142,7 +142,7 @@ public class TourContextMenu {
       menuMgr.add(_actionMergeTour);
       // menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionSetElevationFromSRTM);
 
       tagMenuMgr.fillTagMenu(menuMgr, true);
 
@@ -204,7 +204,7 @@ public class TourContextMenu {
                   && firstSavedTour != null
                   && firstSavedTour.getMergeSourceTourId() != null);
       _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
-      _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
+      _actionSetElevationFromSRTM.setEnabled(isTourSelected);
 
       // enable delete ation when at least one tour is selected
 //		if (isTourSelected) {
@@ -262,7 +262,7 @@ public class TourContextMenu {
       menuMgr.add(_actionMergeTour);
       menuMgr.add(_actionJoinTours);
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionSetElevationFromSRTM);
 
       _tagMenuMgr.fillTagMenu(menuMgr, true);
 

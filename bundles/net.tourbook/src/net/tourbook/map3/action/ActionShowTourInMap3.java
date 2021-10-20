@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,8 +73,8 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
 
       _parent = parent;
 
-      _actionImage = TourbookPlugin.getImageDescriptor(Images.Tour).createImage();
-      _actionImageDisabled = TourbookPlugin.getImageDescriptor(Images.Tour_Disabled).createImage();
+      _actionImage = TourbookPlugin.getThemedImageDescriptor(Images.TourChart).createImage();
+      _actionImageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled).createImage();
    }
 
    @Override

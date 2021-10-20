@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -213,6 +213,18 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_CollateEvent_Label;
    public static String        ColumnFactory_CollateEvent_Tooltip;
+   public static String        ColumnFactory_Device_BatterySoC_End_Header;
+
+   public static String        ColumnFactory_Device_BatterySoC_End_Header_Tooltip;
+
+   public static String        ColumnFactory_Device_BatterySoC_End_Label;
+
+   public static String        ColumnFactory_Device_BatterySoC_Start_Header;
+
+   public static String        ColumnFactory_Device_BatterySoC_Start_Header_Tooltip;
+
+   public static String        ColumnFactory_Device_BatterySoC_Start_Label;
+
    public static String        ColumnFactory_Diff_Header;
    public static String        ColumnFactory_DistanceDelta_Label;
    public static String        ColumnFactory_DistanceDelta_Tooltip;
@@ -308,6 +320,13 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
    public static String        ColumnFactory_Power_TrainingStressScore_Label;
    public static String        ColumnFactory_Power_TrainingStressScore_Tooltip;
+   public static String        ColumnFactory_Pulse_RR;
+   public static String        ColumnFactory_Pulse_RR_Index;
+   public static String        ColumnFactory_Pulse_RR_Index_Tooltip;
+   public static String        ColumnFactory_Pulse_RR_Intervals_Tooltip;
+   public static String        ColumnFactory_Pulse_RR_Intervals;
+   public static String        ColumnFactory_Pulse_RR_Label;
+   public static String        ColumnFactory_Pulse_RR_Tooltip;
    public static String        ColumnFactory_restpulse_label;
    public static String        ColumnFactory_restpulse;
    public static String        ColumnFactory_restpulse_tooltip;
@@ -495,10 +514,12 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AltitudeDown;
    public static String        Tour_Tooltip_Label_AltitudeUp;
    public static String        Tour_Tooltip_Label_AvgCadence;
+   public static String        Tour_Tooltip_Label_AvgElevationChange;
    public static String        Tour_Tooltip_Label_AvgPace;
    public static String        Tour_Tooltip_Label_AvgPower;
    public static String        Tour_Tooltip_Label_AvgPulse;
    public static String        Tour_Tooltip_Label_AvgSpeed;
+   public static String        Tour_Tooltip_Label_Battery;
    public static String        Tour_Tooltip_Label_BodyWeight;
    public static String        Tour_Tooltip_Label_BreakTime;
    public static String        Tour_Tooltip_Label_Calories;
@@ -515,6 +536,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_MaxPulse;
    public static String        Tour_Tooltip_Label_MaxSpeed;
    public static String        Tour_Tooltip_Label_MovingTime;
+   public static String        Tour_Tooltip_Label_NoGeoTour;
    public static String        Tour_Tooltip_Label_NoTour;
    public static String        Tour_Tooltip_Label_ElapsedTime;
    public static String        Tour_Tooltip_Label_PausedTime;

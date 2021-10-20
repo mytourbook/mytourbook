@@ -28,8 +28,8 @@ public class ActionZoomIn extends Action {
       setText(Messages.Action_zoom_in);
       setToolTipText(Messages.Action_zoom_in_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_In));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_In_Disabled));
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_In));
+      setDisabledImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_In_Disabled));
    }
 
    @Override

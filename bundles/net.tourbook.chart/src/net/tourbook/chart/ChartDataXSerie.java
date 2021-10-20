@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,13 +46,13 @@ public class ChartDataXSerie extends ChartDataSerie {
    private double                 _xAxisMaxValueForced   = Double.MIN_VALUE;
 
    /**
-    * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
+    * Index in the x-data at which the graph is painted in the marker color, <code>-1</code>
     * disables the synch marker
     */
    private int                    _synchMarkerStartIndex = -1;
 
    /**
-    * index in the x-data at which the graph is stoped to painted in the marker color
+    * Index in the x-data at which the graph is stoped to painted in the marker color
     */
    private int                    _synchMarkerEndIndex   = -1;
 
@@ -80,6 +80,7 @@ public class ChartDataXSerie extends ChartDataSerie {
    private double                 _scalingFactor         = 1;
 
    private double                 _scalingMaxValue       = 1;
+
    /**
     * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,
     * can be <code>null</code> to disable this feature.
@@ -272,11 +273,13 @@ public class ChartDataXSerie extends ChartDataSerie {
     * @param rangeMarkerEndIndex
     */
    public void setRangeMarkers(final int[] rangeMarkerStartIndex, final int[] rangeMarkerEndIndex) {
+
       _rangeMarkerStartIndex = rangeMarkerStartIndex;
       _rangeMarkerEndIndex = rangeMarkerEndIndex;
    }
 
    public void setScalingFactors(final double scalingFactor, final double scalingMaxValue) {
+
       _scalingFactor = scalingFactor;
       _scalingMaxValue = scalingMaxValue;
    }

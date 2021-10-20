@@ -33,7 +33,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
@@ -319,12 +318,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             numAllWeeks += weeks;
          }
 
-         int colorOffset = 0;
-         if (tourTypeFilter.showUndefinedTourTypes()) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
-
-         int numTourTypes = colorOffset + allActiveTourTypes.length;
+         int numTourTypes = allActiveTourTypes.length;
          numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
          String fromTourData;
@@ -521,7 +515,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                final long dbTypeId = dbValue_TypeIdObject;
                for (int typeIndex = 0; typeIndex < allActiveTourTypes.length; typeIndex++) {
                   if (dbTypeId == allActiveTourTypes[typeIndex].getTypeId()) {
-                     colorIndex = colorOffset + typeIndex;
+                     colorIndex = typeIndex;
                      break;
                   }
                }

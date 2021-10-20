@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,29 +28,29 @@ import org.eclipse.ui.PlatformUI;
 
 public class ActionGraphAnalyzer extends Action {
 
-	private final Chart	fChart;
+   private final Chart _chart;
 
-	public ActionGraphAnalyzer(final Chart chart) {
+   public ActionGraphAnalyzer(final Chart chart) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourAnalyzer));
+      setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourAnalyzer));
 
-		fChart = chart;
-	}
+      _chart = chart;
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-		if (window != null) {
+      if (window != null) {
 
-			Util.showView(TourChartAnalyzerView.ID, true);
+         Util.showView(TourChartAnalyzerView.ID, true);
 
-			// create a new selection to update the analyzer view
-			fChart.fireSliderMoveEvent();
-		}
-	}
+         // create a new selection to update the analyzer view
+         _chart.fireSliderMoveEvent();
+      }
+   }
 }

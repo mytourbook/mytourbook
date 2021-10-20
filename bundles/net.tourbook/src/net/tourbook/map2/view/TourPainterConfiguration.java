@@ -42,12 +42,14 @@ public class TourPainterConfiguration {
 
    private IMapColorProvider               _mapColorProvider;
 
+   boolean                                 isBackgroundDark;
    boolean                                 isShowStartEndInMap;
    boolean                                 isShowTourMarker;
    boolean                                 isShowTourPauses;
    boolean                                 isShowWayPoints;
    boolean                                 isPhotoVisible;
    boolean                                 isTourVisible;
+
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
@@ -127,10 +129,6 @@ public class TourPainterConfiguration {
       isLinkPhotoDisplayed = isLinkPhoto;
    }
 
-   public void setZoomLevelAdjustment(final int zoomLevel) {
-      _zoomLevelAdjustment = zoomLevel;
-   }
-
    public void setTourBounds(final Set<GeoPosition> mapPositions) {
       _tourBounds = mapPositions;
    }
@@ -165,5 +163,9 @@ public class TourPainterConfiguration {
       _tourDataList.add(tourData);
 
       isTourVisible = isShowTour && _tourDataList.size() > 0;
+   }
+
+   public void setZoomLevelAdjustment(final int zoomLevel) {
+      _zoomLevelAdjustment = zoomLevel;
    }
 }

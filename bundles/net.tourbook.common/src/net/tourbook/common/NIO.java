@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import java.io.IOException;
+import java.net.URL;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -27,10 +29,14 @@ import java.util.regex.Pattern;
 
 import net.tourbook.common.util.StatusUtil;
 
+import org.eclipse.core.runtime.FileLocator;
+
 /**
  * Tools for the java.nio package.
  */
 public class NIO {
+
+   private static final String  FILE_PROTOCOL            = "file:";                              //$NON-NLS-1$
 
    public static final String   DEVICE_FOLDER_NAME_START = "[";                                  //$NON-NLS-1$
 
@@ -94,6 +100,38 @@ public class NIO {
       }
 
       return osPath;
+   }
+
+   /**
+    * Convert bundle file path to absolute file path
+    *
+    * @param bundleUrl
+    *           e.g.
+    *           bundleresource://70.fwk1710675314/importdata/sporttracks/fitlogex/files/TimothyLake.fitlogEx
+    * @return
+    * @throws IOException
+    */
+   public static String getAbsolutePathFromBundleUrl(final URL bundleUrl) throws IOException {
+
+      // file:/C:/DAT/MT/mytourbook/bundles/net.tourbook.tests/bin/importdata/sporttracks/fitlogex/files/TimothyLake.fitlogEx
+      final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+
+      // file:/C:/DAT/MT/mytourbook/bundles/net.tourbook.tests/bin/importdata/sporttracks/fitlogex/files/TimothyLake.fitlogEx
+      final String fileExternalForm = fileUrl.toExternalForm();
+
+      // /C:/DAT/MT/mytourbook/bundles/net.tourbook.tests/bin/importdata/sporttracks/fitlogex/files/TimothyLake.fitlogEx
+      String filename_WithoutFileProtocol = fileExternalForm.substring(FILE_PROTOCOL.length());
+
+      /**
+       * Fix java.nio.file.InvalidPathException: Illegal char <:> at index 2:
+       * <p>
+       * /C:/DAT/MT/mytourbook/bundles/net.tourbook.tests/bin/importdata/sporttracks/fitlogex/files/ParkCity.fitlogEx
+       */
+      if (UI.IS_WIN && filename_WithoutFileProtocol.startsWith(UI.SLASH)) {
+         filename_WithoutFileProtocol = filename_WithoutFileProtocol.substring(1);
+      }
+
+      return filename_WithoutFileProtocol;
    }
 
    /**

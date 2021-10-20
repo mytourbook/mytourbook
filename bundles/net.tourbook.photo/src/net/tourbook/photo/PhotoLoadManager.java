@@ -25,7 +25,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.manager.PhotoExifLoader;
@@ -93,7 +92,7 @@ public class PhotoLoadManager {
 
       _display = Display.getDefault();
 
-      _prefStore = Activator.getDefault().getPreferenceStore();
+      _prefStore = PhotoActivator.getPrefStore();
 
       _imageFramework = _prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK);
       _hqImageSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_HQ_IMAGE_SIZE);

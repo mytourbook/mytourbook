@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,10 +24,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -157,8 +157,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override
@@ -1186,7 +1186,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       // use slideout AFTER the toolbar is created/updated/filled, this creates it
       _activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
-      _slideoutStatisticOptions.setupGrid(//
+      _slideoutStatisticOptions.setupGrid(
             _activeStatistic.getGridPrefPrefix(),
             _activeStatistic.getEnabledGridOptions());
    }

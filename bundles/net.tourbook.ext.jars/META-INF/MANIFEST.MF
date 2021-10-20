@@ -2,13 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: External jar's
 Bundle-SymbolicName: net.tourbook.ext.jars;singleton:=true
-Bundle-Version: 21.3.0.qualifier
+Bundle-Version: 21.9.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
  joda-time-2.10.10.jar,
  c3p0-0.9.1.2.jar,
- edtftpj.jar,
  net.sf.swtaddons_0.1.1.jar,
  core-3.1.0.jar,
  caffeine-3.0.1.jar,
@@ -21,14 +20,7 @@ Bundle-ClassPath:
  jackson-databind-2.12.2.jar,
  jackson-annotations-2.12.2.jar,
  commons-suncalc-3.4.jar
-Export-Package: com.enterprisedt,
- com.enterprisedt.net.ftp,
- com.enterprisedt.net.ftp.internal,
- com.enterprisedt.net.ftp.test,
- com.enterprisedt.util,
- com.enterprisedt.util.debug,
- com.enterprisedt.util.proxy,
- com.fasterxml.jackson.annotation,
+Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
  com.fasterxml.jackson.core.async,
  com.fasterxml.jackson.core.base,

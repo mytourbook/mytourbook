@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,26 +47,26 @@ public class ActionXAxisDistance extends Action {
 
    public void setImages() {
 
-      String imagePath;
-      String disabledImagePath;
+      String imageName;
+      String disabledImageName;
 
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         imagePath = Images.XAxis_ShowDistance_Imperial;
-         disabledImagePath = Images.XAxis_ShowDistance_Imperial_Disabled;
+         imageName = Images.XAxis_ShowDistance_Imperial;
+         disabledImageName = Images.XAxis_ShowDistance_Imperial_Disabled;
 
       } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
-         imagePath = Images.XAxis_ShowDistance_NauticMile;
-         disabledImagePath = Images.XAxis_ShowDistance_NauticMile_Disabled;
+         imageName = Images.XAxis_ShowDistance_NauticMile;
+         disabledImageName = Images.XAxis_ShowDistance_NauticMile_Disabled;
 
       } else {
 
-         imagePath = Images.XAxis_ShowDistance;
-         disabledImagePath = Images.XAxis_ShowDistance_Disabled;
+         imageName = Images.XAxis_ShowDistance;
+         disabledImageName = Images.XAxis_ShowDistance_Disabled;
       }
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(imagePath));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImagePath));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageName));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImageName));
    }
 }

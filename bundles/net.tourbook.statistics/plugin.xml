@@ -231,6 +231,16 @@
          category-data  ="AthleteData"
          category-time  ="Year"
       />
+
+      <!-- BATTERY -->
+
+      <statistic 
+         name           ="%Statistic_Battery"
+         id             ="net.tourbook.statistics.graphs.StatisticBattery"
+         class          ="net.tourbook.statistics.graphs.StatisticBattery"
+         category-data  ="Battery"
+         category-time  ="Day"
+      />
             
    </extension>
 

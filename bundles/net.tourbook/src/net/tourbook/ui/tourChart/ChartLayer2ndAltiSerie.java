@@ -23,6 +23,7 @@ import java.text.NumberFormat;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.common.UI;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 
@@ -260,12 +261,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
        */
       if (isAdjustedValues) {
 
-         final Color color1 = new Color(display, new RGB(0xFF, 0x3E, 0x00));
-//         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+         final Color colorAdjustedValue = new Color(UI.IS_DARK_THEME
+               ? new RGB(224, 111, 0)
+               : new RGB(0xFF, 0x3E, 0x00));
 
-         gc.setForeground(color1);
-         gc.setBackground(color1);
+         gc.setForeground(colorAdjustedValue);
+         gc.setBackground(colorAdjustedValue);
          gc.setAlpha(0x80);
 
          // fill background
@@ -277,22 +278,23 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          gc.drawPath(pathAdjustValue);
 
          gc.setAlpha(0xff);
-         color1.dispose();
       }
 
       /*
-       * paint value diff graph
+       * Paint value diff graph
        */
       if (isDiffValues) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+         gc.setForeground(UI.IS_DARK_THEME
+               ? new Color(245, 245, 245, 0xff)
+               : display.getSystemColor(SWT.COLOR_BLACK));
          gc.drawPath(pathValueDiff);
       }
 
       /*
        * paint splines
        */
-      final Color splineColor = new Color(display, 0x00, 0xb4, 0xff);
+      final Color splineColor = new Color(0x00, 0xb4, 0xff);
       final float[] ySplineSerie = _tourData.dataSerieSpline;
       if (ySplineSerie != null) {
 
@@ -322,7 +324,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
        * paint data graph
        */
       if (is2ndYValues) {
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
          gc.drawPath(path2ndSerie);
       }
 
@@ -418,11 +420,14 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       }
 
       /*
-       * paint spline points in the graph
+       * Paint spline points in the graph
        */
       if (isPointInGraph && isAdjustedValues) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+         gc.setForeground(UI.IS_DARK_THEME
+               ? new Color(245, 245, 245, 0xff)
+               : display.getSystemColor(SWT.COLOR_BLACK));
+
          final int[] graphSerieIndex = _splineData.splinePoint_DataSerieIndex;
 
          for (final int serieIndex : graphSerieIndex) {
@@ -436,7 +441,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
             gc.fillOval(devX - 2, devY - 2, 5, 5);
 
             /*
-             * draw altitude
+             * Draw elevation
              */
             final String altiText = _nf3.format(graphY);
             final Point textExtent = gc.textExtent(altiText);
@@ -457,7 +462,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       }
 
       // dispose resources
-      splineColor.dispose();
       path2ndSerie.dispose();
       pathValueDiff.dispose();
       pathAdjustValue.dispose();

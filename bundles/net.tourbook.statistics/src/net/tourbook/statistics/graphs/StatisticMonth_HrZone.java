@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
@@ -36,38 +37,36 @@ import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
 
-   private TourStatisticData_MonthHrZones     _tourMonth_Data;
-   private DataProvider_HrZone_Month _tourMonth_DataProvider = new DataProvider_HrZone_Month();
+   private TourStatisticData_MonthHrZones _tourMonth_Data;
+   private DataProvider_HrZone_Month      _tourMonth_DataProvider = new DataProvider_HrZone_Month();
 
-   private TourPerson                _appPerson;
-   private TourTypeFilter            _appTourTypeFilter;
+   private TourPerson                     _appPerson;
+   private TourTypeFilter                 _appTourTypeFilter;
 
-   private int                       _statYoungestYear;
-   private int                       _statNumberOfYears;
+   private int                            _statYoungestYear;
+   private int                            _statNumberOfYears;
 
-   private Chart                     _chart;
-   private final MinMaxKeeper_YData  _minMaxKeeper           = new MinMaxKeeper_YData();
-   private IChartInfoProvider        _tooltipProvider;
+   private Chart                          _chart;
+   private final MinMaxKeeper_YData       _minMaxKeeper           = new MinMaxKeeper_YData();
+   private IChartInfoProvider             _tooltipProvider;
 
-   private boolean                   _isSynchScaleEnabled;
+   private boolean                        _isSynchScaleEnabled;
 
-   private int                       _barOrderStart;
+   private int                            _barOrderStart;
 
-   private TourPersonHRZone[]        _personHrZones;
-   private TourPersonHRZone[]        _resortedPersonHrZones;
-   private int[][]                   _resortedHrZoneValues;
+   private TourPersonHRZone[]             _personHrZones;
+   private TourPersonHRZone[]             _resortedPersonHrZones;
+   private int[][]                        _resortedHrZoneValues;
 
    public StatisticMonth_HrZone() {
       super();
@@ -79,8 +78,8 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
        * create segments for each year
        */
       final int monthCounter = monthData.hrZoneValues[0].length;
-      final double segmentStart[] = new double[_statNumberOfYears];
-      final double segmentEnd[] = new double[_statNumberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -117,7 +116,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
        * create segments for each year
        */
       final int monthCounter = monthData.hrZoneValues[0].length;
-      final double allMonths[] = new double[monthCounter];
+      final double[] allMonths = new double[monthCounter];
 
       // get start/end and title for each segment
       for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -141,7 +140,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       // set x-axis
 
       final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonth_Data));
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_MONTH);
       xData.setChartSegments(createChartSegments(_tourMonth_Data));
 
       chartDataModel.setXData(xData);
@@ -150,20 +149,20 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    private void createYDataHrZone(final ChartDataModel chartDataModel) {
 
       /*
-       * number of person hr zones decides how many hr zones are displayed
+       * Number of person hr zones decides how many hr zones are displayed
        */
-      final int zoneSize = _resortedPersonHrZones.length;
+      final int numZones = _resortedPersonHrZones.length;
 
       final int[][] monthHrZones = _resortedHrZoneValues;
       final int serieValueLength = monthHrZones[0].length;
 
-      final int[][] hrZones0 = new int[zoneSize][serieValueLength];
-      final int[][] hrColorIndex = new int[zoneSize][serieValueLength];
-      final int[][] hrZoneValues = new int[zoneSize][];
+      final int[][] hrZones0 = new int[numZones][serieValueLength];
+      final int[][] hrColorIndex = new int[numZones][serieValueLength];
+      final int[][] hrZoneValues = new int[numZones][];
 
-      final RGB[] rgbBright = new RGB[zoneSize];
-      final RGB[] rgbDark = new RGB[zoneSize];
-      final RGB[] rgbLine = new RGB[zoneSize];
+      final RGB[] rgbBright = new RGB[numZones];
+      final RGB[] rgbDark = new RGB[numZones];
+      final RGB[] rgbLine = new RGB[numZones];
 
       int zoneIndex = 0;
 
@@ -182,7 +181,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
          zoneIndex++;
       }
 
-      final ChartDataYSerie yData = new ChartDataYSerie(//
+      final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             ChartDataYSerie.BAR_LAYOUT_STACKED,
             Util.convertIntToFloat(hrZones0),
@@ -194,10 +193,11 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       yData.setShowYSlider(true);
 
       yData.setColorIndex(hrColorIndex);
-      yData.setRgbLine(rgbLine);
-      yData.setRgbBright(rgbBright);
-      yData.setRgbDark(rgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      yData.setRgbBar_Gradient_Bright(rgbBright);
+      yData.setRgbBar_Gradient_Dark(rgbDark);
+      yData.setRgbBar_Line(rgbLine);
+
+      yData.setRgbGraph_Text(getRgbGraph_Text_4_Time());
 
       chartDataModel.addYData(yData);
    }

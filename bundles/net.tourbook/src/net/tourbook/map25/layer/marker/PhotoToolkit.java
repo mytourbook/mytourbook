@@ -67,7 +67,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 //   public static final int               IMAGE_SIZE_SMALL         = 160;
 //   public static final int               IMAGE_SIZE_MEDIUM        = 320;
 //   public static final int               IMAGE_SIZE_LARGE         = 320;
-  
+
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
    public MarkerSymbol          _symbol;               //marker symbol, circle or star
@@ -139,6 +139,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       };
    }
 
+
    public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item, final boolean showPhotoTitle) {
 
       Bitmap bitmapImage = getPhotoBitmap(photo);
@@ -152,6 +153,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return bitmapPhoto;
    }
 
+   /**
+    * creates a LIST with tourphotos, which can directly added to the photoLayer via addItems
+    *
+    * @param galleryPhotos
+    *           Arraylist of photos
+    * @param showPhotoTitle
+    *           boolean, show photo with title or not
+    * @param showPhotoScaled
+    * @return
+    */
    public List<MarkerInterface> createPhotoItemList(final ArrayList<Photo> galleryPhotos,
                                                     final boolean showPhotoTitle,
                                                     final boolean showPhotoScaled) {
@@ -214,10 +225,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          if (photo.isGeoFromExif &&
                Math.abs(photo.getImageMetaData().latitude) > Double.MIN_VALUE &&
                Math.abs(photo.getImageMetaData().longitude) > Double.MIN_VALUE) {
+            //photo contains valid(>0) GPS position in the EXIF
 //            debugPrint("PhotoToolkit: *** createPhotoItemList: using exif geo");
             photoLat = photo.getImageMetaData().latitude;
             photoLon = photo.getImageMetaData().longitude;
          } else {
+            //using position via time marker
             debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo"); //$NON-NLS-1$
             photoLat = photo.getTourLatitude();
             photoLon = photo.getTourLongitude();
@@ -226,10 +239,11 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          //debugPrint("PhotoToolkit: *** createPhotoItemList Name: " + photo.getImageMetaData().objectName + " Description: " + photo.getImageMetaData().captionAbstract);
 
          final MarkerItem item = new MarkerItem(photoKey,
-               photoName,
-               photoDescription,
+               photoName, //time as name
+               photoDescription, //rating stars as description
                new GeoPoint(photoLat, photoLon));
 
+         //now create the marker: photoimage with time and stars
          final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, showPhotoTitle);
 
          if (markerSymbol != null) {
@@ -276,13 +290,18 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return photoBitmap;
    }
 
+   /**
+    * @param photo
+    * @param thumbSize
+    *           thumbnail size from slideout
+    * @return
+    */
    private Image getPhotoImage(final Photo photo, final int thumbSize) {
 
       Image photoImage = null;
       Image scaledThumbImage = null;
 
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
-
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
@@ -301,7 +320,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
 
          if (!_isPhotoShowScaled) {
-            debugPrint(" ??????????? PhotoToolkit getPhotoImage: returned unscaled image");
+            debugPrint(" ??????????? PhotoToolkit getPhotoImage: returned unscaled image"); //$NON-NLS-1$
             return photoImage;
          }
 
@@ -365,6 +384,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       //showPhoto(_allPhotos.get(index));
       return false;
    }
+
 
    public void showPhoto(final Photo photo) {
 

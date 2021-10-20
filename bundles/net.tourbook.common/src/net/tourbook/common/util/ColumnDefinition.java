@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,10 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Table;
@@ -282,6 +284,17 @@ public class ColumnDefinition implements Cloneable {
 
       if (columnManager.isNatTableColumnManager() && columnManager.isShowColumnAnnotation_Sorting() && _canSortColumn) {
          sb.append(UI.SPACE1 + Messages.Column_Annotation_Sorting);
+      }
+
+      /*
+       * In the dark theme the right aligned text is just left of the column separator which cannot
+       * be set hidden, it looks just awful
+       */
+      if (columnManager.getColumnViewer() instanceof TreeViewer
+            && _style == SWT.TRAIL
+            && UI.isDarkTheme()) {
+
+         sb.append(UI.SPACE2);
       }
 
       return sb.toString();

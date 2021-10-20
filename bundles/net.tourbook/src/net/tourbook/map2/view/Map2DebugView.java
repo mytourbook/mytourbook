@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.map2.Messages;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -23,12 +26,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.ui.part.ViewPart;
-
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
 
 public class Map2DebugView extends ViewPart {
 
@@ -38,34 +36,19 @@ public class Map2DebugView extends ViewPart {
    private Button             _chkTileInfo;
    private Button             _chkTileBorder;
 
-   private Scale              _scaleDimMap;
+   @Override
+   public void createPartControl(final Composite parent) {
+
+      createUI(parent);
+
+      restoreSettings();
+   }
 
    private void createUI(final Composite parent) {
-
-      Label label;
 
       final Composite infoContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(infoContainer);
       {
-         /*
-          * scale: dim map
-          */
-         label = new Label(infoContainer, SWT.NONE);
-         label.setText(Messages.map_properties_map_dim_level);
-
-         _scaleDimMap = new Scale(infoContainer, SWT.NONE);
-         _scaleDimMap.setIncrement(1);
-         _scaleDimMap.setPageIncrement(10);
-         _scaleDimMap.setMinimum(0);
-         _scaleDimMap.setMaximum(100);
-         _scaleDimMap.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onChangeProperty();
-            }
-         });
-         GridDataFactory.fillDefaults().grab(true, false).hint(1, SWT.DEFAULT).applyTo(_scaleDimMap);
-
          /*
           * tile info
           */
@@ -107,14 +90,6 @@ public class Map2DebugView extends ViewPart {
       }
    }
 
-   @Override
-   public void createPartControl(final Composite parent) {
-
-      createUI(parent);
-
-      restoreSettings();
-   }
-
    /**
     * Property was changed, fire a property change event
     */
@@ -128,9 +103,6 @@ public class Map2DebugView extends ViewPart {
       store.setValue(Map2View.PREF_DEBUG_MAP_SHOW_GEO_GRID, _chkGeoGridBorder.getSelection());
       store.setValue(Map2View.PREF_SHOW_TILE_INFO, _chkTileInfo.getSelection());
       store.setValue(Map2View.PREF_SHOW_TILE_BORDER, _chkTileBorder.getSelection());
-
-      // dim level
-      store.setValue(Map2View.PREF_DEBUG_MAP_DIM_LEVEL, _scaleDimMap.getSelection());
    }
 
    private void restoreSettings() {
@@ -143,9 +115,6 @@ public class Map2DebugView extends ViewPart {
       _chkGeoGridBorder.setSelection(store.getBoolean(Map2View.PREF_DEBUG_MAP_SHOW_GEO_GRID));
       _chkTileInfo.setSelection(store.getBoolean(Map2View.PREF_SHOW_TILE_INFO));
       _chkTileBorder.setSelection(store.getBoolean(Map2View.PREF_SHOW_TILE_BORDER));
-
-      // dim map
-      _scaleDimMap.setSelection(store.getInt(Map2View.PREF_DEBUG_MAP_DIM_LEVEL));
    }
 
    @Override

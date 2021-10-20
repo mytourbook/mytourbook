@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,13 +19,19 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
@@ -53,38 +59,40 @@ public abstract class TourbookStatistic {
    /*
     * Grid prefixes
     */
-   protected static final String    GRID_DAY_ALTITUDE      = "GRID_DAY_ALTITUDE__";        //$NON-NLS-1$
-   protected static final String    GRID_DAY_DISTANCE      = "GRID_DAY_DISTANCE__";        //$NON-NLS-1$
-   protected static final String    GRID_DAY_SUMMARY       = "GRID_DAY_SUMMARY__";         //$NON-NLS-1$
-   protected static final String    GRID_DAY_TIME          = "GRID_DAY_TIME__";            //$NON-NLS-1$
-   protected static final String    GRID_DAY_ATHLETEDATA   = "GRID_DAY_WEIGHT__";          //$NON-NLS-1$
+   protected static final String    GRID_BATTERY           = "GRID_BATTERY__";              //$NON-NLS-1$
 
-   protected static final String    GRID_WEEK_ALTITUDE     = "GRID_WEEK_ALTITUDE__";       //$NON-NLS-1$
-   protected static final String    GRID_WEEK_DISTANCE     = "GRID_WEEK_DISTANCE__";       //$NON-NLS-1$
-   protected static final String    GRID_WEEK_SUMMARY      = "GRID_WEEK_SUMMARY__";        //$NON-NLS-1$
-   protected static final String    GRID_WEEK_TIME         = "GRID_WEEK_TIME__";           //$NON-NLS-1$
-   protected static final String    GRID_WEEK_ATHLETEDATA  = "GRID_WEEK_WEIGHT__";         //$NON-NLS-1$
+   protected static final String    GRID_DAY_ALTITUDE      = "GRID_DAY_ALTITUDE__";         //$NON-NLS-1$
+   protected static final String    GRID_DAY_DISTANCE      = "GRID_DAY_DISTANCE__";         //$NON-NLS-1$
+   protected static final String    GRID_DAY_SUMMARY       = "GRID_DAY_SUMMARY__";          //$NON-NLS-1$
+   protected static final String    GRID_DAY_TIME          = "GRID_DAY_TIME__";             //$NON-NLS-1$
+   protected static final String    GRID_DAY_ATHLETEDATA   = "GRID_DAY_WEIGHT__";           //$NON-NLS-1$
 
-   protected static final String    GRID_MONTH_ALTITUDE    = "GRID_MONTH_ALTITUDE__";      //$NON-NLS-1$
-   protected static final String    GRID_MONTH_DISTANCE    = "GRID_MONTH_DISTANCE__";      //$NON-NLS-1$
-   protected static final String    GRID_MONTH_SUMMARY     = "GRID_MONTH_SUMMARY__";       //$NON-NLS-1$
-   protected static final String    GRID_MONTH_TIME        = "GRID_MONTH_TIME__";          //$NON-NLS-1$
-   protected static final String    GRID_MONTH_ATHLETEDATA = "GRID_MONTH_WEIGHT__";        //$NON-NLS-1$
+   protected static final String    GRID_WEEK_ALTITUDE     = "GRID_WEEK_ALTITUDE__";        //$NON-NLS-1$
+   protected static final String    GRID_WEEK_DISTANCE     = "GRID_WEEK_DISTANCE__";        //$NON-NLS-1$
+   protected static final String    GRID_WEEK_SUMMARY      = "GRID_WEEK_SUMMARY__";         //$NON-NLS-1$
+   protected static final String    GRID_WEEK_TIME         = "GRID_WEEK_TIME__";            //$NON-NLS-1$
+   protected static final String    GRID_WEEK_ATHLETEDATA  = "GRID_WEEK_WEIGHT__";          //$NON-NLS-1$
 
-   protected static final String    GRID_YEAR_ALTITUDE     = "GRID_YEAR_ALTITUDE__";       //$NON-NLS-1$
-   protected static final String    GRID_YEAR_DISTANCE     = "GRID_YEAR_DISTANCE__";       //$NON-NLS-1$
-   protected static final String    GRID_YEAR_SUMMARY      = "GRID_YEAR_SUMMARY__";        //$NON-NLS-1$
-   protected static final String    GRID_YEAR_TIME         = "GRID_YEAR_TIME__";           //$NON-NLS-1$
-   protected static final String    GRID_YEAR_ATHLETEDATA  = "GRID_YEAR_WEIGHT__";         //$NON-NLS-1$
+   protected static final String    GRID_MONTH_ALTITUDE    = "GRID_MONTH_ALTITUDE__";       //$NON-NLS-1$
+   protected static final String    GRID_MONTH_DISTANCE    = "GRID_MONTH_DISTANCE__";       //$NON-NLS-1$
+   protected static final String    GRID_MONTH_SUMMARY     = "GRID_MONTH_SUMMARY__";        //$NON-NLS-1$
+   protected static final String    GRID_MONTH_TIME        = "GRID_MONTH_TIME__";           //$NON-NLS-1$
+   protected static final String    GRID_MONTH_ATHLETEDATA = "GRID_MONTH_WEIGHT__";         //$NON-NLS-1$
 
-   protected static final String    GRID_WEEK_HR_ZONE      = "GRID_WEEK_HR_ZONE__";        //$NON-NLS-1$
-   protected static final String    GRID_MONTH_HR_ZONE     = "GRID_MONTH_HR_ZONE__";       //$NON-NLS-1$
+   protected static final String    GRID_YEAR_ALTITUDE     = "GRID_YEAR_ALTITUDE__";        //$NON-NLS-1$
+   protected static final String    GRID_YEAR_DISTANCE     = "GRID_YEAR_DISTANCE__";        //$NON-NLS-1$
+   protected static final String    GRID_YEAR_SUMMARY      = "GRID_YEAR_SUMMARY__";         //$NON-NLS-1$
+   protected static final String    GRID_YEAR_TIME         = "GRID_YEAR_TIME__";            //$NON-NLS-1$
+   protected static final String    GRID_YEAR_ATHLETEDATA  = "GRID_YEAR_WEIGHT__";          //$NON-NLS-1$
 
-   protected static final String    GRID_TOUR_FREQUENCY    = "GRID_TOUR_FREQUENCY__";      //$NON-NLS-1$
-   protected static final String    GRID_TOUR_TIME         = "GRID_TOUR_TIME__";           //$NON-NLS-1$
+   protected static final String    GRID_WEEK_HR_ZONE      = "GRID_WEEK_HR_ZONE__";         //$NON-NLS-1$
+   protected static final String    GRID_MONTH_HR_ZONE     = "GRID_MONTH_HR_ZONE__";        //$NON-NLS-1$
 
-   protected static final String    GRID_TRAINING_BAR      = "GRID_TRAINING_BAR__";        //$NON-NLS-1$
-   protected static final String    GRID_TRAINING_LINE     = "GRID_TRAINING_LINE__";       //$NON-NLS-1$
+   protected static final String    GRID_TOUR_FREQUENCY    = "GRID_TOUR_FREQUENCY__";       //$NON-NLS-1$
+   protected static final String    GRID_TOUR_TIME         = "GRID_TOUR_TIME__";            //$NON-NLS-1$
+
+   protected static final String    GRID_TRAINING_BAR      = "GRID_TRAINING_BAR__";         //$NON-NLS-1$
+   protected static final String    GRID_TRAINING_LINE     = "GRID_TRAINING_LINE__";        //$NON-NLS-1$
 
    /** ID from plugin.xml */
    public String                    plugin_StatisticId;
@@ -101,6 +109,7 @@ public abstract class TourbookStatistic {
    private boolean                  _isDataDirty;
 
    protected final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
+   protected final IPreferenceStore _prefStore_Common      = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener  _prefChangeListener;
 
@@ -141,6 +150,7 @@ public abstract class TourbookStatistic {
 
                   || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
             //
             ) {
 
@@ -258,6 +268,17 @@ public abstract class TourbookStatistic {
     *         some 100 ms, depending on the statistic.
     */
    public abstract String getRawStatisticValues(boolean isShowSequenceNumbers);
+
+   protected RGB getRgbGraph_Text_4_Time() {
+
+      final String prefColorName_Time = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
+
+      final String prefColorTextThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      return PreferenceConverter.getColor(_prefStore_Common, prefColorName_Time + prefColorTextThemed);
+   }
 
    /**
     * @return When a tour can be selected in the statistic, this will return the tour Id of the

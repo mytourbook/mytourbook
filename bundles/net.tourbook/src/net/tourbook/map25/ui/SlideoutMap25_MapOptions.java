@@ -237,7 +237,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                   _spinnerPhoto_Size = new Spinner(containerPhotoSize, SWT.BORDER);
                   _spinnerPhoto_Size.setMinimum(160);
                   _spinnerPhoto_Size.setMaximum(640);
-                  _spinnerPhoto_Size.setIncrement(5);
+                  _spinnerPhoto_Size.setIncrement(10);
                   _spinnerPhoto_Size.setPageIncrement(10);
                   _spinnerPhoto_Size.setToolTipText(Messages.Slideout_Map25MapOptions_Spinner_Layer_Photo_Size);
 
@@ -295,15 +295,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
          {
             /*
-             * Photo Title
-             */
-            _chkShowPhoto_Scaled = new Button(group, SWT.CHECK);
-            _chkShowPhoto_Scaled.setText("Slideout_Map25MapOptions_Checkbox_Sclaed_Photos");
-            _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
-         }
-
-         {
-            /*
              * Tile info
              */
             _chkShowLayer_TileInfo = new Button(group, SWT.CHECK);
@@ -312,6 +303,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
       }
    }
+
 
    private void createUI_80_Other(final Composite parent) {
 

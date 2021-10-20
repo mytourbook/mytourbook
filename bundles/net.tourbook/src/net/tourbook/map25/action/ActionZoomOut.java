@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomOut extends Action {
 
-	private Map25View	_map25View;
+   private Map25View _map25View;
 
-	public ActionZoomOut(final Map25View map25View) {
+   public ActionZoomOut(final Map25View map25View) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_map25View = map25View;
+      _map25View = map25View;
 
-		setToolTipText(Messages.map_action_zoom_out);
-		
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out_Disabled));
-	}
+      setToolTipText(Messages.map_action_zoom_out);
 
-	@Override
-	public void run() {
-		_map25View.actionZoomOut();
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out_Disabled));
+   }
+
+   @Override
+   public void run() {
+      _map25View.actionZoomOut();
+   }
 
 }

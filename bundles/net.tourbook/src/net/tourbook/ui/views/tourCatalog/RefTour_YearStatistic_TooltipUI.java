@@ -84,7 +84,7 @@ public class RefTour_YearStatistic_TooltipUI {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

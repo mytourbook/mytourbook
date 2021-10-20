@@ -4,7 +4,7 @@
 
    <extension	point="net.tourbook.deviceDataReader">
       <device
-            class="net.tourbook.device.garmin.GarminDeviceDataReader"
+            class="net.tourbook.device.garmin.GarminTCX_DeviceDataReader"
             fileextension="*"
             id="net.tourbook.device.GarminDeviceReader"
             name="%device.name.0"/>

@@ -4,6 +4,8 @@
   "avgCadence" : 0.0,
   "avgPulse" : 126.17141,
   "avgTemperature" : 26.567797,
+  "battery_Percentage_End" : 19,
+  "battery_Percentage_Start" : 19,
   "bodyFat" : 0.0,
   "bodyWeight" : 0.0,
   "breakTimeSerie" : [ false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ],

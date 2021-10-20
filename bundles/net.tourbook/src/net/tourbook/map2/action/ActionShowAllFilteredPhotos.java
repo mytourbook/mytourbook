@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,8 +34,8 @@ public class ActionShowAllFilteredPhotos extends Action {
 
       setToolTipText(Messages.Map_Action_ShowAllFilteredPhotos_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowAllPhotos_InMap));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ShowAllPhotos_InMap));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
    }
 
    @Override

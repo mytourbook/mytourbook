@@ -52,7 +52,6 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -151,7 +150,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
    private IContextMenuProvider        _tableViewerContextMenuProvider   = new TableContextMenuProvider();
    //
    private ActionEditTour              _actionEditTour;
-   private ActionModifyColumns         _actionModifyColumns;
    private ActionOpenMarkerDialog      _actionOpenMarkerDialog;
    private ActionOpenTour              _actionOpenTour;
    private ActionEditQuick             _actionQuickEdit;
@@ -651,7 +649,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
    private void createActions() {
 
       _actionEditTour = new ActionEditTour(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
       _actionQuickEdit = new ActionEditQuick(this);
@@ -1162,9 +1159,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       /*
        * Fill view menu
        */
-      final IMenuManager menuMgr = actionBars.getMenuManager();
-
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = actionBars.getMenuManager();
 
       /*
        * Fill view toolbar

@@ -1,0 +1,13 @@
+
+  These steps are necessary that hibernate do recognize new classes correctly:
+
+   - Update persistence.xml in C:\DAT\MT\mytourbook\bundles\net.tourbook\persistence\META-INF
+   - Zip META-INF folder
+   - Delete persistence.zip
+   - Rename META-INF.zip into persistence.zip
+   
+   - Copy persistence.zip into folder "net.tourbook"
+   - Delete persistence.jar
+   - Rename persistence.zip -> persistence.jar
+   
+   - Update persistence.xml in C:\DAT\MT\mytourbook\bundles\net.tourbook\src\META-INF

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,10 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
-import net.tourbook.device.suunto.Suunto2DeviceDataReader;
+import net.tourbook.device.suunto.Suunto2_DeviceDataReader;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -34,14 +36,14 @@ class Suunto2Tester {
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
-   private static Suunto2DeviceDataReader deviceDataReader;
+   private static Suunto2_DeviceDataReader deviceDataReader;
 
    @BeforeAll
    static void initAll() {
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new Suunto2DeviceDataReader();
+      deviceDataReader = new Suunto2_DeviceDataReader();
    }
 
    /**
@@ -52,7 +54,13 @@ class Suunto2Tester {
       final String filePath = IMPORT_FILE_PATH + "log-F783095113000500-2013-05-18T11_00_38-0"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".xml").toAbsolutePath().toString(); //$NON-NLS-1$
-      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

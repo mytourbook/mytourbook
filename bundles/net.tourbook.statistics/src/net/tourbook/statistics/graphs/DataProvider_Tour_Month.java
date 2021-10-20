@@ -29,7 +29,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
@@ -158,8 +157,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                + "   SUM(1)," + NL //                                       11 //$NON-NLS-1$
 
-               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
-               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyWeight = 0    THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0       THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
                + fromTourData
 
@@ -167,14 +166,9 @@ public class DataProvider_Tour_Month extends DataProvider {
                + "ORDER BY StartYear, StartMonth" + NL //                    //$NON-NLS-1$
          ;
 
-         final boolean isShowUndefinedTourTypes = tourTypeFilter.showUndefinedTourTypes();
+         final boolean isShowMultipleTourTypes = tourTypeFilter.containsMultipleTourTypes();
 
-         int colorOffset = 0;
-         if (isShowUndefinedTourTypes) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
-
-         int numTourTypes = colorOffset + allTourTypes.length;
+         int numTourTypes = allTourTypes.length;
          numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
          final int numMonths = 12 * numYears;
@@ -251,15 +245,15 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             if (dbValue_TourTypeIdObject != null) {
                final long dbTypeId = dbValue_TourTypeIdObject;
-               for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
+               for (int typeIndex = 0; typeIndex < numTourTypes; typeIndex++) {
                   if (dbTypeId == allTourTypes[typeIndex].getTypeId()) {
-                     colorIndex = colorOffset + typeIndex;
+                     colorIndex = typeIndex;
                      break;
                   }
                }
             }
 
-            final long noTourTypeId = isShowUndefinedTourTypes
+            final long noTourTypeId = isShowMultipleTourTypes
                   ? TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
                   : TourType.TOUR_TYPE_IS_NOT_USED;
 
@@ -294,6 +288,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             if (UI.IS_SCRAMBLE_DATA) {
 
 // SET_FORMATTING_OFF
+
                dbElevationUp[colorIndex][monthIndex]  = UI.scrambleNumbers(dbElevationUp[colorIndex][monthIndex]);
                dbDistance[colorIndex][monthIndex]     = UI.scrambleNumbers(dbDistance[colorIndex][monthIndex]);
                dbDurationTime[colorIndex][monthIndex] = UI.scrambleNumbers(dbDurationTime[colorIndex][monthIndex]);
@@ -310,6 +305,7 @@ public class DataProvider_Tour_Month extends DataProvider {
                allDbBodyFat[monthIndex]               = UI.scrambleNumbers(allDbBodyFat[monthIndex]);
 
                tourTypeSum[colorIndex]               += UI.scrambleNumbers(dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime);
+
 // SET_FORMATTING_ON
             }
          }

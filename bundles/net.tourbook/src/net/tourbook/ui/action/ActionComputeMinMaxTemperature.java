@@ -59,17 +59,17 @@ public class ActionComputeMinMaxTemperature extends Action {
       TourLogManager.showLogView();
 
       // Loading selected tours...
-      TourLogManager.logTitle(Messages.Log_App_LoadingSelectedTours);
+      TourLogManager.log_TITLE(Messages.Log_App_LoadingSelectedTours);
 
       long start = System.currentTimeMillis();
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       // {0} tours are loaded
-      TourLogManager.subLog_Info(NLS.bind(Messages.Log_App_LoadedTours, selectedTours.size()));
+      TourLogManager.subLog_INFO(NLS.bind(Messages.Log_App_LoadedTours, selectedTours.size()));
 
       // Performed in %.3f s
-      TourLogManager.logDefault(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
+      TourLogManager.log_DEFAULT(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
 
       if (selectedTours == null || selectedTours.isEmpty()) {
 
@@ -93,7 +93,7 @@ public class ActionComputeMinMaxTemperature extends Action {
 
          // canceled
 
-         TourLogManager.logError(Messages.Log_App_Canceled);
+         TourLogManager.log_ERROR(Messages.Log_App_Canceled);
 
          return;
       }
@@ -101,7 +101,7 @@ public class ActionComputeMinMaxTemperature extends Action {
       // compute min/max temperature
 
       // Computing min/max temperature values
-      TourLogManager.logTitle(Messages.Log_SetMinMaxTemperature_Startup);
+      TourLogManager.log_TITLE(Messages.Log_SetMinMaxTemperature_Startup);
 
       boolean isTaskDone = false;
 
@@ -118,7 +118,7 @@ public class ActionComputeMinMaxTemperature extends Action {
       } finally {
 
          // Performed in %.3f s
-         TourLogManager.logDefault(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
+         TourLogManager.log_DEFAULT(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
 
          if (isTaskDone) {
 
@@ -196,7 +196,7 @@ public class ActionComputeMinMaxTemperature extends Action {
       if (numNotComputedTour >= 0) {
 
          // Tours without temperature values: {0}
-         TourLogManager.subLog_Error(NLS.bind(Messages.Log_SetMinMaxTemperature_NoSuccess, numNotComputedTour));
+         TourLogManager.subLog_ERROR(NLS.bind(Messages.Log_SetMinMaxTemperature_NoSuccess, numNotComputedTour));
       }
 
       return isUpdated;

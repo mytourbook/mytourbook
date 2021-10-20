@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.PhotoImages;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -30,8 +31,8 @@ public class ActionPhotoFilterGPS extends Action {
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_GPS_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilter_GPS));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilter_GPS_Disabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_GPS));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_GPS_Disabled));
 
       _photoGallery = photoGallery;
    }

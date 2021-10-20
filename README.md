@@ -30,9 +30,11 @@ _This document will not repeat already written text in the documentation._
 
 -DlogCalendarProfile
 
+
 **Log FIT data**
 
 -DlogFitData
+
 
 ### Other
 
@@ -42,6 +44,14 @@ It is scrambeling text and values. This is used to create anynymous screenshots
 
 -DscrambleData
 
+
 **Each tour has a unique id so that a tour can be imported multiple times**
 
 -DcreateRandomTourId
+
+
+**Log selected color values**
+
+This can be used to update default values in the Java code
+
+-DlogColorValues

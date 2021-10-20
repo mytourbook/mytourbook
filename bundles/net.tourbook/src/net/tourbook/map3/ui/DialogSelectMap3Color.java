@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,13 @@ package net.tourbook.map3.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
@@ -37,7 +41,6 @@ import net.tourbook.map3.view.Map3View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap3Color;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -50,14 +53,9 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -65,8 +63,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Color;
@@ -152,7 +148,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       _graphId = graphId;
       _map3View = map3View;
 
-      addListener(ownerControl, toolBar);
+      addListener(toolBar);
 
       setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
       setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
@@ -209,7 +205,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             false).open();
    }
 
-   private void addListener(final Control ownerControl, final ToolBar toolBar) {
+   private void addListener(final ToolBar toolBar) {
 
       toolBar.addMouseTrackListener(new MouseTrackAdapter() {
          @Override
@@ -279,7 +275,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditSelectedColor();
          }
       };
-      _actionEditSelectedColor.setImageDescriptor(UI.getGraphImageDescriptor(_graphId));
+      _actionEditSelectedColor.setImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor(_graphId));
       _actionEditSelectedColor.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditSelectedColors);
 
       /*
@@ -291,7 +287,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditAllColors();
          }
       };
-      _actionEditAllColors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options_Bright));
+      _actionEditAllColors.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
       _actionEditAllColors.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditAllColors);
    }
 
@@ -330,20 +326,14 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
       net.tourbook.common.UI.setChildColors(_shellContainer, fgColor, bgColor);
 
-      _shellContainer.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      _shellContainer.addDisposeListener(disposeEvent -> onDispose());
 
       return _shellContainer;
    }
 
    private void createUI_10_ColorViewer(final Composite parent) {
 
-      final ArrayList<Map3GradientColorProvider> colorProviders = Map3GradientColorManager
+      final List<Map3GradientColorProvider> colorProviders = Map3GradientColorManager
             .getColorProviders(_graphId);
 
       int tableStyle;
@@ -384,13 +374,10 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
           * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
           * critical for performance that these methods be as efficient as possible.
           */
-         final Listener paintListener = new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
+         final Listener paintListener = event -> {
 
-               if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-                  onViewerPaint(event);
-               }
+            if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+               onViewerPaint(event);
             }
          };
          table.addListener(SWT.MeasureItem, paintListener);
@@ -460,27 +447,11 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             }
          });
 
-         _colorViewer.addCheckStateListener(new ICheckStateListener() {
+         _colorViewer.addCheckStateListener(this::onViewerCheckStateChange);
 
-            @Override
-            public void checkStateChanged(final CheckStateChangedEvent event) {
-               onViewerCheckStateChange(event);
-            }
-         });
+         _colorViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
 
-         _colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-               onViewerSelectColor();
-            }
-         });
-
-         _colorViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(final DoubleClickEvent event) {
-               actionEditSelectedColor();
-            }
-         });
+         _colorViewer.addDoubleClickListener(doubleClickEvent -> actionEditSelectedColor());
       }
    }
 
@@ -759,20 +730,22 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
          final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
          final ArrayList<RGBVertex> rgbVertices = colorProfile.getProfileImage().getRgbVertices();
 
-         colorProvider.configureColorProvider(//
+         colorProvider.configureColorProvider(
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,
                rgbVertices,
                false);
 
-         image = TourMapPainter.createMapLegendImage(//
+         image = TourMapPainter.createMap3_LegendImage(
                colorProvider,
                ColorProviderConfig.MAP3_PROFILE,
                imageWidth,
                imageHeight,
-               false,
-               false,
-               false);
+               false, // horizontal
+               false, // no unit
+               net.tourbook.common.UI.IS_DARK_THEME, // is dark background
+               false // no shadow
+         );
 
          final Image oldImage = _profileImages.put(colorProvider, image);
 
@@ -1025,7 +998,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       final MapGraphId graphId = selectedColorProvider.getGraphId();
       final Map3ColorDefinition colorDefinition = Map3GradientColorManager.getColorDefinition(graphId);
 
-      final ArrayList<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
+      final List<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
 
       if (allGraphIdColorProvider.size() < 2) {
 

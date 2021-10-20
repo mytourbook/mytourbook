@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,9 +19,9 @@ import java.util.ArrayList;
 
 public class SearchResult {
 
-	final ArrayList<SearchResultItem>	items	= new ArrayList<>();
+   final ArrayList<SearchResultItem> allItems = new ArrayList<>();
 
-	long											totalHits;
+   long                              totalHits;
 
-	String										error;
+   String                            error;
 }

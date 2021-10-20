@@ -135,7 +135,7 @@ public class MapBookmarkManager {
 
          super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MapBookmark_New));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapBookmark_New));
 
          __mapBookmarks = mapBookmarks;
       }

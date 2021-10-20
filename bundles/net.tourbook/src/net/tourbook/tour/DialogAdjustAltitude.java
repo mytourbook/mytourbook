@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,11 +22,8 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartCursor;
-import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartMouseEvent;
-import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.MouseAdapter;
-import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
@@ -35,9 +32,9 @@ import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.srtm.IPreferences;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
-import net.tourbook.ui.tourChart.IXAxisSelectionListener;
 import net.tourbook.ui.tourChart.SplineDrawingData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -51,12 +48,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -67,11 +59,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -196,6 +186,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    private Composite _pageOption_GeoPosition;
 
    private Combo     _comboAdjustmentType;
+   private Label     _lblAdjustmentTypeInfo;
 
    private Button    _btnSRTMRemoveAllPoints;
    private Button    _btnResetAltitude;
@@ -246,7 +237,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _isCreateDummyAltitude = isCreateDummyAltitude;
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.AdjustElevation).createImage());
+      setDefaultImage(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation).createImage());
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -667,95 +658,79 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       spinner.setPageIncrement(1);
       net.tourbook.ui.UI.setWidth(spinner, convertWidthInCharsToPixels(6));
 
-      spinner.addModifyListener(new ModifyListener() {
+      spinner.addModifyListener(modifyEvent -> {
 
-         @Override
-         public void modifyText(final ModifyEvent e) {
-
-            if (_isDisableModifyListener) {
-               return;
-            }
-
-            final Spinner spinner = (Spinner) e.widget;
-
-            if (UI.UNIT_IS_ELEVATION_FOOT) {
-
-               /**
-                * adjust the non metric (imperial) value, this seems to be complicate and it is
-                * <p>
-                * the altitude data are always saved in the database with the metric system therefor
-                * the altitude must always match to the metric system, changing the altitude in the
-                * imperial system has always 3 or 4 value differences from one meter to the next
-                * meter
-                * <p>
-                * after many hours of investigation this seems to work
-                */
-
-               final float modifiedAlti = spinner.getSelection();
-               final float metricAlti = (Float) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
-
-               final float oldAlti = metricAlti / UI.UNIT_VALUE_ELEVATION;
-               float newMetricAlti = modifiedAlti * UI.UNIT_VALUE_ELEVATION;
-
-               if (modifiedAlti > oldAlti) {
-                  newMetricAlti++;
-               }
-
-               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, newMetricAlti);
-
-            } else {
-
-               // adjust metric elevation
-
-               final float modifiedAlti = spinner.getSelection();
-
-               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti);
-
-            }
-
-            onChangeAltitude();
+         if (_isDisableModifyListener) {
+            return;
          }
+
+         final Spinner spinner1 = (Spinner) modifyEvent.widget;
+
+         if (UI.UNIT_IS_ELEVATION_FOOT) {
+
+            /**
+             * adjust the non metric (imperial) value, this seems to be complicate and it is
+             * <p>
+             * the altitude data are always saved in the database with the metric system
+             * therefore
+             * the altitude must always match to the metric system, changing the altitude in the
+             * imperial system has always 3 or 4 value differences from one meter to the next
+             * meter
+             * <p>
+             * after many hours of investigation this seems to work
+             */
+
+            final float modifiedAlti1 = spinner1.getSelection();
+            final float metricAlti = (Float) spinner1.getData(WIDGET_DATA_METRIC_ALTITUDE);
+
+            final float oldAlti = metricAlti / UI.UNIT_VALUE_ELEVATION;
+            float newMetricAlti = modifiedAlti1 * UI.UNIT_VALUE_ELEVATION;
+
+            if (modifiedAlti1 > oldAlti) {
+               newMetricAlti++;
+            }
+
+            spinner1.setData(WIDGET_DATA_METRIC_ALTITUDE, newMetricAlti);
+
+         } else {
+
+            // adjust metric elevation
+
+            final float modifiedAlti2 = spinner1.getSelection();
+
+            spinner1.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti2);
+
+         }
+
+         onChangeAltitude();
       });
 
-      spinner.addMouseWheelListener(new MouseWheelListener() {
+      spinner.addMouseWheelListener(mouseEvent -> {
 
-         @Override
-         public void mouseScrolled(final MouseEvent e) {
-
-            if (_isDisableModifyListener) {
-               return;
-            }
-
-            final Spinner spinner = (Spinner) e.widget;
-
-            int accelerator = (e.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-            accelerator *= (e.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
-            accelerator *= e.count > 0 ? 1 : -1;
-
-            float metricAltitude = (Float) e.widget.getData(WIDGET_DATA_METRIC_ALTITUDE);
-            metricAltitude = metricAltitude + accelerator;
-
-            _isDisableModifyListener = true;
-            {
-               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(metricAltitude));
-               spinner.setSelection((int) (metricAltitude / UI.UNIT_VALUE_ELEVATION));
-            }
-            _isDisableModifyListener = false;
-
-            onChangeAltitude();
+         if (_isDisableModifyListener) {
+            return;
          }
+
+         final Spinner spinner1 = (Spinner) mouseEvent.widget;
+
+         int accelerator = (mouseEvent.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
+         accelerator *= (mouseEvent.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+         accelerator *= mouseEvent.count > 0 ? 1 : -1;
+
+         float metricAltitude = (Float) mouseEvent.widget.getData(WIDGET_DATA_METRIC_ALTITUDE);
+         metricAltitude = metricAltitude + accelerator;
+
+         _isDisableModifyListener = true;
+         {
+            spinner1.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(metricAltitude));
+            spinner1.setSelection((int) (metricAltitude / UI.UNIT_VALUE_ELEVATION));
+         }
+         _isDisableModifyListener = false;
+
+         onChangeAltitude();
       });
 
-      spinner.addFocusListener(new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {}
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            onChangeAltitude();
-         }
-      });
+      spinner.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onChangeAltitude()));
 
       return spinner;
    }
@@ -838,13 +813,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          createUI_30_Options(_dlgContainer);
       }
 
-      parent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      parent.getDisplay().asyncExec(() -> {
 
-            // with the new e4 toolbar update the chart has it's default size (pack() is used) -> resize to window size
+         // with the new e4 toolbar update the chart has it's default size (pack() is used) -> resize to window size
 //            parent.layout(true, true);
-         }
       });
    }
 
@@ -852,12 +824,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       final Composite typeContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(typeContainer);
-      GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 5, 0).applyTo(typeContainer);
+      GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(0, 0, 5, 0).applyTo(typeContainer);
       {
+         // label: adjustment type
          final Label label = new Label(typeContainer, SWT.NONE);
          label.setText(Messages.adjust_altitude_label_adjustment_type);
 
-         // combo: adjust type
+         // combo: adjustment type
          _comboAdjustmentType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
          _comboAdjustmentType.setVisibleItemCount(20);
          _comboAdjustmentType.addSelectionListener(new SelectionAdapter() {
@@ -866,6 +839,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                onSelectAdjustmentType();
             }
          });
+
+         // label: adjustment type info
+         _lblAdjustmentTypeInfo = new Label(typeContainer, SWT.NONE);
+         _lblAdjustmentTypeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         _lblAdjustmentTypeInfo.setText(UI.SPACE1);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.FILL, SWT.CENTER)
+               .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+               .applyTo(_lblAdjustmentTypeInfo);
       }
 
       // fill combo
@@ -904,24 +887,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       _tourChart.setContextProvider(new DialogAdjustAltitudeChartContextProvider(this), true);
 
-      _tourChart.addDataModelListener(new IDataModelListener() {
-         @Override
-         public void dataModelChanged(final ChartDataModel changedChartDataModel) {
-            // set title
-            changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
+      // set title
+      _tourChart.addDataModelListener(changedChartDataModel -> changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData)));
+
+      _tourChart.addSliderMoveListener(selectionChartInfo -> {
+
+         if (_isSliderEventDisabled) {
+            return;
          }
-      });
 
-      _tourChart.addSliderMoveListener(new ISliderMoveListener() {
-         @Override
-         public void sliderMoved(final SelectionChartInfo chartInfo) {
-
-            if (_isSliderEventDisabled) {
-               return;
-            }
-
-            onSelectAdjustmentType();
-         }
+         onSelectAdjustmentType();
       });
 
       _tourChart.addChartMouseListener(new MouseAdapter() {
@@ -943,12 +918,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       });
 
-      _tourChart.addXAxisSelectionListener(new IXAxisSelectionListener() {
-         @Override
-         public void selectionChanged(final boolean showTimeOnXAxis) {
-            if (isAdjustmentType_SRTM_SPline()) {
-               computeElevation_SRTM_WithSpline();
-            }
+      _tourChart.addXAxisSelectionListener(showTimeOnXAxis -> {
+         if (isAdjustmentType_SRTM_SPline()) {
+            computeElevation_SRTM_WithSpline();
          }
       });
 
@@ -966,6 +938,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       // overwrite x-axis from pref store
       _tourChartConfig.setIsShowTimeOnXAxis(
             _prefStore.getString(ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT).equals(TourManager.X_AXIS_TIME));
+
+      // force to show hovered value point value
+      _tourChartConfig.isShowValuePointValue = true;
    }
 
    /**
@@ -1465,12 +1440,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                onSelectSlicePosition();
             }
          });
-         _scaleSlicePos.addListener(SWT.MouseDoubleClick, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               onDoubleClickGeoPos(event.widget);
-            }
-         });
+         _scaleSlicePos.addListener(SWT.MouseDoubleClick, event -> onDoubleClickGeoPos(event.widget));
       }
 
       return group;
@@ -1622,7 +1592,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
    }
 
-   boolean isActionEnabledCreateSplinePoint(final int mouseDownDevPositionX, final int mouseDownDevPositionY) {
+   boolean isActionEnabledCreateSplinePoint(final int mouseDownDevPositionX) {
 
       final SplineDrawingData drawingData = _chartLayer2ndAltiSerie.getDrawingData();
 
@@ -1644,6 +1614,22 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
    private boolean isAdjustmentType_SRTM_SPline() {
       return getSelectedAdjustmentType().__id == ADJUST_TYPE_SRTM_SPLINE;
+   }
+
+   private boolean isSrtmDownloadValid() {
+
+      final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
+      final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+      if (password.trim().length() == 0 || username.trim().length() == 0) {
+         return false;
+      }
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+      if (validationDate < 0) {
+         return false;
+      }
+
+      return true;
    }
 
    @Override
@@ -1691,9 +1677,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                   maxIndex,
                   maxIndex));
 
-      _tourChart.getDisplay().timerExec(100, () -> {
-         updateTourChart();
-      });
+      _tourChart.getDisplay().timerExec(100, this::updateTourChart);
    }
 
    private void onMouseDown(final ChartMouseEvent mouseEvent) {
@@ -1850,15 +1834,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _tourData.splineDataPoints = null;
       _splineData.splinePoint_DataSerieIndex = null;
 
+      _lblAdjustmentTypeInfo.setText(UI.EMPTY_STRING);
+
       final int adjustmentType = getSelectedAdjustmentType().__id;
       switch (adjustmentType) {
-      case ADJUST_TYPE_SRTM:
-
-         _pageBookOptions.showPage(_pageOption_SRTM);
-
-         computeElevation_SRTM();
-
-         break;
 
       case ADJUST_TYPE_HORIZONTAL_GEO_POSITION:
 
@@ -1868,7 +1847,23 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
          break;
 
+      case ADJUST_TYPE_SRTM:
+
+         if (isSrtmDownloadValid() == false) {
+            _lblAdjustmentTypeInfo.setText(Messages.Dialog_AdjustAltitude_Label_SrtmIsInvalid);
+         }
+
+         _pageBookOptions.showPage(_pageOption_SRTM);
+
+         computeElevation_SRTM();
+
+         break;
+
       case ADJUST_TYPE_SRTM_SPLINE:
+
+         if (isSrtmDownloadValid() == false) {
+            _lblAdjustmentTypeInfo.setText(Messages.Dialog_AdjustAltitude_Label_SrtmIsInvalid);
+         }
 
          _pageBookOptions.showPage(_pageOption_SRTM_AndSpline);
 
@@ -2053,9 +2048,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       if (isAdjustmentType_SRTM_SPline()) {
 
-         Display.getCurrent().asyncExec(() -> {
-            onModify_SRTMSelection();
-         });
+         Display.getCurrent().asyncExec(this::onModify_SRTMSelection);
       }
    }
 

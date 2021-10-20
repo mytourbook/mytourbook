@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,7 @@ public final class FileZip {
 
          outFileName = gzipName.substring(0, gzipName.lastIndexOf(File.separator)) + File.separator + gzipEntryName;
 
-         System.out.println("outFileName " + outFileName); //$NON-NLS-1$
+         System.out.println(FileZip.class.getCanonicalName() + " - outFileName: " + outFileName); //$NON-NLS-1$
 
          final OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
@@ -88,7 +88,7 @@ public final class FileZip {
          }
 
          zipEntryName = zipEntry.getName();
-         System.out.println("zipEntryName " + zipEntryName); //$NON-NLS-1$
+         System.out.println(FileZip.class.getCanonicalName() + " - zipEntryName " + zipEntryName); //$NON-NLS-1$
 
          if (zipEntryName.indexOf(File.separator) != -1) {
             // delimiter in name (e.g. in self created kmz files)
@@ -97,7 +97,7 @@ public final class FileZip {
 
          outFileName = zipName.substring(0, zipName.lastIndexOf(File.separator)) + File.separator + zipEntryName;
 
-         System.out.println("outFileName " + outFileName); //$NON-NLS-1$
+         System.out.println(FileZip.class.getCanonicalName() + " - outFileName " + outFileName); //$NON-NLS-1$
 
          final OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
@@ -114,12 +114,13 @@ public final class FileZip {
          return zipEntryName;
 
       } catch (final IOException e) {
-         System.out.println("unzip: Error: " + e.getMessage()); //$NON-NLS-1$
+         System.out.println(FileZip.class.getCanonicalName() + " - unzip: Error: " + e.getMessage()); //$NON-NLS-1$
          throw (e); // return exception
       }
    }
 
    public final static void zip(String fileName, final String zipName) throws Exception {
+
       try {
          // Compress the file
          final File file = new File(fileName);
@@ -150,7 +151,7 @@ public final class FileZip {
          zipOutputStream.close();
 
       } catch (final IOException e) {
-         System.out.println("zip: Error: " + e.getMessage()); //$NON-NLS-1$
+         System.out.println(FileZip.class.getCanonicalName() + " - zip: Error: " + e.getMessage()); //$NON-NLS-1$
          throw (e); // return exception
       }
    }

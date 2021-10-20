@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,7 +65,7 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 
       _parent = parent;
 
-      _actionImage = TourbookPlugin.getImageDescriptor(Images.MapOptions).createImage();
+      _actionImage = TourbookPlugin.getThemedImageDescriptor(Images.MapOptions).createImage();
    }
 
    @Override

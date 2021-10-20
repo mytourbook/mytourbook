@@ -41,172 +41,173 @@ import org.joda.time.PeriodType;
 
 public class DialogAdjustTemperature_Wizard extends Wizard {
 
-	private final IPreferenceStore				_prefStore			= TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore      _prefStore        = TourbookPlugin.getPrefStore();
 
-	private DialogAdjustTemperature_WizardPage	_wizardPage;
+   private static PeriodType                  _durationTemplate = PeriodType.yearMonthDayTime()
 
-	private ArrayList<TourData>					_selectedTours;
-	private ITourProvider2						_tourProvider;
+         //hide these components
+         .withMillisRemoved();
 
-	private static PeriodType					_durationTemplate	= PeriodType.yearMonthDayTime()
-//			// hide these components
-																			.withMillisRemoved();
+   private DialogAdjustTemperature_WizardPage _wizardPage;
+   private ArrayList<TourData>                _selectedTours;
 
-	private final NumberFormat					_nf1				= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
+   private ITourProvider2                     _tourProvider;
 
-	public DialogAdjustTemperature_Wizard(final ArrayList<TourData> selectedTours, final ITourProvider2 tourProvider) {
+   private final NumberFormat                 _nf1              = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
-		super();
+   public DialogAdjustTemperature_Wizard(final ArrayList<TourData> selectedTours, final ITourProvider2 tourProvider) {
 
-		setNeedsProgressMonitor(true);
+      super();
 
-		_selectedTours = selectedTours;
-		_tourProvider = tourProvider;
-	}
+      setNeedsProgressMonitor(true);
 
-	@Override
-	public void addPages() {
+      _selectedTours = selectedTours;
+      _tourProvider = tourProvider;
+   }
 
-		_wizardPage = new DialogAdjustTemperature_WizardPage(Messages.Dialog_AdjustTemperature_Dialog_Title);
+   @Override
+   public void addPages() {
 
-		addPage(_wizardPage);
-	}
+      _wizardPage = new DialogAdjustTemperature_WizardPage(Messages.Dialog_AdjustTemperature_Dialog_Title);
 
-	@Override
-	public String getWindowTitle() {
-		return Messages.Dialog_AdjustTemperature_Dialog_Title;
-	}
+      addPage(_wizardPage);
+   }
 
-	@Override
-	public boolean performFinish() {
+   @Override
+   public String getWindowTitle() {
+      return Messages.Dialog_AdjustTemperature_Dialog_Title;
+   }
 
-		final long start = System.currentTimeMillis();
+   @Override
+   public boolean performFinish() {
 
-		TourLogManager.showLogView();
+      final long start = System.currentTimeMillis();
 
-		try {
+      TourLogManager.showLogView();
 
-			getContainer().run(true, true, performFinish_getRunnable());
+      try {
 
-		} catch (InvocationTargetException | InterruptedException e) {
-			StatusUtil.log(e);
-		}
+         getContainer().run(true, true, performFinish_getRunnable());
 
-		TourLogManager.logDefault(String.format(//
-				TourManager.LOG_TEMP_ADJUST_002_END,
-				(System.currentTimeMillis() - start) / 1000.0));
+      } catch (InvocationTargetException | InterruptedException e) {
+         StatusUtil.log(e);
+      }
 
-		return true;
-	}
+      TourLogManager.log_DEFAULT(String.format(
+            TourManager.LOG_TEMP_ADJUST_002_END,
+            (System.currentTimeMillis() - start) / 1000.0));
 
-	private IRunnableWithProgress performFinish_getRunnable() {
+      return true;
+   }
 
-		_wizardPage.saveState();
+   private IRunnableWithProgress performFinish_getRunnable() {
 
-		final float avgTemperature = _prefStore.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
-		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
+      _wizardPage.saveState();
 
-		final float temperature = UI.convertTemperatureFromMetric(avgTemperature);
-		final Period durationPeriod = new Period(0, durationTime * 1000, _durationTemplate);
+      final float avgTemperature = _prefStore.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
+      final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
 
-		final String logText = NLS.bind(
-				TourManager.LOG_TEMP_ADJUST_001_START,
-				new Object[] {
-						durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER),
-						_nf1.format(temperature),
-						UI.UNIT_LABEL_TEMPERATURE });
+      final float temperature = UI.convertTemperatureFromMetric(avgTemperature);
+      final Period durationPeriod = new Period(0, durationTime * 1000, _durationTemplate);
 
-		TourLogManager.addLog(TourLogState.DEFAULT, logText);
+      final String logText = NLS.bind(
+            TourManager.LOG_TEMP_ADJUST_001_START,
+            new Object[] {
+                  durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER),
+                  _nf1.format(temperature),
+                  UI.UNIT_LABEL_TEMPERATURE });
 
-		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      TourLogManager.log_DEFAULT(logText);
 
-			@Override
-			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-				monitor.beginTask(Messages.Dialog_AdjustTemperature_Label_Progress_Task, _selectedTours.size());
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-				// sort tours by date
-				Collections.sort(_selectedTours);
+            monitor.beginTask(Messages.Dialog_AdjustTemperature_Label_Progress_Task, _selectedTours.size());
 
-				int workedTours = 0;
-				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+            // sort tours by date
+            Collections.sort(_selectedTours);
 
-				for (final TourData tourData : _selectedTours) {
+            int workedTours = 0;
+            final ArrayList<TourData> savedTours = new ArrayList<>();
 
-					if (monitor.isCanceled()) {
-						break;
-					}
+            for (final TourData tourData : _selectedTours) {
 
-					monitor.worked(1);
+               if (monitor.isCanceled()) {
+                  break;
+               }
 
-					monitor.subTask(NLS.bind(
-							Messages.Dialog_AdjustTemperature_Label_Progress_SubTask,
-							++workedTours,
-							_selectedTours.size()));
+               monitor.worked(1);
 
-					final float oldTourAvgTemperature = tourData.getAvgTemperature();
+               monitor.subTask(NLS.bind(
+                     Messages.Dialog_AdjustTemperature_Label_Progress_SubTask,
+                     ++workedTours,
+                     _selectedTours.size()));
 
-					// skip tours which avg temperature is above the minimum avg temperature
-					if (oldTourAvgTemperature > avgTemperature) {
+               final float oldTourAvgTemperature = tourData.getAvgTemperature();
 
-						TourLogManager.subLog_Info(String.format(
-								TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
-								TourManager.getTourDateTimeShort(tourData),
-								oldTourAvgTemperature,
-								avgTemperature));
+               // skip tours which avg temperature is above the minimum avg temperature
+               if (oldTourAvgTemperature > avgTemperature) {
 
-						continue;
-					}
+                  TourLogManager.subLog_INFO(String.format(
+                        TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
+                        TourManager.getTourDateTimeShort(tourData),
+                        oldTourAvgTemperature,
+                        avgTemperature));
 
-					if (TourManager.adjustTemperature(tourData, durationTime)) {
+                  continue;
+               }
 
-						// tour is modified, save it
+               if (TourManager.adjustTemperature(tourData, durationTime)) {
 
-						final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
+                  // tour is modified, save it
 
-						if (savedTourData != null) {
-							savedTours.add(savedTourData);
-						}
-					}
+                  final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
 
-				}
+                  if (savedTourData != null) {
+                     savedTours.add(savedTourData);
+                  }
+               }
 
-				// update the UI
-				if (savedTours.size() > 0) {
+            }
 
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
+            // update the UI
+            if (savedTours.size() > 0) {
 
-							Util.clearSelection();
+               Display.getDefault().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
 
-							/*
-							 * Ensure the tour data editor contains the correct tour data
-							 */
-							TourData tourDataInEditor = null;
+                     Util.clearSelection();
 
-							final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-							if (tourDataEditor != null) {
-								tourDataInEditor = tourDataEditor.getTourData();
-							}
+                     /*
+                      * Ensure the tour data editor contains the correct tour data
+                      */
+                     TourData tourDataInEditor = null;
 
-							final TourEvent tourEvent = new TourEvent(savedTours);
-							tourEvent.tourDataEditorSavedTour = tourDataInEditor;
-							TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+                     final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+                     if (tourDataEditor != null) {
+                        tourDataInEditor = tourDataEditor.getTourData();
+                     }
 
-							// do a reselection of the selected tours to fire the multi tour data selection
-							_tourProvider.toursAreModified(savedTours);
-						}
-					});
-				}
-			}
-		};
+                     final TourEvent tourEvent = new TourEvent(savedTours);
+                     tourEvent.tourDataEditorSavedTour = tourDataInEditor;
+                     TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
 
-		return runnable;
-	}
+                     // do a reselection of the selected tours to fire the multi tour data selection
+                     _tourProvider.toursAreModified(savedTours);
+                  }
+               });
+            }
+         }
+      };
+
+      return runnable;
+   }
 
 }

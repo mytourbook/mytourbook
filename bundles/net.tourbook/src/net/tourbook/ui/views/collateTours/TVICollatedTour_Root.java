@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,23 +82,23 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
       final String sql = UI.EMPTY_STRING //
 
-            + "SELECT" //											//$NON-NLS-1$
+            + "SELECT" //                                            //$NON-NLS-1$
 
-            + " tourID, " //									1	//$NON-NLS-1$
-            + " jTdataTtag.TourTag_tagId, "//					2	//$NON-NLS-1$
+            + " tourID, " //                                      1  //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId, "//                     2  //$NON-NLS-1$
 
-            + " tourStartTime, " //								3	//$NON-NLS-1$
-            + " tourTitle" //									4	//$NON-NLS-1$
+            + " tourStartTime, " //                               3  //$NON-NLS-1$
+            + " tourTitle" //                                     4  //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //      //$NON-NLS-1$ //$NON-NLS-2$
 
             // get tag id's
-            + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" ON TourData.tourId = jTdataTtag.TourData_tourId") //$NON-NLS-1$
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" //  //$NON-NLS-1$
 
-            + (" WHERE 1=1" + sqlData.getWhereString()) // 			//$NON-NLS-1$
+            + " WHERE 1=1" + sqlData.getWhereString() //             //$NON-NLS-1$
 
-            + " ORDER BY tourStartTime";//							//$NON-NLS-1$
+            + " ORDER BY tourStartTime";//                           //$NON-NLS-1$
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -182,7 +182,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
       final String sql = UI.EMPTY_STRING
             //
-            + "SELECT " //						 //$NON-NLS-1$
+            + "SELECT " //                   //$NON-NLS-1$
             + SQL_SUM_COLUMNS
 
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$

@@ -91,19 +91,21 @@
                <restriction base="string">
                   <enumeration value="Other">
                   </enumeration>
-                  <enumeration value="Summary">
-                  </enumeration>
                   <enumeration value="Altitude">
+                  </enumeration>
+                  <enumeration value="AthleteData">
+                  </enumeration>
+                  <enumeration value="Battery">
                   </enumeration>
                   <enumeration value="Distance">
                   </enumeration>
-                  <enumeration value="Time">
-                  </enumeration>
                   <enumeration value="HR">
                   </enumeration>
-                  <enumeration value="Training">
+                  <enumeration value="Summary">
                   </enumeration>
-                  <enumeration value="AthleteData">
+                  <enumeration value="Time">
+                  </enumeration>
+                  <enumeration value="Training">
                   </enumeration>
                </restriction>
             </simpleType>

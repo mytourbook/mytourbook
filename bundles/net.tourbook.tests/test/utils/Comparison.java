@@ -69,7 +69,7 @@ public class Comparison {
             new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
-				new Customization("tourId", (o1, o2) -> true));
+				new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
@@ -118,8 +118,8 @@ public class Comparison {
    }
 
    public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
-      final Map.Entry<Long, TourData> entry = newlyImportedTours.entrySet().iterator().next();
-      return entry.getValue();
+
+		return newlyImportedTours.entrySet().iterator().next().getValue();
    }
 
    /**
@@ -135,6 +135,7 @@ public class Comparison {
 
       try (Writer writer = new FileWriter(myFile);
             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+
          bufferedWriter.write(testContent);
       } catch (final IOException e) {
          e.printStackTrace();

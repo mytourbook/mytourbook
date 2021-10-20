@@ -20,18 +20,40 @@ package net.tourbook.common;
  */
 public class CommonImages {
 
+   public static final String App_Cancel                   = "app-cancel.png";                            //$NON-NLS-1$
+   public static final String App_Cancel_Disabled          = "app-cancel-disabled.png";                   //$NON-NLS-1$
    public static final String App_Close                    = "app-close.png";                             //$NON-NLS-1$
-   public static final String App_Close_Themed             = "app-close-blue.png";                        //$NON-NLS-1$
-   public static final String App_EmptyIcon_Placeholder    = "_empty16.png";
+   public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
+   public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
+   public static final String App_CollapseAll              = "collapseall.png";                           //$NON-NLS-1$
+   public static final String App_CollapseAll_Disabled     = "collapseall-disabled.png";                  //$NON-NLS-1$
+   public static final String App_EmptyIcon_Placeholder    = "_empty16.png";                              //$NON-NLS-1$
+   public static final String App_ExpandAll                = "expandall.png";                             //$NON-NLS-1$
+   public static final String App_ExpandAll_Disabled       = "expandall-disabled.png";                    //$NON-NLS-1$
+   public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
+   public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
+   public static final String App_KeepOpen                 = "app-keep-open.png";                         //$NON-NLS-1$
+   public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
+   public static final String App_Options_Disabled         = "options-disabled.png";                      //$NON-NLS-1$
+   public static final String App_Pin                      = "app-pin.png";                               //$NON-NLS-1$
+   public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
+   public static final String App_Save                     = "app-save.png";                              //$NON-NLS-1$
+   public static final String App_Save_Disabled            = "app-save-disabled.png";                     //$NON-NLS-1$
+   public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
+   public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
+   public static final String App_Undo                     = "app-undo.png";                              //$NON-NLS-1$
+   public static final String App_Undo_Disabled            = "app-undo-disabled.png";                     //$NON-NLS-1$
    public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
-   public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
-   public static final String App_Options_Dark             = "options-dark.png";                          //$NON-NLS-1$
-   public static final String App_Pin_Themed               = "pin-blue.png";                              //$NON-NLS-1$
 
-   public static final String BookOpen_Themed              = "book-open-blue.png";                        //$NON-NLS-1$
+   public static final String Arrow_Left                   = "arrow-left.png";                            //$NON-NLS-1$
+   public static final String Arrow_Left_Disabled          = "arrow-left-disabled.png";                   //$NON-NLS-1$
+   public static final String Arrow_Right                  = "arrow-right.png";                           //$NON-NLS-1$
+   public static final String Arrow_Right_Disabled         = "arrow-right-disabled.png";                  //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$
    public static final String CustomizeProfilesColumns     = "customize-profiles-columns.png";            //$NON-NLS-1$
+   public static final String Lock_Closed                  = "lock-closed.png";                           //$NON-NLS-1$
+   public static final String Lock_Open                    = "lock-open.png";                             //$NON-NLS-1$
 
    public static final String MapProvider_Custom           = "map-provider-custom.png";                   //$NON-NLS-1$
    public static final String MapProvider_Custom_Hill      = "map-provider-custom-hill.png";              //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,8 +30,6 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -97,12 +95,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
          return;
       }
 
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      shell.addDisposeListener(disposeEvent -> onDispose());
 
       createUI(shell);
    }
@@ -171,7 +164,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
       ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
       ttPosY = -tipHeight + 1;
 
-      // ckeck if tooltip is left to the chart border
+      // check if tooltip is left to the chart border
       if (ttPosX + tipWidth < 0) {
 
          // set tooltip to the graph left border

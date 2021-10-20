@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,25 +31,26 @@ import net.tourbook.srtm.download.DownloadSRTM3;
 
 public class ElevationFile {
 
-   private FileChannel fileChannel;
-   private ShortBuffer shortBuffer;
+   private FileChannel _fileChannel;
+   private ShortBuffer _shortBuffer;
 
-   private boolean     _exists           = false;
+   private boolean     _isFileAvailable  = false;
    private boolean     _isLocalFileError = false;
 
-   public ElevationFile(final String fileName, final int elevationTyp) throws Exception {
+   public ElevationFile(final String localFilePath, final String localFilePathUnzipped, final int elevationTyp) throws Exception {
+
       switch (elevationTyp) {
-      case Constants.ELEVATION_TYPE_ETOPO:
-         initETOPO(fileName);
+      case ElevationType.ETOPO:
+         initETOPO(localFilePath);
          break;
-      case Constants.ELEVATION_TYPE_GLOBE:
-         initGLOBE(fileName);
+      case ElevationType.GLOBE:
+         initGLOBE(localFilePath);
          break;
-      case Constants.ELEVATION_TYPE_SRTM3:
-         initSRTM3(fileName);
+      case ElevationType.SRTM3:
+         initSRTM3(localFilePath, localFilePathUnzipped);
          break;
-      case Constants.ELEVATION_TYPE_SRTM1:
-         initSRTM1(fileName);
+      case ElevationType.SRTM1:
+         initSRTM1(localFilePath);
          break;
       }
    }
@@ -57,8 +58,8 @@ public class ElevationFile {
    public void close() {
 
       try {
-         if (fileChannel != null) {
-            fileChannel.close();
+         if (_fileChannel != null) {
+            _fileChannel.close();
          }
       } catch (final IOException e) {
          e.printStackTrace();
@@ -66,15 +67,16 @@ public class ElevationFile {
    }
 
    public short get(final int index) {
-      if (!_exists) {
+
+      if (!_isFileAvailable) {
          return (-32767);
       }
-      return shortBuffer.get(index);
+      return _shortBuffer.get(index);
    }
 
    private void handleError(final String fileName, final Exception e) {
 
-      System.out.println("handleError: " + fileName + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+      System.out.println(this.getClass().getCanonicalName() + " - handleError: " + fileName + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 
       if (e instanceof FileNotFoundException) {
          // done
@@ -82,7 +84,7 @@ public class ElevationFile {
          e.printStackTrace();
       }
 
-      _exists = false;
+      _isFileAvailable = false;
       // dont return exception
    }
 
@@ -142,18 +144,19 @@ public class ElevationFile {
       }
    }
 
-   private void initSRTM3(final String fileName) throws Exception {
+   private void initSRTM3(final String localFilePath, final String localFilePathUnzipped) throws Exception {
 
       if (_isLocalFileError) {
          return;
       }
 
       try {
-         open(fileName);
+         open(localFilePathUnzipped);
       } catch (final FileNotFoundException e1) {
          try {
+
             //  download zip-File <fileName>.zip and unzip
-            final String localZipName = fileName + ".zip"; //$NON-NLS-1$
+            final String localZipName = localFilePath + ".zip"; //$NON-NLS-1$
 
             // check if local zip file exists with a size == 0
             final File localFile = new File(localZipName);
@@ -168,24 +171,24 @@ public class ElevationFile {
                 */
                localFile.delete();
 
-               throw new Exception("local file is empty"); //$NON-NLS-1$
+               throw new Exception(this.getClass().getCanonicalName() + " - local file is empty: " + localFile.getAbsolutePath()); //$NON-NLS-1$
             }
 
             final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
-            DownloadSRTM3.get(remoteFileName, localZipName);
+            new DownloadSRTM3().get(remoteFileName, localZipName);
             FileZip.unzip(localZipName);
 
             // delete zip archive file, this is not needed any more
             final File zipArchive = new File(localZipName);
             zipArchive.delete();
 
-            open(fileName);
+            open(localFilePathUnzipped);
 
          } catch (final Exception e2) {
-            handleError(fileName, e2);
+            handleError(localFilePath, e2);
          }
       } catch (final Exception e1) { // other Error
-         handleError(fileName, e1);
+         handleError(localFilePathUnzipped, e1);
       }
    }
 
@@ -193,13 +196,17 @@ public class ElevationFile {
    private void open(final String fileName) throws Exception {
 
       try {
-         fileChannel = new FileInputStream(new File(fileName)).getChannel();
-         shortBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size()).asShortBuffer();
+
+         _fileChannel = new FileInputStream(new File(fileName)).getChannel();
+         _shortBuffer = _fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, _fileChannel.size()).asShortBuffer();
+
       } catch (final Exception e) {
-         System.out.println(e.getMessage());
+         System.out.println(this.getClass().getCanonicalName() + " - " + e.getMessage()); //$NON-NLS-1$
          throw (e);
       }
-      System.out.println("open " + fileName); //$NON-NLS-1$
-      _exists = true;
+
+      System.out.println(this.getClass().getCanonicalName() + " - open " + fileName); //$NON-NLS-1$
+
+      _isFileAvailable = true;
    }
 }

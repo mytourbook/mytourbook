@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import java.util.ArrayList;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.NormalizedGeoData;
@@ -24,7 +26,6 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoPartItem;
@@ -58,8 +59,8 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
    public PostSelectionProvider     _postSelectionProvider;
 
+   private ITourEventListener       _abstractTourEventListener;
    private IPropertyChangeListener  _prefChangeListener;
-   private ITourEventListener       _tourEventListener;
    private ISelectionListener       _postSelectionListener;
    private IPartListener2           _partListener;
 
@@ -154,7 +155,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
+      _abstractTourEventListener = new ITourEventListener() {
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
@@ -180,20 +181,32 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
             } else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-               final TourData tourData = UI.getTourPropertyTourData((TourEvent) eventData, _tourData);
+               final TourEvent tourEvent = (TourEvent) eventData;
+               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-               // check if the current tour is modified
-               if (tourData != null && tourData.getTourId() == _tourData.getTourId()) {
+               if (modifiedTours != null) {
 
-                  _tourData = tourData;
+                  final long oldTourId = _tourData.getTourId();
 
-                  updateChart();
+                  for (final TourData tourData : modifiedTours) {
+
+                     // check if the current tour is modified
+                     if (tourData.getTourId() == oldTourId) {
+
+                        _tourData = tourData;
+
+                        updateChart();
+
+                        // current tour is updated -> nothing more to do
+                        break;
+                     }
+                  }
                }
             }
          }
       };
 
-      TourManager.getInstance().addTourEventListener(_tourEventListener);
+      TourManager.getInstance().addTourEventListener(_abstractTourEventListener);
    }
 
    @Override
@@ -215,7 +228,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getSite().getPage().removePartListener(_partListener);
 
-      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      TourManager.getInstance().removeTourEventListener(_abstractTourEventListener);
       GeoCompareManager.removeGeoCompareListener(this);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);

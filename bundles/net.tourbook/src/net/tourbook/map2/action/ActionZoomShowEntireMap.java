@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,21 +24,22 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomShowEntireMap extends Action {
 
-	private Map2View	_mapView;
+   private Map2View _mapView;
 
-	public ActionZoomShowEntireMap(final Map2View mapView) {
+   public ActionZoomShowEntireMap(final Map2View mapView) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_mapView = mapView;
+      _mapView = mapView;
 
-		setToolTipText(Messages.map_action_zoom_show_all);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_ShowEntireMap));
-	}
+      setToolTipText(Messages.map_action_zoom_show_all);
 
-	@Override
-	public void run() {
-		_mapView.actionZoomShowEntireMap();
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireMap));
+   }
+
+   @Override
+   public void run() {
+      _mapView.actionZoomShowEntireMap();
+   }
 
 }

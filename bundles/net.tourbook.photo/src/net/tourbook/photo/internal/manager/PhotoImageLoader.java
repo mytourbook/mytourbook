@@ -846,7 +846,7 @@ public class PhotoImageLoader {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind("AWT: image \"{0}\" cannot be loaded.", originalImagePathName)); //$NON-NLS-1$
+         StatusUtil.logError(NLS.bind("AWT: image \"{0}\" cannot be loaded.", originalImagePathName)); //$NON-NLS-1$
 
       } finally {
 

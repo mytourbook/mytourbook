@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,8 +32,8 @@ public class ActionClearView extends Action {
       setText(Messages.import_data_action_clear_view);
       setToolTipText(Messages.import_data_action_clear_view_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RemoveAll));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RemoveAll_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll_Disabled));
    }
 
    @Override

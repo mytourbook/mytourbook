@@ -23,6 +23,8 @@ Bundle-ClassPath: .,
  dinopolis-util-0.5.4mt.jar,
  gpsinput-0.5.4mt.jar
 Export-Package: net.tourbook.ext.velocity,
+ org.apache.commons.collections4,
+ org.apache.commons.lang3.text,
  org.apache.velocity,
  org.apache.velocity.app,
  org.apache.velocity.app.event,

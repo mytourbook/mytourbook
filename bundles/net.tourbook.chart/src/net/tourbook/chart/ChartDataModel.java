@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,7 @@ public class ChartDataModel {
    private ChartDataXSerie            _xData2nd                 = null;
 
    /**
-    * title for the chart, will be positioned on top of the chart
+    * Title for the chart, will be positioned on top of the chart
     */
    private String                     _title;
 
@@ -52,7 +52,7 @@ public class ChartDataModel {
    private ArrayList<ChartDataSerie>  _xyData                   = new ArrayList<>();
 
    /**
-    * storage for custom data
+    * Storage for custom data
     */
    private HashMap<String, Object>    _customData               = new HashMap<>();
 
@@ -66,13 +66,18 @@ public class ChartDataModel {
    private boolean                    _isGraphOverlapped;
 
    /**
-    * minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
+    * Show/hide the hovered value point value label
+    */
+   private boolean                    _isShowValuePointValue;
+
+   /**
+    * Minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
     * each day at least one pixel
     */
    private int                        _chartMinWidth            = ChartComponents.CHART_MIN_WIDTH;
 
    /**
-    * this error message is displayed when data for the chart are not available
+    * This error message is displayed when data for the chart are not available
     */
    private String                     _errorMessage;
 
@@ -80,6 +85,24 @@ public class ChartDataModel {
     * Is <code>true</code> when skipped values are displayed as dots.
     */
    private boolean                    _isNoLinesValuesDisplayed;
+
+   /**
+    * These x values have a different number of slices than {@link #_xData} but the same as
+    * {@link #_variableY_Values}
+    */
+   private double[]                   _variableX_Values;
+
+   /**
+    * These y values have a different number of slices than {@link #_yData} but the same as
+    * {@link #_variableX_Values}
+    */
+   private float[]                    _variableY_Values;
+
+   /**
+    * Each value contains the index into the variable values {@link #_variableX_Values},
+    * {@link #getVariableY_Values()}
+    */
+   private int[]                      _xData_VariableIndex;
 
    public ChartDataModel(final ChartType chartType) {
       _chartType = chartType;
@@ -127,6 +150,14 @@ public class ChartDataModel {
       return _title;
    }
 
+   public double[] getVariableX_Values() {
+      return _variableX_Values;
+   }
+
+   public float[] getVariableY_Values() {
+      return _variableY_Values;
+   }
+
    /**
     * @return returns the dataseries which is used for the x axis
     */
@@ -137,6 +168,10 @@ public class ChartDataModel {
          _xData = new ChartDataXSerie(new double[0]);
       }
       return _xData;
+   }
+
+   public int[] getXData_VariableIndex() {
+      return _xData_VariableIndex;
    }
 
    /**
@@ -170,6 +205,10 @@ public class ChartDataModel {
 
    public boolean isNoLinesValuesDisplayed() {
       return _isNoLinesValuesDisplayed;
+   }
+
+   public boolean isShowValuePointValue() {
+      return _isShowValuePointValue;
    }
 
    /**
@@ -214,8 +253,21 @@ public class ChartDataModel {
       _isNoLinesValuesDisplayed = isNoLinesValuesDisplayed;
    }
 
+   public void setShowValuePointValue(final boolean isShowValuePointValue) {
+      _isShowValuePointValue = isShowValuePointValue;
+   }
+
    public void setTitle(final String title) {
       _title = title;
+   }
+
+   public void setVariableXYData(final double[] variableX_Values,
+                                 final float[] variableY_Values,
+                                 final int[] xData_VariableIndex) {
+
+      this._variableX_Values = variableX_Values;
+      this._variableY_Values = variableY_Values;
+      this._xData_VariableIndex = xData_VariableIndex;
    }
 
    public void setXData(final ChartDataXSerie data) {

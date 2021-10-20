@@ -1,62 +1,64 @@
-21.next.0                                                 Day.Month 2021
+21.next.0                                                 ?.Month 2021
 
 
 TODO's
 ======
 
-* Geo Filter   Investigate/fix https://sourceforge.net/p/mytourbook/discussion/622811/thread/23132f7fbf/?limit=25#fbeb
+https://adoptium.net/ Temurin
 
-* UI Theme:    Provide a UI to select the UI theme
-               https://www.eclipse.org/eclipse/news/4.18/platform.php#system-theme
-               -cssTheme org.eclipse.e4.ui.css.theme.e4_classic
-               -cssTheme org.eclipse.e4.ui.css.theme.e4_default
-               -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
-  
-* Website:     Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-               Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+* Tour Chart      - Select color for 2nd graph line instead of compliment color
+                  - Set default graphs in the graph slideout, sorting still needs the pref page
+
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                 
 
 Issues
 ======
 
 *  
 
+
+Experimental
+============
+
+* 
+
   
 New
 ===
 
-* 
+* Suunto App Integration: (Frederic)
+  - Added support for multiple accounts
+  https://sourceforge.net/p/mytourbook/feature-requests/197/
+
+* Strava Integration: (Frederic)
+  - Added the ability to upload a tour with or without its description
+  - Added the ability to map tour types to Strava activities for a more precise tour upload
+  https://sourceforge.net/p/mytourbook/discussion/622811/thread/e07bd4d3d7/
 
 
 Improvements
 ============
 
-* 2D Map (Frederic):
-  - Extending the zoom levels capacity from 20 to 23
-
-* Tour Chart (Frederic):
-  - Displaying the night sections with a grey color for a more intuitive chart and better readability
+* 
 
 
 Changes  
 =======
 
 * 
-    
+
 
 Bugfix
 ======
 
-* Compress Database
-  Fixed SQL exception when the tour database size is too large to fit into an integer value
+* 
 
-* Tour Chart Value Tooltip 
-  - Fixed a bug when importing tours (FIT, Suunto SML, Suunto XML, Garmin TCX) where in some cases, the tour start components were erroneous (the Time of Day value in the Value Point Tooltip was wrong). Now this data is adjusted with the tour's time zone.
-
-* Tour Import View (Frederic)
-  - The kcal column was displaying values in calories units instead of kcalories
-
-* Chart Tooltip (Frederic)
-  - Displaying the hour from 0 when a new day starts
 
 Translation    
 ===========
@@ -71,5 +73,5 @@ Translation
 System   
 ======
 
-* Eclipse 2021-?
-* FIT SDK 21.47
+* Eclipse 2021-09
+* FIT SDK 21.60

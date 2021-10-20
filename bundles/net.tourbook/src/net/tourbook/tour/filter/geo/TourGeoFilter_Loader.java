@@ -277,7 +277,7 @@ public class TourGeoFilter_Loader {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(sqlSelect);
+         StatusUtil.logError(sqlSelect);
          net.tourbook.ui.UI.showSQLException(e);
 
       }

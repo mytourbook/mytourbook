@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,13 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.nio.charset.Charset;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -23,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -36,6 +43,7 @@ import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.StatusLineManager;
@@ -57,15 +65,12 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -104,6 +109,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.format.PeriodFormatter;
@@ -130,6 +136,8 @@ public class UI {
    public static final String       NEW_LINE1                          = "\n";       //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";     //$NON-NLS-1$
    public static final String       NEW_LINE3                          = "\n\n\n";   //$NON-NLS-1$
+   public static final String       TAB1                               = "\t";       //$NON-NLS-1$
+   public static final String       SLASH                              = "/";        //$NON-NLS-1$
    public static final String       SLASH_WITH_SPACE                   = " / ";      //$NON-NLS-1$
    public static final String       SPACE1                             = " ";        //$NON-NLS-1$
    public static final String       SPACE2                             = "  ";       //$NON-NLS-1$
@@ -194,7 +202,7 @@ public class UI {
    public static final String       SYMBOL_QUESTION_MARK               = "?";        //$NON-NLS-1$
    public static final char         SYMBOL_SEMICOLON                   = ';';
    public static final String       SYMBOL_STAR                        = "*";        //$NON-NLS-1$
-   public static final String       SYMBOL_TEMPERATURE_CELCIUS         = "\u00b0C";  //$NON-NLS-1$
+   public static final String       SYMBOL_TEMPERATURE_CELSIUS         = "\u00b0C";  //$NON-NLS-1$
    public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT      = "\u00b0F";  //$NON-NLS-1$
    public static final String       SYMBOL_UNDERSCORE                  = "_";        //$NON-NLS-1$
    public static final String       SYMBOL_WIND_WITH_SPACE             = "W ";       //$NON-NLS-1$
@@ -233,32 +241,50 @@ public class UI {
          '|', };
 
 // SET_FORMATTING_OFF
+
    public static final boolean   IS_LINUX    = "gtk".equals(SWT.getPlatform());                                                                  //$NON-NLS-1$
    public static final boolean   IS_OSX      = "carbon".equals(SWT.getPlatform())   || "cocoa".equals(SWT.getPlatform());                        //$NON-NLS-1$ //$NON-NLS-2$
    public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
+
 // SET_FORMATTING_ON
+
+   /**
+    * Is <code>true</code> when the dark theme in the UI is selected
+    */
+   public static boolean       IS_DARK_THEME;
 
    /**
     * On Linux an async selection event is fired since e4
     */
-   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2"; //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";   //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";   //$NON-NLS-1$
 
-   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                 //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                   //$NON-NLS-1$
 
-   public static final String  UTF_8                          = "UTF-8";                   //$NON-NLS-1$
-   public static final String  UTF_16                         = "UTF-16";                  //$NON-NLS-1$
-   public static final String  ISO_8859_1                     = "ISO-8859-1";              //$NON-NLS-1$
+   public static final String  TIME_ZONE_UTC                  = "UTC";                       //$NON-NLS-1$
+
+   public static final String  UTF_8                          = "UTF-8";                     //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                    //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";                //$NON-NLS-1$
 
    public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";               //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                 //$NON-NLS-1$
+
+   private static final String NUMBER_FORMAT_1F               = "%.1f";                      //$NON-NLS-1$
+   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ"; //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
     */
    public static final int     DEFAULT_DESCRIPTION_WIDTH      = 350;
    public static final int     DEFAULT_FIELD_WIDTH            = 40;
+
+   /**
+    * The opacity can be set in SWT from 0...255 but no user want's so many steps. In the UI the
+    * user can select this max opacity value which will be converted into 255 when appied.
+    */
+   public static final int     MAX_OPACITY                    = 10;
 
    /**
     * Convert Joule in Calorie
@@ -316,7 +342,7 @@ public class UI {
    /**
     * Imperial system for temperature
     * <p>
-    * (Celcius * 9/5) + 32 = Fahrenheit
+    * (Celsius * 9/5) + 32 = Fahrenheit
     */
    public static final float   UNIT_FAHRENHEIT_MULTI          = 1.8f;
    public static final float   UNIT_FAHRENHEIT_ADD            = 32;
@@ -389,22 +415,22 @@ public class UI {
    public static boolean       UNIT_IS_PRESSURE_MERCURY;
 
    /**
-    * Temperature could be celcius (metric) or fahrenheit
+    * Temperature could be celsius (metric) or fahrenheit
     */
-   public static boolean       UNIT_IS_TEMPERATURE_CELCIUS;
+   public static boolean       UNIT_IS_TEMPERATURE_CELSIUS;
 
    /**
-    * Temperature could be celcius (metric) or fahrenheit
+    * Temperature could be celsius (metric) or fahrenheit
     */
    public static boolean       UNIT_IS_TEMPERATURE_FAHRENHEIT;
 
    /**
-    * Weight could be kilogramm (metric) or pound
+    * Weight could be kilogram (metric) or pound
     */
-   public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
+   public static boolean       UNIT_IS_WEIGHT_KILOGRAM;
 
    /**
-    * Weight could be kilogramm (metric) or pound
+    * Weight could be kilogram (metric) or pound
     */
    public static boolean       UNIT_IS_WEIGHT_POUND;
 
@@ -502,6 +528,7 @@ public class UI {
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
+   public static final String          UNIT_VOLT                  = "V";                        //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
 
@@ -511,7 +538,7 @@ public class UI {
    private static StringBuilder        _formatterSB               = new StringBuilder();
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
-   private static FontMetrics          _fontMetrics;
+   private static FontMetrics          _dialogFont_Metrics;
 
 // SET_FORMATTING_OFF
 
@@ -571,6 +598,8 @@ public class UI {
    public static final Font    AWT_FONT_ARIAL_BOLD_12    = Font.decode("Arial-bold-12");  //$NON-NLS-1$
    public static final Font    AWT_FONT_ARIAL_BOLD_24    = Font.decode("Arial-bold-24");  //$NON-NLS-1$
 
+   public static Font          AWT_DIALOG_FONT;
+
 // SET_FORMATTING_OFF
 
    private static final Random   RANDOM_GENERATOR                       = new Random();
@@ -589,7 +618,7 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-   public final static ImageRegistry IMAGE_REGISTRY;
+   public static final ImageRegistry IMAGE_REGISTRY;
 
    public static final int           DECORATOR_HORIZONTAL_INDENT = 2;
 
@@ -607,15 +636,11 @@ public class UI {
       updateUnits();
 
       setupUI_FontMetrics();
+      setupUI_AWTFonts();
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
 // SET_FORMATTING_OFF
-
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getImageDescriptor(CommonImages.PhotoFilter));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_Disabled));
 
       IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,                    CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
       IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(CommonImages.App_EmptyIcon_Placeholder));
@@ -724,7 +749,7 @@ public class UI {
    private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
    /**
-    * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
+    * When <code>true</code> then data in the UI are scrambled. This is used to create anonymous
     * screenshots.
     * <p>
     * Commandline parameter: <code>-DscrambleData</code>
@@ -746,35 +771,37 @@ public class UI {
     */
    public static void addSashColorHandler(final Sash sash) {
 
-      sash.addMouseTrackListener(new MouseTrackListener() {
+      final Display display = Display.getCurrent();
 
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+      final Color mouseEnterColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultForegroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+
+      final Color mouseExitColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultBackgroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+      final Color mouseDragColor = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultForegroundColor_Shell()
+            : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+
+      sash.addMouseTrackListener(mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
+      sash.addMouseTrackListener(mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
+
+      // set color when sash is initially displayed
+      sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
+
+      sash.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+         // hide background when sash is dragged
+
+         if (selectionEvent.detail == SWT.DRAG) {
+            sash.setBackground(null);
+         } else {
+            sash.setBackground(mouseDragColor);
          }
 
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
-
-      sash.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-
-            // hide background when sash is dragged
-
-            if (e.detail == SWT.DRAG) {
-               sash.setBackground(null);
-            } else {
-               sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-            }
-         }
-      });
+      }));
    }
 
    public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
@@ -830,6 +857,38 @@ public class UI {
       spinner.setSelection(oldValue + valueAdjustment);
    }
 
+   /**
+    * Computes the average elevation change with given values of total elevation
+    * change and total distance.
+    *
+    * @return
+    *         If successful, the average elevation change in the current
+    *         measurement system, 0 otherwise.
+    */
+   public static float computeAverageElevationChange(final float totalElevationChange,
+                                                     final float distance) {
+
+      if (Math.signum(distance) == 0) {
+         return 0;
+      }
+
+      return totalElevationChange / (distance / 1000f);
+   }
+
+   /**
+    * @param averageElevationChange
+    *           In m/km
+    * @return Returns the average elevation change in the current measurement system.
+    */
+   public static float convertAverageElevationChangeFromMetric(final float averageElevationChange) {
+
+      if (UNIT_IS_ELEVATION_METER) {
+         return averageElevationChange;
+      }
+
+      return averageElevationChange * UNIT_VALUE_DISTANCE / UNIT_VALUE_ELEVATION;
+   }
+
    public static float convertBodyHeightFromMetric(final float height) {
       if (UNIT_IS_ELEVATION_METER) {
          return height;
@@ -853,7 +912,7 @@ public class UI {
     */
    public static float convertBodyWeightFromMetric(final float bodyWeight) {
 
-      if (UNIT_IS_WEIGHT_KILOGRAMM) {
+      if (UNIT_IS_WEIGHT_KILOGRAM) {
          return bodyWeight;
       }
 
@@ -867,7 +926,7 @@ public class UI {
     */
    public static float convertBodyWeightToMetric(final float weight) {
 
-      if (UNIT_IS_WEIGHT_KILOGRAMM) {
+      if (UNIT_IS_WEIGHT_KILOGRAM) {
          return weight;
       }
 
@@ -895,7 +954,7 @@ public class UI {
    private static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
 
       // round to the nearest pixel
-      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
+      return (int) ((fontMetrics.getAverageCharacterWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2.0)
             / HORIZONTAL_DIALOG_UNIT_PER_CHAR);
    }
 
@@ -920,7 +979,28 @@ public class UI {
          return dlus * 4;
       }
 
-      return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
+      return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Convert opacity value into 0...255 where 255 corresponds with {@link #MAX_OPACITY}
+    * <p>
+    * The tooltip should display
+    *
+    * <pre>
+    * 0 = transparent ... max = opaque
+    * </pre>
+    *
+    * that {@link #MAX_OPACITY} could be adjusted or customized by the user.
+    *
+    * @param opacity
+    * @return
+    */
+   public static int convertOpacity(final float opacity) {
+
+      final float opacityConverted = opacity / MAX_OPACITY * 0xff;
+
+      return (int) Math.min(0xff, opacityConverted);
    }
 
    /**
@@ -929,7 +1009,7 @@ public class UI {
     */
    public static float convertPrecipitation_FromMetric(final float precipitation) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_TEMPERATURE_CELSIUS) {
          return precipitation;
       }
 
@@ -981,7 +1061,7 @@ public class UI {
     */
    public static float convertTemperatureFromMetric(final float temperature) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_TEMPERATURE_CELSIUS) {
          return temperature;
       }
 
@@ -995,7 +1075,7 @@ public class UI {
     */
    public static float convertTemperatureToMetric(final float temperature) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_TEMPERATURE_CELSIUS) {
          return temperature;
       }
 
@@ -1033,7 +1113,7 @@ public class UI {
       final Color white = display.getSystemColor(SWT.COLOR_WHITE);
       final Color black = display.getSystemColor(SWT.COLOR_BLACK);
 
-      final PaletteData palette = new PaletteData(new RGB[] { white.getRGB(), black.getRGB() });
+      final PaletteData palette = new PaletteData(white.getRGB(), black.getRGB());
 
       final ImageData sourceData = new ImageData(16, 16, 1, palette);
       sourceData.transparentPixel = 0;
@@ -1237,7 +1317,7 @@ public class UI {
     * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
     *
     * @param time
-    *           ini seconds
+    *           in seconds
     * @return
     */
    public static String format_hh_mm_ss(final long time) {
@@ -1452,6 +1532,14 @@ public class UI {
       return directionIndex;
    }
 
+   public static FontMetrics getDialogFontMetrics() {
+
+      // ensure that font metrics are setup
+      setupUI_FontMetrics();
+
+      return _dialogFont_Metrics;
+   }
+
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;
@@ -1605,6 +1693,13 @@ public class UI {
       return isCtrlKey;
    }
 
+   /**
+    * @return <code>true</code> when a dark theme is selected in the UI
+    */
+   public static boolean isDarkTheme() {
+      return IS_DARK_THEME;
+   }
+
    public static boolean isLinuxAsyncEvent(final Widget widget) {
 
       if (IS_LINUX) {
@@ -1718,7 +1813,7 @@ public class UI {
    }
 
    /**
-    * Opens the control context menu, the menue is aligned below the control to the right side
+    * Opens the control context menu, the menu is aligned below the control to the right side
     *
     * @param control
     *           Controls which menu is opened
@@ -1933,7 +2028,7 @@ public class UI {
 
    public static int scrambleNumbers(final int number) {
 
-      return (int) (RANDOM_GENERATOR.nextFloat() * number);
+      return RANDOM_GENERATOR.nextInt() * number;
    }
 
    public static long scrambleNumbers(final long number) {
@@ -1970,31 +2065,6 @@ public class UI {
       }
 
       return new String(scrambledText);
-   }
-
-   public static void setBackgroundColorForAllChildren(final Control parent, final Color bgColor) {
-
-      parent.setBackground(bgColor);
-
-      if (parent instanceof Composite) {
-
-         final Control[] children = ((Composite) parent).getChildren();
-
-         for (final Control child : children) {
-
-            if (child != null
-                  && child.isDisposed() == false //
-
-                  // exclude controls which look ugly
-                  && !child.getClass().equals(Combo.class)
-                  && !child.getClass().equals(Spinner.class)
-            //
-            ) {
-
-               setBackgroundColorForAllChildren(child, bgColor);
-            }
-         }
-      }
    }
 
    /**
@@ -2050,7 +2120,7 @@ public class UI {
    }
 
    /**
-    * Update colors for all decendants.
+    * Update colors for all descendants.
     *
     * @param child
     * @param bgColor
@@ -2258,28 +2328,75 @@ public class UI {
       return gd;
    }
 
+   public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
+
+      IS_DARK_THEME = isDarkThemeSelected;
+   }
+
+   /**
+    * Set the themed image descriptor for a {@link UIElement} with images from the
+    * {@link TourbookPlugin} plugin
+    *
+    * @param uiElement
+    * @param imageName
+    */
+   public static void setThemedIcon(final UIElement uiElement, final String imageName) {
+
+      uiElement.setIcon(CommonActivator.getThemedImageDescriptor(imageName));
+   }
+
+   public static void setupThemedImages() {
+
+// SET_FORMATTING_OFF
+
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,               CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_Disabled));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,     CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,   CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
+
+// SET_FORMATTING_ON
+   }
+
+   private static void setupUI_AWTFonts() {
+
+      if (IS_WIN) {
+
+         final Font winFont = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font"); //$NON-NLS-1$
+
+         if (winFont != null) {
+            AWT_DIALOG_FONT = winFont;
+         }
+
+      } else if (IS_OSX) {
+
+      } else if (IS_LINUX) {
+
+      }
+
+      if (AWT_DIALOG_FONT == null) {
+
+         AWT_DIALOG_FONT = AWT_FONT_ARIAL_12;
+      }
+   }
+
    private static boolean setupUI_FontMetrics() {
 
-      if (_fontMetrics != null) {
+      if (_dialogFont_Metrics != null) {
          return true;
       }
 
       // Compute and keep a font metric
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
-
-      if (activeShell == null) {
-
-         // this can occure when called too early
-         return false;
-      }
-
-      final GC gc = new GC(activeShell);
+      final Display display = Display.getDefault();
+      final Shell shell = new Shell(display);
+      final GC gc = new GC(shell);
       {
          gc.setFont(JFaceResources.getDialogFont());
-         _fontMetrics = gc.getFontMetrics();
+
+         _dialogFont_Metrics = gc.getFontMetrics();
       }
       gc.dispose();
+      shell.dispose();
 
       return true;
    }
@@ -2417,6 +2534,40 @@ public class UI {
       }
 
       return shortedText;
+   }
+
+   /**
+    * Show worked values in progress monitor with the format
+    *
+    * <pre>
+    * {0} / {1} - {2} % - {3} Δ
+    * </pre>
+    *
+    * @param monitor
+    * @param numWorked
+    * @param numAll
+    * @param numLastWorked
+    */
+   public static void showWorkedInProgressMonitor(final IProgressMonitor monitor,
+                                                  final int numWorked,
+                                                  final int numAll,
+                                                  final int numLastWorked) {
+
+      final long numDiff = numWorked - numLastWorked;
+
+      final String percentValue = numAll == 0
+
+            ? UI.EMPTY_STRING
+            : String.format(NUMBER_FORMAT_1F, (float) numWorked / numAll * 100.0);
+
+      // "{0} / {1} - {2} % - {3} Δ"
+      monitor.subTask(NLS.bind(SUB_TASK_PROGRESS,
+            new Object[] {
+                  numWorked,
+                  numAll,
+                  percentValue,
+                  numDiff,
+            }));
    }
 
    /**
@@ -2634,7 +2785,7 @@ public class UI {
       /*
        * Temperature
        */
-      UNIT_IS_TEMPERATURE_CELCIUS         = false;
+      UNIT_IS_TEMPERATURE_CELSIUS         = false;
       UNIT_IS_TEMPERATURE_FAHRENHEIT      = false;
 
       if (activeSystem.getTemperature() == Unit_Temperature.FAHRENHEIT) {
@@ -2651,7 +2802,7 @@ public class UI {
 
          // default is the metric measure system
 
-         UNIT_IS_TEMPERATURE_CELCIUS      = true;
+         UNIT_IS_TEMPERATURE_CELSIUS      = true;
 
          UNIT_LABEL_TEMPERATURE           = UNIT_TEMPERATURE_C;
          UNIT_VALUE_TEMPERATURE           = 1;
@@ -2660,7 +2811,7 @@ public class UI {
       /*
        * Weight
        */
-      UNIT_IS_WEIGHT_KILOGRAMM            = false;
+      UNIT_IS_WEIGHT_KILOGRAM            = false;
       UNIT_IS_WEIGHT_POUND                = false;
 
       if (activeSystem.getWeight() == Unit_Weight.POUND) {
@@ -2676,7 +2827,7 @@ public class UI {
 
          // default is the metric measure system
 
-         UNIT_IS_WEIGHT_KILOGRAMM         = true;
+         UNIT_IS_WEIGHT_KILOGRAM         = true;
 
          UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_KG;
          UNIT_VALUE_WEIGHT                = 1;
@@ -2688,16 +2839,13 @@ public class UI {
 
    public static VerifyListener verifyFilenameInput() {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
+      return verifyEvent -> {
 
-            // check invalid chars
-            for (final char invalidChar : INVALID_FILENAME_CHARS) {
-               if (invalidChar == e.character) {
-                  e.doit = false;
-                  return;
-               }
+         // check invalid chars
+         for (final char invalidChar : INVALID_FILENAME_CHARS) {
+            if (invalidChar == verifyEvent.character) {
+               verifyEvent.doit = false;
+               return;
             }
          }
       };
@@ -2705,16 +2853,13 @@ public class UI {
 
    public static VerifyListener verifyFilePathInput() {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
+      return verifyEvent -> {
 
-            // check invalid chars
-            for (final char invalidChar : INVALID_FILEPATH_CHARS) {
-               if (invalidChar == e.character) {
-                  e.doit = false;
-                  return;
-               }
+         // check invalid chars
+         for (final char invalidChar : INVALID_FILEPATH_CHARS) {
+            if (invalidChar == verifyEvent.character) {
+               verifyEvent.doit = false;
+               return;
             }
          }
       };
@@ -2755,45 +2900,40 @@ public class UI {
 
    public static VerifyListener verifyListenerInteger(final boolean canBeNegative) {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
+      return verifyEvent -> {
 
-            // check backspace and del key
-            if (e.character == SWT.BS || e.character == SWT.DEL) {
-               return;
-            }
+         // check backspace and del key
+         if (verifyEvent.character == SWT.BS || verifyEvent.character == SWT.DEL) {
+            return;
+         }
 
-            // check '-' key
-            if (canBeNegative && e.character == '-') {
-               return;
-            }
+         // check '-' key
+         if (canBeNegative && verifyEvent.character == '-') {
+            return;
+         }
 
-            try {
-               Integer.parseInt(e.text);
-            } catch (final NumberFormatException ex) {
-               e.doit = false;
-            }
+         try {
+            Integer.parseInt(verifyEvent.text);
+         } catch (final NumberFormatException ex) {
+            verifyEvent.doit = false;
          }
       };
    }
 
    public static VerifyListener verifyListenerTypeLong() {
 
-      return new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
-            if (e.text.equals(EMPTY_STRING)) {
-               return;
-            }
-            try {
-               Long.parseLong(e.text);
-            } catch (final NumberFormatException e1) {
-               e.doit = false;
-            }
+      return verifyEvent -> {
+         if (verifyEvent.text.equals(EMPTY_STRING)) {
+            return;
+         }
+         try {
+            Long.parseLong(verifyEvent.text);
+         } catch (final NumberFormatException e1) {
+            verifyEvent.doit = false;
          }
       };
    }
+
 }
 
 //this conversion is not working for all png images, found SWT2Dutil.java

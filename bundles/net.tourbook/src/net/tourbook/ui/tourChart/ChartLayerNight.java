@@ -21,19 +21,25 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class ChartLayerNight implements IChartLayer, IChartOverlay {
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore            = TourbookPlugin.getPrefStore();
 
-   private ChartNightConfig              _cnc;
+   private ChartNightConfig              _chartNightConfig;
+
+   private RGB                           _lightThemeNightColor = new RGB(0x8c, 0x8c, 0x8c);
+   private RGB                           _darkThemeNightColor  = new RGB(0x0, 0x27, 0x75);
 
    public ChartLayerNight() {
       //Nothing to do
@@ -43,31 +49,44 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
     * This paints the night sections for the current graph configuration.
     */
    @Override
-   public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
+   public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart, final PixelConverter pc) {
 
-      final int opacity = _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS);
+      if (!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS)) {
+         return;
+      }
 
-      final int devYTop = drawingData.getDevYTop();
-      final int devGraphHeight = drawingData.devGraphHeight;
+      final int opacity = ColorUtil.getTransparencyFromPercentage(
+            _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
+
+      final int devYTop = graphDrawingData.getDevYTop();
+      final int devGraphHeight = graphDrawingData.devGraphHeight;
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
-      gc.setBackground(new Color(gc.getDevice(), 0x8c, 0x8c, 0x8c, opacity));
+      final Color color = new Color(
+            UI.isDarkTheme()
+                  ? _darkThemeNightColor
+                  : _lightThemeNightColor,
+            opacity);
+      gc.setBackground(color);
       gc.setAlpha(opacity);
 
-      final double scaleX = drawingData.getScaleX();
+      final double scaleX = graphDrawingData.getScaleX();
       final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
-      final int devYBottom = drawingData.getDevYBottom();
-      for (final ChartLabel chartLabel : _cnc.chartLabels) {
+      final int devYBottom = graphDrawingData.getDevYBottom();
+      for (final ChartLabel chartLabel : _chartNightConfig.chartLabelNightSections) {
 
          final double virtualXPos = chartLabel.graphX * scaleX;
          final int devXNightSectionStart = (int) (virtualXPos - devVirtualGraphImageOffset);
          final double virtualXPosEnd = chartLabel.graphXEnd * scaleX;
          final int devXNightSectionEnd = (int) (virtualXPosEnd - devVirtualGraphImageOffset);
 
-         gc.fillRectangle(devXNightSectionStart, devYTop, devXNightSectionEnd - devXNightSectionStart, devYBottom - devYTop);
+         final int width = devXNightSectionEnd - devXNightSectionStart;
+         final int height = devYBottom - devYTop;
+         gc.fillRectangle(devXNightSectionStart, devYTop, width, height);
       }
 
       gc.setClipping((Rectangle) null);
+      gc.setAlpha(0xff);
    }
 
    /**
@@ -81,6 +100,6 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
    }
 
    public void setChartNightConfig(final ChartNightConfig chartNightConfig) {
-      _cnc = chartNightConfig;
+      _chartNightConfig = chartNightConfig;
    }
 }

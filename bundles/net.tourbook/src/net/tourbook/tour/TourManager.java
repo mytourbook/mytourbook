@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TFloatArrayList;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,7 +27,6 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +48,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
@@ -64,6 +67,8 @@ import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
+import net.tourbook.srtm.IPreferences;
+import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -71,11 +76,15 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.GraphBackgroundSource;
 import net.tourbook.ui.tourChart.GraphBackgroundStyle;
 import net.tourbook.ui.tourChart.IValueLabelProvider;
+import net.tourbook.ui.tourChart.PulseGraph;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
+import net.tourbook.ui.views.collateTours.CollatedToursView;
+import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherData;
@@ -89,13 +98,12 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -104,8 +112,18 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class TourManager {
+
+   private static final String SYS_PROP__LOG_RR_ERRORS = "logRRErrors";                                      //$NON-NLS-1$
+   private static boolean      _isLogging_RR_Errors    = System.getProperty(SYS_PROP__LOG_RR_ERRORS) != null;
+
+   static {
+      if (_isLogging_RR_Errors) {
+         Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_RR_ERRORS, "R-R errors are logged"); //$NON-NLS-1$
+      }
+   }
 
    private static final String GRAPH_LABEL_ALTIMETER                           = net.tourbook.common.Messages.Graph_Label_Altimeter;
    private static final String GRAPH_LABEL_ALTITUDE                            = net.tourbook.common.Messages.Graph_Label_Altitude;
@@ -162,9 +180,6 @@ public class TourManager {
    public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TIME                                = "time";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
@@ -172,6 +187,10 @@ public class TourManager {
    public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                     //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                       //$NON-NLS-1$
+
+   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
    //
    public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
@@ -237,63 +256,66 @@ public class TourManager {
    };
 
    private static final IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore                 _prefStore_Common                 = CommonActivator.getPrefStore();
 
    private static TourManager                            _instance;
 
    private static final StringBuilder                    _sbFormatter                      = new StringBuilder();
    private static final Formatter                        _formatter                        = new Formatter(_sbFormatter);
+   //
+   private static final ListenerList<ITourEventListener> _tourEventListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITourSaveListener>  _tourSaveListeners                = new ListenerList<>(ListenerList.IDENTITY);
 
+   public static final String                            cadenceZonesTimes_StatementUpdate = UI.EMPTY_STRING
+
+         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    // //$NON-NLS-1$
+
+         + " SET"                                                                                                                      // //$NON-NLS-1$
+
+         + " cadenceZone_SlowTime=?, "                                                                                                 // //$NON-NLS-1$
+         + " cadenceZone_FastTime=?, "                                                                                                 // //$NON-NLS-1$
+         + " cadenceZones_DelimiterValue=? "                                                                                           // //$NON-NLS-1$
+
+         + " WHERE tourId=?";                                                                                                          // //$NON-NLS-1$
+
+   //
    /**
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
     * not opened
     */
-   private static TourDataEditorView                     _tourDataEditorInstance;
+   private static TourDataEditorView      _tourDataEditorInstance;
    //
-   private static LabelProviderMMSS                      _labelProviderMMSS                = new LabelProviderMMSS();
-   private static LabelProviderInt                       _labelProviderInt                 = new LabelProviderInt();
+   private static LabelProviderMMSS       _labelProviderMMSS = new LabelProviderMMSS();
+   private static LabelProviderInt        _labelProviderInt  = new LabelProviderInt();
    //
-   private static TourData                               _joined_TourData;
-   private static int                                    _joined_TourIds_Hash;
-   private static List<TourData>                         _allLoaded_TourData;
-   private static int                                    _allLoaded_TourData_Hash;
-   private static long                                   _allLoaded_TourData_Key;
-   private static int                                    _allLoaded_TourIds_Hash;
+   private static volatile TourData       _joined_TourData;
+   private static int                     _joined_TourIds_Hash;
+   private static volatile List<TourData> _allLoaded_TourData;
+   private static int                     _allLoaded_TourData_Hash;
+   private static long                    _allLoaded_TourData_Key;
+   private static int                     _allLoaded_TourIds_Hash;
    //
-   private static final ListenerList<ITourEventListener> _tourEventListeners               = new ListenerList<>(ListenerList.IDENTITY);
-   private static final ListenerList<ITourSaveListener>  _tourSaveListeners                = new ListenerList<>(ListenerList.IDENTITY);
-   public static final String                            cadenceZonesTimes_StatementUpdate = UI.EMPTY_STRING
-
-         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    //   //$NON-NLS-1$
-
-         + " SET"                                                                                                                      //                                     //$NON-NLS-1$
-
-         + " cadenceZone_SlowTime=?, "                                                                                                 //                //$NON-NLS-1$
-         + " cadenceZone_FastTime=?, "                                                                                                 //                 //$NON-NLS-1$
-         + " cadenceZones_DelimiterValue=? "                                                                                           //          //$NON-NLS-1$
-
-         + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
+   private ComputeChartValue              _computeAvg_Altimeter;
+   private ComputeChartValue              _computeAvg_Altitude;
+   private ComputeChartValue              _computeAvg_Cadence;
+   private ComputeChartValue              _computeAvg_Gradient;
+   private ComputeChartValue              _computeAvg_Pace;
+   private ComputeChartValue              _computeAvg_Power;
+   private ComputeChartValue              _computeAvg_Pulse;
+   private ComputeChartValue              _computeAvg_Speed;
    //
-   private ComputeChartValue                             _computeAvg_Altimeter;
-   private ComputeChartValue                             _computeAvg_Altitude;
-   private ComputeChartValue                             _computeAvg_Cadence;
-   private ComputeChartValue                             _computeAvg_Gradient;
-   private ComputeChartValue                             _computeAvg_Pace;
-   private ComputeChartValue                             _computeAvg_Power;
-   private ComputeChartValue                             _computeAvg_Pulse;
-   private ComputeChartValue                             _computeAvg_Speed;
+   private ComputeChartValue              _computeAvg_RunDyn_StanceTime;
+   private ComputeChartValue              _computeAvg_RunDyn_StanceTimeBalance;
+   private ComputeChartValue              _computeAvg_RunDyn_StepLength;
+   private ComputeChartValue              _computeAvg_RunDyn_VerticalOscillation;
+   private ComputeChartValue              _computeAvg_RunDyn_VerticalRatio;
    //
-   private ComputeChartValue                             _computeAvg_RunDyn_StanceTime;
-   private ComputeChartValue                             _computeAvg_RunDyn_StanceTimeBalance;
-   private ComputeChartValue                             _computeAvg_RunDyn_StepLength;
-   private ComputeChartValue                             _computeAvg_RunDyn_VerticalOscillation;
-   private ComputeChartValue                             _computeAvg_RunDyn_VerticalRatio;
-   //
-   private final TourDataCache                           _tourDataCache;
+   private final TourDataCache            _tourDataCache;
 
    /**
     * tour chart which shows the selected tour
     */
-   private TourChart                                     _activeTourChart;
+   private TourChart                      _activeTourChart;
 
    public static class LabelProviderInt implements IValueLabelProvider {
 
@@ -345,34 +367,25 @@ public class TourManager {
 
       createAvgCallbacks();
 
-      _prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefStore.addPropertyChangeListener(propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
+         if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
 
-               clearTourDataCache();
+            clearTourDataCache();
 
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
+            // fire modify event
+            Display.getDefault().asyncExec(() -> fireEvent(TourEventId.UPDATE_UI));
 
-                     // fire modify event
-                     fireEvent(TourEventId.UPDATE_UI);
-                  }
-               });
+         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            /*
+             * multiple tours can have the wrong person for hr zones
+             */
 
-               /*
-                * multiple tours can have the wrong person for hr zones
-                */
-
-               _joined_TourData = null;
-               _allLoaded_TourData = null;
-            }
+            _joined_TourData = null;
+            _allLoaded_TourData = null;
          }
       });
    }
@@ -390,7 +403,7 @@ public class TourManager {
       // ensure data are available
       if (temperatureSerie == null) {
 
-         TourLogManager.subLog_Error(
+         TourLogManager.subLog_ERROR(
                String.format(//
                      LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -400,7 +413,7 @@ public class TourManager {
 
       if (timeSerie == null) {
 
-         TourLogManager.subLog_Error(
+         TourLogManager.subLog_ERROR(
                String.format(//
                      LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -426,7 +439,7 @@ public class TourManager {
       // an initial temperature could not be computed because the tour is too short
       if (initialTemperature == Integer.MIN_VALUE) {
 
-         TourLogManager.subLog_Error(
+         TourLogManager.subLog_ERROR(
                String.format(//
                      LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
                      getTourDateTimeShort(tourData)));
@@ -454,14 +467,12 @@ public class TourManager {
 
       final float newAvgTemperature = tourData.getAvgTemperature();
 
-      TourLogManager.addSubLog(
-            TourLogState.IMPORT_OK,
-            String.format(
-                  LOG_TEMP_ADJUST_003_TOUR_CHANGES,
-                  getTourDateTimeShort(tourData),
-                  oldAvgTemperature,
-                  newAvgTemperature,
-                  newAvgTemperature - oldAvgTemperature));
+      TourLogManager.subLog_OK(String.format(
+            LOG_TEMP_ADJUST_003_TOUR_CHANGES,
+            getTourDateTimeShort(tourData),
+            oldAvgTemperature,
+            newAvgTemperature,
+            newAvgTemperature - oldAvgTemperature));
 
       return true;
    }
@@ -483,37 +494,15 @@ public class TourManager {
 
       final long tourId1 = tourData1.getTourId().longValue();
       final long tourId2 = tourData2.getTourId().longValue();
+      final String message = NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
+            tourData2.toStringWithHash(),
+            tourData1.toStringWithHash());
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         final String message = UI.EMPTY_STRING
-               + "ERROR: " //                                                                                              //$NON-NLS-1$
-               + "The internal structure of the application is out of synch." //                                           //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "You can solve the problem by:" //                                                                        //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "- restarting the application" //                                                                         //$NON-NLS-1$
-               + UI.NEW_LINE
-               + "- close the tour editor in all perspectives" //                                                          //$NON-NLS-1$
-               + UI.NEW_LINE
-               + "- save/revert tour and select another tour" //                                                           //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + UI.NEW_LINE
-               + "The tour editor contains the selected tour, but the data are different." //                              //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "Tour in Editor:" //                                                                                      //$NON-NLS-1$
-               + tourData2.toStringWithHash()
-               + UI.NEW_LINE
-               + "Selected Tour:" //                                                                                       //$NON-NLS-1$
-               + tourData1.toStringWithHash()
-               + UI.NEW_LINE2
-               + UI.NEW_LINE
-               + "You should also inform the author of the application how this error occured. " //                        //$NON-NLS-1$
-               + "However it isn't very easy to find out, what actions are exactly done, before this error occured. " //   //$NON-NLS-1$
-               + UI.NEW_LINE2
-               + "These actions must be reproducable otherwise the bug cannot be identified."; //                          //$NON-NLS-1$
-
-         MessageDialog.openError(Display.getDefault().getActiveShell(), "Error: Out of Synch", message); //                //$NON-NLS-1$
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
+               Messages.TourManager_Dialog_OutOfSyncError_Title,
+               message);
 
          throw new MyTourbookException(message);
       }
@@ -568,11 +557,14 @@ public class TourManager {
             }
          }
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
+         TourLogManager.subLog_OK(NLS.bind(
+               Messages.Log_ComputeCadenceZonesTimes_010_Success,
+               numComputedTour));
 
          if (numNotComputedTour >= 0) {
-            TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
-                  NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+            TourLogManager.subLog_ERROR(NLS.bind(
+                  Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess,
+                  numNotComputedTour));
          }
       } catch (final SQLException e) {
          SQL.showException(e);
@@ -603,17 +595,14 @@ public class TourManager {
 
       final boolean[] retValue = { false };
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            for (final TourData tourData : tourDataList) {
+         for (final TourData tourData : tourDataList) {
 
-               final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
+            final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
 
-               if (isComputed) {
-                  retValue[0] = true;
-               }
+            if (isComputed) {
+               retValue[0] = true;
             }
          }
       });
@@ -754,6 +743,7 @@ public class TourManager {
       tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
 
       tcc.isShowBreaktimeValues = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+      tcc.isShowValuePointValue = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
 
       tcc.updateZoomOptions();
 
@@ -781,12 +771,10 @@ public class TourManager {
       loadTourData(tourIds, allMultipleTours, false);
 
       // sort tours by start date/time
-      Collections.sort(allMultipleTours, new Comparator<TourData>() {
-         @Override
-         public int compare(final TourData t1, final TourData t2) {
-            return t1.getTourStartTimeMS() < t2.getTourStartTimeMS() ? -1 : 1;
-         }
-      });
+      Collections.sort(
+            allMultipleTours,
+            (tourData1, tourData2) -> tourData1.getTourStartTimeMS() < tourData2.getTourStartTimeMS()
+                  ? -1 : 1);
 
       int numTimeSlices = 0;
       int numSwimTimeSlices = 0;
@@ -911,7 +899,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
-         final float[] fromPulse_TimeSerie = fromTourData.getPulse_RRIntervals();
+         final float[] fromPulse_BpmFromRRIntervals = fromTourData.getPulse_AvgBpmFromRRIntervals();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -1017,9 +1005,9 @@ public class TourManager {
             isPulseSerie = true;
             System.arraycopy(fromPulseSerie, 0, toPulseSerie, toStartIndex, fromSerieLength);
          }
-         if (fromPulse_TimeSerie != null) {
+         if (fromPulse_BpmFromRRIntervals != null) {
             isPulseSerie_FromTime = true;
-            System.arraycopy(fromPulse_TimeSerie, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
+            System.arraycopy(fromPulse_BpmFromRRIntervals, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
          }
          if (fromTemperaturSerie != null) {
             isTempSerie = true;
@@ -1462,26 +1450,23 @@ public class TourManager {
    }
 
    /**
-    * Get color for a graph from the pref store.
+    * Get color for a graph from the common pref store.
     *
     * @param graphName
     * @param colorProfileName
     *           Can be any of <br>
-    *           {@link GraphColorManager#PREF_COLOR_BRIGHT},<br>
-    *           {@link GraphColorManager#PREF_COLOR_DARK}<br>
-    *           {@link GraphColorManager#PREF_COLOR_LINE}<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_BRIGHT},<br>
+    *           {@link GraphColorManager#PREF_COLOR_GRADIENT_DARK}<br>
+    *           {@link GraphColorManager#PREF_COLOR_LINE_LIGHT}<br>
     *           {@link GraphColorManager#PREF_COLOR_MAPPING}<br>
-    *           {@link GraphColorManager#PREF_COLOR_TEXT}.
+    *           {@link GraphColorManager#PREF_COLOR_TEXT_LIGHT}.
     * @return
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
-      // get COLOR from common pref store
-      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-
-      final RGB color = PreferenceConverter.getColor(commonPrefStore, prefGraphName + colorProfileName);
+      final RGB color = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + colorProfileName);
 
       return color;
    }
@@ -1714,12 +1699,16 @@ public class TourManager {
 
       final String tourTitle = tourData.getTourTitle();
 
-      return getTourDateFull(tourData) //
+      return getTourDateFull(tourData)
             + UI.DASH_WITH_SPACE
             + getTourTimeShort(tourData)
             + ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
    }
 
+   /**
+    * @param tourData
+    * @return Returns the tour title for multiple tours
+    */
    public static String getTourTitleMultiple(final TourData tourData) {
 
       final String[] multipleTourTitles = tourData.multipleTourTitles;
@@ -1732,6 +1721,26 @@ public class TourManager {
       final String lastTour = multipleTourTitles[multipleTourTitles.length - 1];
 
       return firstTour + UI.DASH_WITH_SPACE + lastTour;
+   }
+
+   public static Object[] getTourViewerSelectedTourIds(final ITourViewer3 tourViewer) {
+
+      Object[] selectedItems = null;
+
+      if (tourViewer instanceof TourBookView) {
+
+         selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
+
+      } else if (tourViewer instanceof CollatedToursView) {
+
+         selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
+
+      } else if (tourViewer instanceof RawDataView) {
+
+         selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
+      }
+
+      return selectedItems;
    }
 
    /**
@@ -1763,6 +1772,53 @@ public class TourManager {
       return true;
 
 //      return tourData.hasGeoData();
+   }
+
+   /**
+    * @return <code>true</code> when the user has validated the SRTM server account
+    */
+   private static boolean isSrtmAccountValid() {
+
+      String message = null;
+      String focusField = null;
+
+      final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
+      final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+
+      if (password.trim().length() == 0 || username.trim().length() == 0) {
+
+         message = Messages.SRTM_Download_Info_UsernamePasswordIsEmpty;
+         focusField = PrefPageSRTMData.FOCUS_USER_NAME;
+      }
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+      if (message == null && validationDate < 0) {
+
+         message = Messages.SRTM_Download_Info_NoDownloadValidation;
+         focusField = PrefPageSRTMData.FOCUS_VALIDATE_DOWNLOAD;
+      }
+
+      if (message != null && message.length() > 0) {
+
+         // SRTM download is not valid
+
+         final Shell shell = Display.getCurrent().getActiveShell();
+
+         MessageDialog.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+
+         // show SRTM pref page
+         PreferencesUtil.createPreferenceDialogOn(
+               shell,
+               PrefPageSRTMData.ID,
+               null,
+
+               // set focus to a control
+               focusField).open();
+
+         return false;
+      }
+
+      return true;
    }
 
    /**
@@ -1949,31 +2005,28 @@ public class TourManager {
        * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
        * returns null in none UI threads
        */
-      Display.getDefault().syncExec(new Runnable() {
+      Display.getDefault().syncExec(() -> {
 
-         @Override
-         public void run() {
+         try {
 
-            try {
+            final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-               final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
 
-               final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+            final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
-               final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+            if (viewPart instanceof TourDataEditorView) {
 
-               if (viewPart instanceof TourDataEditorView) {
+               tourDataEditorView[0] = (TourDataEditorView) viewPart;
 
-                  tourDataEditorView[0] = (TourDataEditorView) viewPart;
+               if (isActive) {
 
-                  if (isActive) {
+                  page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-                     page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+               } else if (page.isPartVisible(viewPart) == false || isActive) {
 
-                  } else if (page.isPartVisible(viewPart) == false || isActive) {
-
-                     page.bringToTop(viewPart);
-                  }
+                  page.bringToTop(viewPart);
+               }
 
 // HINT: this does not restore the part when it's in a fast view
 //
@@ -1982,11 +2035,10 @@ public class TourManager {
 //         page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //         page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
 
-               }
-
-            } catch (final PartInitException e) {
-               StatusUtil.log(e);
             }
+
+         } catch (final PartInitException e) {
+            StatusUtil.log(e);
          }
       });
 
@@ -2000,15 +2052,19 @@ public class TourManager {
     * @param firstIndex
     * @param lastIndex
     * @param isRemoveTime
+    * @param isAdjustTourStartTime
     */
    public static void removeTimeSlices(final TourData tourData,
                                        final int firstIndex,
                                        final int lastIndex,
-                                       final boolean isRemoveTime) {
+                                       final boolean isRemoveTime,
+                                       final boolean isAdjustTourStartTime) {
 
-      if (isRemoveTime) {
+      if (isRemoveTime || (isRemoveTime && isAdjustTourStartTime)) {
+
          // this must be done before the time series are modified
-         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex);
+
+         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex, isAdjustTourStartTime);
       }
 
       short[] shortSerie;
@@ -2281,12 +2337,13 @@ public class TourManager {
       return newDataSerie;
    }
 
-   private static void removeTimeSlices_TimeAndDistance(final TourData _tourData,
+   private static void removeTimeSlices_TimeAndDistance(final TourData tourData,
                                                         final int firstIndex,
-                                                        final int lastIndex) {
+                                                        final int lastIndex,
+                                                        final boolean isAdjustTourStartTime) {
 
-      final int[] timeSerie = _tourData.timeSerie;
-      final float[] distSerie = _tourData.distanceSerie;
+      final int[] timeSerie = tourData.timeSerie;
+      final float[] distSerie = tourData.distanceSerie;
 
       if ((timeSerie == null) || (timeSerie.length == 0)) {
          return;
@@ -2314,6 +2371,14 @@ public class TourManager {
          if (distDiff != -1) {
             distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
          }
+      }
+
+      if (isAdjustTourStartTime) {
+
+         final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+         final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);
+
+         tourData.setTourStartTime(newTourStartTime);
       }
    }
 
@@ -2393,21 +2458,20 @@ public class TourManager {
       // ensure data is available
       if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-         TourLogManager.subLog_Error(
-               String.format(
-                     LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-                     getTourDateTimeShort(tourData)));
+         TourLogManager.subLog_ERROR(String.format(
+               LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+               getTourDateTimeShort(tourData)));
 
          return false;
       }
 
       final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
-         TourLogManager.subLog_Error(
-               NLS.bind(
-                     Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-                     new Object[] {
-                           TourManager.getTourDateTimeShort(tourData) }));
+
+         TourLogManager.subLog_ERROR(NLS.bind(
+               Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+               TourManager.getTourDateTimeShort(tourData)));
+
          return false;
       }
 
@@ -2426,7 +2490,7 @@ public class TourManager {
       tourData.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
       tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
 
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, getTourDateTimeShort(tourData));
+      TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
 
       return true;
    }
@@ -2657,80 +2721,94 @@ public class TourManager {
       }
    }
 
-   public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
-
-      if (tourDataList == null || tourDataList.isEmpty()) {
-         return false;
-      }
-
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
-            Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Title,
-            Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Message) == false) {
-         return false;
-      }
-
-      final boolean[] retValue = { false };
-
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-
-            for (final TourData tourData : tourDataList) {
-
-               final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
-
-               retValue[0] = retValue[0] || isReplaced;
-            }
-         }
-      });
-
-      return retValue[0];
-   }
-
    /**
-    * set the graph colors from the pref store
+    * Set the graph colors from the pref store
     *
     * @param yData
     * @param graphName
     */
-   public static void setGraphColor(final ChartDataYSerie yData, final String graphName) {
+   public static void setBarColors(final ChartDataYSerie yData, final String graphName) {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
-      // get COLOR from common pref store
-      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+      // get colors from common pref store
 
-      final RGB prefLineColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final String prefColorLine = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
 
-      final RGB prefTextColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
+      final RGB rgbGradient_Dark = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbGradient_Bright = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
 
-      final RGB prefDarkColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      yData.setRgbBar_Gradient_Dark(new RGB[] { rgbGradient_Dark });
+      yData.setRgbBar_Gradient_Bright(new RGB[] { rgbGradient_Bright });
+      yData.setRgbBar_Line(new RGB[] { rgbLineColor });
+   }
 
-      final RGB prefBrightColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+   public static boolean setElevationValuesFromSRTM(final ArrayList<TourData> allTourData) {
 
-      /**
-       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-       * <p>
-       * Default color is used to draw the y-axis text, using the prefTextColor can cause problems
-       * when the color is white for a dark gradient color.
-       * <p>
-       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-       */
-      yData.setDefaultRGB(prefLineColor);
+      if (allTourData == null || allTourData.isEmpty()) {
+         return false;
+      }
 
-      yData.setRgbLine(new RGB[] { prefLineColor });
-      yData.setRgbText(new RGB[] { prefTextColor });
-      yData.setRgbDark(new RGB[] { prefDarkColor });
-      yData.setRgbBright(new RGB[] { prefBrightColor });
+      if (isSrtmAccountValid() == false) {
+         return false;
+      }
+
+      final Display display = Display.getCurrent();
+
+      if (MessageDialog.openConfirm(
+            display.getActiveShell(),
+            Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Title,
+            Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Message) == false) {
+
+         return false;
+      }
+
+      final boolean[] returnValue = { false };
+
+      BusyIndicator.showWhile(display, () -> {
+
+         for (final TourData tourData : allTourData) {
+
+            final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
+
+            returnValue[0] = returnValue[0] || isReplaced;
+         }
+      });
+
+      return returnValue[0];
+   }
+
+   /**
+    * Set graph colors
+    *
+    * @param yData
+    * @param graphName
+    */
+   public static void setGraphColors(final ChartDataYSerie yData, final String graphName) {
+
+      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
+
+      final String prefColorLineThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
+
+      final String prefColorTextThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+// SET_FORMATTING_OFF
+
+      // put the colors into the chart data
+      yData.setRgbGraph_Gradient_Bright(PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT));
+      yData.setRgbGraph_Gradient_Dark(  PreferenceConverter.getColor(_prefStore_Common, defaultColorName + GraphColorManager.PREF_COLOR_GRADIENT_DARK));
+      yData.setRgbGraph_Line(           PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorLineThemed));
+      yData.setRgbGraph_Text(           PreferenceConverter.getColor(_prefStore_Common, defaultColorName + prefColorTextThemed));
+
+// SET_FORMATTING_ON
+
    }
 
    public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
@@ -3501,6 +3579,16 @@ public class TourManager {
          return chartDataModel;
       }
 
+      final String prefColorName_Distance = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_DISTANCE + UI.SYMBOL_DOT;
+      final String prefColorName_Time = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
+
+      final String prefColorTextThemed = UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      final RGB rgbText_Distance = PreferenceConverter.getColor(_prefStore_Common, prefColorName_Distance + prefColorTextThemed);
+      final RGB rgbText_Time = PreferenceConverter.getColor(_prefStore_Common, prefColorName_Time + prefColorTextThemed);
+
       if (hasPropertyChanged) {
          tourData.clearComputedSeries();
       }
@@ -3511,7 +3599,7 @@ public class TourManager {
       computeValueClipping(tourData);
 
       /*
-       * distance
+       * Distance
        */
       final double[] distanceSerie = tourData.getDistanceSerieDouble();
       ChartDataXSerie xDataDist = null;
@@ -3520,23 +3608,23 @@ public class TourManager {
          xDataDist.setLabel(Messages.tour_editor_label_distance);
          xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
          xDataDist.setValueDivisor(1000);
-         xDataDist.setDefaultRGB(new RGB(0, 0, 0));
+         xDataDist.setRgbGraph_Text(rgbText_Distance);
 
          // do not show average values but show the other values with 3 digits
          xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
       }
 
       /*
-       * time
+       * Time
        */
       final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.getTimeSerieWithTimeZoneAdjusted());
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
-      xDataTime.setDefaultRGB(new RGB(0, 0, 0));
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
+      xDataTime.setRgbGraph_Text(rgbText_Time);
 
       /*
-       * show the distance on the x-axis when a distance is available, otherwise the time is
+       * Show the distance on the x-axis when a distance is available, otherwise the time is
        * displayed
        */
       boolean isShowTimeOnXAxis;
@@ -3567,7 +3655,7 @@ public class TourManager {
          xDataTime.setStartDateTime(tourStartTime);
 
          /*
-          * when time is displayed, the x-axis can show the start time starting from 0 or from the
+          * When time is displayed, the x-axis can show the start time starting from 0 or from the
           * current time of the day
           */
          final int tourTimeOfDay = tourStartTime.get(ChronoField.SECOND_OF_DAY);
@@ -3575,10 +3663,11 @@ public class TourManager {
          final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
 
          final X_AXIS_START_TIME configXAxisTime = tcc.xAxisTime;
-
          final double xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
                ? 0
-               : configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME ? tourTimeOfDay : photoTimeOfDay;
+               : configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME
+                     ? tourTimeOfDay
+                     : photoTimeOfDay;
 
          xDataTime.setUnitStartValue(xAxisStartValue);
 
@@ -3617,7 +3706,7 @@ public class TourManager {
       // HR zones can be displayed when they are available
       final boolean canShowBackground_HrZones = tcc.canShowBackground_HrZones = tourData.getNumberOfHrZones() > 0;
 
-      // swim style can be displayed when they are availabel
+      // swim style can be displayed when they are available
       final boolean canShowBackground_SwimStyle = tcc.canShowBackground_SwimStyle = tourData.swim_Time != null;
 
       final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
@@ -3655,8 +3744,8 @@ public class TourManager {
 
 // SET_FORMATTING_OFF
 
-      final ChartDataYSerie yDataAltitude       = createModelData_Altitude(   tourData, chartDataModel, chartType, useCustomBackground, tcc);
-      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
+      final ChartDataYSerie yDataElevation      = createModelData_Elevation(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
+      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
       final ChartDataYSerie yDataSpeed          = createModelData_Speed(      tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPace           = createModelData_Pace(       tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPower          = createModelData_Power(      tourData, chartDataModel, chartType, useCustomBackground);
@@ -3687,9 +3776,9 @@ public class TourManager {
 
          switch (actionId) {
          case GRAPH_ALTITUDE:
-            if (yDataAltitude != null) {
-               chartDataModel.addYData(yDataAltitude);
-               chartDataModel.setCustomData(CUSTOM_DATA_ALTITUDE, yDataAltitude);
+            if (yDataElevation != null) {
+               chartDataModel.addYData(yDataElevation);
+               chartDataModel.setCustomData(CUSTOM_DATA_ALTITUDE, yDataElevation);
             }
             break;
 
@@ -3831,7 +3920,7 @@ public class TourManager {
 
          yDataHistory.setAxisUnit(ChartDataSerie.AXIS_UNIT_HISTORY);
 
-         setGraphColor(yDataHistory, GraphColorManager.PREF_GRAPH_HISTORY);
+         setGraphColors(yDataHistory, GraphColorManager.PREF_GRAPH_HISTORY);
 
          chartDataModel.addXyData(yDataHistory);
          chartDataModel.addYData(yDataHistory);
@@ -3842,8 +3931,9 @@ public class TourManager {
          createStatisticSegments(tourData, chartDataModel);
       }
 
-      chartDataModel.setShowNoLineValues(tcc.isShowBreaktimeValues);
       chartDataModel.setIsGraphOverlapped(tcc.isGraphOverlapped);
+      chartDataModel.setShowNoLineValues(tcc.isShowBreaktimeValues);
+      chartDataModel.setShowValuePointValue(tcc.isShowValuePointValue);
 
       chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
       chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDist);
@@ -3898,7 +3988,7 @@ public class TourManager {
             yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
          }
 
-         setGraphColor(yDataAltimeter, GraphColorManager.PREF_GRAPH_ALTIMETER);
+         setGraphColors(yDataAltimeter, GraphColorManager.PREF_GRAPH_ALTIMETER);
          chartDataModel.addXyData(yDataAltimeter);
 
          /*
@@ -3934,74 +4024,6 @@ public class TourManager {
                ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
       }
       return yDataAltimeter;
-   }
-
-   /**
-    * Altitude
-    */
-   private ChartDataYSerie createModelData_Altitude(final TourData tourData,
-                                                    final ChartDataModel chartDataModel,
-                                                    final ChartType chartType,
-                                                    final boolean useGraphBgStyle,
-                                                    final TourChartConfiguration tcc) {
-      ChartDataYSerie yDataAltitude = null;
-
-      final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
-      if (altitudeSerie != null) {
-
-         if (tourData.isSRTMAvailable()) {
-
-            tcc.canShowSRTMData = true;
-
-            if (tcc.isSRTMDataVisible) {
-
-               final float[] srtmDataSerie = tourData.getSRTMSerie();
-               if (srtmDataSerie != null) {
-
-                  // create altitude dataserie and adjust min/max values with with the srtm values
-                  yDataAltitude = createChartDataSerie(
-                        new float[][] { altitudeSerie, srtmDataSerie },
-                        chartType);
-               }
-            }
-
-         } else {
-
-            // SRTM data are not available
-            tcc.canShowSRTMData = false;
-         }
-
-         if (yDataAltitude == null) {
-            yDataAltitude = createChartDataSerie(altitudeSerie, chartType);
-         }
-
-         yDataAltitude.setYTitle(GRAPH_LABEL_ALTITUDE);
-         yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
-         yDataAltitude.setShowYSlider(true);
-         yDataAltitude.setDisplayedFractionalDigits(2);
-         yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
-         yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
-
-         if (useGraphBgStyle) {
-            yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
-         } else {
-            yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-         }
-
-         setGraphColor(yDataAltitude, GraphColorManager.PREF_GRAPH_ALTITUDE);
-         chartDataModel.addXyData(yDataAltitude);
-
-         // adjust pulse min/max values when it's defined in the pref store
-         setVisibleForcedValues(
-               yDataAltitude,
-               1,
-               0,
-               ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
-               ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
-               ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
-               ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
-      }
-      return yDataAltitude;
    }
 
    /**
@@ -4052,7 +4074,7 @@ public class TourManager {
             yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
+         setGraphColors(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
          chartDataModel.addXyData(yDataCadence);
 
          // adjust min/max values when it's defined in the pref store
@@ -4069,6 +4091,74 @@ public class TourManager {
    }
 
    /**
+    * Elevation
+    */
+   private ChartDataYSerie createModelData_Elevation(final TourData tourData,
+                                                     final ChartDataModel chartDataModel,
+                                                     final ChartType chartType,
+                                                     final boolean useGraphBgStyle,
+                                                     final TourChartConfiguration tcc) {
+      ChartDataYSerie yDataElevation = null;
+
+      final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
+      if (altitudeSerie != null) {
+
+         if (tourData.isSRTMAvailable()) {
+
+            tcc.canShowSRTMData = true;
+
+            if (tcc.isSRTMDataVisible) {
+
+               final float[] srtmDataSerie = tourData.getSRTMSerie();
+               if (srtmDataSerie != null) {
+
+                  // create altitude dataserie and adjust min/max values with with the srtm values
+                  yDataElevation = createChartDataSerie(
+                        new float[][] { altitudeSerie, srtmDataSerie },
+                        chartType);
+               }
+            }
+
+         } else {
+
+            // SRTM data are not available
+            tcc.canShowSRTMData = false;
+         }
+
+         if (yDataElevation == null) {
+            yDataElevation = createChartDataSerie(altitudeSerie, chartType);
+         }
+
+         yDataElevation.setYTitle(GRAPH_LABEL_ALTITUDE);
+         yDataElevation.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
+         yDataElevation.setShowYSlider(true);
+         yDataElevation.setDisplayedFractionalDigits(2);
+         yDataElevation.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
+         yDataElevation.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
+
+         if (useGraphBgStyle) {
+            yDataElevation.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+         } else {
+            yDataElevation.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         }
+
+         setGraphColors(yDataElevation, GraphColorManager.PREF_GRAPH_ALTITUDE);
+         chartDataModel.addXyData(yDataElevation);
+
+         // adjust pulse min/max values when it's defined in the pref store
+         setVisibleForcedValues(
+               yDataElevation,
+               1,
+               0,
+               ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
+               ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
+               ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
+               ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
+      }
+      return yDataElevation;
+   }
+
+   /**
     * Gears
     */
    private ChartDataYSerie createModelData_Gears(final TourData tourData, final ChartDataModel chartDataModel) {
@@ -4077,8 +4167,8 @@ public class TourManager {
       ChartDataYSerie yDataGears = null;
       if (gearSerie != null) {
 
-         final float[][] chartGearSerie = new float[][] //
-         {
+         final float[][] chartGearSerie = new float[][] {
+
                // gear ratio
                gearSerie[0],
 
@@ -4095,7 +4185,7 @@ public class TourManager {
 
 //         yDataGears.setLineGaps(tourData.getCadenceGaps());
 
-         setGraphColor(yDataGears, GraphColorManager.PREF_GRAPH_GEAR);
+         setGraphColors(yDataGears, GraphColorManager.PREF_GRAPH_GEAR);
          chartDataModel.addXyData(yDataGears);
       }
       return yDataGears;
@@ -4128,7 +4218,7 @@ public class TourManager {
             yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
          }
 
-         setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
+         setGraphColors(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
          chartDataModel.addXyData(yDataGradient);
 
          // adjust min/max values when it's defined in the pref store
@@ -4146,65 +4236,351 @@ public class TourManager {
 
    /**
     * Heartbeat
+    *
+    * @param isShowTimeOnXAxis
     */
    private ChartDataYSerie createModelData_Heartbeat(final TourData tourData,
                                                      final ChartDataModel chartDataModel,
                                                      final ChartType chartType,
                                                      final boolean useGraphBgStyle,
-                                                     final TourChartConfiguration tcc) {
+                                                     final TourChartConfiguration tcc,
+                                                     final boolean isShowTimeOnXAxis) {
 
       ChartDataYSerie yDataPulse = null;
 
       final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
-      final float[] pulseTimeSerie = tourData.getPulse_RRIntervals();
+      final float[] avgBpmFromRRIntervals = tourData.getPulse_AvgBpmFromRRIntervals();
 
-      final boolean isPulseSerie = pulseSerie != null;
-      final boolean isPulseTimeSerie = pulseTimeSerie != null;
+      final boolean isAvailable_PulseSerie = pulseSerie != null;
+      final boolean isAvailable_AvgBpmFromRRIntervals = avgBpmFromRRIntervals != null;
 
-      tcc.canShowPulseSerie = isPulseSerie;
-      tcc.canShowPulseTimeSerie = isPulseTimeSerie;
+      tcc.canShowPulseSerie = isAvailable_PulseSerie;
+      tcc.canShowPulseTimeSerie = isAvailable_AvgBpmFromRRIntervals;
 
       // set graph/line according to the selection
       switch (tcc.pulseGraph) {
-      case DEVICE_BPM_ONLY:
 
-         if (isPulseSerie) {
-            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+      case RR_AVERAGE_ONLY:
+
+         if (isAvailable_AvgBpmFromRRIntervals) {
+            yDataPulse = createChartDataSerie(new float[][] { avgBpmFromRRIntervals }, chartType);
          }
          break;
 
       case RR_INTERVALS_ONLY:
+      case RR_INTERVALS___2ND_RR_AVERAGE:
+      case RR_INTERVALS___2ND_DEVICE_BPM:
 
-         if (isPulseTimeSerie) {
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+         final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
+
+         if (isAvailable_AvgBpmFromRRIntervals && allRRTimesInMilliseconds != null) {
+
+            // data serie which has the same number of slices as the time serie
+            final float[] dataSerie = tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM
+                  ? pulseSerie
+                  : avgBpmFromRRIntervals;
+
+            if (isShowTimeOnXAxis == false) {
+
+               // distance is displayed on the x-axis
+               //
+               // -> too complicated to show the correct RR graph
+               // -> show RR avg or device bpm graph
+
+               yDataPulse = createChartDataSerieNoZero(dataSerie, ChartType.LINE);
+
+               break;
+            }
+
+            final ChartType rrChartType = tcc.pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+
+                  ? ChartType.VARIABLE_X_AXIS
+
+                  // used for RR average and device bpm
+                  : ChartType.VARIABLE_X_AXIS_WITH_2ND_LINE;
+
+            // set a data serie for the 2nd line when it's displayed,
+            // when not displayed it is used to compute visible graph min/max values
+            yDataPulse = createChartDataSerieNoZero(dataSerie, rrChartType);
+
+            final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
+
+            // length: numTimeSlices
+            final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;
+
+            final int numTimeSlices = timeSerie.length;
+            final int numRRTimes = allRRTimesInMilliseconds.length;
+
+            final TDoubleArrayList xData_PulseTime = new TDoubleArrayList((int) (numRRTimes * 1.05));
+            final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
+
+            /**
+             * Syncronize 2 time series which can contain gaps
+             *
+             * <pre>
+             *
+             * x-axis     0----1----2----3----4----5----6----7----10----11----12----13---15-  seconds
+             *
+             * RR times   ------------320---1434-------762---763-------561--785-------1006--  milliseconds
+             *
+             * .
+             * </pre>
+             */
+
+            boolean areInitialRRValuesInvalid = false;
+
+            /*
+             * Adjust all values with the first value, otherwise the graph looks like it is shifted
+             * compared with the device bpm value. This value helps sometimes, but sometimes not.
+             */
+            double firstValueOffset = 0;
+            for (final int rrTimeMS : allRRTimesInMilliseconds) {
+               final double rrSliceTime = rrTimeMS / 1000.0;
+               if (rrSliceTime > 0) {
+                  firstValueOffset = rrSliceTime;
+                  break;
+               }
+            }
+
+            int rrIndex = 0;
+
+            double xAxisRRTime = 0;
+
+            // loop: x-axis time
+            for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+
+               final int xAxisTime = timeSerie[timeIndex];
+               final int rrIndex_FromTimeSerie = timeSerie_WithRRIndex[timeIndex];
+
+               if (rrIndex_FromTimeSerie == -1) {
+
+                  // RR time index is not valid
+
+                  if (xAxisRRTime == 0) {
+
+                     // keep time before RR values are available
+
+                     areInitialRRValuesInvalid = true;
+                  }
+
+               } else {
+
+                  // RR time index is valid
+
+                  // check if the first RR values are invalid
+                  if (areInitialRRValuesInvalid && xAxisRRTime == 0) {
+
+                     // initial RR values are invalid -> adjust start of x-axis RR time
+
+                     xAxisRRTime += xAxisTime;
+
+                     xData_PulseTime.add(xAxisTime);
+                     yData_PulseTime.add(0);
+                  }
+
+                  final int minXAxisDiff = 1;
+
+                  if (xAxisRRTime < xAxisTime) {
+
+                     while (rrIndex < numRRTimes
+
+                           && rrIndex <= rrIndex_FromTimeSerie
+
+                           && xAxisRRTime < xAxisTime
+
+                     ) {
+
+                        final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
+
+                        xAxisRRTime += rrSliceTime;
+                        final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
+
+                        final double xAxisDiff = xAxisRRTime - xAxisTime;
+
+                        if (xAxisDiff > 5) {
+
+                           /**
+                            * <code>
+                            *
+                            * timeIndex               = 8767
+                            * rrIndex                 = 12054
+                            * rrIndex_FromTimeSerie   = 12054
+                            * xAxisRRTime             = 16349.82
+                            * xAxisTime               = 16339
+                            *
+                            * </code>
+                            */
+
+                           xAxisRRTime = xAxisTime;
+
+                           if (_isLogging_RR_Errors) {
+                              System.out.println((System.currentTimeMillis() + " xAxisDiff 1: " + xAxisDiff));//$NON-NLS-1$
+                           }
+                        }
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(bpmFromRRTime);
+
+                        rrIndex++;
+                     }
+
+                     if (xAxisRRTime < xAxisTime - minXAxisDiff) {
+
+                        // RR time is still too small -> adjust RR time to x-Axis time
+
+                        xAxisRRTime += xAxisTime - xAxisRRTime;
+
+                        float yPulseTime = 0;
+                        if (_isLogging_RR_Errors) {
+
+                           yPulseTime = -100;
+
+                        } else {
+
+                           // show previous time
+
+                           final int numPulseTimes = yData_PulseTime.size();
+
+                           if (numPulseTimes > 0) {
+                              yPulseTime = yData_PulseTime.get(numPulseTimes - 1);
+                           }
+                        }
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(yPulseTime);
+                     }
+
+                  } else if (xAxisRRTime > xAxisTime) {
+
+                     // this occured when bpm < 60
+
+                     while (rrIndex < numRRTimes // check array bounds
+
+                           && rrIndex <= rrIndex_FromTimeSerie
+
+                           && xAxisRRTime > xAxisTime
+
+                     ) {
+
+                        final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
+
+                        xAxisRRTime += rrSliceTime;
+                        final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(bpmFromRRTime);
+
+                        rrIndex++;
+                     }
+
+                     final double xAxisDiff = xAxisRRTime - xAxisTime;
+                     if (xAxisDiff > 5) {
+
+                        /**
+                         * <code>
+                         *
+                         * timeIndex               = 8767
+                         * rrIndex                 = 12054
+                         * rrIndex_FromTimeSerie   = 12054
+                         * xAxisRRTime             = 16349.82
+                         * xAxisTime               = 16339
+                         *
+                         * </code>
+                         */
+
+                        xAxisRRTime = xAxisTime;
+
+                        if (_isLogging_RR_Errors) {
+                           System.out.println((System.currentTimeMillis() + " xAxisDiff 2: " + xAxisDiff));//$NON-NLS-1$
+                        }
+                     }
+
+                     if (xAxisRRTime - minXAxisDiff > xAxisTime) {
+
+                        // RR time is still too small -> adjust RR time to x-Axis time
+
+                        rrIndex = rrIndex_FromTimeSerie;
+
+                        xAxisRRTime += xAxisTime - xAxisRRTime;
+
+                        float yPulseTime = 0;
+                        if (_isLogging_RR_Errors) {
+
+                           yPulseTime = 500;
+
+                        } else {
+
+                           // show previous time
+
+                           final int numPulseTimes = yData_PulseTime.size();
+
+                           if (numPulseTimes > 0) {
+                              yPulseTime = yData_PulseTime.get(numPulseTimes - 1);
+                           }
+                        }
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(yPulseTime);
+                     }
+                  }
+               }
+            }
+
+            // set variable xy data after the arrays are filled up
+            chartDataModel.setVariableXYData(
+                  xData_PulseTime.toArray(),
+                  yData_PulseTime.toArray(),
+                  timeSerie_WithRRIndex);
+         }
+
+         break;
+
+      case DEVICE_BPM_ONLY:
+
+         if (isAvailable_PulseSerie) {
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
          }
          break;
 
-      case RR_INTERVALS__2ND_DEVICE_BPM:
+      case RR_AVERAGE___2ND_DEVICE_BPM:
 
-         if (isPulseSerie && isPulseTimeSerie) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseTimeSerie, pulseSerie }, chartType);
+         if (isAvailable_PulseSerie && isAvailable_AvgBpmFromRRIntervals) {
+
+            yDataPulse = createChartDataSerie(new float[][]
+
+            {
+                  avgBpmFromRRIntervals,
+                  pulseSerie
+            },
+                  chartType);
          }
          break;
 
-      case DEVICE_BPM__2ND__RR_INTERVALS:
+      case DEVICE_BPM___2ND_RR_AVERAGE:
       default:
 
-         if (isPulseSerie && isPulseTimeSerie) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, pulseTimeSerie }, chartType);
+         if (isAvailable_PulseSerie && isAvailable_AvgBpmFromRRIntervals) {
+
+            yDataPulse = createChartDataSerie(new float[][]
+
+            {
+                  pulseSerie,
+                  avgBpmFromRRIntervals
+            },
+                  chartType);
          }
       }
 
       // when user selection could not be applied, try to use the remaining possibilities
       if (yDataPulse == null) {
 
-         if (isPulseSerie) {
+         if (isAvailable_PulseSerie) {
 
             yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
 
-         } else if (isPulseTimeSerie) {
+         } else if (isAvailable_AvgBpmFromRRIntervals) {
 
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+            yDataPulse = createChartDataSerieNoZero(avgBpmFromRRIntervals, chartType);
          }
       }
 
@@ -4222,7 +4598,7 @@ public class TourManager {
             yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+         setGraphColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
          chartDataModel.addXyData(yDataPulse);
 
          // adjust  min/max values when it's defined in the pref store
@@ -4267,7 +4643,7 @@ public class TourManager {
             yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
+         setGraphColors(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
          chartDataModel.addXyData(yDataPace);
 
          // adjust min/max values when it's defined in the pref store
@@ -4310,7 +4686,7 @@ public class TourManager {
             yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataPower, GraphColorManager.PREF_GRAPH_POWER);
+         setGraphColors(yDataPower, GraphColorManager.PREF_GRAPH_POWER);
          chartDataModel.addXyData(yDataPower);
 
          // adjust min/max values when it's defined in the pref store
@@ -4354,7 +4730,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4400,7 +4776,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4444,7 +4820,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4489,7 +4865,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4534,7 +4910,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4578,7 +4954,7 @@ public class TourManager {
             yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+         setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
          chartDataModel.addXyData(yDataSpeed);
 
          // adjust  min/max values when it's defined in the pref store
@@ -4622,7 +4998,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_STROKES);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_STROKES);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4666,7 +5042,7 @@ public class TourManager {
             yDataSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
          }
 
-         setGraphColor(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_SWOLF);
+         setGraphColors(yDataSerie, GraphColorManager.PREF_GRAPH_SWIM_SWOLF);
          chartDataModel.addXyData(yDataSerie);
 
          // adjust min/max values when it's defined in the pref store
@@ -4710,7 +5086,7 @@ public class TourManager {
             yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+         setGraphColors(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
          chartDataModel.addXyData(yDataTemperature);
 
          // adjust min/max values when it's defined in the pref store
@@ -4749,7 +5125,7 @@ public class TourManager {
          yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
 
-         setGraphColor(yDataTourCompare, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
+         setGraphColors(yDataTourCompare, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
          chartDataModel.addXyData(yDataTourCompare);
       }
 
@@ -4981,25 +5357,11 @@ public class TourManager {
        */
       if (_tourDataEditorInstance.isDirty()) {
 
-         final String error = "ERROR: " //                                             //$NON-NLS-1$
-               + "The internal structure of the application is out of synch.\n"//               //$NON-NLS-1$
-               + "\n" //                                                         //$NON-NLS-1$
-               + "You can solve the problem by:\n"//                                    //$NON-NLS-1$
-               + "\n"//                                                         //$NON-NLS-1$
-               + "Save or revert the tour in the tour editor and select another tour\n"//         //$NON-NLS-1$
-               + "\n\n" //                                                         //$NON-NLS-1$
-               + "The tour editor contains the selected tour, but the data are different.\n" //   //$NON-NLS-1$
-               + "\n" //                                                         //$NON-NLS-1$
-               + ("Tour in Editor:" + tourDataForEditor.toStringWithHash() + "\n") //            //$NON-NLS-1$ //$NON-NLS-2$
-               + ("Selected Tour: " + tourDataInEditor.toStringWithHash() + "\n") //            //$NON-NLS-1$ //$NON-NLS-2$
-               + "\n\n" //                                                         //$NON-NLS-1$
-               + "You should also inform the author of the application how this error occured." //   //$NON-NLS-1$
-               + " However it isn't very easy to find out, what actions are exactly done," //      //$NON-NLS-1$
-               + " before this error occured. \n" //                                    //$NON-NLS-1$
-               + "\n" //                                                         //$NON-NLS-1$
-               + "These actions must be reproducable otherwise the bug cannot be identified."; //   //$NON-NLS-1$
-
-         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", error); //$NON-NLS-1$
+         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+               Messages.TourManager_Dialog_OutOfSyncError_Title,
+               NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
+                     tourDataForEditor.toStringWithHash(),
+                     tourDataInEditor.toStringWithHash()));
 
       } else {
 

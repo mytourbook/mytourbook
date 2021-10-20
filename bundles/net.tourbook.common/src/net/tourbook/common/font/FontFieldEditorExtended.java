@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -149,7 +149,7 @@ public class FontFieldEditorExtended extends FieldEditor {
        * @return the preferred size of the previewer.
        */
       public int getPreferredWidth() {
-         return convertHorizontalDLUsToPixels(_txtPreviewText, 40 * 4);
+         return convertHorizontalDLUsToPixels(_txtPreviewText, 30 * 4);
       }
 
       public void setEnabled(final boolean isEnabled) {
@@ -611,7 +611,7 @@ public class FontFieldEditorExtended extends FieldEditor {
    @Override
    public void setFocus() {
 
-// this is not working      
+// this is not working
 //    _btnChangeFont.setFocus();
 
       _spinFontSize.setFocus();

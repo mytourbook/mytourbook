@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,16 +15,16 @@
  *******************************************************************************/
 package net.tourbook.ui.views.heartRateVariability;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -45,11 +45,11 @@ import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
-public class SlideoutHRVOptions extends ToolbarSlideout {
+public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private final IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
 
-   private Action                   _actionRestoreDefaults;
+   private ActionResetToDefaults    _actionRestoreDefaults;
 
    private ChartOptions_Grid        _gridUI;
 
@@ -84,18 +84,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -293,12 +282,11 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
       });
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
-      _chkFix2xErrors.setSelection(//
-            _prefStore.getDefaultBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
-      _spinner2xErrorTolerance.setSelection(//
-            _prefStore.getDefaultInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
+      _chkFix2xErrors.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
+      _spinner2xErrorTolerance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
 
       _gridUI.resetToDefaults();
       _gridUI.saveState();
@@ -316,10 +304,8 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, //
-            _chkFix2xErrors.getSelection());
-      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, //
-            _spinner2xErrorTolerance.getSelection());
+      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, _chkFix2xErrors.getSelection());
+      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, _spinner2xErrorTolerance.getSelection());
    }
 
    private void updateUI() {

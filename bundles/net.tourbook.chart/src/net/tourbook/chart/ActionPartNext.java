@@ -28,8 +28,8 @@ public class ActionPartNext extends Action {
       setText(Messages.Action_next_month);
       setToolTipText(Messages.Action_next_month_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Arrow_Right));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Arrow_Right_Disabled));
+      setImageDescriptor(ChartActivator.getImageDescriptor(ChartImages.Arrow_Right));
+      setDisabledImageDescriptor(ChartActivator.getImageDescriptor(ChartImages.Arrow_Right_Disabled));
    }
 
    @Override

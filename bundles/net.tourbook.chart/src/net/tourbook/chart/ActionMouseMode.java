@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,22 +19,22 @@ import org.eclipse.jface.action.Action;
 
 public class ActionMouseMode extends Action {
 
-   private Chart fChart;
+   private Chart _chart;
 
    public ActionMouseMode(final Chart chart) {
 
       super(Messages.Action_mouse_mode, Action.AS_CHECK_BOX);
 
-      fChart = chart;
+      _chart = chart;
 
       setToolTipText(Messages.Action_mouse_mode_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.MouseMode));
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseMode));
    }
 
    @Override
    public void run() {
-      fChart.onExecuteMouseMode(isChecked());
+      _chart.onExecuteMouseMode(isChecked());
    }
 
 }

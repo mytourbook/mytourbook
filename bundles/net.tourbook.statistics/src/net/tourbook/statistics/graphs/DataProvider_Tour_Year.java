@@ -30,7 +30,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
@@ -339,14 +338,9 @@ public class DataProvider_Tour_Year extends DataProvider {
                + "ORDER BY StartYear" + NL //                                 //$NON-NLS-1$
          ;
 
-         final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
+         final boolean isShowMultipleTourTypes = tourTypeFilter.containsMultipleTourTypes();
 
-         int colorOffset = 0;
-         if (isShowNoTourTypes) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
-
-         int numTourTypes = colorOffset + allTourTypes.length;
+         int numTourTypes = allTourTypes.length;
          numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
          final float[][] dbDistance = new float[numTourTypes][numYears];
@@ -431,13 +425,13 @@ public class DataProvider_Tour_Year extends DataProvider {
 
                for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
                   if (dbTypeId == allTourTypes[typeIndex].getTypeId()) {
-                     colorIndex = colorOffset + typeIndex;
+                     colorIndex = typeIndex;
                      break;
                   }
                }
             }
 
-            final long noTourTypeId = isShowNoTourTypes
+            final long noTourTypeId = isShowMultipleTourTypes
                   ? TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
                   : TourType.TOUR_TYPE_IS_NOT_USED;
 
