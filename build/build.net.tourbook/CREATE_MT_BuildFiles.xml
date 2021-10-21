@@ -16,8 +16,8 @@
 	-->
 	<property name="path-root"							value="../../../.." />
 
-	<property name="path-mt-bundles"					value="${path-root}/MT/mytourbook/bundles" />
-	<property name="path-mt-nl"						value="${path-root}/MT/mytourbook/LANGUAGE-FRAGMENTS" />
+	<property name="path-mt-bundles"					value="${path-root}/mytourbook/mytourbook/bundles" />
+	<property name="path-mt-nl"						value="${path-root}/mytourbook/mytourbook/LANGUAGE-FRAGMENTS" />
 
 	<property name="path-mt-build"					value="${path-root}/mytourbook-BUILD-autocreated" />
 
