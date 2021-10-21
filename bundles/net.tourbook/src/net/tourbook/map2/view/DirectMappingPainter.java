@@ -106,6 +106,7 @@ public class DirectMappingPainter implements IDirectPainter {
                               final Image markerImage,
                               final boolean isYPosCenter) {
 
+      //todo fb make the borders thicker ?
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
 
