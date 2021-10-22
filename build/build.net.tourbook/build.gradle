@@ -52,7 +52,7 @@ sonarqube {
     property "sonar.host.url", "https://sonarcloud.io"
     property "sonar.projectBaseDir", "D:/a/mytourbook/mytourbook/bundles"
     property "sonar.sources", "."
-    property "sonar.exclusions", "build/**/*,bundles/net.tourbook.chart/src/net/tourbook/chart/ChartComponentGraph.java,bundles/net.tourbook.ext.jars/**/*,features,LANGUAGE-FRAGMENTS"
+    property "sonar.exclusions", "build/**/*,bundles/net.tourbook.chart/src/net/tourbook/chart/ChartComponentGraph.java,bundles/net.tourbook.ext.jars/**/*,features,LANGUAGE-FRAGMENTS,MESSAGES-EDITOR"
     property "sonar.java.binaries", "."
   }
 }
