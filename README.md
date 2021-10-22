@@ -2,7 +2,7 @@
 [![Build status](https://github.com/fjbdev/mytourbook/actions/workflows/build.yml/badge.svg)](https://sonarcloud.io/project/overview?id=FJBDev_mytourbook)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
 [![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
-[![Latest release](https://img.shields.io/github/tag/wolfgang-ch/mytourbook.svg)](https://GitHub.com/wolfgang-ch/mytourbook.js/tags/)
+[![Latest release](https://img.shields.io/github/tag/wolfgang-ch/mytourbook.svg)](https://GitHub.com/wolfgang-ch/mytourbook/tags/)
 
 # MyTourbook
 
