@@ -3,7 +3,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
 [![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/wolfgang-ch/mytourbook/tags)
 [![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
-[![GitHub tag](https://img.shields.io/github/tag/FJBDev/MyTourbook.js.svg)](https://GitHub.com/FJBDev/MyTourbook.js/tags/)
+[![GitHub tag](https://img.shields.io/github/tag/FJBDev/myTourbook.js.svg)](https://GitHub.com/FJBDev/myTourbook.js/tags/)
 
 # MyTourbook
 
