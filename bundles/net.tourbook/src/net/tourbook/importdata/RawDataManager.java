@@ -3349,6 +3349,11 @@ public class RawDataManager {
 
          oldTourData.getDeviceSensorValues().clear();
          oldTourData.getDeviceSensorValues().addAll(reimportedTourData.getDeviceSensorValues());
+
+         /*
+          * Gear shifting battery
+          */
+         oldTourData.setBatteryLevel_GearShifting(reimportedTourData.getBatteryLevel_GearShifting());
       }
 
       // Cadence

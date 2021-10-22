@@ -96,6 +96,8 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
+   private Short                         _gearShifting_BatteryLevel;
+
    private ImportState_Process           _importState_Process;
 
    public FitData(final FitDataReader fitDataReader,
@@ -258,6 +260,10 @@ public class FitData {
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData, _allGearData);
+
+         if (_gearShifting_BatteryLevel != null) {
+            _tourData.setBatteryLevel_GearShifting(_gearShifting_BatteryLevel);
+         }
 
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
@@ -621,6 +627,10 @@ public class FitData {
       return _allGearData;
    }
 
+   public Short getGearShifting_BatteryLevel() {
+      return _gearShifting_BatteryLevel;
+   }
+
    public String getImportFilePathName() {
       return _importFilePathName;
    }
@@ -756,6 +766,10 @@ public class FitData {
 
    public void setGarminProduct(final String garminProduct) {
       _garminProduct = garminProduct;
+   }
+
+   public void setGearShifting_BatteryLevel(final Short gearShifting_BatteryLevel) {
+      _gearShifting_BatteryLevel = gearShifting_BatteryLevel;
    }
 
    public void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {

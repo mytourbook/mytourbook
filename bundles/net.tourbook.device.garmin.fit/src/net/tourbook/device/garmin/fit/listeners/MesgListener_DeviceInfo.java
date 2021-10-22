@@ -21,6 +21,7 @@ import com.garmin.fit.BodyLocation;
 import com.garmin.fit.DateTime;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
+import com.garmin.fit.Fit;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 import com.garmin.fit.SourceType;
@@ -47,7 +48,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH-mm-ss"); //$NON-NLS-1$
 
-   private boolean                        _isLogDeviceData    = true;
+   private boolean                        _isLogDeviceData;
 
    public MesgListener_DeviceInfo(final FitData fitData) {
 
@@ -113,8 +114,10 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 // SET_FORMATTING_ON
 
       if (true
-//        && serialNumber != null
-//        && batteryVoltage != null
+//       && serialNumber != null
+//       && batteryVoltage != null
+//       && manufacturer != null && manufacturer == 41 // Shimano
+
       ) {
 
          final long javaTime = FitUtils.convertGarminTimeToJavaTime(timestamp.getTimestamp());
@@ -186,6 +189,12 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                removeNull(sensorPosition)
 
          ));
+
+//         final Short batteryLevel = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
+//
+//         System.out.println((System.currentTimeMillis() + " batteryLevel: " + batteryLevel));
+//         // TODO remove SYSTEM.OUT.PRINTLN
+
       }
    }
 
@@ -265,6 +274,15 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          if (hasStrideSensor) {
             fitData.setStrideSensorPresent(hasStrideSensor);
          }
+      }
+
+      /*
+       * Gear shifting battery
+       * https://forums.garmin.com/developer/fit-sdk/f/discussion/276245/di2-battery-level
+       */
+      final Short batteryLevel = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
+      if (batteryLevel != null) {
+         fitData.setGearShifting_BatteryLevel(batteryLevel);
       }
 
       /*

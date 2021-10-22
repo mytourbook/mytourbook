@@ -730,41 +730,45 @@ public class FitDataReader extends TourbookDevice {
 
       final int mesgNum = mesg.getNum();
 
-      boolean isSkip_Message = false
+      boolean isSkipMessage = false
 
-//            || mesgNum == 13 //     13    unknown
-//            || mesgNum == 22 //     22    unknown
-//            || mesgNum == 79 //     79    unknown
-//            || mesgNum == 113 //    113   unknown
-//            || mesgNum == 140 //    140   unknown
-//            || mesgNum == 216 //    216   unknown
-//            || mesgNum == 261 //    261   unknown
-//            || mesgNum == 288 //    288   unknown
-//
-//            || mesgNum == 0 //      FILE_ID
-//            || mesgNum == 2 //      DEVICE_SETTINGS
-//            || mesgNum == 3 //      USER_PROFILE
-//            || mesgNum == 7 //      ZONES_TARGET
-//            || mesgNum == 12 //     SPORT
-//            || mesgNum == 18 //     SESSION
-//            || mesgNum == 19 //     LAP
-//            || mesgNum == 20 //     RECORD
-//            || mesgNum == 21 //     EVENT
-//            || mesgNum == 23 //     DEVICE_INFO
-//            || mesgNum == 34 //     ACTIVITY
-//            || mesgNum == 49 //     FILE_CREATOR
-//            || mesgNum == 72 //     TRAINING_FILE
-//            || mesgNum == 78 //     HRV
-//
-//            || mesgNum == 104 //    Device Battery (not documented)
-//            || mesgNum == 147 //    Registered Device Sensor (not documented)
+            || mesgNum == 13 //     13    unknown
+            || mesgNum == 22 //     22    unknown
+            || mesgNum == 79 //     79    unknown
+            || mesgNum == 113 //    113   unknown
+            || mesgNum == 140 //    140   unknown
+            || mesgNum == 216 //    216   unknown
+            || mesgNum == 261 //    261   unknown
+            || mesgNum == 288 //    288   unknown
+
+            || mesgNum == 0 //      FILE_ID
+            || mesgNum == 2 //      DEVICE_SETTINGS
+            || mesgNum == 3 //      USER_PROFILE
+            || mesgNum == 7 //      ZONES_TARGET
+            || mesgNum == 12 //     SPORT
+            || mesgNum == 18 //     SESSION
+            || mesgNum == 19 //     LAP
+            || mesgNum == 20 //     RECORD
+            || mesgNum == 21 //     EVENT
+            || mesgNum == 23 //     DEVICE_INFO
+            || mesgNum == 34 //     ACTIVITY
+            || mesgNum == 49 //     FILE_CREATOR
+            || mesgNum == 72 //     TRAINING_FILE
+            || mesgNum == 78 //     HRV
+
+            || mesgNum == 104 //    Device Battery (not documented)
+            || mesgNum == 147 //    Registered Device Sensor (not documented)
 
       ;
 
       // hide IDE warning
-      isSkip_Message = !!isSkip_Message;
+      isSkipMessage = !!isSkipMessage;
 
-//      isSkipMessage = false;
+      isSkipMessage = false;
+
+      if (isSkipMessage) {
+         return;
+      }
 
       final Collection<Field> allMessageFields = mesg.getFields();
 
@@ -772,37 +776,34 @@ public class FitDataReader extends TourbookDevice {
 //         return;
       }
 
-      if (isSkip_Message == false) {
+      String messageName = MesgNum.getStringFromValue(mesgNum);
 
-         String messageName = MesgNum.getStringFromValue(mesgNum);
+      if (messageName.length() == 0) {
 
-         if (messageName.length() == 0) {
+         switch (mesgNum) {
+         case 104:
+            messageName = "Device Battery (not documented)"; //$NON-NLS-1$
+            break;
 
-            switch (mesgNum) {
-            case 104:
-               messageName = "Device Battery (not documented)"; //$NON-NLS-1$
-               break;
+         case 147:
+            messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
+            break;
 
-            case 147:
-               messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
-               break;
-
-            default:
-               messageName = mesg.getName();
-               break;
-            }
-
+         default:
+            messageName = mesg.getName();
+            break;
          }
 
-         final boolean isLogMessageHeader = true;
-         if (isLogMessageHeader) {
+      }
 
-            System.out.println(String.format("Message  %3d   %s  Fields: %d", //$NON-NLS-1$
+      final boolean isLogMessageHeader = true;
+      if (isLogMessageHeader) {
 
-                  mesgNum,
-                  messageName,
-                  mesg.getNumFields()));
-         }
+         System.out.println(String.format("Message  %3d   %s  Fields: %d", //$NON-NLS-1$
+
+               mesgNum,
+               messageName,
+               mesg.getNumFields()));
       }
 
       long garminTimestamp = 0;
@@ -817,9 +818,13 @@ public class FitDataReader extends TourbookDevice {
             garminTimestamp = (Long) fieldValue;
          }
 
+//       2   manufacturer 41
+
          boolean isShow_FieldNum = false
 
                || fieldNum == 0 // event
+
+               || fieldNum == 32 // battery_level
 
          ;
 
@@ -832,7 +837,6 @@ public class FitDataReader extends TourbookDevice {
 
          if (StringUtils.isNullOrEmpty(fieldName)
 
-               || isSkip_Message
                || isFieldSkipped(fieldName)
 
          ) {
@@ -850,12 +854,12 @@ public class FitDataReader extends TourbookDevice {
 
                + " %-42s %-10d  %-10s  " //  time     //$NON-NLS-1$
 
-               + " %5d" //       Num                  //$NON-NLS-1$
-               + " %40s" //      Name                 //$NON-NLS-1$
-               + " %20s" //      Value                //$NON-NLS-1$
-               + " %-12s" //     Units                //$NON-NLS-1$
+               + " %5d" //       Field Num            //$NON-NLS-1$
+               + " %40s" //      Field Name           //$NON-NLS-1$
+               + " %20s" //      Field Value          //$NON-NLS-1$
+               + " %-12s" //     Field Units          //$NON-NLS-1$
 
-//               + " %s" //        RawValue             //$NON-NLS-1$
+//             + " %s" //        RawValue             //$NON-NLS-1$
 
                + UI.EMPTY_STRING,
 
@@ -1001,7 +1005,7 @@ public class FitDataReader extends TourbookDevice {
 
          fitBroadcaster.addListener((MesgListener) mesg -> onMesg_ForNotDocumentedMesg(mesg, fitData));
 
-         if (_isLogging_FitData) {
+         if (_isLogging_FitData || false) {
 
             // show debug info
 

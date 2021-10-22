@@ -795,12 +795,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    // ############################################# BATTERY #############################################
 
    /**
-    * Battery start/end values are used for the statistic views,
+    * Battery start/end values of the used recording device
     *
     * -1 indicate that the value is not yet set
     */
    private short                 battery_Percentage_Start      = -1;
    private short                 battery_Percentage_End        = -1;
+
+   /**
+    * Battery level from the shifting device, e.g. Di2 which sends the value to Garmin Edge with D-Fly.
+    *
+    * The value is from 0...100%
+    *
+    * -1 indicate that the value is not yet set
+    */
+   private short                 battery_Level_GearShifting    = -1;
 
     /*
      * The geo bound values are in microdegrees (degrees * 10^6).
@@ -7144,6 +7153,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the battery level for gear shifting in % or -1 when not available
+    */
+   public short getBatteryLevel_GearShifting() {
+      return battery_Level_GearShifting;
+   }
+
+   /**
     * @return Returns the body fat.
     */
    public float getBodyFat() {
@@ -9851,6 +9867,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setBattery_Time(final int[] battery_Time) {
       this.battery_Time = battery_Time;
+   }
+
+   public void setBatteryLevel_GearShifting(final short battery_Level_GearShifting) {
+      this.battery_Level_GearShifting = battery_Level_GearShifting;
    }
 
    /**

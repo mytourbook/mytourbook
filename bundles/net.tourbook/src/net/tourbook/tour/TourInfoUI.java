@@ -75,7 +75,7 @@ public class TourInfoUI {
    private static final int              MAX_DATA_WIDTH           = 300;
 
    private static final String           BATTERY_FORMAT           = "... %d %%";                                                                //$NON-NLS-1$
-   private static final String           REAR_SHIFT_FORMAT        = "/  ";                                                                      //$NON-NLS-1$
+   private static final String           GEAR_SHIFT_FORMAT        = "%d / %d";                                                                  //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStoreCommon         = CommonActivator.getPrefStore();
 
@@ -118,6 +118,7 @@ public class TourInfoUI {
    private boolean _hasBattery;
    private boolean _hasDescription;
    private boolean _hasGears;
+   private boolean _hasGearShiftingBattery;
    private boolean _hasRunDyn;
    private boolean _hasTags;
    private boolean _hasTourType;
@@ -214,8 +215,11 @@ public class TourInfoUI {
    private Label     _lblDistanceUnit;
    private Label     _lblGear;
    private Label     _lblGear_Spacer;
-   private Label     _lblGear_FrontShifts;
-   private Label     _lblGear_RearShifts;
+   private Label     _lblGear_GearShifts;
+   private Label     _lblGear_GearShifts_Spacer;
+   private Label     _lblGearShiftingBattery;
+   private Label     _lblGearShiftingBattery_Value;
+   private Label     _lblGearShiftingBattery_Unit;
    private Label     _lblMaxAltitude;
    private Label     _lblMaxAltitudeUnit;
    private Label     _lblMaxPace;
@@ -341,6 +345,7 @@ public class TourInfoUI {
       _hasBattery = tourData.getBattery_Percentage_Start() != -1;
       _hasDescription = tourDescription != null && tourDescription.length() > 0;
       _hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
+      _hasGearShiftingBattery = tourData.getBatteryLevel_GearShifting() != -1;
       _hasTags = tourTags != null && tourTags.size() > 0;
       _hasTourType = tourType != null;
       _hasWeather = _tourData.getWeather().length() > 0;
@@ -713,8 +718,16 @@ public class TourInfoUI {
        */
       _lblGear = createUI_Label(parent, Messages.Tour_Tooltip_Label_GearShifts);
 
-      _lblGear_FrontShifts = createUI_LabelValue(parent, SWT.TRAIL);
-      _lblGear_RearShifts = createUI_LabelValue(parent, SWT.LEAD);
+      _lblGear_GearShifts = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblGear_GearShifts_Spacer = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Gear shifting battery, e.g. 80 %
+       */
+      _lblGearShiftingBattery = createUI_Label(parent, Messages.Tour_Tooltip_Label_GearShiftingBattery);
+
+      _lblGearShiftingBattery_Value = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblGearShiftingBattery_Unit = createUI_LabelValue(parent, SWT.LEAD);
    }
 
    private void createUI_40_Column_2(final Composite parent) {
@@ -864,7 +877,7 @@ public class TourInfoUI {
 
       {
          /*
-          * Battery 88...56 %
+          * Device battery, e.g. 88...56 %
           */
          _lblBattery = createUI_Label(parent, Messages.Tour_Tooltip_Label_Battery);
 
@@ -1073,7 +1086,7 @@ public class TourInfoUI {
       _lowerPartContainer.setForeground(_fgColor);
       _lowerPartContainer.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
-      GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(_lowerPartContainer);
+      GridLayoutFactory.fillDefaults().numColumns(2).spacing(16, 0).applyTo(_lowerPartContainer);
 //      _lowerPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
       {
          {
@@ -1698,13 +1711,28 @@ public class TourInfoUI {
        * Gears
        */
       if (_hasGears) {
-         _lblGear_FrontShifts.setText(Integer.toString(_tourData.getFrontShiftCount()));
-         _lblGear_RearShifts.setText(REAR_SHIFT_FORMAT + Integer.toString(_tourData.getRearShiftCount()));
+
+         _lblGear_GearShifts.setText(String.format(GEAR_SHIFT_FORMAT,
+               _tourData.getFrontShiftCount(),
+               _tourData.getRearShiftCount()));
       }
+
+      showHideControl(_lblGear_Spacer, _hasGears || _hasGearShiftingBattery);
+
       showHideControl(_lblGear, _hasGears);
-      showHideControl(_lblGear_FrontShifts, _hasGears);
-      showHideControl(_lblGear_RearShifts, _hasGears);
-      showHideControl(_lblGear_Spacer, _hasGears);
+      showHideControl(_lblGear_GearShifts, _hasGears);
+      showHideControl(_lblGear_GearShifts_Spacer, _hasGears);
+
+      /*
+       * Gear shifting battery
+       */
+      if (_hasGearShiftingBattery) {
+         _lblGearShiftingBattery_Value.setText(Short.toString(_tourData.getBatteryLevel_GearShifting()));
+         _lblGearShiftingBattery_Unit.setText(UI.SYMBOL_PERCENTAGE);
+      }
+      showHideControl(_lblGearShiftingBattery, _hasGearShiftingBattery);
+      showHideControl(_lblGearShiftingBattery_Value, _hasGearShiftingBattery);
+      showHideControl(_lblGearShiftingBattery_Unit, _hasGearShiftingBattery);
 
       /*
        * Battery

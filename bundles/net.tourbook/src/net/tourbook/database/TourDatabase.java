@@ -2242,6 +2242,8 @@ public class TourDatabase {
       // sort tags by name
       Collections.sort(tagNames);
 
+      final int numTags = tagNames.size();
+
       // convert list into visible string
       int tagIndex = 0;
       final StringBuilder sb = new StringBuilder();
@@ -2256,8 +2258,10 @@ public class TourDatabase {
             }
          }
 
-         if (isVertical) {
-            // prefix a bullet
+         if (isVertical && numTags > 1) {
+
+            // prefix a bullet but only when multiple tags are available
+
             sb.append(net.tourbook.common.UI.SYMBOL_BULLET + UI.SPACE);
          }
          sb.append(tagName);
@@ -4096,21 +4100,22 @@ public class TourDatabase {
 
             // version 42 end
 
-            // version 45 start  -  after 21.6
+            // version 45 start  -  21.9
 
-            + " Battery_Percentage_Start              SMALLINT DEFAULT 0,                " + NL //$NON-NLS-1$
-            + " Battery_Percentage_End                SMALLINT DEFAULT 0,                " + NL //$NON-NLS-1$
+            /*
+             * The first default values were 0 but only when a new tour db was created
+             * and not when the tour db was updated !!!
+             */
+            + " Battery_Percentage_Start              SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
+            + " Battery_Percentage_End                SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
 
             // version 45 end
 
-            //            // version 35 start  -  18.?
-            //
-            //            + " LatitudeMinE6         INTEGER DEFAULT 0,                    " + NL //$NON-NLS-1$
-            //            + " LatitudeMaxE6         INTEGER DEFAULT 0,                    " + NL //$NON-NLS-1$
-            //            + " LongitudeMinE6        INTEGER DEFAULT 0,                    " + NL //$NON-NLS-1$
-            //            + " LongitudeMaxE6        INTEGER DEFAULT 0,                    " + NL //$NON-NLS-1$
-            //
-            //            // version 35 end ---------
+            // version 46 start  -  after 21.9
+
+            + " Battery_Level_GearShifting            SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
+
+            // version 46 end
 
             // version 5 start
             /**
@@ -8925,6 +8930,14 @@ public class TourDatabase {
 
          if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUE) == false) {
             createTable_DeviceSensorValues(stmt);
+         }
+
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "Battery_Level_GearShifting") == false) { //$NON-NLS-1$
+
+            // add new fields
+            SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Level_GearShifting", DEFAULT_IGNORED); //$NON-NLS-1$
+
+            SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Level_GearShifting"); //$NON-NLS-1$
          }
       }
       stmt.close();
