@@ -30,6 +30,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.PrefPageTourTypeFilterList;
 import net.tourbook.web.WEB;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -51,6 +52,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -262,6 +265,19 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
             _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
             _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
+         }
+         {
+            final PreferenceLinkArea prefLink = new PreferenceLinkArea(
+                  group,
+                  SWT.NONE,
+                  PrefPageTourTypeFilterList.ID,
+                  "The Strava tour filters can be modified in the <a>tour type filter list preference page</a>",
+                  (IWorkbenchPreferenceContainer) getContainer(),
+                  new PrefPageTourTypeFilterList());
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .applyTo(prefLink.getControl());
          }
       }
    }
