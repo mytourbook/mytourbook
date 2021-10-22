@@ -276,8 +276,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    private void enableControls() {
 
-      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) && StringUtils.hasContent(_labelRefreshToken_Value
-            .getText());
+      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) &&
+            StringUtils.hasContent(_labelRefreshToken_Value.getText());
 
       _labelAthleteName_Value.setEnabled(isAuthorized);
       _labelAthleteWebPage.setEnabled(isAuthorized);

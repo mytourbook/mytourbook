@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,12 +15,12 @@
  *******************************************************************************/
 package net.tourbook.map3.ui;
 
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
+
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -36,7 +36,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 
    private static final int   SHELL_MARGIN    = 0;
 
-   public static final Double DEFAULT_OPACITY = new Double(1.0);
+   public static final Double DEFAULT_OPACITY = Double.valueOf(1.0);
 
    // initialize with default values which are (should) never be used
    private Rectangle       _toolTipItemBounds = new Rectangle(0, 0, 50, 50);
@@ -62,7 +62,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 
       super(ownerControl);
 
-      addListener(ownerControl, toolBar);
+      addListener(toolBar);
 
       setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
       setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
@@ -72,16 +72,11 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
       setFadeOutDelaySteps(1);
    }
 
-   private void addListener(final Control ownerControl, final ToolBar toolBar) {
+   private void addListener(final ToolBar toolBar) {
 
-      toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-         @Override
-         public void mouseExit(final MouseEvent e) {
-
-            // prevent to open the tooltip
-            _canOpenToolTip = false;
-         }
-      });
+      // prevent to open the tooltip
+      toolBar.addMouseTrackListener(mouseExitAdapter(
+            mouseEvent -> _canOpenToolTip = false));
    }
 
    @Override
