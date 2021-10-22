@@ -22,7 +22,14 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: gradle
+    - name: Cache Gradle packages
+      uses: gradle/gradle-build-action@v1
+      with:
+          gradle-version: 6.9
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
     - name: Grant execute permission for gradlew
       run: chmod +x ./build/build.net.tourbook/gradlew
     - name: Build with Gradle
-      run: ./build/build.net.tourbook/gradlew build
+      run: ./build/build.net.tourbook/gradlew mt_10_CreateBuildFiles mt_20_BuildProduct mt_30_CopyProduct mt_40_ExtractWinFiles
