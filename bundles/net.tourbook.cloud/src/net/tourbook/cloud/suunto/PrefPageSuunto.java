@@ -287,8 +287,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    private void enableControls() {
 
-      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) && StringUtils.hasContent(_labelRefreshToken_Value
-            .getText());
+      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText())
+            && StringUtils.hasContent(_labelRefreshToken_Value.getText());
 
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);

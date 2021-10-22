@@ -42,7 +42,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
@@ -51,7 +50,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -93,7 +91,7 @@ public class StatisticValuesView extends ViewPart {
    private Composite  _pageContent;
 
    /**
-    * Usinge {@link Text} or {@link StyledText}
+    * Using {@link Text} or {@link StyledText}
     * <p>
     * {@link Text}
     * <p>
@@ -250,41 +248,35 @@ public class StatisticValuesView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
 
-               // update font
+            // update font
 
-               final Font logFont = net.tourbook.ui.UI.getLogFont();
+            final Font logFont = net.tourbook.ui.UI.getLogFont();
 
-               // ensure the font is valid, this case occurred in Ubuntu
-               if (logFont != null) {
+            // ensure the font is valid, this case occurred in Ubuntu
+            if (logFont != null) {
 
-                  _txtStatValues.setFont(logFont);
-               }
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
-
-               updateUI();
+               _txtStatValues.setFont(logFont);
             }
+
+         } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+
+            updateUI();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
-            }
+            // measurement system has changed
          }
       };
 
@@ -294,25 +286,22 @@ public class StatisticValuesView extends ViewPart {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == StatisticValuesView.this) {
-               return;
-            }
+         if (workbenchPart == StatisticValuesView.this) {
+            return;
+         }
 
-            if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+         if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-               clearView();
+            clearView();
 
-            } else if ((eventId == TourEventId.STATISTIC_VALUES)) {
+         } else if ((tourEventId == TourEventId.STATISTIC_VALUES)) {
 
-               // new statistic values are retrieved from the StatisticManager
+            // new statistic values are retrieved from the StatisticManager
 
-               updateUI();
-               enableActions();
-            }
+            updateUI();
+            enableActions();
          }
       };
 

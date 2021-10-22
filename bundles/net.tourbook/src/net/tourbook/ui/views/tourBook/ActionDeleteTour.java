@@ -312,19 +312,17 @@ public class ActionDeleteTour extends Action {
 
       if (numSelectedTours < 2) {
 
+         // delete selected tours
          final Runnable deleteRunnable = () -> deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, null);
          BusyIndicator.showWhile(Display.getCurrent(), deleteRunnable);
 
       } else {
 
-         final IRunnableWithProgress deleteRunnable = new IRunnableWithProgress() {
-            @Override
-            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-               // delete selected tours
-               deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, monitor);
-            }
-         };
+         // delete selected tours
+         final IRunnableWithProgress deleteRunnable = monitor -> deleteTours(selectedTourIDs,
+               treeSelection[0],
+               selectionForDeletedTours,
+               monitor);
 
          try {
             new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, deleteRunnable);
