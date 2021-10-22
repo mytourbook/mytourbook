@@ -31,4 +31,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./build/build.net.tourbook/gradlew
     - name: Build with Gradle
-      run: ./build/build.net.tourbook/gradlew build
+      run: ./build/build.net.tourbook/gradlew build2
