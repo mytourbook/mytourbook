@@ -30,7 +30,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
@@ -52,7 +51,7 @@ public abstract class TourbookStatistic {
    protected static final String STATE_BAR_ORDERING_YEAR_DISTANCE           = "STATE_BAR_ORDERING_YEAR_DISTANCE";           //$NON-NLS-1$
    protected static final String STATE_BAR_ORDERING_YEAR_SUMMARY            = "STATE_BAR_ORDERING_YEAR_SUMMARY";            //$NON-NLS-1$
    protected static final String STATE_BAR_ORDERING_YEAR_TIME               = "STATE_BAR_ORDERING_YEAR_TIME";               //$NON-NLS-1$
-   protected static final String STATE_BAR_ORDERING_YEAR_ATHLETEDATA        = "STATE_BAR_ORDERING_YEAR_WEIGHT";             //$NON-NLS-1$
+   protected static final String STATE_BAR_ORDERING_YEAR_ATHLETEDATA        = "STATE_BAR_ORDERING_YEAR_ATHLETEDATA";        //$NON-NLS-1$
 
    protected static final String STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH = "STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH"; ////$NON-NLS-1$
 
@@ -65,25 +64,25 @@ public abstract class TourbookStatistic {
    protected static final String    GRID_DAY_DISTANCE      = "GRID_DAY_DISTANCE__";         //$NON-NLS-1$
    protected static final String    GRID_DAY_SUMMARY       = "GRID_DAY_SUMMARY__";          //$NON-NLS-1$
    protected static final String    GRID_DAY_TIME          = "GRID_DAY_TIME__";             //$NON-NLS-1$
-   protected static final String    GRID_DAY_ATHLETEDATA   = "GRID_DAY_WEIGHT__";           //$NON-NLS-1$
+   protected static final String    GRID_DAY_ATHLETEDATA   = "GRID_DAY_ATHLETEDATA__";      //$NON-NLS-1$
 
    protected static final String    GRID_WEEK_ALTITUDE     = "GRID_WEEK_ALTITUDE__";        //$NON-NLS-1$
    protected static final String    GRID_WEEK_DISTANCE     = "GRID_WEEK_DISTANCE__";        //$NON-NLS-1$
    protected static final String    GRID_WEEK_SUMMARY      = "GRID_WEEK_SUMMARY__";         //$NON-NLS-1$
    protected static final String    GRID_WEEK_TIME         = "GRID_WEEK_TIME__";            //$NON-NLS-1$
-   protected static final String    GRID_WEEK_ATHLETEDATA  = "GRID_WEEK_WEIGHT__";          //$NON-NLS-1$
+   protected static final String    GRID_WEEK_ATHLETEDATA  = "GRID_WEEK_ATHLETEDATA__";     //$NON-NLS-1$
 
    protected static final String    GRID_MONTH_ALTITUDE    = "GRID_MONTH_ALTITUDE__";       //$NON-NLS-1$
    protected static final String    GRID_MONTH_DISTANCE    = "GRID_MONTH_DISTANCE__";       //$NON-NLS-1$
    protected static final String    GRID_MONTH_SUMMARY     = "GRID_MONTH_SUMMARY__";        //$NON-NLS-1$
    protected static final String    GRID_MONTH_TIME        = "GRID_MONTH_TIME__";           //$NON-NLS-1$
-   protected static final String    GRID_MONTH_ATHLETEDATA = "GRID_MONTH_WEIGHT__";         //$NON-NLS-1$
+   protected static final String    GRID_MONTH_ATHLETEDATA = "GRID_MONTH_ATHLETEDATA__";    //$NON-NLS-1$
 
    protected static final String    GRID_YEAR_ALTITUDE     = "GRID_YEAR_ALTITUDE__";        //$NON-NLS-1$
    protected static final String    GRID_YEAR_DISTANCE     = "GRID_YEAR_DISTANCE__";        //$NON-NLS-1$
    protected static final String    GRID_YEAR_SUMMARY      = "GRID_YEAR_SUMMARY__";         //$NON-NLS-1$
    protected static final String    GRID_YEAR_TIME         = "GRID_YEAR_TIME__";            //$NON-NLS-1$
-   protected static final String    GRID_YEAR_ATHLETEDATA  = "GRID_YEAR_WEIGHT__";          //$NON-NLS-1$
+   protected static final String    GRID_YEAR_ATHLETEDATA  = "GRID_YEAR_ATHLETEDATA__";     //$NON-NLS-1$
 
    protected static final String    GRID_WEEK_HR_ZONE      = "GRID_WEEK_HR_ZONE__";         //$NON-NLS-1$
    protected static final String    GRID_MONTH_HR_ZONE     = "GRID_MONTH_HR_ZONE__";        //$NON-NLS-1$
@@ -135,32 +134,29 @@ public abstract class TourbookStatistic {
       final String gridIsVGridline = gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
 
       // create pref listener
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            final String property = event.getProperty();
+      _prefChangeListener = propertyChangeEvent -> {
+         final String property = propertyChangeEvent.getProperty();
 
-            // test if the color or statistic data have changed
-            if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-                  //
-                  || property.equals(gridHDistance)
-                  || property.equals(gridVDistance)
-                  || property.equals(gridIsHGridline)
-                  || property.equals(gridIsVGridline)
+         // test if the color or statistic data have changed
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+               //
+               || property.equals(gridHDistance)
+               || property.equals(gridVDistance)
+               || property.equals(gridIsHGridline)
+               || property.equals(gridIsVGridline)
 
-                  || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
-                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
-            //
-            ) {
+               || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+               || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+               || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
+         //
+         ) {
 
-               _isInPrefUpdate = true;
-               {
-                  // update chart
-                  preferencesHasChanged();
-               }
-               _isInPrefUpdate = false;
+            _isInPrefUpdate = true;
+            {
+               // update chart
+               preferencesHasChanged();
             }
+            _isInPrefUpdate = false;
          }
       };
 
