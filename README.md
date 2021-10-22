@@ -2,6 +2,7 @@
 ![Build](https://github.com/fjbdev/mytourbook/actions/workflows/build.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
 [![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/wolfgang-ch/mytourbook/tags)
+[![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
 # MyTourbook
 
 All documentations for this project are available on the website <http://mytourbook.sourceforge.net>
