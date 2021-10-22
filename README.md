@@ -1,6 +1,6 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
-![Build](https://github.com/fjbdev/mytourbook/actions/workflows/build.yml/badge.svg)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+![Build](https://github.com/fjbdev/mytourbook/actions/workflows/build.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
 [![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/wolfgang-ch/mytourbook/tags)
 # MyTourbook
 
