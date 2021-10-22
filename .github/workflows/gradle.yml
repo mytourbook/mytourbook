@@ -25,4 +25,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./build/build.net.tourbook/gradlew
     - name: Build with Gradle
-      run: ./build/build.net.tourbook/gradlew mt_10_CreateBuildFiles mt_20_BuildProduct mt_30_CopyProduct mt_40_ExtractWinFiles
+      run: ./build/build.net.tourbook/gradlew build
