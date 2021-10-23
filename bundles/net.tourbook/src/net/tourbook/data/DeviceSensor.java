@@ -301,6 +301,22 @@ public class DeviceSensor implements Cloneable {
       this.description = description;
    }
 
+   public void setManufacturerName(final String manufacturerName) {
+      this.manufacturerName = manufacturerName;
+   }
+
+   public void setManufacturerNumber(final int manufacturerNumber) {
+      this.manufacturerNumber = manufacturerNumber;
+   }
+
+   public void setProductName(final String productName) {
+      this.productName = productName;
+   }
+
+   public void setProductNumber(final int productNumber) {
+      this.productNumber = productNumber;
+   }
+
    public void setSensorName(final String label) {
       this.sensorName = label;
    }

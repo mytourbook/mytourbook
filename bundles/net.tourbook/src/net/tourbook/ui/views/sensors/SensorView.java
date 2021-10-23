@@ -343,11 +343,6 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    }
 
-   private static String getCheckedValue(final String value) {
-
-      return value == null ? UI.EMPTY_STRING : value;
-   }
-
    private void addPartListener() {
 
       _partListener = new IPartListener2() {

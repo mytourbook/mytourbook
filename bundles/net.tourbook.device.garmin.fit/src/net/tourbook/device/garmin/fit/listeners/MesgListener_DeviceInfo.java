@@ -28,6 +28,7 @@ import com.garmin.fit.SourceType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.DeviceSensor;
@@ -35,6 +36,7 @@ import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.FitUtils;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 
 import org.joda.time.format.DateTimeFormat;
@@ -59,6 +61,40 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       if (_isLogDeviceData) {
          logDeviceData_Header();
       }
+   }
+
+   private String getManufacturerName(final Integer manufacturerNumber) {
+
+      String manufacturerName = UI.EMPTY_STRING;
+
+      if (manufacturerNumber != null) {
+         manufacturerName = Manufacturer.getStringFromValue(manufacturerNumber);
+      }
+
+      if (manufacturerName.length() == 0 && manufacturerNumber != null) {
+         manufacturerName = manufacturerNumber.toString();
+      }
+
+      return manufacturerName;
+   }
+
+   private String getProductName(final Integer productNumber, final String productName, final Integer garminProductNumber) {
+
+      String sensorProductName = UI.EMPTY_STRING;
+
+      if (garminProductNumber != null) {
+         sensorProductName = GarminProduct.getStringFromValue(garminProductNumber);
+      }
+
+      if (sensorProductName.length() == 0 && productName != null) {
+         sensorProductName = productName;
+      }
+
+      if (sensorProductName.length() == 0 && productNumber != null) {
+         sensorProductName = productNumber.toString();
+      }
+
+      return sensorProductName;
    }
 
    private boolean hasHeartRateSensor(final Short deviceType) {
@@ -189,12 +225,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                removeNull(sensorPosition)
 
          ));
-
-//         final Short batteryLevel = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
-//
-//         System.out.println((System.currentTimeMillis() + " batteryLevel: " + batteryLevel));
-//         // TODO remove SYSTEM.OUT.PRINTLN
-
       }
    }
 
@@ -345,28 +375,28 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
 //    final DateTime       timestamp            = mesg.getTimestamp();
 
-      final Integer        manufacturer         = mesg.getManufacturer();
-      final Integer        product              = mesg.getProduct();
-      final String         productName          = mesg.getProductName();
-      final Integer        garminProduct        = mesg.getGarminProduct();
-//    final String         descriptor           = mesg.getDescriptor();
+      final Integer        mesgManufacturerNumber   = mesg.getManufacturer();
+      final Integer        mesgProductNumber        = mesg.getProduct();
+      final String         mesgProductName          = mesg.getProductName();
+      final Integer        mesgGarminProductNumber  = mesg.getGarminProduct();
+//    final String         mesgDescriptor           = mesg.getDescriptor();
 
-//    final Short          batteryStatus        = mesg.getBatteryStatus();
-      final Float          batteryVoltage       = mesg.getBatteryVoltage();
-//    final Long           cumOperatingTime     = mesg.getCumOperatingTime();
+//    final Short          mesgBatteryStatus        = mesg.getBatteryStatus();
+      final Float          mesgBatteryVoltage       = mesg.getBatteryVoltage();
+//    final Long           mesgCumOperatingTime     = mesg.getCumOperatingTime();
 
-//    final Short          deviceIndex          = mesg.getDeviceIndex();
-//    final Short          hardwareVersion      = mesg.getHardwareVersion();
-//    final Float          softwareVersion      = mesg.getSoftwareVersion();
+//    final Short          mesgDeviceIndex          = mesg.getDeviceIndex();
+//    final Short          mesgHardwareVersion      = mesg.getHardwareVersion();
+//    final Float          mesgSoftwareVersion      = mesg.getSoftwareVersion();
 //
-//    final AntNetwork     antNetwork           = mesg.getAntNetwork();
-//    final Short          antDeviceType        = mesg.getAntDeviceType();
-//    final Integer        antDeviceNumber      = mesg.getAntDeviceNumber();
-//    final Short          antplusDeviceType    = mesg.getAntplusDeviceType();
-//    final Short          antTransmissionType  = mesg.getAntTransmissionType();
+//    final AntNetwork     mesgAntNetwork           = mesg.getAntNetwork();
+//    final Short          mesgAntDeviceType        = mesg.getAntDeviceType();
+//    final Integer        mesgAntDeviceNumber      = mesg.getAntDeviceNumber();
+//    final Short          mesgAntplusDeviceType    = mesg.getAntplusDeviceType();
+//    final Short          mesgAntTransmissionType  = mesg.getAntTransmissionType();
 //
-//    final SourceType     sourceType           = mesg.getSourceType();
-//    final BodyLocation   sensorPosition       = mesg.getSensorPosition();
+//    final SourceType     mesgSourceType           = mesg.getSourceType();
+//    final BodyLocation   mesgSensorPosition       = mesg.getSensorPosition();
 
 // SET_FORMATTING_ON
 
@@ -384,40 +414,82 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          // create sensor
 
          /*
-          * Sensor manufacturer
+          * Sensor names
           */
-         String manufacturerName = UI.EMPTY_STRING;
-
-         if (manufacturer != null) {
-            manufacturerName = Manufacturer.getStringFromValue(manufacturer);
-         }
-         if (manufacturerName.length() == 0 && manufacturer != null) {
-            manufacturerName = manufacturer.toString();
-         }
-
-         /*
-          * Sensor product
-          */
-         String sensorProductName = UI.EMPTY_STRING;
-
-         if (garminProduct != null) {
-            sensorProductName = GarminProduct.getStringFromValue(garminProduct);
-         }
-
-         if (sensorProductName.length() == 0 && productName != null) {
-            sensorProductName = productName;
-         }
-
-         if (sensorProductName.length() == 0 && product != null) {
-            sensorProductName = product.toString();
-         }
+         final String manufacturerName = getManufacturerName(mesgManufacturerNumber);
+         final String productName = getProductName(mesgProductNumber, mesgProductName, mesgGarminProductNumber);
 
          sensor = RawDataManager.createDeviceSensor(
-               manufacturer == null ? -1 : manufacturer,
+
+               mesgManufacturerNumber == null ? -1 : mesgManufacturerNumber,
                manufacturerName,
-               product == null ? -1 : product,
-               sensorProductName,
+
+               mesgProductNumber == null ? -1 : mesgProductNumber,
+               productName,
+
                sensorSerialNumberKey);
+      }
+
+      boolean isProductUpdated = false;
+      boolean isManufacturerUpdated = false;
+
+      /*
+       * It is possible that a manufacturer/product number is null/-1, try to set the sensor
+       * manufacturer/product number/name from another tour
+       */
+      if (true
+
+            // manufacturer number is available
+            && mesgManufacturerNumber != null &&
+
+            // manufacturer number is not yet set in the sensor
+            sensor.getManufacturerNumber() == -1) {
+
+         /*
+          * Update sensor (saved or not saved) entity
+          */
+         sensor.setManufacturerNumber(mesgManufacturerNumber);
+         sensor.setManufacturerName(getManufacturerName(mesgManufacturerNumber));
+
+         isManufacturerUpdated = true;
+      }
+
+      if (true
+
+            // product number is available
+            && mesgProductNumber != null &&
+
+            // product number is not yet set in the sensor
+            sensor.getProductNumber() == -1) {
+
+         /*
+          * Update sensor (saved or not saved) entity
+          */
+         sensor.setProductNumber(mesgProductNumber);
+         sensor.setProductName(getProductName(mesgProductNumber, mesgProductName, mesgGarminProductNumber));
+
+         isProductUpdated = true;
+      }
+
+      if (isProductUpdated || isManufacturerUpdated) {
+
+         if (sensor.getSensorId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+            /*
+             * Nothing to do, sensor will be saved when a tour is saved which contains this sensor
+             * in net.tourbook.database.TourDatabase.checkUnsavedTransientInstances_Sensors()
+             */
+
+         } else {
+
+            /*
+             * Notify post process to update the sensor in the db
+             */
+            final ImportState_Process importState_Process = fitData.getImportState_Process();
+            final ConcurrentHashMap<String, DeviceSensor> allDeviceSensorsToBeUpdated = importState_Process.getAllDeviceSensorsToBeUpdated();
+
+            allDeviceSensorsToBeUpdated.put(sensor.getSerialNumber(), sensor);
+         }
       }
 
       final List<DeviceSensorValue> allImportedSensorValues = fitData.getAllDeviceSensorValues();
@@ -436,17 +508,17 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
             sensorValue = importedSensorValue;
 
-            if (batteryVoltage != null) {
+            if (mesgBatteryVoltage != null) {
 
                if (sensorValue.getBatteryVoltage_Start() == -1) {
 
                   // start is not yet set
 
-                  sensorValue.setBatteryVoltage_Start(batteryVoltage);
+                  sensorValue.setBatteryVoltage_Start(mesgBatteryVoltage);
 
                } else {
 
-                  sensorValue.setBatteryVoltage_End(batteryVoltage);
+                  sensorValue.setBatteryVoltage_End(mesgBatteryVoltage);
                }
             }
 
@@ -461,8 +533,8 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
          allImportedSensorValues.add(sensorValue);
 
-         if (batteryVoltage != null) {
-            sensorValue.setBatteryVoltage_Start(batteryVoltage);
+         if (mesgBatteryVoltage != null) {
+            sensorValue.setBatteryVoltage_Start(mesgBatteryVoltage);
          }
       }
 

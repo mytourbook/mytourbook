@@ -821,4 +821,8 @@ public class FitData {
 
       _timeDiffMS = timeDiffMS;
    }
+
+   public ImportState_Process getImportState_Process() {
+      return _importState_Process;
+   }
 }
