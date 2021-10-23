@@ -4113,7 +4113,7 @@ public class TourDatabase {
 
             // version 46 start  -  after 21.9
 
-            + " Battery_Level_GearShifting            SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
+            + " Battery_GearShifting_Level            SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
 
             // version 46 end
 
@@ -8932,12 +8932,12 @@ public class TourDatabase {
             createTable_DeviceSensorValues(stmt);
          }
 
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "Battery_Level_GearShifting") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "Battery_GearShifting_Level") == false) { //$NON-NLS-1$
 
             // add new fields
-            SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Level_GearShifting", DEFAULT_IGNORED); //$NON-NLS-1$
+            SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_GearShifting_Level", DEFAULT_IGNORED); //$NON-NLS-1$
 
-            SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Level_GearShifting"); //$NON-NLS-1$
+            SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_GearShifting_Level"); //$NON-NLS-1$
          }
       }
       stmt.close();

@@ -809,7 +809,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * -1 indicate that the value is not yet set
     */
-   private short                 battery_Level_GearShifting    = -1;
+   private short                 battery_GearShifting_Level    = -1;
 
     /*
      * The geo bound values are in microdegrees (degrees * 10^6).
@@ -7156,7 +7156,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the battery level for gear shifting in % or -1 when not available
     */
    public short getBatteryLevel_GearShifting() {
-      return battery_Level_GearShifting;
+      return battery_GearShifting_Level;
    }
 
    /**
@@ -9869,8 +9869,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.battery_Time = battery_Time;
    }
 
-   public void setBatteryLevel_GearShifting(final short battery_Level_GearShifting) {
-      this.battery_Level_GearShifting = battery_Level_GearShifting;
+   public void setBatteryLevel_GearShifting(final short battery_GearShifting_Level) {
+      this.battery_GearShifting_Level = battery_GearShifting_Level;
    }
 
    /**
