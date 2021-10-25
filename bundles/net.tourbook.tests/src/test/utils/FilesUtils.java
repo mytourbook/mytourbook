@@ -19,11 +19,10 @@ import java.nio.file.Paths;
 
 public class FilesUtils {
 
-	public static final String rootPath = "src/test/"; //$NON-NLS-1$
+   public static final String rootPath = "src/test/"; //$NON-NLS-1$
 
+   public static String getAbsoluteFilePath(final String filePath) {
 
-	public static String getAbsoluteFilePath(final String filePath) {
-
-		return Paths.get(filePath).toAbsolutePath().toString();
+      return Paths.get(filePath).toAbsolutePath().toString();
    }
 }

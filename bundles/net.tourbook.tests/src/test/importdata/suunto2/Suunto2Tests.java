@@ -15,7 +15,6 @@
  *******************************************************************************/
 package importdata.suunto2;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
@@ -32,35 +31,39 @@ import utils.FilesUtils;
 
 class Suunto2Tests {
 
-	private static final String IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto2/files/"; //$NON-NLS-1$
+   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto2/files/"; //$NON-NLS-1$
 
-	private static DeviceData deviceData;
-	private static HashMap<Long, TourData> newlyImportedTours;
-	private static HashMap<Long, TourData> alreadyImportedTours;
-	private static Suunto2_DeviceDataReader deviceDataReader;
+   private static DeviceData               deviceData;
+   private static HashMap<Long, TourData>  newlyImportedTours;
+   private static HashMap<Long, TourData>  alreadyImportedTours;
+   private static Suunto2_DeviceDataReader deviceDataReader;
 
-	@BeforeAll
-	static void initAll() {
-		deviceData = new DeviceData();
-		newlyImportedTours = new HashMap<>();
-		alreadyImportedTours = new HashMap<>();
-		deviceDataReader = new Suunto2_DeviceDataReader();
-	}
+   @BeforeAll
+   static void initAll() {
+      deviceData = new DeviceData();
+      newlyImportedTours = new HashMap<>();
+      alreadyImportedTours = new HashMap<>();
+      deviceDataReader = new Suunto2_DeviceDataReader();
+   }
 
-	/**
-	 * Forest park, Portland, OR
-	 */
-	@Test
-	void testImportForestPark() {
-		final String filePath = IMPORT_FILE_PATH + "log-F783095113000500-2013-05-18T11_00_38-0"; //$NON-NLS-1$
+   /**
+    * Forest park, Portland, OR
+    */
+   @Test
+   void testImportForestPark() {
 
-		final String testFilePath = Paths.get(filePath + ".xml").toAbsolutePath().toString(); //$NON-NLS-1$
+      final String filePath = IMPORT_FILE_PATH + "log-F783095113000500-2013-05-18T11_00_38-0"; //$NON-NLS-1$
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".xml"); //$NON-NLS-1$
 
-		deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours,
-				new ImportState_File(), new ImportState_Process());
+      deviceDataReader.processDeviceData(testFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
-		final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-		Comparison.compareTourDataAgainstControl(tour, filePath);
-	}
+      Comparison.compareTourDataAgainstControl(tour, filePath);
+   }
 }
