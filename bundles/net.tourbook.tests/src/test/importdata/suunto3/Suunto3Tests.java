@@ -15,7 +15,6 @@
  *******************************************************************************/
 package importdata.suunto3;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
@@ -33,7 +32,7 @@ import utils.FilesUtils;
 
 class Suunto3Tests {
 
-	private static final String IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto3/files/"; //$NON-NLS-1$
+   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto3/files/"; //$NON-NLS-1$
 
    private static DeviceData               deviceData;
    private static HashMap<Long, TourData>  newlyImportedTours;
@@ -61,8 +60,7 @@ class Suunto3Tests {
    void testImportForestParkLaps() {
 
       final String filePath = IMPORT_FILE_PATH + "597F0A5112001700-2016-08-27T15_45_41-0"; //$NON-NLS-1$
-
-      final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".sml"); //$NON-NLS-1$
 
       deviceDataReader.processDeviceData(testFilePath,
             deviceData,
@@ -83,8 +81,7 @@ class Suunto3Tests {
    void testImportTimothyLake() {
 
       final String filePath = IMPORT_FILE_PATH + "F783095113000500-2015-05-31T09_51_13-0"; //$NON-NLS-1$
-
-      final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".sml"); //$NON-NLS-1$
 
       deviceDataReader.processDeviceData(testFilePath,
             deviceData,
