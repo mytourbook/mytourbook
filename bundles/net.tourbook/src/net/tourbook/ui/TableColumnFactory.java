@@ -218,12 +218,18 @@ public abstract class TableColumnFactory {
    public static final String             SENSOR_PRODUCT_NUMBER_ID                           = "SENSOR_PRODUCT_NUMBER";                           //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_SERIAL_NUMBER;
    public static final String             SENSOR_SERIAL_NUMBER_ID                            = "SENSOR_SERIAL_NUMBER";                            //$NON-NLS-1$
-   public static final TableColumnFactory SENSOR_STATE_BATTERY_VALUES;
-   public static final String             SENSOR_STATE_BATTERY_VALUES_ID                     = "SENSOR_STATE_BATTERY_VALUES";                     //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_STATE_BATTERY_LEVEL;
+   public static final String             SENSOR_STATE_BATTERY_LEVEL_ID                      = "SENSOR_STATE_BATTERY_LEVEL";                      //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_STATE_BATTERY_STATUS;
+   public static final String             SENSOR_STATE_BATTERY_STATUS_ID                     = "SENSOR_STATE_BATTERY_STATUS";                     //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_STATE_BATTERY_VOLTAGE;
+   public static final String             SENSOR_STATE_BATTERY_VOLTAGE_ID                    = "SENSOR_STATE_BATTERY_VOLTAGE";                    //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_TIME_FIRST_USED;
    public static final String             SENSOR_TIME_FIRST_USED_ID                          = "SENSOR_TIME_FIRST_USED";                          //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_TIME_LAST_USED;
    public static final String             SENSOR_TIME_LAST_USED_ID                           = "SENSOR_TIME_LAST_USED";                           //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_TYPE;
+   public static final String             SENSOR_TYPE_ID                                     = "SENSOR_TYPE";                                     //$NON-NLS-1$
 
    public static final TableColumnFactory STATE_DB_STATUS;
    public static final TableColumnFactory STATE_IMPORT_STATE;
@@ -2780,6 +2786,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_ManufacturerNumber);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ManufacturerNumber);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_ManufacturerNumber);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2818,6 +2825,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_ProductNumber);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ProductNumber);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_ProductNumber);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2844,19 +2852,59 @@ public abstract class TableColumnFactory {
          }
       };
 
-      SENSOR_STATE_BATTERY_VALUES = new TableColumnFactory() {
+      SENSOR_STATE_BATTERY_LEVEL = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_STATE_BATTERY_VALUES_ID, SWT.CENTER);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_STATE_BATTERY_LEVEL_ID, SWT.CENTER);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_StateBatteryValues);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_StateBatteryValues);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_StateBatteryValues_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Level_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Level_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Level_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_STATE_BATTERY_STATUS = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_STATE_BATTERY_STATUS_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Status_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Status_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Status_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_STATE_BATTERY_VOLTAGE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_STATE_BATTERY_VOLTAGE_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Voltage_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Voltage_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Voltage_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2895,6 +2943,26 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_Time_LastUsed);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_Time_LastUsed);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_TYPE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_TYPE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_Type);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_Type);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_Type_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

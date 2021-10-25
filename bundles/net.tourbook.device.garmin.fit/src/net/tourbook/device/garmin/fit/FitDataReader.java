@@ -96,6 +96,30 @@ public class FitDataReader extends TourbookDevice {
       return null;
    }
 
+   private String getMessageName(final Mesg mesg, final int mesgNum) {
+
+      String messageName = MesgNum.getStringFromValue(mesgNum);
+
+      if (messageName.length() == 0) {
+
+         switch (mesgNum) {
+         case 104:
+            messageName = "Device Battery (not documented)"; //$NON-NLS-1$
+            break;
+
+         case 147:
+            messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
+            break;
+
+         default:
+            messageName = mesg.getName();
+            break;
+         }
+      }
+
+      return messageName;
+   }
+
    @Override
    public SerialParameters getPortParameters(final String portName) {
       return null;
@@ -111,6 +135,7 @@ public class FitDataReader extends TourbookDevice {
       return 0;
    }
 
+   @SuppressWarnings("unused")
    private boolean isEventHidden(final Collection<Field> allMessageFields) {
 
       boolean isEventHidden = false;
@@ -750,7 +775,7 @@ public class FitDataReader extends TourbookDevice {
             || mesgNum == 19 //     LAP
             || mesgNum == 20 //     RECORD
             || mesgNum == 21 //     EVENT
-            || mesgNum == 23 //     DEVICE_INFO
+//            || mesgNum == 23 //     DEVICE_INFO
             || mesgNum == 34 //     ACTIVITY
             || mesgNum == 49 //     FILE_CREATOR
             || mesgNum == 72 //     TRAINING_FILE
@@ -770,31 +795,9 @@ public class FitDataReader extends TourbookDevice {
          return;
       }
 
-      final Collection<Field> allMessageFields = mesg.getFields();
-
-      if (isEventHidden(allMessageFields)) {
+//      if (isEventHidden(allMessageFields)) {
 //         return;
-      }
-
-      String messageName = MesgNum.getStringFromValue(mesgNum);
-
-      if (messageName.length() == 0) {
-
-         switch (mesgNum) {
-         case 104:
-            messageName = "Device Battery (not documented)"; //$NON-NLS-1$
-            break;
-
-         case 147:
-            messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
-            break;
-
-         default:
-            messageName = mesg.getName();
-            break;
-         }
-
-      }
+//      }
 
       final boolean isLogMessageHeader = true;
       if (isLogMessageHeader) {
@@ -802,9 +805,11 @@ public class FitDataReader extends TourbookDevice {
          System.out.println(String.format("Message  %3d   %s  Fields: %d", //$NON-NLS-1$
 
                mesgNum,
-               messageName,
+               getMessageName(mesg, mesgNum),
                mesg.getNumFields()));
       }
+
+      final Collection<Field> allMessageFields = mesg.getFields();
 
       long garminTimestamp = 0;
 
@@ -818,22 +823,18 @@ public class FitDataReader extends TourbookDevice {
             garminTimestamp = (Long) fieldValue;
          }
 
-//       2   manufacturer 41
-
-         boolean isShow_FieldNum = false
-
-               || fieldNum == 0 // event
-
-               || fieldNum == 32 // battery_level
-
-         ;
-
-         isShow_FieldNum = !!isShow_FieldNum;
-         isShow_FieldNum = true;
-
-         if (isShow_FieldNum == false) {
-            continue;
-         }
+//         boolean isShow_FieldNum = false
+//
+//               || fieldNum == 0 // event
+//               || fieldNum == 32 // battery_level
+//         ;
+//
+//         isShow_FieldNum = !!isShow_FieldNum;
+//         isShow_FieldNum = true;
+//
+//         if (isShow_FieldNum == false) {
+//            continue;
+//         }
 
          if (StringUtils.isNullOrEmpty(fieldName)
 

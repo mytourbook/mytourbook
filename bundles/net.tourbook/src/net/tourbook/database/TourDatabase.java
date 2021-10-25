@@ -3651,6 +3651,7 @@ public class TourDatabase {
 
             // version 46 start
 
+            + "   SensorType           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   SensorName           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   Description          VARCHAR(" + DeviceSensor.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   ManufacturerNumber   INTEGER,                                                 " + NL //$NON-NLS-1$
@@ -3687,11 +3688,14 @@ public class TourDatabase {
             + "   TourStartTime                    BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
             + "   TourEndTime                      BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
-            + "   BatteryVoltage_Start             FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
-            + "   BatteryVoltage_End               FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
+            + "   BatteryLevel_Start               SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
+            + "   BatteryLevel_End                 SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
 
-            + "   CummulatedOperatingTime_Start    BIGINT DEFAULT -1,                  " + NL //$NON-NLS-1$
-            + "   CummulatedOperatingTime_End      BIGINT DEFAULT -1                   " + NL //$NON-NLS-1$
+            + "   BatteryStatus_Start              SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
+            + "   BatteryStatus_End                SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
+
+            + "   BatteryVoltage_Start             FLOAT DEFAULT -1,                   " + NL //$NON-NLS-1$
+            + "   BatteryVoltage_End               FLOAT DEFAULT -1                    " + NL //$NON-NLS-1$
 
             // version 46 end
 
@@ -4112,9 +4116,6 @@ public class TourDatabase {
             // version 45 end
 
             // version 46 start  -  after 21.9
-
-            + " Battery_GearShifting_Level            SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
-
             // version 46 end
 
             // version 5 start
@@ -4137,7 +4138,6 @@ public class TourDatabase {
       createIndex_TourData_022(stmt);
       createIndex_TourData_029(stmt);
       createIndex_TourData_033(stmt);
-//    createIndex_TourData_035(stmt);
       createIndex_TourData_037(stmt);
 
       SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
@@ -8930,14 +8930,6 @@ public class TourDatabase {
 
          if (isTableAvailable(conn, TABLE_DEVICE_SENSOR_VALUE) == false) {
             createTable_DeviceSensorValues(stmt);
-         }
-
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "Battery_GearShifting_Level") == false) { //$NON-NLS-1$
-
-            // add new fields
-            SQL.AddColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_GearShifting_Level", DEFAULT_IGNORED); //$NON-NLS-1$
-
-            SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_GearShifting_Level"); //$NON-NLS-1$
          }
       }
       stmt.close();

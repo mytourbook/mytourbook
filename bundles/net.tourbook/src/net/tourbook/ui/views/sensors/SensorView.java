@@ -39,6 +39,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
+import net.tourbook.data.DeviceSensorType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -180,12 +181,30 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             break;
 
-         case TableColumnFactory.SENSOR_STATE_BATTERY_VALUES_ID:
+         case TableColumnFactory.SENSOR_STATE_BATTERY_LEVEL_ID:
 
-            final int isBatteryValueAvailable1 = item1.isBatteryValuesAvailable ? 1 : 0;
-            final int isBatteryValueAvailable2 = item2.isBatteryValuesAvailable ? 1 : 0;
+            final int isBatteryLevelAvailable1 = item1.isBatteryLevelAvailable ? 1 : 0;
+            final int isBatteryLevelAvailable2 = item2.isBatteryLevelAvailable ? 1 : 0;
 
-            rc = isBatteryValueAvailable1 - isBatteryValueAvailable2;
+            rc = isBatteryLevelAvailable1 - isBatteryLevelAvailable2;
+
+            break;
+
+         case TableColumnFactory.SENSOR_STATE_BATTERY_STATUS_ID:
+
+            final int isBatteryStatusAvailable1 = item1.isBatteryStatusAvailable ? 1 : 0;
+            final int isBatteryStatusAvailable2 = item2.isBatteryStatusAvailable ? 1 : 0;
+
+            rc = isBatteryStatusAvailable1 - isBatteryStatusAvailable2;
+
+            break;
+
+         case TableColumnFactory.SENSOR_STATE_BATTERY_VOLTAGE_ID:
+
+            final int isBatteryVoltageAvailable1 = item1.isBatteryVoltageAvailable ? 1 : 0;
+            final int isBatteryVoltageAvailable2 = item2.isBatteryVoltageAvailable ? 1 : 0;
+
+            rc = isBatteryVoltageAvailable1 - isBatteryVoltageAvailable2;
 
             break;
 
@@ -195,6 +214,17 @@ public class SensorView extends ViewPart implements ITourViewer {
 
          case TableColumnFactory.SENSOR_TIME_LAST_USED_ID:
             rc = item1.usedLastTime - item2.usedLastTime;
+            break;
+
+         case TableColumnFactory.SENSOR_TYPE_ID:
+
+            final DeviceSensorType sensorType1 = item1.sensor.getSensorType();
+            final DeviceSensorType sensorType2 = item2.sensor.getSensorType();
+
+            if (sensorType1 != null && sensorType2 != null) {
+               rc = sensorType1.compareTo(sensorType2);
+            }
+
             break;
 
          case TableColumnFactory.SENSOR_NAME_ID:
@@ -276,7 +306,9 @@ public class SensorView extends ViewPart implements ITourViewer {
       long         usedFirstTime;
       long         usedLastTime;
 
-      boolean      isBatteryValuesAvailable;
+      boolean      isBatteryLevelAvailable;
+      boolean      isBatteryStatusAvailable;
+      boolean      isBatteryVoltageAvailable;
 
       @Override
       public boolean equals(final Object obj) {
@@ -561,6 +593,10 @@ public class SensorView extends ViewPart implements ITourViewer {
    private void defineAllColumns() {
 
       defineColumn_Sensor_Name();
+      defineColumn_Sensor_Type();
+      defineColumn_BatteryState_Level();
+      defineColumn_BatteryState_Status();
+      defineColumn_BatteryState_Voltage();
       defineColumn_Sensor_Description();
       defineColumn_Manufacturer_Name();
       defineColumn_Manufacturer_Number();
@@ -569,15 +605,14 @@ public class SensorView extends ViewPart implements ITourViewer {
       defineColumn_SerialNumber();
       defineColumn_Time_FirstUsed();
       defineColumn_Time_LastUsed();
-      defineColumn_BatteryValueState();
    }
 
    /**
-    * Column: Battery value state
+    * Column: Battery state: 0...100 %
     */
-   private void defineColumn_BatteryValueState() {
+   private void defineColumn_BatteryState_Level() {
 
-      final ColumnDefinition colDef = TableColumnFactory.SENSOR_STATE_BATTERY_VALUES.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_STATE_BATTERY_LEVEL.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -587,7 +622,51 @@ public class SensorView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
-            cell.setText(sensorItem.isBatteryValuesAvailable
+            cell.setText(sensorItem.isBatteryLevelAvailable
+                  ? UI.SYMBOL_BOX
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
+    * Column: Battery state: OK, Low, ...
+    */
+   private void defineColumn_BatteryState_Status() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_STATE_BATTERY_STATUS.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.isBatteryStatusAvailable
+                  ? UI.SYMBOL_BOX
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
+    * Column: Battery voltage state: 3.x Volt
+    */
+   private void defineColumn_BatteryState_Voltage() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_STATE_BATTERY_VOLTAGE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.isBatteryVoltageAvailable
                   ? UI.SYMBOL_BOX
                   : UI.EMPTY_STRING);
          }
@@ -701,6 +780,29 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
             cell.setText(sensorItem.sensor.getSensorName());
+         }
+      });
+   }
+
+   /**
+    * Column: Sensor type
+    */
+   private void defineColumn_Sensor_Type() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            final DeviceSensorType sensorType = sensorItem.sensor.getSensorType();
+            cell.setText(sensorType == null
+                  ? UI.EMPTY_STRING
+                  : sensorType.name());
          }
       });
    }
@@ -883,11 +985,17 @@ public class SensorView extends ViewPart implements ITourViewer {
 
                + "SELECT" + NL //                                                //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SENSORID," + NL //                          1  //$NON-NLS-1$
-               + "   Min(TourStartTime)," + NL //                             2  //$NON-NLS-1$
-               + "   Max(TourStartTime)," + NL //                             3  //$NON-NLS-1$
-               + "   Max(BatteryVoltage_Start)," + NL //                      4  //$NON-NLS-1$
-               + "   Max(BatteryVoltage_End)" + NL //                         5  //$NON-NLS-1$
+               + "   DEVICESENSOR_SENSORID      ," + NL //                    1  //$NON-NLS-1$
+
+               + "   Min(TourStartTime)         ," + NL //                    2  //$NON-NLS-1$
+               + "   Max(TourStartTime)         ," + NL //                    3  //$NON-NLS-1$
+
+               + "   Max(BatteryLevel_Start)    ," + NL //                    4  //$NON-NLS-1$
+               + "   Max(BatteryLevel_End)      ," + NL //                    5  //$NON-NLS-1$
+               + "   Max(BatteryStatus_Start)   ," + NL //                    6  //$NON-NLS-1$
+               + "   Max(BatteryStatus_End)     ," + NL //                    7  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_Start)  ," + NL //                    8  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_End)     " + NL //                    9  //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //        //$NON-NLS-1$
                + "GROUP BY DEVICESENSOR_SENSORID" + NL //                        //$NON-NLS-1$
@@ -907,15 +1015,24 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             } else {
 
-               final long dbUsedFirstTime = resultMinMax.getLong(2);
-               final long dbUsedLastTime = resultMinMax.getLong(3);
-               final float dbMaxValue_Start = resultMinMax.getFloat(4);
-               final float dbMaxValue_End = resultMinMax.getFloat(5);
+// SET_FORMATTING_OFF
+               final long dbUsedFirstTime       = resultMinMax.getLong(2);
+               final long dbUsedLastTime        = resultMinMax.getLong(3);
+
+               final float dbMaxLevel_Start     = resultMinMax.getFloat(4);
+               final float dbMaxLevel_End       = resultMinMax.getFloat(5);
+               final float dbMaxStatus_Start    = resultMinMax.getFloat(6);
+               final float dbMaxStatus_End      = resultMinMax.getFloat(6);
+               final float dbMaxVoltage_Start   = resultMinMax.getFloat(8);
+               final float dbMaxVoltage_End     = resultMinMax.getFloat(9);
+// SET_FORMATTING_ON
 
                sensorItem.usedFirstTime = dbUsedFirstTime;
                sensorItem.usedLastTime = dbUsedLastTime;
 
-               sensorItem.isBatteryValuesAvailable = dbMaxValue_Start > 0 | dbMaxValue_End > 0;
+               sensorItem.isBatteryLevelAvailable = dbMaxLevel_Start > 0 | dbMaxLevel_End > 0;
+               sensorItem.isBatteryStatusAvailable = dbMaxStatus_Start > 0 | dbMaxStatus_End > 0;
+               sensorItem.isBatteryVoltageAvailable = dbMaxVoltage_Start > 0 | dbMaxVoltage_End > 0;
             }
          }
 

@@ -813,6 +813,7 @@ public class Messages extends NLS {
    public static String        Dialog_SaveTags_Wizard_Title;
 
    public static String        Dialog_Sensor_EditSensor_Title;
+   public static String        Dialog_Sensor_Label_SensorType;
 
    public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
    public static String        Dialog_SetTimeZone_Dialog_Title;
@@ -1748,6 +1749,9 @@ public class Messages extends NLS {
 
    public static String        Sensor_Chart_Label_SensorIsNotSelected;
    public static String        Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected;
+
+   public static String        Sensor_Type_GearShifting;
+   public static String        Sensor_Type_Other;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;

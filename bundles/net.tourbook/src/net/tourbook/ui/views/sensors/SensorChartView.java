@@ -563,6 +563,46 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       chartModel.setXData(xData);
 
       /*
+       * Set y-axis values: Level
+       */
+      final ChartDataYSerie yDataLevel = new ChartDataYSerie(
+            ChartType.BAR,
+            sensorData.allBatteryLevel_End,
+            sensorData.allBatteryLevel_Start);
+
+      yDataLevel.setYTitle("Battery  Level ·  " + sensorName);
+      yDataLevel.setUnitLabel("%");
+      yDataLevel.setShowYSlider(true);
+
+      yDataLevel.setRgbGraph_Line(rgbLine);
+      yDataLevel.setRgbGraph_Text(rgbText);
+      yDataLevel.setRgbBar_Line(allRGBLine);
+      yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
+      yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
+
+      chartModel.addYData(yDataLevel);
+
+      /*
+       * Set y-axis values: Status
+       */
+      final ChartDataYSerie yDataStatus = new ChartDataYSerie(
+            ChartType.BAR,
+            sensorData.allBatteryStatus_End,
+            sensorData.allBatteryStatus_Start);
+
+      yDataStatus.setYTitle("Battery  Status ·  " + sensorName);
+      yDataStatus.setUnitLabel("#");
+      yDataStatus.setShowYSlider(true);
+
+      yDataStatus.setRgbGraph_Line(rgbLine);
+      yDataStatus.setRgbGraph_Text(rgbText);
+      yDataStatus.setRgbBar_Line(allRGBLine);
+      yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
+      yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
+
+      chartModel.addYData(yDataStatus);
+
+      /*
        * Set y-axis values: Voltage
        */
       final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
@@ -570,7 +610,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
             sensorData.allBatteryVoltage_End,
             sensorData.allBatteryVoltage_Start);
 
-      yDataVoltage.setYTitle("Battery  ·  " + sensorName);
+      yDataVoltage.setYTitle("Battery Voltage ·  " + sensorName);
       yDataVoltage.setUnitLabel("Volt");
       yDataVoltage.setShowYSlider(true);
 
@@ -583,7 +623,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       chartModel.addYData(yDataVoltage);
 
 //    DISABLE: Is not very valueable
-//          
+//
 //      /*
 //       * Set y-axis values: Battery health
 //       */

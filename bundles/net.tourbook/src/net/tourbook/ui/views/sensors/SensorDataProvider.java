@@ -55,8 +55,12 @@ public class SensorDataProvider {
                + "   TOURDATA_TourID," + NL //                             2  //$NON-NLS-1$
                + "   TourStartTime," + NL //                               3  //$NON-NLS-1$
                + "   TourEndTime," + NL //                                 4  //$NON-NLS-1$
-               + "   BatteryVoltage_Start," + NL //                        5  //$NON-NLS-1$
-               + "   BatteryVoltage_End" + NL //                           6  //$NON-NLS-1$
+               + "   BatteryLevel_Start," + NL //                          5  //$NON-NLS-1$
+               + "   BatteryLevel_End," + NL //                            6  //$NON-NLS-1$
+               + "   BatteryStatus_Start," + NL //                         7  //$NON-NLS-1$
+               + "   BatteryStatus_End," + NL //                           8  //$NON-NLS-1$
+               + "   BatteryVoltage_Start," + NL //                        9  //$NON-NLS-1$
+               + "   BatteryVoltage_End" + NL //                           10 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //     //$NON-NLS-1$
 
@@ -67,13 +71,19 @@ public class SensorDataProvider {
                + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
          ;
 
+         final TFloatArrayList allBatteryLevel_Start = new TFloatArrayList();
+         final TFloatArrayList allBatteryLevel_End = new TFloatArrayList();
+         final TFloatArrayList allBatteryStatus_Start = new TFloatArrayList();
+         final TFloatArrayList allBatteryStatus_End = new TFloatArrayList();
          final TFloatArrayList allBatteryVoltage_Start = new TFloatArrayList();
          final TFloatArrayList allBatteryVoltage_End = new TFloatArrayList();
-//         final TFloatArrayList allBatteryHealth = new TFloatArrayList();
+
          final TIntArrayList allXValues_BySequence = new TIntArrayList();
          final TIntArrayList allXValues_ByTime = new TIntArrayList();
+
          final TLongArrayList allTourIds = new TLongArrayList();
          final TLongArrayList allTourStartTime = new TLongArrayList();
+
          long firstDateTime = Long.MIN_VALUE;
 
          int numXValue = 0;
@@ -89,58 +99,66 @@ public class SensorDataProvider {
 
             final long dbTourId                 = result.getLong(2);
             final long dbTourStartTime          = result.getLong(3);
-//            final long dbTourEndTime            = result.getLong(4);
-            final float dbBatteryVoltage_Start  = result.getFloat(5);
-            final float dbBatteryVoltage_End    = result.getFloat(6);
+//          final long dbTourEndTime            = result.getLong(4);
+            final float dbBatteryLevel_Start    = result.getShort(5);
+            final float dbBatteryLevel_End      = result.getShort(6);
+            final float dbBatteryStatus_Start   = result.getShort(7);
+            final float dbBatteryStatus_End     = result.getShort(8);
+            final float dbBatteryVoltage_Start  = result.getFloat(9);
+            final float dbBatteryVoltage_End    = result.getFloat(10);
+
+
+            // tour duration in seconds
+//          final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
+
+            final boolean isAvailable_Level_Start     = dbBatteryLevel_Start >= 0;
+            final boolean isAvailable_Level_End       = dbBatteryLevel_End >= 0;
+            final boolean isAvailable_Status_Start    = dbBatteryStatus_Start >= 0;
+            final boolean isAvailable_Status_End      = dbBatteryStatus_End >= 0;
+            final boolean isAvailable_Voltage_Start   = dbBatteryVoltage_Start >= 0;
+            final boolean isAvailable_Voltage_End     = dbBatteryVoltage_End >= 0;
 
 // SET_FORMATTING_ON
 
-            final boolean isStartAvailable = dbBatteryVoltage_Start > 0;
-            final boolean isEndAvailable = dbBatteryVoltage_End > 0;
+            final boolean isAvailable_Start = isAvailable_Level_Start
+                  || isAvailable_Status_Start
+                  || isAvailable_Voltage_Start;
 
-            // tour duration in seconds
-//            final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
+            final boolean isAvailable_End = isAvailable_Level_End
+                  || isAvailable_Status_End
+                  || isAvailable_Voltage_End;
 
-            if (isStartAvailable && isEndAvailable) {
+            setStartEndValues(
+                  isAvailable_Start,
+                  isAvailable_End,
+                  isAvailable_Level_Start,
+                  isAvailable_Level_End,
+                  dbBatteryLevel_Start,
+                  dbBatteryLevel_End,
+                  allBatteryLevel_Start,
+                  allBatteryLevel_End);
 
-               /*
-                * Ensure that start and end values are not the same, otherwise they are not visible
-                * and this can happen when only one of them is available or the start end values
-                * have not changed
-                */
-               float startEndMinDiff = 0;
-               final float voltageDiff = dbBatteryVoltage_Start - dbBatteryVoltage_End;
-               if (voltageDiff < 0.01) {
-                  startEndMinDiff = START_END_MIN_VALUE;
-               }
+            setStartEndValues(
+                  isAvailable_Start,
+                  isAvailable_End,
+                  isAvailable_Status_Start,
+                  isAvailable_Status_End,
+                  dbBatteryStatus_Start,
+                  dbBatteryStatus_End,
+                  allBatteryStatus_Start,
+                  allBatteryStatus_End);
 
-               allBatteryVoltage_Start.add(dbBatteryVoltage_Start + startEndMinDiff);
-               allBatteryVoltage_End.add(dbBatteryVoltage_End);
+            setStartEndValues(
+                  isAvailable_Start,
+                  isAvailable_End,
+                  isAvailable_Voltage_Start,
+                  isAvailable_Voltage_End,
+                  dbBatteryVoltage_Start,
+                  dbBatteryVoltage_End,
+                  allBatteryVoltage_Start,
+                  allBatteryVoltage_End);
 
-//               final float batteryHealth = voltageDiff * 1_000_000 / tourDuration;
-
-//               allBatteryHealth.add(batteryHealth);
-
-            } else if (isStartAvailable) {
-
-               allBatteryVoltage_Start.add(dbBatteryVoltage_Start + START_END_MIN_VALUE);
-               allBatteryVoltage_End.add(dbBatteryVoltage_Start);
-
-//               allBatteryHealth.add(0);
-
-            } else if (isEndAvailable) {
-
-               allBatteryVoltage_Start.add(dbBatteryVoltage_End + START_END_MIN_VALUE);
-               allBatteryVoltage_End.add(dbBatteryVoltage_End);
-
-//               allBatteryHealth.add(0);
-
-            } else {
-
-               // ignored for now
-            }
-
-            if (isStartAvailable || isEndAvailable) {
+            if (isAvailable_Start || isAvailable_End) {
 
                allXValues_BySequence.add(numXValue++);
                allTourIds.add(dbTourId);
@@ -169,10 +187,12 @@ public class SensorDataProvider {
          sensorData.allXValues_BySequence = allXValues_BySequence.toArray();
          sensorData.allXValues_ByTime = allXValues_ByTime.toArray();
 
+         sensorData.allBatteryLevel_Start = allBatteryLevel_Start.toArray();
+         sensorData.allBatteryLevel_End = allBatteryLevel_End.toArray();
+         sensorData.allBatteryStatus_Start = allBatteryStatus_Start.toArray();
+         sensorData.allBatteryStatus_End = allBatteryStatus_End.toArray();
          sensorData.allBatteryVoltage_Start = allBatteryVoltage_Start.toArray();
          sensorData.allBatteryVoltage_End = allBatteryVoltage_End.toArray();
-
-//         sensorData.allBatteryPerformance = allBatteryPerformance.toArray();
 
          sensorData.allTourIds = allTourIds.toArray();
          sensorData.allTourStartTime = allTourStartTime.toArray();
@@ -182,6 +202,54 @@ public class SensorDataProvider {
       }
 
       return sensorData;
+   }
+
+   private void setStartEndValues(final boolean isAvailableValue_Start,
+                                  final boolean isAvailableValue_End,
+                                  final boolean isAvailable_Start,
+                                  final boolean isAvailable_End,
+                                  final float batteryValue_Start,
+                                  final float batteryValue_End,
+                                  final TFloatArrayList allBatteryValue_Start,
+                                  final TFloatArrayList allBatteryValue_End) {
+
+      if (isAvailableValue_Start && isAvailableValue_End) {
+
+         /*
+          * Ensure that start and end values are not the same, otherwise they are not visible
+          * and this can happen when only one of them is available or the start end values
+          * have not changed
+          */
+         float startEndMinDiff = 0;
+         final float startEndDiff = batteryValue_Start - batteryValue_End;
+         if (startEndDiff < 0.01) {
+            startEndMinDiff = START_END_MIN_VALUE;
+         }
+
+         allBatteryValue_Start.add(batteryValue_Start + startEndMinDiff);
+         allBatteryValue_End.add(batteryValue_End);
+
+      } else if (isAvailableValue_Start) {
+
+         allBatteryValue_Start.add(batteryValue_Start + START_END_MIN_VALUE);
+         allBatteryValue_End.add(batteryValue_Start);
+
+      } else if (isAvailableValue_End) {
+
+         allBatteryValue_Start.add(batteryValue_End + START_END_MIN_VALUE);
+         allBatteryValue_End.add(batteryValue_End);
+
+      } else {
+
+         if (isAvailable_Start || isAvailable_End) {
+
+            // add dummy data, that all y-data have the same number of items
+
+            allBatteryValue_Start.add(-1);
+            allBatteryValue_End.add(-1);
+         }
+
+      }
    }
 
 }

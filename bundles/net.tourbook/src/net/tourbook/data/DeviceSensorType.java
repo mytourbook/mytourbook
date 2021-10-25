@@ -13,29 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.sensors;
+package net.tourbook.data;
 
-import net.tourbook.data.DeviceSensor;
+public enum DeviceSensorType {
 
-public class SensorData {
+   /**
+    * A sensor type is not defined
+    */
+   NONE,
 
-   public long         firstDateTime;
+   OTHER,
 
-   public long[]       allTourIds;
-   public long[]       allTourStartTime;
+   /**
+    * Gear shifting, e.g. Shimano Di2
+    */
+   GEAR_SHIFTING, //
 
-   public int[]        allXValues_BySequence;
-   public int[]        allXValues_ByTime;
-
-   public float[]      allBatteryLevel_Start;
-   public float[]      allBatteryLevel_End;
-
-   public float[]      allBatteryStatus_Start;
-   public float[]      allBatteryStatus_End;
-
-   public float[]      allBatteryVoltage_Start;
-   public float[]      allBatteryVoltage_End;
-
-   public DeviceSensor sensor;
-
+   CADENCE, //
+   HEARTBEAT, //
+   PACE, //
+   SPEED, //
 }

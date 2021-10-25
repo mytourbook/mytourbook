@@ -802,24 +802,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private short                 battery_Percentage_Start      = -1;
    private short                 battery_Percentage_End        = -1;
 
-   /**
-    * Battery level from the shifting device, e.g. Di2 which sends the value to Garmin Edge with D-Fly.
-    *
-    * The value is from 0...100%
-    *
-    * -1 indicate that the value is not yet set
-    */
-   private short                 battery_GearShifting_Level    = -1;
-
-    /*
-     * The geo bound values are in microdegrees (degrees * 10^6).
-     */
-
-//   private int                 latitudeMinE6;                      // db-version 35
-//   private int                 latitudeMaxE6;                      // db-version 35
-//   private int                 longitudeMinE6;                     // db-version 35
-//   private int                 longitudeMaxE6;                     // db-version 35
-
    // ############################################# UNUSED FIELDS - START #############################################
    /**
     * ssss distance msw
@@ -1745,7 +1727,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int[]         battery_Time;
 
    /**
-    * Containing the battery percentage value
+    * Containing the battery percentage values
     *
     * @since after 21.6
     */
@@ -7153,10 +7135,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns the battery level for gear shifting in % or -1 when not available
+    * @return Returns <code>true</code>
     */
-   public short getBatteryLevel_GearShifting() {
-      return battery_GearShifting_Level;
+   public float getBatteryLevel_GearShifting() {
+
+      for (final DeviceSensorValue sensorValue : deviceSensorValues) {
+
+         final DeviceSensor sensor = sensorValue.getDeviceSensor();
+
+         if (DeviceSensorType.GEAR_SHIFTING.equals(sensor.getSensorType())) {
+            return sensorValue.getBatteryLevel_Start();
+         }
+
+      }
+
+      return -1;
    }
 
    /**
@@ -9867,10 +9860,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setBattery_Time(final int[] battery_Time) {
       this.battery_Time = battery_Time;
-   }
-
-   public void setBatteryLevel_GearShifting(final short battery_GearShifting_Level) {
-      this.battery_GearShifting_Level = battery_GearShifting_Level;
    }
 
    /**

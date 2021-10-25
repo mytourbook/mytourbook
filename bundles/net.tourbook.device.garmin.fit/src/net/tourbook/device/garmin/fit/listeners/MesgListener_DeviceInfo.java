@@ -307,15 +307,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       }
 
       /*
-       * Gear shifting battery
-       * https://forums.garmin.com/developer/fit-sdk/f/discussion/276245/di2-battery-level
-       */
-      final Short batteryLevel = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
-      if (batteryLevel != null) {
-         fitData.setGearShifting_BatteryLevel(batteryLevel);
-      }
-
-      /*
        * Sensor data are set only for device sensors, when the serial number is available, otherwise
        * they cannot be easily identified
        */
@@ -373,30 +364,36 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
       // SET_FORMATTING_OFF
 
-//    final DateTime       timestamp            = mesg.getTimestamp();
+//    final DateTime       timestamp                  = mesg.getTimestamp();
 
-      final Integer        mesgManufacturerNumber   = mesg.getManufacturer();
-      final Integer        mesgProductNumber        = mesg.getProduct();
-      final String         mesgProductName          = mesg.getProductName();
-      final Integer        mesgGarminProductNumber  = mesg.getGarminProduct();
-//    final String         mesgDescriptor           = mesg.getDescriptor();
+      final Integer        mesgManufacturerNumber     = mesg.getManufacturer();
+      final Integer        mesgProductNumber          = mesg.getProduct();
+      final String         mesgProductName            = mesg.getProductName();
+      final Integer        mesgGarminProductNumber    = mesg.getGarminProduct();
+//    final String         mesgDescriptor             = mesg.getDescriptor();
 
-//    final Short          mesgBatteryStatus        = mesg.getBatteryStatus();
-      final Float          mesgBatteryVoltage       = mesg.getBatteryVoltage();
-//    final Long           mesgCumOperatingTime     = mesg.getCumOperatingTime();
+      final Short          mesgBatteryStatus          = mesg.getBatteryStatus();
+      final Float          mesgBatteryVoltage         = mesg.getBatteryVoltage();
+//    final Long           mesgCumOperatingTime       = mesg.getCumOperatingTime();
 
-//    final Short          mesgDeviceIndex          = mesg.getDeviceIndex();
-//    final Short          mesgHardwareVersion      = mesg.getHardwareVersion();
-//    final Float          mesgSoftwareVersion      = mesg.getSoftwareVersion();
+//    final Short          mesgDeviceIndex            = mesg.getDeviceIndex();
+//    final Short          mesgHardwareVersion        = mesg.getHardwareVersion();
+//    final Float          mesgSoftwareVersion        = mesg.getSoftwareVersion();
 //
-//    final AntNetwork     mesgAntNetwork           = mesg.getAntNetwork();
-//    final Short          mesgAntDeviceType        = mesg.getAntDeviceType();
-//    final Integer        mesgAntDeviceNumber      = mesg.getAntDeviceNumber();
-//    final Short          mesgAntplusDeviceType    = mesg.getAntplusDeviceType();
-//    final Short          mesgAntTransmissionType  = mesg.getAntTransmissionType();
+//    final AntNetwork     mesgAntNetwork             = mesg.getAntNetwork();
+//    final Short          mesgAntDeviceType          = mesg.getAntDeviceType();
+//    final Integer        mesgAntDeviceNumber        = mesg.getAntDeviceNumber();
+//    final Short          mesgAntplusDeviceType      = mesg.getAntplusDeviceType();
+//    final Short          mesgAntTransmissionType    = mesg.getAntTransmissionType();
 //
-//    final SourceType     mesgSourceType           = mesg.getSourceType();
-//    final BodyLocation   mesgSensorPosition       = mesg.getSensorPosition();
+//    final SourceType     mesgSourceType             = mesg.getSourceType();
+//    final BodyLocation   mesgSensorPosition         = mesg.getSensorPosition();
+
+      /*
+       * Gear shifting battery
+       * https://forums.garmin.com/developer/fit-sdk/f/discussion/276245/di2-battery-level
+       */
+      final Short          mesgBatteryLevel           = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
 
 // SET_FORMATTING_ON
 
@@ -413,9 +410,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
          // create sensor
 
-         /*
-          * Sensor names
-          */
          final String manufacturerName = getManufacturerName(mesgManufacturerNumber);
          final String productName = getProductName(mesgProductNumber, mesgProductName, mesgGarminProductNumber);
 
@@ -430,13 +424,69 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                sensorSerialNumberKey);
       }
 
+      updateSensorNames(sensor,
+            mesgManufacturerNumber,
+            mesgProductNumber,
+            mesgProductName,
+            mesgGarminProductNumber);
+
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getAllDeviceSensorValues();
+
+      /*
+       * Get sensor value
+       */
+      DeviceSensorValue sensorValue = null;
+      for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
+
+         final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
+
+         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
+
+            // sensor found in sensor values
+
+            sensorValue = importedSensorValue;
+
+            sensorValue.setBattery_Level(mesgBatteryLevel);
+            sensorValue.setBattery_Status(mesgBatteryStatus);
+            sensorValue.setBattery_Voltage(mesgBatteryVoltage);
+
+            break;
+         }
+      }
+
+      if (sensorValue == null) {
+
+         // create new sensor value -> set start values
+
+         sensorValue = new DeviceSensorValue(sensor);
+
+         allImportedSensorValues.add(sensorValue);
+
+         sensorValue.setBattery_Level(mesgBatteryLevel);
+         sensorValue.setBattery_Status(mesgBatteryStatus);
+         sensorValue.setBattery_Voltage(mesgBatteryVoltage);
+      }
+   }
+
+   /**
+    * It is possible that a manufacturer/product number is null/-1, try to set the sensor
+    * manufacturer/product number/name from another tour
+    *
+    * @param sensor
+    * @param mesgManufacturerNumber
+    * @param mesgProductNumber
+    * @param mesgProductName
+    * @param mesgGarminProductNumber
+    */
+   private void updateSensorNames(final DeviceSensor sensor,
+                                  final Integer mesgManufacturerNumber,
+                                  final Integer mesgProductNumber,
+                                  final String mesgProductName,
+                                  final Integer mesgGarminProductNumber) {
+
       boolean isProductUpdated = false;
       boolean isManufacturerUpdated = false;
 
-      /*
-       * It is possible that a manufacturer/product number is null/-1, try to set the sensor
-       * manufacturer/product number/name from another tour
-       */
       if (true
 
             // manufacturer number is available
@@ -491,53 +541,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             allDeviceSensorsToBeUpdated.put(sensor.getSerialNumber(), sensor);
          }
       }
-
-      final List<DeviceSensorValue> allImportedSensorValues = fitData.getAllDeviceSensorValues();
-
-      /*
-       * Get sensor value
-       */
-      DeviceSensorValue sensorValue = null;
-      for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
-
-         final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
-
-         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
-
-            // sensor found in sensor values -> set end voltage
-
-            sensorValue = importedSensorValue;
-
-            if (mesgBatteryVoltage != null) {
-
-               if (sensorValue.getBatteryVoltage_Start() == -1) {
-
-                  // start is not yet set
-
-                  sensorValue.setBatteryVoltage_Start(mesgBatteryVoltage);
-
-               } else {
-
-                  sensorValue.setBatteryVoltage_End(mesgBatteryVoltage);
-               }
-            }
-
-            break;
-         }
-      }
-
-      if (sensorValue == null) {
-
-         // create new sensor value -> set start voltage
-         sensorValue = new DeviceSensorValue(sensor);
-
-         allImportedSensorValues.add(sensorValue);
-
-         if (mesgBatteryVoltage != null) {
-            sensorValue.setBatteryVoltage_Start(mesgBatteryVoltage);
-         }
-      }
-
    }
 
 }

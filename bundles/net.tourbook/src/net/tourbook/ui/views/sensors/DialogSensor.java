@@ -19,7 +19,9 @@ import de.byteholder.geoclipse.map.UI;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.DeviceSensor;
+import net.tourbook.data.DeviceSensorType;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -27,6 +29,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -48,8 +51,10 @@ public class DialogSensor extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Text _txtDescription;
-   private Text _txtName;
+   private Combo _comboSensorType;
+
+   private Text  _txtDescription;
+   private Text  _txtName;
 
    public DialogSensor(final Shell parentShell, final DeviceSensor sensor) {
 
@@ -76,16 +81,18 @@ public class DialogSensor extends TitleAreaDialog {
 
       super.create();
 
-      final StringBuilder sb = new StringBuilder();
-
       final String sensorName = _sensor_Original.getSensorName();
-      if (sensorName != null && sensorName.length() > 0) {
-         sb.append(sensorName);
-      } else {
-         sb.append(_sensor_Original.getProductName() + UI.DASH_WITH_SPACE + _sensor_Original.getManufacturerName());
-      }
+      final String productManufacturerName = _sensor_Original.getProductName() + UI.DASH_WITH_SPACE + _sensor_Original.getManufacturerName();
 
-      setTitle(sb.toString());
+      if (sensorName != null && sensorName.length() > 0) {
+
+         setTitle(sensorName);
+         setMessage(productManufacturerName);
+
+      } else {
+
+         setTitle(productManufacturerName);
+      }
    }
 
    @Override
@@ -123,7 +130,9 @@ public class DialogSensor extends TitleAreaDialog {
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
       {
          {
-            // Text: Name
+            /*
+             * Text: Name
+             */
 
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Dialog_Label_Name);
@@ -133,7 +142,26 @@ public class DialogSensor extends TitleAreaDialog {
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtName);
          }
          {
-            // Text: Notes
+            /*
+             * Combo: Sensor Type
+             */
+
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Dialog_Sensor_Label_SensorType);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+            _comboSensorType = new Combo(container, SWT.READ_ONLY);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtName);
+
+            // fill combo
+            for (final ComboEnumEntry<?> item : SensorManager.ALL_SENSOR_TYPES) {
+               _comboSensorType.add(item.label);
+            }
+         }
+         {
+            /*
+             * Text: Notes
+             */
 
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Dialog_Label_Description);
@@ -153,6 +181,44 @@ public class DialogSensor extends TitleAreaDialog {
 
       // keep window size and position
       return _state;
+   }
+
+   /**
+    * @return Returns the selected tour type configuration or <code>null</code> when a tour type
+    *         will not be set.
+    */
+   private Enum<DeviceSensorType> getSelectedSensorType() {
+
+      int itemIndex = _comboSensorType.getSelectionIndex();
+
+      if (itemIndex == -1) {
+         itemIndex = 0;
+      }
+
+      final ComboEnumEntry<?> selectedItem = SensorManager.ALL_SENSOR_TYPES[itemIndex];
+
+      return (DeviceSensorType) selectedItem.value;
+   }
+
+   private int getSensorTypeIndex(final Enum<DeviceSensorType> requestedSensorType) {
+
+      if (requestedSensorType == null) {
+
+         // this case should not happen
+
+         return 0;
+      }
+
+      final ComboEnumEntry<?>[] allSensorTypes = SensorManager.ALL_SENSOR_TYPES;
+
+      for (int itemIndex = 0; itemIndex < allSensorTypes.length; itemIndex++) {
+
+         if (allSensorTypes[itemIndex].value.equals(requestedSensorType)) {
+            return itemIndex;
+         }
+      }
+
+      return 0;
    }
 
    @Override
@@ -175,11 +241,18 @@ public class DialogSensor extends TitleAreaDialog {
 
       _txtName.setText(_sensor_Clone.getSensorName());
       _txtDescription.setText(_sensor_Clone.getDescription());
+
+      // sensor type
+      final DeviceSensorType sensorType = _sensor_Clone.getSensorType();
+      final int sensorIndex = getSensorTypeIndex(sensorType);
+      _comboSensorType.select(sensorIndex);
    }
 
    private void saveState() {
 
-      _sensor_Clone.setDescription(_txtDescription.getText());
       _sensor_Clone.setSensorName(_txtName.getText());
+      _sensor_Clone.setDescription(_txtDescription.getText());
+
+      _sensor_Clone.setSensorType((DeviceSensorType) getSelectedSensorType());
    }
 }

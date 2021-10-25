@@ -367,6 +367,15 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Segment_Descent_Label;
    public static String        ColumnFactory_Segment_Descent_Tooltip;
 
+   public static String        ColumnFactory_Sensor_BatteryState_Level_Header;
+   public static String        ColumnFactory_Sensor_BatteryState_Level_Label;
+   public static String        ColumnFactory_Sensor_BatteryState_Level_Tooltip;
+   public static String        ColumnFactory_Sensor_BatteryState_Status_Header;
+   public static String        ColumnFactory_Sensor_BatteryState_Status_Label;
+   public static String        ColumnFactory_Sensor_BatteryState_Status_Tooltip;
+   public static String        ColumnFactory_Sensor_BatteryState_Voltage_Header;
+   public static String        ColumnFactory_Sensor_BatteryState_Voltage_Label;
+   public static String        ColumnFactory_Sensor_BatteryState_Voltage_Tooltip;
    public static String        ColumnFactory_Sensor_Description;
    public static String        ColumnFactory_Sensor_ManufacturerName;
    public static String        ColumnFactory_Sensor_ManufacturerNumber;
@@ -379,6 +388,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_StateBatteryValues_Tooltip;
    public static String        ColumnFactory_Sensor_Time_FirstUsed;
    public static String        ColumnFactory_Sensor_Time_LastUsed;
+   public static String        ColumnFactory_Sensor_Type;
+   public static String        ColumnFactory_Sensor_Type_Tooltip;
+
 
    public static String        ColumnFactory_SerieIndex;
    public static String        ColumnFactory_SerieIndex_Label;

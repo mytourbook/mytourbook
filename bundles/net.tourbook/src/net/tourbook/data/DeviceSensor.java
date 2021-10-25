@@ -19,6 +19,8 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,13 +55,23 @@ public class DeviceSensor implements Cloneable {
     */
    private String               sensorName;
 
+   /**
+    * Description for the sensor
+    */
+   private String               description;
+
+   /**
+    * The type is displayed in the sensor chart or tour info
+    */
+   @Enumerated(EnumType.STRING)
+   private DeviceSensorType     sensorType            = DeviceSensorType.NONE;
+
    private String               manufacturerName;
    private int                  manufacturerNumber;
 
    private String               productName;
    private int                  productNumber;
 
-   private String               description;
    private String               serialNumber          = UI.EMPTY_STRING;
 
    /**
@@ -218,6 +230,10 @@ public class DeviceSensor implements Cloneable {
       return sensorName;
    }
 
+   public DeviceSensorType getSensorType() {
+      return sensorType;
+   }
+
    public String getSerialNumber() {
       return serialNumber;
    }
@@ -321,6 +337,10 @@ public class DeviceSensor implements Cloneable {
       this.sensorName = label;
    }
 
+   public void setSensorType(final DeviceSensorType sensorType) {
+      this.sensorType = sensorType;
+   }
+
    public void setSerialNumber(final String serialNumber) {
       this.serialNumber = serialNumber;
    }
@@ -364,5 +384,7 @@ public class DeviceSensor implements Cloneable {
 
       sensorName = modifiedSensor.sensorName;
       description = modifiedSensor.description;
+
+      sensorType = modifiedSensor.sensorType;
    }
 }

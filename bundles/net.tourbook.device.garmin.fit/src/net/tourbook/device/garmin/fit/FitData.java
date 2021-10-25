@@ -96,8 +96,6 @@ public class FitData {
    private TourMarker                    _current_TourMarker;
    private long                          _timeDiffMS;
 
-   private Short                         _gearShifting_BatteryLevel;
-
    private ImportState_Process           _importState_Process;
 
    public FitData(final FitDataReader fitDataReader,
@@ -259,11 +257,7 @@ public class FitData {
          finalizeTour_Sensors(_tourData);
 
          // must be called after time series are created
-         finalizeTour_Gears(_tourData, _allGearData);
-
-         if (_gearShifting_BatteryLevel != null) {
-            _tourData.setBatteryLevel_GearShifting(_gearShifting_BatteryLevel);
-         }
+         finalizeTour_Gears(_tourData);
 
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
@@ -316,9 +310,9 @@ public class FitData {
       }
    }
 
-   private void finalizeTour_Gears(final TourData tourData, final List<GearData> gearList) {
+   private void finalizeTour_Gears(final TourData tourData) {
 
-      if (gearList == null) {
+      if (_allGearData.size() == 0) {
          return;
       }
 
@@ -336,7 +330,7 @@ public class FitData {
       final List<GearData> validatedGearList = new ArrayList<>();
       GearData startGear = null;
 
-      for (final GearData gearData : gearList) {
+      for (final GearData gearData : _allGearData) {
 
          final long gearTime = gearData.absoluteTime;
 
@@ -513,8 +507,8 @@ public class FitData {
        */
       for (final DeviceSensorValue deviceSensorValue : _allDeviceSensorValues) {
 
-         deviceSensorValue.setTourStartTime(tourData.getTourStartTimeMS());
-         deviceSensorValue.setTourEndTime(tourData.getTourEndTimeMS());
+         deviceSensorValue.setTourTime_Start(tourData.getTourStartTimeMS());
+         deviceSensorValue.setTourTime_End(tourData.getTourEndTimeMS());
 
          deviceSensorValue.setTourData(tourData);
       }
@@ -627,12 +621,12 @@ public class FitData {
       return _allGearData;
    }
 
-   public Short getGearShifting_BatteryLevel() {
-      return _gearShifting_BatteryLevel;
-   }
-
    public String getImportFilePathName() {
       return _importFilePathName;
+   }
+
+   public ImportState_Process getImportState_Process() {
+      return _importState_Process;
    }
 
    public TimeData getLastAdded_TimeData() {
@@ -768,10 +762,6 @@ public class FitData {
       _garminProduct = garminProduct;
    }
 
-   public void setGearShifting_BatteryLevel(final Short gearShifting_BatteryLevel) {
-      _gearShifting_BatteryLevel = gearShifting_BatteryLevel;
-   }
-
    public void setHeartRateSensorPresent(final boolean isHeartRateSensorPresent) {
       _tourData.setIsPulseSensorPresent(isHeartRateSensorPresent);
    }
@@ -820,9 +810,5 @@ public class FitData {
    public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
-   }
-
-   public ImportState_Process getImportState_Process() {
-      return _importState_Process;
    }
 }

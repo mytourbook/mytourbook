@@ -345,7 +345,7 @@ public class TourInfoUI {
       _hasBattery = tourData.getBattery_Percentage_Start() != -1;
       _hasDescription = tourDescription != null && tourDescription.length() > 0;
       _hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
-      _hasGearShiftingBattery = tourData.getBatteryLevel_GearShifting() != -1;
+      _hasGearShiftingBattery = tourData.getBatteryLevel_GearShifting() >= 0;
       _hasTags = tourTags != null && tourTags.size() > 0;
       _hasTourType = tourType != null;
       _hasWeather = _tourData.getWeather().length() > 0;
@@ -1727,7 +1727,7 @@ public class TourInfoUI {
        * Gear shifting battery
        */
       if (_hasGearShiftingBattery) {
-         _lblGearShiftingBattery_Value.setText(Short.toString(_tourData.getBatteryLevel_GearShifting()));
+         _lblGearShiftingBattery_Value.setText(_nf0.format(_tourData.getBatteryLevel_GearShifting()));
          _lblGearShiftingBattery_Unit.setText(UI.SYMBOL_PERCENTAGE);
       }
       showHideControl(_lblGearShiftingBattery, _hasGearShiftingBattery);

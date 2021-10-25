@@ -389,6 +389,7 @@ public class RawDataManager {
     * SYNCHRONIZED: Create new device sensor and keep it in {@link #_allImported_NewDeviceSensors}
     * or uses an already created sensor
     *
+    * @param sensorType
     * @param serialNumber
     * @param sensorSerialNumberKey
     * @return Returns the new device sensor
@@ -3336,7 +3337,7 @@ public class RawDataManager {
 
       final boolean isAllTimeSlices = allTourValueTypes.contains(TourValueType.ALL_TIME_SLICES);
 
-      // Battery %
+      // Battery
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__BATTERY)) {
 
          // re-import battery values only
@@ -3349,11 +3350,6 @@ public class RawDataManager {
 
          oldTourData.getDeviceSensorValues().clear();
          oldTourData.getDeviceSensorValues().addAll(reimportedTourData.getDeviceSensorValues());
-
-         /*
-          * Gear shifting battery
-          */
-         oldTourData.setBatteryLevel_GearShifting(reimportedTourData.getBatteryLevel_GearShifting());
       }
 
       // Cadence
