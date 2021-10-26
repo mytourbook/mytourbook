@@ -71,6 +71,7 @@ public class CadenceTests {
 
    @AfterEach
    void tearDown() {
+
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
 
