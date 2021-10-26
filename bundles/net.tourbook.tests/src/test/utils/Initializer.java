@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 import javax.persistence.Persistence;
@@ -59,7 +58,8 @@ public class Initializer {
 
    public static boolean deserializeVendorCredentials() {
 
-      final String vendorCredentialsFilePath = Paths.get(UTIL_FILE_PATH + VendorCredentialsFileName).toAbsolutePath().toString();
+      final String vendorCredentialsFilePath = utils.FilesUtils.getAbsoluteFilePath(
+            UTIL_FILE_PATH + VendorCredentialsFileName);
 
       final File vendorCredentialsFile = new File(vendorCredentialsFilePath);
 
@@ -102,15 +102,15 @@ public class Initializer {
       final InputStream gpx = Initializer.class.getResourceAsStream(IMPORT_FILE_PATH);
 
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            
+
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-            
+
             new ImportState_File(),
             new ImportState_Process(),
-            
+
             deviceDataReader);
 
       if (parser != null) {
