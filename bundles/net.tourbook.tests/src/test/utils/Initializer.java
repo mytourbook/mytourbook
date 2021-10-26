@@ -83,6 +83,7 @@ public class Initializer {
    }
 
    public static String getCredential(final String vendorName) {
+
       if (_vendorCredentials.isEmpty()) {
          return UI.EMPTY_STRING;
       }
