@@ -60,6 +60,7 @@ class FitLogExTests {
 
    @AfterEach
    void tearDown() {
+
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
    }
