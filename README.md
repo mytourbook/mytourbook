@@ -1,3 +1,11 @@
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
+[![Downloads](https://img.shields.io/sourceforge/dm/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
+[![Latest release](https://badgen.net/github/tag/wolfgang-ch/mytourbook)](https://github.com/wolfgang-ch/mytourbook/tags/)
+
+[![Build status](https://github.com/FJBDev/mytourbook/actions/workflows/build.yml/badge.svg)](https://github.com/FJBDev/mytourbook/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
+
 # MyTourbook
 
 All documentations for this project are available on the website <http://mytourbook.sourceforge.net>

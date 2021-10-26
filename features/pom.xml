@@ -21,7 +21,7 @@
       
       <module>feature.net.tourbook.ext.derby</module>
       <module>feature.net.tourbook.ext.eclipse</module>
-      <module>feature.net.tourbook.ext.eclipse.nl</module>
+	      <!--<module>feature.net.tourbook.ext.eclipse.nl</module>-->
       <module>feature.net.tourbook.ext.ejb3</module>
       <module>feature.net.tourbook.ext.jars</module>
       <module>feature.net.tourbook.ext.rxtx</module>

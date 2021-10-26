@@ -1,6 +1,8 @@
 plugins {
 
    id 'com.github.dkorotych.gradle-maven-exec' version '2.2.1'
+   id 'org.sonarqube' version '3.3'
+   id 'jacoco'
 }
 
 // get MT version and remove quotes
@@ -44,6 +46,17 @@ mt_0_Build.dependsOn(
    'mt_70_CopyReleaseNotes',
 )
 
+sonarqube {
+  properties {
+    property "sonar.projectKey", "FJBDev_mytourbook"
+    property "sonar.organization", "fjbdev"
+    property "sonar.host.url", "https://sonarcloud.io"
+    property "sonar.projectBaseDir", "D:/a/mytourbook/mytourbook/bundles"
+    property "sonar.sources", "."
+    property "sonar.exclusions", "build/**/*,bundles/net.tourbook.chart/src/net/tourbook/chart/ChartComponentGraph.java,bundles/net.tourbook.ext.jars/**/*,features/**/*,LANGUAGE-FRAGMENTS/**/*,MESSAGES-EDITOR/**/*"
+    property "sonar.java.binaries", "."
+  }
+}
 
 /*
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
@@ -71,7 +84,7 @@ task mt_20_BuildProduct {
       mavenexec {
 
          workingDir  buildDir
-         goals       'verify'
+         goals       'clean', 'verify'
          
          // repos can be used offline when this option "offline true" is set, 
          // by default it is disabled 
