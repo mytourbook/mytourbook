@@ -24,7 +24,7 @@ jobs:
             echo "GITHUB_ACTOR: ${GITHUB_ACTOR}"
             echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
             echo "GITHUB_EVENT_NAME: ${GITHUB_EVENT_NAME}"
-            echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+            echo "GITHUB_WORKSPACE: ${github.workspace}"
             echo "GITHUB_SHA: ${GITHUB_SHA}"
             echo "GITHUB_REF: ${GITHUB_REF}"
       - name: Set up JDK 11
