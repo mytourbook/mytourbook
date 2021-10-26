@@ -52,7 +52,7 @@ sonarqube {
     property "sonar.organization", "fjbdev"
     property "sonar.host.url", "https://sonarcloud.io"
     property "sonar.sources", "bundles"
-    property "sonar.exclusions", "build/**/*,bundles/net.tourbook.chart/src/net/tourbook/chart/ChartComponentGraph.java,bundles/net.tourbook.ext.jars/**/*,features/**/*,LANGUAGE-FRAGMENTS/**/*,MESSAGES-EDITOR/**/*"
+    property "sonar.exclusions", "bundles/net.tourbook.chart/src/net/tourbook/chart/ChartComponentGraph.java,bundles/net.tourbook.ext.jars/**/*"
     property "sonar.java.binaries", "."
   }
 }
