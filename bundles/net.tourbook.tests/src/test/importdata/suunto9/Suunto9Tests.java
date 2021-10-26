@@ -85,6 +85,7 @@ class Suunto9Tests {
 
    @AfterEach
    void tearDown() {
+
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
    }
