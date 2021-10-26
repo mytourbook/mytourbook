@@ -57,6 +57,7 @@ public class FitLogTests {
 
    @AfterEach
    void tearDown() {
+
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
    }
