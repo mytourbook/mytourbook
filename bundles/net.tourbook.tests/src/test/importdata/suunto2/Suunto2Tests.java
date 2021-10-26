@@ -40,6 +40,7 @@ class Suunto2Tests {
 
    @BeforeAll
    static void initAll() {
+
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();

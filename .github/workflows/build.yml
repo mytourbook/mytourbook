@@ -17,7 +17,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-          working-directory: ./build/build.net.tourbook
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
@@ -43,4 +42,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./build/build.net.tourbook/gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --settings-file=./build/build.net.tourbook/settings.gradle --warning-mode all --stacktrace --info
+        run: cd ./build/build.net.tourbook && gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --settings-file=settings.gradle --warning-mode all --stacktrace --info
