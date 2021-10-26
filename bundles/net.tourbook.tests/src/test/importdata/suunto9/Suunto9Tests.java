@@ -276,6 +276,7 @@ class Suunto9Tests {
     */
    @Test
    void testImportTinyPause() {
+
       final String filePath = IMPORT_FILE_PATH + "1594598677631_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
