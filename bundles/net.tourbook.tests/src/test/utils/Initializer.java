@@ -91,6 +91,7 @@ public class Initializer {
    }
 
    public static TourData importTour() {
+
       final SAXParser parser = Initializer.initializeParser();
       final DeviceData deviceData = new DeviceData();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
