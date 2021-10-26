@@ -94,6 +94,7 @@ class Suunto9Tests {
     */
    @Test
    void testImportCityOfRocks() {
+
       final String filePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
