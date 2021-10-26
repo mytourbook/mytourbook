@@ -136,6 +136,7 @@ class Suunto9Tests {
     */
    @Test
    void testImportRRData() {
+
       final String filePath = IMPORT_FILE_PATH + "1549250450458_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
