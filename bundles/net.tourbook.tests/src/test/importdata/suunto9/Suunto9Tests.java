@@ -60,6 +60,7 @@ class Suunto9Tests {
     * @return If any, the last processed activity.
     */
    private TourData getLastTourDataImported() {
+
       Field field = null;
       try {
          field = Suunto9_DeviceDataReader.class.getDeclaredField("_processedActivities"); //$NON-NLS-1$
