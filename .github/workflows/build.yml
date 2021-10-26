@@ -40,4 +40,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./build/build.net.tourbook/gradlew mt_10_CreateBuildFiles mt_20_BuildProduct mt_30_CopyProduct mt_40_ExtractWinFiles sonarqube --settings-file=./build/build.net.tourbook/settings.gradle --warning-mode all --stacktrace --info
+        run: ./build/build.net.tourbook/gradlew mt_10_CreateBuildFiles mt_20_BuildProduct mt_30_CopyProduct sonarqube --settings-file=./build/build.net.tourbook/settings.gradle --warning-mode all --stacktrace --info
