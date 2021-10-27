@@ -123,7 +123,7 @@
       
       -->
       
-      
+      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
 
    </repositories>
