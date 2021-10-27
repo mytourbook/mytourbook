@@ -36,7 +36,6 @@ import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
-import net.tourbook.tour.TourManager;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -131,8 +130,9 @@ class GPX_SAX_HandlerTests {
 
       final float[] altitudeSerie = tour.altitudeSerie;
       assertArrayEquals(new float[] { 395, 394, 393, 394 }, altitudeSerie);
-      //Because it's a localized time, it could have an extra " AM" or " PM" or not
-      org.junit.jupiter.api.Assertions.assertTrue(TourManager.getTourDateTimeFull(tour).startsWith("Sunday, October 10, 2010 - 12:00")); //$NON-NLS-1$
+      assertEquals(2010, tour.getTourStartTime().getYear());
+      assertEquals(10, tour.getTourStartTime().getMonthValue());
+      assertEquals(10, tour.getTourStartTime().getDayOfMonth());
       final Integer timeSerieLength = tour.timeSerie.length;
       assertEquals(4, timeSerieLength);
       final int[] timeSerie = tour.timeSerie;
