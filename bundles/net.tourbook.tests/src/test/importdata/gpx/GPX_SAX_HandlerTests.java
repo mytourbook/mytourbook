@@ -139,6 +139,7 @@ class GPX_SAX_HandlerTests {
       assertArrayEquals(new int[] { 0, 600, 1200, 1800 }, timeSerie);
 
       final double[] latitudeSerie = tour.latitudeSerie;
+
       assertArrayEquals(new double[] { 47.567517620, 47.585505568, 47.585397817, 47.567409937 }, latitudeSerie);
       final double[] longitudeSerie = tour.longitudeSerie;
       assertArrayEquals(new double[] { 9.450832423, 9.450987056, 9.477574415, 9.477410677 }, longitudeSerie);
