@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -45,6 +43,9 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -86,6 +87,7 @@ public class ChartComponentGraph extends Canvas {
    private static final NumberFormat _nf               = NumberFormat.getNumberInstance();
 
    private static final int[][]      _leftAccelerator  = new int[][] {
+
          { -40, -200 },
          { -30, -50 },
          { -20, -10 },
@@ -556,24 +558,27 @@ public class ChartComponentGraph extends Canvas {
     */
    private void addListener() {
 
-      addPaintListener(paintEvent -> {
+      addPaintListener(new PaintListener() {
+         @Override
+         public void paintControl(final PaintEvent event) {
 
-         if (_isChartDragged) {
+            if (_isChartDragged) {
 
-            drawSync_020_MoveCanvas(paintEvent.gc);
+               drawSync_020_MoveCanvas(event.gc);
 
-         } else {
+            } else {
 
 //               final long start = System.nanoTime();
 //               System.out.println();
 //               System.out.println("onPaint\tstart\t");
 //               // TODO remove SYSTEM.OUT.PRINTLN
 
-            drawSync_000_onPaint(paintEvent.gc, paintEvent.time & 0xFFFFFFFFL);
+               drawSync_000_onPaint(event.gc, event.time & 0xFFFFFFFFL);
 
 //               System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //               System.out.println();
 //               // TODO remove SYSTEM.OUT.PRINTLN
+            }
          }
       });
 
@@ -581,7 +586,12 @@ public class ChartComponentGraph extends Canvas {
       final ScrollBar horizontalBar = getHorizontalBar();
       horizontalBar.setEnabled(false);
       horizontalBar.setVisible(false);
-      horizontalBar.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onScroll(selectionEvent)));
+      horizontalBar.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent event) {
+            onScroll(event);
+         }
+      });
 
       addMouseMoveListener(mouseEvent -> {
          if (_isGraphVisible) {
