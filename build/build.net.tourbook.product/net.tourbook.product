@@ -97,7 +97,7 @@
       <feature id="org.eclipse.emf.common"/>
 
       <feature id="feature.net.tourbook.ext.eclipse"        installMode="root"/>
-      <feature id="feature.net.tourbook.ext.eclipse.nl"     installMode="root"/>
+	      <!--<feature id="feature.net.tourbook.ext.eclipse.nl"     installMode="root"/>-->
       <feature id="feature.net.tourbook.ext.derby"          installMode="root"/>
       <feature id="feature.net.tourbook.ext.ejb3"           installMode="root"/>
       <feature id="feature.net.tourbook.ext.jars"           installMode="root"/>
