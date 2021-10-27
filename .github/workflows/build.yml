@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - '**.java'
+      - '**.yml'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
