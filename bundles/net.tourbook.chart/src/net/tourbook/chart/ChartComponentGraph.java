@@ -87,7 +87,6 @@ public class ChartComponentGraph extends Canvas {
    private static final NumberFormat _nf               = NumberFormat.getNumberInstance();
 
    private static final int[][]      _leftAccelerator  = new int[][] {
-
          { -40, -200 },
          { -30, -50 },
          { -20, -10 },
