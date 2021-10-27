@@ -1652,6 +1652,7 @@ public class TourManager {
 
       return tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
    }
+
    /**
     * @return returns the date of this tour
     */
