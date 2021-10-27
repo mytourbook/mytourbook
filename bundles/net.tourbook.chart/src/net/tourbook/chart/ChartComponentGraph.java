@@ -3325,13 +3325,16 @@ public class ChartComponentGraph extends Canvas {
       final boolean isBottomTop = yData.isYAxisDirection();
 
       // get the horizontal offset for the graph
-      float graphValueOffset;
+      double graphValueOffset;
       if (_chartComponents._synchConfigSrc == null) {
+
          // a synch marker is not set, draw it normally
-         graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+         graphValueOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
+
       } else {
+
          // adjust the start position to the synch marker position
-         graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleX);
+         graphValueOffset = _xxDevViewPortLeftBorder / scaleX;
       }
 
       final int devGraphCanvasHeight = drawingData.devGraphHeight;
