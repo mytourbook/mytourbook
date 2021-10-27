@@ -1647,7 +1647,6 @@ public class TourManager {
             + UI.DASH_WITH_SPACE
             + getTourTimeShort(tourData);
    }
-
    public static String getTourDateTimeShort(final TourData tourData) {
 
       return tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
