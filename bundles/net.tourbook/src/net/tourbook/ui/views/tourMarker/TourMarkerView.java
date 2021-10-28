@@ -425,11 +425,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
       }
 
-      //The distance in km or miles
-      final float distanceDifference = (_tourData.getMetricDistanceSerie()[currentMarkerIndex] - _tourData
-            .getMetricDistanceSerie()[previousMarkerIndex]) / UI.UNIT_VALUE_DISTANCE / 1000;
+      final float[] distanceSerieMetric = _tourData.getMetricDistanceSerie();
+      final int[] timeSerie = _tourData.timeSerie;
+      if (distanceSerieMetric == null || timeSerie == null) {
+         return 0.0;
+      }
 
-      int timeDifference = _tourData.timeSerie[currentMarkerIndex] - _tourData.timeSerie[previousMarkerIndex];
+      //The distance in km or miles
+      final float distanceDifference = (distanceSerieMetric[currentMarkerIndex] - distanceSerieMetric[previousMarkerIndex])
+            / UI.UNIT_VALUE_DISTANCE
+            / 1000;
+
+      int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex];
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
 
       if (isPaceAndSpeedFromRecordedTime) {

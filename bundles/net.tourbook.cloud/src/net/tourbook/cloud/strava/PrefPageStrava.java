@@ -30,6 +30,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.PrefPageTourTypeFilterList;
 import net.tourbook.web.WEB;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -51,6 +52,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -80,19 +83,20 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
-   private Label  _labelAccessToken;
-   private Label  _labelAccessToken_Value;
-   private Label  _labelAthleteName;
-   private Label  _labelAthleteName_Value;
-   private Label  _labelAthleteWebPage;
-   private Label  _labelExpiresAt;
-   private Label  _labelExpiresAt_Value;
-   private Label  _labelRefreshToken;
-   private Label  _labelRefreshToken_Value;
-   private Button _chkSendDescription;
-   private Button _chkUseTourTypeMapping;
+   private Label              _labelAccessToken;
+   private Label              _labelAccessToken_Value;
+   private Label              _labelAthleteName;
+   private Label              _labelAthleteName_Value;
+   private Label              _labelAthleteWebPage;
+   private Label              _labelExpiresAt;
+   private Label              _labelExpiresAt_Value;
+   private Label              _labelRefreshToken;
+   private Label              _labelRefreshToken_Value;
+   private Button             _chkSendDescription;
+   private Button             _chkUseTourTypeMapping;
 
-   private Link   _linkAthleteWebPage;
+   private Link               _linkAthleteWebPage;
+   private PreferenceLinkArea _linkTourTypeFilters;
 
    private String constructAthleteWebPageLink(final String athleteId) {
       if (StringUtils.hasContent(athleteId)) {
@@ -263,6 +267,19 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
             _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
          }
+         {
+            _linkTourTypeFilters = new PreferenceLinkArea(
+                  group,
+                  SWT.NONE,
+                  PrefPageTourTypeFilterList.ID,
+                  Messages.PrefPage_TourTypeFilter_Link_StravaTourTypes,
+                  (IWorkbenchPreferenceContainer) getContainer(),
+                  new PrefPageTourTypeFilterList());
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .applyTo(_linkTourTypeFilters.getControl());
+         }
       }
    }
 
@@ -290,6 +307,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _labelExpiresAt.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
       _chkUseTourTypeMapping.setEnabled(isAuthorized);
+
+      _linkTourTypeFilters.getControl().setEnabled(_chkUseTourTypeMapping.getSelection());
    }
 
    private String getLocalExpireAtDateTime() {

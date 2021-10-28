@@ -75,6 +75,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String        ID         = "net.tourbook.preferences.PrefPageTourTypeFilter"; //$NON-NLS-1$
+
    private final IPreferenceStore    _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
    private SelectionListener         _defaultSelectionListener;
