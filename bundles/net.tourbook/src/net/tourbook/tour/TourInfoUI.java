@@ -19,6 +19,8 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -33,6 +35,8 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.DeviceSensor;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
@@ -44,6 +48,7 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
+import net.tourbook.ui.views.sensors.SensorManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -115,10 +120,10 @@ public class TourInfoUI {
       _nf3.setMaximumFractionDigits(3);
    }
 
-   private boolean _hasBattery;
+   private boolean _hasRecordingDeviceBattery;
+   private boolean _hasSensorBatteries;
    private boolean _hasDescription;
    private boolean _hasGears;
-   private boolean _hasGearShiftingBattery;
    private boolean _hasRunDyn;
    private boolean _hasTags;
    private boolean _hasTourType;
@@ -172,116 +177,117 @@ public class TourInfoUI {
    /*
     * UI controls
     */
-   private Composite _ttContainer;
-   private Composite _lowerPartContainer;
+   private Composite        _ttContainer;
+   private Composite        _lowerPartContainer;
 
-   private Text      _txtDescription;
-   private Text      _txtWeather;
+   private Text             _txtDescription;
+   private Text             _txtWeather;
 
-   private CLabel    _lblClouds;
-   private CLabel    _lblTourType_Image;
+   private CLabel           _lblClouds;
+   private CLabel           _lblTourType_Image;
 
-   private Label     _lblAltitudeUp;
-   private Label     _lblAltitudeUpUnit;
-   private Label     _lblAltitudeDown;
-   private Label     _lblAltitudeDownUnit;
-   private Label     _lblAvgElevationChange;
-   private Label     _lblAvgElevationChangeUnit;
-   private Label     _lblAvgSpeed;
-   private Label     _lblAvgSpeedUnit;
-   private Label     _lblAvgPace;
-   private Label     _lblAvgPaceUnit;
-   private Label     _lblAvgPulse;
-   private Label     _lblAvgPulseUnit;
-   private Label     _lblAvgCadence;
-   private Label     _lblAvgCadenceUnit;
-   private Label     _lblAvg_Power;
-   private Label     _lblAvg_PowerUnit;
-   private Label     _lblBattery;
-   private Label     _lblBattery_Spacer;
-   private Label     _lblBattery_Start;
-   private Label     _lblBattery_End;
-   private Label     _lblBodyWeight;
-   private Label     _lblBreakTime;
-   private Label     _lblBreakTime_Unit;
-   private Label     _lblCalories;
-   private Label     _lblCloudsUnit;
-   private Label     _lblDate;
-   private Label     _lblDateTimeCreatedValue;
-   private Label     _lblDateTimeModifiedValue;
-   private Label     _lblDateTimeModified;
-   private Label     _lblDescription;
-   private Label     _lblDistance;
-   private Label     _lblDistanceUnit;
-   private Label     _lblGear;
-   private Label     _lblGear_Spacer;
-   private Label     _lblGear_GearShifts;
-   private Label     _lblGear_GearShifts_Spacer;
-   private Label     _lblGearShiftingBattery;
-   private Label     _lblGearShiftingBattery_Value;
-   private Label     _lblGearShiftingBattery_Unit;
-   private Label     _lblMaxAltitude;
-   private Label     _lblMaxAltitudeUnit;
-   private Label     _lblMaxPace;
-   private Label     _lblMaxPaceUnit;
-   private Label     _lblMaxPulse;
-   private Label     _lblMaxPulseUnit;
-   private Label     _lblMaxSpeed;
-   private Label     _lblMaxSpeedUnit;
-   private Label     _lblMovingTime;
-   private Label     _lblMovingTime_Unit;
-   private Label     _lblElapsedTime;
-   private Label     _lblElapsedTime_Unit;
-   private Label     _lblPausedTime;
-   private Label     _lblPausedTime_Unit;
-   private Label     _lblRecordedTime;
-   private Label     _lblRecordedTime_Unit;
-   private Label     _lblRestPulse;
-   private Label     _lblTemperature;
-   private Label     _lblTimeZone_Value;
-   private Label     _lblTimeZoneDifference;
-   private Label     _lblTimeZoneDifference_Value;
-   private Label     _lblTitle;
-   private Label     _lblTourTags;
-   private Label     _lblTourTags_Value;
-   private Label     _lblTourType;
-   private Label     _lblTourType_Value;
-   private Label     _lblWeather;
-   private Label     _lblWindSpeed;
-   private Label     _lblWindSpeedUnit;
-   private Label     _lblWindDirection;
-   private Label     _lblWindDirectionUnit;
+   private Label            _lblAltitudeUp;
+   private Label            _lblAltitudeUpUnit;
+   private Label            _lblAltitudeDown;
+   private Label            _lblAltitudeDownUnit;
+   private Label            _lblAvgElevationChange;
+   private Label            _lblAvgElevationChangeUnit;
+   private Label            _lblAvgSpeed;
+   private Label            _lblAvgSpeedUnit;
+   private Label            _lblAvgPace;
+   private Label            _lblAvgPaceUnit;
+   private Label            _lblAvgPulse;
+   private Label            _lblAvgPulseUnit;
+   private Label            _lblAvgCadence;
+   private Label            _lblAvgCadenceUnit;
+   private Label            _lblAvg_Power;
+   private Label            _lblAvg_PowerUnit;
+   private Label            _lblBattery;
+   private Label            _lblBattery_Spacer;
+   private Label            _lblBattery_Start;
+   private Label            _lblBattery_End;
+   private Label            _lblBodyWeight;
+   private Label            _lblBreakTime;
+   private Label            _lblBreakTime_Unit;
+   private Label            _lblCalories;
+   private Label            _lblCloudsUnit;
+   private Label            _lblDate;
+   private Label            _lblDateTimeCreatedValue;
+   private Label            _lblDateTimeModifiedValue;
+   private Label            _lblDateTimeModified;
+   private Label            _lblDescription;
+   private Label            _lblDistance;
+   private Label            _lblDistanceUnit;
+   private Label            _lblGear;
+   private Label            _lblGear_Spacer;
+   private Label            _lblGear_GearShifts;
+   private Label            _lblGear_GearShifts_Spacer;
+   private Label            _lblMaxAltitude;
+   private Label            _lblMaxAltitudeUnit;
+   private Label            _lblMaxPace;
+   private Label            _lblMaxPaceUnit;
+   private Label            _lblMaxPulse;
+   private Label            _lblMaxPulseUnit;
+   private Label            _lblMaxSpeed;
+   private Label            _lblMaxSpeedUnit;
+   private Label            _lblMovingTime;
+   private Label            _lblMovingTime_Unit;
+   private Label            _lblElapsedTime;
+   private Label            _lblElapsedTime_Unit;
+   private Label            _lblPausedTime;
+   private Label            _lblPausedTime_Unit;
+   private Label            _lblRecordedTime;
+   private Label            _lblRecordedTime_Unit;
+   private Label            _lblRestPulse;
+   private Label            _lblTemperature;
+   private Label            _lblTimeZone_Value;
+   private Label            _lblTimeZoneDifference;
+   private Label            _lblTimeZoneDifference_Value;
+   private Label            _lblTitle;
+   private Label            _lblTourTags;
+   private Label            _lblTourTags_Value;
+   private Label            _lblTourType;
+   private Label            _lblTourType_Value;
+   private Label            _lblWeather;
+   private Label            _lblWindSpeed;
+   private Label            _lblWindSpeedUnit;
+   private Label            _lblWindDirection;
+   private Label            _lblWindDirectionUnit;
 
-   private Label     _lblRunDyn_StanceTime_Min;
-   private Label     _lblRunDyn_StanceTime_Min_Unit;
-   private Label     _lblRunDyn_StanceTime_Max;
-   private Label     _lblRunDyn_StanceTime_Max_Unit;
-   private Label     _lblRunDyn_StanceTime_Avg;
-   private Label     _lblRunDyn_StanceTime_Avg_Unit;
-   private Label     _lblRunDyn_StanceTimeBalance_Min;
-   private Label     _lblRunDyn_StanceTimeBalance_Min_Unit;
-   private Label     _lblRunDyn_StanceTimeBalance_Max;
-   private Label     _lblRunDyn_StanceTimeBalance_Max_Unit;
-   private Label     _lblRunDyn_StanceTimeBalance_Avg;
-   private Label     _lblRunDyn_StanceTimeBalance_Avg_Unit;
-   private Label     _lblRunDyn_StepLength_Min;
-   private Label     _lblRunDyn_StepLength_Min_Unit;
-   private Label     _lblRunDyn_StepLength_Max;
-   private Label     _lblRunDyn_StepLength_Max_Unit;
-   private Label     _lblRunDyn_StepLength_Avg;
-   private Label     _lblRunDyn_StepLength_Avg_Unit;
-   private Label     _lblRunDyn_VerticalOscillation_Min;
-   private Label     _lblRunDyn_VerticalOscillation_Min_Unit;
-   private Label     _lblRunDyn_VerticalOscillation_Max;
-   private Label     _lblRunDyn_VerticalOscillation_Max_Unit;
-   private Label     _lblRunDyn_VerticalOscillation_Avg;
-   private Label     _lblRunDyn_VerticalOscillation_Avg_Unit;
-   private Label     _lblRunDyn_VerticalRatio_Min;
-   private Label     _lblRunDyn_VerticalRatio_Min_Unit;
-   private Label     _lblRunDyn_VerticalRatio_Max;
-   private Label     _lblRunDyn_VerticalRatio_Max_Unit;
-   private Label     _lblRunDyn_VerticalRatio_Avg;
-   private Label     _lblRunDyn_VerticalRatio_Avg_Unit;
+   private Label            _lblRunDyn_StanceTime_Min;
+   private Label            _lblRunDyn_StanceTime_Min_Unit;
+   private Label            _lblRunDyn_StanceTime_Max;
+   private Label            _lblRunDyn_StanceTime_Max_Unit;
+   private Label            _lblRunDyn_StanceTime_Avg;
+   private Label            _lblRunDyn_StanceTime_Avg_Unit;
+   private Label            _lblRunDyn_StanceTimeBalance_Min;
+   private Label            _lblRunDyn_StanceTimeBalance_Min_Unit;
+   private Label            _lblRunDyn_StanceTimeBalance_Max;
+   private Label            _lblRunDyn_StanceTimeBalance_Max_Unit;
+   private Label            _lblRunDyn_StanceTimeBalance_Avg;
+   private Label            _lblRunDyn_StanceTimeBalance_Avg_Unit;
+   private Label            _lblRunDyn_StepLength_Min;
+   private Label            _lblRunDyn_StepLength_Min_Unit;
+   private Label            _lblRunDyn_StepLength_Max;
+   private Label            _lblRunDyn_StepLength_Max_Unit;
+   private Label            _lblRunDyn_StepLength_Avg;
+   private Label            _lblRunDyn_StepLength_Avg_Unit;
+   private Label            _lblRunDyn_VerticalOscillation_Min;
+   private Label            _lblRunDyn_VerticalOscillation_Min_Unit;
+   private Label            _lblRunDyn_VerticalOscillation_Max;
+   private Label            _lblRunDyn_VerticalOscillation_Max_Unit;
+   private Label            _lblRunDyn_VerticalOscillation_Avg;
+   private Label            _lblRunDyn_VerticalOscillation_Avg_Unit;
+   private Label            _lblRunDyn_VerticalRatio_Min;
+   private Label            _lblRunDyn_VerticalRatio_Min_Unit;
+   private Label            _lblRunDyn_VerticalRatio_Max;
+   private Label            _lblRunDyn_VerticalRatio_Max_Unit;
+   private Label            _lblRunDyn_VerticalRatio_Avg;
+   private Label            _lblRunDyn_VerticalRatio_Avg_Unit;
+
+   private ArrayList<Label> _allSensorValue_Label;
+   private ArrayList<Label> _allSensorValue_Unit;
+   private ArrayList<Label> _allSensorValue_Value;
 
    private class ActionCloseTooltip extends Action {
 
@@ -342,10 +348,11 @@ public class TourInfoUI {
 
       _hasRunDyn = _tourData.isRunDynAvailable();
 
-      _hasBattery = tourData.getBattery_Percentage_Start() != -1;
+      _hasRecordingDeviceBattery = tourData.getBattery_Percentage_Start() != -1;
+      _hasSensorBatteries = tourData.getDeviceSensorValues().size() > 0;
+
       _hasDescription = tourDescription != null && tourDescription.length() > 0;
       _hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
-      _hasGearShiftingBattery = tourData.getBatteryLevel_GearShifting() >= 0;
       _hasTags = tourTags != null && tourTags.size() > 0;
       _hasTourType = tourType != null;
       _hasWeather = _tourData.getWeather().length() > 0;
@@ -720,14 +727,6 @@ public class TourInfoUI {
 
       _lblGear_GearShifts = createUI_LabelValue(parent, SWT.TRAIL);
       _lblGear_GearShifts_Spacer = createUI_LabelValue(parent, SWT.LEAD);
-
-      /*
-       * Gear shifting battery, e.g. 80 %
-       */
-      _lblGearShiftingBattery = createUI_Label(parent, Messages.Tour_Tooltip_Label_GearShiftingBattery);
-
-      _lblGearShiftingBattery_Value = createUI_LabelValue(parent, SWT.TRAIL);
-      _lblGearShiftingBattery_Unit = createUI_LabelValue(parent, SWT.LEAD);
    }
 
    private void createUI_40_Column_2(final Composite parent) {
@@ -749,6 +748,7 @@ public class TourInfoUI {
 
          _lblBattery_Spacer = createUI_Spacer(container);
          createUI_45_Battery(container);
+         createUI_46_SensorValues(container);
       }
    }
 
@@ -883,6 +883,60 @@ public class TourInfoUI {
 
          _lblBattery_Start = createUI_LabelValue(parent, SWT.TRAIL);
          _lblBattery_End = createUI_LabelValue(parent, SWT.LEAD);
+      }
+   }
+
+   private void createUI_46_SensorValues(final Composite parent) {
+
+      /*
+       * Sensor batteries
+       */
+      final Set<DeviceSensorValue> allSensorValues = _tourData.getDeviceSensorValues();
+      if (allSensorValues.size() == 0) {
+         return;
+      }
+
+      // sort by sensor label
+      final ArrayList<DeviceSensorValue> allSortedSensorValues = new ArrayList<>(allSensorValues);
+      Collections.sort(allSortedSensorValues, (sensorValue1, sensorValue2) -> {
+
+         if (sensorValue1.isDataAvailable() && sensorValue2.isDataAvailable()) {
+
+            return sensorValue1.getDeviceSensor().getLabel().compareTo(sensorValue2.getDeviceSensor().getLabel());
+         }
+
+         return 0;
+      });
+
+      _allSensorValue_Label = new ArrayList<>();
+      _allSensorValue_Value = new ArrayList<>();
+      _allSensorValue_Unit = new ArrayList<>();
+
+      for (final DeviceSensorValue sensorValue : allSortedSensorValues) {
+
+         if (sensorValue.isDataAvailable() == false) {
+            continue;
+         }
+
+         final DeviceSensor sensor = sensorValue.getDeviceSensor();
+         String sensorLabel = sensor.getLabel();
+
+         final String sensorTypeName = SensorManager.getSensorTypeName(sensor.getSensorType());
+         final String sensorCustomName = sensor.getSensorName();
+         final String productManufacturerName = sensor.getManufacturerName() + UI.DASH_WITH_SPACE + sensor.getProductName();
+
+         if (sensorCustomName.length() > 0) {
+
+            sensorLabel = sensorCustomName + UI.DASH_WITH_SPACE + sensorTypeName;
+
+         } else {
+
+            sensorLabel = productManufacturerName + UI.DASH_WITH_SPACE + sensorTypeName;
+         }
+
+         _allSensorValue_Label.add(createUI_Label(parent, sensorLabel));
+         _allSensorValue_Value.add(createUI_LabelValue(parent, SWT.TRAIL));
+         _allSensorValue_Unit.add(createUI_LabelValue(parent, SWT.LEAD));
       }
    }
 
@@ -1717,34 +1771,23 @@ public class TourInfoUI {
                _tourData.getRearShiftCount()));
       }
 
-      showHideControl(_lblGear_Spacer, _hasGears || _hasGearShiftingBattery);
+      showHideControl(_lblGear_Spacer, _hasGears);
 
       showHideControl(_lblGear, _hasGears);
       showHideControl(_lblGear_GearShifts, _hasGears);
       showHideControl(_lblGear_GearShifts_Spacer, _hasGears);
 
       /*
-       * Gear shifting battery
-       */
-      if (_hasGearShiftingBattery) {
-         _lblGearShiftingBattery_Value.setText(_nf0.format(_tourData.getBatteryLevel_GearShifting()));
-         _lblGearShiftingBattery_Unit.setText(UI.SYMBOL_PERCENTAGE);
-      }
-      showHideControl(_lblGearShiftingBattery, _hasGearShiftingBattery);
-      showHideControl(_lblGearShiftingBattery_Value, _hasGearShiftingBattery);
-      showHideControl(_lblGearShiftingBattery_Unit, _hasGearShiftingBattery);
-
-      /*
        * Battery
        */
-      if (_hasBattery) {
+      if (_hasRecordingDeviceBattery) {
          _lblBattery_Start.setText(Short.toString(_tourData.getBattery_Percentage_Start()));
          _lblBattery_End.setText(String.format(BATTERY_FORMAT, _tourData.getBattery_Percentage_End()));
       }
-      showHideControl(_lblBattery, _hasBattery);
-      showHideControl(_lblBattery_Spacer, _hasBattery);
-      showHideControl(_lblBattery_Start, _hasBattery);
-      showHideControl(_lblBattery_End, _hasBattery);
+      showHideControl(_lblBattery, _hasRecordingDeviceBattery);
+      showHideControl(_lblBattery_Spacer, _hasRecordingDeviceBattery);
+      showHideControl(_lblBattery_Start, _hasRecordingDeviceBattery);
+      showHideControl(_lblBattery_End, _hasRecordingDeviceBattery);
 
       /*
        * Date/time

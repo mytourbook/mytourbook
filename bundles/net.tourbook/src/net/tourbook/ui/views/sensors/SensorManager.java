@@ -52,4 +52,45 @@ public class SensorManager {
 
    private SensorManager() {}
 
+   public static int getSensorTypeIndex(final Enum<DeviceSensorType> requestedSensorType) {
+
+      if (requestedSensorType == null) {
+
+         // this case should not happen
+
+         return 0;
+      }
+
+      for (int itemIndex = 0; itemIndex < ALL_SENSOR_TYPES.length; itemIndex++) {
+
+         if (ALL_SENSOR_TYPES[itemIndex].value.equals(requestedSensorType)) {
+            return itemIndex;
+         }
+      }
+
+      return 0;
+   }
+
+   /**
+    * @param requestedSensorType
+    * @return Returns a UI name of the sensor type
+    */
+   public static String getSensorTypeName(final Enum<DeviceSensorType> requestedSensorType) {
+
+      if (requestedSensorType == null) {
+
+         // this case should not happen
+
+         return Messages.App_Label_NotAvailable;
+      }
+
+      for (final ComboEnumEntry<?> enumItem : ALL_SENSOR_TYPES) {
+
+         if (enumItem.value.equals(requestedSensorType)) {
+            return enumItem.label;
+         }
+      }
+
+      return Messages.App_Label_NotAvailable;
+   }
 }

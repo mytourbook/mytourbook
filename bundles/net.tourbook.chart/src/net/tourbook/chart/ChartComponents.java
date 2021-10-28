@@ -63,30 +63,27 @@ import org.eclipse.swt.widgets.Event;
  */
 public class ChartComponents extends Composite {
 
-   public static final int BAR_SELECTION_DELAY_TIME = 100;
+   public static final int       BAR_SELECTION_DELAY_TIME = 100;
 
    /**
     * min/max pixel widthDev/heightDev of the chart
     */
-   static final int        CHART_MIN_WIDTH          = 5;
-   static final int        CHART_MIN_HEIGHT         = 5;
+   static final int              CHART_MIN_WIDTH          = 5;
+   static final int              CHART_MIN_HEIGHT         = 5;
 
-//   static final int            CHART_MAX_WIDTH       = Integer.MAX_VALUE;      // 2'147'483'647
-//   static final int            CHART_MAX_WIDTH       = 1000000000;             // 1'000'000'000
-   static final long             CHART_MAX_WIDTH       = 1000000000000L;      //    1'000'000'000'000
-//                                                                               //   308'333'095
-   static final int              CHART_MAX_HEIGHT      = 10000;
+   static final long             CHART_MAX_WIDTH          = 1_000_000_000_000L;  // seconds which is about 31'700 years
+   static final int              CHART_MAX_HEIGHT         = 10_000;
 
-   private static final int      MARGIN_TOP_WITH_TITLE = 5;
+   private static final int      MARGIN_TOP_WITH_TITLE    = 5;
 
    /**
     * Number of seconds in one day
     */
-   private static final int      DAY_IN_SECONDS        = 24 * 60 * 60;
-   private static final int      MONTH_IN_SECONDS      = 31 * DAY_IN_SECONDS;
-   private static final int      YEAR_IN_SECONDS       = 366 * DAY_IN_SECONDS;
+   private static final int      DAY_IN_SECONDS           = 24 * 60 * 60;
+   private static final int      MONTH_IN_SECONDS         = 31 * DAY_IN_SECONDS;
+   private static final int      YEAR_IN_SECONDS          = 366 * DAY_IN_SECONDS;
 
-   private static final String[] _monthLabels          =
+   private static final String[] _monthLabels             =
          {
                Messages.Month_jan,
                Messages.Month_feb,
@@ -102,7 +99,7 @@ public class ChartComponents extends Composite {
                Messages.Month_dec
          };
 
-   private static final String[] _monthShortLabels     =
+   private static final String[] _monthShortLabels        =
          {
                Integer.toString(1),
                Integer.toString(2),
@@ -584,6 +581,36 @@ public class ChartComponents extends Composite {
       final ZonedDateTime tourStartTime = xData.getStartDateTime().withNano(0);
       final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(graphMaxValue);
 
+      final int devVisibleWidth = getDevVisibleChartWidth();
+//      final double zoomRatio = componentGraph.getZoomRatio();
+//      if (zoomRatio == 1) {
+//
+//         // chart is not zoomed -> set a left/right border that the first/last values are better visible
+//
+//         final long timeDiff = Duration.between(tourStartTime, tourEndTime).toSeconds();
+//
+//         final int devBorder = 15;
+//         final int devBorder2 = 2 * devBorder;
+//
+//         final double devVisibleWithBorder = devVisibleWidth - devBorder2;
+//
+//         // ensure it is wide enough
+//         if (devVisibleWithBorder > devBorder2) {
+//
+//            final double devTimeDiff = timeDiff / devVisibleWithBorder;
+//            final double devTimeBorder = devTimeDiff * devBorder;
+//
+//            final ZonedDateTime tourStartTime_WithBorder = tourStartTime.minusSeconds((long) devTimeBorder);
+//            final ZonedDateTime tourEndTime_WithBorder = tourEndTime.plusSeconds((long) devTimeBorder);
+//
+//            tourStartTime = tourStartTime_WithBorder;
+//            tourEndTime = tourEndTime_WithBorder;
+//
+//            int a = 0;
+//            a++;
+//         }
+//      }
+
       final long tourStartTimeMilli = tourStartTime.toInstant().toEpochMilli();
 
       long unitStart = tourStartTimeMilli;
@@ -657,7 +684,6 @@ public class ChartComponents extends Composite {
       xData.setUnitLabel(UI.EMPTY_STRING);
 
       final double devGraphXOffset = componentGraph.getXXDevViewPortLeftBorder();
-      final int devVisibleWidth = getDevVisibleChartWidth();
 
       final long graphLeftBorder = (long) (devGraphXOffset / scaleX);
       final long graphRightBorder = (long) ((devGraphXOffset + devVisibleWidth) / scaleX);

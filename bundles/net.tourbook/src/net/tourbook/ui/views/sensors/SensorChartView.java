@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -537,7 +538,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final RGB rgbGradientBright = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientBright_Active();
       final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
 
-      final int numValues = sensorData.allXValues_ByTime.length;
+      final int[] allXValues_ByTime = sensorData.allXValues_ByTime;
+      final int numValues = allXValues_ByTime.length;
       final RGB[] allRGBLine = new RGB[numValues];
       final RGB[] allRGBGradientBright = new RGB[numValues];
       final RGB[] allRGBGradientDark = new RGB[numValues];
@@ -557,50 +559,100 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       /*
        * Set x-axis values
        */
-      final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(sensorData.allXValues_ByTime));
+      final double[] xDataConverted = Util.convertIntToDouble(allXValues_ByTime);
+      final int lastTimeInSec = allXValues_ByTime[numValues - 1];
+
+      final ZonedDateTime tourStartTime = getTourStartTime(sensorData.firstDateTime);
+      final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(lastTimeInSec);
+
+      ZonedDateTime startTimeAdjusted = tourStartTime;
+      ZonedDateTime endTimeAdjusted = tourEndTime;
+
+      final double forcedTourStartTime;
+      final double forcedTourEndTime;
+
+      if (xDataConverted.length == 1) {
+
+         // only 1 point is visible
+
+         startTimeAdjusted = startTimeAdjusted.minusSeconds(1);
+         endTimeAdjusted = endTimeAdjusted.plusSeconds(1);
+
+         forcedTourStartTime = -1;
+         forcedTourEndTime = +1;
+
+      } else {
+
+         // add additional 3% tour time that the tour do not start/end at the chart border
+
+         final double timeDurationSeconds = Duration.between(tourStartTime, tourEndTime).getSeconds();
+
+         /**
+          * Very important: round to 0 ms
+          */
+         long timeOffset = ((long) (timeDurationSeconds * 0.05) / 1000) * 1000;
+
+         // ensure there is a time difference of 1 second
+         if (timeOffset == 0) {
+            timeOffset = 1000;
+         }
+
+         forcedTourStartTime = -timeOffset;
+         forcedTourEndTime = timeDurationSeconds + timeOffset;
+
+//         startTimeAdjusted = startTimeAdjusted.minusSeconds(timeOffset);
+//         endTimeAdjusted = endTimeAdjusted.plusSeconds(timeOffset);
+      }
+
+      final ChartDataXSerie xData = new ChartDataXSerie(xDataConverted);
       xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
-      xData.setStartDateTime(getTourStartTime(sensorData.firstDateTime));
+
+      xData.setStartDateTime(startTimeAdjusted);
+
+//      xData.forceXAxisMinValue(forcedTourStartTime);
+//      xData.forceXAxisMaxValue(forcedTourEndTime);
+
       chartModel.setXData(xData);
 
-      /*
-       * Set y-axis values: Level
-       */
-      final ChartDataYSerie yDataLevel = new ChartDataYSerie(
-            ChartType.BAR,
-            sensorData.allBatteryLevel_End,
-            sensorData.allBatteryLevel_Start);
+//      /*
+//       * Set y-axis values: Level
+//       */
+//      final ChartDataYSerie yDataLevel = new ChartDataYSerie(
+//            ChartType.BAR,
+//            sensorData.allBatteryLevel_End,
+//            sensorData.allBatteryLevel_Start);
+//
+//      yDataLevel.setYTitle("Battery  Level ·  " + sensorName);
+//      yDataLevel.setUnitLabel("%");
+//      yDataLevel.setShowYSlider(true);
+//
+//      yDataLevel.setRgbGraph_Line(rgbLine);
+//      yDataLevel.setRgbGraph_Text(rgbText);
+//      yDataLevel.setRgbBar_Line(allRGBLine);
+//      yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
+//      yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
+//
+//      chartModel.addYData(yDataLevel);
 
-      yDataLevel.setYTitle("Battery  Level ·  " + sensorName);
-      yDataLevel.setUnitLabel("%");
-      yDataLevel.setShowYSlider(true);
-
-      yDataLevel.setRgbGraph_Line(rgbLine);
-      yDataLevel.setRgbGraph_Text(rgbText);
-      yDataLevel.setRgbBar_Line(allRGBLine);
-      yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
-      yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
-
-      chartModel.addYData(yDataLevel);
-
-      /*
-       * Set y-axis values: Status
-       */
-      final ChartDataYSerie yDataStatus = new ChartDataYSerie(
-            ChartType.BAR,
-            sensorData.allBatteryStatus_End,
-            sensorData.allBatteryStatus_Start);
-
-      yDataStatus.setYTitle("Battery  Status ·  " + sensorName);
-      yDataStatus.setUnitLabel("#");
-      yDataStatus.setShowYSlider(true);
-
-      yDataStatus.setRgbGraph_Line(rgbLine);
-      yDataStatus.setRgbGraph_Text(rgbText);
-      yDataStatus.setRgbBar_Line(allRGBLine);
-      yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
-      yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
-
-      chartModel.addYData(yDataStatus);
+//      /*
+//       * Set y-axis values: Status
+//       */
+//      final ChartDataYSerie yDataStatus = new ChartDataYSerie(
+//            ChartType.BAR,
+//            sensorData.allBatteryStatus_End,
+//            sensorData.allBatteryStatus_Start);
+//
+//      yDataStatus.setYTitle("Battery  Status ·  " + sensorName);
+//      yDataStatus.setUnitLabel("#");
+//      yDataStatus.setShowYSlider(true);
+//
+//      yDataStatus.setRgbGraph_Line(rgbLine);
+//      yDataStatus.setRgbGraph_Text(rgbText);
+//      yDataStatus.setRgbBar_Line(allRGBLine);
+//      yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
+//      yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
+//
+//      chartModel.addYData(yDataStatus);
 
       /*
        * Set y-axis values: Voltage
@@ -613,6 +665,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       yDataVoltage.setYTitle("Battery Voltage ·  " + sensorName);
       yDataVoltage.setUnitLabel("Volt");
       yDataVoltage.setShowYSlider(true);
+      yDataVoltage.setSetMinMax_0Values(true);
 
       yDataVoltage.setRgbGraph_Line(rgbLine);
       yDataVoltage.setRgbGraph_Text(rgbText);
@@ -621,28 +674,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       yDataVoltage.setRgbBar_Gradient_Dark(allRGBGradientDark);
 
       chartModel.addYData(yDataVoltage);
-
-//    DISABLE: Is not very valueable
-//
-//      /*
-//       * Set y-axis values: Battery health
-//       */
-//      final ChartDataYSerie yData_Performance = new ChartDataYSerie(
-//            ChartType.DOT,
-//            sensorData.allBatteryPerformance,
-//            true);
-//
-//      yData_Performance.setYTitle("Battery Health");
-//      yData_Performance.setUnitLabel("Volt Diff / Tour Duration");
-//      yData_Performance.setShowYSlider(true);
-//
-//      yData_Performance.setRgbGraph_Line(rgbLine);
-//      yData_Performance.setRgbGraph_Text(rgbText);
-//      yData_Performance.setRgbBar_Line(allRGBLine);
-//      yData_Performance.setRgbBar_Gradient_Bright(allRGBGradientBright);
-//      yData_Performance.setRgbBar_Gradient_Dark(allRGBGradientDark);
-//
-//      chartModel.addYData(yData_Performance);
 
       /*
        * Setup other properties

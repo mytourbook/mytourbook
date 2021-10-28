@@ -30,6 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.views.sensors.SensorManager;
 
 /**
  */
@@ -95,6 +96,12 @@ public class DeviceSensor implements Cloneable {
 
    @Transient
    private long                 _createId             = 0;
+
+   /**
+    * Sensor name which is containg info about type, manufacturer or product
+    */
+   @Transient
+   private String               _label;
 
    /**
     * Default constructor used in EJB
@@ -195,6 +202,20 @@ public class DeviceSensor implements Cloneable {
       return description;
    }
 
+   /**
+    * @return Returns a name which is containg info about the sensor type, manufacturer or product
+    */
+   public String getLabel() {
+
+      if (_label != null) {
+         return _label;
+      }
+
+      updateSensorLabel();
+
+      return _label;
+   }
+
    public String getManufacturerName() {
       return manufacturerName;
    }
@@ -219,7 +240,7 @@ public class DeviceSensor implements Cloneable {
    }
 
    /**
-    * @return Returns the sensor name or an empty string when not available
+    * @return Returns the sensor custom name or an empty string when not available
     */
    public String getSensorName() {
 
@@ -318,7 +339,10 @@ public class DeviceSensor implements Cloneable {
    }
 
    public void setManufacturerName(final String manufacturerName) {
+
       this.manufacturerName = manufacturerName;
+
+      updateSensorLabel();
    }
 
    public void setManufacturerNumber(final int manufacturerNumber) {
@@ -326,7 +350,10 @@ public class DeviceSensor implements Cloneable {
    }
 
    public void setProductName(final String productName) {
+
       this.productName = productName;
+
+      updateSensorLabel();
    }
 
    public void setProductNumber(final int productNumber) {
@@ -334,11 +361,17 @@ public class DeviceSensor implements Cloneable {
    }
 
    public void setSensorName(final String label) {
+
       this.sensorName = label;
+
+      updateSensorLabel();
    }
 
    public void setSensorType(final DeviceSensorType sensorType) {
+
       this.sensorType = sensorType;
+
+      updateSensorLabel();
    }
 
    public void setSerialNumber(final String serialNumber) {
@@ -386,5 +419,21 @@ public class DeviceSensor implements Cloneable {
       description = modifiedSensor.description;
 
       sensorType = modifiedSensor.sensorType;
+   }
+
+   private void updateSensorLabel() {
+
+      final String sensorTypeName = SensorManager.getSensorTypeName(sensorType);
+      final String sensorCustomName = getSensorName();
+      final String productManufacturerName = manufacturerName + UI.DASH_WITH_SPACE + productName;
+
+      if (sensorCustomName.length() > 0) {
+
+         _label = sensorCustomName + UI.DASH_WITH_SPACE + sensorTypeName;
+
+      } else {
+
+         _label = productManufacturerName + UI.DASH_WITH_SPACE + sensorTypeName;
+      }
    }
 }

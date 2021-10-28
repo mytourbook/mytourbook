@@ -219,6 +219,21 @@ public class DeviceSensorValue {
       return Objects.hash(sensorValueId);
    }
 
+   /**
+    * @return Returns <code>true</code> when any values are available
+    */
+   public boolean isDataAvailable() {
+
+      if (batteryLevel_Start != -1 || batteryLevel_End != -1
+            || batteryStatus_Start != -1 || batteryStatus_End != -1
+            || batteryVoltage_Start != -1 || batteryVoltage_End != -1) {
+
+         return true;
+      }
+
+      return false;
+   }
+
    public void setBattery_Level(final Short batteryLevel) {
 
       if (batteryLevel == null) {
@@ -234,6 +249,20 @@ public class DeviceSensorValue {
       } else {
 
          batteryLevel_End = batteryLevel;
+      }
+
+      /*
+       * Ensure that the start value is larger than the end value
+       */
+      if (batteryLevel_Start != -1 && batteryLevel_End != -1
+
+            && batteryLevel_End > batteryLevel_Start) {
+
+         final short batteryLevel_StartBackup = batteryLevel_Start;
+
+         batteryLevel_Start = batteryLevel_End;
+         batteryLevel_End = batteryLevel_StartBackup;
+
       }
    }
 
@@ -270,6 +299,21 @@ public class DeviceSensorValue {
       } else {
 
          batteryVoltage_End = batteryVoltage;
+      }
+
+      /*
+       * It happened, that the end value is larger than the start value -> this cannot be possible
+       * when riding a tour -> the sensor chart could hide bars because of the wrong min/max values
+       */
+      if (batteryVoltage_Start != -1 && batteryVoltage_End != -1
+
+            && batteryVoltage_End > batteryVoltage_Start) {
+
+         final float batteryVoltage_StartBackup = batteryVoltage_Start;
+
+         batteryVoltage_Start = batteryVoltage_End;
+         batteryVoltage_End = batteryVoltage_StartBackup;
+
       }
    }
 

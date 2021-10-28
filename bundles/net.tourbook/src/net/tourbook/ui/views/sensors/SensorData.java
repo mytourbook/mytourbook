@@ -24,7 +24,9 @@ public class SensorData {
    public long[]       allTourIds;
    public long[]       allTourStartTime;
 
-   public int[]        allXValues_BySequence;
+   /**
+    * Relative time values in seconds, starting from 0
+    */
    public int[]        allXValues_ByTime;
 
    public float[]      allBatteryLevel_Start;

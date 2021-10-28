@@ -200,26 +200,7 @@ public class DialogSensor extends TitleAreaDialog {
       return (DeviceSensorType) selectedItem.value;
    }
 
-   private int getSensorTypeIndex(final Enum<DeviceSensorType> requestedSensorType) {
 
-      if (requestedSensorType == null) {
-
-         // this case should not happen
-
-         return 0;
-      }
-
-      final ComboEnumEntry<?>[] allSensorTypes = SensorManager.ALL_SENSOR_TYPES;
-
-      for (int itemIndex = 0; itemIndex < allSensorTypes.length; itemIndex++) {
-
-         if (allSensorTypes[itemIndex].value.equals(requestedSensorType)) {
-            return itemIndex;
-         }
-      }
-
-      return 0;
-   }
 
    @Override
    protected void okPressed() {
@@ -244,7 +225,7 @@ public class DialogSensor extends TitleAreaDialog {
 
       // sensor type
       final DeviceSensorType sensorType = _sensor_Clone.getSensorType();
-      final int sensorIndex = getSensorTypeIndex(sensorType);
+      final int sensorIndex = SensorManager.getSensorTypeIndex(sensorType);
       _comboSensorType.select(sensorIndex);
    }
 

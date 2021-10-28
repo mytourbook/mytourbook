@@ -7135,24 +7135,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns <code>true</code>
-    */
-   public float getBatteryLevel_GearShifting() {
-
-      for (final DeviceSensorValue sensorValue : deviceSensorValues) {
-
-         final DeviceSensor sensor = sensorValue.getDeviceSensor();
-
-         if (DeviceSensorType.GEAR_SHIFTING.equals(sensor.getSensorType())) {
-            return sensorValue.getBatteryLevel_Start();
-         }
-
-      }
-
-      return -1;
-   }
-
-   /**
     * @return Returns the body fat.
     */
    public float getBodyFat() {

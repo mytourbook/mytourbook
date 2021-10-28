@@ -9652,7 +9652,7 @@ public class ChartComponentGraph extends Canvas {
          xValueIndex_Right = Math.min(xValueIndex_Right, yValuesLastIndex);
          xValueIndex_Right = Math.max(xValueIndex_Right, 0);
 
-         // set dummy value
+         // set invalid value
          float dataMinValue = Float.MIN_VALUE;
          float dataMaxValue = Float.MIN_VALUE;
 
@@ -9749,11 +9749,22 @@ public class ChartComponentGraph extends Canvas {
                yData.setVisibleMinValue(forcedMinValue);
             }
 
-         } else if (dataMinValue != 0) {
+         } else {
 
             // min is not forced
 
-            yData.setVisibleMinValue(dataMinValue);
+            if (false
+
+                  // set any values
+                  || yData.isSetVisibleMinMax_0_Values
+
+                  // this is the historic behavior
+                  || dataMinValue != 0
+
+            ) {
+
+               yData.setVisibleMinValue(dataMinValue);
+            }
          }
 
          if (yData.isForceMaxValue()) {
@@ -9778,12 +9789,24 @@ public class ChartComponentGraph extends Canvas {
                yData.setVisibleMaxValue(forcedMaxValue);
             }
 
-         } else if (dataMaxValue != 0) {
+         } else {
 
             // max is not forced
 
-            yData.setVisibleMaxValue(dataMaxValue);
+            if (false
+
+                  // set any values
+                  || yData.isSetVisibleMinMax_0_Values
+
+                  // this is the historic behavior
+                  || dataMaxValue != 0
+
+            ) {
+
+               yData.setVisibleMaxValue(dataMaxValue);
+            }
          }
+
       }
    }
 

@@ -78,15 +78,12 @@ public class SensorDataProvider {
          final TFloatArrayList allBatteryVoltage_Start = new TFloatArrayList();
          final TFloatArrayList allBatteryVoltage_End = new TFloatArrayList();
 
-         final TIntArrayList allXValues_BySequence = new TIntArrayList();
          final TIntArrayList allXValues_ByTime = new TIntArrayList();
 
          final TLongArrayList allTourIds = new TLongArrayList();
          final TLongArrayList allTourStartTime = new TLongArrayList();
 
          long firstDateTime = Long.MIN_VALUE;
-
-         int numXValue = 0;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -160,7 +157,6 @@ public class SensorDataProvider {
 
             if (isAvailable_Start || isAvailable_End) {
 
-               allXValues_BySequence.add(numXValue++);
                allTourIds.add(dbTourId);
                allTourStartTime.add(dbTourStartTime);
 
@@ -172,8 +168,9 @@ public class SensorDataProvider {
                }
 
                final long relativeTimeDiffInMS = dbTourStartTime - firstDateTime;
+               final long relativeTimeDiffInSec = relativeTimeDiffInMS / 1000;
 
-               allXValues_ByTime.add((int) (relativeTimeDiffInMS / 1000));
+               allXValues_ByTime.add((int) relativeTimeDiffInSec);
             }
          }
 
@@ -184,7 +181,6 @@ public class SensorDataProvider {
 
          sensorData.firstDateTime = firstDateTime;
 
-         sensorData.allXValues_BySequence = allXValues_BySequence.toArray();
          sensorData.allXValues_ByTime = allXValues_ByTime.toArray();
 
          sensorData.allBatteryLevel_Start = allBatteryLevel_Start.toArray();

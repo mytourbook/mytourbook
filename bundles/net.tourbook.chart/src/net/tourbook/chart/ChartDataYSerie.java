@@ -124,6 +124,12 @@ public class ChartDataYSerie extends ChartDataSerie {
    private boolean                _isIgnoreMinMaxZero;
 
    /**
+    * When <code>false</code> which is the default and the historic behavior, then 0 values are
+    * ignored when visible min/max values are set
+    */
+   protected boolean              isSetVisibleMinMax_0_Values;
+
+   /**
     * When this value is > 0 a line chart will not draw a line to the next value point when the
     * difference in the x-data values is greater than this value.
     * <p>
@@ -733,6 +739,10 @@ public class ChartDataYSerie extends ChartDataSerie {
          _originalMinValue = _visibleMinValue;
          _originalMaxValue = _visibleMaxValue;
       }
+   }
+
+   public void setSetMinMax_0Values(final boolean isSetMinMax_0Values) {
+      this.isSetVisibleMinMax_0_Values = isSetMinMax_0Values;
    }
 
    /**
