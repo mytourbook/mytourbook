@@ -26,10 +26,10 @@
 </dependency>
 </dependencies>
 	
-<properties>
-	<tycho.version>2.5.0</tycho.version>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-</properties>
+   <properties>
+      <tycho.version>2.5.0</tycho.version>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+   </properties>
 
 
    <modules>
@@ -67,7 +67,6 @@
             <module>build/build.update-site-no-NL</module>
          </modules>
       </profile>
-
       
    </profiles>
 
