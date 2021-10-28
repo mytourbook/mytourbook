@@ -57,12 +57,6 @@ sonarqube {
   }
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
-
 /*
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
 */
