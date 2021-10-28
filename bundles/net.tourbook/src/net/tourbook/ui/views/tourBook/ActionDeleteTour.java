@@ -56,9 +56,7 @@ public class ActionDeleteTour extends Action {
 
       private Long _tourId;
 
-
       public TourItem(final Long tourId) {
-
          _tourId = tourId;
       }
 
