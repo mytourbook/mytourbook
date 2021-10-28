@@ -10,7 +10,9 @@ repositories/
 
 **/build/*repo/**/*.jar
 **/build/*update-site/**/*.jar
+**/build/**/build/sonar
 **/*vtm*/**/build/
+
 
 .apt_generated
 .gradle
@@ -19,4 +21,6 @@ repositories/
 
 *.js.map
 *.js.uncompressed.js
+
+*.hprof
 

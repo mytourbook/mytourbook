@@ -29,9 +29,7 @@
          id="feature.net.tourbook.ext.eclipse"
          version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.eclipse.nl"
-         version="0.0.0"/>
+   <includes id="feature.net.tourbook.ext.eclipse.nl" version="0.0.0"/>
 
    <includes
          id="feature.net.tourbook.app"
