@@ -31,7 +31,6 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
-
    <modules>
       <!-- artifact.bundles -->
       <module>../../mytourbook-BUILD-autocreated/core</module>
