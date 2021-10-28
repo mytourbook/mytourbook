@@ -41,80 +41,89 @@ import utils.Initializer;
 
 class FitLogExTests {
 
-	private static final String IMPORT_PATH = "/importdata/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+   private static final String           IMPORT_PATH = "/importdata/sporttracks/fitlogex/files/"; //$NON-NLS-1$
 
-	private static SAXParser parser;
-	private static Map<Long, TourData> newlyImportedTours;
-	private static Map<Long, TourData> alreadyImportedTours;
-	private static FitLogDeviceDataReader deviceDataReader;
+   private static SAXParser              parser;
+   private static Map<Long, TourData>    newlyImportedTours;
+   private static Map<Long, TourData>    alreadyImportedTours;
+   private static FitLogDeviceDataReader deviceDataReader;
 
-	@BeforeAll
-	static void initAll() {
+   @BeforeAll
+   static void initAll() {
 
-		Initializer.initializeDatabase();
-		parser = Initializer.initializeParser();
-		newlyImportedTours = new HashMap<>();
-		alreadyImportedTours = new HashMap<>();
-		deviceDataReader = new FitLogDeviceDataReader();
-	}
+      Initializer.initializeDatabase();
+      parser = Initializer.initializeParser();
+      newlyImportedTours = new HashMap<>();
+      alreadyImportedTours = new HashMap<>();
+      deviceDataReader = new FitLogDeviceDataReader();
+   }
 
-	@AfterEach
-	void tearDown() {
-		newlyImportedTours.clear();
-		alreadyImportedTours.clear();
-	}
+   @AfterEach
+   void tearDown() {
 
-	/**
-	 * This tests parses a file for which the time offset of -7 hours is wrong
-	 * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST
-	 * zone (-6h or -21600). However, the start time is correct and needs to be
-	 * kept.
-	 *
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	@Test
-	void testImportParkCity() throws SAXException, IOException {
+      newlyImportedTours.clear();
+      alreadyImportedTours.clear();
+   }
 
-		final String filePathWithoutExtension = IMPORT_PATH + "ParkCity"; //$NON-NLS-1$
-		final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
-		final InputStream fitLogExFile = FitLogExTests.class.getResourceAsStream(importFilePath);
+   /**
+    * This tests parses a file for which the time offset of -7 hours is wrong
+    * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST
+    * zone (-6h or -21600). However, the start time is correct and needs to be
+    * kept.
+    *
+    * @throws SAXException
+    * @throws IOException
+    */
+   @Test
+   void testImportParkCity() throws SAXException, IOException {
 
-		final URL importFile_BundleUrl = FitLogExTests.class.getResource(importFilePath);
+      final String filePathWithoutExtension = IMPORT_PATH + "ParkCity"; //$NON-NLS-1$
+      final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
+      final InputStream fitLogExFile = FitLogExTests.class.getResourceAsStream(importFilePath);
 
-		final FitLog_SAXHandler handler = new FitLog_SAXHandler(NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
-				alreadyImportedTours, newlyImportedTours, true, new ImportState_File(), new ImportState_Process(),
-				deviceDataReader);
+      final URL importFile_BundleUrl = FitLogExTests.class.getResource(importFilePath);
 
-		parser.parse(fitLogExFile, handler);
+      final FitLog_SAXHandler handler = new FitLog_SAXHandler(NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
+            alreadyImportedTours,
+            newlyImportedTours,
+            true,
+            new ImportState_File(),
+            new ImportState_Process(),
+            deviceDataReader);
 
-		final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+      parser.parse(fitLogExFile, handler);
 
-		// set relative path that it works with different OS
-		tour.setImportFilePath(importFilePath);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-		Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
-	}
+      // set relative path that it works with different OS
+      tour.setImportFilePath(importFilePath);
 
-	@Test
-	void testImportTimothyLake() throws SAXException, IOException {
+      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+   }
 
-		final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
-		final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
-		final InputStream fitLogExFile = FitLogExTests.class.getResourceAsStream(importFilePath);
-		final URL importFile_BundleUrl = FitLogExTests.class.getResource(importFilePath);
+   @Test
+   void testImportTimothyLake() throws SAXException, IOException {
 
-		final FitLog_SAXHandler handler = new FitLog_SAXHandler(NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
-				alreadyImportedTours, newlyImportedTours, true, new ImportState_File(), new ImportState_Process(),
-				deviceDataReader);
+      final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
+      final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
+      final InputStream fitLogExFile = FitLogExTests.class.getResourceAsStream(importFilePath);
+      final URL importFile_BundleUrl = FitLogExTests.class.getResource(importFilePath);
 
-		parser.parse(fitLogExFile, handler);
+      final FitLog_SAXHandler handler = new FitLog_SAXHandler(NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
+            alreadyImportedTours,
+            newlyImportedTours,
+            true,
+            new ImportState_File(),
+            new ImportState_Process(),
+            deviceDataReader);
 
-		final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+      parser.parse(fitLogExFile, handler);
 
-		// set relative path that it works with different OS
-		tour.setImportFilePath(importFilePath);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-		Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
-	}
+      // set relative path that it works with different OS
+      tour.setImportFilePath(importFilePath);
+
+      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+   }
 }

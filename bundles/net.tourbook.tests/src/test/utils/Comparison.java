@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +68,7 @@ public class Comparison {
             new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
-				new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
+            new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
@@ -112,14 +111,14 @@ public class Comparison {
 
    public static String readFileContent(final String controlDocumentFileName) {
 
-      final String controlDocumentFilePath = Paths.get(controlDocumentFileName).toAbsolutePath().toString();
+      final String controlDocumentFilePath = utils.FilesUtils.getAbsoluteFilePath(controlDocumentFileName);
 
       return FilesUtils.readFileContentString(controlDocumentFilePath);
    }
 
    public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
 
-		return newlyImportedTours.entrySet().iterator().next().getValue();
+      return newlyImportedTours.entrySet().iterator().next().getValue();
    }
 
    /**

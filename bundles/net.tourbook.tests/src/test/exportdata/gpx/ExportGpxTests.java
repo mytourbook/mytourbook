@@ -37,75 +37,77 @@ import utils.Initializer;
 
 public class ExportGpxTests {
 
-	private static final String IMPORT_PATH = FilesUtils.rootPath + "exportdata/gpx/files/"; //$NON-NLS-1$
-	private static final String _testTourFilePath = IMPORT_PATH + "GPXExport.gpx"; //$NON-NLS-1$
+   private static final String IMPORT_PATH       = FilesUtils.rootPath + "exportdata/gpx/files/"; //$NON-NLS-1$
+   private static final String _testTourFilePath = IMPORT_PATH + "GPXExport.gpx";                 //$NON-NLS-1$
 
-	private static TourData _tour;
-	private TourExporter _tourExporter;
+   private static TourData     _tour;
+   private TourExporter        _tourExporter;
 
-	@BeforeAll
-	static void initAll() {
+   @BeforeAll
+   static void initAll() {
 
-		_tour = Initializer.importTour();
-		final TourType tourType = new TourType();
-		tourType.setName("Running"); //$NON-NLS-1$
-		_tour.setTourType(tourType);
-	}
+      _tour = Initializer.importTour();
+      final TourType tourType = new TourType();
+      tourType.setName("Running"); //$NON-NLS-1$
+      _tour.setTourType(tourType);
+   }
 
-	@AfterEach
-	void afterEach() {
+   @AfterEach
+   void afterEach() {
 
-		if (!Files.exists(Paths.get(_testTourFilePath))) {
-			return;
-		}
-		try {
-			Files.delete(Paths.get(_testTourFilePath));
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-	}
+      if (!Files.exists(Paths.get(_testTourFilePath))) {
+         return;
+      }
+      try {
+         Files.delete(Paths.get(_testTourFilePath));
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
+   }
 
-	@BeforeEach
-	void beforeEach() {
+   @BeforeEach
+   void beforeEach() {
 
-		_tourExporter = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE).useTourData(_tour);
-		_tourExporter.setActivityType(_tour.getTourType().getName());
-	}
+      _tourExporter = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE).useTourData(_tour);
+      _tourExporter.setActivityType(_tour.getTourType().getName());
+   }
 
-	private void executeTest(final String controlTourFileName) {
+   private void executeTest(final String controlTourFileName) {
 
-		_tourExporter.export(_testTourFilePath);
+      _tourExporter.export(_testTourFilePath);
 
-		final List<String> nodesToFilter = Arrays.asList("Cadence", "mt:tourType", "mt:tourDistance"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		final List<String> attributesToFilter = Arrays.asList("creator"); //$NON-NLS-1$
-		Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName, _testTourFilePath, nodesToFilter,
-				attributesToFilter);
-	}
+      final List<String> nodesToFilter = Arrays.asList("Cadence", "mt:tourType", "mt:tourDistance"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final List<String> attributesToFilter = Arrays.asList("creator"); //$NON-NLS-1$
+      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName,
+            _testTourFilePath,
+            nodesToFilter,
+            attributesToFilter);
+   }
 
-	@Test
-	void testGpxExportAllOptions() {
+   @Test
+   void testGpxExportAllOptions() {
 
-		final String controlTourFileName = "LongsPeak-AllOptions-RelativeDistance.gpx"; //$NON-NLS-1$
+      final String controlTourFileName = "LongsPeak-AllOptions-RelativeDistance.gpx"; //$NON-NLS-1$
 
-		_tourExporter.setUseDescription(true);
-		_tourExporter.setIsExportAllTourData(true);
-		_tourExporter.setIsExportSurfingWaves(true);
-		_tourExporter.setIsExportWithBarometer(true);
-		_tourExporter.setIsCamouflageSpeed(true);
-		_tourExporter.setCamouflageSpeed(15 / 3.6f); // 15km/h
-		_tour.setBodyWeight(77.7f); // 77.7kg
-		_tour.setCalories(1282000); // 1282 kcal / 1282000 calories
+      _tourExporter.setUseDescription(true);
+      _tourExporter.setIsExportAllTourData(true);
+      _tourExporter.setIsExportSurfingWaves(true);
+      _tourExporter.setIsExportWithBarometer(true);
+      _tourExporter.setIsCamouflageSpeed(true);
+      _tourExporter.setCamouflageSpeed(15 / 3.6f); // 15km/h
+      _tour.setBodyWeight(77.7f); // 77.7kg
+      _tour.setCalories(1282000); // 1282 kcal / 1282000 calories
 
-		executeTest(controlTourFileName);
-	}
+      executeTest(controlTourFileName);
+   }
 
-	@Test
-	void testGpxExportDescriptionAndActivity() {
+   @Test
+   void testGpxExportDescriptionAndActivity() {
 
-		final String controlTourFileName = "LongsPeak-AbsoluteDistance.gpx"; //$NON-NLS-1$
+      final String controlTourFileName = "LongsPeak-AbsoluteDistance.gpx"; //$NON-NLS-1$
 
-		_tourExporter.setUseAbsoluteDistance(true);
+      _tourExporter.setUseAbsoluteDistance(true);
 
-		executeTest(controlTourFileName);
-	}
+      executeTest(controlTourFileName);
+   }
 }
