@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 public class SensorDataProvider {
 
@@ -37,9 +38,11 @@ public class SensorDataProvider {
    /**
     * Retrieve chart data from the database
     *
+    * @param sensorId
+    * @param isUseAppFilter
     * @return
     */
-   SensorData getData(final long sensorId) {
+   SensorData getData(final long sensorId, final boolean isUseAppFilter) {
 
       String sql = null;
 
@@ -47,12 +50,32 @@ public class SensorDataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+         String sqlAppFilter = UI.EMPTY_STRING;
+
+         if (isUseAppFilter) {
+
+            final String sqlTourIds = UI.EMPTY_STRING
+
+                  + "SELECT" + NL //                                          //$NON-NLS-1$
+
+                  + " TourId" + NL //                                         //$NON-NLS-1$
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //           //$NON-NLS-1$
+
+                  + " WHERE 1=1 " + appFilter.getWhereClause() + NL //        //$NON-NLS-1$
+            ;
+
+            sqlAppFilter = " AND TOURDATA_TourID IN (" + sqlTourIds + ")"; // //$NON-NLS-1$ //$NON-NLS-2$
+
+         }
+
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL
 
                + "   DEVICESENSOR_SensorID," + NL //                       1  //$NON-NLS-1$
                + "   TOURDATA_TourID," + NL //                             2  //$NON-NLS-1$
+
                + "   TourStartTime," + NL //                               3  //$NON-NLS-1$
                + "   TourEndTime," + NL //                                 4  //$NON-NLS-1$
                + "   BatteryLevel_Start," + NL //                          5  //$NON-NLS-1$
@@ -67,6 +90,7 @@ public class SensorDataProvider {
                + "WHERE" + NL //                                              //$NON-NLS-1$
 
                + "   DEVICESENSOR_SensorID = ?" + NL //                       //$NON-NLS-1$
+               + "   " + sqlAppFilter + NL //                                 //$NON-NLS-1$
 
                + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
          ;
@@ -78,6 +102,10 @@ public class SensorDataProvider {
          final TFloatArrayList allBatteryVoltage_Start = new TFloatArrayList();
          final TFloatArrayList allBatteryVoltage_End = new TFloatArrayList();
 
+         boolean isAvailable_Level = false;
+         boolean isAvailable_Status = false;
+         boolean isAvailable_Voltage = false;
+
          final TIntArrayList allXValues_ByTime = new TIntArrayList();
 
          final TLongArrayList allTourIds = new TLongArrayList();
@@ -85,11 +113,15 @@ public class SensorDataProvider {
 
          long firstDateTime = Long.MIN_VALUE;
 
-         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
 
-         prepStmt.setLong(1, sensorId);
+         stmt.setLong(1, sensorId);
 
-         final ResultSet result = prepStmt.executeQuery();
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmt, 2);
+         }
+
+         final ResultSet result = stmt.executeQuery();
          while (result.next()) {
 
 // SET_FORMATTING_OFF
@@ -114,6 +146,10 @@ public class SensorDataProvider {
             final boolean isAvailable_Status_End      = dbBatteryStatus_End >= 0;
             final boolean isAvailable_Voltage_Start   = dbBatteryVoltage_Start >= 0;
             final boolean isAvailable_Voltage_End     = dbBatteryVoltage_End >= 0;
+
+            isAvailable_Level    |= isAvailable_Level_Start    || isAvailable_Level_End;
+            isAvailable_Status   |= isAvailable_Status_Start   || isAvailable_Status_End;
+            isAvailable_Voltage  |= isAvailable_Voltage_Start  || isAvailable_Voltage_End;
 
 // SET_FORMATTING_ON
 
@@ -190,6 +226,10 @@ public class SensorDataProvider {
          sensorData.allBatteryVoltage_Start = allBatteryVoltage_Start.toArray();
          sensorData.allBatteryVoltage_End = allBatteryVoltage_End.toArray();
 
+         sensorData.isAvailable_Level = isAvailable_Level;
+         sensorData.isAvailable_Status = isAvailable_Status;
+         sensorData.isAvailable_Voltage = isAvailable_Voltage;
+
          sensorData.allTourIds = allTourIds.toArray();
          sensorData.allTourStartTime = allTourStartTime.toArray();
 
@@ -204,36 +244,63 @@ public class SensorDataProvider {
                                   final boolean isAvailableValue_End,
                                   final boolean isAvailable_Start,
                                   final boolean isAvailable_End,
-                                  final float batteryValue_Start,
-                                  final float batteryValue_End,
+                                  final float value_Start,
+                                  final float value_End,
                                   final TFloatArrayList allBatteryValue_Start,
                                   final TFloatArrayList allBatteryValue_End) {
 
+      float value_1;
+      float value_2;
+
       if (isAvailableValue_Start && isAvailableValue_End) {
+
+         float startEndMinDiff = 0;
+         float startEndDiff = value_Start - value_End;
+
+         // ensure a positive diff
+         if (startEndDiff < 0) {
+            startEndDiff = -startEndDiff;
+         }
 
          /*
           * Ensure that start and end values are not the same, otherwise they are not visible
           * and this can happen when only one of them is available or the start end values
           * have not changed
           */
-         float startEndMinDiff = 0;
-         final float startEndDiff = batteryValue_Start - batteryValue_End;
          if (startEndDiff < 0.01) {
             startEndMinDiff = START_END_MIN_VALUE;
          }
 
-         allBatteryValue_Start.add(batteryValue_Start + startEndMinDiff);
-         allBatteryValue_End.add(batteryValue_End);
+         value_1 = value_Start + startEndMinDiff;
+         value_2 = value_End;
+
+         // ensure start > end, otherwise the chart bar is painted wrong also the min/max values are wrong
+         if (value_2 > value_1) {
+
+            final float value_1_Backup = value_1;
+
+            value_1 = value_2;
+            value_2 = value_1_Backup;
+         }
+
+         allBatteryValue_Start.add(value_1);
+         allBatteryValue_End.add(value_2);
 
       } else if (isAvailableValue_Start) {
 
-         allBatteryValue_Start.add(batteryValue_Start + START_END_MIN_VALUE);
-         allBatteryValue_End.add(batteryValue_Start);
+         value_1 = value_Start + START_END_MIN_VALUE;
+         value_2 = value_Start;
+
+         allBatteryValue_Start.add(value_1);
+         allBatteryValue_End.add(value_2);
 
       } else if (isAvailableValue_End) {
 
-         allBatteryValue_Start.add(batteryValue_End + START_END_MIN_VALUE);
-         allBatteryValue_End.add(batteryValue_End);
+         value_1 = value_End + START_END_MIN_VALUE;
+         value_2 = value_End;
+
+         allBatteryValue_Start.add(value_1);
+         allBatteryValue_End.add(value_2);
 
       } else {
 
@@ -241,8 +308,8 @@ public class SensorDataProvider {
 
             // add dummy data, that all y-data have the same number of items
 
-            allBatteryValue_Start.add(-1);
-            allBatteryValue_End.add(-1);
+            allBatteryValue_Start.add(0);
+            allBatteryValue_End.add(0);
          }
 
       }

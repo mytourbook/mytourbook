@@ -425,6 +425,17 @@ public class SensorView extends ViewPart implements ITourViewer {
                 * the tree must be redrawn because the styled text does not show with the new color
                 */
                _sensorViewer.getTable().redraw();
+
+            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+               // reselect current sensor that the sensor chart (when opened) is reloaded
+
+               final StructuredSelection selection = getViewerSelection();
+
+               _sensorViewer.setSelection(selection, true);
+
+               final Table table = _sensorViewer.getTable();
+               table.showSelection();
             }
          }
       };
@@ -800,9 +811,10 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
             final DeviceSensorType sensorType = sensorItem.sensor.getSensorType();
+
             cell.setText(sensorType == null
                   ? UI.EMPTY_STRING
-                  : sensorType.name());
+                  : SensorManager.getSensorTypeName(sensorType));
          }
       });
    }
@@ -1100,6 +1112,12 @@ public class SensorView extends ViewPart implements ITourViewer {
          }
          _viewerContainer.setRedraw(true);
 
+         /*
+          * When a sensor is modified, all tours with sensor values do contain the old sensor
+          * instance
+          */
+         TourManager.getInstance().clearTourDataCache();
+         TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, this);
       }
    }
 

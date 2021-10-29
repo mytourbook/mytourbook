@@ -48,7 +48,7 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
-import net.tourbook.ui.views.sensors.SensorManager;
+import net.tourbook.ui.views.sensors.BatteryStatus;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -155,6 +155,8 @@ public class TourInfoUI {
     * Tour which is displayed in the tool tip
     */
    private TourData                       _tourData;
+
+   private ArrayList<DeviceSensorValue>   _allSensorValuesWithData;
 
    private String                         _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
 
@@ -286,8 +288,10 @@ public class TourInfoUI {
    private Label            _lblRunDyn_VerticalRatio_Avg_Unit;
 
    private ArrayList<Label> _allSensorValue_Label;
-   private ArrayList<Label> _allSensorValue_Unit;
-   private ArrayList<Label> _allSensorValue_Value;
+
+   private ArrayList<Label> _allSensorValue_Level;
+   private ArrayList<Label> _allSensorValue_Status;
+   private ArrayList<Label> _allSensorValue_Voltage;
 
    private class ActionCloseTooltip extends Action {
 
@@ -426,7 +430,7 @@ public class TourInfoUI {
             }
 
             createUI_90_LowerPart(_ttContainer);
-            createUI_92_CreateModifyTime(_ttContainer);
+            createUI_99_CreateModifyTime(_ttContainer);
          }
       }
 
@@ -748,7 +752,6 @@ public class TourInfoUI {
 
          _lblBattery_Spacer = createUI_Spacer(container);
          createUI_45_Battery(container);
-         createUI_46_SensorValues(container);
       }
    }
 
@@ -883,60 +886,6 @@ public class TourInfoUI {
 
          _lblBattery_Start = createUI_LabelValue(parent, SWT.TRAIL);
          _lblBattery_End = createUI_LabelValue(parent, SWT.LEAD);
-      }
-   }
-
-   private void createUI_46_SensorValues(final Composite parent) {
-
-      /*
-       * Sensor batteries
-       */
-      final Set<DeviceSensorValue> allSensorValues = _tourData.getDeviceSensorValues();
-      if (allSensorValues.size() == 0) {
-         return;
-      }
-
-      // sort by sensor label
-      final ArrayList<DeviceSensorValue> allSortedSensorValues = new ArrayList<>(allSensorValues);
-      Collections.sort(allSortedSensorValues, (sensorValue1, sensorValue2) -> {
-
-         if (sensorValue1.isDataAvailable() && sensorValue2.isDataAvailable()) {
-
-            return sensorValue1.getDeviceSensor().getLabel().compareTo(sensorValue2.getDeviceSensor().getLabel());
-         }
-
-         return 0;
-      });
-
-      _allSensorValue_Label = new ArrayList<>();
-      _allSensorValue_Value = new ArrayList<>();
-      _allSensorValue_Unit = new ArrayList<>();
-
-      for (final DeviceSensorValue sensorValue : allSortedSensorValues) {
-
-         if (sensorValue.isDataAvailable() == false) {
-            continue;
-         }
-
-         final DeviceSensor sensor = sensorValue.getDeviceSensor();
-         String sensorLabel = sensor.getLabel();
-
-         final String sensorTypeName = SensorManager.getSensorTypeName(sensor.getSensorType());
-         final String sensorCustomName = sensor.getSensorName();
-         final String productManufacturerName = sensor.getManufacturerName() + UI.DASH_WITH_SPACE + sensor.getProductName();
-
-         if (sensorCustomName.length() > 0) {
-
-            sensorLabel = sensorCustomName + UI.DASH_WITH_SPACE + sensorTypeName;
-
-         } else {
-
-            sensorLabel = productManufacturerName + UI.DASH_WITH_SPACE + sensorTypeName;
-         }
-
-         _allSensorValue_Label.add(createUI_Label(parent, sensorLabel));
-         _allSensorValue_Value.add(createUI_LabelValue(parent, SWT.TRAIL));
-         _allSensorValue_Unit.add(createUI_LabelValue(parent, SWT.LEAD));
       }
    }
 
@@ -1136,24 +1085,33 @@ public class TourInfoUI {
 
    private void createUI_90_LowerPart(final Composite parent) {
 
+      final int numColumns = 4;
+
       _lowerPartContainer = new Composite(parent, SWT.NONE);
       _lowerPartContainer.setForeground(_fgColor);
       _lowerPartContainer.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
-      GridLayoutFactory.fillDefaults().numColumns(2).spacing(16, 0).applyTo(_lowerPartContainer);
+      GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer);
 //      _lowerPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
       {
+
+         createUI_92_SensorValues(_lowerPartContainer);
+
          {
             /*
              * Tour type
              */
             _lblTourType = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourType);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblTourType);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING)
+                  .indent(0, 5)
+                  .applyTo(_lblTourType);
 
             _lblTourType_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
+                  .span(numColumns - 1, 1)
                   .grab(true, false)
                   .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+                  .indent(0, 5)
                   .applyTo(_lblTourType_Value);
          }
          {
@@ -1165,6 +1123,7 @@ public class TourInfoUI {
 
             _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
+                  .span(numColumns - 1, 1)
                   .grab(true, false)
                   .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .applyTo(_lblTourTags_Value);
@@ -1175,13 +1134,13 @@ public class TourInfoUI {
              */
             _lblWeather = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Weather);
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(numColumns, 1)
                   .indent(0, 5)
                   .applyTo(_lblWeather);
 
             _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(numColumns, 1)
                   .grab(true, false)
                   .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtWeather);
@@ -1197,7 +1156,7 @@ public class TourInfoUI {
             // label
             _lblDescription = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Description);
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(numColumns, 1)
                   .indent(0, 5)
                   .applyTo(_lblDescription);
 
@@ -1211,7 +1170,7 @@ public class TourInfoUI {
 
             _txtDescription = new Text(_lowerPartContainer, style);
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(numColumns, 1)
                   .grab(true, false)
                   .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtDescription);
@@ -1227,7 +1186,54 @@ public class TourInfoUI {
       }
    }
 
-   private void createUI_92_CreateModifyTime(final Composite parent) {
+   private void createUI_92_SensorValues(final Composite parent) {
+
+      /*
+       * Sensor batteries
+       */
+      final Set<DeviceSensorValue> allSensorValues = _tourData.getDeviceSensorValues();
+      if (allSensorValues.size() == 0) {
+         return;
+      }
+
+      // sort by sensor label
+      final ArrayList<DeviceSensorValue> allSortedSensorValues = new ArrayList<>(allSensorValues);
+      Collections.sort(allSortedSensorValues, (sensorValue1, sensorValue2) -> {
+
+         if (sensorValue1.isDataAvailable() && sensorValue2.isDataAvailable()) {
+
+            return sensorValue1.getDeviceSensor().getLabel().compareTo(sensorValue2.getDeviceSensor().getLabel());
+         }
+
+         return 0;
+      });
+
+      _allSensorValuesWithData = new ArrayList<>();
+      _allSensorValue_Label = new ArrayList<>();
+
+      _allSensorValue_Level = new ArrayList<>();
+      _allSensorValue_Status = new ArrayList<>();
+      _allSensorValue_Voltage = new ArrayList<>();
+
+      for (final DeviceSensorValue sensorValue : allSortedSensorValues) {
+
+         if (sensorValue.isDataAvailable() == false) {
+            continue;
+         }
+
+         final DeviceSensor sensor = sensorValue.getDeviceSensor();
+
+         _allSensorValuesWithData.add(sensorValue);
+
+         _allSensorValue_Label.add(createUI_Label(parent, sensor.getLabel()));
+
+         _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
+         _allSensorValue_Voltage.add(createUI_LabelValue(parent, SWT.LEAD));
+         _allSensorValue_Status.add(createUI_LabelValue(parent, SWT.LEAD));
+      }
+   }
+
+   private void createUI_99_CreateModifyTime(final Composite parent) {
 
       if (_uiDtCreated == null && _uiDtModified == null) {
          return;
@@ -1789,6 +1795,8 @@ public class TourInfoUI {
       showHideControl(_lblBattery_Start, _hasRecordingDeviceBattery);
       showHideControl(_lblBattery_End, _hasRecordingDeviceBattery);
 
+      updateUI_SensorValues();
+
       /*
        * Date/time
        */
@@ -1876,4 +1884,76 @@ public class TourInfoUI {
 
       _ttContainer.layout(true, true);
    }
+
+   private void updateUI_SensorValues() {
+
+      for (int sensorValueIndex = 0; sensorValueIndex < _allSensorValuesWithData.size(); sensorValueIndex++) {
+
+         final DeviceSensorValue sensorValue = _allSensorValuesWithData.get(sensorValueIndex);
+
+         final Label lblLevel = _allSensorValue_Level.get(sensorValueIndex);
+         final Label lblStatus = _allSensorValue_Status.get(sensorValueIndex);
+         final Label lblVoltage = _allSensorValue_Voltage.get(sensorValueIndex);
+
+         final float batteryLevel_Start = sensorValue.getBatteryLevel_Start();
+         final float batteryLevel_End = sensorValue.getBatteryLevel_End();
+         final float batteryStatus_Start = sensorValue.getBatteryStatus_Start();
+         final float batteryStatus_End = sensorValue.getBatteryStatus_End();
+         final float batteryVoltage_Start = sensorValue.getBatteryVoltage_Start();
+         final float batteryVoltage_End = sensorValue.getBatteryVoltage_End();
+
+         final boolean isBatteryLevel = batteryLevel_Start != -1 || batteryLevel_End != -1;
+         final boolean isBatteryStatus = batteryStatus_Start != -1 || batteryStatus_End != -1;
+         final boolean isBatteryVoltage = batteryVoltage_Start != -1 || batteryVoltage_End != -1;
+
+         if (isBatteryLevel) {
+
+            // 77 ... 51 %
+
+            String batteryLevel = batteryLevel_Start == batteryLevel_End
+
+                  // don't repeat the same level
+                  ? _nf0.format(batteryLevel_Start)
+
+                  : _nf0.format(batteryLevel_Start) + UI.ELLIPSIS_WITH_SPACE + _nf0.format(batteryLevel_End);
+
+            // add unit
+            batteryLevel += UI.SPACE + UI.SYMBOL_PERCENTAGE;
+
+            lblLevel.setText(batteryLevel);
+
+         }
+
+         if (isBatteryStatus) {
+
+            final String statusStart_Name = BatteryStatus.getLabelFromValue((short) batteryStatus_Start);
+
+            final String batteryStatus = batteryStatus_Start == batteryStatus_End
+
+                  // don't repeat the same status
+                  ? statusStart_Name
+
+                  : statusStart_Name + UI.ELLIPSIS_WITH_SPACE + BatteryStatus.getLabelFromValue((short) batteryStatus_End);
+
+            lblStatus.setText(batteryStatus);
+         }
+
+         if (isBatteryVoltage) {
+
+            String batteryVoltage = batteryVoltage_Start == batteryVoltage_End
+
+                  // don't repeat the same level
+                  ? _nf2.format(batteryVoltage_Start)
+
+                  : _nf2.format(batteryVoltage_Start) + UI.ELLIPSIS_WITH_SPACE + _nf2.format(batteryVoltage_End);
+
+            // add unit
+            batteryVoltage += UI.SPACE + "V";
+
+            lblVoltage.setText(batteryVoltage);
+         }
+
+      }
+   }
+
 }

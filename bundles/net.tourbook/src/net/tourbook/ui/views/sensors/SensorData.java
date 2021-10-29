@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
-import net.tourbook.data.DeviceSensor;
-
 public class SensorData {
 
    public long         firstDateTime;
@@ -38,6 +36,7 @@ public class SensorData {
    public float[]      allBatteryVoltage_Start;
    public float[]      allBatteryVoltage_End;
 
-   public DeviceSensor sensor;
-
+   public boolean      isAvailable_Level;
+   public boolean      isAvailable_Status;
+   public boolean      isAvailable_Voltage;
 }

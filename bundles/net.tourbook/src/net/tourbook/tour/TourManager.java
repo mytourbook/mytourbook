@@ -1296,6 +1296,14 @@ public class TourManager {
       }
    }
 
+   public static void fireEvent(final TourEventId tourEventId,  final IWorkbenchPart part) {
+
+      final Object[] allListeners = _tourEventListeners.getListeners();
+      for (final Object listener : allListeners) {
+         fireEvent_Final((ITourEventListener) listener, tourEventId, part, null);
+      }
+   }
+
    public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent) {
 
       final Object[] allListeners = _tourEventListeners.getListeners();

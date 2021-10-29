@@ -25,15 +25,15 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 /**
  */
 @Entity
 public class DeviceSensorValue {
 
-   private static final String  NL                   = UI.NEW_LINE;
+   private static final char    NL                   = UI.NEW_LINE;
 
    /**
     * Create a unique id to identify imported sensor values
@@ -262,7 +262,6 @@ public class DeviceSensorValue {
 
          batteryLevel_Start = batteryLevel_End;
          batteryLevel_End = batteryLevel_StartBackup;
-
       }
    }
 
@@ -286,7 +285,7 @@ public class DeviceSensorValue {
 
    public void setBattery_Voltage(final Float batteryVoltage) {
 
-      if (batteryVoltage == null) {
+      if (batteryVoltage == null || batteryVoltage == 0.0) {
          return;
       }
 
@@ -318,7 +317,7 @@ public class DeviceSensorValue {
    }
 
    public void setDeviceIndex(final int deviceIndex) {
-      this._deviceIndex = deviceIndex;
+      _deviceIndex = deviceIndex;
    }
 
    public void setDeviceSensor(final DeviceSensor deviceSensor) {
@@ -345,8 +344,6 @@ public class DeviceSensorValue {
 
       return "DeviceSensorValue" + NL //                                            //$NON-NLS-1$
 
-//          + "[" + NL //                                                           //$NON-NLS-1$
-
             + "   sensorValueId        = " + sensorValueId + NL //                  //$NON-NLS-1$
             + "   batteryLevel_Start   = " + batteryLevel_Start + NL //             //$NON-NLS-1$
             + "   batteryLevel_End     = " + batteryLevel_End + NL //               //$NON-NLS-1$
@@ -357,7 +354,7 @@ public class DeviceSensorValue {
             + "   deviceSensor         = " + deviceSensor + NL //                   //$NON-NLS-1$
 //          + "   tourData             = " + tourData + NL //                       //$NON-NLS-1$
 
-//          + "]" + NL //                                                           //$NON-NLS-1$
       ;
    }
+
 }

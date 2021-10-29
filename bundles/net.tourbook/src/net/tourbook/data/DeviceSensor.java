@@ -403,6 +403,7 @@ public class DeviceSensor implements Cloneable {
             + "      productNumber        = " + productNumber + NL //         //$NON-NLS-1$
             + "      productName          = " + productName + NL //           //$NON-NLS-1$
             + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
+            + "      _label               = " + getLabel() + NL //          //$NON-NLS-1$
 
 //            + "]" + NL //                                              //$NON-NLS-1$
       ;
@@ -423,17 +424,21 @@ public class DeviceSensor implements Cloneable {
 
    private void updateSensorLabel() {
 
-      final String sensorTypeName = SensorManager.getSensorTypeName(sensorType);
+      String sensorTypeName = SensorManager.getSensorTypeName(sensorType);
+      sensorTypeName = sensorTypeName.length() == 0
+            ? sensorTypeName
+            : UI.DASH_WITH_SPACE + sensorTypeName;
+
       final String sensorCustomName = getSensorName();
       final String productManufacturerName = manufacturerName + UI.DASH_WITH_SPACE + productName;
 
       if (sensorCustomName.length() > 0) {
 
-         _label = sensorCustomName + UI.DASH_WITH_SPACE + sensorTypeName;
+         _label = sensorCustomName + sensorTypeName;
 
       } else {
 
-         _label = productManufacturerName + UI.DASH_WITH_SPACE + sensorTypeName;
+         _label = productManufacturerName + sensorTypeName;
       }
    }
 }

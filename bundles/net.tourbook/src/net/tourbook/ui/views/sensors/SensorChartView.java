@@ -34,6 +34,8 @@ import net.tourbook.chart.DelayedBarSelection_TourToolTip;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionBarChart;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipProvider;
@@ -49,6 +51,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -89,6 +92,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private boolean                         _isChartDisplayed;
 
+   private DeviceSensor                    _selectedSensor;
    private SensorData                      _sensorData;
    private SensorDataProvider              _sensorDataProvider      = new SensorDataProvider();
 
@@ -97,6 +101,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private DelayedBarSelection_TourToolTip _tourToolTip;
    private TourInfoIconToolTipProvider     _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
    private TourInfoUI                      _tourInfoUI              = new TourInfoUI();
+
+   private boolean                         _isUseAppFilter;
+
+   private ActionAppTourFilter             _actionAppTourFilter;
 
    /*
     * UI controls
@@ -107,6 +115,24 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private Composite _pageNoBatteryData;
 
    private Chart     _sensorChart;
+
+   private class ActionAppTourFilter extends Action {
+
+      public ActionAppTourFilter() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_AppFilter(isChecked());
+      }
+   }
 
    private void addPartListener() {
 
@@ -149,13 +175,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          /*
           * Create a new chart configuration when the colors has changed
           */
-         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+               || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-            if (_sensorData != null) {
-
-               updateChart(_sensorData);
-            }
+            updateChart();
          }
+
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
@@ -183,6 +208,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private void createActions() {
 
       _sensorChart.createChartActions();
+      _actionAppTourFilter = new ActionAppTourFilter();
 
       fillToolbar();
    }
@@ -337,6 +363,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_sensorChart.getAction_MouseWheelMode());
+      tbm.add(_actionAppTourFilter);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -377,6 +404,13 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _tk = new FormToolkit(parent.getDisplay());
    }
 
+   private void onAction_AppFilter(final boolean isSelected) {
+
+      _isUseAppFilter = isSelected;
+
+      updateChart();
+   }
+
    private void onSelectionChanged(final ISelection selection) {
 
       if (selection instanceof StructuredSelection) {
@@ -385,31 +419,13 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
          if (firstElement instanceof SensorView.SensorItem) {
 
-            // show selected sensor
+            // show data for a selected sensor
 
             final SensorView.SensorItem sensorItem = (SensorView.SensorItem) firstElement;
 
-            final long sensorId = sensorItem.sensor.getSensorId();
+            _selectedSensor = sensorItem.sensor;
 
-            _sensorData = _sensorDataProvider.getData(sensorId);
-
-            _sensorData.sensor = sensorItem.sensor;
-
-            if (_sensorData.allTourIds.length == 0) {
-
-               _isChartDisplayed = false;
-               enableActions();
-
-               _pageBook.showPage(_pageNoBatteryData);
-
-            } else {
-
-               _isChartDisplayed = true;
-               enableActions();
-
-               _pageBook.showPage(_sensorChart);
-               updateChart(_sensorData);
-            }
+            updateChart();
          }
       }
    }
@@ -526,6 +542,31 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _sensorChart.setFocus();
    }
 
+   private void updateChart() {
+
+      if (_selectedSensor == null) {
+         return;
+      }
+
+      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseAppFilter);
+
+      if (_sensorData.allTourIds.length == 0) {
+
+         _isChartDisplayed = false;
+         enableActions();
+
+         _pageBook.showPage(_pageNoBatteryData);
+
+      } else {
+
+         _isChartDisplayed = true;
+         enableActions();
+
+         _pageBook.showPage(_sensorChart);
+         updateChart(_sensorData);
+      }
+   }
+
    private void updateChart(final SensorData sensorData) {
 
       /*
@@ -550,12 +591,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
-      final DeviceSensor sensor = sensorData.sensor;
-      String sensorName = sensor.getSensorName();
-      if (sensorName.length() == 0) {
-         sensorName = sensor.getManufacturerName() + UI.DASH_WITH_SPACE + sensor.getProductName();
-      }
-
       /*
        * Set x-axis values
        */
@@ -568,8 +603,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       ZonedDateTime startTimeAdjusted = tourStartTime;
       ZonedDateTime endTimeAdjusted = tourEndTime;
 
-      final double forcedTourStartTime;
-      final double forcedTourEndTime;
+//      final double forcedTourStartTime;
+//      final double forcedTourEndTime;
 
       if (xDataConverted.length == 1) {
 
@@ -578,8 +613,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          startTimeAdjusted = startTimeAdjusted.minusSeconds(1);
          endTimeAdjusted = endTimeAdjusted.plusSeconds(1);
 
-         forcedTourStartTime = -1;
-         forcedTourEndTime = +1;
+//         forcedTourStartTime = -1;
+//         forcedTourEndTime = +1;
 
       } else {
 
@@ -597,8 +632,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
             timeOffset = 1000;
          }
 
-         forcedTourStartTime = -timeOffset;
-         forcedTourEndTime = timeDurationSeconds + timeOffset;
+//         forcedTourStartTime = -timeOffset;
+//         forcedTourEndTime = timeDurationSeconds + timeOffset;
 
 //         startTimeAdjusted = startTimeAdjusted.minusSeconds(timeOffset);
 //         endTimeAdjusted = endTimeAdjusted.plusSeconds(timeOffset);
@@ -614,66 +649,77 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       chartModel.setXData(xData);
 
-//      /*
-//       * Set y-axis values: Level
-//       */
-//      final ChartDataYSerie yDataLevel = new ChartDataYSerie(
-//            ChartType.BAR,
-//            sensorData.allBatteryLevel_End,
-//            sensorData.allBatteryLevel_Start);
-//
-//      yDataLevel.setYTitle("Battery  Level ·  " + sensorName);
-//      yDataLevel.setUnitLabel("%");
-//      yDataLevel.setShowYSlider(true);
-//
-//      yDataLevel.setRgbGraph_Line(rgbLine);
-//      yDataLevel.setRgbGraph_Text(rgbText);
-//      yDataLevel.setRgbBar_Line(allRGBLine);
-//      yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
-//      yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
-//
-//      chartModel.addYData(yDataLevel);
+      final String sensorLabel = _selectedSensor.getLabel();
 
-//      /*
-//       * Set y-axis values: Status
-//       */
-//      final ChartDataYSerie yDataStatus = new ChartDataYSerie(
-//            ChartType.BAR,
-//            sensorData.allBatteryStatus_End,
-//            sensorData.allBatteryStatus_Start);
-//
-//      yDataStatus.setYTitle("Battery  Status ·  " + sensorName);
-//      yDataStatus.setUnitLabel("#");
-//      yDataStatus.setShowYSlider(true);
-//
-//      yDataStatus.setRgbGraph_Line(rgbLine);
-//      yDataStatus.setRgbGraph_Text(rgbText);
-//      yDataStatus.setRgbBar_Line(allRGBLine);
-//      yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
-//      yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
-//
-//      chartModel.addYData(yDataStatus);
+      /*
+       * Set y-axis values: Status
+       */
+      if (sensorData.isAvailable_Status) {
+
+         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
+               ChartType.BAR,
+               sensorData.allBatteryStatus_End,
+               sensorData.allBatteryStatus_Start);
+
+         yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
+         yDataStatus.setUnitLabel("#");
+         yDataStatus.setShowYSlider(true);
+
+         yDataStatus.setRgbGraph_Line(rgbLine);
+         yDataStatus.setRgbGraph_Text(rgbText);
+         yDataStatus.setRgbBar_Line(allRGBLine);
+         yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
+         yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
+
+         chartModel.addYData(yDataStatus);
+      }
+
+      /*
+       * Set y-axis values: Level
+       */
+      if (sensorData.isAvailable_Level) {
+
+         final ChartDataYSerie yDataLevel = new ChartDataYSerie(
+               ChartType.BAR,
+               sensorData.allBatteryLevel_End,
+               sensorData.allBatteryLevel_Start);
+
+         yDataLevel.setYTitle("Battery  Level ·  " + sensorLabel);
+         yDataLevel.setUnitLabel("%");
+         yDataLevel.setShowYSlider(true);
+
+         yDataLevel.setRgbGraph_Line(rgbLine);
+         yDataLevel.setRgbGraph_Text(rgbText);
+         yDataLevel.setRgbBar_Line(allRGBLine);
+         yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
+         yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
+
+         chartModel.addYData(yDataLevel);
+      }
 
       /*
        * Set y-axis values: Voltage
        */
-      final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
-            ChartType.BAR,
-            sensorData.allBatteryVoltage_End,
-            sensorData.allBatteryVoltage_Start);
+      if (sensorData.isAvailable_Voltage) {
 
-      yDataVoltage.setYTitle("Battery Voltage ·  " + sensorName);
-      yDataVoltage.setUnitLabel("Volt");
-      yDataVoltage.setShowYSlider(true);
-      yDataVoltage.setSetMinMax_0Values(true);
+         final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
+               ChartType.BAR,
+               sensorData.allBatteryVoltage_End,
+               sensorData.allBatteryVoltage_Start);
 
-      yDataVoltage.setRgbGraph_Line(rgbLine);
-      yDataVoltage.setRgbGraph_Text(rgbText);
-      yDataVoltage.setRgbBar_Line(allRGBLine);
-      yDataVoltage.setRgbBar_Gradient_Bright(allRGBGradientBright);
-      yDataVoltage.setRgbBar_Gradient_Dark(allRGBGradientDark);
+         yDataVoltage.setYTitle("Battery Voltage ·  " + sensorLabel);
+         yDataVoltage.setUnitLabel("Volt");
+         yDataVoltage.setShowYSlider(true);
+         yDataVoltage.setSetMinMax_0Values(true);
 
-      chartModel.addYData(yDataVoltage);
+         yDataVoltage.setRgbGraph_Line(rgbLine);
+         yDataVoltage.setRgbGraph_Text(rgbText);
+         yDataVoltage.setRgbBar_Line(allRGBLine);
+         yDataVoltage.setRgbBar_Gradient_Bright(allRGBGradientBright);
+         yDataVoltage.setRgbBar_Gradient_Dark(allRGBGradientDark);
+
+         chartModel.addYData(yDataVoltage);
+      }
 
       /*
        * Setup other properties
