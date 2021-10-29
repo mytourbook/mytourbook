@@ -28,7 +28,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
    //This is the date (01/26/2021) that Suunto forced the users to switch to Suunto App.
-   public static long SUUNTO_FILTER_SINCE_DATE = 1611619200000L;
+   public static final long SUUNTO_FILTER_SINCE_DATE = 1611619200000L;
 
    @Override
    public void initializeDefaultPreferences() {
