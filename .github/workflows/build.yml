@@ -7,8 +7,6 @@ on:
       - '**.java'
       - '**.yml'
   pull_request_target:
-    branches:
-      - FJBDev
     types: [opened, synchronize, reopened]
 jobs:
   build:
