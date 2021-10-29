@@ -37,6 +37,7 @@ public class Messages extends NLS {
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Message;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Title;
    public static String        PrefPage_CloudConnectivity_Label_WebPage;
+   public static String        PrefPage_TourTypeFilter_Link_StravaTourTypes;
 
    //DROPBOX
    public static String Dialog_DropboxBrowser_Button_ParentFolder_Tooltip;
