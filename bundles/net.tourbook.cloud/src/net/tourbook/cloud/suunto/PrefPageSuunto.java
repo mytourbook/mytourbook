@@ -435,7 +435,9 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       // This empty string represents "All people"
       tourPersonIds.add(UI.EMPTY_STRING);
-      tourPeopleList.forEach(tourPerson -> tourPersonIds.add(String.valueOf(tourPerson.getPersonId())));
+      tourPeopleList.forEach(
+            tourPerson -> tourPersonIds.add(
+                  String.valueOf(tourPerson.getPersonId())));
 
       for (final String tourPersonId : tourPersonIds) {
 

@@ -197,18 +197,41 @@
                </environments>
             </configuration>
     </plugin>
-	<plugin>
-		<groupId>org.eclipse.tycho</groupId>
-		<artifactId>tycho-surefire-plugin</artifactId>
-		<version>${tycho.version}</version>
-		<configuration>
-			<useUIHarness>true</useUIHarness>
-			<useUIThread>false</useUIThread>
-			<product>org.eclipse.platform.ide</product>
-		</configuration>
-	</plugin>
+    <plugin>
+	    <groupId>org.eclipse.tycho</groupId>
+	    <artifactId>tycho-surefire-plugin</artifactId>
+	    <version>${tycho.version}</version>
+	    <configuration>
+		    <useUIHarness>true</useUIHarness>
+		    <useUIThread>false</useUIThread>
+		    <product>org.eclipse.platform.ide</product>
+		    <skipTests>true</skipTests>
+	    </configuration>
+    </plugin>
+    <plugin>
+	    <groupId>org.jacoco</groupId>
+	    <artifactId>jacoco-maven-plugin</artifactId>
+	    <version>0.8.7</version>
+	    <executions>
+		    <execution>
+			    <goals>
+				    <goal>prepare-agent</goal>
+		            </goals>
+		    </execution>
+		    <execution>
+			    <id>report</id>
+		            <phase>verify</phase>
+			    <goals>
+				    <goal>report-aggregate</goal>
+		            </goals>
+			    <configuration>
+				    <skip>true</skip>
+			    </configuration>
+                    </execution>
+            </executions>
+     </plugin>
 
-      </plugins>
+    </plugins>
    </build>
 
 </project>
