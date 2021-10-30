@@ -3,8 +3,8 @@
 [![Downloads](https://img.shields.io/sourceforge/dm/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
 [![Latest release](https://badgen.net/github/tag/wolfgang-ch/mytourbook)](https://github.com/wolfgang-ch/mytourbook/tags/)
 
-[![Build status](https://github.com/FJBDev/mytourbook/actions/workflows/build.yml/badge.svg)](https://github.com/FJBDev/mytourbook/actions/workflows/build.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=FJBDev_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=FJBDev_mytourbook)
+[![Build status](https://github.com/wolfgang-ch/mytourbook/actions/workflows/build.yml/badge.svg)](https://github.com/wolfgang-ch/mytourbook/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
 
 # MyTourbook
 

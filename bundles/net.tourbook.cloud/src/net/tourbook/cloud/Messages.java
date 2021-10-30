@@ -37,7 +37,6 @@ public class Messages extends NLS {
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Message;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Title;
    public static String        PrefPage_CloudConnectivity_Label_WebPage;
-   public static String        PrefPage_TourTypeFilter_Link_StravaTourTypes;
 
    //DROPBOX
    public static String Dialog_DropboxBrowser_Button_ParentFolder_Tooltip;
@@ -95,6 +94,7 @@ public class Messages extends NLS {
    public static String PrefPage_AccountInformation_Label_AthleteName;
    public static String PrefPage_AccountInformation_Label_AthleteWebPage;
    public static String PrefPage_AccountInformation_Link_Strava_WebPage;
+   public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
    public static String PrefPage_UploadConfiguration_Button_SendDescription;
    public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping;
    public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip;

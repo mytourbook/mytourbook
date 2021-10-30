@@ -266,11 +266,13 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
             _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
             _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
+            _chkUseTourTypeMapping.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _linkTourTypeFilters.getControl().setEnabled(_chkUseTourTypeMapping.getSelection())));
          }
          {
             _linkTourTypeFilters = new PreferenceLinkArea(
                   group,
-                  SWT.NONE,
+                  SWT.MULTI | SWT.WRAP,
                   PrefPageTourTypeFilterList.ID,
                   Messages.PrefPage_TourTypeFilter_Link_StravaTourTypes,
                   (IWorkbenchPreferenceContainer) getContainer(),
