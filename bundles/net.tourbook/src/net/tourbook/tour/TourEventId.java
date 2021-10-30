@@ -20,6 +20,8 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.tourChart.HoveredValueData;
+import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
+import net.tourbook.ui.views.sensors.SelectionSensor;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public enum TourEventId {
@@ -114,6 +116,16 @@ public enum TourEventId {
     * A tour pause is selected, event data contain a {@link SelectionTourPause}.
     */
    PAUSE_SELECTION,
+
+   /**
+    * A sensor is selected, event data contains a {@link SelectionSensor}
+    */
+   SELECTION_SENSOR,
+
+   /**
+    * A sensor is selected, event data contains a {@link SelectionRecordingDeviceBattery}
+    */
+   SELECTION_RECORDING_DEVICE_BATTERY,
 
    /**
     * Show geo grid in the map, event data contains {@link TourGeoFilterItem}

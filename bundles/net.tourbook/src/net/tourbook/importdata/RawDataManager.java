@@ -608,9 +608,11 @@ public class RawDataManager {
        */
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
 
-         previousData.add(oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE + oldTourData.getBattery_Percentage_End()
-               + UI.UNIT_VOLT);
-         newData.add(newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE + newTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
+         previousData.add(oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
+               + oldTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
+
+         newData.add(newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
+               + newTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {

@@ -391,7 +391,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_Type;
    public static String        ColumnFactory_Sensor_Type_Tooltip;
 
-
    public static String        ColumnFactory_SerieIndex;
    public static String        ColumnFactory_SerieIndex_Label;
    public static String        ColumnFactory_SerieIndex_Tooltip;
@@ -557,6 +556,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AvgPulse;
    public static String        Tour_Tooltip_Label_AvgSpeed;
    public static String        Tour_Tooltip_Label_Battery;
+   public static String        Tour_Tooltip_Label_Battery_Tooltip;
    public static String        Tour_Tooltip_Label_BodyWeight;
    public static String        Tour_Tooltip_Label_BreakTime;
    public static String        Tour_Tooltip_Label_Calories;

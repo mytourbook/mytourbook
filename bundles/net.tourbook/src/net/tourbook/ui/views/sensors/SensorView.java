@@ -1128,9 +1128,10 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
 
       final IStructuredSelection selection = _sensorViewer.getStructuredSelection();
+      final DeviceSensor sensor = ((SensorItem) selection.getFirstElement()).sensor;
 
       if (selection.getFirstElement() != null) {
-         _postSelectionProvider.setSelection(selection);
+         _postSelectionProvider.setSelection(new StructuredSelection(sensor));
       }
    }
 

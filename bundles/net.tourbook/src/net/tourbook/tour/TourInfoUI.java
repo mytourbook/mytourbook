@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,12 +45,16 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
+import net.tourbook.statistic.StatisticView;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 import net.tourbook.ui.views.sensors.BatteryStatus;
+import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
+import net.tourbook.ui.views.sensors.SelectionSensor;
+import net.tourbook.ui.views.sensors.SensorChartView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -60,6 +66,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -67,6 +74,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.joda.time.Period;
@@ -121,7 +129,6 @@ public class TourInfoUI {
    }
 
    private boolean _hasRecordingDeviceBattery;
-   private boolean _hasSensorBatteries;
    private boolean _hasDescription;
    private boolean _hasGears;
    private boolean _hasRunDyn;
@@ -204,7 +211,6 @@ public class TourInfoUI {
    private Label            _lblAvgCadenceUnit;
    private Label            _lblAvg_Power;
    private Label            _lblAvg_PowerUnit;
-   private Label            _lblBattery;
    private Label            _lblBattery_Spacer;
    private Label            _lblBattery_Start;
    private Label            _lblBattery_End;
@@ -287,7 +293,8 @@ public class TourInfoUI {
    private Label            _lblRunDyn_VerticalRatio_Avg;
    private Label            _lblRunDyn_VerticalRatio_Avg_Unit;
 
-   private ArrayList<Label> _allSensorValue_Label;
+   private Link             _linkBattery;
+   private ArrayList<Link>  _allSensorValue_Link;
 
    private ArrayList<Label> _allSensorValue_Level;
    private ArrayList<Label> _allSensorValue_Status;
@@ -350,13 +357,10 @@ public class TourInfoUI {
             ? null
             : TourDatabase.getTourTypeName(tourType.getTypeId());
 
-      _hasRunDyn = _tourData.isRunDynAvailable();
-
-      _hasRecordingDeviceBattery = tourData.getBattery_Percentage_Start() != -1;
-      _hasSensorBatteries = tourData.getDeviceSensorValues().size() > 0;
-
       _hasDescription = tourDescription != null && tourDescription.length() > 0;
       _hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
+      _hasRecordingDeviceBattery = tourData.getBattery_Percentage_Start() != -1;
+      _hasRunDyn = _tourData.isRunDynAvailable();
       _hasTags = tourTags != null && tourTags.size() > 0;
       _hasTourType = tourType != null;
       _hasWeather = _tourData.getWeather().length() > 0;
@@ -882,10 +886,15 @@ public class TourInfoUI {
          /*
           * Device battery, e.g. 88...56 %
           */
-         _lblBattery = createUI_Label(parent, Messages.Tour_Tooltip_Label_Battery);
+         _linkBattery = createUI_Link(parent, Messages.Tour_Tooltip_Label_Battery);
+         _linkBattery.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
+         _linkBattery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Battery()));
 
          _lblBattery_Start = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblBattery_Start.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
+
          _lblBattery_End = createUI_LabelValue(parent, SWT.LEAD);
+         _lblBattery_End.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
       }
    }
 
@@ -1189,8 +1198,16 @@ public class TourInfoUI {
    private void createUI_92_SensorValues(final Composite parent) {
 
       /*
-       * Sensor batteries
+       * Setup sensor value data BEFORE returning, otherwise old data could cause widget dispose
+       * exceptions because this instance is reused
        */
+      _allSensorValuesWithData = new ArrayList<>();
+      _allSensorValue_Link = new ArrayList<>();
+
+      _allSensorValue_Level = new ArrayList<>();
+      _allSensorValue_Status = new ArrayList<>();
+      _allSensorValue_Voltage = new ArrayList<>();
+
       final Set<DeviceSensorValue> allSensorValues = _tourData.getDeviceSensorValues();
       if (allSensorValues.size() == 0) {
          return;
@@ -1208,13 +1225,6 @@ public class TourInfoUI {
          return 0;
       });
 
-      _allSensorValuesWithData = new ArrayList<>();
-      _allSensorValue_Label = new ArrayList<>();
-
-      _allSensorValue_Level = new ArrayList<>();
-      _allSensorValue_Status = new ArrayList<>();
-      _allSensorValue_Voltage = new ArrayList<>();
-
       for (final DeviceSensorValue sensorValue : allSortedSensorValues) {
 
          if (sensorValue.isDataAvailable() == false) {
@@ -1225,7 +1235,11 @@ public class TourInfoUI {
 
          _allSensorValuesWithData.add(sensorValue);
 
-         _allSensorValue_Label.add(createUI_Label(parent, sensor.getLabel()));
+         // sensor label/link
+         final Link link = createUI_Link(parent, sensor.getLabel());
+         link.setData(sensor);
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
+         _allSensorValue_Link.add(link);
 
          _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
          _allSensorValue_Voltage.add(createUI_LabelValue(parent, SWT.LEAD));
@@ -1309,6 +1323,16 @@ public class TourInfoUI {
       GridDataFactory.fillDefaults().applyTo(label);
 
       return label;
+   }
+
+   private Link createUI_Link(final Composite parent, final String linkText) {
+
+      final Link link = new Link(parent, SWT.NONE);
+      link.setText(UI.LINK_TAG_START + linkText + UI.LINK_TAG_END);
+      link.setForeground(_fgColor);
+      link.setBackground(_bgColor);
+
+      return link;
    }
 
    public Composite createUI_NoData(final Composite parent) {
@@ -1406,6 +1430,40 @@ public class TourInfoUI {
       final boolean isSingleTour = !_tourData.isMultipleTours();
 
       return isShortTour || isSingleTour;
+   }
+
+   /**
+    * Show tour in battery SoC statistic
+    */
+   private void onSelect_Battery() {
+
+      Util.showView(StatisticView.ID, false);
+
+      TourManager.fireEventWithCustomData(
+
+            TourEventId.SELECTION_RECORDING_DEVICE_BATTERY,
+            new SelectionRecordingDeviceBattery(_tourData.getTourId(), _tourData.getStartYear()),
+            null);
+   }
+
+   /**
+    * Show sensor in the sensor chart, e.g. to visualize the voltage or level over time
+    *
+    * @param selectionEvent
+    */
+   private void onSelect_Sensor(final SelectionEvent selectionEvent) {
+
+      final Object linkData = selectionEvent.widget.getData();
+      if (linkData instanceof DeviceSensor) {
+
+         Util.showView(SensorChartView.ID, false);
+
+         TourManager.fireEventWithCustomData(
+
+               TourEventId.SELECTION_SENSOR,
+               new SelectionSensor((DeviceSensor) linkData, _tourData.getTourId()),
+               null);
+      }
    }
 
    /**
@@ -1790,7 +1848,7 @@ public class TourInfoUI {
          _lblBattery_Start.setText(Short.toString(_tourData.getBattery_Percentage_Start()));
          _lblBattery_End.setText(String.format(BATTERY_FORMAT, _tourData.getBattery_Percentage_End()));
       }
-      showHideControl(_lblBattery, _hasRecordingDeviceBattery);
+      showHideControl(_linkBattery, _hasRecordingDeviceBattery);
       showHideControl(_lblBattery_Spacer, _hasRecordingDeviceBattery);
       showHideControl(_lblBattery_Start, _hasRecordingDeviceBattery);
       showHideControl(_lblBattery_End, _hasRecordingDeviceBattery);
@@ -1887,6 +1945,10 @@ public class TourInfoUI {
 
    private void updateUI_SensorValues() {
 
+      if (_allSensorValuesWithData == null) {
+         return;
+      }
+
       for (int sensorValueIndex = 0; sensorValueIndex < _allSensorValuesWithData.size(); sensorValueIndex++) {
 
          final DeviceSensorValue sensorValue = _allSensorValuesWithData.get(sensorValueIndex);
@@ -1948,7 +2010,7 @@ public class TourInfoUI {
                   : _nf2.format(batteryVoltage_Start) + UI.ELLIPSIS_WITH_SPACE + _nf2.format(batteryVoltage_End);
 
             // add unit
-            batteryVoltage += UI.SPACE + "V";
+            batteryVoltage += UI.SPACE + UI.UNIT_VOLT;
 
             lblVoltage.setText(batteryVoltage);
          }

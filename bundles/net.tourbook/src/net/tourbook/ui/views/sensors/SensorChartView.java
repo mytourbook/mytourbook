@@ -43,6 +43,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
@@ -87,6 +88,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private IPartListener2                  _partListener;
    private ISelectionListener              _postSelectionListener;
    private IPropertyChangeListener         _prefChangeListener;
+   private ITourEventListener              _tourEventListener;
 
    private FormToolkit                     _tk;
 
@@ -205,6 +207,23 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
+   private void addTourEventListener() {
+
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
+
+         if (workbenchPart == SensorChartView.this) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.SELECTION_SENSOR && eventData instanceof SelectionSensor) {
+
+            onSelectionChanged((SelectionSensor) eventData);
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
+
    private void createActions() {
 
       _sensorChart.createChartActions();
@@ -222,6 +241,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       addPartListener();
       addPrefListener();
       addSelectionListener();
+      addTourEventListener();
 
       restoreState();
    }
@@ -305,11 +325,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
             _selectedTourId = tourIds[valueIndex];
             _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-            // don't fire an event when preferences are updated
-//               if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
-//                  return;
-//               }
-
             // this view can be inactive -> selection is not fired with the SelectionProvider interface
             TourManager.fireEventWithCustomData(
                   TourEventId.TOUR_SELECTION,
@@ -346,6 +361,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
+
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       super.dispose();
    }
@@ -417,16 +434,28 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-         if (firstElement instanceof SensorView.SensorItem) {
+         if (firstElement instanceof DeviceSensor) {
 
             // show data for a selected sensor
 
-            final SensorView.SensorItem sensorItem = (SensorView.SensorItem) firstElement;
-
-            _selectedSensor = sensorItem.sensor;
+            _selectedSensor = (DeviceSensor) firstElement;
 
             updateChart();
+
          }
+
+      } else if (selection instanceof SelectionSensor) {
+
+         final SelectionSensor sensorSelection = (SelectionSensor) selection;
+
+         _selectedSensor = sensorSelection.getSensor();
+
+         // 1. show sensor
+         updateChart();
+
+         // 2. select tour
+         _selectedTourId = sensorSelection.getTourId();
+         selectTour(_selectedTourId);
       }
    }
 

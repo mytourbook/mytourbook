@@ -8643,6 +8643,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return startWeekYear;
    }
 
+   public short getStartYear() {
+      return startYear;
+   }
+
    public short getSurfing_MinDistance() {
       return surfing_MinDistance;
    }
