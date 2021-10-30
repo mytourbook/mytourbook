@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -196,7 +197,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
             final Map3ColorDefinition colorDef = (Map3ColorDefinition) parentElement;
 
-            final ArrayList<Map3GradientColorProvider> colorProvider = colorDef.getColorProviders();
+            final List<Map3GradientColorProvider> colorProvider = colorDef.getColorProviders();
 
             return colorProvider.toArray(new Map3GradientColorProvider[colorProvider.size()]);
          }
@@ -1021,7 +1022,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
          final MapGraphId graphId = colorProvider.getGraphId();
 
          // profiles can only be removed when more than one profile is available for a graph type
-         final ArrayList<Map3GradientColorProvider> graphIdColorProviders = Map3GradientColorManager
+         final List<Map3GradientColorProvider> graphIdColorProviders = Map3GradientColorManager
                .getColorProviders(graphId);
          canRemoveProfiles = graphIdColorProviders.size() > 1;
       }
@@ -1526,7 +1527,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       final MapGraphId graphId = selectedColorProvider.getGraphId();
       final Map3ColorDefinition colorDefinition = Map3GradientColorManager.getColorDefinition(graphId);
 
-      final ArrayList<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
+      final List<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
 
       if (allGraphIdColorProvider.size() < 2) {
 

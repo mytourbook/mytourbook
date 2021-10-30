@@ -196,7 +196,9 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
             _chkShowPauseTooltip = new Button(container, SWT.CHECK);
             _chkShowPauseTooltip.setText(Messages.Slideout_ChartPausesOptions_Checkbox_IsShowPauseTooltip);
             _chkShowPauseTooltip.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkShowPauseTooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_chkShowPauseTooltip);
          }
          {
             /*

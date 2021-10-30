@@ -46,7 +46,6 @@ import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -56,6 +55,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -1296,7 +1296,7 @@ public class EasyImportManager {
 
       TourLogManager.subLog_DEFAULT(String.format(
             LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
-            tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+            TourManager.getTourDateTimeShort(tourData),
             String.format("%s (%s)", tourTypeName, tourTypeCadence.getNlsLabel())));//$NON-NLS-1$
    }
 }

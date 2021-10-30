@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -25,10 +27,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -41,7 +41,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private SelectionAdapter       _defaultSelectionListener;
+   private SelectionListener      _defaultSelectionListener;
    private MouseWheelListener     _defaultMouseWheelListener;
 
    /*
@@ -71,7 +71,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
    @Override
    public void createUI(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createUI_10_DataGroups(parent);
       createUI_20_DurationTime(parent);
@@ -479,21 +479,13 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
       }
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
    }
 
@@ -501,13 +493,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 
       // update chart async (which is done when a pref store value is modified) that the UI is updated immediately
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-
-            saveState();
-         }
-      });
+      Display.getCurrent().asyncExec(this::saveState);
    }
 
    @Override

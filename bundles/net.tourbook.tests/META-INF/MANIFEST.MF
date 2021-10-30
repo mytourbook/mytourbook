@@ -8,6 +8,10 @@ Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+ hibernate-entitymanager.jar,
+ jsonassert-1.5.0.jar,
+ xmlunit-core-2.8.3.jar
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.fasterxml.jackson.core.type,

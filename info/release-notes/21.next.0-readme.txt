@@ -32,7 +32,14 @@ Experimental
 New
 ===
 
-* 
+* Suunto App Integration: (Frederic)
+  - Added support for multiple accounts
+  https://sourceforge.net/p/mytourbook/feature-requests/197/
+
+* Strava Integration: (Frederic)
+  - Added the ability to upload a tour with or without its description
+  - Added the ability to map tour types to Strava activities for a more precise tour upload
+  https://sourceforge.net/p/mytourbook/discussion/622811/thread/e07bd4d3d7/
 
 
 Improvements

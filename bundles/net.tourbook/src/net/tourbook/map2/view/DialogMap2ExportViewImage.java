@@ -51,11 +51,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -143,23 +141,20 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      shell.addListener(SWT.Resize, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      shell.addListener(SWT.Resize, event -> {
 
-            // allow resizing the width but not the height
+         // allow resizing the width but not the height
 
-            if (_shellDefaultSize == null) {
-               _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            }
-
-            final Point shellSize = shell.getSize();
-
-            shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
-            shellSize.y = _shellDefaultSize.y;
-
-            shell.setSize(shellSize);
+         if (_shellDefaultSize == null) {
+            _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
          }
+
+         final Point shellSize = shell.getSize();
+
+         shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+         shellSize.y = _shellDefaultSize.y;
+
+         shell.setSize(shellSize);
       });
    }
 

@@ -18,6 +18,7 @@ package net.tourbook.ui.views.rawData;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static net.tourbook.ui.UI.getIconUrl;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,13 +152,9 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -176,8 +173,8 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -196,7 +193,6 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -347,7 +343,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private TableViewer                    _tourViewer;
    private TableViewerTourInfoToolTip     _tourInfoToolTip;
    private ColumnManager                  _columnManager;
-   private SelectionAdapter               _columnSortListener;
+   private SelectionListener              _columnSortListener;
    private TableColumnDefinition          _timeZoneOffsetColDef;
    private ImportComparator               _importComparator;
    //
@@ -982,16 +978,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-            if (part == RawDataView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (workbenchPart == RawDataView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
@@ -2408,12 +2401,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // link
             _linkImport = new Link(container, SWT.NONE);
             _linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
-            _linkImport.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _rawDataMgr.actionImportFromFile();
-               }
-            });
+            _linkImport.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _rawDataMgr.actionImportFromFile()));
             GridDataFactory.fillDefaults()//
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
@@ -2438,12 +2427,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // link
             final Link linkTransfer = new Link(container, SWT.NONE);
             linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
-            linkTransfer.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _rawDataMgr.actionImportFromDevice();
-               }
-            });
+            linkTransfer.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _rawDataMgr.actionImportFromDevice()));
             GridDataFactory.fillDefaults()//
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
@@ -2468,12 +2453,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // link
             final Link linkTransferDirect = new Link(container, SWT.NONE);
             linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
-            linkTransferDirect.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _rawDataMgr.actionImportFromDeviceDirect();
-               }
-            });
+            linkTransferDirect.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _rawDataMgr.actionImportFromDeviceDirect()));
             GridDataFactory.fillDefaults() //
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
@@ -2494,12 +2475,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // link
             final Link link = new Link(container, SWT.NONE);
             link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
-            link.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectUI_New();
-               }
-            });
+            link.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onSelectUI_New()));
             GridDataFactory.fillDefaults()//
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
@@ -2668,28 +2645,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _tourViewer.setContentProvider(new TourDataContentProvider());
       _tourViewer.setComparator(_importComparator);
 
-      _tourViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+      _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 
-            final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+         final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
-            if (firstElement instanceof TourData) {
-               TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
-            }
+         if (firstElement instanceof TourData) {
+            TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
          }
       });
 
-      _tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
+      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> {
 
-            if (_isInUpdate) {
-               return;
-            }
-
-            fireSelectedTour();
+         if (_isInUpdate) {
+            return;
          }
+
+         fireSelectedTour();
       });
 
       // set tour info tooltip provider
@@ -3197,7 +3168,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = (TourData) cell.getElement();
 
-            cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Date_S));
+            cell.setText(TourManager.getTourDateShort(tourData));
          }
       });
 
@@ -3239,7 +3210,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             } else {
 
-               cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_S));
+               cell.setText(TourManager.getTourTimeShort(tourData));
             }
          }
       });
@@ -3527,7 +3498,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       int selectedTours = 0;
 
       // contains all tours which are selected and not deleted
-      int selectedNotDeleteTours = 0;
+      int selectedNotDeletedTours = 0;
 
       TourData firstSavedTour = null;
       TourData firstValidTour = null;
@@ -3547,7 +3518,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   // tour is not deleted, deleted tours are ignored
 
                   unsavedTours++;
-                  selectedNotDeleteTours++;
+                  selectedNotDeletedTours++;
                }
 
             } else {
@@ -3557,19 +3528,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                }
 
                savedTours++;
-               selectedNotDeleteTours++;
+               selectedNotDeletedTours++;
             }
 
-            if (selectedNotDeleteTours == 1) {
+            if (selectedNotDeletedTours == 1) {
                firstValidTour = tourData;
             }
          }
       }
 
       final boolean isSavedTourSelected = savedTours > 0;
-      final boolean isOneSavedAndNotDeleteTour = (selectedNotDeleteTours == 1) && (savedTours == 1);
+      final boolean isOneSavedAndNotDeleteTour = (selectedNotDeletedTours == 1) && (savedTours == 1);
 
-      final boolean isOneSelectedNotDeleteTour = selectedNotDeleteTours == 1;
+      final boolean isOneSelectedNotDeleteTour = selectedNotDeletedTours == 1;
 
       // action: save tour with person
       final TourPerson person = TourbookPlugin.getActivePerson();
@@ -3610,9 +3581,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
       _actionReimport_Tours.setEnabled(selectedTours > 0);
       _actionRemoveTour.setEnabled(selectedTours > 0);
-      _actionExportTour.setEnabled(selectedNotDeleteTours > 0);
-      _actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
-      _actionUploadTour.setEnabled(selectedNotDeleteTours > 0);
+      _actionExportTour.setEnabled(selectedNotDeletedTours > 0);
+      _actionJoinTours.setEnabled(selectedNotDeletedTours > 1);
+      _actionUploadTour.setEnabled(selectedNotDeletedTours > 0);
 
       _actionEditTour.setEnabled(isOneSavedAndNotDeleteTour);
       _actionEditQuick.setEnabled(isOneSavedAndNotDeleteTour);
@@ -3836,7 +3807,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private String getDurationText(final ImportLauncher importLauncher) {
 
       final int duration = importLauncher.temperatureAdjustmentDuration;
-      final Period durationPeriod = new Period(0, duration * 1000, _durationTemplate);
+      final Period durationPeriod = new Period(0, duration * 1000L, _durationTemplate);
 
       return durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER);
    }
@@ -4095,12 +4066,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       createResources_Web();
 
       _importComparator = new ImportComparator();
-      _columnSortListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelect_SortColumn(e);
-         }
-      };
+      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
    /**
@@ -4640,12 +4606,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       updateToolTipState();
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            reimportAllImportFiles(true);
-         }
-      });
+      Display.getCurrent().asyncExec(() -> reimportAllImportFiles(true));
    }
 
    private void runEasyImport(final long tileId) {
@@ -4843,9 +4804,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // update viewer when required
 
-         Display.getDefault().asyncExec(() -> {
-            importState_Process.runPostProcess();
-         });
+         Display.getDefault().asyncExec(importState_Process::runPostProcess);
 
          if (importState_Easy.isUpdateImportViewer) {
 
@@ -5489,12 +5448,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (_postSelectionProvider.getSelection() == null) {
 
          // fire a selected tour when the selection provider was cleared sometime before
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               fireSelectedTour();
-            }
-         });
+         Display.getCurrent().asyncExec(this::fireSelectedTour);
       }
    }
 
@@ -5536,18 +5490,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (_browser == null || _browser.isDisposed()) {
 
          // show OLD UI after 5 seconds
-         Display.getDefault().timerExec(5000, new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().timerExec(5000, () -> {
 
-               if (_parent.isDisposed()) {
-                  return;
-               }
+            if (_parent.isDisposed()) {
+               return;
+            }
 
-               // check again because the browser could be set
-               if (_browser == null || _browser.isDisposed()) {
-                  onSelectUI_Old();
-               }
+            // check again because the browser could be set
+            if (_browser == null || _browser.isDisposed()) {
+               onSelectUI_Old();
             }
          });
       }
@@ -5964,27 +5915,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          if (_isEasyImportUI) {
 
-            _parent.getDisplay().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            _parent.getDisplay().asyncExec(() -> {
 
-                  _isInUIStartup = isInStartUp;
+               _isInUIStartup = isInStartUp;
 
-                  createUI_NewUI();
-                  _topPageBook.showPage(_topPage_Dashboard);
+               createUI_NewUI();
+               _topPageBook.showPage(_topPage_Dashboard);
 
-                  // create dashboard UI
-                  updateUI_2_Dashboard();
+               // create dashboard UI
+               updateUI_2_Dashboard();
 
-                  if (_browser == null) {
+               if (_browser == null) {
 
-                     // deactivate background task
+                  // deactivate background task
 
-                     setWatcher_Off();
-                  }
-
-                  // the watcher is started in onBrowser_Completed
+                  setWatcher_Off();
                }
+
+               // the watcher is started in onBrowser_Completed
             });
 
          } else {
@@ -6031,20 +5979,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void updateUI_DeviceState() {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            if (_browser.isDisposed()) {
-               // this occurred
-               return;
-            }
+         if (_browser.isDisposed()) {
+            // this occurred
+            return;
+         }
 
-            if (_isBrowserCompleted) {
-               updateUI_DeviceState_DOM();
-            } else {
-               _isDeviceStateUpdateDelayed.set(true);
-            }
+         if (_isBrowserCompleted) {
+            updateUI_DeviceState_DOM();
+         } else {
+            _isDeviceStateUpdateDelayed.set(true);
          }
       });
    }

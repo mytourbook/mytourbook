@@ -436,7 +436,7 @@ public class TourExporter {
                   cadNum++;
                }
 
-               // totaldistance
+               // total distance
                if (gta.hasValidDistance()) {
                   totaldistance = gta.getDistance();
                }

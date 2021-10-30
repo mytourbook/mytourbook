@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -36,19 +38,12 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -63,10 +58,8 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -82,9 +75,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String        ID         = "net.tourbook.preferences.PrefPageTourTypeFilter"; //$NON-NLS-1$
+
    private final IPreferenceStore    _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-   private SelectionAdapter          _defaultSelectionAdapter;
+   private SelectionListener         _defaultSelectionListener;
    private MouseWheelListener        _defaultMouseWheelListener;
    private IPropertyChangeListener   _prefChangeListener;
 
@@ -126,13 +121,10 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            if (event.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-               updateViewers();
-            }
+         if (propertyChangeEvent.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+            updateViewers();
          }
       };
 
@@ -252,19 +244,8 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
       });
 
-      _filterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectFilter();
-         }
-      });
-
-      _filterViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onRenameFilterSet();
-         }
-      });
+      _filterViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectFilter());
+      _filterViewer.addDoubleClickListener(doubleClickEvent -> onRenameFilterSet());
 
       /*
        * set drag adapter
@@ -335,7 +316,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
                   final Table filterTable = _filterViewer.getTable();
 
                   /*
-                   * check if drag was startet from this filter, remove the filter item before the
+                   * check if drag was started from this filter, remove the filter item before the
                    * new filter is inserted
                    */
                   if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
@@ -451,36 +432,23 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
       });
 
-      _tourTypeViewer.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
-            _isModified = true;
-         }
-      });
+      _tourTypeViewer.addCheckStateListener(checkStateChangedEvent -> _isModified = true);
 
-      _tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectTourType();
-         }
-      });
+      _tourTypeViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectTourType());
 
-      _tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+      _tourTypeViewer.addDoubleClickListener(doubleClickEvent -> {
 
-            /*
-             * invert check state
-             */
-            final TourType tourType = (TourType) ((StructuredSelection) _tourTypeViewer.getSelection())
-                  .getFirstElement();
+         /*
+          * invert check state
+          */
+         final TourType tourType = (TourType) ((StructuredSelection) _tourTypeViewer.getSelection())
+               .getFirstElement();
 
-            final boolean isChecked = _tourTypeViewer.getChecked(tourType);
+         final boolean isChecked = _tourTypeViewer.getChecked(tourType);
 
-            _tourTypeViewer.setChecked(tourType, !isChecked);
+         _tourTypeViewer.setChecked(tourType, !isChecked);
 
 //				getSelectedTourTypes();
-         }
       });
    }
 
@@ -494,34 +462,22 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          _btnNew = new Button(container, SWT.NONE);
          _btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
          setButtonLayoutData(_btnNew);
-         _btnNew.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onNewFilterSet();
-            }
-         });
+         _btnNew.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> onNewFilterSet()));
 
          // button: rename
          _btnRename = new Button(container, SWT.NONE);
          _btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
          setButtonLayoutData(_btnRename);
-         _btnRename.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onRenameFilterSet();
-            }
-         });
+         _btnRename.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> onRenameFilterSet()));
 
          // button: delete
          _btnRemove = new Button(container, SWT.NONE);
          _btnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
          setButtonLayoutData(_btnRemove);
-         _btnRemove.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onDeleteFilterSet();
-            }
-         });
+         _btnRemove.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> onDeleteFilterSet()));
 
          // spacer
          new Label(container, SWT.NONE);
@@ -530,23 +486,13 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          _btnUp = new Button(container, SWT.NONE);
          _btnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
          setButtonLayoutData(_btnUp);
-         _btnUp.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onMoveUp();
-            }
-         });
+         _btnUp.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onMoveUp()));
 
          // button: down
          _btnDown = new Button(container, SWT.NONE);
          _btnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
          setButtonLayoutData(_btnDown);
-         _btnDown.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onMoveDown();
-            }
-         });
+         _btnDown.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onMoveDown()));
       }
    }
 
@@ -563,12 +509,8 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
             _chkTourTypeContextMenu = new Button(container, SWT.CHECK | SWT.WRAP);
             _chkTourTypeContextMenu.setText(Messages.Pref_Appearance_ShowTourTypeContextMenu);
             _chkTourTypeContextMenu.setToolTipText(Messages.Pref_Appearance_ShowTourTypeContextMenu_Tooltip);
-            _chkTourTypeContextMenu.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _isModified = true;
-               }
-            });
+            _chkTourTypeContextMenu.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _isModified = true));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(0, 10)
@@ -587,7 +529,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
             _spinnerRecentTourTypes.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
             _spinnerRecentTourTypes.setMinimum(0);
             _spinnerRecentTourTypes.setMaximum(9);
-            _spinnerRecentTourTypes.addSelectionListener(_defaultSelectionAdapter);
+            _spinnerRecentTourTypes.addSelectionListener(_defaultSelectionListener);
             _spinnerRecentTourTypes.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -625,19 +567,12 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
    private void initUI() {
 
-      _defaultSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeProperty();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(
+            selectionEvent -> onChangeProperty());
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeProperty();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeProperty();
       };
    }
 
@@ -870,9 +805,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
    @Override
    public boolean performOk() {
 
-      saveState();
-
-      return true;
+      return isValid();
    }
 
    private void restoreState() {

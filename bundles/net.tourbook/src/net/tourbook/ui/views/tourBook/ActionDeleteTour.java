@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import java.util.concurrent.CompletableFuture;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
@@ -123,12 +122,12 @@ public class ActionDeleteTour extends Action {
          }
 
          final TourData tourData = TourManager.getTour(tourId);
-         final String tour = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+         final String tourDate = TourManager.getTourDateTimeShort(tourData);
 
          if (TourDatabase.deleteTour(tourId)) {
 
             // log deletion
-            TourLogManager.addSubLog(TourLogState.TOUR_DELETED, tour);
+            TourLogManager.addSubLog(TourLogState.TOUR_DELETED, tourDate);
 
             // keep removed tour id
             removedTours.add(new TourItem(tourId));
@@ -177,7 +176,7 @@ public class ActionDeleteTour extends Action {
 
             final Long tourId = tourItem.getTourId();
             final TourData tourData = TourManager.getTour(tourId);
-            final String tour = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+            final String tour = TourManager.getTourDateTimeShort(tourData);
 
             if (TourDatabase.deleteTour(tourId)) {
 
@@ -275,7 +274,7 @@ public class ActionDeleteTour extends Action {
 
          final CompletableFuture<Void> rowIndexFuture = _tourBookView.getNatTable_DataLoader().getRowIndexFromTourId(firstTourId)
 
-               .thenAccept((allRowPositions) -> {
+               .thenAccept(allRowPositions -> {
 
                   // keep row position for the first deleted tour
                   final int firstRowPosition = allRowPositions[0];
@@ -313,26 +312,17 @@ public class ActionDeleteTour extends Action {
 
       if (numSelectedTours < 2) {
 
-         final Runnable deleteRunnable = new Runnable() {
-            @Override
-            public void run() {
-
-               // delete selected tours
-               deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, null);
-            }
-         };
+         // delete selected tours
+         final Runnable deleteRunnable = () -> deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, null);
          BusyIndicator.showWhile(Display.getCurrent(), deleteRunnable);
 
       } else {
 
-         final IRunnableWithProgress deleteRunnable = new IRunnableWithProgress() {
-            @Override
-            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-               // delete selected tours
-               deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, monitor);
-            }
-         };
+         // delete selected tours
+         final IRunnableWithProgress deleteRunnable = monitor -> deleteTours(selectedTourIDs,
+               treeSelection[0],
+               selectionForDeletedTours,
+               monitor);
 
          try {
             new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, deleteRunnable);

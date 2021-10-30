@@ -34,6 +34,7 @@
       <module>net.tourbook.photo</module>
       <module>net.tourbook.printing</module>
       <module>net.tourbook.statistics</module>
+      <module>net.tourbook.tests</module>
       <module>net.tourbook.web</module>
 
       <module>net.tourbook.ext.apache</module>

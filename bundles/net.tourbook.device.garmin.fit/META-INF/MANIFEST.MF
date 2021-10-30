@@ -15,7 +15,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .,
- fit-21.60.00.jar
+ fit-21.67.00.jar
 Import-Package: net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,
