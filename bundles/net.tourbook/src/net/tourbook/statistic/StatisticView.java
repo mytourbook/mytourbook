@@ -125,6 +125,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private Action_StatisticOptions      _action_StatisticOptions;
    private ActionSynchChartScale        _action_SynchChartScale;
 
+   private boolean                      _isInTourSelection;
    private boolean                      _isSynchScaleEnabled;
    private boolean                      _isVerticalOrderDisabled;
 
@@ -189,7 +190,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
       _activeStatistic.updateStatistic(
-            new StatisticContext(//
+            new StatisticContext(
                   _activePerson,
                   _activeTourTypeFilter,
                   _selectedYear,
@@ -324,40 +325,41 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId tourEventId, final Object eventData) {
+      _tourEventListener = (part, tourEventId, eventData) -> {
 
-            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+         if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-               if (part == StatisticView.this) {
-                  return;
-               }
-
-               if (((TourEvent) eventData).isTourModified) {
-                  /*
-                   * ignore edit changes because the statistics show data only from saved data
-                   */
-                  return;
-               }
-
-               _isInUpdateUI = true;
-
-               // update statistics
-               updateStatistic();
-
-               _isInUpdateUI = false;
-
-            } else if (tourEventId == TourEventId.UPDATE_UI ||
-                  tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
-               updateStatistic();
-
-            } else if (tourEventId == TourEventId.SELECTION_RECORDING_DEVICE_BATTERY
-                  && eventData instanceof SelectionRecordingDeviceBattery) {
-
-               selectBatterySoCStatistic((SelectionRecordingDeviceBattery) eventData);
+            if (part == StatisticView.this) {
+               return;
             }
+
+            if (((TourEvent) eventData).isTourModified) {
+               /*
+                * ignore edit changes because the statistics show data only from saved data
+                */
+               return;
+            }
+
+            _isInUpdateUI = true;
+
+            // update statistics
+            updateStatistic();
+
+            _isInUpdateUI = false;
+
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if (tourEventId == TourEventId.UPDATE_UI ||
+               tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+            updateStatistic();
+
+         } else if (tourEventId == TourEventId.SELECTION_RECORDING_DEVICE_BATTERY
+               && eventData instanceof SelectionRecordingDeviceBattery) {
+
+            selectBatterySoCStatistic((SelectionRecordingDeviceBattery) eventData);
          }
       };
       TourManager.getInstance().addTourEventListener(_tourEventListener);
@@ -689,13 +691,29 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.setBarVerticalOrder(_comboBarVerticalOrder.getSelectionIndex());
    }
 
+   private void onSelectionChanged(final ISelection selection) {
+      // TODO Auto-generated method stub
+
+//      if (selection instanceof SelectionTourId) {
+//
+//         final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+//         tourIdSelection.getTourId();
+//
+//         _isInTourSelection = true;
+//
+//         updateStatistic_10_NoReload(tourIdSelection.getTourId());
+//
+//         _isInTourSelection = false;
+//      }
+   }
+
    private void onSelectStatistic() {
 
       if (setActiveStatistic() == false) {
          return;
       }
 
-      updateStatistic_10_NoReload();
+      updateStatistic_10_NoReload(null);
    }
 
    private void onSelectYear(final boolean isUpdateStatistic) {
@@ -730,7 +748,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
          if (isUpdateStatistic) {
-            updateStatistic_10_NoReload();
+            updateStatistic_10_NoReload(null);
          }
       }
    }
@@ -944,7 +962,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
     * @param batterySoCSelection
     */
    private void selectBatterySoCStatistic(final SelectionRecordingDeviceBattery batterySoCSelection) {
-      // TODO Auto-generated method stub
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
       if (allAvailableStatistics.isEmpty()) {
@@ -996,7 +1013,10 @@ public class StatisticView extends ViewPart implements ITourProvider {
          onSelectYear(false);
       }
 
-      onSelectStatistic();
+      /*
+       * Select tour
+       */
+      updateStatistic_10_NoReload(batterySoCSelection.getTourId());
    }
 
    private void selectYear(final int defaultYear) {
@@ -1120,8 +1140,10 @@ public class StatisticView extends ViewPart implements ITourProvider {
    }
 
    /**
+    * @param tourId
+    *           Tour which should be selected or <code>null</code>
     */
-   private void updateStatistic_10_NoReload() {
+   private void updateStatistic_10_NoReload(final Long tourId) {
 
       // keep current year
       if (_selectedYear == -1) {
@@ -1144,7 +1166,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _activePerson,
             _activeTourTypeFilter,
             _selectedYear,
-            getNumberOfYears());
+            getNumberOfYears(),
+            tourId);
 
       _activeStatistic.updateStatistic(statContext);
 

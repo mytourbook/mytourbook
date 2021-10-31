@@ -483,27 +483,36 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       _currentYear = statContext.statSelectedYear;
       _numberOfYears = statContext.statNumberOfYears;
 
-      /*
-       * get currently selected tour id
-       */
+      final Long statTourId = statContext.statTourId;
       long selectedTourId = -1;
-      final ISelection selection = _chart.getSelection();
-      if (selection instanceof SelectionBarChart) {
-         final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-         if (barChartSelection.serieIndex != -1 && _batteryData != null) {
+      if (statTourId == null) {
 
-            int selectedValueIndex = barChartSelection.valueIndex;
-            final long[] tourIds = _batteryData.allTourIds;
+         /*
+          * Get currently selected tour id
+          */
+         final ISelection selection = _chart.getSelection();
+         if (selection instanceof SelectionBarChart) {
+            final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-            if (tourIds.length > 0) {
-               if (selectedValueIndex >= tourIds.length) {
-                  selectedValueIndex = tourIds.length - 1;
+            if (barChartSelection.serieIndex != -1 && _batteryData != null) {
+
+               int selectedValueIndex = barChartSelection.valueIndex;
+               final long[] tourIds = _batteryData.allTourIds;
+
+               if (tourIds.length > 0) {
+                  if (selectedValueIndex >= tourIds.length) {
+                     selectedValueIndex = tourIds.length - 1;
+                  }
+
+                  selectedTourId = tourIds[selectedValueIndex];
                }
-
-               selectedTourId = tourIds[selectedValueIndex];
             }
          }
+
+      } else {
+
+         selectedTourId = statTourId;
       }
 
       _batteryData = _batteryDataProvider.getTourTimeData(
