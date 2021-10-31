@@ -1,13 +1,7 @@
 name: Build
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**.java'
-      - '**.yml'
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  schedule:
+  - cron: "0 0 * * *"
 jobs:
   build:
     name: Build
