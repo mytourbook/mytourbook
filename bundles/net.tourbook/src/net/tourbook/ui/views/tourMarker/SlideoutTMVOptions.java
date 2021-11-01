@@ -70,7 +70,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
 
       createActions();
 
-      final Composite ui = createUI(parent);
+      final Composite container = createUI(parent);
 
       restoreState();
 
@@ -78,7 +78,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
 
       updateUI();
 
-      return ui;
+      return container;
    }
 
    private Composite createUI(final Composite parent) {
