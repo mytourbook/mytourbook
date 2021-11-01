@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,8 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
-/**
- */
 public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
@@ -51,8 +49,8 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    /*
     * UI controls
     */
-   private Button _chkFix2xErrors;
-   private Button _lbl2xErrorTolerance;
+   private Button _chkUseElapsedTime;
+   private Button _chkUseRecordedTime;
 
    public SlideoutTMVOptions(final Control ownerControl,
                              final ToolBar toolBar) {
@@ -141,20 +139,20 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
             /*
              * Show distance
              */
-            _chkFix2xErrors = new Button(parent, SWT.RADIO);
-            _chkFix2xErrors.setText("Use elapsed time");//Messages.Slideout_HVROptions_Checkbox_2xValues);
-            _chkFix2xErrors.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
-            _chkFix2xErrors.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkFix2xErrors);
+            _chkUseElapsedTime = new Button(parent, SWT.RADIO);
+            _chkUseElapsedTime.setText("Use elapsed time");//Messages.Slideout_HVROptions_Checkbox_2xValues);
+            _chkUseElapsedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
+            _chkUseElapsedTime.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().applyTo(_chkUseElapsedTime);
          }
 
          {
             /*
              * Label: 2x tolerance
              */
-            _lbl2xErrorTolerance = new Button(parent, SWT.RADIO);
-            _lbl2xErrorTolerance.setText("Use recorded time");
-            GridDataFactory.fillDefaults().applyTo(_lbl2xErrorTolerance);
+            _chkUseRecordedTime = new Button(parent, SWT.RADIO);
+            _chkUseRecordedTime.setText("Use recorded time");
+            GridDataFactory.fillDefaults().applyTo(_chkUseRecordedTime);
 
          }
       }
@@ -187,7 +185,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    @Override
    public void resetToDefaults() {
 
-      _chkFix2xErrors.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
+      _chkUseElapsedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
 
       onChangeUI();
    }
@@ -198,7 +196,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, _chkFix2xErrors.getSelection());
+      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, _chkUseElapsedTime.getSelection());
    }
 
    private void updateUI() {
