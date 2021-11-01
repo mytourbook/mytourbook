@@ -85,6 +85,12 @@
          <url>http://download.eclipse.org/nattable/releases/2.0.0/repository</url>
       </repository>   
 
+	      <repository>
+			<id>rcptt</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/rcptt/release/2.5.1/repository/</url>
+		</repository>
+
 
 
       <!-- Repo for Chromium is/was not supported in Eclipse
