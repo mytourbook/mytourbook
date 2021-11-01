@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMarker;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionResetToDefaults;
@@ -22,59 +24,40 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
 public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private final IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private ActionResetToDefaults    _actionRestoreDefaults;
+   private ActionResetToDefaults  _actionRestoreDefaults;
 
-   private ChartOptions_Grid        _gridUI;
-
-   private SelectionAdapter         _defaultSelectionListener;
-
-   private TourMarkerView         _tourMarkerView;
+   private SelectionListener      _defaultSelectionListener;
 
    /*
     * UI controls
     */
-   private Button  _chkFix2xErrors;
-
-   private Button  _lbl2xErrorTolerance;
-   private Label   _lbl2xErrorTolerance_Unit;
-   private Label   _lbl2xToleranceResult;
-   private Label   _lbl2xToleranceResult_Value;
-
-   private Spinner _spinner2xErrorTolerance;
+   private Button _chkFix2xErrors;
+   private Button _lbl2xErrorTolerance;
 
    public SlideoutTMVOptions(final Control ownerControl,
-                             final ToolBar toolBar,
-                             final String prefStoreGridPrefix,
-                             final TourMarkerView tourMarkerView) {
+                             final ToolBar toolBar) {
 
       super(ownerControl, toolBar);
-
-      _tourMarkerView = tourMarkerView;
-
-      _gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
    }
 
    private void createActions() {
@@ -85,7 +68,8 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
-      initUI(parent);
+      initUI();
+
       createActions();
 
       final Composite ui = createUI(parent);
@@ -109,14 +93,10 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
          GridLayoutFactory.fillDefaults()//
                .numColumns(2)
                .applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
             createUI_12_Actions(container);
-
             createUI_20_Options(container);
-
-            // _gridUI.createUI(container);
          }
       }
 
@@ -151,8 +131,6 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
 
    private void createUI_20_Options(final Composite parent) {
 
-      //  final Group group = new Group(parent, SWT.NONE);
-      //  group.setText(Messages.Slideout_HVROptions_Group);
       GridDataFactory.fillDefaults()//
             .grab(true, false)
             .span(2, 1)
@@ -183,30 +161,15 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    }
 
    private void enableControls() {
-//
-//      final boolean isRemove2xValue = _chkFix2xErrors.getSelection();
-//
-//      _lbl2xErrorTolerance.setEnabled(isRemove2xValue);
-//      _lbl2xErrorTolerance_Unit.setEnabled(isRemove2xValue);
-//      _spinner2xErrorTolerance.setEnabled(isRemove2xValue);
-//
-//      _lbl2xToleranceResult.setEnabled(isRemove2xValue);
-//      _lbl2xToleranceResult_Value.setEnabled(isRemove2xValue);
+
    }
 
    /*
     * UI controls
     */
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
-
-
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
    }
 
    private void onChangeUI() {
@@ -225,10 +188,6 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    public void resetToDefaults() {
 
       _chkFix2xErrors.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
-      _spinner2xErrorTolerance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
-
-      _gridUI.resetToDefaults();
-      _gridUI.saveState();
 
       onChangeUI();
    }
@@ -240,7 +199,6 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    private void saveState() {
 
       _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, _chkFix2xErrors.getSelection());
-      _prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, _spinner2xErrorTolerance.getSelection());
    }
 
    private void updateUI() {

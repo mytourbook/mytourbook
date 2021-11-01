@@ -100,7 +100,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    public static final String       ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
 
-   private static final String GRID_PREF_PREFIX                        = "GRID_HEART_RATE_VARIABILITY__";                                       //$NON-NLS-1$
    private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
 
@@ -158,9 +157,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
          final SlideoutTMVOptions slideoutTMVOptions = new SlideoutTMVOptions(
                _pageBook,
-               toolbar,
-               GRID_PREF_PREFIX,
-               TourMarkerView.this);
+               toolbar);
 
          return slideoutTMVOptions;
       }
