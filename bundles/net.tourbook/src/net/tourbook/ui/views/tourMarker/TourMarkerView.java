@@ -28,6 +28,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -59,6 +61,7 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -85,6 +88,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -96,52 +100,71 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    public static final String       ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
 
+   private static final String GRID_PREF_PREFIX                        = "GRID_HEART_RATE_VARIABILITY__";                                       //$NON-NLS-1$
    private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
+
    private final IDialogSettings    _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
 
    private TourData                 _tourData;
-
    private PostSelectionProvider    _postSelectionProvider;
    private ISelectionListener       _postSelectionListener;
    private IPropertyChangeListener  _prefChangeListener;
    private IPropertyChangeListener  _prefChangeListener_Common;
    private ITourEventListener       _tourEventListener;
+
    private IPartListener2           _partListener;
-
    private MenuManager              _viewerMenuManager;
-   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
+   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ActionOpenMarkerDialog   _actionEditTourMarkers;
+
    private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
 
+   private ActionToolbarSlideout    _actionTmvOptions;
+
    private PixelConverter           _pc;
-
    private TableViewer              _markerViewer;
+
    private ColumnManager            _columnManager;
-
    private boolean                  _isInUpdate;
+
    private boolean                  _isMultipleTours;
-
    private ColumnDefinition         _colDefName;
-   private ColumnDefinition         _colDefVisibility;
 
+   private ColumnDefinition         _colDefVisibility;
    private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
+
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
    }
-
    /*
     * UI controls
     */
    private PageBook  _pageBook;
    private Composite _pageNoData;
+
    private Composite _viewerContainer;
 
    private Font      _boldFont;
 
    private Menu      _tableContextMenu;
+
+   private class ActionTmvOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         final SlideoutTMVOptions slideoutTMVOptions = new SlideoutTMVOptions(
+               _pageBook,
+               toolbar,
+               GRID_PREF_PREFIX,
+               TourMarkerView.this);
+
+         return slideoutTMVOptions;
+      }
+   }
 
    class MarkerViewerContentProvider implements IStructuredContentProvider {
 
@@ -177,7 +200,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
-
    /**
     * Sort the markers by time
     */
@@ -452,6 +474,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
+      _actionTmvOptions = new ActionTmvOptions();
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
    }
@@ -924,7 +947,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          public void update(final ViewerCell cell) {
 
             final TourMarker marker = (TourMarker) cell.getElement();
-            final long time = marker.getTime();
+             final long time = marker.getTime();
+
+            //TODO FB time -= _tourData.getPausedTime(0, marker.getSerieIndex());
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
          }
@@ -944,11 +969,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
             int lastTime = 0;
+            int lastSerieIndex = 0;
             TourData lastTourData = null;
             if (null != lastRow) {
                final Object element = lastRow.getElement();
                if (element instanceof TourMarker) {
                   lastTime = ((TourMarker) element).getTime();
+                  lastSerieIndex = ((TourMarker) element).getSerieIndex();
                   lastTourData = ((TourMarker) element).getTourData();
                }
             }
@@ -961,6 +988,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             if (lastTourData != null && !lastTourData.getTourId().equals(currentTourData.getTourId())) {
                timeDifference = currentTime;
             }
+
+            final int previousMarkerIndex = getPreviousMarkerIndex(cell);
+
+            int currentMarkerIndex = getCurrentMarkerIndex(cell);
+            if (_tourData.isMultipleTours()) {
+               currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
+            }
+            //TODO FB timeDifference -= _tourData.getPausedTime(lastSerieIndex, currentMarkerIndex);
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(timeDifference));
 
@@ -1066,6 +1101,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    private void fillToolbar() {
+
+      /*
+       * View toolbar
+       */
+      final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+      toolBarManager.add(_actionTmvOptions);
 
 //      final IActionBars actionBars = getViewSite().getActionBars();
 
