@@ -161,6 +161,7 @@ public class SensorDataProvider {
                   || isAvailable_Status_End
                   || isAvailable_Voltage_End;
 
+            // level
             setStartEndValues(
                   isAvailable_Start,
                   isAvailable_End,
@@ -171,6 +172,7 @@ public class SensorDataProvider {
                   allBatteryLevel_Start,
                   allBatteryLevel_End);
 
+            // status
             setStartEndValues(
                   isAvailable_Start,
                   isAvailable_End,
@@ -181,6 +183,7 @@ public class SensorDataProvider {
                   allBatteryStatus_Start,
                   allBatteryStatus_End);
 
+            // voltage
             setStartEndValues(
                   isAvailable_Start,
                   isAvailable_End,
@@ -240,12 +243,15 @@ public class SensorDataProvider {
       return sensorData;
    }
 
-   private void setStartEndValues(final boolean isAvailableValue_Start,
-                                  final boolean isAvailableValue_End,
-                                  final boolean isAvailable_Start,
+   private void setStartEndValues(final boolean isAvailable_Start,
                                   final boolean isAvailable_End,
+
+                                  final boolean isAvailableValue_Start,
+                                  final boolean isAvailableValue_End,
+
                                   final float value_Start,
                                   final float value_End,
+
                                   final TFloatArrayList allBatteryValue_Start,
                                   final TFloatArrayList allBatteryValue_End) {
 

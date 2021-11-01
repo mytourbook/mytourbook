@@ -75,7 +75,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class ChartComponentGraph extends Canvas {
 
-   private static final double       FLOAT_ZERO        = ChartDataYSerie.FLOAT_ZERO;
+   private static final double       FLOAT_ALMOST_ZERO = ChartDataYSerie.FLOAT_ALMOST_ZERO;
 
    private static final double       ZOOM_RATIO        = 1.3;
    private static double             ZOOM_RATIO_FACTOR = ZOOM_RATIO;
@@ -9694,7 +9694,7 @@ public class ChartComponentGraph extends Canvas {
                      continue;
                   }
 
-                  if (isIgnoreMinMaxZero && (yValue > -FLOAT_ZERO && yValue < FLOAT_ZERO)) {
+                  if (isIgnoreMinMaxZero && (yValue > -FLOAT_ALMOST_ZERO && yValue < FLOAT_ALMOST_ZERO)) {
                      // value is zero (almost) -> ignore
                      continue;
                   }

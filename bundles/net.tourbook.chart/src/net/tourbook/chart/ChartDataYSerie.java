@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class ChartDataYSerie extends ChartDataSerie {
 
-   static final double            FLOAT_ZERO                        = 0.0001;
+   static final double            FLOAT_ALMOST_ZERO                 = 0.0001;
 
    /**
     * the bars has only a low and high value
@@ -160,6 +160,14 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
    }
 
+   public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie, final boolean isIgnoreZero) {
+
+      _chartType = chartType;
+      _isIgnoreMinMaxZero = isIgnoreZero;
+
+      setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
+   }
+
    public ChartDataYSerie(final ChartType chartType, final float[][] valueSeries) {
 
       _chartType = chartType;
@@ -276,7 +284,7 @@ public class ChartDataYSerie extends ChartDataSerie {
                   continue;
                }
 
-               if (value < -FLOAT_ZERO || value > FLOAT_ZERO) {
+               if (value < -FLOAT_ALMOST_ZERO || value > FLOAT_ALMOST_ZERO) {
                   return value;
                }
             }
@@ -566,12 +574,22 @@ public class ChartDataYSerie extends ChartDataSerie {
             // get the min/max values for all data
             for (final float[] valueSerie : highValues) {
                for (final float value : valueSerie) {
+
+                  if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+                     continue;
+                  }
+
                   _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
                }
             }
 
             for (final float[] valueSerie : lowValues) {
                for (final float value : valueSerie) {
+
+                  if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+                     continue;
+                  }
+
                   _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
                }
             }
@@ -611,55 +629,54 @@ public class ChartDataYSerie extends ChartDataSerie {
    }
 
    private void setMinMaxValues_Bar(final float[][] valueSeries) {
-      {
 
-         switch (_chartLayout) {
-         case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
-         case ChartDataYSerie.BAR_LAYOUT_BESIDE:
+      switch (_chartLayout) {
 
-            // get the min/max highValues for all data
-            for (final float[] valuesOuter : valueSeries) {
-               for (final float value : valuesOuter) {
+      case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
+      case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
-                  if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
-                     continue;
-                  }
+         // get the min/max highValues for all data
+         for (final float[] valuesOuter : valueSeries) {
+            for (final float value : valuesOuter) {
 
-                  _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
-                  _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
+               if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+                  continue;
                }
+
+               _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+               _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
             }
-
-            break;
-
-         case ChartDataYSerie.BAR_LAYOUT_STACKED:
-
-            final float[] serieMax = new float[valueSeries[0].length];
-
-            // get the max value for the data which are stacked on each
-            // other
-            for (final float[] valuesOuter : valueSeries) {
-               for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
-
-                  final float outerValue = valuesOuter[valueIndex];
-                  final float outerValueWithMax = serieMax[valueIndex] + outerValue;
-
-                  serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
-                        ? _visibleMaxValue
-                        : outerValueWithMax);
-
-                  _visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
-               }
-            }
-
-            // get max for all series
-            _visibleMaxValue = 0;
-            for (final float serieValue : serieMax) {
-               _visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
-            }
-
-            break;
          }
+
+         break;
+
+      case ChartDataYSerie.BAR_LAYOUT_STACKED:
+
+         final float[] serieMax = new float[valueSeries[0].length];
+
+         // get the max value for the data which are stacked on each
+         // other
+         for (final float[] valuesOuter : valueSeries) {
+            for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
+
+               final float outerValue = valuesOuter[valueIndex];
+               final float outerValueWithMax = serieMax[valueIndex] + outerValue;
+
+               serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
+                     ? _visibleMaxValue
+                     : outerValueWithMax);
+
+               _visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
+            }
+         }
+
+         // get max for all series
+         _visibleMaxValue = 0;
+         for (final float serieValue : serieMax) {
+            _visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
+         }
+
+         break;
       }
    }
 
@@ -706,7 +723,7 @@ public class ChartDataYSerie extends ChartDataSerie {
                   continue;
                }
 
-               if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
+               if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
                   // ignore zero
                   continue;
                }

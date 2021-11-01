@@ -688,7 +688,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          final ChartDataYSerie yDataStatus = new ChartDataYSerie(
                ChartType.BAR,
                sensorData.allBatteryStatus_End,
-               sensorData.allBatteryStatus_Start);
+               sensorData.allBatteryStatus_Start,
+               false);
 
          yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
          yDataStatus.setUnitLabel("#");
@@ -711,7 +712,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          final ChartDataYSerie yDataLevel = new ChartDataYSerie(
                ChartType.BAR,
                sensorData.allBatteryLevel_End,
-               sensorData.allBatteryLevel_Start);
+               sensorData.allBatteryLevel_Start,
+               true);
 
          yDataLevel.setYTitle("Battery  Level ·  " + sensorLabel);
          yDataLevel.setUnitLabel("%");
@@ -734,7 +736,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
                ChartType.BAR,
                sensorData.allBatteryVoltage_End,
-               sensorData.allBatteryVoltage_Start);
+               sensorData.allBatteryVoltage_Start,
+               true);
 
          yDataVoltage.setYTitle("Battery Voltage ·  " + sensorLabel);
          yDataVoltage.setUnitLabel("Volt");
