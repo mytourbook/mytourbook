@@ -234,9 +234,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
                UI.adjustSpinnerValueOnMouseScroll(event);
                onSelect_GeoFilter();
             });
-            _spinnerGeoFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               onSelect_GeoFilter();
-            }));
+            _spinnerGeoFilter.addSelectionListener(
+                  widgetSelectedAdapter(selectionEvent -> onSelect_GeoFilter()));
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(_spinnerGeoFilter);
@@ -253,10 +252,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 
    private void createUI_30_LatLonDigits(final Composite parent) {
 
-      final SelectionListener _selectionListener_LatLonDigits = widgetSelectedAdapter(selectionEvent -> {
-
-         onSelect_LatLonDigits();
-      });
+      final SelectionListener _selectionListener_LatLonDigits =
+            widgetSelectedAdapter(selectionEvent -> onSelect_LatLonDigits());
 
       /*
        * Lat/lon digits
