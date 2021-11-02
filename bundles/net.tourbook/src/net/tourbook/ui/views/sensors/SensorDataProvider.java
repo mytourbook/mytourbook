@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -95,18 +96,18 @@ public class SensorDataProvider {
                + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
          ;
 
-         final TFloatArrayList allBatteryLevel_Start = new TFloatArrayList();
-         final TFloatArrayList allBatteryLevel_End = new TFloatArrayList();
-         final TFloatArrayList allBatteryStatus_Start = new TFloatArrayList();
-         final TFloatArrayList allBatteryStatus_End = new TFloatArrayList();
-         final TFloatArrayList allBatteryVoltage_Start = new TFloatArrayList();
-         final TFloatArrayList allBatteryVoltage_End = new TFloatArrayList();
+         final TFloatArrayList allDbBatteryLevel_Start = new TFloatArrayList();
+         final TFloatArrayList allDbBatteryLevel_End = new TFloatArrayList();
+         final TFloatArrayList allDbBatteryStatus_Start = new TFloatArrayList();
+         final TFloatArrayList allDbBatteryStatus_End = new TFloatArrayList();
+         final TFloatArrayList allDbBatteryVoltage_Start = new TFloatArrayList();
+         final TFloatArrayList allDbBatteryVoltage_End = new TFloatArrayList();
 
          boolean isAvailable_Level = false;
          boolean isAvailable_Status = false;
          boolean isAvailable_Voltage = false;
 
-         final TIntArrayList allXValues_ByTime = new TIntArrayList();
+         final TIntArrayList allDbXValues_ByTime = new TIntArrayList();
 
          final TLongArrayList allTourIds = new TLongArrayList();
          final TLongArrayList allTourStartTime = new TLongArrayList();
@@ -128,7 +129,7 @@ public class SensorDataProvider {
 
             final long dbTourId                 = result.getLong(2);
             final long dbTourStartTime          = result.getLong(3);
-//          final long dbTourEndTime            = result.getLong(4);
+//            final long dbTourEndTime            = result.getLong(4);
             final float dbBatteryLevel_Start    = result.getShort(5);
             final float dbBatteryLevel_End      = result.getShort(6);
             final float dbBatteryStatus_Start   = result.getShort(7);
@@ -138,7 +139,7 @@ public class SensorDataProvider {
 
 
             // tour duration in seconds
-//          final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
+//            final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
 
             final boolean isAvailable_Level_Start     = dbBatteryLevel_Start >= 0;
             final boolean isAvailable_Level_End       = dbBatteryLevel_End >= 0;
@@ -169,8 +170,8 @@ public class SensorDataProvider {
                   isAvailable_Level_End,
                   dbBatteryLevel_Start,
                   dbBatteryLevel_End,
-                  allBatteryLevel_Start,
-                  allBatteryLevel_End);
+                  allDbBatteryLevel_Start,
+                  allDbBatteryLevel_End);
 
             // status
             setStartEndValues(
@@ -180,8 +181,8 @@ public class SensorDataProvider {
                   isAvailable_Status_End,
                   dbBatteryStatus_Start,
                   dbBatteryStatus_End,
-                  allBatteryStatus_Start,
-                  allBatteryStatus_End);
+                  allDbBatteryStatus_Start,
+                  allDbBatteryStatus_End);
 
             // voltage
             setStartEndValues(
@@ -191,8 +192,8 @@ public class SensorDataProvider {
                   isAvailable_Voltage_End,
                   dbBatteryVoltage_Start,
                   dbBatteryVoltage_End,
-                  allBatteryVoltage_Start,
-                  allBatteryVoltage_End);
+                  allDbBatteryVoltage_Start,
+                  allDbBatteryVoltage_End);
 
             if (isAvailable_Start || isAvailable_End) {
 
@@ -209,8 +210,38 @@ public class SensorDataProvider {
                final long relativeTimeDiffInMS = dbTourStartTime - firstDateTime;
                final long relativeTimeDiffInSec = relativeTimeDiffInMS / 1000;
 
-               allXValues_ByTime.add((int) relativeTimeDiffInSec);
+               allDbXValues_ByTime.add((int) relativeTimeDiffInSec);
             }
+         }
+
+         /*
+          * Add time margin values
+          */
+         final int[] allXValues = allDbXValues_ByTime.toArray();
+         final float[] allBatteryLevel_Start = allDbBatteryLevel_Start.toArray();
+         final float[] allBatteryLevel_End = allDbBatteryLevel_End.toArray();
+         final float[] allBatteryStatus_Start = allDbBatteryStatus_Start.toArray();
+         final float[] allBatteryStatus_End = allDbBatteryStatus_End.toArray();
+         final float[] allBatteryVoltage_Start = allDbBatteryVoltage_Start.toArray();
+         final float[] allBatteryVoltage_End = allDbBatteryVoltage_End.toArray();
+
+         final int numValues = allXValues.length;
+         int timeOffset = 0;
+
+         if (numValues > 0) {
+
+            final double timeDuration_Seconds = allXValues[numValues - 1];
+
+            /**
+             * Add 2% more time that the first/last values do not stick at the y-axis -> better
+             * visible
+             * <p>
+             * It took me a few days to finally implement this "simple" solution with hopefully no
+             * undiscovered side effects
+             */
+            final double timeOffsetNotRounded = timeDuration_Seconds * 0.02;
+
+            timeOffset = (int) timeOffsetNotRounded;
          }
 
          /*
@@ -218,29 +249,98 @@ public class SensorDataProvider {
           */
          sensorData = new SensorData();
 
-         sensorData.firstDateTime = firstDateTime;
+// SET_FORMATTING_OFF
 
-         sensorData.allXValues_ByTime = allXValues_ByTime.toArray();
+         sensorData.firstDateTime            = TimeTools.getZonedDateTime(firstDateTime).minusSeconds(timeOffset);
 
-         sensorData.allBatteryLevel_Start = allBatteryLevel_Start.toArray();
-         sensorData.allBatteryLevel_End = allBatteryLevel_End.toArray();
-         sensorData.allBatteryStatus_Start = allBatteryStatus_Start.toArray();
-         sensorData.allBatteryStatus_End = allBatteryStatus_End.toArray();
-         sensorData.allBatteryVoltage_Start = allBatteryVoltage_Start.toArray();
-         sensorData.allBatteryVoltage_End = allBatteryVoltage_End.toArray();
+         sensorData.allXValues_ByTime        = getXData_TimeMarginValues(allXValues, timeOffset);
 
-         sensorData.isAvailable_Level = isAvailable_Level;
-         sensorData.isAvailable_Status = isAvailable_Status;
-         sensorData.isAvailable_Voltage = isAvailable_Voltage;
+         sensorData.allBatteryLevel_Start    = getYData_WithTimeMarginValues(allBatteryLevel_Start);
+         sensorData.allBatteryLevel_End      = getYData_WithTimeMarginValues(allBatteryLevel_End);
+         sensorData.allBatteryStatus_Start   = getYData_WithTimeMarginValues(allBatteryStatus_Start);
+         sensorData.allBatteryStatus_End     = getYData_WithTimeMarginValues(allBatteryStatus_End);
+         sensorData.allBatteryVoltage_Start  = getYData_WithTimeMarginValues(allBatteryVoltage_Start);
+         sensorData.allBatteryVoltage_End    = getYData_WithTimeMarginValues(allBatteryVoltage_End);
 
-         sensorData.allTourIds = allTourIds.toArray();
-         sensorData.allTourStartTime = allTourStartTime.toArray();
+         sensorData.isAvailable_Level        = isAvailable_Level;
+         sensorData.isAvailable_Status       = isAvailable_Status;
+         sensorData.isAvailable_Voltage      = isAvailable_Voltage;
+
+         sensorData.allTourIds               = getTourIDs_WithTimeMarginValues(allTourIds.toArray());
+
+// SET_FORMATTING_ON
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       }
 
       return sensorData;
+   }
+
+   private long[] getTourIDs_WithTimeMarginValues(final long[] allTourIDs) {
+
+      final int numValues_NoMargin = allTourIDs.length;
+
+      if (numValues_NoMargin == 0) {
+         return allTourIDs;
+      }
+
+      // add time margin values
+      final int numValues_WithMargin = numValues_NoMargin + 2;
+
+      final long[] allValues_WithMargin = new long[numValues_WithMargin];
+
+      // copy db tour id's
+      System.arraycopy(allTourIDs, 0, allValues_WithMargin, 1, numValues_NoMargin);
+
+      // create dummy tour id's
+      allValues_WithMargin[0] = TourDatabase.ENTITY_IS_NOT_SAVED;
+      allValues_WithMargin[numValues_WithMargin - 1] = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      return allValues_WithMargin;
+   }
+
+   private int[] getXData_TimeMarginValues(final int[] allXValues_NoMargin, final int timeMargin) {
+
+      final int numValues_NoMargin = allXValues_NoMargin.length;
+
+      if (numValues_NoMargin == 0) {
+         return allXValues_NoMargin;
+      }
+
+      // add time margin values
+      final int numValues_WithMargin = numValues_NoMargin + 2;
+
+      final int[] allValues_WithTimeMargins = new int[numValues_WithMargin];
+
+      // add time margin to each value
+      for (int valueIndex = 0; valueIndex < allXValues_NoMargin.length; valueIndex++) {
+
+         allValues_WithTimeMargins[valueIndex + 1] = allXValues_NoMargin[valueIndex] + timeMargin;
+      }
+
+      // set last value
+      allValues_WithTimeMargins[numValues_WithMargin - 1] = allValues_WithTimeMargins[numValues_WithMargin - 2] + timeMargin;
+
+      return allValues_WithTimeMargins;
+   }
+
+   private float[] getYData_WithTimeMarginValues(final float[] allValues_NoMargin) {
+
+      final int numValues_NoMargin = allValues_NoMargin.length;
+
+      if (numValues_NoMargin == 0) {
+         return allValues_NoMargin;
+      }
+
+      // add time margin values
+      final int numValues_WithMargin = numValues_NoMargin + 2;
+
+      final float[] allValues_WithMargin = new float[numValues_WithMargin];
+
+      System.arraycopy(allValues_NoMargin, 0, allValues_WithMargin, 1, numValues_NoMargin);
+
+      return allValues_WithMargin;
    }
 
    private void setStartEndValues(final boolean isAvailable_Start,

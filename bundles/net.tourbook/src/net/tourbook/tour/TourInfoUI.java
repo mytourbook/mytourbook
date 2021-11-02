@@ -77,6 +77,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IWorkbenchPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
@@ -141,6 +142,11 @@ public class TourInfoUI {
    private int     _descriptionLineCount;
    private int     _descriptionScroll_Lines = 15;
    private int     _descriptionScroll_Height;
+
+   /**
+    * Part which fired an event
+    */
+   private IWorkbenchPart _part;
 
    /*
     * Actions
@@ -299,6 +305,7 @@ public class TourInfoUI {
    private ArrayList<Label> _allSensorValue_Level;
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
+
 
    private class ActionCloseTooltip extends Action {
 
@@ -1462,7 +1469,7 @@ public class TourInfoUI {
 
                TourEventId.SELECTION_SENSOR,
                new SelectionSensor((DeviceSensor) linkData, _tourData.getTourId()),
-               null);
+               _part);
       }
    }
 
@@ -1492,6 +1499,10 @@ public class TourInfoUI {
     */
    public void setNoTourTooltip(final String noTourTooltip) {
       _noTourTooltip = noTourTooltip;
+   }
+
+   public void setPart(final IWorkbenchPart part) {
+      _part = part;
    }
 
    /**

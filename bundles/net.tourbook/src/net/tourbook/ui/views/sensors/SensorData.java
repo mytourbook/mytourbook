@@ -15,28 +15,29 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
+import java.time.ZonedDateTime;
+
 public class SensorData {
 
-   public long         firstDateTime;
+   public ZonedDateTime firstDateTime;
 
-   public long[]       allTourIds;
-   public long[]       allTourStartTime;
+   public long[]        allTourIds;
 
    /**
     * Relative time values in seconds, starting from 0
     */
-   public int[]        allXValues_ByTime;
+   public int[]         allXValues_ByTime;
 
-   public float[]      allBatteryLevel_Start;
-   public float[]      allBatteryLevel_End;
+   public float[]       allBatteryLevel_Start;
+   public float[]       allBatteryLevel_End;
 
-   public float[]      allBatteryStatus_Start;
-   public float[]      allBatteryStatus_End;
+   public float[]       allBatteryStatus_Start;
+   public float[]       allBatteryStatus_End;
 
-   public float[]      allBatteryVoltage_Start;
-   public float[]      allBatteryVoltage_End;
+   public float[]       allBatteryVoltage_Start;
+   public float[]       allBatteryVoltage_End;
 
-   public boolean      isAvailable_Level;
-   public boolean      isAvailable_Status;
-   public boolean      isAvailable_Voltage;
+   public boolean       isAvailable_Level;
+   public boolean       isAvailable_Status;
+   public boolean       isAvailable_Voltage;
 }

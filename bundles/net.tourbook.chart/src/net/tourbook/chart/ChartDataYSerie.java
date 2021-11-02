@@ -567,6 +567,8 @@ public class ChartDataYSerie extends ChartDataSerie {
          _visibleMinValue = lowValues[0][0];
          _visibleMaxValue = highValues[0][0];
 
+         boolean isMinValueSet = false;
+
          if (_chartType == ChartType.LINE
                || (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
                || (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
@@ -587,7 +589,19 @@ public class ChartDataYSerie extends ChartDataSerie {
                for (final float value : valueSerie) {
 
                   if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+
+                     // value is 0
+
                      continue;
+                  }
+
+                  if (isMinValueSet == false) {
+
+                     // overwrite initial value which could be 0 but 0 values could be ignored
+
+                     isMinValueSet = true;
+
+                     _visibleMinValue = value;
                   }
 
                   _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;

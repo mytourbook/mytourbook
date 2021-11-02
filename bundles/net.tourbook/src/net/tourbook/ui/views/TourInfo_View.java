@@ -274,6 +274,7 @@ public class TourInfo_View extends ViewPart {
       _tourInfoUI = new TourInfoUI();
       _tourInfoUI.setIsUIEmbedded(true);
       _tourInfoUI.setNoTourTooltip(Messages.UI_Label_TourIsNotSelected);
+      _tourInfoUI.setPart(this);
    }
 
    private void onResize() {

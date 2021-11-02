@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -34,7 +33,6 @@ import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
@@ -103,6 +101,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private TourInfoUI                      _tourInfoUI                   = new TourInfoUI();
 
    private boolean                         _isUseTourFilter;
+   private boolean                         _isInSelect;
 
    private ActionAppTourFilter             _actionAppTourFilter;
 
@@ -312,6 +311,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       sensorChart.addBarSelectionListener((serieIndex, valueIndex) -> {
 
+         if (_isInSelect) {
+            return;
+         }
+
          final long[] tourIds = _sensorData.allTourIds;
 
          if (tourIds != null && tourIds.length > 0) {
@@ -432,12 +435,17 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
          _selectedSensor = sensorSelection.getSensor();
 
-         // 1. show sensor
-         updateChart();
+         // prevent reselection
+         _isInSelect = true;
+         {
+            // 1. show sensor
+            updateChart();
 
-         // 2. select tour
-         _selectedTourId = sensorSelection.getTourId();
-         selectTour(_selectedTourId);
+            // 2. select tour
+            _selectedTourId = sensorSelection.getTourId();
+            selectTour(_selectedTourId);
+         }
+         _isInSelect = false;
       }
    }
 
@@ -596,7 +604,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
 
       final int[] allXValues_ByTime = sensorData.allXValues_ByTime;
-      final int numValues = allXValues_ByTime.length;
+      int numValues = allXValues_ByTime.length;
+
+      // add time margin items
+      numValues += 2;
+
       final RGB[] allRGBLine = new RGB[numValues];
       final RGB[] allRGBGradientBright = new RGB[numValues];
       final RGB[] allRGBGradientDark = new RGB[numValues];
@@ -610,13 +622,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       /*
        * Set x-axis values
        */
-      final double[] xDataConverted = Util.convertIntToDouble(allXValues_ByTime);
-      final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(sensorData.firstDateTime);
+      final double[] allXValues_Double = Util.convertIntToDouble(allXValues_ByTime);
 
-      final ChartDataXSerie xData = new ChartDataXSerie(xDataConverted);
+      final ChartDataXSerie xData = new ChartDataXSerie(allXValues_Double);
 
       xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
-      xData.setHistoryStartDateTime(tourStartTime);
+      xData.setHistoryStartDateTime(sensorData.firstDateTime);
 
       chartModel.setXData(xData);
 
@@ -631,7 +642,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                ChartType.BAR,
                sensorData.allBatteryStatus_End,
                sensorData.allBatteryStatus_Start,
-               false);
+               true);
 
          yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
          yDataStatus.setUnitLabel("#");
