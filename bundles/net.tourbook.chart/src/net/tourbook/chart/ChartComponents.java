@@ -205,16 +205,20 @@ public class ChartComponents extends Composite {
     */
    String                    errorMessage;
 
-   private long              _historyUnitStart;
-   private long              _historyUnitDuration;
+   private long              _historyUnitStart_EpochMilli;
+   private long              _historyUnitDurationOrTime;
 
-   private int[]             _historyYears;
+   private int[]             _historyUnit_Years;
 
    /**
     * Contains number of days for each month
     */
-   private int[][]           _historyMonths;
-   private int[]             _historyDOY;
+   private int[][]           _historyUnit_Months;
+
+   /**
+    * Contains days of year (DOY) for all years
+    */
+   private int[]             _historyUnit_DOY;
 
    /**
     * Create and layout the components of the chart
@@ -374,13 +378,13 @@ public class ChartComponents extends Composite {
       }
 
       /*
-       * calculate the number of units which will be visible by dividing the visible length by the
+       * Calculate the number of units which will be visible by dividing the visible length by the
        * minimum size which one unit should have in pixels
        */
-      final long defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
+      final long numDefaultUnits = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
       // unit raw value (not yet rounded) is the number in data values for one unit
-      final double graphDefaultUnit = graphRange / Math.max(1, defaultUnitCount);
+      final double graphDefaultUnit = graphRange / Math.max(1, numDefaultUnits);
 
       final int unitType = xData.getAxisUnit();
       switch (unitType) {
@@ -569,24 +573,24 @@ public class ChartComponents extends Composite {
       drawingData.setScaleX((double) devVirtualGraphWidth / allDaysInAllYears);
    }
 
-   private void createDrawingData_X_History(final GraphDrawingData graphDrawingData, final double graphDefaultUnitD) {
+   private void createDrawingData_X_History(final GraphDrawingData graphDrawingData, final double graphDefaultUnit_Double) {
 
       final ChartDataXSerie xData = graphDrawingData.getXData();
       final double scaleX = graphDrawingData.getScaleX();
 
-      final long graphMaxValue = (long) xData.getOriginalMaxValue();
-      final long graphDefaultUnit = (long) graphDefaultUnitD;
+      final long graphMaxValue_Seconds = (long) xData.getOriginalMaxValue();
+      final long graphDefaultUnit = (long) graphDefaultUnit_Double;
 
       // get start time with mills truncated
       final ZonedDateTime tourStartTime = xData.getHistoryStartDateTime().withNano(0);
-      final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(graphMaxValue);
+      final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(graphMaxValue_Seconds);
 
       final long tourStartTimeMilli = tourStartTime.toInstant().toEpochMilli();
 
-      long unitStart = tourStartTimeMilli;
-      long unitEnd = graphMaxValue;
-      long firstUnitYear = tourStartTime.getYear();
-      long lastUnitYear = tourEndTime.getYear();
+      long unitStart_EpochMilli = tourStartTimeMilli;
+      long unitDurationOrTime = graphMaxValue_Seconds;
+      long firstUnit_Year = tourStartTime.getYear();
+      long lastUnit_Year = tourEndTime.getYear();
 
       long roundedYearUnit = 0;
       long majorRoundedYearUnit = 0;
@@ -603,7 +607,7 @@ public class ChartComponents extends Composite {
       if (isYearRounded) {
 
          /*
-          * adjust years to the rounded values
+          * Adjust years to the rounded values
           */
 
          final double unitYears = (double) graphDefaultUnit / YEAR_IN_SECONDS;
@@ -617,30 +621,32 @@ public class ChartComponents extends Composite {
          final long yearMinRemainder = firstHistoryYear % roundedYearUnit;
          final long yearMinValue = firstHistoryYear - yearMinRemainder;
 
-         final long yearMaxValue = lastUnitYear - (lastUnitYear % roundedYearUnit) + roundedYearUnit;
+         final long yearMaxValue = lastUnit_Year - (lastUnit_Year % roundedYearUnit) + roundedYearUnit;
 
-         unitStart = ZonedDateTime
+         unitStart_EpochMilli = ZonedDateTime
                .of((int) yearMinValue, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
                .toInstant()
                .toEpochMilli();
-         unitEnd = ZonedDateTime
+
+         unitDurationOrTime = ZonedDateTime
                .of((int) yearMaxValue, 12, 31, 23, 59, 59, 999, TimeTools.getDefaultTimeZone())
                .toInstant()
                .toEpochMilli();
 
-         firstUnitYear = yearMinValue;
-         lastUnitYear = yearMaxValue;
+         firstUnit_Year = yearMinValue;
+         lastUnit_Year = yearMaxValue;
       }
 
       /*
        * check if history units must be created, this is done only once for a tour to optimize it
        */
-      if (unitStart != _historyUnitStart || unitEnd != _historyUnitDuration) {
+      if (unitStart_EpochMilli != _historyUnitStart_EpochMilli
+            || unitDurationOrTime != _historyUnitDurationOrTime) {
 
-         _historyUnitStart = unitStart;
-         _historyUnitDuration = unitEnd;
+         _historyUnitStart_EpochMilli = unitStart_EpochMilli;
+         _historyUnitDurationOrTime = unitDurationOrTime;
 
-         createHistoryUnits((int) firstUnitYear, (int) lastUnitYear);
+         createHistoryUnits((int) firstUnit_Year, (int) lastUnit_Year);
       }
 
       graphDrawingData.setXUnitTextPos(GraphDrawingData.X_UNIT_TEXT_POS_CENTER);
@@ -709,14 +715,14 @@ public class ChartComponents extends Composite {
 
          int yearIndex = 0;
          long graphYearOffset = 0;
-         while (startYear > _historyYears[yearIndex]) {
-            graphYearOffset += _historyDOY[yearIndex++] * DAY_IN_SECONDS;
+         while (startYear > _historyUnit_Years[yearIndex]) {
+            graphYearOffset += _historyUnit_DOY[yearIndex++] * DAY_IN_SECONDS;
          }
 
          long graphValue = -startDOY * DAY_IN_SECONDS - startDaySeconds - graphYearOffset;
 
          // loop: years
-         while (graphValue <= graphMaxValue) {
+         while (graphValue <= graphMaxValue_Seconds) {
 
             long graphUnit = 0;
 
@@ -725,7 +731,7 @@ public class ChartComponents extends Composite {
                final int unitYearIndex = historyYearIndex + unitIndex;
 
                // graph unit = rounded years
-               graphUnit += _historyDOY[unitYearIndex] * DAY_IN_SECONDS;
+               graphUnit += _historyUnit_DOY[unitYearIndex] * DAY_IN_SECONDS;
             }
 
             if (graphValue < graphLeftBorder
@@ -748,7 +754,7 @@ public class ChartComponents extends Composite {
             /*
              * draw year tick
              */
-            final int yearValue = _historyYears[historyYearIndex];
+            final int yearValue = _historyUnit_Years[historyYearIndex];
 
             final boolean isMajorValue = yearValue % majorRoundedYearUnit == 0;
 
@@ -786,10 +792,10 @@ public class ChartComponents extends Composite {
          long graphValue = -startDOY * DAY_IN_SECONDS - startSeconds;
 
          // loop: years
-         while (graphValue <= graphMaxValue) {
+         while (graphValue <= graphMaxValue_Seconds) {
 
             // graph unit = 1 year
-            final long graphUnit = _historyDOY[historyYearIndex] * DAY_IN_SECONDS;
+            final long graphUnit = _historyUnit_DOY[historyYearIndex] * DAY_IN_SECONDS;
 
             if (graphValue < graphLeftBorder
                   - graphUnit //
@@ -809,7 +815,7 @@ public class ChartComponents extends Composite {
             }
 
             final int devUnitWidth = (int) (scaleX * graphUnit);
-            final int[] historyMonthDays = _historyMonths[historyYearIndex];
+            final int[] historyMonthDays = _historyUnit_Months[historyYearIndex];
 
             /*
              * draw year tick
@@ -820,7 +826,7 @@ public class ChartComponents extends Composite {
              * draw year title
              */
             {
-               final String yearLabel = Integer.toString(_historyYears[historyYearIndex]);
+               final String yearLabel = Integer.toString(_historyUnit_Years[historyYearIndex]);
 
                /*
                 * get number of repeated year labels within a year unit
@@ -921,9 +927,9 @@ public class ChartComponents extends Composite {
          monthLoop:
 
          // loop: months
-         while (graphValue <= graphMaxValue) {
+         while (graphValue <= graphMaxValue_Seconds) {
 
-            final int[] yearMonths = _historyMonths[historyYearIndex];
+            final int[] yearMonths = _historyUnit_Months[historyYearIndex];
 
             for (int monthIndex = 0; monthIndex < yearMonths.length; monthIndex++) {
 
@@ -955,7 +961,7 @@ public class ChartComponents extends Composite {
                {
                   final String monthTitle = _monthLabels[monthIndex]
                         + UI.SPACE2
-                        + Integer.toString(_historyYears[historyYearIndex]);
+                        + Integer.toString(_historyUnit_Years[historyYearIndex]);
 
                   // get number of repeated labels within one graph unit
                   int repeatedDays = 1;
@@ -1836,6 +1842,12 @@ public class ChartComponents extends Composite {
       }
    }
 
+   /**
+    * Create year, month and day units for the history graph
+    *
+    * @param firstYear
+    * @param lastYear
+    */
    private void createHistoryUnits(final int firstYear, int lastYear) {
 
       /*
@@ -1844,11 +1856,11 @@ public class ChartComponents extends Composite {
        */
       lastYear += 1;
 
-      final int numberOfYears = lastYear - firstYear + 1;
+      final int numYears = lastYear - firstYear + 1;
 
-      _historyYears = new int[numberOfYears];
-      _historyMonths = new int[numberOfYears][12];
-      _historyDOY = new int[numberOfYears];
+      _historyUnit_Years = new int[numYears];
+      _historyUnit_Months = new int[numYears][12];
+      _historyUnit_DOY = new int[numYears];
 
       int yearIndex = 0;
 
@@ -1858,7 +1870,7 @@ public class ChartComponents extends Composite {
 
          currentYear = currentYear.plusYears(1);
 
-         _historyYears[yearIndex] = currentYearNo;
+         _historyUnit_Years[yearIndex] = currentYearNo;
 
          int yearDOY = 0;
 
@@ -1870,12 +1882,12 @@ public class ChartComponents extends Composite {
                   .range(ChronoField.DAY_OF_MONTH)
                   .getMaximum();
 
-            _historyMonths[yearIndex][monthIndex] = monthDays;
+            _historyUnit_Months[yearIndex][monthIndex] = monthDays;
 
             yearDOY += monthDays;
          }
 
-         _historyDOY[yearIndex] = yearDOY;
+         _historyUnit_DOY[yearIndex] = yearDOY;
 
          yearIndex++;
       }
