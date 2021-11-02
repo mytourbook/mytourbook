@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,13 +74,14 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class SensorChartView extends ViewPart implements ITourProvider {
 
-   public static final String              ID                       = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
+   public static final String              ID                            = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
 
-   private static final String             STATE_MOUSE_WHEEL_MODE   = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
-   private static final String             STATE_SELECTED_TOUR_ID   = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
+   private static final String             STATE_IS_SELECTED_TOUR_FILTER = "STATE_IS_SELECTED_TOUR_FILTER";                    //$NON-NLS-1$
+   private static final String             STATE_MOUSE_WHEEL_MODE        = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
+   private static final String             STATE_SELECTED_TOUR_ID        = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
 
-   private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
-   private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
+   private final IPreferenceStore          _prefStore                    = TourbookPlugin.getPrefStore();
+   private final IDialogSettings           _state                        = TourbookPlugin.getState(ID);
 
    private IPartListener2                  _partListener;
    private ISelectionListener              _postSelectionListener;
@@ -96,15 +94,15 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private DeviceSensor                    _selectedSensor;
    private SensorData                      _sensorData;
-   private SensorDataProvider              _sensorDataProvider      = new SensorDataProvider();
+   private SensorDataProvider              _sensorDataProvider           = new SensorDataProvider();
 
    private Long                            _selectedTourId;
 
    private DelayedBarSelection_TourToolTip _tourToolTip;
-   private TourInfoIconToolTipProvider     _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
-   private TourInfoUI                      _tourInfoUI              = new TourInfoUI();
+   private TourInfoIconToolTipProvider     _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
+   private TourInfoUI                      _tourInfoUI                   = new TourInfoUI();
 
-   private boolean                         _isUseAppFilter;
+   private boolean                         _isUseTourFilter;
 
    private ActionAppTourFilter             _actionAppTourFilter;
 
@@ -400,22 +398,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       return selectedTours;
    }
 
-   /**
-    * @param tourStartTime
-    * @return Returns the tour start date time with the tour time zone, when not available with the
-    *         default time zone.
-    */
-
-   private ZonedDateTime getTourStartTime(final long tourStartTime) {
-
-      final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
-      final ZoneId tourStartTimeZoneId = TimeTools.getDefaultTimeZone();
-
-      final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
-
-      return zonedStartTime;
-   }
-
    private void initUI(final Composite parent) {
 
       _tk = new FormToolkit(parent.getDisplay());
@@ -423,7 +405,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void onAction_AppFilter(final boolean isSelected) {
 
-      _isUseAppFilter = isSelected;
+      _isUseTourFilter = isSelected;
 
       updateChart();
    }
@@ -462,6 +444,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private void restoreState() {
 
       _selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOUR_ID, -1);
+      _isUseTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
+
+      _actionAppTourFilter.setChecked(_isUseTourFilter);
 
       /*
        * Select tour even when tour ID == -1 because this will set the selected bar selection flags
@@ -490,6 +475,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       // mouse wheel mode
       final MouseWheelMode mouseWheelMode = _sensorChart.getAction_MouseWheelMode().getMouseWheelMode();
       Util.setStateEnum(_state, STATE_MOUSE_WHEEL_MODE, mouseWheelMode);
+
+      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionAppTourFilter.isChecked());
    }
 
    /**
@@ -577,7 +564,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          return;
       }
 
-      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseAppFilter);
+      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseTourFilter);
 
       if (_sensorData.allTourIds.length == 0) {
 
@@ -624,57 +611,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
        * Set x-axis values
        */
       final double[] xDataConverted = Util.convertIntToDouble(allXValues_ByTime);
-      final int lastTimeInSec = allXValues_ByTime[numValues - 1];
-
-      final ZonedDateTime tourStartTime = getTourStartTime(sensorData.firstDateTime);
-      final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(lastTimeInSec);
-
-      ZonedDateTime startTimeAdjusted = tourStartTime;
-      ZonedDateTime endTimeAdjusted = tourEndTime;
-
-//      final double forcedTourStartTime;
-//      final double forcedTourEndTime;
-
-      if (xDataConverted.length == 1) {
-
-         // only 1 point is visible
-
-         startTimeAdjusted = startTimeAdjusted.minusSeconds(1);
-         endTimeAdjusted = endTimeAdjusted.plusSeconds(1);
-
-//         forcedTourStartTime = -1;
-//         forcedTourEndTime = +1;
-
-      } else {
-
-         // add additional 3% tour time that the tour do not start/end at the chart border
-
-         final double timeDurationSeconds = Duration.between(tourStartTime, tourEndTime).getSeconds();
-
-         /**
-          * Very important: round to 0 ms
-          */
-         long timeOffset = ((long) (timeDurationSeconds * 0.05) / 1000) * 1000;
-
-         // ensure there is a time difference of 1 second
-         if (timeOffset == 0) {
-            timeOffset = 1000;
-         }
-
-//         forcedTourStartTime = -timeOffset;
-//         forcedTourEndTime = timeDurationSeconds + timeOffset;
-
-//         startTimeAdjusted = startTimeAdjusted.minusSeconds(timeOffset);
-//         endTimeAdjusted = endTimeAdjusted.plusSeconds(timeOffset);
-      }
+      final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(sensorData.firstDateTime);
 
       final ChartDataXSerie xData = new ChartDataXSerie(xDataConverted);
+
       xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
-
-      xData.setStartDateTime(startTimeAdjusted);
-
-//      xData.forceXAxisMinValue(forcedTourStartTime);
-//      xData.forceXAxisMaxValue(forcedTourEndTime);
+      xData.setHistoryStartDateTime(tourStartTime);
 
       chartModel.setXData(xData);
 

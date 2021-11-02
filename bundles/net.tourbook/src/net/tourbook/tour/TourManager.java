@@ -3660,7 +3660,7 @@ public class TourManager {
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
 
          // set date/time when x-axis starts
-         xDataTime.setStartDateTime(tourStartTime);
+         xDataTime.setHistoryStartDateTime(tourStartTime);
 
          /*
           * When time is displayed, the x-axis can show the start time starting from 0 or from the
@@ -3920,7 +3920,7 @@ public class TourManager {
          xDataTime.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_HISTORY);
 
          // set date/time when x-axis starts
-         xDataTime.setStartDateTime(tourData.getTourStartTime());
+         xDataTime.setHistoryStartDateTime(tourData.getTourStartTime());
 
          // history do not have any y-data, create dummy values
          final float[] yHistorySerie = new float[tourData.timeSerieHistory.length];

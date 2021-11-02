@@ -90,7 +90,7 @@ public class ChartDataXSerie extends ChartDataSerie {
    /**
     * X-axis start Date/Time
     */
-   private ZonedDateTime          _startDateTime;
+   private ZonedDateTime          _historyStartDateTime;
 
    private boolean                _timeSerieWithTimeZoneAdjustment;
 
@@ -127,6 +127,13 @@ public class ChartDataXSerie extends ChartDataSerie {
       return _highValuesDouble;
    }
 
+   /**
+    * @return Returns x-axis start date/time or <code>null</code> when not available.
+    */
+   public ZonedDateTime getHistoryStartDateTime() {
+      return _historyStartDateTime;
+   }
+
    public HistoryTitle getHistoryTitle() {
       return _historyTitle;
    }
@@ -153,13 +160,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 
    public double getScalingMaxValue() {
       return _scalingMaxValue;
-   }
-
-   /**
-    * @return Returns x-axis start date/time or <code>null</code> when not available.
-    */
-   public ZonedDateTime getStartDateTime() {
-      return _startDateTime;
    }
 
    /**
@@ -203,6 +203,17 @@ public class ChartDataXSerie extends ChartDataSerie {
 
    public void setChartSegments(final ChartStatisticSegments chartSegments) {
       _chartSegments = chartSegments;
+   }
+
+   /**
+    * Set history start time on the x-axis. this is used when
+    * <p>
+    * <code>xData.setAxisUnit({@link ChartDataSerie#X_AXIS_UNIT_HISTORY})</code>
+    * 
+    * @param dateTime
+    */
+   public void setHistoryStartDateTime(final ZonedDateTime dateTime) {
+      _historyStartDateTime = dateTime;
    }
 
    public void setHistoryTitle(final HistoryTitle historyTitle) {
@@ -282,13 +293,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 
       _scalingFactor = scalingFactor;
       _scalingMaxValue = scalingMaxValue;
-   }
-
-   /**
-    * @param dateTime
-    */
-   public void setStartDateTime(final ZonedDateTime dateTime) {
-      _startDateTime = dateTime;
    }
 
    /**

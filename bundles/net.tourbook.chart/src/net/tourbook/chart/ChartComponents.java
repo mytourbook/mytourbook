@@ -523,7 +523,7 @@ public class ChartComponents extends Composite {
          final double unitPos = graphValue - unitOffset;
          double unitLabelValue = unitPos + xStartValue;
 
-         if ((unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
+         if ((unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND
                || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND) && xStartValue > 0) {
 
             /*
@@ -578,38 +578,8 @@ public class ChartComponents extends Composite {
       final long graphDefaultUnit = (long) graphDefaultUnitD;
 
       // get start time with mills truncated
-      final ZonedDateTime tourStartTime = xData.getStartDateTime().withNano(0);
+      final ZonedDateTime tourStartTime = xData.getHistoryStartDateTime().withNano(0);
       final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(graphMaxValue);
-
-      final int devVisibleWidth = getDevVisibleChartWidth();
-//      final double zoomRatio = componentGraph.getZoomRatio();
-//      if (zoomRatio == 1) {
-//
-//         // chart is not zoomed -> set a left/right border that the first/last values are better visible
-//
-//         final long timeDiff = Duration.between(tourStartTime, tourEndTime).toSeconds();
-//
-//         final int devBorder = 15;
-//         final int devBorder2 = 2 * devBorder;
-//
-//         final double devVisibleWithBorder = devVisibleWidth - devBorder2;
-//
-//         // ensure it is wide enough
-//         if (devVisibleWithBorder > devBorder2) {
-//
-//            final double devTimeDiff = timeDiff / devVisibleWithBorder;
-//            final double devTimeBorder = devTimeDiff * devBorder;
-//
-//            final ZonedDateTime tourStartTime_WithBorder = tourStartTime.minusSeconds((long) devTimeBorder);
-//            final ZonedDateTime tourEndTime_WithBorder = tourEndTime.plusSeconds((long) devTimeBorder);
-//
-//            tourStartTime = tourStartTime_WithBorder;
-//            tourEndTime = tourEndTime_WithBorder;
-//
-//            int a = 0;
-//            a++;
-//         }
-//      }
 
       final long tourStartTimeMilli = tourStartTime.toInstant().toEpochMilli();
 
@@ -684,6 +654,7 @@ public class ChartComponents extends Composite {
       xData.setUnitLabel(UI.EMPTY_STRING);
 
       final double devGraphXOffset = componentGraph.getXXDevViewPortLeftBorder();
+      final int devVisibleWidth = getDevVisibleChartWidth();
 
       final long graphLeftBorder = (long) (devGraphXOffset / scaleX);
       final long graphRightBorder = (long) ((devGraphXOffset + devVisibleWidth) / scaleX);
@@ -1856,8 +1827,8 @@ public class ChartComponents extends Composite {
          final String valueLabel = isShowLabel ? _monthLabels[monthIndex] : UI.EMPTY_STRING;
          final boolean isMajorValue = majorMonth == 0 ? false : monthIndex % majorMonth == 0;
 
-         xUnits.add(new ChartUnit(//
-               graphValue + monthValue + DAY_IN_SECONDS - 1, //
+         xUnits.add(new ChartUnit(
+               graphValue + monthValue + DAY_IN_SECONDS - 1,
                valueLabel,
                isMajorValue)
          //

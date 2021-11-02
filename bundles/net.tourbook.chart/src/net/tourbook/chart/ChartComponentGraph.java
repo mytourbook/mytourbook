@@ -1686,9 +1686,9 @@ public class ChartComponentGraph extends Canvas {
 
             if (isLastGraph) {
                // draw the unit label and unit tick for the last graph
-               drawAsync_210_XUnits_VerticalGrid(gcChart, gcGraph, graphDrawingData, true);
+               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph, graphDrawingData, true);
             } else {
-               drawAsync_210_XUnits_VerticalGrid(gcChart, gcGraph, graphDrawingData, false);
+               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph, graphDrawingData, false);
             }
          }
 
@@ -2074,10 +2074,10 @@ public class ChartComponentGraph extends Canvas {
     *           <code>true</code> indicate to draws the unit tick and unit label additional to the
     *           unit grid line
     */
-   private void drawAsync_210_XUnits_VerticalGrid(final GC gcChart,
-                                                  final GC gcGraph,
-                                                  final GraphDrawingData graphDrawingData,
-                                                  final boolean isDrawUnit) {
+   private void drawAsync_210_XUnits_And_VerticalGrid(final GC gcChart,
+                                                      final GC gcGraph,
+                                                      final GraphDrawingData graphDrawingData,
+                                                      final boolean isDrawUnit) {
 
       final ArrayList<ChartUnit> xUnits = graphDrawingData.getXUnits();
 
@@ -3325,16 +3325,16 @@ public class ChartComponentGraph extends Canvas {
       final boolean isBottomTop = yData.isYAxisDirection();
 
       // get the horizontal offset for the graph
-      double graphValueOffset;
+      double devXOffset;
       if (_chartComponents._synchConfigSrc == null) {
 
          // a synch marker is not set, draw it normally
-         graphValueOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
+         devXOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
 
       } else {
 
          // adjust the start position to the synch marker position
-         graphValueOffset = _xxDevViewPortLeftBorder / scaleX;
+         devXOffset = _xxDevViewPortLeftBorder / scaleX;
       }
 
       final int devGraphCanvasHeight = drawingData.devGraphHeight;
@@ -3397,7 +3397,7 @@ public class ChartComponentGraph extends Canvas {
          for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
 
             // get the x position
-            int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
+            int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
 
             // center the bar
             if (devBarWidth > 1 && barPosition == GraphDrawingData.BAR_POS_CENTER) {
