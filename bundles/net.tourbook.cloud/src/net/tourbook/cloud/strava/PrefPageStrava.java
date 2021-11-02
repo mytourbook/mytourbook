@@ -41,6 +41,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -73,6 +74,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    private IPreferenceStore        _prefStore          = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
+   private SelectionListener       _defaultSelectionListener;
    private LocalHostServer         _server;
 
    private String                  _athleteId;
@@ -112,6 +114,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    @Override
    protected void createFieldEditors() {
+
+      initUI();
 
       createUI();
 
@@ -266,8 +270,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
             _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
             _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
-            _chkUseTourTypeMapping.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> _linkTourTypeFilters.getControl().setEnabled(_chkUseTourTypeMapping.getSelection())));
+            _chkUseTourTypeMapping.addSelectionListener(_defaultSelectionListener);
          }
          {
             _linkTourTypeFilters = new PreferenceLinkArea(
@@ -321,6 +324,11 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    @Override
    public void init(final IWorkbench workbench) {
       //Not needed
+   }
+
+   private void initUI() {
+
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
    }
 
    @Override
