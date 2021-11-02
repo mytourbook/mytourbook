@@ -1,13 +1,7 @@
 name: Build
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**.java'
-      - '**.yml'
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  schedule:
+  - cron: "0 6 * * *"
 jobs:
   build:
     name: Build
@@ -37,8 +31,6 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Make gradlew executable
         run: chmod +x ./build/build.net.tourbook/gradlew
-      - name: Increase Java Heap size #Not sure that it is taken into account
-        run: set SONAR_SCANNER_OPTS="-Xmx4096m -XX:MaxPermSize=512m -XX:ReservedCodeCacheSize=128m"
       - name: Rename MT to mytourbook
         run: cd ./build/build.net.tourbook && powershell -Command "(gc CREATE_MT_BuildFiles.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII CREATE_MT_BuildFiles.xml" && cd ../../bundles && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml" && cd ../LANGUAGE-FRAGMENTS && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml"
       - name: Deactivate the nl repo
