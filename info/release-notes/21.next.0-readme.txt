@@ -53,6 +53,10 @@ Improvements
 * GPX Import
   - Import tours also with the date/time format "yyyy-MM-dd'T'HH:mm:ss.SSSS"
 
+* Tour Marker View (Frederic)
+  - Added the ability to select between elapsed, moving and recorded time
+  https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/?page=1#32dc
+
 
 Changes  
 =======
