@@ -131,11 +131,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private ColumnDefinition         _colDefVisibility;
    private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
-
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
    }
+
    /*
     * UI controls
     */
