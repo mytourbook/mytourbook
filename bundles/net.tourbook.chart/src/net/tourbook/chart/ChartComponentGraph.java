@@ -8503,8 +8503,10 @@ public class ChartComponentGraph extends Canvas {
          return selectedIndex;
       }
 
+      final int numItems = _selectedBarItems.length;
+
       // find selected Index and reset last selected bar item(s)
-      for (int index = 0; index < _selectedBarItems.length; index++) {
+      for (int index = 0; index < numItems; index++) {
          if (selectedIndex == Chart.NO_BAR_SELECTION && _selectedBarItems[index]) {
             selectedIndex = index;
          }
@@ -8514,20 +8516,35 @@ public class ChartComponentGraph extends Canvas {
       if (selectedIndex == Chart.NO_BAR_SELECTION) {
 
          // a bar item is not selected, select first
+
          selectedIndex = 0;
 
       } else {
 
          // select next bar item
 
-         if (selectedIndex == _selectedBarItems.length - 1) {
-            /*
-             * last bar item is currently selected, select the first bar item
-             */
+         if (selectedIndex == numItems - 1) {
+
+            // last bar item is currently selected, select the first bar item
+
             selectedIndex = 0;
+
          } else {
+
             // select next bar item
+
             selectedIndex++;
+         }
+      }
+
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2
+               && (selectedIndex == 0
+                     || selectedIndex == numItems - 1)) {
+
+            selectedIndex = 1;
          }
       }
 
@@ -8552,12 +8569,17 @@ public class ChartComponentGraph extends Canvas {
          return selectedIndex;
       }
 
+      final int numItems = _selectedBarItems.length;
+
       // find selected item, reset last selected bar item(s)
-      for (int index = 0; index < _selectedBarItems.length; index++) {
+      for (int index = 0; index < numItems; index++) {
+
          // get the first selected item if there are many selected
+
          if (selectedIndex == -1 && _selectedBarItems[index]) {
             selectedIndex = index;
          }
+
          _selectedBarItems[index] = false;
       }
 
@@ -8571,13 +8593,27 @@ public class ChartComponentGraph extends Canvas {
          // select next bar item
 
          if (selectedIndex == 0) {
-            /*
-             * first bar item is currently selected, select the last bar item
-             */
-            selectedIndex = _selectedBarItems.length - 1;
+
+            // first bar item is currently selected, select the last bar item
+
+            selectedIndex = numItems - 1;
+
          } else {
+
             // select previous bar item
+
             selectedIndex = selectedIndex - 1;
+         }
+      }
+
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2
+               && (selectedIndex == 0
+                     || selectedIndex == numItems - 1)) {
+
+            selectedIndex = numItems - 2;
          }
       }
 
@@ -8953,17 +8989,21 @@ public class ChartComponentGraph extends Canvas {
       _isSelectionDirty = true;
 
       if (_isDisableHoveredLineValueIndex) {
+
          /*
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          * prevent setting new positions until the chart is redrawn otherwise the slider has the
+          * Prevent setting new positions until the chart is redrawn otherwise the slider has the
           * value index -1, the chart is flickering when autoscrolling and the map is WRONGLY / UGLY
           * positioned
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           */
+
          _isDisableHoveredLineValueIndex = false;
+
       } else {
 
          // prevent using old value index which can cause bound exceptions
+
          _hoveredValuePointIndex = -1;
          _lineDevPositions.clear();
          _lineFocusRectangles.clear();

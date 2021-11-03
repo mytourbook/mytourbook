@@ -340,6 +340,10 @@ public class SensorDataProvider {
 
       System.arraycopy(allValues_NoMargin, 0, allValues_WithMargin, 1, numValues_NoMargin);
 
+      // set dummy values, these values are skipped when navigated in the bar chart
+      allValues_WithMargin[0] = Float.MIN_VALUE;
+      allValues_WithMargin[numValues_WithMargin - 1] = Float.MIN_VALUE;
+
       return allValues_WithMargin;
    }
 

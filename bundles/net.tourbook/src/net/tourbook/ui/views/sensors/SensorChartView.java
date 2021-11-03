@@ -713,6 +713,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       // set dummy title that the history labels are not truncated
       chartModel.setTitle(UI.SPACE);
 
+      // because the first and last values are dummy values, skip them when navigated
+      chartModel.setSkipNavigationForFirstLastValues(true);
+
       setChartProviders(chartModel);
 
       // show the data in the chart
