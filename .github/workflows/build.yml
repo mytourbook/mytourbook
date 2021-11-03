@@ -2,8 +2,9 @@ name: Build
 on:
   needs: check_date
   if: ${{ needs.check_date.outputs.should_run != 'false' }}
-  schedule:
-    - cron: "0 6 * * *"  
+  push:
+    branches:
+      - fb-buildfix
 jobs:
   build:
     name: Build
