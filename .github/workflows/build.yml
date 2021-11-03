@@ -1,8 +1,7 @@
 name: Build
 on:
-  push:
-    branches:
-    - fb-buildfix
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   build:
     needs: check_date
