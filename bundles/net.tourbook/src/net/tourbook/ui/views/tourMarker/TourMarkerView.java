@@ -29,7 +29,6 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -88,7 +87,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -150,19 +148,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private Menu      _tableContextMenu;
 
-   private class ActionTmvOptions extends ActionToolbarSlideout {
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-         final SlideoutTMVOptions slideoutTMVOptions = new SlideoutTMVOptions(
-               _pageBook,
-               toolbar);
-
-         return slideoutTMVOptions;
-      }
-   }
-
    class MarkerViewerContentProvider implements IStructuredContentProvider {
 
       @Override
@@ -197,6 +182,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
+
    /**
     * Sort the markers by time
     */
@@ -291,9 +277,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _markerViewer.refresh();
-         } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)) {
 
-            // Pace and speed value computation has changed
+         } else if (property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME) ||
+               property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME) ||
+               property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME)) {
 
             refreshView();
          }
@@ -471,7 +458,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
-      _actionTmvOptions = new ActionTmvOptions();
+      _actionTmvOptions = new ActionTmvOptions(_pageBook);
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
    }
@@ -944,12 +931,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          public void update(final ViewerCell cell) {
 
             final TourMarker marker = (TourMarker) cell.getElement();
-             final long time = marker.getTime();
+            long time = marker.getTime();
 
-            //TODO FB time -= _tourData.getPausedTime(0, marker.getSerieIndex());
+            if (useRecordedTime()) {
+               time -= _tourData.getPausedTime(0, marker.getSerieIndex());
+            } else if (useMovingTime()) {
+               time -= _tourData.getBreakTime(0, marker.getSerieIndex());
+            }
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
          }
+
       });
    }
 
@@ -986,13 +978,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                timeDifference = currentTime;
             }
 
-            final int previousMarkerIndex = getPreviousMarkerIndex(cell);
-
             int currentMarkerIndex = getCurrentMarkerIndex(cell);
             if (_tourData.isMultipleTours()) {
                currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
             }
-            //TODO FB timeDifference -= _tourData.getPausedTime(lastSerieIndex, currentMarkerIndex);
+
+            if (useRecordedTime()) {
+               timeDifference -= _tourData.getPausedTime(lastSerieIndex, currentMarkerIndex);
+            } else if (useMovingTime()) {
+               timeDifference -= _tourData.getBreakTime(lastSerieIndex, currentMarkerIndex);
+            }
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(timeDifference));
 
@@ -1015,7 +1010,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          }
       });
    }
-
    /**
     * Column: Description
     */
@@ -1422,5 +1416,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       }
 
       enableActions();
+   }
+
+   private boolean useMovingTime() {
+
+      return _prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME);
+   }
+
+   private boolean useRecordedTime() {
+
+      return _prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME);
    }
 }
