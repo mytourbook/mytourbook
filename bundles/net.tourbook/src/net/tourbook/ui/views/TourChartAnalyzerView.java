@@ -1265,7 +1265,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
                   graphInfo.prevAvgValue = (int) avgValue;
 
-                  lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true) + UI.SPACE);
+                  lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true, -1) + UI.SPACE);
                   lblAvg.setForeground(graphInfo.valueForegroundColor);
                }
             }

@@ -50,8 +50,6 @@ public class SQLFilter {
     */
    public static final Set<SQLAppFilter>  NO_PHOTOS          = new HashSet<>();
 
-   public static final Set<SQLAppFilter>  NO_GEO_LOCATION    = new HashSet<>();
-
    /**
     * Use sql app filter with {@link SQLAppFilter#Photo} and {@link SQLAppFilter#Tag}
     */
@@ -64,8 +62,6 @@ public class SQLFilter {
       DEFAULT_APP_FILTER.add(SQLAppFilter.GeoLocation);
 
       FAST_APP_FILTER.add(SQLAppFilter.Photo);
-
-      NO_GEO_LOCATION.add(SQLAppFilter.Photo);
 
       TAG_FILTER.add(SQLAppFilter.Photo);
       TAG_FILTER.add(SQLAppFilter.GeoLocation);

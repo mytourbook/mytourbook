@@ -444,6 +444,8 @@ public class Messages extends NLS {
    public static String        DataImport_Error_file_does_not_exist_msg;
    public static String        DataImport_Error_file_does_not_exist_title;
 
+   public static String        Db_Field_SensorDescription;
+   public static String        Db_Field_SensorName;
    public static String        Db_Field_TourData_Description;
    public static String        Db_Field_TourData_EndPlace;
    public static String        Db_Field_TourData_StartPlace;
@@ -740,6 +742,9 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
+   public static String        Dialog_Label_Description;
+   public static String        Dialog_Label_Name;
+
    public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Checkbox_BatteryValues;
@@ -806,6 +811,9 @@ public class Messages extends NLS {
    public static String        Dialog_SaveTags_Radio_RemoveTags_Selected;
    public static String        Dialog_SaveTags_Radio_ReplaceTags;
    public static String        Dialog_SaveTags_Wizard_Title;
+
+   public static String        Dialog_Sensor_EditSensor_Title;
+   public static String        Dialog_Sensor_Label_SensorType;
 
    public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
    public static String        Dialog_SetTimeZone_Dialog_Title;
@@ -1738,6 +1746,12 @@ public class Messages extends NLS {
    public static String        Search_View_Link_ExternalBrowser;
    public static String        Search_View_Link_LinuxBrowser;
    public static String        Search_View_Link_SetupExternalBrowser;
+
+   public static String        Sensor_Chart_Label_SensorIsNotSelected;
+   public static String        Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected;
+
+   public static String        Sensor_Type_GearShifting;
+   public static String        Sensor_Type_Other;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;

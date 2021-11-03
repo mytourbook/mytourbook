@@ -75,7 +75,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class ChartComponentGraph extends Canvas {
 
-   private static final double       FLOAT_ZERO        = ChartDataYSerie.FLOAT_ZERO;
+   private static final double       FLOAT_ALMOST_ZERO = ChartDataYSerie.FLOAT_ALMOST_ZERO;
 
    private static final double       ZOOM_RATIO        = 1.3;
    private static double             ZOOM_RATIO_FACTOR = ZOOM_RATIO;
@@ -171,7 +171,7 @@ public class ChartComponentGraph extends Canvas {
    private double                      _zoomRatioLeftBorder;
 
    /**
-    * ratio where the mouse was double clicked, this position is used to zoom the chart with the
+    * Ratio where the mouse was double clicked, this position is used to zoom the chart with the
     * mouse
     */
    private double                      _zoomRatioCenter;
@@ -179,7 +179,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * This zoom ratio is used when zooming the next time with the keyboard, when 0 this is ignored.
     */
-   private double                      _zoomRatioCenterKey;
+   private double                      _zoomRatioCenter_WithKeyboard;
 
    /**
     * when the slider is dragged and the mouse up event occurs, the graph is zoomed to the sliders
@@ -521,8 +521,7 @@ public class ChartComponentGraph extends Canvas {
       addListener();
       createContextMenu();
 
-      final Point devMouse = this.toControl(display.getCursorLocation());
-      setCursorStyle(devMouse.y);
+      setCursorStyle();
    }
 
    /**
@@ -1687,9 +1686,9 @@ public class ChartComponentGraph extends Canvas {
 
             if (isLastGraph) {
                // draw the unit label and unit tick for the last graph
-               drawAsync_210_XUnits_VerticalGrid(gcChart, gcGraph, graphDrawingData, true);
+               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph, graphDrawingData, true);
             } else {
-               drawAsync_210_XUnits_VerticalGrid(gcChart, gcGraph, graphDrawingData, false);
+               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph, graphDrawingData, false);
             }
          }
 
@@ -2075,10 +2074,10 @@ public class ChartComponentGraph extends Canvas {
     *           <code>true</code> indicate to draws the unit tick and unit label additional to the
     *           unit grid line
     */
-   private void drawAsync_210_XUnits_VerticalGrid(final GC gcChart,
-                                                  final GC gcGraph,
-                                                  final GraphDrawingData graphDrawingData,
-                                                  final boolean isDrawUnit) {
+   private void drawAsync_210_XUnits_And_VerticalGrid(final GC gcChart,
+                                                      final GC gcGraph,
+                                                      final GraphDrawingData graphDrawingData,
+                                                      final boolean isDrawUnit) {
 
       final ArrayList<ChartUnit> xUnits = graphDrawingData.getXUnits();
 
@@ -3326,13 +3325,16 @@ public class ChartComponentGraph extends Canvas {
       final boolean isBottomTop = yData.isYAxisDirection();
 
       // get the horizontal offset for the graph
-      float graphValueOffset;
+      double devXOffset;
       if (_chartComponents._synchConfigSrc == null) {
+
          // a synch marker is not set, draw it normally
-         graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+         devXOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
+
       } else {
+
          // adjust the start position to the synch marker position
-         graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleX);
+         devXOffset = _xxDevViewPortLeftBorder / scaleX;
       }
 
       final int devGraphCanvasHeight = drawingData.devGraphHeight;
@@ -3395,7 +3397,7 @@ public class ChartComponentGraph extends Canvas {
          for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
 
             // get the x position
-            int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
+            int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
 
             // center the bar
             if (devBarWidth > 1 && barPosition == GraphDrawingData.BAR_POS_CENTER) {
@@ -5839,7 +5841,7 @@ public class ChartComponentGraph extends Canvas {
             final String unitLabel = yData.getUnitLabel();
 
             // create the slider text
-            labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
+            labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true, 0.01));
             if (unitLabel.length() > 0) {
                labelText.append(UI.SPACE);
                labelText.append(unitLabel);
@@ -7148,14 +7150,14 @@ public class ChartComponentGraph extends Canvas {
     * @param isCenterSliderPosition
     * @param isMoveChartToShowSlider
     * @param isFireEvent
-    * @param isSetKeyCenterZoomPosition
+    * @param isCenterZoomPosition
     */
    void moveXSlider(final ChartXSlider xSlider,
                     int valueIndex,
                     final boolean isCenterSliderPosition,
                     final boolean isMoveChartToShowSlider,
                     final boolean isFireEvent,
-                    final boolean isSetKeyCenterZoomPosition) {
+                    final boolean isCenterZoomPosition) {
 
       final ChartDataXSerie xData = getXData();
 
@@ -7180,7 +7182,9 @@ public class ChartComponentGraph extends Canvas {
       xSlider.setValueIndex(valueIndex);
       xSlider.moveToXXDevPosition(xxDevLinePos, true, true, false, isFireEvent);
 
-      _zoomRatioCenterKey = isSetKeyCenterZoomPosition ? xxDevLinePos / _xxDevGraphWidth : 0;
+      _zoomRatioCenter_WithKeyboard = isCenterZoomPosition
+            ? xxDevLinePos / _xxDevGraphWidth
+            : 0;
 
       setChartPosition(xSlider, isCenterSliderPosition, isMoveChartToShowSlider, 15);
 
@@ -7275,8 +7279,8 @@ public class ChartComponentGraph extends Canvas {
             case '+':
 
                // overwrite zoom ratio
-               if (_zoomRatioCenterKey != 0) {
-                  _zoomRatioCenter = _zoomRatioCenterKey;
+               if (_zoomRatioCenter_WithKeyboard != 0) {
+                  _zoomRatioCenter = _zoomRatioCenter_WithKeyboard;
                }
 
                _chart.onExecuteZoomIn(accelerator);
@@ -7286,8 +7290,8 @@ public class ChartComponentGraph extends Canvas {
             case '-':
 
                // overwrite zoom ratio
-               if (_zoomRatioCenterKey != 0) {
-                  _zoomRatioCenter = _zoomRatioCenterKey;
+               if (_zoomRatioCenter_WithKeyboard != 0) {
+                  _zoomRatioCenter = _zoomRatioCenter_WithKeyboard;
                }
                _chart.onExecuteZoomOut(true, accelerator);
 
@@ -7402,7 +7406,7 @@ public class ChartComponentGraph extends Canvas {
          moveXSlider(_selectedXSlider, valueIndex, false, true, true, false);
 
          redraw();
-         setCursorStyle(event.y);
+         setCursorStyle();
       }
    }
 
@@ -7441,23 +7445,23 @@ public class ChartComponentGraph extends Canvas {
 
             // toggle mouse mode
 
-            if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+            if (_chart.getMouseWheelMode().equals(MouseWheelMode.Selection)) {
 
                // switch to mouse zoom mode
-               _chart.setMouseMode(false);
+               _chart.setMouseWheelMode(MouseWheelMode.Zoom);
 
             } else {
 
                // switch to mouse slider mode
-               _chart.setMouseMode(true);
+               _chart.setMouseWheelMode(MouseWheelMode.Selection);
             }
 
          } else {
 
-            if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+            if (_chart.getMouseWheelMode().equals(MouseWheelMode.Selection)) {
 
                // switch to mouse zoom mode
-               _chart.setMouseMode(false);
+               _chart.setMouseWheelMode(MouseWheelMode.Zoom);
             }
 
             // mouse mode: zoom chart
@@ -7683,7 +7687,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      setCursorStyle(devYMouse);
+      setCursorStyle();
    }
 
    /**
@@ -7760,7 +7764,7 @@ public class ChartComponentGraph extends Canvas {
          isRedraw = true;
       }
 
-      setCursorStyle(event.y);
+      setCursorStyle();
 
       if (isRedraw) {
          redraw();
@@ -7974,13 +7978,13 @@ public class ChartComponentGraph extends Canvas {
                _isHoveredBarDirty = true;
                isRedraw = true;
 
-               setCursorStyle(devYMouse);
+               setCursorStyle();
 
             } else {
 
                canShowHoveredValueTooltip = true;
 
-               setCursorStyle(devYMouse);
+               setCursorStyle();
             }
          }
       }
@@ -8301,7 +8305,7 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      setCursorStyle(devYMouse);
+      setCursorStyle();
    }
 
    void onMouseWheel(final Event event, final boolean isEventFromAxis, final boolean isLeftAxis) {
@@ -8310,7 +8314,7 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+      if (_chart.getMouseWheelMode().equals(MouseWheelMode.Selection)) {
 
          // mouse mode: move slider
 
@@ -8491,7 +8495,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * select the next bar item
     */
-   int selectBarItemNext() {
+   int selectBarItem_Next() {
 
       int selectedIndex = Chart.NO_BAR_SELECTION;
 
@@ -8499,8 +8503,10 @@ public class ChartComponentGraph extends Canvas {
          return selectedIndex;
       }
 
+      final int numItems = _selectedBarItems.length;
+
       // find selected Index and reset last selected bar item(s)
-      for (int index = 0; index < _selectedBarItems.length; index++) {
+      for (int index = 0; index < numItems; index++) {
          if (selectedIndex == Chart.NO_BAR_SELECTION && _selectedBarItems[index]) {
             selectedIndex = index;
          }
@@ -8510,24 +8516,41 @@ public class ChartComponentGraph extends Canvas {
       if (selectedIndex == Chart.NO_BAR_SELECTION) {
 
          // a bar item is not selected, select first
+
          selectedIndex = 0;
 
       } else {
 
          // select next bar item
 
-         if (selectedIndex == _selectedBarItems.length - 1) {
-            /*
-             * last bar item is currently selected, select the first bar item
-             */
+         if (selectedIndex == numItems - 1) {
+
+            // last bar item is currently selected, select the first bar item
+
             selectedIndex = 0;
+
          } else {
+
             // select next bar item
+
             selectedIndex++;
          }
       }
 
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2
+               && (selectedIndex == 0
+                     || selectedIndex == numItems - 1)) {
+
+            selectedIndex = 1;
+         }
+      }
+
       _selectedBarItems[selectedIndex] = true;
+
+      setChartPosition(selectedIndex);
 
       redrawSelection();
 
@@ -8537,7 +8560,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * select the previous bar item
     */
-   int selectBarItemPrevious() {
+   int selectBarItem_Previous() {
 
       int selectedIndex = Chart.NO_BAR_SELECTION;
 
@@ -8546,12 +8569,17 @@ public class ChartComponentGraph extends Canvas {
          return selectedIndex;
       }
 
+      final int numItems = _selectedBarItems.length;
+
       // find selected item, reset last selected bar item(s)
-      for (int index = 0; index < _selectedBarItems.length; index++) {
+      for (int index = 0; index < numItems; index++) {
+
          // get the first selected item if there are many selected
+
          if (selectedIndex == -1 && _selectedBarItems[index]) {
             selectedIndex = index;
          }
+
          _selectedBarItems[index] = false;
       }
 
@@ -8565,17 +8593,33 @@ public class ChartComponentGraph extends Canvas {
          // select next bar item
 
          if (selectedIndex == 0) {
-            /*
-             * first bar item is currently selected, select the last bar item
-             */
-            selectedIndex = _selectedBarItems.length - 1;
+
+            // first bar item is currently selected, select the last bar item
+
+            selectedIndex = numItems - 1;
+
          } else {
+
             // select previous bar item
+
             selectedIndex = selectedIndex - 1;
          }
       }
 
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2
+               && (selectedIndex == 0
+                     || selectedIndex == numItems - 1)) {
+
+            selectedIndex = numItems - 2;
+         }
+      }
+
       _selectedBarItems[selectedIndex] = true;
+
+      setChartPosition(selectedIndex);
 
       redrawSelection();
 
@@ -8707,6 +8751,102 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
+    * Move chart to the valueIndex position.
+    *
+    * @param valueIndex
+    */
+   private void setChartPosition(int valueIndex) {
+
+      final boolean isCenterPosition = false;
+      final double borderOffset = 15;
+
+      if (_graphZoomRatio == 1) {
+         // chart is not zoomed, nothing to do
+         return;
+      }
+
+      final ChartDataXSerie xData = getXData();
+      if (xData == null) {
+         return;
+      }
+
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final int xValueLastIndex = xValues.length - 1;
+
+      // adjust the value index to the array bounds
+      valueIndex = valueIndex < 0
+            ? 0
+            : valueIndex > xValueLastIndex
+                  ? xValueLastIndex
+                  : valueIndex;
+
+      final double xValue = xValues[valueIndex];
+      final double xValueMax = xValues[xValueLastIndex];
+
+      final double xxDev_XValuePos = _xxDevGraphWidth * xValue / xValueMax;
+
+      final int devXViewPortWidth = getDevVisibleChartWidth();
+      final long xxDevCenter = (long) (xxDev_XValuePos - devXViewPortWidth / 2);
+
+      double xxDevOffset = xxDev_XValuePos;
+
+      if (isCenterPosition) {
+
+         xxDevOffset = xxDevCenter;
+
+      } else {
+
+         /*
+          * Check if the value index is in the visible area
+          */
+         if (xxDev_XValuePos < _xxDevViewPortLeftBorder + borderOffset) {
+
+            xxDevOffset = xxDev_XValuePos + 1 - borderOffset;
+
+         } else if (xxDev_XValuePos > _xxDevViewPortLeftBorder + devXViewPortWidth - borderOffset) {
+
+            xxDevOffset = xxDev_XValuePos - devXViewPortWidth + borderOffset;
+         }
+      }
+
+      if (xxDevOffset != xxDev_XValuePos) {
+
+         /*
+          * Value index is not visible
+          */
+
+         // check left border
+         xxDevOffset = Math.max(xxDevOffset, 0);
+
+         // check right border
+         xxDevOffset = Math.min(xxDevOffset, _xxDevGraphWidth - devXViewPortWidth);
+
+         _zoomRatioLeftBorder = xxDevOffset / _xxDevGraphWidth;
+
+         /*
+          * Reposition the mouse zoom position
+          */
+         final double xOffsetMouse = _xxDevViewPortLeftBorder + devXViewPortWidth / 2;
+         _zoomRatioCenter = xOffsetMouse / _xxDevGraphWidth;
+
+         updateVisibleMinMaxValues();
+
+         /*
+          * Prevent to display the old chart image
+          */
+         _isChartDirty = true;
+
+         _chartComponents.onResize();
+      }
+
+      /*
+       * Set position where the double click occurred, this position will be used when the chart is
+       * zoomed
+       */
+      _zoomRatioCenter = xxDev_XValuePos / _xxDevGraphWidth;
+   }
+
+   /**
     * Move a zoomed chart to a new position
     *
     * @param xxDevNewPosition
@@ -8758,7 +8898,7 @@ public class ChartComponentGraph extends Canvas {
       _zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
    }
 
-   void setCursorStyle(final int devYMouse) {
+   void setCursorStyle() {
 
       final ChartDataModel chartDataModel = _chart.getChartDataModel();
       if (chartDataModel == null) {
@@ -8767,9 +8907,11 @@ public class ChartComponentGraph extends Canvas {
 
       final ChartType chartType = chartDataModel.getChartType();
 
-      if (chartType == ChartType.LINE || chartType == ChartType.LINE_WITH_BARS) {
+      if (chartType == ChartType.LINE
+            || chartType == ChartType.LINE_WITH_BARS
+            || chartType == ChartType.BAR) {
 
-         final boolean isMouseModeSlider = _chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER);
+         final boolean isMouseModeSlider = _chart.getMouseWheelMode().equals(MouseWheelMode.Selection);
 
          if (_xSliderDragged != null) {
 
@@ -8847,17 +8989,21 @@ public class ChartComponentGraph extends Canvas {
       _isSelectionDirty = true;
 
       if (_isDisableHoveredLineValueIndex) {
+
          /*
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          * prevent setting new positions until the chart is redrawn otherwise the slider has the
+          * Prevent setting new positions until the chart is redrawn otherwise the slider has the
           * value index -1, the chart is flickering when autoscrolling and the map is WRONGLY / UGLY
           * positioned
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           */
+
          _isDisableHoveredLineValueIndex = false;
+
       } else {
 
          // prevent using old value index which can cause bound exceptions
+
          _hoveredValuePointIndex = -1;
          _lineDevPositions.clear();
          _lineFocusRectangles.clear();
@@ -9466,42 +9612,50 @@ public class ChartComponentGraph extends Canvas {
 
       final double[] xValues = xValueSerie[0];
       final double lastXValue = xValues[xValues.length - 1];
-      final double valueVisibleArea = lastXValue / _graphZoomRatio;
+      final double xValueVisibleArea = lastXValue / _graphZoomRatio;
 
-      final double valueLeftBorder = lastXValue * _zoomRatioLeftBorder;
-      double valueRightBorder = valueLeftBorder + valueVisibleArea;
+      final double xValue_LeftBorder = lastXValue * _zoomRatioLeftBorder;
+      double xValue_RightBorder = xValue_LeftBorder + xValueVisibleArea;
 
       // make sure right is higher than left
-      if (valueLeftBorder >= valueRightBorder) {
-         valueRightBorder = valueLeftBorder + 1;
+      if (xValue_LeftBorder >= xValue_RightBorder) {
+         xValue_RightBorder = xValue_LeftBorder + 1;
       }
 
       /*
-       * get value index for the left and right border of the visible area
+       * Get value index for the left and right border of the visible area
        */
-      int xValueIndexLeft = 0;
+      int xValueIndex_Left = 0;
       for (int serieIndex = 0; serieIndex < xValues.length; serieIndex++) {
 
          final double xValue = xValues[serieIndex];
 
-         if (xValue == valueLeftBorder) {
-            xValueIndexLeft = serieIndex;
+         if (xValue == xValue_LeftBorder) {
+
+            xValueIndex_Left = serieIndex;
+
             break;
          }
 
-         if (xValue > valueLeftBorder) {
-            xValueIndexLeft = serieIndex == 0
+         if (xValue > xValue_LeftBorder) {
+
+            xValueIndex_Left = serieIndex == 0
+
                   ? 0
 
                   // get index from last invisible value
                   : serieIndex - 1;
+
             break;
          }
       }
 
-      int xValueIndexRight = xValueIndexLeft;
-      for (; xValueIndexRight < xValues.length; xValueIndexRight++) {
-         if (xValues[xValueIndexRight] > valueRightBorder) {
+      /*
+       * Get value index for the right border of the visible area
+       */
+      int xValueIndex_Right = xValueIndex_Left;
+      for (; xValueIndex_Right < xValues.length; xValueIndex_Right++) {
+         if (xValues[xValueIndex_Right] > xValue_RightBorder) {
             break;
          }
       }
@@ -9511,13 +9665,13 @@ public class ChartComponentGraph extends Canvas {
        */
       // ensure array bounds
       final int xValuesLastIndex = xValues.length - 1;
-      xValueIndexLeft = Math.min(xValueIndexLeft, xValuesLastIndex);
-      xValueIndexLeft = Math.max(xValueIndexLeft, 0);
-      xValueIndexRight = Math.min(xValueIndexRight, xValuesLastIndex);
-      xValueIndexRight = Math.max(xValueIndexRight, 0);
+      xValueIndex_Left = Math.min(xValueIndex_Left, xValuesLastIndex);
+      xValueIndex_Left = Math.max(xValueIndex_Left, 0);
+      xValueIndex_Right = Math.min(xValueIndex_Right, xValuesLastIndex);
+      xValueIndex_Right = Math.max(xValueIndex_Right, 0);
 
-      xData.setVisibleMinValue(xValues[xValueIndexLeft]);
-      xData.setVisibleMaxValue(xValues[xValueIndexRight]);
+      xData.setVisibleMinValue(xValues[xValueIndex_Left]);
+      xData.setVisibleMaxValue(xValues[xValueIndex_Right]);
 
       /*
        * Get min/max value for each y-data serie to fill the visible area with the chart
@@ -9526,59 +9680,80 @@ public class ChartComponentGraph extends Canvas {
 
          final boolean isIgnoreMinMaxZero = yData.isIgnoreMinMaxZero();
 
-         final float[][] yValueSeries = yData.getHighValuesFloat();
-         final float[] yValues = yValueSeries[0];
+         final float[][] yValueSeries_High = yData.getHighValuesFloat();
+         final float[][] yValueSeries_Low = yData.getLowValuesFloat();
+
+         final float[] yValues = yValueSeries_High[0];
 
          // ensure array bounds
          final int yValuesLastIndex = yValues.length - 1;
-         xValueIndexLeft = Math.min(xValueIndexLeft, yValuesLastIndex);
-         xValueIndexLeft = Math.max(xValueIndexLeft, 0);
-         xValueIndexRight = Math.min(xValueIndexRight, yValuesLastIndex);
-         xValueIndexRight = Math.max(xValueIndexRight, 0);
+         xValueIndex_Left = Math.min(xValueIndex_Left, yValuesLastIndex);
+         xValueIndex_Left = Math.max(xValueIndex_Left, 0);
+         xValueIndex_Right = Math.min(xValueIndex_Right, yValuesLastIndex);
+         xValueIndex_Right = Math.max(xValueIndex_Right, 0);
 
-         // set dummy value
+         // set invalid value
          float dataMinValue = Float.MIN_VALUE;
          float dataMaxValue = Float.MIN_VALUE;
 
-         for (final float[] yValueSerie : yValueSeries) {
+         // loop: max and min values (when available)
+         for (int yValueSerieIndex = 0; yValueSerieIndex < 2; yValueSerieIndex++) {
 
-            if (yValueSerie == null) {
-               continue;
+            float[][] yValueSeries = null;
+
+            if (yValueSerieIndex == 0) {
+
+               yValueSeries = yValueSeries_High;
+
+            } else if (yValueSerieIndex == 1 && yValueSeries_Low != null) {
+
+               yValueSeries = yValueSeries_Low;
+
+            } else {
+
+               break;
             }
 
-            for (int valueIndex = xValueIndexLeft; valueIndex <= xValueIndexRight; valueIndex++) {
+            for (final float[] yValueSerie : yValueSeries) {
 
-               final float yValue = yValueSerie[valueIndex];
-
-               if (yValue != yValue) {
-                  // ignore NaN
+               if (yValueSerie == null) {
                   continue;
                }
 
-               if (yValue == Float.POSITIVE_INFINITY) {
-                  // ignore infinity
-                  continue;
-               }
+               for (int valueIndex = xValueIndex_Left; valueIndex <= xValueIndex_Right; valueIndex++) {
 
-               if (isIgnoreMinMaxZero && (yValue > -FLOAT_ZERO && yValue < FLOAT_ZERO)) {
-                  // value is zero (almost) -> ignore
-                  continue;
-               }
+                  final float yValue = yValueSerie[valueIndex];
 
-               if (dataMinValue == Float.MIN_VALUE) {
-
-                  // setup first value
-                  dataMinValue = dataMaxValue = yValue;
-
-               } else {
-
-                  // check subsequent values
-
-                  if (yValue < dataMinValue) {
-                     dataMinValue = yValue;
+                  if (yValue != yValue) {
+                     // ignore NaN
+                     continue;
                   }
-                  if (yValue > dataMaxValue) {
-                     dataMaxValue = yValue;
+
+                  if (yValue == Float.POSITIVE_INFINITY) {
+                     // ignore infinity
+                     continue;
+                  }
+
+                  if (isIgnoreMinMaxZero && (yValue > -FLOAT_ALMOST_ZERO && yValue < FLOAT_ALMOST_ZERO)) {
+                     // value is zero (almost) -> ignore
+                     continue;
+                  }
+
+                  if (dataMinValue == Float.MIN_VALUE) {
+
+                     // setup first value
+                     dataMinValue = dataMaxValue = yValue;
+
+                  } else {
+
+                     // check subsequent values
+
+                     if (yValue < dataMinValue) {
+                        dataMinValue = yValue;
+                     }
+                     if (yValue > dataMaxValue) {
+                        dataMaxValue = yValue;
+                     }
                   }
                }
             }
@@ -9586,7 +9761,8 @@ public class ChartComponentGraph extends Canvas {
 
          if (dataMinValue == Float.MIN_VALUE) {
 
-            // a valid value is not found
+            // a valid value is not found -> set defaults
+
             dataMinValue = 0;
             dataMaxValue = 1;
          }
@@ -9613,11 +9789,22 @@ public class ChartComponentGraph extends Canvas {
                yData.setVisibleMinValue(forcedMinValue);
             }
 
-         } else if (dataMinValue != 0) {
+         } else {
 
             // min is not forced
 
-            yData.setVisibleMinValue(dataMinValue);
+            if (false
+
+                  // set any values
+                  || yData.isSetVisibleMinMax_0_Values
+
+                  // this is the historic behavior
+                  || dataMinValue != 0
+
+            ) {
+
+               yData.setVisibleMinValue(dataMinValue);
+            }
          }
 
          if (yData.isForceMaxValue()) {
@@ -9642,12 +9829,24 @@ public class ChartComponentGraph extends Canvas {
                yData.setVisibleMaxValue(forcedMaxValue);
             }
 
-         } else if (dataMaxValue != 0) {
+         } else {
 
             // max is not forced
 
-            yData.setVisibleMaxValue(dataMaxValue);
+            if (false
+
+                  // set any values
+                  || yData.isSetVisibleMinMax_0_Values
+
+                  // this is the historic behavior
+                  || dataMaxValue != 0
+
+            ) {
+
+               yData.setVisibleMaxValue(dataMaxValue);
+            }
          }
+
       }
    }
 

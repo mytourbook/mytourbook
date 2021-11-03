@@ -213,8 +213,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private final long                    DEFAULT_DATE_TIME;
 
    private final SimpleDateFormat        TIME_FORMAT;
-   private final SimpleDateFormat        TIME_FORMAT_SSSZ;
    private final SimpleDateFormat        TIME_FORMAT_RFC822;
+   private final SimpleDateFormat        TIME_FORMAT_SSSS;
+   private final SimpleDateFormat        TIME_FORMAT_SSSZ;
    {
       DEFAULT_DATE_TIME = ZonedDateTime
 
@@ -227,12 +228,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
       final String DateTimePattern = "yyyy-MM-dd'T'HH:mm:ss"; //$NON-NLS-1$
 
       TIME_FORMAT          = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_SSSZ     = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
       TIME_FORMAT_RFC822   = new SimpleDateFormat(DateTimePattern + "Z"); //$NON-NLS-1$
+      TIME_FORMAT_SSSS     = new SimpleDateFormat(DateTimePattern + ".SSSS"); //$NON-NLS-1$
+      TIME_FORMAT_SSSZ     = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
 
       TIME_FORMAT          .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
-      TIME_FORMAT_SSSZ     .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
       TIME_FORMAT_RFC822   .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      TIME_FORMAT_SSSS     .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
+      TIME_FORMAT_SSSZ     .setTimeZone(TimeZone.getTimeZone(UI.TIME_ZONE_UTC));
 
 // SET_FORMATTING_ON
    }
@@ -721,26 +724,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
             _isInTime = false;
 
-            try {
-               _timeSlice.absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
-            } catch (final Exception e0) {
-               try {
-                  _timeSlice.absoluteTime = TIME_FORMAT.parse(charData).getTime();
-               } catch (final ParseException e1) {
-                  try {
-                     _timeSlice.absoluteTime = TIME_FORMAT_SSSZ.parse(charData).getTime();
-                  } catch (final ParseException e2) {
-                     try {
-                        _timeSlice.absoluteTime = TIME_FORMAT_RFC822.parse(charData).getTime();
-                     } catch (final ParseException e3) {
-
-                        _isError = true;
-
-                        logError(e3);
-                     }
-                  }
-               }
-            }
+            _timeSlice.absoluteTime = parseDateTime(charData);
 
          } else if (name.equals(TAG_MT_SERIE_GEAR)) {
 
@@ -859,26 +843,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
             _isInGpxDataStartTime = false;
 
-            try {
-               _gpxDataLap.absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
-            } catch (final Exception e0) {
-               try {
-                  _gpxDataLap.absoluteTime = TIME_FORMAT.parse(charData).getTime();
-               } catch (final ParseException e1) {
-                  try {
-                     _gpxDataLap.absoluteTime = TIME_FORMAT_SSSZ.parse(charData).getTime();
-                  } catch (final ParseException e2) {
-                     try {
-                        _gpxDataLap.absoluteTime = TIME_FORMAT_RFC822.parse(charData).getTime();
-                     } catch (final ParseException e3) {
+            _gpxDataLap.absoluteTime = parseDateTime(charData);
 
-                        _isError = true;
-
-                        logError(e3);
-                     }
-                  }
-               }
-            }
          } else if (name.equals(TAG_EXT_DATA_ELAPSED_TIME)) {
 
             _isInGpxDataElapsedTime = false;
@@ -909,26 +875,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          _isInWpt_Time = false;
 
-         try {
-            _wayPoint.setTime(ZonedDateTime.parse(charData).toInstant().toEpochMilli());
-         } catch (final Exception e0) {
-            try {
-               _wayPoint.setTime(TIME_FORMAT.parse(charData).getTime());
-            } catch (final ParseException e1) {
-               try {
-                  _wayPoint.setTime(TIME_FORMAT_SSSZ.parse(charData).getTime());
-               } catch (final ParseException e2) {
-                  try {
-                     _wayPoint.setTime(TIME_FORMAT_RFC822.parse(charData).getTime());
-                  } catch (final ParseException e3) {
-
-                     _isError = true;
-
-                     logError(e3);
-                  }
-               }
-            }
-         }
+         _wayPoint.setTime(parseDateTime(charData));
 
       } else if (name.equals(TAG_WPT_NAME)) {
 
@@ -1443,6 +1390,48 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private void logError(final ParseException e) {
 
       TourLogManager.log_EXCEPTION_WithStacktrace(_importFilePath, e);
+   }
+
+   private long parseDateTime(final String charData) {
+
+      long absoluteTime = 0;
+
+      try {
+
+         absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
+
+      } catch (final Exception e0) {
+         try {
+
+            absoluteTime = TIME_FORMAT.parse(charData).getTime();
+
+         } catch (final ParseException e1) {
+            try {
+
+               absoluteTime = TIME_FORMAT_SSSZ.parse(charData).getTime();
+
+            } catch (final ParseException e2) {
+               try {
+
+                  absoluteTime = TIME_FORMAT_RFC822.parse(charData).getTime();
+
+               } catch (final ParseException e3) {
+                  try {
+
+                     absoluteTime = TIME_FORMAT_SSSS.parse(charData).getTime();
+
+                  } catch (final ParseException e4) {
+
+                     _isError = true;
+
+                     logError(e4);
+                  }
+               }
+            }
+         }
+      }
+
+      return absoluteTime;
    }
 
    @Override

@@ -59,6 +59,7 @@ import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
+import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
@@ -112,6 +113,25 @@ public class RawDataManager {
    private static final String   VALUE_UNIT_PULSE                            = net.tourbook.ui.Messages.Value_Unit_Pulse;
 
 // SET_FORMATTING_ON
+
+   /**
+    * This can be useful that the logged import events have a defined sequence instead of
+    * randomly when multiple threads are used.
+    */
+   private static final String SYS_PROP__SINGLE_THREAD_TOUR_IMPORT = "singleThreadTourImport";                                       //$NON-NLS-1$
+   private static boolean      _isSingleThreadTourImport           = System.getProperty(SYS_PROP__SINGLE_THREAD_TOUR_IMPORT) != null;
+
+   static {
+
+      if (_isSingleThreadTourImport) {
+
+         Util.logSystemProperty_IsEnabled(
+
+               RawDataManager.class,
+               SYS_PROP__SINGLE_THREAD_TOUR_IMPORT,
+               "Single thread tour import/re-import"); //$NON-NLS-1$
+      }
+   }
 
    private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
    private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
@@ -173,49 +193,55 @@ public class RawDataManager {
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<String, Object>   _allInvalidFiles                         = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, Object>       _allInvalidFiles                         = new ConcurrentHashMap<>();
 
    /**
     * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<IPath, Object>    _allPreviousReimportFolders              = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<IPath, Object>        _allPreviousReimportFolders              = new ConcurrentHashMap<>();
 
-   private static volatile IPath                            _previousReimportFolder;
+   private static volatile IPath                                _previousReimportFolder;
 
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private static final ConcurrentHashMap<Long, TourData>   _allImported_Tours                       = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<Long, TourData>       _allImported_Tours                       = new ConcurrentHashMap<>();
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
     */
-   private static final ConcurrentHashMap<String, String>   _allImported_FileNames                   = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>       _allImported_FileNames                   = new ConcurrentHashMap<>();
 
    /**
     * Contains filenames which are not directly imported but is imported from other imported files
     */
-   private static final ConcurrentHashMap<String, String>   _allImported_FileNamesChildren           = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>       _allImported_FileNamesChildren           = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourType}'s which are imported and could be saved or not, key is the tour type
     * name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourType> _allImported_NewTourTypes                = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourType>     _allImported_NewTourTypes                = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
     * name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourTag>  _allImported_NewTourTags                 = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourTag>      _allImported_NewTourTags                 = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
     * name + contained id in notes, all is in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourTag>  _allImported_NewTourTags_WithContainedId = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourTag>      _allImported_NewTourTags_WithContainedId = new ConcurrentHashMap<>();
+
+   /**
+    * Contains {@link DeviceSensor}'s which are imported and could be saved or not, key is the
+    * serial number name in UPPERCASE
+    */
+   private static final ConcurrentHashMap<String, DeviceSensor> _allImported_NewDeviceSensors            = new ConcurrentHashMap<>();
 
    //
    /**
@@ -224,8 +250,11 @@ public class RawDataManager {
    private static final DeviceData               _deviceData        = new DeviceData();
    //
    private static ThreadPoolExecutor             _importTour_Executor;
-   private static ArrayBlockingQueue<ImportFile> _importTour_Queue  = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static CountDownLatch                 _importTour_CountDownLatch;
+   private static ArrayBlockingQueue<ImportFile> _importTour_Queue  = new ArrayBlockingQueue<>(
+         _isSingleThreadTourImport
+               ? 1
+               : Util.NUMBER_OF_PROCESSORS);
 
    private static ThreadPoolExecutor             _loadingTour_Executor;
    private static ArrayBlockingQueue<TourData>   _loadingTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
@@ -243,7 +272,11 @@ public class RawDataManager {
          return thread;
       };
 
-      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, importThreadFactory);
+      _importTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
+            _isSingleThreadTourImport
+                  ? 1
+                  : Util.NUMBER_OF_PROCESSORS,
+            importThreadFactory);
 
       final ThreadFactory loadingThreadFactory = runnable -> {
 
@@ -353,6 +386,59 @@ public class RawDataManager {
    }
 
    /**
+    * SYNCHRONIZED: Create new device sensor and keep it in {@link #_allImported_NewDeviceSensors}
+    * or uses an already created sensor
+    *
+    * @param sensorType
+    * @param serialNumber
+    * @param sensorSerialNumberKey
+    * @return Returns the new device sensor
+    */
+   public static synchronized DeviceSensor createDeviceSensor(final int manufacturerNumber,
+                                                              final String manufacturerName,
+
+                                                              final int productNumber,
+                                                              final String productName,
+
+                                                              final String serialNumber) {
+
+      final String serialNumberKey = serialNumber.toUpperCase();
+
+      /*
+       * Check imported sensors
+       */
+      final DeviceSensor importedSensor = _allImported_NewDeviceSensors.get(serialNumberKey);
+      if (importedSensor != null) {
+         return importedSensor;
+      }
+
+      /*
+       * Check if sensor is still unavailable in the database
+       */
+      final DeviceSensor deviceSensor = TourDatabase.getAllDeviceSensors_BySerialNo().get(serialNumberKey);
+      if (deviceSensor != null) {
+         return deviceSensor;
+      }
+
+      /*
+       * Sensor is for sure not available -> create it now
+       */
+      final DeviceSensor newSensor = new DeviceSensor(
+
+            manufacturerNumber,
+            manufacturerName,
+
+            productNumber,
+            productName,
+
+            serialNumber);
+
+      _allImported_NewDeviceSensors.put(serialNumberKey, newSensor);
+
+      return newSensor;
+   }
+
+   /**
     * SYNCHRONIZED: Add new tour tags and save them in the database
     *
     * @param allRequestedTourTagNames
@@ -452,7 +538,7 @@ public class RawDataManager {
     * SYNCHRONIZED: Create new tour type and keep it in {@link #_allImported_NewTourTypes}
     *
     * @param requestedTourTypeName
-    * @return Returns the newly saved tour type
+    * @return Returns the new tour type
     */
    private static synchronized TourType createTourType(final String requestedTourTypeName) {
 
@@ -522,9 +608,11 @@ public class RawDataManager {
        */
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
 
-         previousData.add(oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE + oldTourData.getBattery_Percentage_End()
-               + UI.UNIT_VOLT);
-         newData.add(newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE + newTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
+         previousData.add(oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
+               + oldTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
+
+         newData.add(newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
+               + newTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
@@ -761,6 +849,10 @@ public class RawDataManager {
 
    public static boolean isSetBodyWeight() {
       return _importState_IsSetBodyWeight;
+   }
+
+   public static boolean isSingleThreadTourImport() {
+      return _isSingleThreadTourImport;
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
@@ -3247,7 +3339,7 @@ public class RawDataManager {
 
       final boolean isAllTimeSlices = allTourValueTypes.contains(TourValueType.ALL_TIME_SLICES);
 
-      // Battery %
+      // Battery
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__BATTERY)) {
 
          // re-import battery values only
@@ -3257,6 +3349,9 @@ public class RawDataManager {
 
          oldTourData.setBattery_Percentage_Start(reimportedTourData.getBattery_Percentage_Start());
          oldTourData.setBattery_Percentage_End(reimportedTourData.getBattery_Percentage_End());
+
+         oldTourData.getDeviceSensorValues().clear();
+         oldTourData.getDeviceSensorValues().addAll(reimportedTourData.getDeviceSensorValues());
       }
 
       // Cadence
@@ -3441,6 +3536,8 @@ public class RawDataManager {
       _allImported_NewTourTags.clear();
       _allImported_NewTourTags_WithContainedId.clear();
       _allImported_NewTourTypes.clear();
+
+      _allImported_NewDeviceSensors.clear();
    }
 
    public void removeTours(final TourData[] removedTours) {

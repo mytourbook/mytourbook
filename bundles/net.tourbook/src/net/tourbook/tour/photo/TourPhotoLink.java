@@ -218,12 +218,12 @@ public class TourPhotoLink {
       final ArrayList<HistoryData> historySlices = new ArrayList<>();
 
       /*
-       * set tour start time line before first time slice
+       * Set tour start time line before first time slice
        */
       addTimeSlice(historySlices, tourStartTime);
 
       /*
-       * create time data list for all time slices which contains photos
+       * Create time data list for all time slices which contains photos
        */
       long prevTimeSliceTime = Long.MIN_VALUE;
       for (final long timeSliceTime : historyTimeSerie) {
@@ -239,7 +239,7 @@ public class TourPhotoLink {
       }
 
       /*
-       * set tour end time after the last time slice
+       * Set tour end time after the last time slice
        */
       addTimeSlice(historySlices, tourEndTime);
 
