@@ -63,4 +63,4 @@ jobs:
         continue-on-error: true
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'push' }}
-        run: test -z $(git rev-list --after="24 hours" 7e509d1879b23e478b7235d2bd1045bbd7029943) && echo "::set-output name=should_run::false"
+        run: test -z $(git rev-list --after="24 hours" 2668675b6ef645660b1c0005f93659d2f158056e) && echo "::set-output name=should_run::false"
