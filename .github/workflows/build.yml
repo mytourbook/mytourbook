@@ -1,14 +1,14 @@
 name: Build
 on:
-  needs: check_date
-  if: ${{ needs.check_date.outputs.should_run != 'false' }}
   push:
     branches:
-      - fb-buildfix
+    - fb-buildfix
 jobs:
   build:
     name: Build
     runs-on: windows-latest
+    needs: check_date
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
     steps:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
