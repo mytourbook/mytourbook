@@ -5,10 +5,10 @@ on:
     - fb-buildfix
 jobs:
   build:
-    name: Build
-    runs-on: windows-latest
     needs: check_date
     if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    name: Build
+    runs-on: windows-latest
     steps:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
