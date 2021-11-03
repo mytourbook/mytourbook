@@ -32,6 +32,11 @@ Experimental
 New
 ===
 
+* Sensor Battery        https://github.com/wolfgang-ch/mytourbook/issues/376
+  - Sensor view displays all sensors 
+  - Sensor chart displays sensor battery history values 
+  - Tour info displays the sensor battery values from a tour
+
 * Suunto App Integration: (Frederic)
   - Added support for multiple accounts
   https://sourceforge.net/p/mytourbook/feature-requests/197/

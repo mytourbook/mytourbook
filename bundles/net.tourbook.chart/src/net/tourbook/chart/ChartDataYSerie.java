@@ -602,9 +602,11 @@ public class ChartDataYSerie extends ChartDataSerie {
                      isMinValueSet = true;
 
                      _visibleMinValue = value;
-                  }
 
-                  _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+                  } else {
+
+                     _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+                  }
                }
             }
 
