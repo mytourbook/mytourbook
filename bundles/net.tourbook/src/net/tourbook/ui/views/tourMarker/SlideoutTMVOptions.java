@@ -86,54 +86,57 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
-            createUI_10_Title(container);
-            createUI_12_Actions(container);
-            createUI_20_Options(container);
+            createUI_10_Header(container);
+            createUI_20_Controls(container);
          }
       }
 
       return shellContainer;
    }
 
-   private void createUI_10_Title(final Composite parent) {
+   private void createUI_10_Header(final Composite parent) {
 
-      /*
-       * Label: Slideout title
-       */
-      final Label label = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(label);
-      label.setText(Messages.Slideout_TMVOptions_Label_Title);
-      MTFont.setBannerFont(label);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Label: Slideout title
+             */
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_TMVOptions_Label_Title);
+
+            MTFont.setBannerFont(label);
+         }
+         {
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.BEGINNING)
+                  .applyTo(toolbar);
+
+            final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+            tbm.add(_actionRestoreDefaults);
+
+            tbm.update(true);
+         }
+      }
    }
 
-   private void createUI_12_Actions(final Composite parent) {
+   private void createUI_20_Controls(final Composite parent) {
 
-      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()//
-            .grab(true, false)
-            .align(SWT.END, SWT.BEGINNING)
-            .applyTo(toolbar);
-
-      final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-      tbm.add(_actionRestoreDefaults);
-
-      tbm.update(true);
-   }
-
-   private void createUI_20_Options(final Composite parent) {
-
-      GridDataFactory.fillDefaults()//
-            .grab(true, false)
-            .span(2, 1)
-            .applyTo(parent);
-      GridLayoutFactory.swtDefaults().applyTo(parent);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+      GridLayoutFactory.swtDefaults().applyTo(container);
       {
          {
             /*
              * Use Elapsed time
              */
-            _chkUseElapsedTime = new Button(parent, SWT.RADIO);
+            _chkUseElapsedTime = new Button(container, SWT.RADIO);
             _chkUseElapsedTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseElapsedTime);
             _chkUseElapsedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
             _chkUseElapsedTime.addSelectionListener(_defaultSelectionListener);
@@ -143,7 +146,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
             /*
              * Use Moving time
              */
-            _chkUseMovingTime = new Button(parent, SWT.RADIO);
+            _chkUseMovingTime = new Button(container, SWT.RADIO);
             _chkUseMovingTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseMovingTime);
             _chkUseMovingTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
             _chkUseMovingTime.addSelectionListener(_defaultSelectionListener);
@@ -153,7 +156,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
             /*
              * Use Recorded time
              */
-            _chkUseRecordedTime = new Button(parent, SWT.RADIO);
+            _chkUseRecordedTime = new Button(container, SWT.RADIO);
             _chkUseRecordedTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseRecordedTime);
             _chkUseRecordedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
             _chkUseRecordedTime.addSelectionListener(_defaultSelectionListener);
