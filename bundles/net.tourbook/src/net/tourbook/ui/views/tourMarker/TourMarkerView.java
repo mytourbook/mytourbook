@@ -442,7 +442,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             / UI.UNIT_VALUE_DISTANCE
             / 1000;
 
-      final int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex] - getTotalStoppedTime(previousMarkerIndex,
+      final int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex] - getStoppedTimeBetweenIndices(previousMarkerIndex,
             currentMarkerIndex);
 
       final double averageSpeed = timeDifference == 0 ? 0.0 : 3600 * distanceDifference / timeDifference;
@@ -925,7 +925,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          public void update(final ViewerCell cell) {
 
             final TourMarker marker = (TourMarker) cell.getElement();
-            final long time = marker.getTime() - getTotalStoppedTime(0, marker.getSerieIndex());
+            final long time = marker.getTime() - getStoppedTimeBetweenIndices(0, marker.getSerieIndex());
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
          }
@@ -976,7 +976,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
             }
 
-            timeDifference -= getTotalStoppedTime(lastSerieIndex, currentMarkerIndex);
+            timeDifference -= getStoppedTimeBetweenIndices(lastSerieIndex, currentMarkerIndex);
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(timeDifference));
 
@@ -1171,7 +1171,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       return selectedTours;
    }
 
-   private int getTotalStoppedTime(final int previousMarkerIndex, final int currentMarkerIndex) {
+   private int getStoppedTimeBetweenIndices(final int previousMarkerIndex, final int currentMarkerIndex) {
 
       if (useRecordedTime()) {
          return _tourData.getPausedTime(previousMarkerIndex, currentMarkerIndex);
