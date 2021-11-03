@@ -2043,6 +2043,11 @@ public class Messages extends NLS {
 
    public static String        Slideout_StatisticOptions_Label_Title;
 
+   public static String        Slideout_TMVOptions_Label_Title;
+   public static String        Slideout_TMVOptions_Checkbox_UseElapsedTime;
+   public static String        Slideout_TMVOptions_Checkbox_UseMovingTime;
+   public static String        Slideout_TMVOptions_Checkbox_UseRecordedTime;
+
    public static String        Slideout_TourBlogOptions_Label_Title;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip;

@@ -84,9 +84,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults()//
-               .numColumns(2)
-               .applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
             createUI_10_Title(container);
             createUI_12_Actions(container);
@@ -104,7 +102,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
        */
       final Label label = new Label(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(label);
-      label.setText("Tour Marker View Options");//Messages.Slideout_HVROptions_Label_Title);
+      label.setText(Messages.Slideout_TMVOptions_Label_Title);
       MTFont.setBannerFont(label);
    }
 
@@ -136,7 +134,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
              * Use Elapsed time
              */
             _chkUseElapsedTime = new Button(parent, SWT.RADIO);
-            _chkUseElapsedTime.setText("Use elapsed time");//Messages.Slideout_HVROptions_Checkbox_2xValues);
+            _chkUseElapsedTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseElapsedTime);
             _chkUseElapsedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
             _chkUseElapsedTime.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().applyTo(_chkUseElapsedTime);
@@ -146,7 +144,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
              * Use Moving time
              */
             _chkUseMovingTime = new Button(parent, SWT.RADIO);
-            _chkUseMovingTime.setText("Use moving time");//Messages.Slideout_HVROptions_Checkbox_2xValues);
+            _chkUseMovingTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseMovingTime);
             _chkUseMovingTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
             _chkUseMovingTime.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().applyTo(_chkUseMovingTime);
@@ -156,7 +154,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
              * Use Recorded time
              */
             _chkUseRecordedTime = new Button(parent, SWT.RADIO);
-            _chkUseRecordedTime.setText("Use recorded time");//Messages.Slideout_HVROptions_Checkbox_2xValues);
+            _chkUseRecordedTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseRecordedTime);
             _chkUseRecordedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
             _chkUseRecordedTime.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().applyTo(_chkUseRecordedTime);

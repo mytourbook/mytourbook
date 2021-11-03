@@ -442,14 +442,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             / UI.UNIT_VALUE_DISTANCE
             / 1000;
 
-      int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex];
-      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-
-      if (isPaceAndSpeedFromRecordedTime) {
-         timeDifference -= _tourData.getPausedTime(previousMarkerIndex, currentMarkerIndex);
-      } else {
-         timeDifference -= _tourData.getBreakTime(previousMarkerIndex, currentMarkerIndex);
-      }
+      final int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex] - getTotalStoppedTime(previousMarkerIndex,
+            currentMarkerIndex);
 
       final double averageSpeed = timeDifference == 0 ? 0.0 : 3600 * distanceDifference / timeDifference;
 
@@ -931,13 +925,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          public void update(final ViewerCell cell) {
 
             final TourMarker marker = (TourMarker) cell.getElement();
-            long time = marker.getTime();
-
-            if (useRecordedTime()) {
-               time -= _tourData.getPausedTime(0, marker.getSerieIndex());
-            } else if (useMovingTime()) {
-               time -= _tourData.getBreakTime(0, marker.getSerieIndex());
-            }
+            final long time = marker.getTime() - getTotalStoppedTime(0, marker.getSerieIndex());
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
          }
@@ -961,11 +949,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             int lastSerieIndex = 0;
             TourData lastTourData = null;
             if (null != lastRow) {
+
                final Object element = lastRow.getElement();
+
                if (element instanceof TourMarker) {
-                  lastTime = ((TourMarker) element).getTime();
-                  lastSerieIndex = ((TourMarker) element).getSerieIndex();
-                  lastTourData = ((TourMarker) element).getTourData();
+
+                  final TourMarker tourMarker = (TourMarker) element;
+
+                  lastTime = tourMarker.getTime();
+                  lastSerieIndex = tourMarker.getSerieIndex();
+                  lastTourData = tourMarker.getTourData();
                }
             }
 
@@ -983,11 +976,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
             }
 
-            if (useRecordedTime()) {
-               timeDifference -= _tourData.getPausedTime(lastSerieIndex, currentMarkerIndex);
-            } else if (useMovingTime()) {
-               timeDifference -= _tourData.getBreakTime(lastSerieIndex, currentMarkerIndex);
-            }
+            timeDifference -= getTotalStoppedTime(lastSerieIndex, currentMarkerIndex);
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(timeDifference));
 
@@ -1010,6 +999,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          }
       });
    }
+
    /**
     * Column: Description
     */
@@ -1179,6 +1169,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       }
 
       return selectedTours;
+   }
+
+   private int getTotalStoppedTime(final int previousMarkerIndex, final int currentMarkerIndex) {
+
+      if (useRecordedTime()) {
+         return _tourData.getPausedTime(previousMarkerIndex, currentMarkerIndex);
+      } else if (useMovingTime()) {
+         return _tourData.getBreakTime(previousMarkerIndex, currentMarkerIndex);
+      }
+
+      return 0;
    }
 
    @Override
