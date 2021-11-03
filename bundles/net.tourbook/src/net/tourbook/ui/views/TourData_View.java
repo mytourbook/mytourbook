@@ -372,6 +372,18 @@ public class TourData_View extends ViewPart {
 
                clearView();
 
+            } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+               if (_tourData != null) {
+
+                  // reload tour
+
+                  final Long tourId = _tourData.getTourId();
+                  final TourData tourData = TourManager.getTour(tourId);
+
+                  onSelectionChanged(new SelectionTourData(tourData));
+               }
+
             } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
                onSelectionChanged((ISelection) eventData);

@@ -176,14 +176,14 @@ public class SerieData implements Serializable {
    /**
     * Containing the battery time in seconds, relative to the tour start time
     *
-    * @since after 21.6
+    * @since 21.9
     */
    public int[]                battery_Time;
 
    /**
     * Containing the battery percentage value
     *
-    * @since after 21.6
+    * @since 21.9
     */
    public short[]              battery_Percentage;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,28 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.data;
 
-import org.eclipse.jface.action.Action;
+public enum DeviceSensorType {
 
-public class ActionMouseMode extends Action {
+   /**
+    * A sensor type is not defined
+    */
+   NONE,
 
-   private Chart _chart;
+   OTHER,
 
-   public ActionMouseMode(final Chart chart) {
+   /**
+    * Gear shifting, e.g. Shimano Di2
+    */
+   GEAR_SHIFTING, //
 
-      super(Messages.Action_mouse_mode, Action.AS_CHECK_BOX);
-
-      _chart = chart;
-
-      setToolTipText(Messages.Action_mouse_mode_tooltip);
-
-      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseMode));
-   }
-
-   @Override
-   public void run() {
-      _chart.onExecuteMouseMode(isChecked());
-   }
-
+   CADENCE, //
+   HEARTBEAT, //
+   PACE, //
+   SPEED, //
 }

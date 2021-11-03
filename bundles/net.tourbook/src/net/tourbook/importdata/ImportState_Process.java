@@ -15,9 +15,17 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.DeviceSensor;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -27,9 +35,9 @@ import net.tourbook.tour.TourManager;
  */
 public class ImportState_Process {
 
-   private boolean       isLog_DEFAULT;
-   private boolean       isLog_INFO;
-   private boolean       isLog_OK;
+   private boolean                                 isLog_DEFAULT;
+   private boolean                                 isLog_INFO;
+   private boolean                                 isLog_OK;
 
    /**
     * IN state:
@@ -37,7 +45,7 @@ public class ImportState_Process {
     * When <code>true</code> then errors are not displayed to the user, default is
     * <code>false</code>
     */
-   private boolean       isSilentError;
+   private boolean                                 isSilentError;
 
    /**
     * IN state:
@@ -45,7 +53,7 @@ public class ImportState_Process {
     * When <code>true</code> then tours will be skipped when the import file is not defined or not
     * available, default is <code>false</code>
     */
-   private boolean       isSkipToursWithFileNotFound;
+   private boolean                                 isSkipToursWithFileNotFound;
 
    /**
     * IN state:
@@ -53,7 +61,7 @@ public class ImportState_Process {
     * Is <code>true</code> when the import is started from easy import, default is
     * <code>false</code>
     */
-   private boolean       isEasyImport;
+   private boolean                                 isEasyImport;
 
    /**
     * IN state:
@@ -61,28 +69,28 @@ public class ImportState_Process {
     * Is <code>true</code> when the current import is run within a JUnit test, default is
     * <code>false</code>
     */
-   private boolean       isJUnitTest;
+   private boolean                                 isJUnitTest;
 
    /**
     * INTERNAL state:
     * <p>
     * Contains a unique id so that each import can be identified.
     */
-   private long          importId                      = System.currentTimeMillis();
+   private long                                    importId                      = System.currentTimeMillis();
 
    /**
     * OUT state:
     * <p>
     * Is <code>true</code> when the import was canceled by the user
     */
-   private AtomicBoolean isImportCanceled_ByMonitor    = new AtomicBoolean();
+   private AtomicBoolean                           isImportCanceled_ByMonitor    = new AtomicBoolean();
 
    /**
     * OUT state:
     * <p>
     * Is <code>true</code> when the import was canceled after a dialog was displayed to the user
     */
-   private AtomicBoolean isImportCanceled_ByUserDialog = new AtomicBoolean();
+   private AtomicBoolean                           isImportCanceled_ByUserDialog = new AtomicBoolean();
 
    /**
     * OUT state:
@@ -90,7 +98,7 @@ public class ImportState_Process {
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
     * imported.
     */
-   private AtomicBoolean isCreated_NewTag              = new AtomicBoolean();
+   private AtomicBoolean                           isCreated_NewTag              = new AtomicBoolean();
 
    /**
     * OUT state:
@@ -98,7 +106,14 @@ public class ImportState_Process {
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
     * imported.
     */
-   private AtomicBoolean isCreated_NewTourType         = new AtomicBoolean();
+   private AtomicBoolean                           isCreated_NewTourType         = new AtomicBoolean();
+
+   /**
+    * OUT state:
+    * <p>
+    * Device sensors which must be updated in the db, key is the serial number
+    */
+   private ConcurrentHashMap<String, DeviceSensor> _allDeviceSensorToBeUpdated   = new ConcurrentHashMap<>();
 
    /**
     * IN and OUT states for the whole import/re-import process.
@@ -110,6 +125,10 @@ public class ImportState_Process {
       setIsLog_DEFAULT(true);
       setIsLog_INFO(true);
       setIsLog_OK(true);
+   }
+
+   public ConcurrentHashMap<String, DeviceSensor> getAllDeviceSensorsToBeUpdated() {
+      return _allDeviceSensorToBeUpdated;
    }
 
    public long getImportId() {
@@ -180,6 +199,10 @@ public class ImportState_Process {
     * Run post process actions, e.g. when new tour tags or tour types were created, update the UI
     */
    public void runPostProcess() {
+
+      if (_allDeviceSensorToBeUpdated.size() > 0) {
+         updateSensors();
+      }
 
       if (isCreated_NewTourType.get()) {
 
@@ -291,6 +314,34 @@ public class ImportState_Process {
 
       if (importState_Process.isCreated_NewTourType.get()) {
          isCreated_NewTourType.set(true);
+      }
+   }
+
+   private void updateSensors() {
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
+
+      try {
+
+         for (final Entry<String, DeviceSensor> entrySet : _allDeviceSensorToBeUpdated.entrySet()) {
+
+            final DeviceSensor sensor = entrySet.getValue();
+
+            ts.begin();
+            {
+               em.merge(sensor);
+            }
+            ts.commit();
+         }
+
+      } catch (final Exception e) {
+         StatusUtil.showStatus(e);
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         }
+         em.close();
       }
    }
 

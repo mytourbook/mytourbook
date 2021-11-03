@@ -239,8 +239,9 @@
          id             ="net.tourbook.statistics.graphs.StatisticBattery"
          class          ="net.tourbook.statistics.graphs.StatisticBattery"
          category-data  ="Battery"
-         category-time  ="Day"
+         category-time  ="Other"
       />
+
             
    </extension>
 

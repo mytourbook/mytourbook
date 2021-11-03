@@ -55,6 +55,14 @@ public class Messages extends NLS {
 
    public static String        Advanced_Menu_AnimationSymbol;
 
+   public static String        Battery_Status_CHARGING;
+   public static String        Battery_Status_CRITICAL;
+   public static String        Battery_Status_GOOD;
+   public static String        Battery_Status_LOW;
+   public static String        Battery_Status_NEW;
+   public static String        Battery_Status_OK;
+   public static String        Battery_Status_UNKNOWN;
+
    public static String        Column_Annotation_Formatting;
    public static String        Column_Annotation_Sorting;
 
@@ -142,6 +150,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Pace;
    public static String        Graph_Label_Power;
    public static String        Graph_Label_Power_Unit;
+   public static String        Graph_Label_Sensor;
    public static String        Graph_Label_Speed;
    public static String        Graph_Label_Temperature;
    public static String        Graph_Label_Time;

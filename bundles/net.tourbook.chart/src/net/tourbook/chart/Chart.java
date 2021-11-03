@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-   private static final String                       ACTION_ID_MOUSE_MODE             = "ACTION_ID_MOUSE_MODE";             //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_LEFT_SLIDER_HERE  = "ACTION_ID_MOVE_LEFT_SLIDER_HERE";  //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
@@ -61,9 +60,6 @@ public class Chart extends ViewForm {
    public static final int                           SYNCH_MODE_NO                    = 0;
    public static final int                           SYNCH_MODE_BY_SCALE              = 1;
    public static final int                           SYNCH_MODE_BY_SIZE               = 2;
-
-   public static final String                        MOUSE_MODE_SLIDER                = "slider";                           //$NON-NLS-1$
-   public static final String                        MOUSE_MODE_ZOOM                  = "zoom";                             //$NON-NLS-1$
 
    private static final int                          MouseMove                        = 10;
    private static final int                          MouseDown                        = 20;
@@ -85,6 +81,8 @@ public class Chart extends ViewForm {
    private final ListenerList<IChartOverlay>         _chartOverlayListener            = new ListenerList<>();
    private final ListenerList<ISliderMoveListener>   _sliderMoveListeners             = new ListenerList<>();
 
+   private ActionMouseWheelMode                      _action_MouseWheelMode;
+
    private ChartComponents                           _chartComponents;
 
    private Chart                                     _synchedChart;
@@ -93,9 +91,10 @@ public class Chart extends ViewForm {
 
    private IToolBarManager                           _toolbarMgr;
    private IChartContextProvider                     _chartContextProvider;
-   private boolean                                   _isShowZoomActions               = false;
 
+   private boolean                                   _isShowZoomActions               = false;
    private boolean                                   _isShowMouseMode                 = false;
+
    private Color                                     _backgroundColor;
 
    /**
@@ -155,23 +154,21 @@ public class Chart extends ViewForm {
    /*
     * Segment alternate color
     */
-   protected boolean isShowSegmentAlternateColor = true;
-   protected RGB     segmentAlternateColor_Light = new RGB(0xf5, 0xf5, 0xf5);
-   protected RGB     segmentAlternateColor_Dark  = new RGB(0x40, 0x40, 0x40);
+   protected boolean      isShowSegmentAlternateColor = true;
+   protected RGB          segmentAlternateColor_Light = new RGB(0xf5, 0xf5, 0xf5);
+   protected RGB          segmentAlternateColor_Dark  = new RGB(0x40, 0x40, 0x40);
 
    /**
-    * Mouse behaviour:<br>
-    * <br>
-    * {@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
+    * Mouse wheel mode to move a x-slider, select a bar or zoom the chart
     */
-   private String    _mouseMode                  = MOUSE_MODE_SLIDER;
+   private MouseWheelMode _mouseWheelMode             = MouseWheelMode.Selection;
 
-   private boolean   _isTopMenuPosition;
+   private boolean        _isTopMenuPosition;
 
    /**
     * Is <code>true</code> when running in UI update, then events are not fired.
     */
-   private boolean   _isInUpdateUI;
+   private boolean        _isInUpdateUI;
 
    /**
     * Chart widget
@@ -281,7 +278,8 @@ public class Chart extends ViewForm {
 
       _allChartActions = new HashMap<>();
 
-      _allChartActions.put(ACTION_ID_MOUSE_MODE, new ActionMouseMode(this));
+      _action_MouseWheelMode = new ActionMouseWheelMode(this);
+
       _allChartActions.put(ACTION_ID_MOVE_LEFT_SLIDER_HERE, new ActionMoveLeftSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_RIGHT_SLIDER_HERE, new ActionMoveRightSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_SLIDERS_TO_BORDER, new ActionMoveSlidersToBorder(this));
@@ -382,10 +380,11 @@ public class Chart extends ViewForm {
       // fit to graph is always enabled because the y-slider can change the chart
       _allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(true);
 
-      _allChartActions.get(ACTION_ID_MOUSE_MODE).setEnabled(true);
       _allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE).setEnabled(true);
       _allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE).setEnabled(true);
       _allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
+
+      _action_MouseWheelMode.setEnabled(true);
    }
 
    void fillContextMenu(final IMenuManager menuMgr,
@@ -402,7 +401,9 @@ public class Chart extends ViewForm {
 
       // check if this is slider context
       final boolean isSliderContext = leftSlider != null || rightSlider != null;
-      final boolean showOnlySliderContext = isSliderContext && _chartContextProvider.showOnlySliderContextMenu();
+      final boolean showOnlySliderContext = isSliderContext
+            && _chartContextProvider != null
+            && _chartContextProvider.showOnlySliderContextMenu();
 
       if (_chartContextProvider != null && showOnlySliderContext == false && _isTopMenuPosition) {
          _chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
@@ -422,38 +423,47 @@ public class Chart extends ViewForm {
                                              final int hoveredBarSerieIndex,
                                              final int hoveredBarValueIndex) {
 
+      /*
+       * Mouse wheel action
+       */
+      // set text for mouse wheel mode
+      if (_mouseWheelMode.equals(MouseWheelMode.Selection)) {
+
+         // mouse mode: slider
+         _action_MouseWheelMode.setText(Messages.Action_mouse_mode_zoom);
+
+      } else {
+
+         // mouse mode: zoom
+         _action_MouseWheelMode.setText(Messages.Action_mouse_mode_slider);
+      }
+
       if (_chartDataModel.getChartType() == ChartType.BAR) {
 
          /*
-          * create menu for bar charts
+          * Create menu for bar charts
           */
 
          // get the context provider from the data model
-         final IChartContextProvider barChartContextProvider = (IChartContextProvider) _chartDataModel
-               .getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
+         final IChartContextProvider barChartContextProvider =
+               (IChartContextProvider) _chartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
 
          if (barChartContextProvider != null) {
             barChartContextProvider.fillBarChartContextMenu(menuMgr, hoveredBarSerieIndex, hoveredBarValueIndex);
          }
 
+         if (_isShowZoomActions) {
+
+            menuMgr.add(new Separator());
+            menuMgr.add(_action_MouseWheelMode);
+            menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH));
+         }
+
       } else {
 
          /*
-          * create menu for line charts
+          * Create menu for line charts
           */
-
-         // set text for mouse wheel mode
-         final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_MODE);
-         if (_mouseMode.equals(MOUSE_MODE_SLIDER)) {
-
-            // mouse mode: slider
-            actionMouseMode.setText(Messages.Action_mouse_mode_zoom);
-
-         } else {
-
-            // mouse mode: zoom
-            actionMouseMode.setText(Messages.Action_mouse_mode_slider);
-         }
 
          // fill slider context menu
          if (_chartContextProvider != null) {
@@ -465,7 +475,7 @@ public class Chart extends ViewForm {
          if (_isShowZoomActions) {
 
             menuMgr.add(new Separator());
-            menuMgr.add(actionMouseMode);
+            menuMgr.add(_action_MouseWheelMode);
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE));
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE));
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER));
@@ -626,6 +636,13 @@ public class Chart extends ViewForm {
       }
    }
 
+   /**
+    * @return Returns action to set the mouse wheel mode
+    */
+   public ActionMouseWheelMode getAction_MouseWheelMode() {
+      return _action_MouseWheelMode;
+   }
+
    public Color getBackgroundColor() {
       return _backgroundColor;
    }
@@ -701,8 +718,8 @@ public class Chart extends ViewForm {
       return _chartComponents.getDevChartMarginTop();
    }
 
-   public String getMouseMode() {
-      return _mouseMode;
+   public MouseWheelMode getMouseWheelMode() {
+      return _mouseWheelMode;
    }
 
    /**
@@ -811,8 +828,8 @@ public class Chart extends ViewForm {
       return _chartComponents.devSliderBarHeight != 0;
    }
 
-   void onExecuteMouseMode(final boolean isChecked) {
-      setMouseMode(isChecked);
+   void onExecuteMouseWheelMode(final MouseWheelMode mouseWheelMode) {
+      setMouseWheelMode(mouseWheelMode);
    }
 
    void onExecuteMoveLeftSliderHere() {
@@ -1140,30 +1157,15 @@ public class Chart extends ViewForm {
    }
 
    /**
-    * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
-    * this is the default
-    *
-    * @param isChecked
+    * Sets the mouse wheel mode
     */
-   public void setMouseMode(final boolean isChecked) {
+   public void setMouseWheelMode(final MouseWheelMode mouseWheelMode) {
 
-      _mouseMode = isChecked ? MOUSE_MODE_SLIDER : MOUSE_MODE_ZOOM;
+      _mouseWheelMode = mouseWheelMode;
 
-      updateMouseModeUIState();
+      updateUI_MouseWheelMode();
 
-      final Point devMouse = this.toControl(getDisplay().getCursorLocation());
-      _chartComponents.getChartComponentGraph().setCursorStyle(devMouse.y);
-
-   }
-
-   public void setMouseMode(final Object newMouseMode) {
-
-      if (newMouseMode instanceof String) {
-
-         _mouseMode = (String) newMouseMode;
-
-         updateMouseModeUIState();
-      }
+      _chartComponents.getChartComponentGraph().setCursorStyle();
    }
 
    /**
@@ -1259,6 +1261,7 @@ public class Chart extends ViewForm {
     *           toolbar will be filled when the chart is updated
     */
    public void setToolBarManager(final IToolBarManager toolbarMgr, final boolean isFillToolbar) {
+
       _toolbarMgr = toolbarMgr;
       _isFillToolbar = isFillToolbar;
    }
@@ -1424,13 +1427,6 @@ public class Chart extends ViewForm {
       _chartComponents.updateCustomLayers();
    }
 
-   private void updateMouseModeUIState() {
-
-      if (_allChartActions != null) {
-         _allChartActions.get(ACTION_ID_MOUSE_MODE).setChecked(_mouseMode.equals(MOUSE_MODE_SLIDER));
-      }
-   }
-
    /**
     * Update different properties and refresh the chart.
     *
@@ -1460,6 +1456,14 @@ public class Chart extends ViewForm {
       segmentAlternateColor_Dark = rgbAlternateColor_Dark;
 
       _chartComponents.onResize();
+   }
+
+   private void updateUI_MouseWheelMode() {
+
+      if (_action_MouseWheelMode != null) {
+
+         _action_MouseWheelMode.setMouseWheelMode(_mouseWheelMode);
+      }
    }
 
    public void zoomOut() {

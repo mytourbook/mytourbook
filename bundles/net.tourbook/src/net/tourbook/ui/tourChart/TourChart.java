@@ -49,6 +49,7 @@ import net.tourbook.chart.IKeyListener;
 import net.tourbook.chart.ILineSelectionPainter;
 import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.MouseAdapter;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.PointLong;
@@ -2797,10 +2798,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
-      final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
-
       final Action action = _allTourChartActions.get(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED);
       if (action != null) {
+
+         final boolean canAutoZoom = getMouseWheelMode().equals(MouseWheelMode.Zoom);
+
          action.setEnabled(canAutoZoom);
       }
    }
@@ -3709,7 +3711,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final boolean isMoveChartToShowSlider = _selectedSegmenterSegment_2 == null;
 
-      selectSegmenterSegments(//
+      selectSegmenterSegments(
             _selectedSegmenterSegment_1,
             _selectedSegmenterSegment_2,
             isMoveChartToShowSlider);
@@ -4293,7 +4295,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          final boolean isMoveChartToShowSlider = _selectedSegmenterSegment_2 == null;
 
-         selectSegmenterSegments(//
+         selectSegmenterSegments(
                _selectedSegmenterSegment_1,
                _selectedSegmenterSegment_2,
                isMoveChartToShowSlider);
@@ -4360,7 +4362,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       selectionSliderPosition.setCustomData(selectedSegments);
       selectionSliderPosition.setMoveChartToShowSlider(isMoveChartToShowSlider);
-      selectionSliderPosition.setCenterZoomPositionWithKey(true);
+      selectionSliderPosition.setCenterZoomPosition(true);
 
       /*
        * Set x slider position in the chart but do not fire an event because the event would be
@@ -5149,14 +5151,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    @Override
-   public void setMouseMode(final boolean isChecked) {
-      super.setMouseMode(isChecked);
-      enableZoomOptions();
-   }
+   public void setMouseWheelMode(final MouseWheelMode mouseWheelMode) {
 
-   @Override
-   public void setMouseMode(final Object newMouseMode) {
-      super.setMouseMode(newMouseMode);
+      super.setMouseWheelMode(mouseWheelMode);
+
       enableZoomOptions();
    }
 
@@ -5844,7 +5842,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // get options check status from the configuration
       final boolean isMoveSlidersWhenZoomed = _tourChartConfiguration.moveSlidersWhenZoomed;
       final boolean isAutoZoomToSlider = _tourChartConfiguration.autoZoomToSlider;
-      final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
+      final boolean canAutoZoom = getMouseWheelMode().equals(MouseWheelMode.Zoom);
 
       // update tour chart actions
       tourAction = _allTourChartActions.get(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER);
@@ -5997,12 +5995,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       updateChart(newChartDataModel, !isMinMaxKeeper);
 
       /*
-       * this must be done after the chart is created because is sets an action, set it only once
+       * This must be done after the chart is created because is sets an action, set it only once
        * when the chart is displayed the first time otherwise it's annoying
        */
       if (_isMouseModeSet == false) {
+
          _isMouseModeSet = true;
-         setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
+
+         final String prefMouseWheelMode = _prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE);
+         final Enum<MouseWheelMode> mouseWheelMode = Util.getEnumValue(prefMouseWheelMode, MouseWheelMode.Zoom);
+
+         setMouseWheelMode((MouseWheelMode) mouseWheelMode);
       }
 
       _tourInfoIconTooltipProvider.setTourData(_tourData);

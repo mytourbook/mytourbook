@@ -39,6 +39,8 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
+   private static final char     NL                                         = UI.NEW_LINE;
+
    protected static final String STATE_SELECTED_TOUR_ID                     = "STATE_SELECTED_TOUR_ID";                     //$NON-NLS-1$
 
    protected static final String STATE_BAR_ORDERING_MONTH_ALTITUDE          = "STATE_BAR_ORDERING_MONTH_ALTITUDE";          //$NON-NLS-1$
@@ -59,6 +61,7 @@ public abstract class TourbookStatistic {
     * Grid prefixes
     */
    protected static final String    GRID_BATTERY           = "GRID_BATTERY__";              //$NON-NLS-1$
+   protected static final String    GRID_SENSOR            = "GRID_SENSOR__";               //$NON-NLS-1$
 
    protected static final String    GRID_DAY_ALTITUDE      = "GRID_DAY_ALTITUDE__";         //$NON-NLS-1$
    protected static final String    GRID_DAY_DISTANCE      = "GRID_DAY_DISTANCE__";         //$NON-NLS-1$
@@ -135,11 +138,12 @@ public abstract class TourbookStatistic {
 
       // create pref listener
       _prefChangeListener = propertyChangeEvent -> {
+         
          final String property = propertyChangeEvent.getProperty();
 
          // test if the color or statistic data have changed
          if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-               //
+
                || property.equals(gridHDistance)
                || property.equals(gridVDistance)
                || property.equals(gridIsHGridline)
@@ -148,7 +152,7 @@ public abstract class TourbookStatistic {
                || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
                || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
                || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
-         //
+
          ) {
 
             _isInPrefUpdate = true;
@@ -226,12 +230,12 @@ public abstract class TourbookStatistic {
    /**
     * Convert 'old' chart type format into 'new' format.
     *
-    * @param _chartType
+    * @param chartType
     * @return
     */
-   protected int getChartType(final String _chartType) {
+   protected int getChartType(final String chartType) {
 
-      switch (_chartType) {
+      switch (chartType) {
 
       case ChartDataSerie.CHART_TYPE_BAR_ADJACENT:
          return ChartDataYSerie.BAR_LAYOUT_BESIDE;
@@ -410,10 +414,11 @@ public abstract class TourbookStatistic {
 
    @Override
    public String toString() {
-      return "TourbookStatistic ["// //$NON-NLS-1$
-            + ("statisticId=" + plugin_StatisticId + ", ")// //$NON-NLS-1$ //$NON-NLS-2$
-            + ("visibleName=" + plugin_VisibleName) //$NON-NLS-1$
-            + "]"; //$NON-NLS-1$
+
+      return "TourbookStatistic [" + NL //                  //$NON-NLS-1$
+            + "statisticId=" + plugin_StatisticId + NL //   //$NON-NLS-1$
+            + "visibleName=" + plugin_VisibleName + NL //   //$NON-NLS-1$
+            + "]"; //                                       //$NON-NLS-1$
    }
 
    /**

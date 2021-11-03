@@ -18,7 +18,9 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -131,7 +133,10 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
             } else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-               _tourChart.setMouseMode(event.getNewValue());
+               final Object newValue = event.getNewValue();
+               final Enum<MouseWheelMode> enumValue = Util.getEnumValue((String) newValue, MouseWheelMode.Zoom);
+
+               _tourChart.setMouseWheelMode((MouseWheelMode) enumValue);
             }
          }
       };
