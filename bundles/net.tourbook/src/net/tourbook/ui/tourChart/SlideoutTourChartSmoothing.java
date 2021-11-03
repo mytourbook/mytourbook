@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,16 +15,15 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.ui.views.SmoothingUI;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -39,11 +38,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 /**
  * Tour chart properties slideout.
  */
-public class SlideoutTourChartSmoothing extends ToolbarSlideout {
+public class SlideoutTourChartSmoothing extends ToolbarSlideout implements IActionResetToDefault {
 
    private ActionOpenPrefDialog _actionPrefDialog;
 
-   private Action               _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
    /*
     * UI controls
     */
@@ -79,18 +78,7 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Tour_Action_EditSmoothingPreferences,
@@ -196,7 +184,8 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
       _smoothingUI.dispose();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _smoothingUI.performDefaults();
 

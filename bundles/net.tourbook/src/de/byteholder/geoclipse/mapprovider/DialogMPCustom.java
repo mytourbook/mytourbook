@@ -72,7 +72,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
    private static final int    MAX_RANDOM                             = 9999;
 
-   private static final int    UI_MAX_ZOOM_LEVEL                      = 20;
+   private static final int    UI_MAX_ZOOM_LEVEL                      = 23;
    private static final int    UI_MIN_ZOOM_LEVEL                      = 1;
    private static final int    MAP_MAX_ZOOM_LEVEL                     = UI_MAX_ZOOM_LEVEL
          - UI_MIN_ZOOM_LEVEL;

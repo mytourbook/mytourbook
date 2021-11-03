@@ -17,11 +17,11 @@ package net.tourbook.photo.internal.preferences;
 
 import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.common.util.Util;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoUI;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -56,7 +56,7 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
    private static final int       BORDER_MIN_SIZE = 0;
    private static final int       BORDER_MAX_SIZE = 50;
 
-   private final IPreferenceStore _prefStore      = Activator.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore      = PhotoActivator.getPrefStore();
 
    private boolean                _isImageViewerUIModified;
    private boolean                _isImageQualityModified;

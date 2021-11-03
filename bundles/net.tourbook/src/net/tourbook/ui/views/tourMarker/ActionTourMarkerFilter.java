@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMarker;
 
-import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -56,7 +57,7 @@ public class ActionTourMarkerFilter extends ContributionItem {
       _tourMarkerAllView = tourMarkerAllView;
       _parent = parent;
 
-      _actionImage = TourbookPlugin.getImageDescriptor(Images.TourOptions).createImage();
+      _actionImage = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
    }
 
    @Override

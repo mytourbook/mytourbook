@@ -1,0 +1,67 @@
+21.6.1                                                      2. July 2021
+
+
+Improvements   
+============
+
+* Tour Search
+
+  - Selecting a tour with the mouse in the tour search results is now 
+    working again in the embedded browser
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/745a5ebd1b/#9997
+
+ 
+* Tour Chart
+
+  - Show value of the hovered graph point, can be disabled in the chart  
+    options
+  - Set the default graphs in the graph slideout, previously it could be 
+    set only in the preferences dialog
+  - Show values in the value point tooltip with the correct color when 
+    using the dark theme
+
+
+* 2D Map
+
+  - Enable/disable map dimming, moved map dimming parameters into 2D Map 
+    Options slideout
+  - Legend units and scale colors depend on the map dim level
+
+ 
+* Tour Data Editor
+
+  - New action to delete time slices and adjust the tour start time.
+    This can be helpfull when a GPS device had no connection at the tour 
+    start and the tour start time is totally wrong.
+    The author had a tour whose tour start time was postponed 19 hours 
+    until the GPS signal was received
+
+ 
+Changes  
+=======
+
+* Strava Upload (Frederic)
+
+  - Enhanced the tour type comparison when mapping tour types to Strava 
+    activity types
+
+ 
+W10   
+===
+
+* Installation
+
+  - The installer has a new icon
+  - Show correct icon in "Apps & features"
+
+ 
+Translation    
+===========
+
+* French (Frederic)
+
+ 
+System   
+======
+
+* Eclipse 2021-03

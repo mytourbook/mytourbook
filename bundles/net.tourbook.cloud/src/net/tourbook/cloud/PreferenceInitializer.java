@@ -15,14 +15,20 @@
  *******************************************************************************/
 package net.tourbook.cloud;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.tourbook.common.UI;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-   public PreferenceInitializer() {}
+   //This is the date (01/26/2021) that Suunto forced the users to switch to Suunto App.
+   public static final long SUUNTO_FILTER_SINCE_DATE = 1611619200000L;
 
    @Override
    public void initializeDefaultPreferences() {
@@ -39,16 +45,34 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, 0);
       store.setDefault(Preferences.STRAVA_ATHLETEID, UI.EMPTY_STRING);
       store.setDefault(Preferences.STRAVA_ATHLETEFULLNAME, UI.EMPTY_STRING);
+      store.setDefault(Preferences.STRAVA_SENDDESCRIPTION, true);
+      store.setDefault(Preferences.STRAVA_USETOURTYPEMAPPING, false);
 
-      store.setDefault(Preferences.SUUNTO_ACCESSTOKEN, UI.EMPTY_STRING);
-      store.setDefault(Preferences.SUUNTO_REFRESHTOKEN, UI.EMPTY_STRING);
-      store.setDefault(Preferences.SUUNTO_ACCESSTOKEN_EXPIRES_IN, 0);
-      store.setDefault(Preferences.SUUNTO_ACCESSTOKEN_ISSUE_DATETIME, 0);
-      store.setDefault(Preferences.SUUNTO_WORKOUT_DOWNLOAD_FOLDER, UI.EMPTY_STRING);
-      store.setDefault(Preferences.SUUNTO_USE_WORKOUT_FILTER_SINCE_DATE, false);
+      initializeDefaultSuuntoPreferences(store);
+      store.setDefault(Preferences.SUUNTO_SELECTED_PERSON_INDEX, 0);
+      store.setDefault(Preferences.SUUNTO_SELECTED_PERSON_ID, UI.EMPTY_STRING);
+   }
 
-      //This is the date (01/26/2021) that Suunto forced the users to switch to Suunto App.
-      store.setDefault(Preferences.SUUNTO_WORKOUT_FILTER_SINCE_DATE, 1611619200000L);
+   private void initializeDefaultSuuntoPreferences(final IPreferenceStore store) {
 
+      final List<TourPerson> tourPeopleList = PersonManager.getTourPeople();
+      final List<String> tourPersonIds = new ArrayList<>();
+
+      // This empty string represents "All people"
+      tourPersonIds.add(UI.EMPTY_STRING);
+      tourPeopleList.forEach(
+            tourPerson -> tourPersonIds.add(
+                  String.valueOf(tourPerson.getPersonId())));
+
+      for (final String tourPersonId : tourPersonIds) {
+
+         store.setDefault(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
+         store.setDefault(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
+         store.setDefault(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
+         store.setDefault(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
+         store.setDefault(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
+         store.setDefault(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
+         store.setDefault(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), SUUNTO_FILTER_SINCE_DATE);
+      }
    }
 }

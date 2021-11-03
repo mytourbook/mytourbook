@@ -15,15 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -43,7 +42,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour blog options
  */
-public class SlideoutTourBlogOptions extends ToolbarSlideout {
+public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE         = net.tourbook.web.Messages.App_Web_Label_ContentFontSize;
    private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP = net.tourbook.web.Messages.App_Web_Label_ContentFontSize_Tooltip;
@@ -51,7 +50,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
    private static final IDialogSettings _state_WEB                              = WEB.getState();
    private static IDialogSettings       _state;
 
-   private Action                       _actionRestoreDefaults;
+   private ActionResetToDefaults        _actionRestoreDefaults;
 
    private TourBlogView                 _tourBlogView;
 
@@ -85,15 +84,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
 
    private void createActions() {
 
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -245,7 +236,8 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
       _tourBlogView.updateUI();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
 // SET_FORMATTING_OFF
 

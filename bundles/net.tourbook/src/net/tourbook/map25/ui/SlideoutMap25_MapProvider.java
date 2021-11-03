@@ -467,9 +467,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          }
       }
 
-      // a map provider is not selected -> this should not occure
-//      int a = 0;
-//      a++;
    }
 
    private void updateMap(final Map25Provider mapProvider) {

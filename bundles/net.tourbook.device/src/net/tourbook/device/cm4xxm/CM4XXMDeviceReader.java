@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2021 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,13 +29,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
@@ -158,10 +160,12 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;
@@ -537,7 +541,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       deviceData.transferMonth = cm4xxmDeviceData.transferMonth;
       deviceData.transferDay = cm4xxmDeviceData.transferDay;
 
-      return true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
@@ -697,11 +701,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
     */
    private boolean verifyReferenceConsitency(final RandomAccessFile file, final int offsetDDRecord) throws IOException {
       final byte[] buffer = new byte[5];
-      String recordType = UI.EMPTY_STRING;
 
       file.seek(offsetDDRecord);
       file.read(buffer);
-      recordType = new String(buffer, 2, 2);
+      String recordType = new String(buffer, 2, 2);
 
       // make sure we read a DD record
       if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$

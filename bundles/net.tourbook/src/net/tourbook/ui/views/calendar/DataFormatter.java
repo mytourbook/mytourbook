@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,11 +64,11 @@ abstract class DataFormatter {
          return _colorDefinition.getGradientDark_Active();
 
       case LINE:
-         return _colorDefinition.getLineColor_Active();
+         return _colorDefinition.getLineColor_Active_Themed();
 
       case TEXT:
       default:
-         return _colorDefinition.getTextColor_Active();
+         return _colorDefinition.getTextColor_Active_Themed();
       }
    }
 

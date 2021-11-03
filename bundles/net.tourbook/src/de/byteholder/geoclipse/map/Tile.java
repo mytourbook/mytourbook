@@ -41,7 +41,7 @@ public class Tile extends Observable {
 
 //   private static final double            MAX_LATITUDE_85_05112877   = 85.05112877;
 
-   private static final String             NL                        = "\n";                                //$NON-NLS-1$
+   private static final String NL = "\n"; //$NON-NLS-1$
    /*
     * private static final String COLUMN_2 = "  "; //$NON-NLS-1$
     * private static final String COLUMN_4 = "    "; //$NON-NLS-1$
@@ -581,7 +581,7 @@ public class Tile extends Observable {
     */
    private Image getCheckedImage(Image image) {
 
-      // ckeck if available or disposed
+      // check if available or disposed
       if ((image == null) || image.isDisposed()) {
          image = null;
          return null;

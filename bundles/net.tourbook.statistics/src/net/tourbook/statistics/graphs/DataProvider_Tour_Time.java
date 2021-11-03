@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
@@ -227,13 +226,9 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          statistic_LastYear = lastYear;
          statistic_NumberOfYears = numberOfYears;
+         final String yearList = getYearList(lastYear, numberOfYears);
 
          setupYearNumbers();
-
-         int colorOffset = 0;
-         if (tourTypeFilter.showUndefinedTourTypes()) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
 
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
@@ -241,6 +236,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
 
          sql = UI.EMPTY_STRING
 
@@ -269,14 +265,15 @@ public class DataProvider_Tour_Time extends DataProvider {
                + "   TourType_typeId," + NL //                                   15 //$NON-NLS-1$
                + "   jTdataTtag.TourTag_tagId" + NL //                           16 //$NON-NLS-1$
 
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //           //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
 
                // get/filter tag id's
                + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //    //$NON-NLS-1$
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                  //$NON-NLS-1$
 
-               + " WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
+               + "WHERE" + NL //                                                    //$NON-NLS-1$
+               + "   StartYear IN (" + yearList + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
+               + "   " + sqlAppFilter.getWhereClause() //                           //$NON-NLS-1$
 
                + " ORDER BY TourStartTime"; //                                      //$NON-NLS-1$
 
@@ -323,7 +320,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(15);
+            final Object dbTagId = result.getObject(16);
 
             if (dbTourId == lastTourId) {
 
@@ -383,8 +380,11 @@ public class DataProvider_Tour_Time extends DataProvider {
                allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
                allTourStartWeek.add(dbTourStartWeek);
 
+               // start date/time
                allTourStartDateTime.add(zonedStartDateTime);
                allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
+
+               // start/end time only
                allTourStartTime.add(startDayTime);
                allTourEndTime.add((startDayTime + dbRecordedTime));
 
@@ -408,7 +408,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                }
 
                /*
-                * convert type id to the type index in the tour type array, this is also the
+                * Convert type id to the type index in the tour type array, this is also the
                 * color index for the tour type
                 */
                int colorIndex = 0;
@@ -420,7 +420,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                   for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
                      if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-                        colorIndex = colorOffset + typeIndex;
+                        colorIndex = typeIndex;
                         break;
                      }
                   }

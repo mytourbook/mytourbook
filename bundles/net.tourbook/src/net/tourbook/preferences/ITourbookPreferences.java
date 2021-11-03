@@ -137,9 +137,22 @@ public interface ITourbookPreferences {
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE"; //$NON-NLS-1$
 
    /*
+    * Statistic: Athlete's data
+    */
+   public static final String STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE = "STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE = "STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE"; //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE    = "STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE";    //$NON-NLS-1$
+   public static final String STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE    = "STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE";    //$NON-NLS-1$
+
+   /*
     * Graphs
     */
+   /** All graphs in the visible sequence */
    public static final String GRAPH_ALL                                 = "graphs.all";                                //$NON-NLS-1$
+
+   /** All graphs which are currently displayed in the chart */
+   public static final String GRAPH_VISIBLE                             = "graphs.visible";                            //$NON-NLS-1$
+
    public static final String GRAPH_ANTIALIASING                        = "Graph_Antialiasing";                        //$NON-NLS-1$
    public static final String GRAPH_ARE_PAUSES_VISIBLE                  = "GRAPH_ARE_PAUSES_VISIBLE";                  //$NON-NLS-1$
    public static final String GRAPH_BACKGROUND_SOURCE                   = "GRAPH_BACKGROUND_SOURCE";                   //$NON-NLS-1$
@@ -152,42 +165,50 @@ public interface ITourbookPreferences {
    public static final String GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE       = "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";       //$NON-NLS-1$
    public static final String GRAPH_IS_TOUR_PHOTO_VISIBLE               = "GRAPH_IS_TOUR_PHOTO_VISIBLE";               //$NON-NLS-1$
    public static final String GRAPH_SEGMENT_ALTERNATE_COLOR             = "GRAPH_SEGMENT_ALTERNATE_COLOR";             //$NON-NLS-1$
+   public static final String GRAPH_SEGMENT_ALTERNATE_COLOR_DARK        = "GRAPH_SEGMENT_ALTERNATE_COLOR_DARK";        //$NON-NLS-1$
 
    public static final String GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE      = "GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE";      //$NON-NLS-1$
    public static final String GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE = "GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE"; //$NON-NLS-1$
 
    // SET_FORMATTING_OFF
-   public static final String GRAPH_MARKER_COLOR_DEFAULT                                  = "GRAPH_MARKER_COLOR_DEFAULT";                             //$NON-NLS-1$
-   public static final String GRAPH_MARKER_COLOR_DEVICE                                   = "GRAPH_MARKER_COLOR_DEVICE";                              //$NON-NLS-1$
-   public static final String GRAPH_MARKER_COLOR_HIDDEN                                   = "GRAPH_MARKER_COLOR_HIDDEN";                              //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR                     = "GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR";                //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_MODIFIED                                    = "GRAPH_MARKER_IS_MODIFIED";                               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_LABEL_ELEVATION                             = "GRAPH_MARKER_IS_LABEL_ELEVATION";                               //$NON-NLS-1$
+   public static final String GRAPH_MARKER_COLOR_DEFAULT                                  = "GRAPH_MARKER_COLOR_DEFAULT";                                   //$NON-NLS-1$
+   public static final String GRAPH_MARKER_COLOR_DEFAULT_DARK                             = "GRAPH_MARKER_COLOR_DEFAULT_DARK";                              //$NON-NLS-1$
+   public static final String GRAPH_MARKER_COLOR_DEVICE                                   = "GRAPH_MARKER_COLOR_DEVICE";                                    //$NON-NLS-1$
+   public static final String GRAPH_MARKER_COLOR_DEVICE_DARK                              = "GRAPH_MARKER_COLOR_DEVICE_DARK";                               //$NON-NLS-1$
+   public static final String GRAPH_MARKER_COLOR_HIDDEN                                   = "GRAPH_MARKER_COLOR_HIDDEN";                                    //$NON-NLS-1$
+   public static final String GRAPH_MARKER_COLOR_HIDDEN_DARK                              = "GRAPH_MARKER_COLOR_HIDDEN_DARK";                               //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR                     = "GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR";                      //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_MODIFIED                                    = "GRAPH_MARKER_IS_MODIFIED";                                     //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_LABEL_ELEVATION                             = "GRAPH_MARKER_IS_LABEL_ELEVATION";                              //$NON-NLS-1$
    public static final String GRAPH_MARKER_IS_LABEL_DISTANCE                              = "GRAPH_MARKER_IS_LABEL_DISTANCE";                               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_LABEL_TIME                                  = "GRAPH_MARKER_IS_LABEL_TIME";                               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_LABEL_TIME_DIFFERENCE                       = "GRAPH_MARKER_IS_LABEL_TIME_DIFFERENCE";                               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_LABEL_DISTANCE_DIFFERENCE                   = "GRAPH_MARKER_IS_LABEL_DISTANCE_DIFFERENCE";                               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_LABEL_ELEVATIONGAIN_DIFFERENCE              = "GRAPH_MARKER_IS_LABEL_ELEVATIONGAIN_DIFFERENCE";                               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES                        = "GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES";                   //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER                          = "GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER";                     //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION                    = "GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION";               //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_MARKER_LABEL                           = "GRAPH_MARKER_IS_SHOW_MARKER_LABEL";                      //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_MARKER_POINT                           = "GRAPH_MARKER_IS_SHOW_MARKER_POINT";                      //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP                         = "GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP";                    //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION                 = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION";          //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE                  = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE";           //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION                  = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION";           //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE  = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE"; //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE       = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE"; //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE       = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE"; //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION                  = "GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION";             //$NON-NLS-1$
-   public static final String GRAPH_MARKER_IS_SHOW_SIGN_IMAGE                             = "GRAPH_MARKER_IS_SHOW_SIGN_IMAGE";                        //$NON-NLS-1$
-   public static final String GRAPH_MARKER_HOVER_SIZE                                     = "GRAPH_MARKER_HOVER_OFFSET";                              //$NON-NLS-1$
-   public static final String GRAPH_MARKER_LABEL_OFFSET                                   = "GRAPH_MARKER_LABEL_OFFSET";                              //$NON-NLS-1$
-   public static final String GRAPH_MARKER_LABEL_TEMP_POSITION                            = "GRAPH_MARKER_LABEL_TEMP_POSITION";                       //$NON-NLS-1$
-   public static final String GRAPH_MARKER_POINT_SIZE                                     = "GRAPH_MARKER_POINT_SIZE";                                //$NON-NLS-1$
-   public static final String GRAPH_MARKER_SIGN_IMAGE_SIZE                                = "GRAPH_MARKER_SIGN_IMAGE_SIZE";                           //$NON-NLS-1$
-   public static final String GRAPH_MARKER_TOOLTIP_POSITION                               = "GRAPH_MARKER_TOOLTIP_POSITION";                          //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_LABEL_TIME                                  = "GRAPH_MARKER_IS_LABEL_TIME";                                   //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_LABEL_TIME_DIFFERENCE                       = "GRAPH_MARKER_IS_LABEL_TIME_DIFFERENCE";                        //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_LABEL_DISTANCE_DIFFERENCE                   = "GRAPH_MARKER_IS_LABEL_DISTANCE_DIFFERENCE";                    //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_LABEL_ELEVATIONGAIN_DIFFERENCE              = "GRAPH_MARKER_IS_LABEL_ELEVATIONGAIN_DIFFERENCE";               //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES                        = "GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES";                         //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER                          = "GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER";                           //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION                    = "GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION";                     //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_MARKER_LABEL                           = "GRAPH_MARKER_IS_SHOW_MARKER_LABEL";                            //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_MARKER_POINT                           = "GRAPH_MARKER_IS_SHOW_MARKER_POINT";                            //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP                         = "GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP";                          //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION                 = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION";                  //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE                  = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE";                   //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION                  = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION";                   //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE  = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE";   //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE       = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE";        //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE       = "GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE";        //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION                  = "GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION";                   //$NON-NLS-1$
+   public static final String GRAPH_MARKER_IS_SHOW_SIGN_IMAGE                             = "GRAPH_MARKER_IS_SHOW_SIGN_IMAGE";                              //$NON-NLS-1$
+   public static final String GRAPH_MARKER_HOVER_SIZE                                     = "GRAPH_MARKER_HOVER_OFFSET";                                    //$NON-NLS-1$
+   public static final String GRAPH_MARKER_LABEL_OFFSET                                   = "GRAPH_MARKER_LABEL_OFFSET";                                    //$NON-NLS-1$
+   public static final String GRAPH_MARKER_LABEL_TEMP_POSITION                            = "GRAPH_MARKER_LABEL_TEMP_POSITION";                             //$NON-NLS-1$
+   public static final String GRAPH_MARKER_POINT_SIZE                                     = "GRAPH_MARKER_POINT_SIZE";                                      //$NON-NLS-1$
+   public static final String GRAPH_MARKER_SIGN_IMAGE_SIZE                                = "GRAPH_MARKER_SIGN_IMAGE_SIZE";                                 //$NON-NLS-1$
+   public static final String GRAPH_MARKER_TOOLTIP_POSITION                               = "GRAPH_MARKER_TOOLTIP_POSITION";                                //$NON-NLS-1$
+
+   public static final String GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP                          = "GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP";                          //$NON-NLS-1$
+   public static final String GRAPH_PAUSES_TOOLTIP_POSITION                               = "GRAPH_PAUSES_TOOLTIP_POSITION";                          //$NON-NLS-1$
+
    // SET_FORMATTING_ON
 
    public static final String GRAPH_PULSE_GRAPH_VALUES              = "GRAPH_PULSE_GRAPH_VALUES";              //$NON-NLS-1$
@@ -198,13 +219,16 @@ public interface ITourbookPreferences {
     */
    public static final String GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES = "GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES"; //$NON-NLS-1$
    public static final String GRAPH_IS_SHOW_PACE_GRAPH_INVERTED     = "GRAPH_IS_SHOW_PACE_GRAPH_INVERTED";     //$NON-NLS-1$
+   public static final String GRAPH_IS_SHOW_NIGHT_SECTIONS          = "GRAPH_IS_SHOW_NIGHT_SECTIONS";          //$NON-NLS-1$
+   public static final String GRAPH_IS_SHOW_VALUE_POINT_VALUE       = "GRAPH_IS_SHOW_VALUE_POINT_VALUE";       //$NON-NLS-1$
+   public static final String GRAPH_OPACITY_NIGHT_SECTIONS          = "GRAPH_OPACITY_NIGHT_SECTIONS";          //$NON-NLS-1$
    public static final String GRAPH_MOUSE_MODE                      = "graph.toggle-mouse";                    //$NON-NLS-1$
    public static final String GRAPH_MOVE_SLIDERS_WHEN_ZOOMED        = "graphs.move-sliders-when-zoomed";       //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_FILLING            = "Graph_Transparency_Filling";            //$NON-NLS-1$
+   public static final String GRAPH_TRANSPARENCY_FILLING_DARK       = "GRAPH_TRANSPARENCY_FILLING_DARK";       //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_LINE               = "Graph_Transparency_Line";               //$NON-NLS-1$
    public static final String GRAPH_X_AXIS                          = "graphs.x-axis";                         //$NON-NLS-1$
    public static final String GRAPH_X_AXIS_STARTTIME                = "graphs.x-axis.starttime";               //$NON-NLS-1$
-   public static final String GRAPH_VISIBLE                         = "graphs.visible";                        //$NON-NLS-1$
    public static final String GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER        = "graphs.zoom.autozoom-to-slider";        //$NON-NLS-1$
 
    /*
@@ -414,7 +438,6 @@ public interface ITourbookPreferences {
    public static final String MAP_LAYOUT_BORDER_COLOR              = "MAP_LAYOUT_BORDER_COLOR";                 //$NON-NLS-1$
    public static final String MAP_LAYOUT_BORDER_DIMM_VALUE         = "MAP_LAYOUT_BORDER_DIMM_VALUE";            //$NON-NLS-1$
    public static final String MAP_LAYOUT_BORDER_WIDTH              = "map.layout.borderWidth";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_MAP_DIMM_COLOR            = "map.layout.dim-color";                    //$NON-NLS-1$
    public static final String MAP_LAYOUT_LIVE_UPDATE               = "MAP_LAYOUT_LIVE_UPDATE";                  //$NON-NLS-1$
    public static final String MAP_LAYOUT_PAINT_WITH_BORDER         = "map.layout.paintWithBorder";              //$NON-NLS-1$
    public static final String MAP_LAYOUT_PLOT_TYPE                 = "map.layout.symbol";                       //$NON-NLS-1$
@@ -525,6 +548,7 @@ public interface ITourbookPreferences {
     */
    public static final String TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME = "TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME";//$NON-NLS-1$
 
+   public static final String TOGGLE_STATE_DELETE_TOUR_VALUES                 = "TOGGLE_STATE_DELETE_TOUR_VALUES";                //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_TOUR_VALUES               = "TOGGLE_STATE_REIMPORT_TOUR_VALUES";              //$NON-NLS-1$
 
    public static final String TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING     = "TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING";    //$NON-NLS-1$

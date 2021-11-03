@@ -55,8 +55,8 @@ public class ActionMergeIntoMenu extends Action implements IMenuCreator {
 
       fRawDataView = rawDataView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Saved_MergedTour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Saved_MergedTour_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour_Disabled));
    }
 
    private void addActionToMenu(final Action action, final Menu menu) {

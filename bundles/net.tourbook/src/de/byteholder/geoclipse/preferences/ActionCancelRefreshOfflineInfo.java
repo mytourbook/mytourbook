@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,28 +15,29 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionCancelRefreshOfflineInfo extends Action {
 
-	private PrefPage_Map2_Providers	fPrefPageMapFactories;
+   private PrefPage_Map2_Providers _prefPageMapFactories;
 
-	public ActionCancelRefreshOfflineInfo(final PrefPage_Map2_Providers prefPageMapFactories) {
+   public ActionCancelRefreshOfflineInfo(final PrefPage_Map2_Providers prefPageMapFactories) {
 
-		setToolTipText(Messages.Pref_Map_Button_CancelTileInfo_Tooltip);
+      setToolTipText(Messages.Pref_Map_Button_CancelTileInfo_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel_Disabled));
+      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Cancel));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Cancel_Disabled));
 
-		fPrefPageMapFactories = prefPageMapFactories;
-	}
+      _prefPageMapFactories = prefPageMapFactories;
+   }
 
-	@Override
-	public void run() {
-		fPrefPageMapFactories.actionCancelRefreshOfflineInfo();
-	}
+   @Override
+   public void run() {
+
+      _prefPageMapFactories.actionCancelRefreshOfflineInfo();
+   }
 
 }

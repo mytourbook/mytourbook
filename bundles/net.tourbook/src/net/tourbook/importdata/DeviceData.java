@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,21 +21,16 @@ package net.tourbook.importdata;
 
 /**
  * Contains device data
- * 
+ *
  * @author Wolfgang Schramm
  */
 public class DeviceData {
 
-	/**
-	 * the transfer date is used to create the filename for the transfered tours
-	 */
-	public short	transferYear	= 1999;
-	public short	transferMonth	= 1;
-	public short	transferDay		= 1;
-
-	/**
-	 * Contains a unique id so that each import can be identified.
-	 */
-	public long		importId;
+   /**
+    * The transfer date is used to create the filename for the transfered tours
+    */
+   public short transferYear  = 1999;
+   public short transferMonth = 1;
+   public short transferDay   = 1;
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,9 +91,9 @@ public class ActionSaveTourInDatabase extends Action {
 
       setImageDescriptor(isWithPerson
             ? TourbookPlugin.getImageDescriptor(Images.Saved_Tour)
-            : TourbookPlugin.getImageDescriptor(Images.Saved_Tour_OtherPerson));
+            : TourbookPlugin.getThemedImageDescriptor(Images.Saved_Tour_OtherPerson));
 
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Saved_Tour_Disabled));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Saved_Tour_Disabled));
 
       // setToolTipText("Save tour(s) in the database so it can be viewed in
       // other views");

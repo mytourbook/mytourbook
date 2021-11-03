@@ -60,8 +60,6 @@ public class Messages extends NLS {
    public static String        legendcolor_dialog_txt_max_value;
    public static String        legendcolor_dialog_txt_min_value;
 
-   public static String        map_action_dim_map;
-   public static String        map_action_dim_map_disabled;
    public static String        map_action_reload_map;
    public static String        map_action_save_default_position;
    public static String        map_action_set_default_position;
@@ -121,8 +119,6 @@ public class Messages extends NLS {
    public static String        map_dlg_dim_warning_message;
    public static String        map_dlg_dim_warning_title;
    public static String        map_dlg_dim_warning_toggle_message;
-
-   public static String        map_properties_map_dim_level;
 
    public static String        statusLine_mapInfo_data;
    public static String        statusLine_mapInfo_defaultText;

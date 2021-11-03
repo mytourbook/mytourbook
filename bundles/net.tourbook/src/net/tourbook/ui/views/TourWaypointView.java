@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,7 +41,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -51,7 +50,6 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -119,14 +117,12 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
    /*
     * UI controls
     */
-   private PageBook            _pageBook;
+   private PageBook    _pageBook;
 
-   private TableViewer         _wpViewer;
+   private TableViewer _wpViewer;
 
-   private Composite           _pageNoData;
-   private Composite           _viewerContainer;
-
-   private ActionModifyColumns _actionModifyColumns;
+   private Composite   _pageNoData;
+   private Composite   _viewerContainer;
 
    /*
     * none UI
@@ -261,11 +257,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
                _wpViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
                _wpViewer.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _wpViewer.getTable().redraw();
             }
          }
       };
@@ -365,8 +356,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
    private void createActions() {
 
-      _actionModifyColumns = new ActionModifyColumns(this);
-
    }
 
    /**
@@ -447,8 +436,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
       table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       table.setHeaderVisible(true);
-//		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-      table.setLinesVisible(true);
+      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
       table.addKeyListener(new KeyAdapter() {
          @Override
@@ -830,10 +818,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
       /*
        * fill view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+//
+//      menuMgr.add(new Separator());
    }
 
    /**
@@ -915,7 +902,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
          if (firstElement instanceof TVICatalogComparedTour) {
             tourId = ((TVICatalogComparedTour) firstElement).getTourId();
          } else if (firstElement instanceof TVICompareResultComparedTour) {
-            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+            tourId = ((TVICompareResultComparedTour) firstElement).getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

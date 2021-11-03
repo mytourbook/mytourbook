@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,13 @@
  *******************************************************************************/
 package net.tourbook.training;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.ui.ChartOptions_Grid;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -34,14 +33,14 @@ import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
-public class SlideoutTrainingOptions extends ToolbarSlideout {
+public class SlideoutTrainingOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private TrainingView      _trainingView;
+   private TrainingView          _trainingView;
 
-   private Action            _actionRestoreDefaults;
-   private ActionEditHrZones _actionEditHrZones;
+   private ActionResetToDefaults _actionRestoreDefaults;
+   private ActionEditHrZones     _actionEditHrZones;
 
-   private ChartOptions_Grid _gridUI;
+   private ChartOptions_Grid     _gridUI;
 
    /*
     * UI controls
@@ -61,18 +60,7 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionEditHrZones = new ActionEditHrZones(_trainingView);
    }
@@ -138,11 +126,11 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
       tbm.update(true);
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _gridUI.resetToDefaults();
       _gridUI.saveState();
-
    }
 
    private void restoreState() {

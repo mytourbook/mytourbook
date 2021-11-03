@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,7 @@ import de.byteholder.geoclipse.map.UI;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -31,13 +31,12 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
-import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.preferences.TourTypeColorDefinition;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourTypeWrapper;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.osgi.util.NLS;
 import org.xml.sax.Attributes;
@@ -49,20 +48,20 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * <pre>
  * &lt;xs:schema version="1.0"
- * 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
- * 	targetNamespace="http://www.polarpersonaltrainer.com"
- * 	xmlns="http://www.polarpersonaltrainer.com"
- * 	elementFormDefault="qualified"
- * 	attributeFormDefault="unqualified"&gt;
+ *    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ *    targetNamespace="http://www.polarpersonaltrainer.com"
+ *    xmlns="http://www.polarpersonaltrainer.com"
+ *    elementFormDefault="qualified"
+ *    attributeFormDefault="unqualified"&gt;
  *
- * 	&lt;xs:annotation&gt;
- * 		&lt;xs:appinfo&gt;Polar Personaltrainer.com data export&lt;/xs:appinfo&gt;
- * 		&lt;xs:documentation xml:lang="en"&gt;
- * 			XML Schema for validating data objects exported from Polar Personaltrainer.com
+ *    &lt;xs:annotation&gt;
+ *       &lt;xs:appinfo&gt;Polar Personaltrainer.com data export&lt;/xs:appinfo&gt;
+ *       &lt;xs:documentation xml:lang="en"&gt;
+ *          XML Schema for validating data objects exported from Polar Personaltrainer.com
  *
- * 			&lt;b&gt;ALL UNITS ARE ASSUMED METRIC.&lt;/b&gt;
- * 		&lt;/xs:documentation&gt;
- * 	&lt;/xs:annotation&gt;
+ *          &lt;b&gt;ALL UNITS ARE ASSUMED METRIC.&lt;/b&gt;
+ *       &lt;/xs:documentation&gt;
+ *    &lt;/xs:annotation&gt;
  * </pre>
  */
 public class PolarTrainerSAXHandler extends DefaultHandler {
@@ -91,103 +90,102 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
    private static final String SAMPLE_TYPE_HEARTRATE             = "HEARTRATE";              //$NON-NLS-1$
    private static final String SAMPLE_TYPE_SPEED                 = "SPEED";                  //$NON-NLS-1$
    private static final String SAMPLE_TYPE_TEMPERATURE           = "TEMPERATURE";            //$NON-NLS-1$
-//	private static final String		SAMPLE_TYPE_POWER			= "POWER";
-//	private static final String		SAMPLE_TYPE_POWER_PI		= "POWER_PI";
-//	private static final String		SAMPLE_TYPE_POWER_LRB		= "POWER_LRB";
-//	private static final String		SAMPLE_TYPE_AIR_PRESSURE	= "AIR_PRESSURE";
-//	private static final String		SAMPLE_TYPE_RUN_CADENCE		= "RUN_CADENCE";
+// private static final String SAMPLE_TYPE_POWER                 = "POWER";
+// private static final String SAMPLE_TYPE_POWER_PI              = "POWER_PI";
+// private static final String SAMPLE_TYPE_POWER_LRB             = "POWER_LRB";
+// private static final String SAMPLE_TYPE_AIR_PRESSURE          = "AIR_PRESSURE";
+// private static final String SAMPLE_TYPE_RUN_CADENCE           = "RUN_CADENCE";
    //
-   private static final String  PATTERN_HHMMSS              = "(\\d{0,2}):*(\\d{0,2}):*(\\d{0,2}).*";                             //$NON-NLS-1$
-   private static final String  PATTERN_DATE_TIME           = "(\\d{4})-(\\d{2})-(\\d{2})\\s(\\d{2}):(\\d{2}):(\\d{2})\\.\\d{1}"; //$NON-NLS-1$
+   private static final String    PATTERN_HHMMSS              = "(\\d{0,2}):*(\\d{0,2}):*(\\d{0,2}).*";                             //$NON-NLS-1$
+   private static final String    PATTERN_DATE_TIME           = "(\\d{4})-(\\d{2})-(\\d{2})\\s(\\d{2}):(\\d{2}):(\\d{2})\\.\\d{1}"; //$NON-NLS-1$
    //
-   private static final Pattern _patternHHMMSS              = Pattern.compile(
+   private static final Pattern   _patternHHMMSS              = Pattern.compile(
          PATTERN_HHMMSS,
          Pattern.DOTALL);
-   private static final Pattern _patternDateTime            = Pattern.compile(
+
+   private static final Pattern   _patternDateTime            = Pattern.compile(
          PATTERN_DATE_TIME,
          Pattern.DOTALL);
    //
-   private static final String  TAG_ROOT                    = "polar-exercise-data";                                              //$NON-NLS-1$
-   private static final String  TAG_ROOT_XMLNS              = "xmlns";                                                            //$NON-NLS-1$
-   private static final String  TAG_ROOT_XMLNS_POLARTRAINER = "http://www.polarpersonaltrainer.com";                              //$NON-NLS-1$
-   private static final String  TAG_ROOT_VERSION            = "version";                                                          //$NON-NLS-1$
-   private static final String  TAG_ROOT_VERSION_1          = "1.0";                                                              //$NON-NLS-1$
+   private static final String    TAG_ROOT                    = "polar-exercise-data";                                              //$NON-NLS-1$
+   private static final String    TAG_ROOT_XMLNS              = "xmlns";                                                            //$NON-NLS-1$
+   private static final String    TAG_ROOT_XMLNS_POLARTRAINER = "http://www.polarpersonaltrainer.com";                              //$NON-NLS-1$
+   private static final String    TAG_ROOT_VERSION            = "version";                                                          //$NON-NLS-1$
+   private static final String    TAG_ROOT_VERSION_1          = "1.0";                                                              //$NON-NLS-1$
    //
-   private static final String  TAG_EXERCISE                = "exercise";                                                         //$NON-NLS-1$
-   private static final String  TAG_EXERCISE_CREATED        = "created";                                                          //$NON-NLS-1$
-   private static final String  TAG_EXERCISE_TIME           = "time";                                                             //$NON-NLS-1$
-   private static final String  TAG_EXERCISE_NAME           = "name";                                                             //$NON-NLS-1$
-   private static final String  TAG_EXERCISE_SPORT          = "sport";                                                            //$NON-NLS-1$
+   private static final String    TAG_EXERCISE                = "exercise";                                                         //$NON-NLS-1$
+   private static final String    TAG_EXERCISE_CREATED        = "created";                                                          //$NON-NLS-1$
+   private static final String    TAG_EXERCISE_TIME           = "time";                                                             //$NON-NLS-1$
+   private static final String    TAG_EXERCISE_NAME           = "name";                                                             //$NON-NLS-1$
+   private static final String    TAG_EXERCISE_SPORT          = "sport";                                                            //$NON-NLS-1$
    //
-   private static final String  TAG_RESULT                  = "result";                                                           //$NON-NLS-1$
-   private static final String  TAG_RESULT_DURATION         = "duration";                                                         //$NON-NLS-1$
-   private static final String  TAG_RESULT_CALORIES         = "calories";                                                         //$NON-NLS-1$
-   private static final String  TAG_RESULT_RECORDING_RATE   = "recording-rate";                                                   //$NON-NLS-1$
+   private static final String    TAG_RESULT                  = "result";                                                           //$NON-NLS-1$
+   private static final String    TAG_RESULT_DURATION         = "duration";                                                         //$NON-NLS-1$
+   private static final String    TAG_RESULT_CALORIES         = "calories";                                                         //$NON-NLS-1$
+   private static final String    TAG_RESULT_RECORDING_RATE   = "recording-rate";                                                   //$NON-NLS-1$
    //
-   private static final String  TAG_LAPS                    = "laps";                                                             //$NON-NLS-1$
-   private static final String  TAG_LAP                     = "lap";                                                              //$NON-NLS-1$
-   private static final String  TAG_LAP_DURATION            = "duration";                                                         //$NON-NLS-1$
-   private static final String  TAG_LAP_DISTANCE            = "distance";                                                         //$NON-NLS-1$
+   private static final String    TAG_LAPS                    = "laps";                                                             //$NON-NLS-1$
+   private static final String    TAG_LAP                     = "lap";                                                              //$NON-NLS-1$
+   private static final String    TAG_LAP_DURATION            = "duration";                                                         //$NON-NLS-1$
+   private static final String    TAG_LAP_DISTANCE            = "distance";                                                         //$NON-NLS-1$
    //
-   private static final String  TAG_SAMPLES                 = "samples";                                                          //$NON-NLS-1$
-   private static final String  TAG_SAMPLE                  = "sample";                                                           //$NON-NLS-1$
-   private static final String  TAG_SAMPLE_TYPE             = "type";                                                             //$NON-NLS-1$
-   private static final String  TAG_SAMPLE_VALUES           = "values";                                                           //$NON-NLS-1$
+   private static final String    TAG_SAMPLES                 = "samples";                                                          //$NON-NLS-1$
+   private static final String    TAG_SAMPLE                  = "sample";                                                           //$NON-NLS-1$
+   private static final String    TAG_SAMPLE_TYPE             = "type";                                                             //$NON-NLS-1$
+   private static final String    TAG_SAMPLE_VALUES           = "values";                                                           //$NON-NLS-1$
    //
-   private static final String  TAG_USER_SETTINGS           = "user-settings";                                                    //$NON-NLS-1$
-   private static final String  TAG_USER_SETTINGS_RESTING   = "resting";                                                          //$NON-NLS-1$
+   private static final String    TAG_USER_SETTINGS           = "user-settings";                                                    //$NON-NLS-1$
+   private static final String    TAG_USER_SETTINGS_RESTING   = "resting";                                                          //$NON-NLS-1$
+   //
+   private boolean                _isPolarDataValid;
+   private int                    _dataVersion                = -1;
+   //
+   private boolean                _isInExercise;
+   private boolean                _isInExerciseCreated;
+   private boolean                _isInExerciseTime;
+   private boolean                _isInExerciseName;
+   private boolean                _isInExerciseSport;
+   //
+   private boolean                _isInResult;
+   private boolean                _isInResultCalories;
+   private boolean                _isInResultDuration;
+   private boolean                _isInResultRecordingRate;
+   //
+   private boolean                _isInLaps;
+   private boolean                _isInLap;
+   private boolean                _isInLapDuration;
+   private boolean                _isInLapDistance;
+   //
+   private boolean                _isInSamples;
+   private boolean                _isInSample;
+   private boolean                _isInSampleType;
+   private boolean                _isInSampleValues;
+   //
+   private boolean                _isInUserSettings;
+   private boolean                _isInUserSettingsResting;
+   //
+   private boolean                _isDebug;
+   //
+   private String                 _importFilePath;
+   private Map<Long, TourData>    _alreadyImportedTours;
+   private Map<Long, TourData>    _newlyImportedTours;
+   private ImportState_File       _importState_File;
+   private ImportState_Process    _importState_Process;
+   private PolarTrainerDataReader _polarTrainer_DataReader;
 
-   //
-   private boolean                 _isPolarDataValid = false;
-   private int                     _dataVersion      = -1;
-   //
-   private boolean                 _isInExercise;
-   private boolean                 _isInExerciseCreated;
-   private boolean                 _isInExerciseTime;
-   private boolean                 _isInExerciseName;
-   private boolean                 _isInExerciseSport;
-   //
-   private boolean                 _isInResult;
-   private boolean                 _isInResultCalories;
-   private boolean                 _isInResultDuration;
-   private boolean                 _isInResultRecordingRate;
-   //
-   private boolean                 _isInLaps;
-   private boolean                 _isInLap;
-   private boolean                 _isInLapDuration;
-   private boolean                 _isInLapDistance;
-   //
-   private boolean                 _isInSamples;
-   private boolean                 _isInSample;
-   private boolean                 _isInSampleType;
-   private boolean                 _isInSampleValues;
-   //
-   private boolean                 _isInUserSettings;
-   private boolean                 _isInUserSettingsResting;
+   private ArrayList<TimeData>    _timeSlices                 = new ArrayList<>();
+   private ArrayList<Lap>         _laps                       = new ArrayList<>();
 
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private ArrayList<TourType>     _allTourTypes;
+   private Exercise               _currentExercise;
+   private Lap                    _currentLap;
+   private String                 _currentSampleType;
 
-   private boolean                 _isImported;
-   private boolean                 _isDebug          = false;
-   private boolean                 _isNewTourType    = false;
-
-   private ArrayList<TimeData>     _timeSlices       = new ArrayList<>();
-   private ArrayList<Lap>          _laps             = new ArrayList<>();
-
-   private Exercise                _currentExercise;
-   private Lap                     _currentLap;
-   private String                  _currentSampleType;
-
-   private StringBuilder           _characters       = new StringBuilder(100);
+   private StringBuilder          _characters                 = new StringBuilder(100);
 
    private class Exercise {
 
       private String        tourTitle;
-      private String        sport;
+      private String        sportName;
 
       private ZonedDateTime tourStart;
       private ZonedDateTime dtCreated;
@@ -229,42 +227,48 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
    }
 
-   public PolarTrainerSAXHandler(final TourbookDevice device,
-                                 final String importFileName,
-                                 final DeviceData deviceData,
-                                 final HashMap<Long, TourData> alreadyImportedTours,
-                                 final HashMap<Long, TourData> newlyImportedTours) {
+   public PolarTrainerSAXHandler(final String importFileName,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process,
+                                 final PolarTrainerDataReader polarTrainerSAXHandler) {
 
-      _device = device;
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
 
-      _allTourTypes = TourDatabase.getAllTourTypes();
+      _importState_File = importState_File;
+      _importState_Process = importState_Process;
+
+      _polarTrainer_DataReader = polarTrainerSAXHandler;
    }
 
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isPolarDataValid && (//
-      _isInLapDuration
-            || _isInLapDistance
-            || _isInSampleType
-            || _isInSampleValues
-            || _isInExerciseCreated
-            || _isInExerciseTime
-            || _isInExerciseName
-            || _isInExerciseSport
-            || _isInResultCalories
-            || _isInResultRecordingRate || _isInResultDuration
-      //
-      )) {
+      if (_isPolarDataValid
+
+            && (_isInLapDuration
+                  || _isInLapDistance
+                  || _isInSampleType
+                  || _isInSampleValues
+                  || _isInExerciseCreated
+                  || _isInExerciseTime
+                  || _isInExerciseName
+                  || _isInExerciseSport
+                  || _isInResultCalories
+                  || _isInResultRecordingRate
+                  || _isInResultDuration
+
+            )) {
 
          _characters.append(chars, startIndex, length);
       }
    }
 
    public void dispose() {
+
       _laps.clear();
       _timeSlices.clear();
    }
@@ -272,7 +276,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
    @Override
    public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-//		System.out.println("</" + name + ">\t" + _isInSample);
+//      System.out.println("</" + name + ">\t" + _isInSample);
 
       try {
 
@@ -313,7 +317,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
          } else if (_isInExerciseSport) {
 
             _isInExerciseSport = false;
-            _currentExercise.sport = _characters.toString();
+            _currentExercise.sportName = _characters.toString();
          }
 
          /*
@@ -371,7 +375,6 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
    private void finalizeTour() throws InvalidDeviceSAXException {
 
       if (finalizeTour_10_CreateTimeSlices() == false) {
-         _isImported = false;
          return;
       }
 
@@ -391,7 +394,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
       tourData.setCalories(_currentExercise.calories);
       tourData.setRestPulse(_currentExercise.restPulse);
 
-      tourData.setDeviceId(_device.deviceId);
+      tourData.setDeviceId(_polarTrainer_DataReader.deviceId);
       tourData.setDeviceName(DEVICE_NAME_POLAR_PERSONALTRAINER);
 
       tourData.setDeviceFirmwareVersion(_dataVersion == 1 ? TAG_ROOT_VERSION_1 : UI.EMPTY_STRING);
@@ -399,7 +402,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
       tourData.createTimeSeries(_timeSlices, true);
 
       // after all data are added, the tour id can be created
-      final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_TRAINER);
+      final String uniqueId = _polarTrainer_DataReader.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_TRAINER);
       final Long tourId = tourData.createTourId(uniqueId);
 
       // check if the tour is already imported
@@ -418,7 +421,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
          tourData.computeComputedValues();
       }
 
-      _isImported = true;
+      _importState_File.isFileImportedWithValidData = true;
    }
 
    /**
@@ -583,7 +586,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
             serieIndex = timeSerie.length - 1;
          }
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
          tourMarker.setLabel(Integer.toString(lapCounter));
          tourMarker.setSerieIndex(serieIndex);
@@ -615,51 +618,17 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
     */
    private void finalizeTour_30_SetTourType(final TourData tourData) {
 
-      final String sport = _currentExercise.sport;
+      final String sportName = _currentExercise.sportName;
 
-      if (sport == null) {
+      if (sportName == null) {
          return;
       }
 
-      TourType tourType = null;
+      final TourTypeWrapper tourTypeWrapper = RawDataManager.setTourType(tourData, sportName);
 
-      // find tour type in existing tour types
-      for (final TourType mapTourType : _allTourTypes) {
-         if (sport.equalsIgnoreCase(mapTourType.getName())) {
-            tourType = mapTourType;
-            break;
-         }
+      if (tourTypeWrapper.isNewTourType) {
+         _importState_Process.isCreated_NewTourType().set(true);
       }
-
-      TourType newSavedTourType = null;
-
-      if (tourType == null) {
-
-         // create new tour type
-
-         final TourType newTourType = new TourType(sport);
-
-         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
-               newTourType,
-               Long.toString(newTourType.getTypeId()),
-               newTourType.getName());
-
-         newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
-         newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
-         newTourType.setColorLine(newColorDefinition.getLineColor_Default());
-         newTourType.setColorText(newColorDefinition.getTextColor_Default());
-
-         // save new entity
-         newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-         if (newSavedTourType != null) {
-            tourType = newSavedTourType;
-            _allTourTypes.add(tourType);
-         }
-      }
-
-      tourData.setTourType(tourType);
-
-      _isNewTourType |= newSavedTourType != null;
    }
 
    /**
@@ -675,6 +644,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
    private ZonedDateTime getDateTime(final String dtValue) {
 
       final Matcher matcherResult = _patternDateTime.matcher(dtValue);
+
       if (matcherResult.matches()) {
 
          try {
@@ -807,17 +777,6 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
       _currentSampleType = null;
       _currentExercise = new Exercise();
-   }
-
-   /**
-    * @return Returns <code>true</code> when a tour was imported
-    */
-   public boolean isImported() {
-      return _isImported;
-   }
-
-   boolean isNewTourType() {
-      return _isNewTourType;
    }
 
    private void parseLap01Start(final String name) {
@@ -1015,7 +974,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
    public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
          throws SAXException {
 
-//		System.out.print("<" + name + ">\n");
+//      System.out.print("<" + name + ">\n");
 
       if (_dataVersion == 1) {
 

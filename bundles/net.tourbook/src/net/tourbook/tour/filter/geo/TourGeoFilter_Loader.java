@@ -200,7 +200,7 @@ public class TourGeoFilter_Loader {
          final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
 
          // get app filter without geo location, this is added here
-         appFilter = new SQLFilter(SQLFilter.NO_GEO_LOCATION);
+         appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
 
          sqlSelect = UI.EMPTY_STRING
 
@@ -277,7 +277,7 @@ public class TourGeoFilter_Loader {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(sqlSelect);
+         StatusUtil.logError(sqlSelect);
          net.tourbook.ui.UI.showSQLException(e);
 
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map25.action;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.map2.Messages;
 import net.tourbook.preferences.PrefPage_Map25Provider;
 
@@ -30,7 +30,7 @@ public class ActionManageMap25Providers extends Action {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class SubMenu_Elevation extends Action implements IMenuCreator {
 
-   private Menu                            _menu;
+   private Menu                             _menu;
 
-   private ActionComputeElevationGain      _action_ComputeElevationGain;
-   private ActionSetAltitudeValuesFromSRTM _action_SetAltitudeFromSRTM;
+   private ActionComputeElevationGain       _action_ComputeElevationGain;
+   private ActionSetElevationValuesFromSRTM _action_SetElevationFromSRTM;
 
    public SubMenu_Elevation(final ITourProvider2 tourProvider, final ITourProviderByID tourProviderById) {
 
@@ -44,7 +44,7 @@ public class SubMenu_Elevation extends Action implements IMenuCreator {
       setMenuCreator(this);
 
       _action_ComputeElevationGain = new ActionComputeElevationGain(tourProviderById);
-      _action_SetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(tourProvider);
+      _action_SetElevationFromSRTM = new ActionSetElevationValuesFromSRTM(tourProvider);
    }
 
    @Override
@@ -59,7 +59,7 @@ public class SubMenu_Elevation extends Action implements IMenuCreator {
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_action_ComputeElevationGain).fill(menu, -1);
-      new ActionContributionItem(_action_SetAltitudeFromSRTM).fill(menu, -1);
+      new ActionContributionItem(_action_SetElevationFromSRTM).fill(menu, -1);
    }
 
    @Override

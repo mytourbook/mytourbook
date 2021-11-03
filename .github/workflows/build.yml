@@ -1,0 +1,46 @@
+name: Build
+on:
+  schedule:
+  - cron: "0 6 * * *"
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - name: echo-default-env-variables
+        run: echo "github.workspace = ${{ github.workspace }}"
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: gradle/gradle-build-action@v1
+        with:
+          gradle-version: 6.9
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Make gradlew executable
+        run: chmod +x ./build/build.net.tourbook/gradlew
+      - name: Rename MT to mytourbook
+        run: cd ./build/build.net.tourbook && powershell -Command "(gc CREATE_MT_BuildFiles.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII CREATE_MT_BuildFiles.xml" && cd ../../bundles && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml" && cd ../LANGUAGE-FRAGMENTS && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml"
+      - name: Deactivate the nl repo
+        run: cd ./build/build.net.tourbook.feature && powershell -Command "(gc feature.xml) | select-string -pattern 'feature.net.tourbook.ext.eclipse.nl' -notmatch | Set-Content -encoding ASCII feature.xml" && cd ../build.net.tourbook.product && powershell -Command "(gc net.tourbook.product) | select-string -pattern 'feature.net.tourbook.ext.eclipse.nl' -notmatch | Set-Content -encoding ASCII net.tourbook.product" && cd ../../features && powershell -Command "(gc pom.xml) | select-string -pattern 'feature.net.tourbook.ext.eclipse.nl' -notmatch | Set-Content -encoding ASCII pom.xml" && cd .. && powershell -Command "(gc pom.xml) | select-string -pattern '.nl.repo' -notmatch | Set-Content -encoding ASCII pom.xml"
+      - name: Activate the unit tests
+        run: powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml"
+      - name: Activate JaCoCo for the code coverage
+        run: powershell -Command "(gc pom.xml) -replace '<skip>true</skip>', '<skip>false</skip>' | Out-File -encoding ASCII pom.xml"
+      - name: Build and analyze              
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: cd ./build/build.net.tourbook && ./gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --warning-mode all --stacktrace --info

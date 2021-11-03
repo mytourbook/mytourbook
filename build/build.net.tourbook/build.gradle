@@ -1,6 +1,8 @@
 plugins {
 
    id 'com.github.dkorotych.gradle-maven-exec' version '2.2.1'
+   id 'org.sonarqube' version '3.3'
+   id 'jacoco'
 }
 
 // get MT version and remove quotes
@@ -13,7 +15,7 @@ def _dirProductReleaseNotes      = file('../../info/release-notes')
 def _pathProductArchive          = _dirProductArchive.absolutePath
                                  
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
-def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 5/iscc.exe').absolutePath
+def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
 
 gradle.taskGraph.beforeTask { Task task ->
@@ -44,6 +46,17 @@ mt_0_Build.dependsOn(
    'mt_70_CopyReleaseNotes',
 )
 
+sonarqube {
+  properties {
+    property "sonar.projectKey",       "wolfgang-ch_mytourbook"
+    property "sonar.organization",     "wolfgang-ch"
+    property "sonar.host.url",         "https://sonarcloud.io"
+    property "sonar.sources",          "bundles"
+    property "sonar.exclusions",       "bundles/net.tourbook.ext.jars/**/*"
+    property "sonar.java.binaries",    "."
+    property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml'
+  }
+}
 
 /*
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
@@ -71,7 +84,7 @@ task mt_20_BuildProduct {
       mavenexec {
 
          workingDir  buildDir
-         goals       'verify'
+         goals       'clean', 'verify'
          
          // repos can be used offline when this option "offline true" is set, 
          // by default it is disabled 

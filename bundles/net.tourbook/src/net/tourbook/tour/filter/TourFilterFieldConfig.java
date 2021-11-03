@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ public class TourFilterFieldConfig {
    /**
     * Visible field name
     */
-   final String                    name;
+   private final String            name;
 
    /**
     * Every field must have a unique id, it is <code>null</code> when it's a category. config.
@@ -67,7 +67,8 @@ public class TourFilterFieldConfig {
    String                          unitLabel             = UI.EMPTY_STRING;
 
    private TourFilterFieldConfig(final String name) {
-      this.name = name;
+
+      this.name = name;//UI.SPACE2 + name;
    }
 
    /**
@@ -91,28 +92,10 @@ public class TourFilterFieldConfig {
 
    private static String createLabel_Category(final String category) {
 
-      final String label = UI.EMPTY_STRING
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + category.toUpperCase()
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
+      // put spaces between characters that it looks more as a title
+      final String categoryNameWithSpaces = category.replaceAll(".", "$0  "); //$NON-NLS-1$ //$NON-NLS-2$
 
-      ;
+      final String label = UI.SPACE3 + UI.SPACE3 + categoryNameWithSpaces.toUpperCase();
 
       return label;
    }
@@ -202,6 +185,10 @@ public class TourFilterFieldConfig {
 
       // default operator is invalid, get first operator
       return fieldOperators[0];
+   }
+
+   public String getName() {
+      return name;
    }
 
    /**

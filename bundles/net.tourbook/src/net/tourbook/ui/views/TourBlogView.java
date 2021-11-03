@@ -28,6 +28,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -147,13 +148,13 @@ public class TourBlogView extends ViewPart {
 
    private String                        _htmlCss;
 
-   private String                        _actionEditImageUrl;
-   private String                        _actionHideMarkerUrl;
-   private String                        _actionShowMarkerUrl;
+   private String                        _imageUrl_ActionEdit;
+   private String                        _imageUrl_ActionHideMarker;
+   private String                        _imageUrl_ActionShowMarker;
 
-   private String                        _cssMarkerDefaultColor;
-   private String                        _cssMarkerDeviceColor;
-   private String                        _cssMarkerHiddenColor;
+   private String                        _cssMarker_DefaultColor;
+   private String                        _cssMarker_DeviceColor;
+   private String                        _cssMarker_HiddenColor;
 
    private boolean                       _isDrawWithDefaultColor;
    private boolean                       _isShowHiddenMarker;
@@ -329,7 +330,29 @@ public class TourBlogView extends ViewPart {
 
       // set body size
       final int bodyFontSize = Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT);
-      final String htmlCss = _htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG, Integer.toString(bodyFontSize));
+      String htmlCss = _htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG, Integer.toString(bodyFontSize));
+
+      /*
+       * Replace theme tags
+       */
+
+// SET_FORMATTING_OFF
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__COLOR,                        UI.IS_DARK_THEME ? "ddd" : "333");        //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__BACKGROUND_COLOR,             UI.IS_DARK_THEME ? "333" : "fff");        //$NON-NLS-1$ //$NON-NLS-2$
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__A_LINK__COLOR,                      UI.IS_DARK_THEME ? "D6FF6F" : "3B9529");  //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__A_VISITED__COLOR,                   UI.IS_DARK_THEME ? "7E9543" : "DE559D");  //$NON-NLS-1$ //$NON-NLS-2$
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR, UI.IS_DARK_THEME ? "444" : "f8f8f8");     //$NON-NLS-1$ //$NON-NLS-2$
+
+// SET_FORMATTING_ON
+
+      if (UI.IS_DARK_THEME) {
+
+         // show dark scrollbar
+         htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY_SCROLLBAR, WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK);
+      }
 
       final String html = UI.EMPTY_STRING
 
@@ -432,7 +455,7 @@ public class TourBlogView extends ViewPart {
 
                      ("<div class='action-container'>" //                           //$NON-NLS-1$
                            + ("<a class='action' style='background: url(" //        //$NON-NLS-1$
-                                 + _actionEditImageUrl
+                                 + _imageUrl_ActionEdit
                                  + ") no-repeat;'" //                               //$NON-NLS-1$
                                  + " href='" + hrefEditTour + "'" //                //$NON-NLS-1$ //$NON-NLS-2$
                                  + " title='" + hoverEdit + "'" //                  //$NON-NLS-1$ //$NON-NLS-2$
@@ -513,34 +536,34 @@ public class TourBlogView extends ViewPart {
       if (_isDrawWithDefaultColor) {
 
          // force default color
-         cssMarkerColor = _cssMarkerDefaultColor;
+         cssMarkerColor = _cssMarker_DefaultColor;
 
       } else if (tourMarker.isMarkerVisible() == false) {
 
          // show hidden color
-         cssMarkerColor = _cssMarkerHiddenColor;
+         cssMarkerColor = _cssMarker_HiddenColor;
 
       } else if (tourMarker.isDeviceMarker()) {
 
          // show with device color
-         cssMarkerColor = _cssMarkerDeviceColor;
+         cssMarkerColor = _cssMarker_DeviceColor;
 
       } else {
 
-         cssMarkerColor = _cssMarkerDefaultColor;
+         cssMarkerColor = _cssMarker_DefaultColor;
       }
 
       final String htmlMarkerStyle = " style='color:" + cssMarkerColor + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
       final String htmlActionShowHideMarker = tourMarker.isMarkerVisible() //
-            ? createHtml_Action(hrefHideMarker, hoverHideMarker, _actionHideMarkerUrl)
-            : createHtml_Action(hrefShowMarker, hoverShowMarker, _actionShowMarkerUrl);
+            ? createHtml_Action(hrefHideMarker, hoverHideMarker, _imageUrl_ActionHideMarker)
+            : createHtml_Action(hrefShowMarker, hoverShowMarker, _imageUrl_ActionShowMarker);
 
       final String htmlActionContainer = UI.EMPTY_STRING //
             + "<div class='action-container'>" //$NON-NLS-1$
             + ("<table><tbody><tr>") //$NON-NLS-1$
             + ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _actionEditImageUrl) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
             + "</tr></tbody></table>" // //$NON-NLS-1$
             + "</div>" + NL; //$NON-NLS-1$
 
@@ -691,10 +714,7 @@ public class TourBlogView extends ViewPart {
 
          } catch (final Exception e) {
 
-            /*
-             * Use WebKit browser, this is necessary for Linux when default browser fails however
-             * the XULrunner needs to be installed.
-             */
+            // use WebKit browser for Linux when default browser fails
             _browser = new Browser(parent, SWT.WEBKIT);
          }
 
@@ -862,9 +882,9 @@ public class TourBlogView extends ViewPart {
          /*
           * set image urls
           */
-         _actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Images.App_Edit);
-         _actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Images.App_Remove);
-         _actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Images.Eye);
+         _imageUrl_ActionEdit = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Edit));
+         _imageUrl_ActionHideMarker = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Hide));
+         _imageUrl_ActionShowMarker = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Show));
 
       } catch (final IOException | URISyntaxException e) {
          StatusUtil.showStatus(e);
@@ -1040,7 +1060,7 @@ public class TourBlogView extends ViewPart {
          if (firstElement instanceof TVICatalogComparedTour) {
             tourId = ((TVICatalogComparedTour) firstElement).getTourId();
          } else if (firstElement instanceof TVICompareResultComparedTour) {
-            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+            tourId = ((TVICompareResultComparedTour) firstElement).getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -1141,9 +1161,21 @@ public class TourBlogView extends ViewPart {
       _isDrawWithDefaultColor = _state.getBoolean(STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR);
       _isShowHiddenMarker = _state.getBoolean(STATE_IS_SHOW_HIDDEN_MARKER);
 
-      _cssMarkerDefaultColor = CSS.color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
-      _cssMarkerHiddenColor = CSS.color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
-      _cssMarkerDeviceColor = CSS.color(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
+      final String graphMarker_ColorDefault = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT;
+
+      final String graphMarker_ColorHidden = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN;
+
+      final String graphMarker_ColorDevice = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE;
+
+      _cssMarker_DefaultColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDefault));
+      _cssMarker_HiddenColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorHidden));
+      _cssMarker_DeviceColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDevice));
 
 //      Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
 //      several domains (including "ibm.com") require compatibility mode. You may see your web application run

@@ -1,45 +1,69 @@
-21.next.0                                                 Day.Month 2021
+21.next.0                                                 ?.Month 2021
 
 
 TODO's
 ======
 
-* Website:  Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-            Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+https://adoptium.net/ Temurin
 
-* Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 
+* Tour Chart      - Select color for 2nd graph line instead of compliment color
+                  - Set default graphs in the graph slideout, sorting still needs the pref page
+
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+                 
 
 Issues
 ======
 
 *  
 
+
+Experimental
+============
+
+* 
+
   
 New
 ===
 
-* 
+* Sensor Battery        https://github.com/wolfgang-ch/mytourbook/issues/376
+  - Sensor view displays all sensors 
+  - Sensor chart displays sensor battery history values 
+  - Tour info displays the sensor battery values from a tour
+
+* Suunto App Integration: (Frederic)
+  - Added support for multiple accounts
+  https://sourceforge.net/p/mytourbook/feature-requests/197/
+
+* Strava Integration: (Frederic)
+  - Added the ability to upload a tour with or without its description
+  - Added the ability to map tour types to Strava activities for a more precise tour upload
+  https://sourceforge.net/p/mytourbook/discussion/622811/thread/e07bd4d3d7/
 
 
 Improvements
 ============
 
-* 
+* GPX Import
+  - Import tours also with the date/time format "yyyy-MM-dd'T'HH:mm:ss.SSSS"
 
 
 Changes  
 =======
 
 * 
-    
+
 
 Bugfix
 ======
 
-* Compress Database
-  Fxed SQL exception when the tour database size is too large to fit into an integer value
-
+* 
 
 
 Translation    
@@ -55,5 +79,5 @@ Translation
 System   
 ======
 
-* Eclipse 2021-?
-* FIT SDK 21.47
+* Eclipse 2021-09
+* FIT SDK 21.60

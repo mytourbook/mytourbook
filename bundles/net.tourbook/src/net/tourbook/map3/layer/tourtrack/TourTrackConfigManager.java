@@ -240,7 +240,7 @@ public class TourTrackConfigManager {
    /**
     * Contains all configurations which are loaded from a xml file.
     */
-   private static final ArrayList<TourTrackConfig> _allConfigs    = new ArrayList<TourTrackConfig>();
+   private static final ArrayList<TourTrackConfig> _allConfigs    = new ArrayList<>();
 
    private static TourTrackConfig                  _activeConfig;
    private static String                           _activeConfigIdFromXml;
@@ -623,7 +623,7 @@ public class TourTrackConfigManager {
 
    /**
     * Overwrite default values according to the default id {@link TourTrackConfig#defaultId}.
-    * 
+    *
     * @param config
     */
    private static void overwriteConfig_DefaultValues(final TourTrackConfig config) {
@@ -715,7 +715,7 @@ public class TourTrackConfigManager {
 
    /**
     * Parse configuration xml.
-    * 
+    *
     * @param allConfigurations
     * @param xmlRoot
     * @param parseRootXml
@@ -1118,7 +1118,7 @@ public class TourTrackConfigManager {
 
    /**
     * Read/create tour track configuration a xml file
-    * 
+    *
     * @return
     */
    private static void readConfigFromXml() {
@@ -1211,7 +1211,7 @@ public class TourTrackConfigManager {
 
          // this case should not happen, create a clean default config
 
-         StatusUtil.log("Created default config for tour track properties.");//$NON-NLS-1$
+         StatusUtil.logInfo("Created default config for tour track properties.");//$NON-NLS-1$
 
          createAllDefaults();
          overwriteConfig_DefaultValues_ForAll();
@@ -1233,7 +1233,7 @@ public class TourTrackConfigManager {
       final XMLMemento xmlRoot = resetConfig(_activeConfig.defaultId);
 
       // parse xml
-      final ArrayList<TourTrackConfig> newConfigs = new ArrayList<TourTrackConfig>();
+      final ArrayList<TourTrackConfig> newConfigs = new ArrayList<>();
       parse_000_All(newConfigs, xmlRoot, false);
 
       final TourTrackConfig newConfig = newConfigs.get(0);

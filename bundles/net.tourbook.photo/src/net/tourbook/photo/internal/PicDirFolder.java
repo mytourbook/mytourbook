@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.photo.PhotoCache;
@@ -140,7 +141,7 @@ public class PicDirFolder {
    }
 
    private IDialogSettings                  _state;
-   private final IPreferenceStore           _prefStore       = Activator.getDefault().getPreferenceStore();
+   private final IPreferenceStore           _prefStore       = PhotoActivator.getPrefStore();
 
    private PicDirView                       _picDirView;
    private PicDirImages                     _picDirImages;

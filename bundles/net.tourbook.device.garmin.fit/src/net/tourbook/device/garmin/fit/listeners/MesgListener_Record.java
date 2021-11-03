@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitData;
+import net.tourbook.device.garmin.fit.FitUtils;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.device.garmin.fit.Messages;
 
@@ -108,10 +109,8 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
          boolean isCreateExceededMarker = false;
 
-         // convert garmin time into java time
-         final long garminTimeS = garminTime.getTimestamp();
-         final long garminTimeMS = garminTimeS * 1000;
-         final long sliceJavaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+         final long sliceJavaTime = FitUtils.convertGarminTimeToJavaTime(
+               garminTime.getTimestamp());
 
          absoluteTime = sliceJavaTime;
          long timeDiff = 0;
@@ -300,6 +299,12 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
       final Float verticalRatio = mesg.getVerticalRatio();
       if (verticalRatio != null) {
          timeData.runDyn_VerticalRatio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
+      }
+
+      final Float batterySoc = mesg.getBatterySoc();
+      if (batterySoc != null) {
+//         System.out.println((System.currentTimeMillis() + " battery Soc: " + batterySoc));
+         // TODO remove SYSTEM.OUT.PRINTLN
       }
 
       setRecord_DeveloperData(mesg, timeData);

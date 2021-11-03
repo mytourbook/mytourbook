@@ -16,6 +16,13 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 
 repositories {
+   google()
+   jcenter {
+        content {
+          // https://youtrack.jetbrains.com/issue/IDEA-261387
+              includeModule("org.jetbrains.trove4j", "trove4j")
+        }
+   }
    mavenCentral()
    maven { url 'https://jitpack.io' }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
- * Copyright (C) 2018, 2019, 2020 Thomas Theussing
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+
 package net.tourbook.map25;
 
 import com.badlogic.gdx.Gdx;
@@ -69,6 +70,7 @@ import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
@@ -104,7 +106,7 @@ import org.oscim.utils.Parameters;
 
 import okhttp3.Cache;
 
-public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerItem> {
+public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
    private static final String     STATE_MAP_POS_X                   = "STATE_MAP_POS_X";                  //$NON-NLS-1$
    private static final String     STATE_MAP_POS_Y                   = "STATE_MAP_POS_Y";                  //$NON-NLS-1$
@@ -160,10 +162,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * opacity.
     */
    private int                       _layer_HillShading_Opacity;
+   private int                       _layer_Photo_Size;
 
    private LabelLayerMT              _layer_Label;
    private MarkerLayer               _layer_Marker;
    private BitmapTileLayer           _layer_HillShading;
+   private ItemizedLayer             _layer_Photo;
    private BitmapTileLayer           _layer_Satellite;
    private MapScaleBarLayer          _layer_ScaleBar;
    private SliderLocation_Layer      _layer_SliderLocation;
@@ -186,16 +190,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float                     _mf_UserScale              = 2.50f;
    private float                     _online_UserScale          = 2.0f;
 
-   private ItemizedLayer<MarkerItem> _layer_MapBookmark;
+   private ItemizedLayer             _layer_MapBookmark;
    private MarkerToolkit             _markertoolkit;
    private MarkerMode                _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
-   private ItemizedLayer<MarkerItem> _layer_Photo;
    private boolean                   _isPhotoClustered          = true;
    private boolean                   _isPhotoShowTitle          = true;
 
+   private boolean                   _isPhotoShowScaled         = false;
    public PhotoToolkit               _phototoolkit;
-   public List<MarkerItem>           _selectedPhotosPts;
+
+   public List<MarkerInterface>      _selectedPhotosPts;
 
    /**
     * Is <code>true</code> when a tour marker is hit.
@@ -544,6 +549,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _isPhotoClustered;
    }
 
+   public boolean getIsPhotoShowScaled() {
+      return _isPhotoShowScaled;
+   }
+
    public boolean getIsPhotoShowTitle() {
       return _isPhotoShowTitle;
    }
@@ -568,12 +577,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_Label;
    }
 
-   public ItemizedLayer<MarkerItem> getLayer_MapBookmark() {
+   public ItemizedLayer getLayer_MapBookmark() {
       return _layer_MapBookmark;
    }
 
-   public ItemizedLayer<MarkerItem> getLayer_Photo() {
+   public ItemizedLayer getLayer_Photo() {
       return _layer_Photo;
+   }
+
+   public int getLayer_Photo_Size() {
+      return _layer_Photo_Size;
    }
 
    public S3DBLayer getLayer_S3DB() {
@@ -789,16 +802,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "####### loadtheme: leaving styleID: " + styleId); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
+
+
+
+   @Override
+   public boolean onItemLongPress(final int index, final MapMarker item) {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    /**
-    * longpress on a tourmarker
+    * longpress on a mapbookmark
+    * this method is moved to net.tourbook.map25.layer.marker.MarkerToolkit !!
     *
     * @param index
-    * @param MapMarker
+    * @param MarkerItem
     * @return true, when clicked
     */
    @Override
-   public boolean onItemLongPress(final int index, final MapMarker item) {
-
+   public boolean onItemLongPress(final int index, final MarkerInterface mi) {
+      final MarkerItem markerItem = (MarkerItem) mi;
+      System.out.println("Marker tap " + markerItem.getTitle()); //$NON-NLS-1$
       System.out.println(
             (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") // //$NON-NLS-1$ //$NON-NLS-2$
                   + ("\tonItemLongPress (Tourmarker)") //$NON-NLS-1$
@@ -812,20 +836,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //
 // return true;
 
-      return false;
-   }
-
-   /**
-    * longpress on a mapbookmark
-    * this method is moved to net.tourbook.map25.layer.marker.MarkerToolkit !!
-    *
-    * @param index
-    * @param MarkerItem
-    * @return true, when clicked
-    */
-   @Override
-   public boolean onItemLongPress(final int index, final MarkerItem item) {
-      // TODO Auto-generated method stub
       return false;
    }
 
@@ -864,7 +874,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * @return true, when clicked
     */
    @Override
-   public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
+   public boolean onItemSingleTapUp(final int index, final MarkerInterface mi) {
       // TODO Auto-generated method stub
       return false;
    }
@@ -981,6 +991,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       this._isPhotoClustered = state;
    }
 
+   public void setIsPhotoShowScaled(final boolean state) {
+      this._isPhotoShowScaled = state;
+      debugPrint(" map25: " + "############# setIsPhotoShowScaled: " + state); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
    public void setIsPhotoShowTitle(final boolean state) {
       this._isPhotoShowTitle = state;
       debugPrint(" map25: " + "############# setIsPhotoShowTitle: " + state); //$NON-NLS-1$ //$NON-NLS-2$
@@ -988,6 +1003,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setLayer_HillShading_Opacity(final int layer_HillShading_Opacity) {
       _layer_HillShading_Opacity = layer_HillShading_Opacity;
+   }
+
+   public void setLayer_Photo_Size(final int layer_Photo_Size) {
+      _layer_Photo_Size = layer_Photo_Size;
+      debugPrint(" map25: " + "############# setLayer_PhotoSize to: " + layer_Photo_Size); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    public void setMapProvider(final Map25Provider mapProvider) {
@@ -1019,7 +1039,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (mapProvider.tileEncoding == TileEncoding.VTM) {
             final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
             _layer_BaseMap.setTileSource(tileSource);
-            _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+            _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
             if (onlineOfflineStatusHasChanged) {
                setupMap(mapProvider, tileSource);
             }
@@ -1027,7 +1047,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          } else {
             final MapilionMvtTileSource tileSource = createMaplilionMvtTileSource(mapProvider, _httpFactory);
             _layer_BaseMap.setTileSource(tileSource);
-            _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.OPENMAPTILES));
+            _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.OPENMAPTILES));
             if (onlineOfflineStatusHasChanged) {
                setupMap(mapProvider, tileSource);
             }
@@ -1035,7 +1055,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 //			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 //			_layer_BaseMap.setTileSource(tileSource);
-//			_layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+//			_layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
 
          if (onlineOfflineStatusHasChanged) {
             //setupMap(mapProvider, tileSource);
@@ -1175,7 +1195,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
                   debugPrint(" map25: " + "############# setMapProvider: Theme loader started"); //$NON-NLS-1$ //$NON-NLS-2$
                   this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
                   debugPrint(" map25: " + "############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$ //$NON-NLS-2$
-                  _layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
+                  _layer_BaseMap.setTheme(_mf_IRenderTheme);
                   ////mMap.setTheme(_mf_IRenderTheme);
                   loadTheme(mapProvider.mf_ThemeStyle); //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
                   debugPrint(" map25: " + "############# setMapProvider: ...activaded"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1213,7 +1233,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "############# setMapProvider leaving: layers now: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
-   public void setPhotoSelection(final List<MarkerItem> _photoItems) {
+   public void setPhotoSelection(final List<MarkerInterface> _photoItems) {
       debugPrint("MapApp25: setPhotoSelection size input: " + _photoItems.size()); //$NON-NLS-1$
       this._selectedPhotosPts = _photoItems;
    }
@@ -1274,7 +1294,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _layer_BaseMap.setTileSource(tileSource);
 
-      _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //to avoid errors
+      _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //to avoid errors
 
       // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
@@ -1309,9 +1329,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          mMap.setTheme(VtmThemes.OSMARENDER); // ThemeLoader.load(_mf_themeFilePath));
       } else {
 
-         //_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
+         //_l.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
          this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath); // because of changes in loadtheme
-         _layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
+         _layer_BaseMap.setTheme(_mf_IRenderTheme);
          mMap.setTheme(ThemeLoader.load(_mf_themeFilePath)); //neccercary?seem so
          ////loadTheme(mapProvider.mf_ThemeStyle); //neccercary?
       }
@@ -1339,7 +1359,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _layer_BaseMap.setTileSource(tileSource);
 
-      //_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+      //_l.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
 
 // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
@@ -1408,7 +1428,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
 //    // Buildings or S3DB  Block I
       _layer_S3DB_Building = new S3DBLayer(mMap, _layer_BaseMap, true); //this is working with subtheme  switching, but no online buildings anymore
-      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, false); // building is not working with online maps, so deactvated also the shadow
+      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true); // building is not working with online maps, so deactvated also the shadow
 
       if (_isOfflineMap) {
 //			// S3DB
@@ -1416,15 +1436,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_S3DB_Building.setEnabled(true);
          _layer_S3DB_Building.setColored(true);
          debugPrint(" map25: " + "################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$ //$NON-NLS-2$
-         //_layer_BaseMap.setRenderTheme(_mf_IRenderTheme); //again??
-         //layers.remove(_layer_Building);
+         //_layer_BaseMap.setTheme(_mf_IRenderTheme); //again??
+         layers.remove(_layer_Building);
          layers.add(_layer_S3DB_Building);
       } else {
          // building
 
          _layer_Building.setEnabled(true);
          debugPrint(" map25: " + "################ setupMap_Layers:Building Layer "); //$NON-NLS-1$ //$NON-NLS-2$
-         //layers.remove(_layer_S3DB_Building);
+         layers.remove(_layer_S3DB_Building);
          layers.add(_layer_Building);
       }
 
@@ -1433,28 +1453,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Label.setEnabled(false);
       layers.add(_layer_Label);
 
-      //Photos
-      _phototoolkit = new PhotoToolkit();
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, _phototoolkit);
-      } else {
-         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-         _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, _phototoolkit);
-      }
-      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
-      _layer_Photo.setEnabled(false);
-      layers.add(_layer_Photo);
-
       // MapBookmarks
       //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
       _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
       if (config.isMarkerClustered) {
          //_layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
-         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, _markertoolkit);
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._markerRendererFactory, _markertoolkit);
       } else {
-         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, _markertoolkit);
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
       }
-      final List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(false);
       layers.add(_layer_MapBookmark);
@@ -1463,6 +1471,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Marker = new MarkerLayer(mMap, this);
       _layer_Marker.setEnabled(false);
       layers.add(_layer_Marker);
+
+      //Photos
+      _phototoolkit = new PhotoToolkit();
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
+      } else {
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
+      }
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
+      _layer_Photo.setEnabled(false);
+      layers.add(_layer_Photo);
 
       // slider location
       _layer_SliderLocation = new SliderLocation_Layer(mMap);
@@ -1506,9 +1525,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          layers.remove(_layer_MapBookmark);
          if (config.isMarkerClustered) {
-            _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, _markertoolkit);
+            _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._markerRendererFactory, _markertoolkit);
          } else {
-            _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, _markertoolkit);
+            _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
          }
          layers.add(layer_index_MapBookmarkLayer, _layer_MapBookmark);
          //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark); //$NON-NLS-1$
@@ -1516,7 +1535,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_MapBookmark.removeAllItems();
       }
       //_layer_Bookmark.removeAllItems();
-      final List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
       //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): #MapBookmartks: " + pts.size()); //$NON-NLS-1$
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(isShowMapBookmarkLayer);
@@ -1558,22 +1577,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // using settings from MapBookmarks must be changed later with own config
       //"STATE_IS_LAYER_PHOTO_VISIBLE"
       //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
-      //if (config.isPhotoClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI.
       if (config.isMarkerClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI.
          //debugPrint(" map25: " + "# updateUI_PhotoLayer(): index was before: " + layer_index_PhotoLayer); //$NON-NLS-1$
          layers.remove(_layer_Photo);
          //if (config.isPhotoClustered) {
          if (config.isMarkerClustered) {
-            _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, _phototoolkit);
+            _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
          } else {
-            _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, _phototoolkit);
+            _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
          }
          layers.add(layer_index_PhotoLayer, _layer_Photo);
       } else {
          _layer_Photo.removeAllItems();
       }
 
-      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle()); //hopefully done in map25view "paintToursAndUpdate"
+      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle(), getIsPhotoShowScaled()); //hopefully done in map25view "paintToursAndUpdate"
       debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);

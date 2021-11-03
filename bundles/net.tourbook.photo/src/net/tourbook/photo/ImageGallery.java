@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,6 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
 import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.Messages;
@@ -142,7 +141,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private static final String    DEFAULT_GALLERY_FONT         = "arial,sans-serif";                         //$NON-NLS-1$
 
    private IDialogSettings        _state;
-   private final IPreferenceStore _prefStore                   = Activator.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore                   = PhotoActivator.getPrefStore();
 
    /*
     * worker thread management
@@ -558,7 +557,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       }
 
       if (_galleryFont == null) {
-         StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
+         StatusUtil.logError("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
          _galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
       }
    }
@@ -1380,31 +1379,28 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
       if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
 
-         _display.asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         _display.asyncExec(() -> {
 
-               final MessageDialog messageDialog = new MessageDialog(
-                     _display.getActiveShell(),
-                     Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
-                     null,
-                     Messages.Pic_Dir_Dialog_CleanupStoreImages_Message,
-                     MessageDialog.QUESTION,
-                     new String[] {
-                           Messages.Pic_Dir_Dialog_CleanupStoreImages_KeepImages,
-                           Messages.Pic_Dir_Dialog_CleanupStoreImages_DiscardImages },
-                     0);
+            final MessageDialog messageDialog = new MessageDialog(
+                  _display.getActiveShell(),
+                  Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
+                  null,
+                  Messages.Pic_Dir_Dialog_CleanupStoreImages_Message,
+                  MessageDialog.QUESTION,
+                  new String[] {
+                        Messages.Pic_Dir_Dialog_CleanupStoreImages_KeepImages,
+                        Messages.Pic_Dir_Dialog_CleanupStoreImages_DiscardImages },
+                  0);
 
-               if (messageDialog.open() == 1) {
-                  // discard all imaged
-                  disposeAndDeleteAllImages();
-               }
+            if (messageDialog.open() == 1) {
+               // discard all imaged
+               disposeAndDeleteAllImages();
+            }
 
-               _galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
+            _galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
 
-               if (_galleryActionBar != null) {
-                  _galleryActionBar.updateUI_ImageIndicatorTooltip();
-               }
+            if (_galleryActionBar != null) {
+               _galleryActionBar.updateUI_ImageIndicatorTooltip();
             }
          });
 
@@ -2878,12 +2874,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       // set new sorting algorithm
       _currentSorting = gallerySorting;
 
-      BusyIndicator.showWhile(_display, new Runnable() {
-         @Override
-         public void run() {
-            sortGallery_10_Runnable();
-         }
-      });
+      BusyIndicator.showWhile(_display, () -> sortGallery_10_Runnable());
    }
 
    /**
@@ -3065,63 +3056,60 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
    private void updateUI_GalleryInfo() {
 
-      _display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      _display.syncExec(() -> {
 
-            if (_galleryMT20.isDisposed()) {
-               return;
+         if (_galleryMT20.isDisposed()) {
+            return;
+         }
+
+         showPageBookPage(_pageGalleryInfo, true);
+
+         final int imageCount = _allPhotos.length;
+
+         if (imageCount == 0) {
+
+            if (_defaultStatusMessage.length() > 0) {
+               _lblGalleryInfo.setText(_defaultStatusMessage);
+            } else {
+               _lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImages);
             }
 
-            showPageBookPage(_pageGalleryInfo, true);
+         } else {
 
-            final int imageCount = _allPhotos.length;
+            final int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
 
-            if (imageCount == 0) {
+            if (exifLoadingQueueSize > 0) {
 
-               if (_defaultStatusMessage.length() > 0) {
-                  _lblGalleryInfo.setText(_defaultStatusMessage);
-               } else {
-                  _lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImages);
-               }
+               // show filter message only when image files are being loaded
+
+               _lblGalleryInfo.setText(NLS.bind(
+                     Messages.Pic_Dir_StatusLabel_FilteringImages,
+                     exifLoadingQueueSize));
 
             } else {
 
-               final int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+               if (_sortedAndFilteredPhotos.length == 0) {
 
-               if (exifLoadingQueueSize > 0) {
-
-                  // show filter message only when image files are being loaded
-
-                  _lblGalleryInfo.setText(NLS.bind(
-                        Messages.Pic_Dir_StatusLabel_FilteringImages,
-                        exifLoadingQueueSize));
+                  if (imageCount == 1) {
+                     _lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_1ImageIsHiddenByFilter);
+                  } else {
+                     _lblGalleryInfo.setText(NLS.bind(
+                           Messages.Pic_Dir_StatusLabel_nImagesAreHiddenByFilter,
+                           imageCount));
+                  }
 
                } else {
-
-                  if (_sortedAndFilteredPhotos.length == 0) {
-
-                     if (imageCount == 1) {
-                        _lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_1ImageIsHiddenByFilter);
-                     } else {
-                        _lblGalleryInfo.setText(NLS.bind(
-                              Messages.Pic_Dir_StatusLabel_nImagesAreHiddenByFilter,
-                              imageCount));
-                     }
-
-                  } else {
-                     // this case should not happen, the gallery is displayed
-                  }
+                  // this case should not happen, the gallery is displayed
                }
             }
-
-            if (imageCount == 0) {
-               _isAttributesPainted = false;
-            }
-
-            enableActions(imageCount > 0);
-            enableAttributeActions(_isAttributesPainted);
          }
+
+         if (imageCount == 0) {
+            _isAttributesPainted = false;
+         }
+
+         enableActions(imageCount > 0);
+         enableAttributeActions(_isAttributesPainted);
       });
    }
 
@@ -3155,33 +3143,30 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
       _sortedAndFilteredPhotos = filteredAndSortedPhotos;
 
-      _display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      _display.syncExec(() -> {
 
-            if (_galleryMT20.isDisposed()) {
-               return;
-            }
+         if (_galleryMT20.isDisposed()) {
+            return;
+         }
 
-            final boolean isItemAvailable = sortedGalleryItems.length > 0;
+         final boolean isItemAvailable = sortedGalleryItems.length > 0;
 
-            enableActions(isItemAvailable);
+         enableActions(isItemAvailable);
 
-            if (isItemAvailable) {
+         if (isItemAvailable) {
 
-               // gallery items are available
+            // gallery items are available
 
-               _sortedGalleryItems = sortedGalleryItems;
-               _contentGalleryPosition = galleryPosition;
+            _sortedGalleryItems = sortedGalleryItems;
+            _contentGalleryPosition = galleryPosition;
 
-               showPageGalleryContent();
+            showPageGalleryContent();
 
-            } else {
+         } else {
 
-               // there is no gallery item
+            // there is no gallery item
 
-               updateUI_GalleryInfo();
-            }
+            updateUI_GalleryInfo();
          }
       });
    }
@@ -3197,19 +3182,16 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
    public void updateUI_StatusMessageInUIThread(final String message) {
 
-      _display.asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _display.asyncExec(() -> {
 
-            if (_galleryMT20.isDisposed()) {
-               return;
-            }
+         if (_galleryMT20.isDisposed()) {
+            return;
+         }
 
-            if (message.length() == 0) {
-               setStatusMessage(getStatusDefaultMessage());
-            } else {
-               setStatusMessage(message);
-            }
+         if (message.length() == 0) {
+            setStatusMessage(getStatusDefaultMessage());
+         } else {
+            setStatusMessage(message);
          }
       });
    }
@@ -3225,17 +3207,14 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
       if (_workerStateDir != null) {
 
-         _display.syncExec(new Runnable() {
-            @Override
-            public void run() {
+         _display.syncExec(() -> {
 
-               // guard against the ui being closed before this runs
-               if (_uiContainer.isDisposed()) {
-                  return;
-               }
-
-               setStatusMessage(UI.EMPTY_STRING);
+            // guard against the ui being closed before this runs
+            if (_uiContainer.isDisposed()) {
+               return;
             }
+
+            setStatusMessage(UI.EMPTY_STRING);
          });
 
          // get all image files, sorting is not yet done
@@ -3309,34 +3288,31 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
       _allPhotos = photos;
 
-      _display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      _display.syncExec(() -> {
 
-            // guard against the ui being closed before this runs
-            if (_uiContainer.isDisposed()) {
-               return;
-            }
-
-            // initialize tooltip for a new folder
-            _photoGalleryTooltip.reset(true);
-
-            final double galleryPosition = getCachedGalleryPosition();
-
-            _galleryMT20.setupItems(0, galleryPosition, _restoredSelection);
-
-            _restoredSelection = null;
-
-            /*
-             * update status info
-             */
-            final long timeDiff = System.currentTimeMillis() - _workerStart;
-            final String timeDiffText = NLS.bind(
-                  Messages.Pic_Dir_Status_Loaded,
-                  new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotos.length) });
-
-            setStatusMessage(timeDiffText);
+         // guard against the ui being closed before this runs
+         if (_uiContainer.isDisposed()) {
+            return;
          }
+
+         // initialize tooltip for a new folder
+         _photoGalleryTooltip.reset(true);
+
+         final double galleryPosition = getCachedGalleryPosition();
+
+         _galleryMT20.setupItems(0, galleryPosition, _restoredSelection);
+
+         _restoredSelection = null;
+
+         /*
+          * update status info
+          */
+         final long timeDiff = System.currentTimeMillis() - _workerStart;
+         final String timeDiffText = NLS.bind(
+               Messages.Pic_Dir_Status_Loaded,
+               new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotos.length) });
+
+         setStatusMessage(timeDiffText);
       });
 
       /*

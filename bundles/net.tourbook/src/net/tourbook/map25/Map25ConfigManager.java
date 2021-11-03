@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -102,6 +102,7 @@ public class Map25ConfigManager {
    private static final String ATTR_CONFIG_VERSION = "configVersion";      //$NON-NLS-1$
    //
    /*
+    * ############# setIsPhotoShowTitle:
     * Tour options
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
@@ -117,17 +118,19 @@ public class Map25ConfigManager {
    private static final String TAG_TRACK       = "Track";      //$NON-NLS-1$
    //
    // outline
-   private static final String TAG_OUTLINE             = "Outline";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_OPACITY    = "opacity";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_WIDTH      = "width";                 //$NON-NLS-1$
+   private static final String TAG_OUTLINE                             = "Outline";               //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_OPACITY                    = "opacity";               //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_WIDTH                      = "width";                 //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW    = "directionArrow";        //$NON-NLS-1$
    //
-   public static final RGB     DEFAULT_OUTLINE_COLOR   = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_OUTLINE_OPACITY = 70;
-   public static final float   DEFAULT_OUTLINE_WIDTH   = 2.5f;
-   public static final int     OUTLINE_OPACITY_MIN     = 1;
-   public static final int     OUTLINE_OPACITY_MAX     = 100;
-   public static final float   OUTLINE_WIDTH_MIN       = 0.1f;
-   public static final float   OUTLINE_WIDTH_MAX       = 20.0f;
+   public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
+   public static final int     DEFAULT_OUTLINE_OPACITY                 = 70;
+   public static final float   DEFAULT_OUTLINE_WIDTH                   = 2.5f;
+   public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = false;
+   public static final int     OUTLINE_OPACITY_MIN                     = 1;
+   public static final int     OUTLINE_OPACITY_MAX                     = 100;
+   public static final float   OUTLINE_WIDTH_MIN                       = 0.1f;
+   public static final float   OUTLINE_WIDTH_MAX                       = 20.0f;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -175,6 +178,7 @@ public class Map25ConfigManager {
    private static final String ATTR_IS_SHOW_MAP_BOOKMARK   = "isShowMapBookmark";    //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_PHOTO          = "isShowPhoto";          //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_PHOTO_TITLE    = "isShowPhotoTitle";     //$NON-NLS-1$
+   private static final String ATTR_PHOTO_SIZE             = "markerPhotoSize";      //$NON-NLS-1$
    private static final String ATTR_MARKER_ORIENTATION     = "markerOrientation";    //$NON-NLS-1$
    //
    private static final String ATTR_MARKER_FILL_OPACITY    = "markerFillOpacity";    //$NON-NLS-1$
@@ -201,6 +205,7 @@ public class Map25ConfigManager {
     * Defaults, min/max
     */
    // symbol
+   public static final int   DEFAULT_MARKER_PHOTO_SIZE   = 160;
    public static final int   DEFAULT_MARKER_SYMBOL_SIZE  = 20;
    public static final float DEFAULT_MARKER_OUTLINE_SIZE = 2.0f;
    public static final float MARKER_OUTLINE_SIZE_MIN     = 0;
@@ -260,6 +265,7 @@ public class Map25ConfigManager {
    //
    private static String                            _fromXml_ActiveMarkerConfigId;
    private static String                            _fromXml_ActiveTrackConfigId;
+
    // !!! enable new formatting
    {}
 
@@ -474,6 +480,7 @@ public class Map25ConfigManager {
          xmlConfig.putBoolean(      ATTR_IS_SHOW_MAP_BOOKMARK,    config.isShowMapBookmark);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO,           config.isShowPhoto);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO_TITLE,     config.isShowPhotoTitle);
+         xmlConfig.putInteger(      ATTR_PHOTO_SIZE,              config.markerPhoto_Size);
          xmlConfig.putInteger(      ATTR_MARKER_ORIENTATION,      config.markerOrientation);
 
          xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,     config.markerFill_Opacity);
@@ -517,8 +524,9 @@ public class Map25ConfigManager {
          // <Outline>
          final IMemento xmlOutline = Util.setXmlRgb(xmlConfig, TAG_OUTLINE, config.outlineColor);
          {
-            xmlOutline.putFloat(       ATTR_OUTLINE_WIDTH,           config.outlineWidth);
-            xmlOutline.putInteger(     ATTR_OUTLINE_OPACITY,         config.outlineOpacity);
+            xmlOutline.putBoolean(     ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, config.isShowDirectionArrow);
+            xmlOutline.putFloat(       ATTR_OUTLINE_WIDTH,                   config.outlineWidth);
+            xmlOutline.putInteger(     ATTR_OUTLINE_OPACITY,                 config.outlineOpacity);
          }
 
          // <SliderPath>
@@ -648,7 +656,7 @@ public class Map25ConfigManager {
 
          // this case should not happen, create a config
 
-         StatusUtil.log("Created default config for marker properties");//$NON-NLS-1$
+         StatusUtil.logInfo("Created default config for marker properties");//$NON-NLS-1$
 
          createDefaults_Markers();
 
@@ -680,7 +688,7 @@ public class Map25ConfigManager {
 
          // this case should not happen, create a config
 
-         StatusUtil.log("Created default config for tour track properties");//$NON-NLS-1$
+         StatusUtil.logInfo("Created default config for tour track properties");//$NON-NLS-1$
 
          createDefaults_Tracks();
 
@@ -716,9 +724,10 @@ public class Map25ConfigManager {
 
          case TAG_OUTLINE:
 
-            config.outlineColor        = Util.getXmlRgb(xmlConfigChild,          DEFAULT_OUTLINE_COLOR);
-            config.outlineOpacity      = Util.getXmlInteger(xmlConfigChild,      ATTR_OUTLINE_OPACITY,   DEFAULT_OUTLINE_OPACITY,   OUTLINE_OPACITY_MIN, OUTLINE_OPACITY_MAX);
-            config.outlineWidth        = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,     DEFAULT_OUTLINE_WIDTH,     OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
+            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW);
+            config.outlineColor              = Util.getXmlRgb(xmlConfigChild,          DEFAULT_OUTLINE_COLOR);
+            config.outlineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_OUTLINE_OPACITY,   DEFAULT_OUTLINE_OPACITY,   OUTLINE_OPACITY_MIN, OUTLINE_OPACITY_MAX);
+            config.outlineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,     DEFAULT_OUTLINE_WIDTH,     OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
             break;
 
          case TAG_SLIDER_PATH:
@@ -766,6 +775,7 @@ public class Map25ConfigManager {
       config.isShowMapBookmark      = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_MAP_BOOKMARK,    true);
       config.isShowTourMarker       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,     true);
       config.isShowPhoto            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO,           true);
+      config.markerPhoto_Size       = Util.getXmlInteger(xmlConfig,     ATTR_PHOTO_SIZE,              DEFAULT_MARKER_PHOTO_SIZE);
       config.isShowPhotoTitle       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO_TITLE,     true);
       config.markerOrientation      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_ORIENTATION,      Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 

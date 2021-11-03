@@ -19,33 +19,34 @@ import java.util.ArrayList;
 
 public class EasyConfig {
 
-   static final int     ANIMATION_DURATION_DEFAULT               = 20;   // seconds/10
-   static final int     ANIMATION_DURATION_MIN                   = 0;
-   static final int     ANIMATION_DURATION_MAX                   = 100;  // ->10 seconds
+   static final int     ANIMATION_DURATION_DEFAULT                  = 20;   // seconds/10
+   static final int     ANIMATION_DURATION_MIN                      = 0;
+   static final int     ANIMATION_DURATION_MAX                      = 100;  // ->10 seconds
 
-   static final int     ANIMATION_CRAZINESS_FACTOR_DEFAULT       = 1;
-   static final int     ANIMATION_CRAZINESS_FACTOR_MIN           = -100;
-   static final int     ANIMATION_CRAZINESS_FACTOR_MAX           = 100;
+   static final int     ANIMATION_CRAZINESS_FACTOR_DEFAULT          = 1;
+   static final int     ANIMATION_CRAZINESS_FACTOR_MIN              = -100;
+   static final int     ANIMATION_CRAZINESS_FACTOR_MAX              = 100;
 
-   static final int     BACKGROUND_OPACITY_DEFAULT               = 5;
-   static final int     BACKGROUND_OPACITY_MIN                   = 0;
-   static final int     BACKGROUND_OPACITY_MAX                   = 100;
+   static final int     BACKGROUND_OPACITY_DEFAULT                  = 5;
+   static final int     BACKGROUND_OPACITY_MIN                      = 0;
+   static final int     BACKGROUND_OPACITY_MAX                      = 100;
 
-   static final int     HORIZONTAL_TILES_DEFAULT                 = 5;
-   static final int     HORIZONTAL_TILES_MIN                     = 1;
-   static final int     HORIZONTAL_TILES_MAX                     = 50;
+   static final int     HORIZONTAL_TILES_DEFAULT                    = 5;
+   static final int     HORIZONTAL_TILES_MIN                        = 1;
+   static final int     HORIZONTAL_TILES_MAX                        = 50;
 
-   static final boolean LIVE_UPDATE_DEFAULT                      = true;
+   static final boolean IS_LIVE_UPDATE_DEFAULT                      = true;
+   static final boolean IS_LOG_DETAILS_DEFAULT                      = false;
 
-   static final boolean STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH = false;
-   static final int     STATE_TOOLTIP_WIDTH_DEFAULT              = 500;
+   static final boolean STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH = false;
+   static final int     STATE_TOOLTIP_WIDTH_DEFAULT                 = 500;
 
-   static final int     STATE_TOOLTIP_WIDTH_MIN                  = 300;
-   static final int     STATE_TOOLTIP_WIDTH_MAX                  = 2000;
+   static final int     STATE_TOOLTIP_WIDTH_MIN                     = 300;
+   static final int     STATE_TOOLTIP_WIDTH_MAX                     = 2000;
 
-   static final int     TILE_SIZE_DEFAULT                        = 100;
-   static final int     TILE_SIZE_MIN                            = 20;
-   static final int     TILE_SIZE_MAX                            = 300;
+   static final int     TILE_SIZE_DEFAULT                           = 100;
+   static final int     TILE_SIZE_MIN                               = 20;
+   static final int     TILE_SIZE_MAX                               = 300;
 
    /*
     * Launcher config
@@ -67,19 +68,20 @@ public class EasyConfig {
    /*
     * Dash fields
     */
-   public boolean isLiveUpdate                        = LIVE_UPDATE_DEFAULT;
+   public boolean isLiveUpdate                        = IS_LIVE_UPDATE_DEFAULT;
+   public boolean isLogDetails                        = IS_LOG_DETAILS_DEFAULT;
 
    public int     numHorizontalTiles                  = HORIZONTAL_TILES_DEFAULT;
    public int     tileSize                            = TILE_SIZE_DEFAULT;
 
-   /** Background opacity in %. */
+   /** Background opacity in % */
    public int     backgroundOpacity                   = BACKGROUND_OPACITY_DEFAULT;
 
    /** Duration in seconds/10 */
    public int     animationDuration                   = ANIMATION_DURATION_DEFAULT;
    public int     animationCrazinessFactor            = ANIMATION_CRAZINESS_FACTOR_DEFAULT;
 
-   public boolean stateToolTipDisplayAbsoluteFilePath = STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH;
+   public boolean stateToolTipDisplayAbsoluteFilePath = STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH;
    public int     stateToolTipWidth                   = STATE_TOOLTIP_WIDTH_DEFAULT;
 
    /*

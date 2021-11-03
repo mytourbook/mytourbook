@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomIn extends Action {
 
-	private IMapDefaultActions	_mapActionProvider;
+   private IMapDefaultActions _mapActionProvider;
 
-	public ActionZoomIn(final IMapDefaultActions mapActionProvider) {
+   public ActionZoomIn(final IMapDefaultActions mapActionProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_mapActionProvider = mapActionProvider;
+      _mapActionProvider = mapActionProvider;
 
-		setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
+      setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_mapActionProvider.actionZoomIn();
-	}
+   @Override
+   public void run() {
+      _mapActionProvider.actionZoomIn();
+   }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@ import java.util.Collection;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 import net.tourbook.common.util.Util;
@@ -125,7 +127,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Close));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -141,7 +143,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Pin_Blue));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Pin));
       }
 
       @Override
@@ -158,7 +160,11 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    private class ActionToggleGalleryOrientation extends Action {
 
       public ActionToggleGalleryOrientation() {
+
          super(null, Action.AS_PUSH_BUTTON);
+
+         // an image must be set otherwise the toolbar icons can be too small, this happens not allways :-(
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
       }
 
       @Override
@@ -715,12 +721,12 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       if (_isVerticalGallery) {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Vertical));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 

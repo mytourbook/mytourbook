@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.tourbook.data.SwimData;
 import net.tourbook.device.garmin.fit.FitData;
+import net.tourbook.device.garmin.fit.FitUtils;
 
 /**
  * Set swim data
@@ -50,9 +51,8 @@ public class MesgListener_Length extends AbstractMesgListener implements LengthM
       final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
 
       // convert garmin time into java time
-      final long garminTimeS = garminTime.getTimestamp();
-      final long garminTimeMS = garminTimeS * 1000;
-      final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+      final long javaTime = FitUtils.convertGarminTimeToJavaTime(
+            garminTime.getTimestamp());
 
       final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
       final LengthType lengthType = mesg.getLengthType();
@@ -77,5 +77,4 @@ public class MesgListener_Length extends AbstractMesgListener implements LengthM
          swimData.swim_StrokeStyle = swimStrokeStyle.getValue();
       }
    }
-
 }

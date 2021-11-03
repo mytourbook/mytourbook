@@ -245,7 +245,7 @@ public class HistoricalWeatherRetriever {
          weatherData.setPrecipitation(sumPrecipitation);
 
       } catch (final Exception e) {
-         StatusUtil.log(
+         StatusUtil.logError(
                "WeatherHistoryRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
          return null;
@@ -307,7 +307,7 @@ public class HistoricalWeatherRetriever {
          weatherHistory = response.body();
 
       } catch (final Exception ex) {
-         StatusUtil.log(
+         StatusUtil.logError(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
                      + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
          return UI.EMPTY_STRING;

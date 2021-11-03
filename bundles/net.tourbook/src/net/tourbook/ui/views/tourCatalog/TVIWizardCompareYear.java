@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,53 +21,77 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 public class TVIWizardCompareYear extends TVIWizardCompareItem {
 
    int tourYear;
 
-   TVIWizardCompareYear(final TVIWizardCompareItem parentItem) {
+   TVIWizardCompareYear(final TVIWizardCompareItem parentItem, final boolean isUseAppFilter) {
+
       setParentItem(parentItem);
+
+      this.isUseAppFilter = isUseAppFilter;
    }
 
    @Override
    protected void fetchChildren() {
 
-      final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+      /*
+       * Set the children for the year item, these are month items
+       */
+      final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
+      // use fast app filter
+      final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
 
-      sb.append("SELECT"); //$NON-NLS-1$
+      String sqlWhere = UI.EMPTY_STRING;
 
-      sb.append(" startYear, "); //$NON-NLS-1$
-      sb.append(" startMonth "); //$NON-NLS-1$
+      if (isUseAppFilter) {
+         sqlWhere = UI.SPACE + appFilter.getWhereClause() + NL; //
+      }
 
-      sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+      final String sql = NL
 
-      sb.append(" WHERE startYear=?"); //$NON-NLS-1$
+            + "SELECT" + NL //                                 //$NON-NLS-1$
 
-      sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
-      sb.append(" ORDER BY startMonth"); //$NON-NLS-1$
+            + " startYear, " + NL //                           //$NON-NLS-1$
+            + " startMonth " + NL //                           //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //  //$NON-NLS-1$
+
+            + " WHERE startYear=?" + NL //                     //$NON-NLS-1$
+            + sqlWhere
+
+            + " GROUP BY startYear, startMonth" + NL //        //$NON-NLS-1$
+            + " ORDER BY startMonth" + NL //                   //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
-         statement.setInt(1, tourYear);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+         stmt.setInt(1, tourYear);
 
-         final ResultSet result = statement.executeQuery();
+         // app filter parameters
+         if (isUseAppFilter) {
+            appFilter.setParameters(stmt, 2);
+         }
+
+         final ResultSet result = stmt.executeQuery();
          while (result.next()) {
 
-            final TVIWizardCompareMonth monthItem = new TVIWizardCompareMonth(this);
+            final TVIWizardCompareMonth monthItem = new TVIWizardCompareMonth(this, isUseAppFilter);
             children.add(monthItem);
 
             final int dbYear = result.getInt(1);
             final int dbMonth = result.getInt(2);
 
-            monthItem.treeColumn = calendar8//
+            monthItem.treeColumn = monthDateTime
                   .withYear(dbYear)
                   .withMonth(dbMonth)
                   .format(TimeTools.Formatter_Month);

@@ -10,11 +10,24 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>21.3.0-SNAPSHOT</version>
+                                             <version>21.9.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
+	   <dependencies>
+		<dependency>
+			<groupId>org.eclipse.pde</groupId>
+			<artifactId>org.eclipse.pde.junit.runtime</artifactId>
+			<version>3.6.0</version>
+		</dependency>
+		<dependency>
+    <groupId>org.eclipse.core</groupId>
+    <artifactId>org.eclipse.core.runtime</artifactId>
+    <version>3.7.0</version>
+</dependency>
+</dependencies>
+	
    <properties>
-      <tycho.version>1.4.0</tycho.version>
+      <tycho.version>2.5.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -63,14 +76,25 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.17</id>                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2020-09</url>
+         <id>eclipse.platform.4.20</id>                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2021-06</url>
       </repository>   
 
+      <repository>
+         <id>eclipse.nattable.2.0</id>                                  <layout>p2</layout>
+         <url>http://download.eclipse.org/nattable/releases/2.0.0/repository</url>
+      </repository>   
+
+
+
+      <!-- Repo for Chromium is/was not supported in Eclipse
+      
       <repository>
          <id>com.make.chromium.cef</id>                                 <layout>p2</layout>
          <url>http://dl.maketechnology.io/chromium-cef/rls/repository</url>
       </repository>   
+      
+      -->
    
       <!-- 
       
@@ -99,10 +123,7 @@
       
       -->
       
-      <repository>
-         <id>eclipse.4.17.nl</id>                                       <layout>p2</layout>
-         <url>file:build/build.eclipse.4.17.nl.repo</url>
-      </repository>
+      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
 
    </repositories>
@@ -175,9 +196,43 @@
 
                </environments>
             </configuration>
-         </plugin>
+    </plugin>
+    <plugin>
+	    <groupId>org.eclipse.tycho</groupId>
+	    <artifactId>tycho-surefire-plugin</artifactId>
+	    <version>${tycho.version}</version>
+	    <configuration>
+		    <useUIHarness>true</useUIHarness>
+		    <useUIThread>false</useUIThread>
+		    <product>org.eclipse.platform.ide</product>
+		    <skipTests>true</skipTests>
+	    </configuration>
+    </plugin>
+    <plugin>
+	    <groupId>org.jacoco</groupId>
+	    <artifactId>jacoco-maven-plugin</artifactId>
+	    <version>0.8.7</version>
+	    <executions>
+		    <execution>
+			    <goals>
+				    <goal>prepare-agent</goal>
+		            </goals>
+		    </execution>
+		    <execution>
+			    <id>report</id>
+		            <phase>verify</phase>
+			    <goals>
+				    <goal>report-aggregate</goal>
+		            </goals>
+			    <configuration>
+				    <skip>true</skip>
+			    </configuration>
+                    </execution>
+            </executions>
+     </plugin>
 
-      </plugins>
+    </plugins>
    </build>
 
 </project>
+

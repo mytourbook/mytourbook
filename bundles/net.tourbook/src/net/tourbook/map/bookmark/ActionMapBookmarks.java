@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,8 +36,8 @@ public class ActionMapBookmarks extends ActionToolbarSlideout {
    public ActionMapBookmarks(final Composite ownerControl,
                              final IMapBookmarks mapBookmarks) {
 
-      super(TourbookPlugin.getImageDescriptor(Images.MapBookmark),
-            TourbookPlugin.getImageDescriptor(Images.MapBookmark_Disabled));
+      super(TourbookPlugin.getThemedImageDescriptor(Images.MapBookmark),
+            TourbookPlugin.getThemedImageDescriptor(Images.MapBookmark_Disabled));
 
       _ownerControl = ownerControl;
       _mapBookmarks = mapBookmarks;

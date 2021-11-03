@@ -15,16 +15,18 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -32,6 +34,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -86,61 +89,29 @@ public class ChartComponentAxis extends Canvas {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
+   ChartComponentAxis(final Chart chart, final Composite parent) {
 
       super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
       _chart = chart;
 
-      _moveMarkerColor = new Color(parent.getDisplay(), 0x8B, 0xC6, 0xFF);
+      _moveMarkerColor = UI.IS_DARK_THEME
+            ? new Color(70, 137, 201)
+            : new Color(0x8B, 0xC6, 0xFF);
 
       addDisposeListener(disposeEvent -> onDispose());
 
       addPaintListener(paintEvent -> onPaint(paintEvent.gc));
 
-      addDisposeListener(disposeEvent -> _axisImage = Util.disposeResource(_axisImage));
-
-      addMouseListener(new MouseAdapter() {
-         @Override
-         public void mouseDoubleClick(final MouseEvent e) {
-            _componentGraph.onMouseDoubleClick(e);
-         }
-
-         @Override
-         public void mouseDown(final MouseEvent e) {
-            onMouseDown();
-         }
-
-      });
+      addMouseListener(MouseListener.mouseDoubleClickAdapter(mouseEvent -> _componentGraph.onMouseDoubleClick(mouseEvent)));
+      addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown()));
 
       addMouseMoveListener(this::onMouseMove);
 
-      addMouseTrackListener(new MouseTrackListener() {
+      addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(this::onMouseEnter));
+      addMouseTrackListener(MouseTrackListener.mouseExitAdapter(this::onMouseExit));
 
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            onMouseEnter(e);
-         }
-
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            onMouseExit(e);
-         }
-
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      });
-
-      addControlListener(new ControlListener() {
-
-         @Override
-         public void controlMoved(final ControlEvent e) {}
-
-         @Override
-         public void controlResized(final ControlEvent e) {
-            _clientArea = getClientArea();
-         }
-      });
+      addControlListener(controlResizedAdapter(controlEvent -> _clientArea = getClientArea()));
 
       addListener(SWT.MouseWheel, this::onMouseWheel);
    }
@@ -203,20 +174,32 @@ public class ChartComponentAxis extends Canvas {
          _axisImage = Util.createImage(_display, _axisImage, axisRect);
       }
 
-      // draw into the image
-      final GC gc = new GC(_axisImage);
-      {
-         gc.setBackground(_chart.getBackgroundColor());
-         gc.fillRectangle(_axisImage.getBounds());
+      final Color backgroundColor = UI.isDarkTheme()
+            ? ThemeUtil.getDarkestBackgroundColor()
+            : _chart.getBackgroundColor();
 
-         draw_10_ZoomMarker(gc, axisRect);
-         draw_20_YUnits(gc, axisRect);
+      if (backgroundColor == null) {
 
-         if (_tourInfoIconToolTipProvider != null) {
-            _tourInfoIconToolTipProvider.paint(gc, axisRect);
+         // this happened during app startup with dark theme
+
+      } else {
+
+         // draw into the image
+
+         final GC gc = new GC(_axisImage);
+         {
+            gc.setBackground(backgroundColor);
+            gc.fillRectangle(_axisImage.getBounds());
+
+            draw_10_ZoomMarker(gc, axisRect);
+            draw_20_YUnits(gc, axisRect);
+
+            if (_tourInfoIconToolTipProvider != null) {
+               _tourInfoIconToolTipProvider.paint(gc, axisRect);
+            }
          }
+         gc.dispose();
       }
-      gc.dispose();
 
       _isAxisModified = false;
    }
@@ -232,6 +215,7 @@ public class ChartComponentAxis extends Canvas {
 
       final double zoomRatio = _componentGraph.getZoomRatio();
       if (zoomRatio == 1.0) {
+
          // chart is not zoomed
          return;
       }
@@ -256,7 +240,7 @@ public class ChartComponentAxis extends Canvas {
 
          final int devZoomMarkerWidth = (int) (devAxisWidth * moveRatio);
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                0,
                devYMarker,
                devZoomMarkerWidth,
@@ -268,8 +252,8 @@ public class ChartComponentAxis extends Canvas {
          final String zoomText = getZoomText(moveRatio * 100);
          final int textHeight = gc.textExtent(zoomText).y;
 
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-         gc.drawText(zoomText, //
+         gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         gc.drawText(zoomText,
                1,
                devYMarker - textHeight + 2,
                true);
@@ -280,7 +264,7 @@ public class ChartComponentAxis extends Canvas {
 
          final int devZoomMarkerWidth = (int) (devAxisWidth * moveValue);
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                devAxisWidth - devZoomMarkerWidth,
                devYMarker,
                devZoomMarkerWidth,
@@ -295,8 +279,8 @@ public class ChartComponentAxis extends Canvas {
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
 
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-         gc.drawText(zoomText, //
+         gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+         gc.drawText(zoomText,
                devAxisWidth - textWidth - 0,
                devYMarker - textHeight + 2,
                true);
@@ -384,29 +368,31 @@ public class ChartComponentAxis extends Canvas {
 //					labelExtend = gc.textExtent(yTitle);
 //				}
 
-            final int xPos = labelExtend.y / 2;
-            final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
+            int xPos = labelExtend.y / 2;
+            int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
-            final Color fgColor = new Color(_display, yData.getDefaultRGB());
-            gc.setForeground(fgColor);
+            gc.setForeground(new Color(yData.getRgbGraph_Text()));
 
             final Transform tr = new Transform(_display);
             {
+               xPos = DPIUtil.autoScaleUp(xPos);
+               yPos = DPIUtil.autoScaleUp(yPos);
+
                tr.translate(xPos, yPos);
                tr.rotate(-90f);
 
                gc.setTransform(tr);
                gc.drawText(yTitle, 0, 0, true);
-
                gc.setTransform(null);
             }
             tr.dispose();
-            fgColor.dispose();
          }
 
          /*
           * Draw y units
           */
+         gc.setForeground(Chart.FOREGROUND_COLOR_UNITS);
+
          int devY;
 
          for (final ChartUnit yUnit : yUnits) {
@@ -419,8 +405,6 @@ public class ChartComponentAxis extends Canvas {
             } else {
                devY = devYTop + (int) devYUnit;
             }
-
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
             final String valueLabel = yUnit.valueLabel;
 
@@ -449,7 +433,6 @@ public class ChartComponentAxis extends Canvas {
 
             // draw unit line only when units are available
 
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
             gc.drawLine(devX, devYBottom, devX, devYTop);
          }
       }
@@ -477,9 +460,7 @@ public class ChartComponentAxis extends Canvas {
 
    private void onDispose() {
 
-      if (_moveMarkerColor != null) {
-         _moveMarkerColor.dispose();
-      }
+      _axisImage = Util.disposeResource(_axisImage);
    }
 
    private void onMouseDown() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomIn extends Action {
 
-	private Map2View	fMapView;
+   private Map2View _map2View;
 
-	public ActionZoomIn(final Map2View mapView) {
+   public ActionZoomIn(final Map2View mapView) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		fMapView = mapView;
+      _map2View = mapView;
 
-		setToolTipText(Messages.map_action_zoom_in);
+      setToolTipText(Messages.map_action_zoom_in);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In_Disabled));
+   }
 
-	@Override
-	public void run() {
-		fMapView.actionZoomIn();
-	}
+   @Override
+   public void run() {
+      _map2View.actionZoomIn();
+   }
 
 }

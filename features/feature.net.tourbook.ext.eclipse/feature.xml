@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse"
       label="Additional Eclipse Plugins for MyTourbook"
-      version="4.17.0.qualifier">
+      version="4.19.0.qualifier">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -84,9 +84,9 @@
          id="org.eclipse.nebula.widgets.nattable.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0.202012161455"
          unpack="false"/>
-
+         
    <plugin
          id="org.eclipse.ui.themes"
          download-size="0"

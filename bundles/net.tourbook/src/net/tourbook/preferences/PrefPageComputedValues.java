@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -44,13 +46,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -59,8 +61,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
@@ -72,37 +72,37 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private static final String GRAPH_LABEL_CADENCE_UNIT          = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 
-   public static final String  ID                                = "net.tourbook.preferences.PrefPageComputedValues";    //$NON-NLS-1$
+   public static final String  ID                                = "net.tourbook.preferences.PrefPageComputedValues";                               //$NON-NLS-1$
 
-   public static final String  URL_DOUGLAS_PEUCKER_ALGORITHM     =
-         "https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm";                                //$NON-NLS-1$
+   public static final String  URL_DOUGLAS_PEUCKER_ALGORITHM     = "https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm"; //$NON-NLS-1$
 
-   private static final String STATE_COMPUTED_VALUE_SELECTED_TAB = "computedValue.selectedTab";                          //$NON-NLS-1$
+   private static final String STATE_COMPUTED_VALUE_SELECTED_TAB = "computedValue.selectedTab";                                                     //$NON-NLS-1$
 
    /*
-    * contains the tab folder index
+    * Contains the tab folder index
     */
-   public static final int    TAB_FOLDER_SMOOTHING     = 0;
-   public static final int    TAB_FOLDER_BREAK_TIME    = 1;
-   public static final int    TAB_FOLDER_ELEVATION     = 2;
-   public static final int    TAB_FOLDER_CADENCE_ZONES = 4;
+   public static final int    TAB_FOLDER_SMOOTHING      = 0;
+   public static final int    TAB_FOLDER_BREAK_TIME     = 1;
+   public static final int    TAB_FOLDER_PACE_SPEED     = 2;
+   public static final int    TAB_FOLDER_ELEVATION_GAIN = 3;
+   public static final int    TAB_FOLDER_CADENCE_ZONES  = 4;
 
-   private static final float SPEED_DIGIT_VALUE        = 10.0f;
+   private static final float SPEED_DIGIT_VALUE         = 10.0f;
 
    /**
     * 100 km/h is very high but it supports air planes which are slow on the ground
     */
-   public static final int    BREAK_MAX_SPEED_KM_H     = 1000;                            // 100.0 km/h
+   public static final int    BREAK_MAX_SPEED_KM_H      = 1000;                            // 100.0 km/h
 
    private int                DEFAULT_DESCRIPTION_WIDTH;
    private int                DEFAULT_V_DISTANCE_PARAGRAPH;
 
-   private IPreferenceStore   _prefStore               = TourbookPlugin.getPrefStore();
+   private IPreferenceStore   _prefStore                = TourbookPlugin.getPrefStore();
 
    private int                _initialUnitHashCode;
 
-   private NumberFormat       _nf0                     = NumberFormat.getNumberInstance();
-   private NumberFormat       _nf1                     = NumberFormat.getNumberInstance();
+   private NumberFormat       _nf0                      = NumberFormat.getNumberInstance();
+   private NumberFormat       _nf1                      = NumberFormat.getNumberInstance();
    {
       _nf0.setMinimumFractionDigits(0);
       _nf0.setMaximumFractionDigits(0);
@@ -111,7 +111,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    }
 
    private boolean                  _isUpdateUI;
-   private SelectionAdapter         _selectionListener;
+   private SelectionListener        _selectionListener;
    private MouseWheelListener       _spinnerMouseWheelListener;
 
    /**
@@ -125,7 +125,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    /*
     * UI controls
     */
-   private TabFolder         _tabFolder;
+   private CTabFolder        _tabFolder;
 
    private Combo             _comboBreakMethod;
 
@@ -137,6 +137,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Composite         _pageBreakByTimeDistance;
 
    private Label             _lblBreakDistanceUnit;
+
+   private Button            _rdoDeviceTime_Recorded;
+   private Button            _rdoComputedTime_Moving;
 
    private Spinner           _spinnerBreakShortestTime;
    private Spinner           _spinnerBreakMaxDistance;
@@ -180,8 +183,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
@@ -196,33 +198,35 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          /*
           * tab folder: computed values
           */
-         _tabFolder = new TabFolder(container, SWT.TOP);
-         GridDataFactory
-               .fillDefaults()//
+         _tabFolder = new CTabFolder(container, SWT.TOP);
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolder);
          {
 
-            final TabItem tabSmoothing = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabSmoothing = new CTabItem(_tabFolder, SWT.NONE);
             tabSmoothing.setControl(createUI_10_Smoothing(_tabFolder));
             tabSmoothing.setText(Messages.Compute_Values_Group_Smoothing);
 
-            final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
             tabBreakTime.setControl(createUI_50_BreakTime(_tabFolder));
             tabBreakTime.setText(Messages.Compute_BreakTime_Group_BreakTime);
 
-            final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
-            tabElevation.setControl(createUI_20_ElevationGain(_tabFolder));
+            final CTabItem tabPaceSpeed = new CTabItem(_tabFolder, SWT.NONE);
+            tabPaceSpeed.setControl(createUI_60_PaceSpeed(_tabFolder));
+            tabPaceSpeed.setText(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay);
+
+            final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
+            tabElevation.setControl(createUI_70_ElevationGain(_tabFolder));
             tabElevation.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
 
-            final TabItem tabHrZone = new TabItem(_tabFolder, SWT.NONE);
-            tabHrZone.setControl(createUI_60_HrZone(_tabFolder));
-            tabHrZone.setText(Messages.Compute_HrZone_Group);
-
-            // tab: cadence zones
-            final TabItem tabItemCadenceZones = new TabItem(_tabFolder, SWT.NONE);
-            tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolder));
+            final CTabItem tabItemCadenceZones = new CTabItem(_tabFolder, SWT.NONE);
+            tabItemCadenceZones.setControl(createUI_80_CadenceZones(_tabFolder));
             tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
+
+            final CTabItem tabHrZone = new CTabItem(_tabFolder, SWT.NONE);
+            tabHrZone.setControl(createUI_90_HrZone(_tabFolder));
+            tabHrZone.setText(Messages.Compute_HrZone_Group);
 
             /**
              * 4.8.2009 week no/year is currently disabled because a new field in the db is
@@ -246,13 +250,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_smoothingScrolledContainer);
       {
          _smoothingScrolledContent = _tk.createComposite(_smoothingScrolledContainer);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(_smoothingScrolledContent);
-         GridLayoutFactory
-               .swtDefaults() //
+         GridLayoutFactory.swtDefaults()
                .extendedMargins(5, 5, 10, 5)
                .numColumns(1)
                .applyTo(_smoothingScrolledContent);
@@ -276,97 +278,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       }
 
       return _smoothingScrolledContainer;
-   }
-
-   private Control createUI_20_ElevationGain(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
-         final Composite dpContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(dpContainer);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(dpContainer);
-         {
-            // label: DP Tolerance
-            final Link linkDP = new Link(dpContainer, SWT.NONE);
-            linkDP.setText(Messages.Compute_TourValue_ElevationGain_Link_DBTolerance);
-            linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
-            linkDP.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
-               }
-            });
-
-            // spinner: minimum altitude
-            _spinnerDPTolerance = new Spinner(dpContainer, SWT.BORDER);
-            GridDataFactory.fillDefaults().applyTo(_spinnerDPTolerance);
-            _spinnerDPTolerance.setMinimum(1); // 0.1
-            _spinnerDPTolerance.setMaximum(10000); // 1000
-            _spinnerDPTolerance.setDigits(1);
-            _spinnerDPTolerance.addSelectionListener(_selectionListener);
-            _spinnerDPTolerance.addMouseWheelListener(_spinnerMouseWheelListener);
-
-            // label: unit
-            final Label label = new Label(dpContainer, SWT.NONE);
-            label.setText(UI.UNIT_LABEL_ELEVATION);
-         }
-
-         {
-            // label: description
-            Label label = new Label(container, SWT.WRAP);
-            GridDataFactory
-                  .fillDefaults()//
-                  .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
-                  .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-                  .grab(true, false)
-                  .applyTo(label);
-            label.setText(Messages.Compute_TourValue_ElevationGain_Label_Description);
-
-            // label: tip
-            final Composite tipContainer = new Composite(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
-                  .grab(true, false)
-                  .applyTo(tipContainer);
-            GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(tipContainer);
-            tipContainer.setBackground(tipContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-            {
-               // label: description
-               label = new Label(tipContainer, SWT.WRAP);
-               GridDataFactory
-                     .fillDefaults()//
-                     .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-                     .grab(true, false)
-                     .applyTo(label);
-               label.setText(Messages.compute_tourValueElevation_label_description_Hints);
-            }
-         }
-
-         final Composite btnContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(btnContainer);
-         GridLayoutFactory.fillDefaults().applyTo(btnContainer);
-         {
-            // button: compute computed values
-            final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
-                  .applyTo(btnComputValues);
-            btnComputValues.setText(Messages.compute_tourValueElevation_button_computeValues);
-            btnComputValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
-            btnComputValues.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeElevationGainValues();
-               }
-            });
-         }
-      }
-      return container;
    }
 
    private Composite createUI_50_BreakTime(final Composite parent) {
@@ -398,13 +309,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // combo: break method
          _comboBreakMethod = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboBreakMethod.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateUIShowSelectedBreakTimeMethod();
-               onModifyBreakTime();
-            }
-         });
+         _comboBreakMethod.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> {
+
+                  updateUIShowSelectedBreakTimeMethod();
+                  onModifyComputedValuePreference();
+               }));
 
          // fill combo
          for (final BreakTimeMethod breakMethod : BreakTimeTool.BREAK_TIME_METHODS) {
@@ -427,8 +337,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * label: description part II
           */
          label = new Label(container, SWT.WRAP);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -440,7 +349,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * hints
           */
          FormTools.createBullets(
-               container, //
+               container,
                Messages.Compute_BreakTime_Label_Hints,
                1,
                2,
@@ -455,16 +364,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          GridLayoutFactory.fillDefaults().applyTo(btnContainer);
          {
             // button: compute computed values
-            final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-            GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputValues);
-            btnComputValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
-            btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
-            btnComputValues.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeBreakTimeValues();
-               }
-            });
+            final Button btnComputeValues = new Button(btnContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputeValues);
+            btnComputeValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
+            btnComputeValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
+            btnComputeValues.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onComputeBreakTimeValues()));
          }
       }
 
@@ -498,14 +403,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // spinner: minimum speed
             _spinnerBreakMinAvgSpeedAS = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_spinnerBreakMinAvgSpeedAS);
             _spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
             _spinnerBreakMinAvgSpeedAS.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
             _spinnerBreakMinAvgSpeedAS.setDigits(1);
             _spinnerBreakMinAvgSpeedAS.addSelectionListener(_selectionListener);
             _spinnerBreakMinAvgSpeedAS.addMouseWheelListener(_spinnerMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerBreakMinAvgSpeedAS);
 
             // label: km/h
             label = new Label(container, SWT.NONE);
@@ -523,14 +426,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // spinner: minimum speed
             _spinnerBreakMinSliceSpeedAS = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_spinnerBreakMinSliceSpeedAS);
             _spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
             _spinnerBreakMinSliceSpeedAS.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
             _spinnerBreakMinSliceSpeedAS.setDigits(1);
             _spinnerBreakMinSliceSpeedAS.addSelectionListener(_selectionListener);
             _spinnerBreakMinSliceSpeedAS.addMouseWheelListener(_spinnerMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerBreakMinSliceSpeedAS);
 
             // label: km/h
             label = new Label(container, SWT.NONE);
@@ -548,13 +449,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // spinner: minimum slice time
             _spinnerBreakMinSliceTimeAS = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_spinnerBreakMinSliceTimeAS);
             _spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
             _spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
             _spinnerBreakMinSliceTimeAS.addSelectionListener(_selectionListener);
             _spinnerBreakMinSliceTimeAS.addMouseWheelListener(_spinnerMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerBreakMinSliceTimeAS);
 
             // label: seconds
             label = new Label(container, SWT.NONE);
@@ -565,14 +464,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * label: description
           */
          final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory
-               .fillDefaults()//
+         label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed);
+         GridDataFactory.fillDefaults()
                .span(3, 1)
                .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .grab(true, false)
                .applyTo(label);
-         label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed);
       }
 
       return container;
@@ -596,14 +494,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // spinner: minimum speed
          _spinnerBreakMinAvgSpeed = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .applyTo(_spinnerBreakMinAvgSpeed);
          _spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
          _spinnerBreakMinAvgSpeed.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
          _spinnerBreakMinAvgSpeed.setDigits(1);
          _spinnerBreakMinAvgSpeed.addSelectionListener(_selectionListener);
          _spinnerBreakMinAvgSpeed.addMouseWheelListener(_spinnerMouseWheelListener);
+         GridDataFactory.fillDefaults().applyTo(_spinnerBreakMinAvgSpeed);
 
          // label: km/h
          label = new Label(container, SWT.NONE);
@@ -613,14 +509,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * label: description
           */
          label = new Label(container, SWT.WRAP);
-         GridDataFactory
-               .fillDefaults()//
+         label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
+         GridDataFactory.fillDefaults()
                .span(3, 1)
                .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .grab(true, false)
                .applyTo(label);
-         label.setText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
       }
 
       return container;
@@ -644,14 +539,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // spinner: minimum speed
          _spinnerBreakMinSliceSpeed = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .applyTo(_spinnerBreakMinSliceSpeed);
          _spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
          _spinnerBreakMinSliceSpeed.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
          _spinnerBreakMinSliceSpeed.setDigits(1);
          _spinnerBreakMinSliceSpeed.addSelectionListener(_selectionListener);
          _spinnerBreakMinSliceSpeed.addMouseWheelListener(_spinnerMouseWheelListener);
+         GridDataFactory.fillDefaults().applyTo(_spinnerBreakMinSliceSpeed);
 
          // label: km/h
          label = new Label(container, SWT.NONE);
@@ -661,14 +554,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * label: description
           */
          label = new Label(container, SWT.WRAP);
-         GridDataFactory
-               .fillDefaults()//
+         label.setText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
+         GridDataFactory.fillDefaults()
                .span(3, 1)
                .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .grab(true, false)
                .applyTo(label);
-         label.setText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
       }
 
       return container;
@@ -691,13 +583,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // spinner: break minimum time
             _spinnerBreakShortestTime = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_spinnerBreakShortestTime);
             _spinnerBreakShortestTime.setMinimum(1);
             _spinnerBreakShortestTime.setMaximum(120); // 120 seconds
             _spinnerBreakShortestTime.addSelectionListener(_selectionListener);
             _spinnerBreakShortestTime.addMouseWheelListener(_spinnerMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerBreakShortestTime);
 
             // label: unit
             label = new Label(container, SWT.NONE);
@@ -715,19 +605,16 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // spinner: break minimum time
             _spinnerBreakMaxDistance = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_spinnerBreakMaxDistance);
             _spinnerBreakMaxDistance.setMinimum(1);
             _spinnerBreakMaxDistance.setMaximum(1000); // 1000 m/yards
             _spinnerBreakMaxDistance.addSelectionListener(_selectionListener);
             _spinnerBreakMaxDistance.addMouseWheelListener(_spinnerMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerBreakMaxDistance);
 
             // label: unit
             _lblBreakDistanceUnit = new Label(container, SWT.NONE);
             _lblBreakDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
 //						.span(2, 1)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblBreakDistanceUnit);
@@ -745,13 +632,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // spinner: slice diff break time
             _spinnerBreakSliceDiff = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_spinnerBreakSliceDiff);
             _spinnerBreakSliceDiff.setMinimum(0);
             _spinnerBreakSliceDiff.setMaximum(60); // minutes
             _spinnerBreakSliceDiff.addSelectionListener(_selectionListener);
             _spinnerBreakSliceDiff.addMouseWheelListener(_spinnerMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerBreakSliceDiff);
 
             // label: unit
             label = new Label(container, SWT.NONE);
@@ -762,8 +647,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * label: description
           */
          final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .span(3, 1)
                .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -775,27 +659,120 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       return container;
    }
 
-   private Control createUI_60_HrZone(final Composite parent) {
+   private Control createUI_60_PaceSpeed(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).extendedMargins(5, 5, 10, 5).applyTo(container);
       {
-         final PreferenceLinkArea prefLink = new PreferenceLinkArea(
-               container,
-               SWT.NONE,
-               PrefPagePeople.ID,
-               Messages.Compute_HrZone_Link,
-               (IWorkbenchPreferenceContainer) getContainer(),
-               new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, null));
+         /*
+          * Time to use for pace and speed computation
+          */
+         {
+            final Label label = new Label(container, NONE);
+            label.setText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption);
+            label.setToolTipText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+         }
 
-         GridDataFactory
-               .fillDefaults()//
-               .grab(true, false)
-               .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-               .applyTo(prefLink.getControl());
+         final Composite innerContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(innerContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(innerContainer);
+         {
+            {
+               // Recorded time
+               _rdoDeviceTime_Recorded = new Button(innerContainer, SWT.RADIO);
+               _rdoDeviceTime_Recorded.setText(Messages.Pref_Appearance_Radio_UseRecordedTime);
+               _rdoDeviceTime_Recorded.setToolTipText(Messages.Pref_Appearance_Radio_UseRecordedTime_Tooltip);
+            }
+            {
+               // Moving time
+               _rdoComputedTime_Moving = new Button(innerContainer, SWT.RADIO);
+               _rdoComputedTime_Moving.setText(Messages.Pref_Appearance_Radio_UseMovingTime);
+               _rdoComputedTime_Moving.setToolTipText(Messages.Pref_Appearance_Radio_UseMovingTime_Tooltip);
+            }
+         }
       }
 
+      return container;
+   }
+
+   private Control createUI_70_ElevationGain(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         final Composite dpContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(dpContainer);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(dpContainer);
+         {
+            // label: DP Tolerance
+            final Link linkDP = new Link(dpContainer, SWT.NONE);
+            linkDP.setText(Messages.Compute_TourValue_ElevationGain_Link_DBTolerance);
+            linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
+            linkDP.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM)));
+
+            // spinner: minimum altitude
+            _spinnerDPTolerance = new Spinner(dpContainer, SWT.BORDER);
+            GridDataFactory.fillDefaults().applyTo(_spinnerDPTolerance);
+            _spinnerDPTolerance.setMinimum(1); // 0.1
+            _spinnerDPTolerance.setMaximum(10000); // 1000
+            _spinnerDPTolerance.setDigits(1);
+            _spinnerDPTolerance.addSelectionListener(_selectionListener);
+            _spinnerDPTolerance.addMouseWheelListener(_spinnerMouseWheelListener);
+
+            // label: unit
+            final Label label = new Label(dpContainer, SWT.NONE);
+            label.setText(UI.UNIT_LABEL_ELEVATION);
+         }
+
+         {
+            // label: description
+            Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.Compute_TourValue_ElevationGain_Label_Description);
+            GridDataFactory.fillDefaults()
+                  .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+                  .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+                  .grab(true, false)
+                  .applyTo(label);
+
+            // label: tip
+            final Composite tipContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+                  .grab(true, false)
+                  .applyTo(tipContainer);
+            GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(tipContainer);
+            tipContainer.setBackground(tipContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+            {
+               // label: description
+               label = new Label(tipContainer, SWT.WRAP);
+               label.setText(Messages.compute_tourValueElevation_label_description_Hints);
+               GridDataFactory.fillDefaults()
+                     .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+                     .grab(true, false)
+                     .applyTo(label);
+            }
+         }
+
+         final Composite btnContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().applyTo(btnContainer);
+         GridLayoutFactory.fillDefaults().applyTo(btnContainer);
+         {
+            // button: compute computed values
+            final Button btnComputeValues = new Button(btnContainer, SWT.NONE);
+            btnComputeValues.setText(Messages.compute_tourValueElevation_button_computeValues);
+            btnComputeValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
+            btnComputeValues.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onComputeElevationGainValues()));
+            GridDataFactory.fillDefaults()
+                  .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+                  .applyTo(btnComputeValues);
+         }
+      }
       return container;
    }
 
@@ -803,7 +780,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
     * UI for the selection of the cadence differentiating slow cadence (hiking) from
     * fast cadence (running).
     */
-   private Control createUI_70_CadenceZones(final Composite parent) {
+   private Control createUI_80_CadenceZones(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
@@ -818,15 +795,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _spinnerCadenceDelimiter.setMinimum(0);
          _spinnerCadenceDelimiter.setMaximum(200);
          _spinnerCadenceDelimiter.addSelectionListener(_selectionListener);
-         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onModifyCadenceZonesDelimiter();
+         _spinnerCadenceDelimiter.addMouseWheelListener(mouseEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            onModifyComputedValuePreference();
          });
 
          // label: unit
@@ -838,24 +812,43 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       {
          // label: Text explaining the meaning of the two zones
          final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults()//
+         label.setText(Messages.Compute_CadenceZonesTimes_Label_Description_CadenceZonesDelimiter);
+         GridDataFactory.fillDefaults()
                .grab(true, false)
                .span(3, 0)
                .hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(label);
-         label.setText(Messages.Compute_CadenceZonesTimes_Label_Description_CadenceZonesDelimiter);
       }
 
       // button: compute time values
       final Button buttonComputeTimes = new Button(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
       buttonComputeTimes.setText(Messages.Compute_CadenceZonesTimes_ComputeAllTours);
-      buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onComputeCadenceZonesTimeValues();
-         }
-      });
+      buttonComputeTimes.addSelectionListener(widgetSelectedAdapter(
+            selectionEvent -> onComputeCadenceZonesTimeValues()));
+
+      return container;
+   }
+
+   private Control createUI_90_HrZone(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(1).applyTo(container);
+      {
+         final PreferenceLinkArea prefLink = new PreferenceLinkArea(
+               container,
+               SWT.NONE,
+               PrefPagePeople.ID,
+               Messages.Compute_HrZone_Link,
+               (IWorkbenchPreferenceContainer) getContainer(),
+               new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, null));
+
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+               .applyTo(prefLink.getControl());
+      }
 
       return container;
    }
@@ -895,30 +888,26 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       _pc = new PixelConverter(parent);
 
-      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
+      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(70);
       DEFAULT_V_DISTANCE_PARAGRAPH = _pc.convertVerticalDLUsToPixels(4);
 
       _initialUnitHashCode = UI.UNIT_HASH_CODE;
 
-      _selectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyBreakTime();
-         }
-      };
+      _selectionListener = widgetSelectedAdapter(
+            selectionEvent -> {
 
-      _spinnerMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            if (_isUpdateUI) {
-               return;
-            }
-            Util.adjustSpinnerValueOnMouseScroll(event);
-            onModifyBreakTime();
+               if (_isUpdateUI) {
+                  return;
+               }
+               onModifyComputedValuePreference();
+            });
+
+      _spinnerMouseWheelListener = mouseEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModifyComputedValuePreference();
       };
    }
 
@@ -1160,17 +1149,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       fireTourModifyEvent();
    }
 
-   private void onModifyBreakTime() {
-
-      saveState();
-
-      TourManager.getInstance().removeAllToursFromCache();
-
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
-   }
-
-   private void onModifyCadenceZonesDelimiter() {
+   private void onModifyComputedValuePreference() {
 
       saveState();
 
@@ -1182,6 +1161,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    @Override
    public boolean performCancel() {
+
       saveUIState();
       return super.performCancel();
    }
@@ -1191,7 +1171,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       final int selectedTab = _tabFolder.getSelectionIndex();
 
-      if (selectedTab == TAB_FOLDER_ELEVATION) {
+      if (selectedTab == TAB_FOLDER_ELEVATION_GAIN) {
 
          /*
           * compute altitude
@@ -1262,7 +1242,16 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _isUpdateUI = false;
 
          // keep state and fire event
-         onModifyBreakTime();
+         onModifyComputedValuePreference();
+
+      } else if (selectedTab == TAB_FOLDER_PACE_SPEED) {
+
+         final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getDefaultBoolean(
+               ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
+         _rdoDeviceTime_Recorded.setSelection(isPaceAndSpeedFromRecordedTime);
+         _rdoComputedTime_Moving.setSelection(!isPaceAndSpeedFromRecordedTime);
+
       } else if (selectedTab == TAB_FOLDER_CADENCE_ZONES) {
 
          final int cadenceZonesDelimiterValue = _prefStore.getDefaultInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER);
@@ -1331,7 +1320,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _spinnerBreakSliceDiff.setSelection(prefSliceDiff);
 
          /*
-          * folder
+          * Folder
           */
          _tabFolder.setSelection(_prefStore.getInt(STATE_COMPUTED_VALUE_SELECTED_TAB));
 
@@ -1339,6 +1328,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * Cadence zones delimiter
           */
          _spinnerCadenceDelimiter.setSelection(_prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER));
+
+         /*
+          * Pace/Speed
+          */
+         final boolean prefIsRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+         _rdoDeviceTime_Recorded.setSelection(prefIsRecordedTime);
+         _rdoComputedTime_Moving.setSelection(!prefIsRecordedTime);
 
          updateUIShowSelectedBreakTimeMethod();
       }
@@ -1418,6 +1414,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
        * Cadence delimiter value
        */
       _prefStore.setValue(ITourbookPreferences.CADENCE_ZONES_DELIMITER, _spinnerCadenceDelimiter.getSelection());
+
+      /*
+       * Pace/Speed
+       */
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
    }
 
    private void saveUIState() {

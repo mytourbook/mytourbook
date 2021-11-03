@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ public class ActionSynchChartScale extends Action {
 
       _statView = statView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
       setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
    }
 

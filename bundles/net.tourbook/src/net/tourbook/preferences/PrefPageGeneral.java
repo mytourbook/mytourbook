@@ -62,6 +62,8 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -71,8 +73,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -139,7 +139,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    /*
     * UI controls
     */
-   private TabFolder _tabFolder;
+   private CTabFolder _tabFolder;
 
    // timezone
    private Button _chkTimeZone_LiveUpdate;
@@ -212,25 +212,26 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       GridLayoutFactory.fillDefaults().applyTo(parent);
       {
 
-         _tabFolder = new TabFolder(parent, SWT.TOP);
+         _tabFolder = new CTabFolder(parent, SWT.TOP /* | SWT.BORDER | SWT.FLAT */);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolder);
+//         _tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
 
-            final TabItem tabMeasurementSystem = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabMeasurementSystem = new CTabItem(_tabFolder, SWT.NONE);
             tabMeasurementSystem.setControl(createUI_100_MeasurementSystem(_tabFolder));
             tabMeasurementSystem.setText(Messages.Pref_general_system_measurement);
 
-            final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
             tabBreakTime.setControl(createUI_200_TimeZone(_tabFolder));
             tabBreakTime.setText(Messages.Pref_General_Group_TimeZone);
 
-            final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
             tabElevation.setControl(createUI_300_WeekNumber(_tabFolder));
             tabElevation.setText(Messages.Pref_General_CalendarWeek);
 
-            final TabItem tabNotes = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabNotes = new CTabItem(_tabFolder, SWT.NONE);
             tabNotes.setControl(createUI_400_Notes(_tabFolder));
             tabNotes.setText(Messages.Pref_General_Notes);
          }
@@ -264,6 +265,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                   .applyTo(_chkSystem_ShowMeasurementInAppToolbar);
          }
       }
+
+      container.getDisplay().asyncExec(() -> {
+//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+      });
 
       return container;
    }

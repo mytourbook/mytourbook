@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,8 +34,8 @@ public class ActionSyncMapWithChartSlider extends Action {
 
 		setToolTipText(Messages.map_action_synch_with_slider);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled));
 	}
 
 	@Override

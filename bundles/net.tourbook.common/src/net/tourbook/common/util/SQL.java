@@ -170,7 +170,7 @@ public final class SQL {
                   "SQL Error", //$NON-NLS-1$
                   message);
 
-            StatusUtil.log(message);
+            StatusUtil.logError(message);
             StatusUtil.log(exception);
          }
       });

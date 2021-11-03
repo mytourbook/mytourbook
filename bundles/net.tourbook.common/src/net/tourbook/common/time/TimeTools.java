@@ -52,6 +52,7 @@ import org.eclipse.osgi.util.NLS;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.shredzone.commons.suncalc.SunTimes;
 
 public class TimeTools {
 
@@ -145,6 +146,8 @@ public class TimeTools {
     * The date must not be in the first or last week of the year.
     */
    private static LocalDate               _dateToGetNumOfWeeks = LocalDate.of(2000, 5, 5);
+
+   private static final Object            TIME_ZONE_LOCK       = new Object();
 
    static {
 
@@ -266,6 +269,20 @@ public class TimeTools {
       return dtYMDhms;
    }
 
+   private static SunTimes createSunTimes(final ZonedDateTime zonedDateTime, final double latitude, final double longitude) {
+
+      // Because giving a date with a specific hour could result into getting the
+      // sunset of the previous day,
+      // we adjust the date to the beginning of the day
+
+      final SunTimes times = SunTimes.compute()
+            .on(zonedDateTime.getYear(), zonedDateTime.getMonthValue(), zonedDateTime.getDayOfMonth())
+            .timezone(zonedDateTime.getZone())
+            .at(latitude, longitude)
+            .execute();
+      return times;
+   }
+
    /**
     * Creates a tour date time with the tour time zone.
     *
@@ -318,6 +335,24 @@ public class TimeTools {
       return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
    }
 
+   public static ZonedDateTime determineSunriseTimes(final ZonedDateTime zonedDateTime,
+                                                     final double latitude,
+                                                     final double longitude) {
+
+      final SunTimes times = createSunTimes(zonedDateTime, latitude, longitude);
+
+      return times.getRise();
+   }
+
+   public static ZonedDateTime determineSunsetTimes(final ZonedDateTime zonedDateTime,
+                                                    final double latitude,
+                                                    final double longitude) {
+
+      final SunTimes times = createSunTimes(zonedDateTime, latitude, longitude);
+
+      return times.getSet();
+   }
+
    /**
     * @return Returns a list with all available time zones which are sorted by zone offset, zone id
     *         and zone name key.
@@ -326,73 +361,80 @@ public class TimeTools {
 
       if (_allSortedTimeZones == null) {
 
-         final int currentYear = LocalDate.now().getYear();
+         synchronized (TIME_ZONE_LOCK) {
 
-         final ArrayList<TimeZoneData> sortedTimeZones = new ArrayList<>();
+            // check again, it could be created in another thread
+            if (_allSortedTimeZones == null) {
 
-         for (final String rawZoneId : ZoneId.getAvailableZoneIds()) {
+               final int currentYear = LocalDate.now().getYear();
 
-            final ZoneId zoneId = ZoneId.of(rawZoneId);
-            final ZoneRules zoneRules = zoneId.getRules();
+               final ArrayList<TimeZoneData> sortedTimeZones = new ArrayList<>();
 
-            final ZonedDateTime zonedDateTimeWinter = ZonedDateTime.of(currentYear, 1, 1, 12, 0, 0, 0, zoneId);
-            final ZonedDateTime zonedDateTimeSummer = ZonedDateTime.of(currentYear, 6, 1, 12, 0, 0, 0, zoneId);
+               for (final String rawZoneId : ZoneId.getAvailableZoneIds()) {
 
-            final ZoneOffset zoneOffsetWinter = zonedDateTimeWinter.getOffset();
-            final ZoneOffset zoneOffsetSummer = zonedDateTimeSummer.getOffset();
-            final int utcTimeZoneSecondsWinter = zoneOffsetWinter.getTotalSeconds();
-            final int utcTimeZoneSecondsSummer = zoneOffsetSummer.getTotalSeconds();
+                  final ZoneId zoneId = ZoneId.of(rawZoneId);
+                  final ZoneRules zoneRules = zoneId.getRules();
 
-            final Instant nowInstantWinter = zonedDateTimeWinter.toInstant();
-            final Instant nowInstantSummer = zonedDateTimeSummer.toInstant();
+                  final ZonedDateTime zonedDateTimeWinter = ZonedDateTime.of(currentYear, 1, 1, 12, 0, 0, 0, zoneId);
+                  final ZonedDateTime zonedDateTimeSummer = ZonedDateTime.of(currentYear, 6, 1, 12, 0, 0, 0, zoneId);
 
-            final Boolean isDstWinter = zoneRules.isDaylightSavings(nowInstantWinter);
-            final Boolean isDstSummer = zoneRules.isDaylightSavings(nowInstantSummer);
+                  final ZoneOffset zoneOffsetWinter = zonedDateTimeWinter.getOffset();
+                  final ZoneOffset zoneOffsetSummer = zonedDateTimeSummer.getOffset();
+                  final int utcTimeZoneSecondsWinter = zoneOffsetWinter.getTotalSeconds();
+                  final int utcTimeZoneSecondsSummer = zoneOffsetSummer.getTotalSeconds();
 
-            final Duration dstDurationWinter = zoneRules.getDaylightSavings(nowInstantWinter);
-            final Duration dstDurationSummer = zoneRules.getDaylightSavings(nowInstantSummer);
+                  final Instant nowInstantWinter = zonedDateTimeWinter.toInstant();
+                  final Instant nowInstantSummer = zonedDateTimeSummer.toInstant();
 
-            final String dstSouth = NLS.bind(
-                  Messages.Time_Tools_DST_South,
-                  printDSTDuration(dstDurationWinter.getSeconds() * 1000));
+                  final Boolean isDstWinter = zoneRules.isDaylightSavings(nowInstantWinter);
+                  final Boolean isDstSummer = zoneRules.isDaylightSavings(nowInstantSummer);
 
-            final String dstNorth = NLS.bind(
-                  Messages.Time_Tools_DST_North,
-                  printDSTDuration(dstDurationSummer.getSeconds() * 1000));
+                  final Duration dstDurationWinter = zoneRules.getDaylightSavings(nowInstantWinter);
+                  final Duration dstDurationSummer = zoneRules.getDaylightSavings(nowInstantSummer);
 
-            final String dst = UI.EMPTY_STRING
-                  + (isDstWinter ? dstSouth : UI.EMPTY_STRING)
-                  + (isDstSummer ? dstNorth : UI.EMPTY_STRING);
+                  final String dstSouth = NLS.bind(
+                        Messages.Time_Tools_DST_South,
+                        printDSTDuration(dstDurationWinter.getSeconds() * 1000));
 
-            final String label = UI.EMPTY_STRING
-                  + (printOffset(utcTimeZoneSecondsWinter, false) + UI.SPACE4)
-                  + (printOffset(utcTimeZoneSecondsSummer, false) + UI.SPACE4)
-                  + zoneId.getId()
-                  + (dst.length() == 0 //
-                        ? UI.EMPTY_STRING
-                        : UI.DASH_WITH_DOUBLE_SPACE + dst);
+                  final String dstNorth = NLS.bind(
+                        Messages.Time_Tools_DST_North,
+                        printDSTDuration(dstDurationSummer.getSeconds() * 1000));
 
-            final TimeZoneData timeZone = new TimeZoneData();
+                  final String dst = UI.EMPTY_STRING
+                        + (isDstWinter ? dstSouth : UI.EMPTY_STRING)
+                        + (isDstSummer ? dstNorth : UI.EMPTY_STRING);
 
-            timeZone.label = label;
-            timeZone.zoneId = zoneId.getId();
-            timeZone.zoneOffsetSeconds = utcTimeZoneSecondsWinter;
+                  final String label = UI.EMPTY_STRING
+                        + printOffset(utcTimeZoneSecondsWinter, false) + UI.SPACE4
+                        + printOffset(utcTimeZoneSecondsSummer, false) + UI.SPACE4
+                        + zoneId.getId()
+                        + (dst.length() == 0
+                              ? UI.EMPTY_STRING
+                              : UI.DASH_WITH_DOUBLE_SPACE + dst);
 
-            sortedTimeZones.add(timeZone);
-         }
+                  final TimeZoneData timeZone = new TimeZoneData();
 
-         Collections.sort(sortedTimeZones, (timeZoneData1, timeZoneData2) -> {
+                  timeZone.label = label;
+                  timeZone.zoneId = zoneId.getId();
+                  timeZone.zoneOffsetSeconds = utcTimeZoneSecondsWinter;
 
-            int result = timeZoneData1.zoneId.compareTo(timeZoneData2.zoneId);
+                  sortedTimeZones.add(timeZone);
+               }
 
-            if (result == 0) {
-               result = timeZoneData1.zoneOffsetSeconds - timeZoneData2.zoneOffsetSeconds;
+               Collections.sort(sortedTimeZones, (timeZoneData1, timeZoneData2) -> {
+
+                  int result = timeZoneData1.zoneId.compareTo(timeZoneData2.zoneId);
+
+                  if (result == 0) {
+                     result = timeZoneData1.zoneOffsetSeconds - timeZoneData2.zoneOffsetSeconds;
+                  }
+
+                  return result;
+               });
+
+               _allSortedTimeZones = sortedTimeZones;
             }
-
-            return result;
-         });
-
-         _allSortedTimeZones = sortedTimeZones;
+         }
       }
 
       return _allSortedTimeZones;
@@ -422,7 +464,7 @@ public class TimeTools {
       final ZonedDateTime zdt = ZonedDateTime.now();
       final int tzOffset = zdt.getOffset().getTotalSeconds();
 
-      final Period period = new Period(tzOffset * 1000);
+      final Period period = new Period(tzOffset * 1000L);
 
       return period.toString(DURATION_FORMATTER);
    }
@@ -576,7 +618,7 @@ public class TimeTools {
     */
    public static ZonedDateTime getZonedDateTime(final long epochOfMilli) {
 
-      return ZonedDateTime.ofInstant(//
+      return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             getDefaultTimeZone());
    }
@@ -588,7 +630,7 @@ public class TimeTools {
     */
    public static ZonedDateTime getZonedDateTimeWithUTC(final long epochOfMilli) {
 
-      return ZonedDateTime.ofInstant(//
+      return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             ZoneOffset.UTC);
    }
@@ -599,6 +641,14 @@ public class TimeTools {
    public static ZonedDateTime now() {
 
       return ZonedDateTime.now(getDefaultTimeZone());
+   }
+
+   /**
+    * @return Return now with the default time zone in milliseconds
+    */
+   public static long nowInMilliseconds() {
+
+      return now().toInstant().toEpochMilli();
    }
 
    /**

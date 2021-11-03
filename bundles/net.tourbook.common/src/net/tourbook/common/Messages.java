@@ -25,8 +25,17 @@ public class Messages extends NLS {
    public static String        App_Action_New_WithConfirm;
    public static String        App_Action_Remove_NoConfirm;
    public static String        App_Action_Rename_WithConfirm;
+   public static String        App_Action_RestoreDefault;
+   public static String        App_Action_RestoreDefault_Tooltip;
 
    public static String        App_Error_NotSupportedValueFormatter;
+
+   public static String        App_Theme_BackgroundColor_Light_Tooltip;
+   public static String        App_Theme_BackgroundColor_Dark_Tooltip;
+   public static String        App_Theme_ForegroundColor_Light_Tooltip;
+   public static String        App_Theme_ForegroundColor_Dark_Tooltip;
+   public static String        App_Theme_ValueFor_Light_Tooltip;
+   public static String        App_Theme_ValueFor_Dark_Tooltip;
 
    public static String        Action_App_CustomizeColumnsAndProfiles;
    public static String        Action_App_SizeAllColumnsToFit;
@@ -45,6 +54,14 @@ public class Messages extends NLS {
    public static String        Action_ColumnManager_ValueFormatter_Tour;
 
    public static String        Advanced_Menu_AnimationSymbol;
+
+   public static String        Battery_Status_CHARGING;
+   public static String        Battery_Status_CRITICAL;
+   public static String        Battery_Status_GOOD;
+   public static String        Battery_Status_LOW;
+   public static String        Battery_Status_NEW;
+   public static String        Battery_Status_OK;
+   public static String        Battery_Status_UNKNOWN;
 
    public static String        Column_Annotation_Formatting;
    public static String        Column_Annotation_Sorting;
@@ -133,11 +150,14 @@ public class Messages extends NLS {
    public static String        Graph_Label_Pace;
    public static String        Graph_Label_Power;
    public static String        Graph_Label_Power_Unit;
+   public static String        Graph_Label_Sensor;
    public static String        Graph_Label_Speed;
    public static String        Graph_Label_Temperature;
-   public static String        Graph_Label_TimeDuration;
    public static String        Graph_Label_Time;
+   public static String        Graph_Label_TimeDuration;
+   public static String        Graph_Label_TimeEnd;
    public static String        Graph_Label_TimeOfDay;
+   public static String        Graph_Label_TimeStart;
    public static String        Graph_Label_Tour;
    public static String        Graph_Label_Tour_Compare;
    public static String        Graph_Label_Tour_Compare_Unit;
@@ -159,11 +179,13 @@ public class Messages extends NLS {
 
    public static String        Graph_Pref_color_gradient_bright;
    public static String        Graph_Pref_color_gradient_dark;
-   public static String        Graph_Pref_color_line;
    public static String        Graph_Pref_color_mapping;
    public static String        Graph_Pref_color_statistic_distance;
    public static String        Graph_Pref_color_statistic_time;
-   public static String        Graph_Pref_ColorText;
+   public static String        Graph_Pref_ColorLine_Theme_Dark;
+   public static String        Graph_Pref_ColorLine_Theme_Light;
+   public static String        Graph_Pref_ColorText_Theme_Dark;
+   public static String        Graph_Pref_ColorText_Theme_Light;
 
    public static String        Map3_Color_ProfileName_Default;
    public static String        Map3_Color_ProfileName_New;
@@ -249,7 +271,7 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_Pressure_Atmosphere_Millibar;
    public static String        Pref_System_Option_SmallLength_Inch;
    public static String        Pref_System_Option_SmallLength_Millimeter;
-   public static String        Pref_System_Option_Temperature_Celcius;
+   public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
 
    public static String        Weather_Clounds_Clouds;

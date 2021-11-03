@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,13 +39,13 @@ public abstract class ChartDataSerie {
    public static final int         X_AXIS_UNIT_HOUR_MINUTE               = 202;
    public static final int         X_AXIS_UNIT_HISTORY                   = 500;
 
-   public static final String      CHART_TYPE_BAR_ADJACENT               = "CHART_TYPE_BAR_ADJACENT";       //$NON-NLS-1$
-   public static final String      CHART_TYPE_BAR_STACKED                = "CHART_TYPE_BAR_STACKED";        //$NON-NLS-1$
+   public static final String      CHART_TYPE_BAR_ADJACENT               = "CHART_TYPE_BAR_ADJACENT"; //$NON-NLS-1$
+   public static final String      CHART_TYPE_BAR_STACKED                = "CHART_TYPE_BAR_STACKED";  //$NON-NLS-1$
 
    /**
     * Default color, when default color is not set
     */
-   private static RGB              DEFAULT_DEFAULT_RGB                   = new RGB(0xFF, 0xA5, 0xCB);
+   private static RGB              DEFAULT_GRAPH_RGB                     = new RGB(0xFF, 0xA5, 0xCB);
 
    /**
     * divisor for highValues
@@ -108,12 +108,20 @@ public abstract class ChartDataSerie {
 
    private HashMap<String, Object> _customData                           = new HashMap<>();
 
-   private RGB                     _rgbBright[]                          = new RGB[] { new RGB(255, 0, 0) };
-   private RGB                     _rgbDark[]                            = new RGB[] { new RGB(0, 0, 255) };
-   private RGB                     _rgbLine[]                            = new RGB[] { new RGB(0, 255, 0) };
-   private RGB                     _rgbText[]                            = new RGB[] { new RGB(0, 0, 0) };
+   /*
+    * Bar colors are mainly used for bar graphs
+    */
+   private RGB[] _rgbBar_Gradient_Bright = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB[] _rgbBar_Gradient_Dark   = new RGB[] { DEFAULT_GRAPH_RGB };
+   private RGB[] _rgbBar_Line            = new RGB[] { DEFAULT_GRAPH_RGB };
 
-   private RGB                     _defaultRGB;
+   /*
+    * Graph colors are mainly used for line graphs, graph title or units
+    */
+   private RGB _rgbGraph_Gradient_Bright = DEFAULT_GRAPH_RGB;
+   private RGB _rgbGraph_Gradient_Dark   = DEFAULT_GRAPH_RGB;
+   private RGB _rgbGraph_Line            = DEFAULT_GRAPH_RGB;
+   private RGB _rgbGraph_Text            = DEFAULT_GRAPH_RGB;
 
    public double getAvgPositiveValue() {
       return _avgPositiveValue;
@@ -135,22 +143,6 @@ public abstract class ChartDataSerie {
       }
    }
 
-   /**
-    * @return Returns the default color for this data serie
-    */
-   public RGB getDefaultRGB() {
-
-      /*
-       * when default color is not set, return an ugly color to see in the ui that something is
-       * wrong
-       */
-      if (_defaultRGB == null) {
-         return DEFAULT_DEFAULT_RGB;
-      }
-
-      return _defaultRGB;
-   }
-
    public int getDisplayedFractionalDigits() {
       return _displayedFractionalDigits;
    }
@@ -167,20 +159,37 @@ public abstract class ChartDataSerie {
       return _originalMinValue;
    }
 
-   public RGB[] getRgbBright() {
-      return _rgbBright;
+   public RGB[] getRgbBar_Gradient_Bright() {
+      return _rgbBar_Gradient_Bright;
    }
 
-   public RGB[] getRgbDark() {
-      return _rgbDark;
+   public RGB[] getRgbBar_Gradient_Dark() {
+      return _rgbBar_Gradient_Dark;
    }
 
-   public RGB[] getRgbLine() {
-      return _rgbLine;
+   public RGB[] getRgbBar_Line() {
+      return _rgbBar_Line;
    }
 
-   public RGB[] getRgbText() {
-      return _rgbText;
+   public RGB getRgbGraph_Gradient_Bright() {
+      return _rgbGraph_Gradient_Bright;
+   }
+
+   public RGB getRgbGraph_Gradient_Dark() {
+      return _rgbGraph_Gradient_Dark;
+   }
+
+   public RGB getRgbGraph_Line() {
+      return _rgbGraph_Line;
+   }
+
+   /**
+    * This color is mainly used to draw the graph tile, graph value or unit label
+    *
+    * @return
+    */
+   public RGB getRgbGraph_Text() {
+      return _rgbGraph_Text;
    }
 
    /**
@@ -224,6 +233,11 @@ public abstract class ChartDataSerie {
       return _isForceMinValue;
    }
 
+   /**
+    * Sets the unit for the x-axis, default is {@link #AXIS_UNIT_NUMBER}
+    *
+    * @param axisUnit
+    */
    public void setAxisUnit(final int axisUnit) {
       _axisUnit = axisUnit;
    }
@@ -236,15 +250,6 @@ public abstract class ChartDataSerie {
       _customData.put(key, value);
    }
 
-   /**
-    * This value is also used to draw the axis text for the data serie
-    *
-    * @param color
-    */
-   public void setDefaultRGB(final RGB color) {
-      _defaultRGB = color;
-   }
-
    public void setDisplayedFractionalDigits(final int displayedFractionalDigits) {
       _displayedFractionalDigits = displayedFractionalDigits;
    }
@@ -253,20 +258,37 @@ public abstract class ChartDataSerie {
       _label = label;
    }
 
-   public void setRgbBright(final RGB[] rgbBright) {
-      _rgbBright = rgbBright;
+   public void setRgbBar_Gradient_Bright(final RGB[] rgbGradient_Bright) {
+      _rgbBar_Gradient_Bright = rgbGradient_Bright;
    }
 
-   public void setRgbDark(final RGB[] rgbDark) {
-      _rgbDark = rgbDark;
+   public void setRgbBar_Gradient_Dark(final RGB[] rgbGradient_Dark) {
+      _rgbBar_Gradient_Dark = rgbGradient_Dark;
    }
 
-   public void setRgbLine(final RGB[] rgbLine) {
-      _rgbLine = rgbLine;
+   public void setRgbBar_Line(final RGB[] rgbLine) {
+      _rgbBar_Line = rgbLine;
    }
 
-   public void setRgbText(final RGB _rgbText[]) {
-      this._rgbText = _rgbText;
+   public void setRgbGraph_Gradient_Bright(final RGB rgbDefault_Gradient_Bright) {
+      _rgbGraph_Gradient_Bright = rgbDefault_Gradient_Bright;
+   }
+
+   public void setRgbGraph_Gradient_Dark(final RGB rgbDefault_Gradient_Dark) {
+      _rgbGraph_Gradient_Dark = rgbDefault_Gradient_Dark;
+   }
+
+   public void setRgbGraph_Line(final RGB rgbDefault_Line) {
+      _rgbGraph_Line = rgbDefault_Line;
+   }
+
+   /**
+    * This color is used to draw the graph tile, graph value or unit label
+    *
+    * @param rgbGraph_Text
+    */
+   public void setRgbGraph_Text(final RGB rgbGraph_Text) {
+      _rgbGraph_Text = rgbGraph_Text;
    }
 
    /**
@@ -288,10 +310,10 @@ public abstract class ChartDataSerie {
    public void setVisibleMinValue(final double minValue) {
 
 // debug: check Nan
-//		if (minValue != minValue) {
-//			int a = 0;
-//			a++;
-//		}
+//    if (minValue != minValue) {
+//       int a = 0;
+//       a++;
+//    }
 
       _visibleMinValue = minValue;
    }

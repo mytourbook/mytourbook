@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,10 +65,10 @@ public class Map3GradientColorManager {
     * Default colors are defined in the UI and then replaced with created code from
     * {@link #createCodeForDefaultColors(ArrayList)}.
     */
-   private static HashMap<MapGraphId, Map3ColorDefinition> _map3ColorDefinitions           = new HashMap<>();
+   private static EnumMap<MapGraphId, Map3ColorDefinition> _map3ColorDefinitions           = new EnumMap<>(MapGraphId.class);
    private static ArrayList<Map3ColorDefinition>           _sortedColorDefinitions;
 
-   private static HashMap<MapGraphId, Map3ColorProfile>    DEFAULT_PROFILES                = new HashMap<>();
+   private static EnumMap<MapGraphId, Map3ColorProfile>    DEFAULT_PROFILES                = new EnumMap<>(MapGraphId.class);
 
    private static final Map3ColorProfile                   DEFAULT_PROFILE;
 
@@ -101,7 +102,6 @@ public class Map3GradientColorManager {
    public static final int    OPACITY_MIN           = 0;
    public static final int    OPACITY_MAX           = 100;
    public static final double OPACITY_DIGITS_FACTOR = 100.0;
-   public static final int    OPACITY_DIGITS        = 2;
    public static final float  OPACITY_DEFAULT       = 1.0f;
 
    /**
@@ -718,7 +718,7 @@ public class Map3GradientColorManager {
       readColors();
 
       // sort by name
-      _sortedColorDefinitions = new ArrayList<>(_map3ColorDefinitions.values());
+      _sortedColorDefinitions = new ArrayList<>(getColorDefinitions().values());
       Collections.sort(_sortedColorDefinitions);
    }
 
@@ -734,7 +734,7 @@ public class Map3GradientColorManager {
 
       for (final Map3ColorDefinition colorDefinition : colorDefinitions) {
 
-         final ArrayList<Map3GradientColorProvider> colorProviders = colorDefinition.getColorProviders();
+         final List<Map3GradientColorProvider> colorProviders = colorDefinition.getColorProviders();
 
          final MapGraphId graphId = colorDefinition.getGraphId();
 
@@ -807,7 +807,8 @@ public class Map3GradientColorManager {
     */
    public static void disposeProfileImages() {
 
-      for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
+      for (final Map3ColorDefinition colorDef : getColorDefinitions().values()) {
+
          for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
 
             final Map3ColorProfile map3ColorProfile = colorProvider.getMap3ColorProfile();
@@ -821,7 +822,7 @@ public class Map3GradientColorManager {
 
       Map3GradientColorProvider activeColorProvider = null;
 
-      final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(graphId);
+      final List<Map3GradientColorProvider> colorProviders = getColorProviders(graphId);
 
       for (final Map3GradientColorProvider colorProvider : colorProviders) {
          if (colorProvider.getMap3ColorProfile().isActiveColorProfile()) {
@@ -844,7 +845,7 @@ public class Map3GradientColorManager {
 
    public static Map3ColorDefinition getColorDefinition(final MapGraphId graphId) {
 
-      final HashMap<MapGraphId, Map3ColorDefinition> mapColorDefinitions = getColorDefinitions();
+      final EnumMap<MapGraphId, Map3ColorDefinition> mapColorDefinitions = getColorDefinitions();
 
       final Map3ColorDefinition colorDef = mapColorDefinitions.get(graphId);
 
@@ -861,7 +862,7 @@ public class Map3GradientColorManager {
    /**
     * @return Returns color definitions which are defined for a 3D map.
     */
-   private static HashMap<MapGraphId, Map3ColorDefinition> getColorDefinitions() {
+   private static EnumMap<MapGraphId, Map3ColorDefinition> getColorDefinitions() {
 
       return _map3ColorDefinitions;
    }
@@ -870,7 +871,7 @@ public class Map3GradientColorManager {
     * @param graphId
     * @return Returns all color profiles for the requested {@link MapGraphId}.
     */
-   public static ArrayList<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
+   public static List<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
 
       return getColorDefinition(graphId).getColorProviders();
    }
@@ -905,18 +906,18 @@ public class Map3GradientColorManager {
 
       if (xmlColorDefinitions == null) {
 
-         for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
+         // set only first default color profile as active
+         getColorDefinitions().values().forEach(colorDefinition -> {
 
-            for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
-
-               final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
-
-               colorProfile.setIsActiveColorProfile(true);
-
-               // set only first default color profile as active
-               break;
+            final Map3GradientColorProvider firstColorProvider = colorDefinition.getColorProviders().get(0);
+            if (firstColorProvider == null) {
+               return;
             }
+
+            firstColorProvider.getMap3ColorProfile().setIsActiveColorProfile(true);
          }
+
+         );
 
          return;
       }
@@ -924,7 +925,7 @@ public class Map3GradientColorManager {
       // replace existing color providers with loaded color providers
       for (final Map3ColorDefinition xmlColorDef : xmlColorDefinitions) {
 
-         final ArrayList<Map3GradientColorProvider> xmlColorProvider = xmlColorDef.getColorProviders();
+         final List<Map3GradientColorProvider> xmlColorProvider = xmlColorDef.getColorProviders();
          if (xmlColorProvider.size() > 0) {
 
             final MapGraphId xmlGraphId = xmlColorDef.getGraphId();
@@ -937,7 +938,7 @@ public class Map3GradientColorManager {
       // ensure that only one color provider for each graph id is active
       for (final Map3ColorDefinition colorDef : getColorDefinitions().values()) {
 
-         final ArrayList<Map3GradientColorProvider> colorProviders = colorDef.getColorProviders();
+         final List<Map3GradientColorProvider> colorProviders = colorDef.getColorProviders();
 
          Map3GradientColorProvider activeColorProvider = null;
 
@@ -1118,7 +1119,7 @@ public class Map3GradientColorManager {
       final MapGraphId modifiedGraphId = modifiedColorProvider.getGraphId();
 
       // remove old profile
-      final ArrayList<Map3GradientColorProvider> allOriginalProviders = getColorProviders(originalGraphId);
+      final List<Map3GradientColorProvider> allOriginalProviders = getColorProviders(originalGraphId);
 
       // add new/modified profile
       if (originalGraphId == modifiedGraphId) {
@@ -1148,14 +1149,10 @@ public class Map3GradientColorManager {
     */
    public static void saveColors() {
 
-      BufferedWriter writer = null;
+      final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
+      final File file = stateLocation.append(MAP3_COLOR_FILE).toFile();
 
-      try {
-
-         final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
-         final File file = stateLocation.append(MAP3_COLOR_FILE).toFile();
-
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8))) {
 
          final XMLMemento xmlRoot = saveColors_0_getXMLRoot();
 
@@ -1165,15 +1162,6 @@ public class Map3GradientColorManager {
 
       } catch (final IOException e) {
          StatusUtil.log(e);
-      } finally {
-
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
    }
 
@@ -1264,7 +1252,7 @@ public class Map3GradientColorManager {
     */
    public static void setActiveColorProvider(final Map3GradientColorProvider activeColorProvider) {
 
-      final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(activeColorProvider.getGraphId());
+      final List<Map3GradientColorProvider> colorProviders = getColorProviders(activeColorProvider.getGraphId());
 
       for (final Map3GradientColorProvider colorProvider : colorProviders) {
 

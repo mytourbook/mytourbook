@@ -62,8 +62,8 @@ public class FileSystemManager {
          return null;
       }
 
-      final String filePath =
-            absolutefilePath.substring(tourbookFileSystem.getId().length());
+      final String filePath = absolutefilePath.substring(tourbookFileSystem.getId().length());
+
       return tourbookFileSystem.copyFileLocally(filePath);
    }
 

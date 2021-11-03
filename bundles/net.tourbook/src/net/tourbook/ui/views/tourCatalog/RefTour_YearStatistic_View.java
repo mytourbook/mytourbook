@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -27,6 +29,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
+import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
@@ -41,6 +44,7 @@ import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -61,8 +65,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -115,13 +117,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    }
 
    private int[]                             _displayedYears;
-
    private int[]                             _numberOfDaysInYear;
-
-   /**
-    * contains all {@link TVICatalogComparedTour} tour objects for all years
-    */
-   private ArrayList<TVICatalogComparedTour> _allTours                = new ArrayList<>();
 
    /**
     * Years which the user can select as start year in the combo box
@@ -129,20 +125,25 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private ArrayList<Integer>                _comboYears              = new ArrayList<>();
 
    /**
+    * Contains all {@link TVICatalogComparedTour} tour objects for all years
+    */
+   private ArrayList<TVICatalogComparedTour> _statValues_AllTours     = new ArrayList<>();
+
+   /**
     * Day of year values for all displayed years<br>
     * DOY...Day Of Year
     */
-   private ArrayList<Integer>                _DOYValues               = new ArrayList<>();
+   private ArrayList<Integer>                _statValues_DOYValues    = new ArrayList<>();
 
    /**
     * Tour speed for all years
     */
-   private ArrayList<Float>                  _tourSpeed               = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_TourSpeed    = new ArrayList<>();
 
    /**
-    * Average pulse for all years.
+    * Average pulse for all years
     */
-   private ArrayList<Float>                  _avgPulse                = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgPulse     = new ArrayList<>();
 
    /**
     * this is the last year (on the right side) which is displayed in the statistics
@@ -150,7 +151,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private int                               _lastYear                = TimeTools.now().getYear();
 
    /**
-    * year item for the visible statistics
+    * Reference tour item for which the statistic is displayed. This statistic can display only
+    * compared tours for ONE reference tour.
     */
    private TVICatalogRefTourItem             _currentRefItem;
 
@@ -166,7 +168,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private int                               _numberOfYears;
 
    /**
-    * Contains the index in {@link #_allTours} for the currently selected tour.
+    * Contains the index in {@link #_statValues_AllTours} for the currently selected tour.
     */
    private int                               _selectedTourIndex;
 
@@ -176,19 +178,21 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private YearStatisticTourToolTip          _tourToolTip;
    private TourInfoIconToolTipProvider       _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
 
+   private PixelConverter                    _pc;
+
    /*
     * UI controls
     */
    private PageBook  _pageBook;
-   private Label     _pageNoChart;
+   private Composite _pageChart;
+   private Composite _pageNoChart;
 
    private Chart     _yearChart;
 
-   private Composite _toolbar;
    private Combo     _cboLastYear;
    private Combo     _cboNumberOfYears;
 
-   private Composite _pageChart;
+   private Label     _labelRefTourTitle;
 
    private class ActionYearStatisticOptions extends ActionToolbarSlideout {
 
@@ -286,7 +290,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _postSelectionListener = new ISelectionListener() {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
             // prevent to listen to a selection which is originated by this year chart
+
             if (selection != _currentSelection) {
                onSelectionChanged(selection);
             }
@@ -306,8 +312,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
             if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
                   && propertyData instanceof TourPropertyCompareTourChanged) {
 
-               final TourPropertyCompareTourChanged compareTourProperty =
-                     (TourPropertyCompareTourChanged) propertyData;
+               final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
                if (compareTourProperty.isDataSaved) {
                   updateUI_YearChart(false);
@@ -325,6 +330,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private void computeMinMaxValues(final ChartDataYSerie yData) {
 
       final TVICatalogRefTourItem refItem = _currentRefItem;
+
       final float minValue = (float) yData.getVisibleMinValue();
       final float maxValue = (float) yData.getVisibleMaxValue();
 
@@ -418,6 +424,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
+      initUI(parent);
       createUI(parent);
 
       addSelectionListener();
@@ -438,44 +445,98 @@ public class RefTour_YearStatistic_View extends ViewPart {
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
    }
 
-//   private ChartToolTipInfo createToolTipInfo(int valueIndex) {
-//
-//      if (valueIndex >= _DOYValues.size()) {
-//         valueIndex -= _DOYValues.size();
-//      }
-//
-//      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
-//         return null;
-//      }
-//
-//      /*
-//       * set calendar day/month/year
-//       */
-//      final int firstYear = getFirstYear();
-//      final int tourDOY = _DOYValues.get(valueIndex);
-//
-//      final ZonedDateTime tourDate = ZonedDateTime
-//            .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
-//            .plusDays(tourDOY);
-//
-//      final StringBuilder toolTipFormat = new StringBuilder();
-//      toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
-//      toolTipFormat.append(UI.NEW_LINE);
-//
-//      final String ttText = UI.EMPTY_STRING
-//            + String.format(Messages.tourCatalog_view_tooltip_speed, _nf1.format(_tourSpeed.get(valueIndex)))
-//            + UI.NEW_LINE
-//            + String.format(Messages.Year_Statistic_Tooltip_Pulse, _avgPulse.get(valueIndex));
-//
-////      Pulse:   %1.1f
-//
-//      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-//
-//      toolTipInfo.setTitle(tourDate.format(TimeTools.Formatter_Date_F));
-//      toolTipInfo.setLabel(ttText);
-//
-//      return toolTipInfo;
-//   }
+   private void createStatisticData_WithoutYearCategories(final int firstYear, final boolean isShowLatestYear) {
+
+      final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
+
+      // loop: all tours
+      for (final Object item : allItems) {
+
+         if (item instanceof TVICatalogComparedTour) {
+
+            final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) item;
+
+            final int tourYear = tourItem.year;
+
+            if (tourYear >= firstYear && tourYear <= _lastYear) {
+
+               final LocalDate tourDate = tourItem.tourDate;
+
+               _statValues_AllTours.add(tourItem);
+               _statValues_DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
+
+               _statValues_AvgPulse.add(tourItem.getAvgPulse());
+               _statValues_TourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
+            }
+         }
+      }
+   }
+
+   private void createStatisticData_WithYearCategories(final int firstYear, final boolean isShowLatestYear) {
+
+      final Object[] allYearItems = _currentRefItem.getFetchedChildrenAsArray();
+
+      // get the last year when it's forced
+      if (isShowLatestYear && allYearItems != null && allYearItems.length > 0) {
+
+         final Object firstItem = allYearItems[0];
+         final Object lastItem = allYearItems[allYearItems.length - 1];
+
+         if (lastItem instanceof TVICatalogYearItem) {
+
+            final int newFirstYear = ((TVICatalogYearItem) firstItem).year;
+            final int newLastYear = ((TVICatalogYearItem) lastItem).year;
+
+            /*
+             * Use current years when the new items are in the current range, otherwise adjust the
+             * years
+             */
+            if (newLastYear <= _lastYear && newFirstYear >= _lastYear - _numberOfYears) {
+
+               // new years are within the current year range
+
+            } else {
+
+               // overwrite last year
+               _lastYear = newLastYear;
+            }
+         }
+      }
+
+
+      /**
+       * Create data for all years
+       */
+      for (final Object yearItemObj : allYearItems) {
+
+         if (yearItemObj instanceof TVICatalogYearItem) {
+
+            final TVICatalogYearItem yearItem = (TVICatalogYearItem) yearItemObj;
+
+            // check if the year can be displayed
+            final int yearItemYear = yearItem.year;
+            if (yearItemYear >= firstYear && yearItemYear <= _lastYear) {
+
+               // loop: all tours
+               final Object[] tourItems = yearItem.getFetchedChildrenAsArray();
+               for (final Object tourItemObj : tourItems) {
+                  if (tourItemObj instanceof TVICatalogComparedTour) {
+
+                     final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) tourItemObj;
+
+                     final LocalDate tourDate = tourItem.tourDate;
+
+                     _statValues_AllTours.add(tourItem);
+                     _statValues_DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
+
+                     _statValues_AvgPulse.add(tourItem.getAvgPulse());
+                     _statValues_TourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
+                  }
+               }
+            }
+         }
+      }
+   }
 
    /**
     * @param toolTipProvider
@@ -488,11 +549,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
                                 final Composite parent,
                                 int valueIndex) {
 
-      if (valueIndex >= _DOYValues.size()) {
-         valueIndex -= _DOYValues.size();
+      if (valueIndex >= _statValues_DOYValues.size()) {
+         valueIndex -= _statValues_DOYValues.size();
       }
 
-      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
+      if (_statValues_DOYValues == null || valueIndex >= _statValues_DOYValues.size()) {
          return;
       }
 
@@ -500,7 +561,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
        * Get day/month/year
        */
       final int firstYear = getFirstYear();
-      final int tourDOY = _DOYValues.get(valueIndex);
+      final int tourDOY = _statValues_DOYValues.get(valueIndex);
 
       final ZonedDateTime tourDate = ZonedDateTime
             .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
@@ -514,101 +575,93 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
             title,
 
-            _avgPulse.get(valueIndex),
-            _tourSpeed.get(valueIndex)
-
-      );
-
+            _statValues_AvgPulse.get(valueIndex),
+            _statValues_TourSpeed.get(valueIndex));
    }
 
    private void createUI(final Composite parent) {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoChart = new Label(_pageBook, SWT.NONE);
-      _pageNoChart.setText(Messages.tourCatalog_view_label_year_not_selected);
+      _pageNoChart = net.tourbook.ui.UI.createPage(_pageBook, Messages.tourCatalog_view_label_year_not_selected);
 
-      createUI_10_PageYearChart();
+      _pageChart = createUI_10_PageYearChart(_pageBook);
    }
 
-   private void createUI_10_PageYearChart() {
+   private Composite createUI_10_PageYearChart(final Composite parent) {
 
-      _pageChart = new Composite(_pageBook, SWT.NONE);
-      GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(_pageChart);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_20_Toolbar(_pageChart);
-         createUI_30_Chart(_pageChart);
+         createUI_20_Toolbar(container);
+         createUI_30_Chart(container);
       }
+
+      return container;
    }
 
    /**
-    * toolbar
+    * Toolbar
     */
    private void createUI_20_Toolbar(final Composite parent) {
 
-      final PixelConverter pc = new PixelConverter(parent);
-
-      _toolbar = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
             .grab(true, false)
-            .align(SWT.BEGINNING, SWT.FILL)
-            .applyTo(_toolbar);
-      GridLayoutFactory
-            .fillDefaults()//
-            .numColumns(3)
+            .align(SWT.FILL, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(4)
             .margins(3, 3)
-            .applyTo(_toolbar);
+            .applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         /*
-          * combo: last year
-          */
-         _cboLastYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
-               .applyTo(_cboLastYear);
-         _cboLastYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
-         _cboLastYear.setVisibleItemCount(50);
-         _cboLastYear.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectYear();
-            }
-         });
+         {
+            /*
+             * Last year
+             */
+            _cboLastYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _cboLastYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
+            _cboLastYear.setVisibleItemCount(50);
+            _cboLastYear.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectYear()));
+            GridDataFactory.fillDefaults()
+                  .hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
+                  .applyTo(_cboLastYear);
+         }
+         {
+            /*
+             * Number of years
+             */
 
-         /*
-          * number of years
-          */
-         // label
-         final Label label = new Label(_toolbar, SWT.NONE);
-         GridDataFactory
-               .fillDefaults()//
-               .align(SWT.FILL, SWT.CENTER)
-               .indent(10, 0)
-               .applyTo(label);
-         label.setText(Messages.Year_Statistic_Label_NumberOfYears);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Year_Statistic_Label_NumberOfYears);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(10, 0)
+                  .applyTo(label);
 
-         // combo
-         _cboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-         GridDataFactory
-               .fillDefaults()//
-               .indent(2, 0)
-               .hint(pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
-               .applyTo(_cboNumberOfYears);
-         _cboNumberOfYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
-         _cboNumberOfYears.setVisibleItemCount(50);
-         _cboNumberOfYears.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectNumberOfYears(getSelectedYears());
-            }
-         });
-      }
-
-      // fill combo box
-      for (int year = 1; year <= 50; year++) {
-         _cboNumberOfYears.add(Integer.toString(year));
+            // combo
+            _cboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _cboNumberOfYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
+            _cboNumberOfYears.setVisibleItemCount(50);
+            _cboNumberOfYears.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectNumberOfYears(getSelectedYears())));
+            GridDataFactory.fillDefaults()
+                  .hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
+                  .applyTo(_cboNumberOfYears);
+         }
+         {
+            /*
+             * Ref tour title
+             */
+            _labelRefTourTitle = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .grab(true, false)
+                  .applyTo(_labelRefTourTitle);
+         }
       }
    }
 
@@ -624,16 +677,16 @@ public class RefTour_YearStatistic_View extends ViewPart {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-            if (_allTours.isEmpty()) {
+            if (_statValues_AllTours.isEmpty()) {
                _tourInfoToolTipProvider.setTourId(-1);
                return;
             }
 
             // ensure list size
-            _selectedTourIndex = Math.min(valueIndex, _allTours.size() - 1);
+            _selectedTourIndex = Math.min(valueIndex, _statValues_AllTours.size() - 1);
 
             // select tour in the tour viewer & show tour in compared tour char
-            final TVICatalogComparedTour tourCatalogComparedTour = _allTours.get(_selectedTourIndex);
+            final TVICatalogComparedTour tourCatalogComparedTour = _statValues_AllTours.get(_selectedTourIndex);
             _currentSelection = new StructuredSelection(tourCatalogComparedTour);
             _postSelectionProvider.setSelection(_currentSelection);
 
@@ -704,6 +757,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
       return yearDOYs;
    }
 
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+   }
+
    /**
     * get numbers for each year <br>
     * <br>
@@ -717,9 +775,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    TVICatalogComparedTour navigateTour(final boolean isNextTour) {
 
-      final int numberOfTours = _allTours.size();
+      final int numTours = _statValues_AllTours.size();
 
-      if (numberOfTours < 2) {
+      if (numTours < 2) {
          return null;
       }
 
@@ -728,7 +786,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          // get nexttour
 
-         if (_selectedTourIndex >= numberOfTours - 1) {
+         if (_selectedTourIndex >= numTours - 1) {
 
             navIndex = 0;
 
@@ -743,7 +801,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          if (_selectedTourIndex <= 0) {
 
-            navIndex = numberOfTours - 1;
+            navIndex = numTours - 1;
 
          } else {
 
@@ -751,7 +809,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          }
       }
 
-      return _allTours.get(navIndex);
+      return _statValues_AllTours.get(navIndex);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -797,18 +855,19 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
             // select first tour for the youngest year
             int yearIndex = 0;
-            for (final TVICatalogComparedTour tourItem : _allTours) {
+            for (final TVICatalogComparedTour tourItem : _statValues_AllTours) {
 
                if (tourItem.tourDate.getYear() == _lastYear) {
                   break;
                }
+
                yearIndex++;
             }
 
-            final int allTourSize = _allTours.size();
+            final int allTourSize = _statValues_AllTours.size();
 
             if (allTourSize > 0 && yearIndex < allTourSize) {
-               selectTourInYearChart(_allTours.get(yearIndex).getTourId());
+               selectTourInYearChart(_statValues_AllTours.get(yearIndex).getTourId());
             }
          }
 
@@ -817,15 +876,77 @@ public class RefTour_YearStatistic_View extends ViewPart {
          final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
          if (structuredSelection.size() > 0) {
+
             final Object firstElement = structuredSelection.getFirstElement();
+
             if (firstElement instanceof TVICatalogComparedTour) {
 
                final TVICatalogComparedTour compareItem = (TVICatalogComparedTour) firstElement;
 
+               // get year item
+               final TreeViewerItem compareParentItem = compareItem.getParentItem();
+               if (compareParentItem instanceof TVICatalogYearItem) {
+
+                  final TVICatalogYearItem yearItem = (TVICatalogYearItem) compareParentItem;
+
+                  // get ref tour item
+                  final TreeViewerItem yearParentItem = yearItem.getParentItem();
+                  if (yearParentItem instanceof TVICatalogRefTourItem) {
+
+                     final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) yearParentItem;
+
+                     final long refId = refTourItem.refId;
+
+                     if (_currentRefItem == null) {
+
+                        // create new ref item for the ref tour
+                        _currentRefItem = TourCompareManager.createCatalogRefItem(refId);
+
+                        updateUI_YearChart(false);
+
+                     } else {
+
+                        if (_currentRefItem.refId != refId) {
+
+                           // the current statistic do not show the ref tour for the compared tour
+                           // -> show also the ref tour
+
+                           _currentRefItem = refTourItem;
+
+                           updateUI_YearChart(false);
+                        }
+                     }
+                  }
+               }
+
                // select tour in the year chart
-               final Long compTourId = compareItem.getTourId();
-               if (compTourId != null) {
-                  selectTourInYearChart(compTourId);
+               final Long tourId = compareItem.getTourId();
+               if (tourId != null) {
+                  selectTourInYearChart(tourId);
+               }
+
+            } else if (firstElement instanceof TVICompareResultComparedTour) {
+
+               final TVICompareResultComparedTour compareResult = (TVICompareResultComparedTour) firstElement;
+
+               final Long tourId = compareResult.getTourId();
+               if (tourId != null) {
+
+                  final RefTourItem refTour = compareResult.refTour;
+
+                  final long refId = refTour.refId;
+                  if (_currentRefItem == null || _currentRefItem.refId != refId) {
+
+                     // the current statistic do not show the ref tour for the compared tour
+                     // -> first show the ref tour
+
+                     // create new ref item for the ref tour
+                     _currentRefItem = TourCompareManager.createCatalogRefItem(refId);
+
+                     updateUI_YearChart(false);
+                  }
+
+                  selectTourInYearChart(tourId);
                }
             }
          }
@@ -834,7 +955,36 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
 
-         if (removedCompTours.removedComparedTours.size() > 0) {
+         final ArrayList<ElevationCompareResult> allCompareResults = removedCompTours.removedComparedTours;
+
+         if (allCompareResults.size() > 0) {
+
+            // create new ref item which do not contain the removed compared tours
+
+            final ElevationCompareResult compareResult = allCompareResults.get(0);
+            final long refTourId = compareResult.refTourId;
+
+            _currentRefItem = TourCompareManager.createCatalogRefItem(refTourId);
+
+            updateUI_YearChart(false);
+         }
+
+      } else if (selection instanceof SelectionPersistedCompareResults) {
+
+         final SelectionPersistedCompareResults savedCompTours = (SelectionPersistedCompareResults) selection;
+
+         final ArrayList<TVICompareResultComparedTour> persistedCompareResults = savedCompTours.persistedCompareResults;
+
+         if (persistedCompareResults.size() > 0) {
+
+            // create new ref item which contains the newly persisted compared tours
+
+            final TVICompareResultComparedTour tviCompareResultComparedTour = persistedCompareResults.get(0);
+            final RefTourItem refTour = tviCompareResultComparedTour.refTour;
+            final long savedRefId = refTour.refId;
+
+            _currentRefItem = TourCompareManager.createCatalogRefItem(savedRefId);
+
             updateUI_YearChart(false);
          }
       }
@@ -849,11 +999,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       // get selected tour
       long selectedTourId = 0;
-      if (_allTours.isEmpty()) {
+      if (_statValues_AllTours.isEmpty()) {
          selectedTourId = -1;
       } else {
-         final int selectedTourIndex = Math.min(_selectedTourIndex, _allTours.size() - 1);
-         selectedTourId = _allTours.get(selectedTourIndex).getTourId();
+         final int selectedTourIndex = Math.min(_selectedTourIndex, _statValues_AllTours.size() - 1);
+         selectedTourId = _statValues_AllTours.get(selectedTourIndex).getTourId();
       }
 
       _numberOfYears = numberOfYears;
@@ -878,6 +1028,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    private void restoreState() {
 
+      // fill combo box
+      for (int numYears = 1; numYears <= 50; numYears++) {
+         _cboNumberOfYears.add(Integer.toString(numYears));
+      }
+
       // select previous value
       final int selectedYear = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_YEARS, 3);
       _cboNumberOfYears.select(Math.min(selectedYear - 1, _cboNumberOfYears.getItemCount() - 1));
@@ -897,31 +1052,37 @@ public class RefTour_YearStatistic_View extends ViewPart {
    /**
     * select the tour in the year map chart
     *
-    * @param selectedTourId
+    * @param tourIdToSelect
     *           tour id which should be selected
     */
-   private void selectTourInYearChart(final long selectedTourId) {
+   private void selectTourInYearChart(final long tourIdToSelect) {
 
-      if (_allTours.isEmpty()) {
+      if (_statValues_AllTours.isEmpty()) {
          _tourInfoToolTipProvider.setTourId(-1);
          return;
       }
 
-      final int tourLength = _allTours.size();
+      final int tourLength = _statValues_AllTours.size();
       final boolean[] selectedTours = new boolean[tourLength];
       boolean isTourSelected = false;
 
       for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
-         final TVICatalogComparedTour comparedItem = _allTours.get(tourIndex);
-         if (comparedItem.getTourId() == selectedTourId) {
+
+         final TVICatalogComparedTour comparedItem = _statValues_AllTours.get(tourIndex);
+
+         if (comparedItem.getTourId() == tourIdToSelect) {
+
             selectedTours[tourIndex] = true;
             isTourSelected = true;
          }
       }
 
       if (isTourSelected == false && selectedTours.length > 0) {
+
          // a tour is not selected, select first tour
-         selectedTours[0] = true;
+
+// disable it can be confusing when the wrong tour is selected
+//         selectedTours[0] = true;
       }
 
       _yearChart.setSelectedBars(selectedTours);
@@ -953,90 +1114,50 @@ public class RefTour_YearStatistic_View extends ViewPart {
    }
 
    /**
-    * show statistic for several years
+    * Show statistic for several years
     *
     * @param isShowLatestYear
-    *           shows the latest year and the years before
+    *           Shows the latest year and the years before
     */
    private void updateUI_YearChart(final boolean isShowLatestYear) {
 
       if (_currentRefItem == null) {
+
+         _pageBook.showPage(_pageNoChart);
+
          return;
       }
 
       _pageBook.showPage(_pageChart);
 
-      final Object[] yearItems = _currentRefItem.getFetchedChildrenAsArray();
+      /*
+       * Reset statistic values
+       */
+      _statValues_AllTours.clear();
+      _statValues_DOYValues.clear();
 
-      // get the last year when it's forced
-      if (isShowLatestYear && yearItems != null && yearItems.length > 0) {
-
-         final Object firstItem = yearItems[0];
-         final Object lastItem = yearItems[yearItems.length - 1];
-
-         if (lastItem instanceof TVICatalogYearItem) {
-
-            final int newFirstYear = ((TVICatalogYearItem) firstItem).year;
-            final int newLastYear = ((TVICatalogYearItem) lastItem).year;
-
-            /*
-             * Use current years when the new items are in the current range, otherwise adjust the
-             * years
-             */
-            if (newLastYear <= _lastYear && newFirstYear >= _lastYear - _numberOfYears) {
-
-               // new years are within the current year range
-
-            } else {
-
-               _lastYear = newLastYear;
-            }
-         }
-      }
+      _statValues_AvgPulse.clear();
+      _statValues_TourSpeed.clear();
 
       final int firstYear = getFirstYear();
 
-      /**
-       * Create data for all years
-       */
-      _allTours.clear();
-      _DOYValues.clear();
+      if (TourCompareManager.getReferenceTour_ViewLayout() == TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
 
-      _avgPulse.clear();
-      _tourSpeed.clear();
+         // with year categories
 
-      for (final Object yearItemObj : yearItems) {
-         if (yearItemObj instanceof TVICatalogYearItem) {
+         createStatisticData_WithYearCategories(firstYear, isShowLatestYear);
 
-            final TVICatalogYearItem yearItem = (TVICatalogYearItem) yearItemObj;
+      } else {
 
-            // check if the year can be displayed
-            final int yearItemYear = yearItem.year;
-            if (yearItemYear >= firstYear && yearItemYear <= _lastYear) {
+         // without year categories
 
-               // loop: all tours
-               final Object[] tourItems = yearItem.getFetchedChildrenAsArray();
-               for (final Object tourItemObj : tourItems) {
-                  if (tourItemObj instanceof TVICatalogComparedTour) {
-
-                     final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) tourItemObj;
-
-                     final LocalDate tourDate = tourItem.tourDate;
-
-                     _allTours.add(tourItem);
-                     _DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
-
-                     _avgPulse.add(tourItem.getAvgPulse());
-                     _tourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
-                  }
-               }
-            }
-         }
+         createStatisticData_WithoutYearCategories(firstYear, isShowLatestYear);
       }
+
 
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
-      final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToDouble(_DOYValues));
+      final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToDouble(_statValues_DOYValues));
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
       xData.setChartSegments(createChartSegments());
       chartModel.setXData(xData);
@@ -1047,12 +1168,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
       // set the bar low/high data
       final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
             ChartType.BAR,
-            ArrayListToArray.toFloat(_tourSpeed),
+            ArrayListToArray.toFloat(_statValues_TourSpeed),
             true);
 
       computeMinMaxValues(yDataSpeed);
 
-      TourManager.setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+      TourManager.setBarColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+      TourManager.setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
       yDataSpeed.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
       yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -1072,12 +1194,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
       // set the bar low/high data
       final ChartDataYSerie yDataPulse = new ChartDataYSerie(
             ChartType.BAR,
-            ArrayListToArray.toFloat(_avgPulse),
+            ArrayListToArray.toFloat(_statValues_AvgPulse),
             true);
 
       computeMinMaxValues(yDataPulse);
 
-      TourManager.setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+      TourManager.setBarColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+      TourManager.setGraphColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
       yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
       yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -1099,11 +1222,15 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+
             RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, valueIndex);
          }
       });
 
       net.tourbook.ui.UI.updateChartProperties(_yearChart, GRID_PREF_PREFIX);
+
+      final ChartTitleSegmentConfig ctsConfig = _yearChart.getChartTitleSegmentConfig();
+      ctsConfig.isShowSegmentTitle = true;
 
       // show the data in the chart
       _yearChart.updateChart(chartModel, false, true);
@@ -1120,5 +1247,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       }
 
       _cboLastYear.select(_numberOfYears - 0);
+
+      _labelRefTourTitle.setText(_currentRefItem.label);
    }
 }

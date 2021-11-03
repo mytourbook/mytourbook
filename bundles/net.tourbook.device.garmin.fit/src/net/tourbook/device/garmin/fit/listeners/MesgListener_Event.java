@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.tourbook.data.GearData;
 import net.tourbook.device.garmin.fit.FitData;
+import net.tourbook.device.garmin.fit.FitUtils;
 
 /**
  * Set gear data
@@ -34,6 +35,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
    List<GearData>     _gearData;
    private List<Long> _pausedTime_Start = new ArrayList<>();
    private List<Long> _pausedTime_End   = new ArrayList<>();
+   private boolean    _isTimerStopped   = true;
 
    public MesgListener_Event(final FitData fitData) {
 
@@ -42,54 +44,80 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       _gearData = fitData.getGearData();
       _pausedTime_Start = fitData.getPausedTime_Start();
       _pausedTime_End = fitData.getPausedTime_End();
-
    }
 
-   @SuppressWarnings("incomplete-switch")
+   private void handleTimerStartEvent(final long javaTime) {
+
+      final int numberOfPausedTime_Start = _pausedTime_Start.size();
+
+      if (numberOfPausedTime_Start == 0) {
+         //The timer is started for the first time
+         _isTimerStopped = false;
+         return;
+      }
+      // We need to avoid the cases where starts are consecutive events.
+      // In this case, we ignore the start event if the timer is already started.
+      if (!_isTimerStopped) {
+         return;
+      }
+
+      final long lastPausedTime_Start = _pausedTime_Start.get(
+            numberOfPausedTime_Start - 1);
+
+      if (javaTime - lastPausedTime_Start >= 1000) {
+
+         _pausedTime_End.add(javaTime);
+         _isTimerStopped = false;
+      }
+   }
+
+   private void handleTimerStopEvents(final long javaTime) {
+      // We need to avoid the cases where stops are consecutive events.
+      // In this case, we ignore the stop event if the timer is already stopped.
+      if (_isTimerStopped) {
+         return;
+      }
+
+      _pausedTime_Start.add(javaTime);
+      _isTimerStopped = true;
+   }
+
    @Override
    public void onMesg(final EventMesg mesg) {
 
+      /*
+       * Time data
+       */
       final Event event = mesg.getEvent();
       final EventType eventType = mesg.getEventType();
-      if (event != null && event == Event.TIMER && eventType != null) {
+      final long javaTime = FitUtils.convertGarminTimeToJavaTime(mesg.getTimestamp().getTimestamp());
 
-         final int numberOfPausedTime_Start = _pausedTime_Start.size();
-         final int numberOfPausedTime_End = _pausedTime_End.size();
+      if (event != null && event == Event.TIMER && eventType != null) {
 
          switch (eventType) {
 
+         //The Garmin usage of START/STOP/STOP_ALL is described here:
+         //https://www.thisisant.com/forum/viewthread/4319/#7452
+
          case START:
 
-            if (numberOfPausedTime_Start == 0) {
-               return;
-            }
-
-            final long lastPausedTime_Start = _pausedTime_Start.get(numberOfPausedTime_Start - 1);
-
-            final long pausedTime_End = mesg.getTimestamp().getTimestamp() * 1000 + com.garmin.fit.DateTime.OFFSET;
-            if (pausedTime_End - lastPausedTime_Start > 1000) {
-               _pausedTime_End.add(pausedTime_End);
-            }
+            handleTimerStartEvent(javaTime);
             break;
 
          case STOP:
          case STOP_ALL:
 
-            // We need to avoid the cases where stops are consecutive events.
-            // In this case, we take the latest and remove the previous one.
-            if (numberOfPausedTime_Start > numberOfPausedTime_End) {
-               _pausedTime_Start.remove(numberOfPausedTime_Start - 1);
-            }
-            final long javaTime = mesg.getTimestamp().getTimestamp() * 1000 + com.garmin.fit.DateTime.OFFSET;
-            _pausedTime_Start.add(javaTime);
+            handleTimerStopEvents(javaTime);
             break;
 
-         //The Garmin usage of START/STOP/STOP_ALL is described here:
-         //https://www.thisisant.com/forum/viewthread/4319/#7452
-
+         default:
+            break;
          }
       }
 
+      /*
+       * Gear data
+       */
       final Long gearChangeData = mesg.getGearChangeData();
 
       // check if gear data are available, it can be null
@@ -98,18 +126,10 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          // create gear data for the current time
          final GearData gearData = new GearData();
 
-         final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
-
-         // convert garmin time into java time
-         final long garminTimeS = garminTime.getTimestamp();
-         final long garminTimeMS = garminTimeS * 1000;
-         final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
-
          gearData.absoluteTime = javaTime;
          gearData.gears = gearChangeData;
 
          _gearData.add(gearData);
       }
    }
-
 }

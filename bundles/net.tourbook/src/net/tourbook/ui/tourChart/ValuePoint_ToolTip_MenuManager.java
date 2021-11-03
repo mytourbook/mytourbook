@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.tooltip.Pinned_ToolTip_PinLocation;
 import net.tourbook.data.TourData;
 
@@ -130,8 +132,10 @@ public class ValuePoint_ToolTip_MenuManager {
    private final class ActionCloseTTContextMenu extends Action {
 
       public ActionCloseTTContextMenu() {
+
          super(Messages.Tooltip_ValuePoint_Action_CloseContextMenu);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -143,8 +147,10 @@ public class ValuePoint_ToolTip_MenuManager {
    private class ActionHideToolTip extends Action {
 
       public ActionHideToolTip() {
+
          setText(Messages.Action_ToolTip_Hide);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -207,8 +213,10 @@ public class ValuePoint_ToolTip_MenuManager {
    private class ActionSetDefaults extends Action {
 
       public ActionSetDefaults() {
+
          setText(Messages.Action_ToolTip_SetDefaults);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo));
       }
 
       @Override
@@ -245,10 +253,11 @@ public class ValuePoint_ToolTip_MenuManager {
          _graphId = graphId;
 
          if (graphImageName != null) {
-            _graphImage = TourbookPlugin.getImageDescriptor(graphImageName);
+            _graphImage = TourbookPlugin.getThemedImageDescriptor(graphImageName);
          }
+
          if (graphImageNameDisabled != null) {
-            _graphImageDisabled = TourbookPlugin.getImageDescriptor(graphImageNameDisabled);
+            _graphImageDisabled = TourbookPlugin.getThemedImageDescriptor(graphImageNameDisabled);
          }
       }
 
@@ -339,31 +348,31 @@ public class ValuePoint_ToolTip_MenuManager {
 
    private void createGraphActions() {
 
-      _actionValue_Header = new ActionValueItem(//
+      _actionValue_Header = new ActionValueItem(
             -1,
             Messages.Tooltip_ValuePoint_Action_Value_Header,
             null,
             null);
 
-      _actionValue_TimeSlices = new ActionValueItem(//
+      _actionValue_TimeSlices = new ActionValueItem(
             VALUE_ID_TIME_SLICES,
             Messages.Tooltip_ValuePoint_Action_Value_TimeSlices,
             null,
             null);
 
-      _actionValue_ChartZoomFactor = new ActionValueItem(//
+      _actionValue_ChartZoomFactor = new ActionValueItem(
             VALUE_ID_CHART_ZOOM_FACTOR,
             Messages.Tooltip_ValuePoint_Action_Value_ChartZoomFactor,
             null,
             null);
 
-      _actionValue_TimeDuration = new ActionValueItem(//
+      _actionValue_TimeDuration = new ActionValueItem(
             VALUE_ID_TIME_DURATION,
             Messages.Tooltip_ValuePoint_Action_Value_TimeDuration,
             null,
             null);
 
-      _actionValue_TimeOfDay = new ActionValueItem(//
+      _actionValue_TimeOfDay = new ActionValueItem(
             VALUE_ID_TIME_OF_DAY,
             Messages.Tooltip_ValuePoint_Action_Value_TimeOfDay,
             null,

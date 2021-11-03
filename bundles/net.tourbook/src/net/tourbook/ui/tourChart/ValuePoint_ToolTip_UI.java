@@ -18,13 +18,15 @@ package net.tourbook.ui.tourChart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.HoveredValuePointData;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
@@ -34,16 +36,15 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -153,10 +154,10 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private int     _allVisibleAndAvailable_ValueCounter;
 
    private boolean _isVisible_And_Available_Altimeter;
-   private boolean _isVisible_And_Available_Altitude;
    private boolean _isVisible_And_Available_Cadence;
    private boolean _isVisible_And_Available_ChartZoomFactor;
    private boolean _isVisible_And_Available_Distance;
+   private boolean _isVisible_And_Available_Elevation;
    private boolean _isVisible_And_Available_Gears;
    private boolean _isVisible_And_Available_Gradient;
    private boolean _isVisible_And_Available_Pace;
@@ -181,9 +182,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    /*
     * UI resources
     */
-   private Color                    _fgColor;
+//   private Color                    _fgColor;
+//   private Color                    _bgColor;
    private Color                    _fgBorder;
-   private Color                    _bgColor;
    private final ColorCache         _colorCache                   = new ColorCache();
    private final GraphColorManager  _colorManager                 = GraphColorManager.getInstance();
 
@@ -194,40 +195,58 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * UI controls
     */
    private Composite _shellContainer;
+
    private ToolBar   _toolbarControl;
 
    private Label     _lblAltimeter;
-   private Label     _lblAltitude;
+   private Label     _lblAltimeter_Unit;
    private Label     _lblCadence;
    private Label     _lblCadence_Unit;
    private Label     _lblChartZoomFactor;
    private Label     _lblDataSerieCurrent;
    private Label     _lblDataSerieMax;
    private Label     _lblDistance;
+   private Label     _lblDistance_Unit;
+   private Label     _lblElevation;
+   private Label     _lblElevation_Unit;
    private Label     _lblGears;
    private Label     _lblGradient;
+   private Label     _lblGradient_Unit;
    private Label     _lblPace;
+   private Label     _lblPace_Unit;
    private Label     _lblPower;
+   private Label     _lblPower_Unit;
    private Label     _lblPulse;
+   private Label     _lblPulse_Unit;
    private Label     _lblSpeed;
+   private Label     _lblSpeed_Unit;
    private Label     _lblTemperature;
+   private Label     _lblTemperature_Unit;
    private Label     _lblTimeDuration;
+   private Label     _lblTimeDuration_Unit;
    private Label     _lblTimeOfDay;
+   private Label     _lblTimeOfDay_Unit;
    private Label     _lblTourCompareResult;
 
    private Label     _lblRunDyn_StanceTime;
+   private Label     _lblRunDyn_StanceTime_Unit;
    private Label     _lblRunDyn_StanceTimeBalance;
+   private Label     _lblRunDyn_StanceTimeBalance_Unit;
    private Label     _lblRunDyn_StepLength;
+   private Label     _lblRunDyn_StepLength_Unit;
    private Label     _lblRunDyn_VerticalOscillation;
+   private Label     _lblRunDyn_VerticalOscillation_Unit;
    private Label     _lblRunDyn_VerticalRatio;
+   private Label     _lblRunDyn_VerticalRatio_Unit;
 
    private class ActionOpenTooltipMenu extends Action {
 
-      public ActionOpenTooltipMenu(final ValuePoint_ToolTip_MenuManager tooltipMenuManager) {
-         super(null, Action.AS_PUSH_BUTTON);
+      public ActionOpenTooltipMenu() {
+
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
       }
 
       @Override
@@ -312,33 +331,30 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * create a new chart configuration when the preferences has changed
-             */
-            if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)
-            //
-            ) {
-               _isToolTipVisible = (Boolean) event.getNewValue();
+         /*
+          * create a new chart configuration when the preferences has changed
+          */
+         if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)
+         //
+         ) {
+            _isToolTipVisible = (Boolean) propertyChangeEvent.getNewValue();
 
-               if (_isToolTipVisible) {
-                  show(new Point(_devXMouse, _devYMouse));
-               } else {
-                  hide();
-               }
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-
-               // dispose old colors
-               _colorCache.dispose();
-
-               reopen();
+            if (_isToolTipVisible) {
+               show(new Point(_devXMouse, _devYMouse));
+            } else {
+               hide();
             }
+
+         } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+            // dispose old colors
+            _colorCache.dispose();
+
+            reopen();
          }
       };
 
@@ -349,7 +365,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _ttMenuMgr = new ValuePoint_ToolTip_MenuManager(this, state);
 
-      _actionOpenTooltipMenu = new ActionOpenTooltipMenu(_ttMenuMgr);
+      _actionOpenTooltipMenu = new ActionOpenTooltipMenu();
    }
 
    @Override
@@ -366,9 +382,12 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       final Display display = parent.getDisplay();
 
-      _fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
-      _bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xff));
-      _fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+      _fgBorder = UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultBackgroundColor_Shell()
+            : _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
+
+//      _bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xff));
+//      _fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
       _valueUnitDistance = _isHorizontal ? 2 : 5;
 
@@ -409,21 +428,18 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
             .applyTo(_shellContainer);
 
-      _shellContainer.setForeground(_fgColor);
-      _shellContainer.setBackground(_bgColor);
-      _shellContainer.addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent e) {
-            onPaintShellContainer(e);
-         }
-      });
+//      _shellContainer.setForeground(_fgColor);
+//      _shellContainer.setBackground(_bgColor);
+      _shellContainer.addPaintListener(this::onPaintShellContainer);
 //      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
 
          if (_allVisibleAndAvailable_ValueIds > 0) {
 
             createUI_020_AllValues(_shellContainer);
+
          } else {
+
             createUI_999_NoData(_shellContainer);
          }
 
@@ -454,7 +470,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                .applyTo(container);
       }
 
-      container.setBackground(_bgColor);
+//      container.setBackground(_bgColor);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          createUI_100_TimeSlices(container);
@@ -487,12 +503,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * create toolbar
        */
       _toolbarControl = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
 //            .align(SWT.END, SWT.FILL)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(_toolbarControl);
-      _toolbarControl.setForeground(_fgColor);
-      _toolbarControl.setBackground(_bgColor);
+//      _toolbarControl.setForeground(_fgColor);
+//      _toolbarControl.setBackground(_bgColor);
+
 //      _toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 //      _toolbarControl.setBackground(_fgToolbar);
 
@@ -508,18 +525,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_isVisible_And_Available_TimeSlice) {
 
          final Composite container = new Composite(parent, SWT.NONE);
-         GridDataFactory
-               .fillDefaults()//
+//         container.setForeground(_fgColor);
+//         container.setBackground(_bgColor);
+         GridDataFactory.fillDefaults()
                .align(SWT.CENTER, SWT.FILL)
                .grab(true, false)
                .applyTo(container);
-         GridLayoutFactory
-               .fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(3)
                .spacing(2, 0)
                .applyTo(container);
-         container.setForeground(_fgColor);
-         container.setBackground(_bgColor);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
 
@@ -558,7 +573,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_TIME_DURATION,
                   GraphColorManager.PREF_GRAPH_TIME);
 
-            createUILabel(
+            _lblTimeDuration_Unit = createUILabel(
                   container,
                   UI.UNIT_LABEL_TIME,
                   GRAPH_LABEL_TIME_DURATION,
@@ -583,7 +598,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_TIME_OF_DAY,
                   GraphColorManager.PREF_GRAPH_TIME);
 
-            createUILabel(
+            _lblTimeOfDay_Unit = createUILabel(
                   container,
                   UI.UNIT_LABEL_TIME,
                   GRAPH_LABEL_TIME_OF_DAY,
@@ -608,13 +623,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_DISTANCE,
                   GraphColorManager.PREF_GRAPH_DISTANCE);
 
-            final Label lblDistanceUnit = createUI_Label_ValueUnit(
+            _lblDistance_Unit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_DISTANCE,
                   GraphColorManager.PREF_GRAPH_DISTANCE);
 
-            lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+            _lblDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE);
          }
          _firstColumnControls.add(_lblDistance);
          _firstColumnContainerControls.add(container);
@@ -623,26 +638,26 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private void createUI_210_Altitude(final Composite parent) {
 
-      if (_isVisible_And_Available_Altitude) {
+      if (_isVisible_And_Available_Elevation) {
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblAltitude = createUI_Label_Value(
+            _lblElevation = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   6,
                   GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
 
-            final Label lblAltitudeUnit = createUI_Label_ValueUnit(
+            _lblElevation_Unit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
 
-            lblAltitudeUnit.setText(UI.UNIT_LABEL_ELEVATION);
+            _lblElevation_Unit.setText(UI.UNIT_LABEL_ELEVATION);
          }
-         _firstColumnControls.add(_lblAltitude);
+         _firstColumnControls.add(_lblElevation);
          _firstColumnContainerControls.add(container);
       }
    }
@@ -660,7 +675,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_HEARTBEAT,
                   GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-            createUILabel(
+            _lblPulse_Unit = createUILabel(
                   container,
                   GRAPH_LABEL_HEARTBEAT_UNIT,
                   GRAPH_LABEL_HEARTBEAT,
@@ -684,14 +699,14 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_SPEED,
                   GraphColorManager.PREF_GRAPH_SPEED);
 
-            final Label lblSpeedUnit = createUI_Label_Value(
+            _lblSpeed_Unit = createUI_Label_Value(
                   container,
                   SWT.LEAD,
                   11, // km/h needs more space
                   GRAPH_LABEL_SPEED,
                   GraphColorManager.PREF_GRAPH_SPEED);
 
-            lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+            _lblSpeed_Unit.setText(UI.UNIT_LABEL_SPEED);
          }
          _firstColumnControls.add(_lblSpeed);
          _firstColumnContainerControls.add(container);
@@ -711,14 +726,14 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_PACE,
                   GraphColorManager.PREF_GRAPH_PACE);
 
-            final Label lblPaceUnit = createUI_Label_Value(
+            _lblPace_Unit = createUI_Label_Value(
                   container,
                   SWT.LEAD,
                   12, // min/km needs more space
                   GRAPH_LABEL_PACE,
                   GraphColorManager.PREF_GRAPH_PACE);
 
-            lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
+            _lblPace_Unit.setText(UI.UNIT_LABEL_PACE);
          }
          _firstColumnControls.add(_lblPace);
          _firstColumnContainerControls.add(container);
@@ -738,7 +753,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_POWER,
                   GraphColorManager.PREF_GRAPH_POWER);
 
-            createUILabel(//
+            _lblPower_Unit = createUILabel(
                   container,
                   GRAPH_LABEL_POWER_UNIT,
                   GRAPH_LABEL_POWER,
@@ -762,13 +777,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_TEMPERATURE,
                   GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
-            final Label lblTemperatureUnit = createUI_Label_ValueUnit(
+            _lblTemperature_Unit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_TEMPERATURE,
                   GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
-            lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+            _lblTemperature_Unit.setText(UI.UNIT_LABEL_TEMPERATURE);
          }
          _firstColumnControls.add(_lblTemperature);
          _firstColumnContainerControls.add(container);
@@ -788,7 +803,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_GRADIENT,
                   GraphColorManager.PREF_GRAPH_GRADIENT);
 
-            createUILabel(
+            _lblGradient_Unit = createUILabel(
                   container,
                   GRAPH_LABEL_GRADIENT_UNIT,
                   GRAPH_LABEL_GRADIENT,
@@ -812,13 +827,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_ALTIMETER,
                   GraphColorManager.PREF_GRAPH_ALTIMETER);
 
-            final Label lblAltimeterUnit = createUI_Label_ValueUnit(
+            _lblAltimeter_Unit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_ALTIMETER,
                   GraphColorManager.PREF_GRAPH_ALTIMETER);
 
-            lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
+            _lblAltimeter_Unit.setText(UI.UNIT_LABEL_ALTIMETER);
          }
          _firstColumnControls.add(_lblAltimeter);
          _firstColumnContainerControls.add(container);
@@ -913,7 +928,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
 
-            createUILabel(
+            _lblRunDyn_StanceTime_Unit = createUILabel(
                   container,
                   UI.UNIT_MS,
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME,
@@ -937,7 +952,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
 
-            createUILabel(
+            _lblRunDyn_StanceTimeBalance_Unit = createUILabel(
                   container,
                   UI.UNIT_PERCENT,
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
@@ -961,7 +976,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
 
-            createUILabel(
+            _lblRunDyn_StepLength_Unit = createUILabel(
                   container,
                   UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
                   GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
@@ -985,7 +1000,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 
-            createUILabel(
+            _lblRunDyn_VerticalOscillation_Unit = createUILabel(
                   container,
                   UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
                   GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
@@ -1009,7 +1024,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
 
-            createUILabel(
+            _lblRunDyn_VerticalRatio_Unit = createUILabel(
                   container,
                   UI.UNIT_PERCENT,
                   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
@@ -1049,14 +1064,14 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       final Composite shellContainer = new Composite(parent, SWT.NONE);
-      shellContainer.setForeground(_fgColor);
-      shellContainer.setBackground(_bgColor);
+//      shellContainer.setForeground(_fgColor);
+//      shellContainer.setBackground(_bgColor);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
 
          final Composite container = new Composite(shellContainer, SWT.NONE);
-         container.setForeground(_fgColor);
-         container.setBackground(_bgColor);
+//         container.setForeground(_fgColor);
+//         container.setBackground(_bgColor);
          GridLayoutFactory
                .fillDefaults()//
                .extendedMargins(5, 5, 0, 0)
@@ -1065,8 +1080,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Tooltip_ValuePoint_Label_NoData);
             label.setToolTipText(Messages.Tooltip_ValuePoint_Label_NoData_Tooltip);
-            label.setForeground(_fgColor);
-            label.setBackground(_bgColor);
+//            label.setForeground(_fgColor);
+//            label.setBackground(_bgColor);
          }
       }
 
@@ -1112,24 +1127,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             .hint(charsWidth, SWT.DEFAULT)
             .applyTo(label);
 
-      label.setBackground(_bgColor);
+//      label.setBackground(_bgColor);
 
       if (tooltip != null) {
          label.setToolTipText(tooltip);
       }
 
-      if (colorId == null) {
-
-         label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-
-      } else {
-
-         final Color fgColor = _colorCache.getColor(//
-               colorId, //
-               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
-
-         label.setForeground(fgColor);
-      }
+      updateUI_Color(label, colorId);
 
       return label;
    }
@@ -1155,8 +1159,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                                final String colorId) {
 
       final Label label = new Label(parent, SWT.NONE);
-      label.setForeground(_fgColor);
-      label.setBackground(_bgColor);
+//      label.setForeground(_fgColor);
+//      label.setBackground(_bgColor);
 
       if (labelText != null) {
          label.setText(labelText);
@@ -1168,9 +1172,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (colorId != null) {
 
-         final Color fgColor = _colorCache.getColor(//
-               colorId, //
-               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
+         final Color fgColor = _colorCache.getColor(
+               colorId,
+               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active_Themed());
 
          label.setForeground(fgColor);
       }
@@ -1183,8 +1187,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).spacing(_valueUnitDistance, 0).applyTo(container);
-      container.setForeground(_fgColor);
-      container.setBackground(_bgColor);
+//      container.setForeground(_fgColor);
+//      container.setBackground(_bgColor);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
       return container;
@@ -1497,7 +1501,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             ;
 
       _isVisible_And_Available_Altimeter           = isAvailable_Altimeter          && visibleId_Altimeter > 0;
-      _isVisible_And_Available_Altitude            = isAvailable_Altitude           && visibleId_Altitude > 0;
+      _isVisible_And_Available_Elevation            = isAvailable_Altitude           && visibleId_Altitude > 0;
       _isVisible_And_Available_Cadence             = isAvailable_Cadence            && visibleId_Cadence > 0;
       _isVisible_And_Available_ChartZoomFactor     = isAvailable_ChartZoomFactor    && visibleId_ChartZoomFactor > 0;
       _isVisible_And_Available_Distance            = isAvailable_Distance           && visibleId_Distance > 0;
@@ -1522,7 +1526,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _allVisibleAndAvailable_ValueCounter =
 
               (_isVisible_And_Available_Altimeter                    ? 1 : 0)
-            + (_isVisible_And_Available_Altitude                     ? 1 : 0)
+            + (_isVisible_And_Available_Elevation                     ? 1 : 0)
             + (_isVisible_And_Available_Cadence                      ? 1 : 0)
             + (_isVisible_And_Available_ChartZoomFactor              ? 1 : 0)
             + (_isVisible_And_Available_Distance                     ? 1 : 0)
@@ -1583,6 +1587,22 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    }
 
+   private void updateUI_Color(final Label label, final String colorId) {
+
+      if (colorId == null) {
+
+         label.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+
+      } else {
+
+         final Color fgColor = _colorCache.getColor(
+               colorId,
+               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active_Themed());
+
+         label.setForeground(fgColor);
+      }
+   }
+
    private void updateUI_Runnable(int valueIndex) {
 
       if (_shellContainer == null || _shellContainer.isDisposed()) {
@@ -1607,8 +1627,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          _lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
       }
 
-      if (_isVisible_And_Available_Altitude) {
-         _lblAltitude.setText(_nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]));
+      if (_isVisible_And_Available_Elevation) {
+         _lblElevation.setText(_nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]));
       }
 
       if (_isVisible_And_Available_Cadence) {
@@ -1656,11 +1676,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          final long pace = (long) _tourData.getPaceSerieSeconds()[valueIndex];
 
          _lblPace.setText(String.format(Messages.Tooltip_ValuePoint_Format_Pace,
-
                pace / 60,
-               pace % 60)
-
-               .toString());
+               pace % 60));
       }
 
       if (_isVisible_And_Available_Power) {
@@ -1673,11 +1690,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
                TourChart.PULSE_GRAPH_DEFAULT);
 
-         // @FJBDev: Do NOT optimize these if statements, this way it is better readable for me !
+         // @FJBDev: Do NOT optimize the following if statements, this way it is better readable for me !
 
          if (_isAvailable_Pulse_BpmFromDevice) {
 
-            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS) {
+            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE) {
 
                _lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
             }
@@ -1686,9 +1703,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          if (_isAvailable_Pulse_RRIntervals) {
 
-            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY || pulseGraph == PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM) {
+            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+                  || pulseGraph == PulseGraph.RR_AVERAGE___2ND_DEVICE_BPM
+                  || pulseGraph == PulseGraph.RR_AVERAGE_ONLY) {
 
-               _lblPulse.setText(_nf1.format(_tourData.getPulse_RRIntervals()[valueIndex]));
+               _lblPulse.setText(_nf1.format(_tourData.getPulse_AvgBpmFromRRIntervals()[valueIndex]));
             }
          }
       }
@@ -1718,12 +1737,18 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
-         _lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + timeSerie[valueIndex]));
+         _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + timeSerie[valueIndex]) % 86400));
       }
 
       if (_isVisible_And_Available_TimeSlice) {
-         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
-         _lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
+
+         /*
+          * Show the same time slice value which is also selected in the tour editor where time
+          * slices are starting with 1, otherwise it could be confusing
+          */
+
+         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex + 1));
+         _lblDataSerieMax.setText(Integer.toString(timeSerie.length));
       }
 
       if (_isVisible_And_Available_TourCompareResult) {
@@ -1747,6 +1772,121 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       _lastUpdateUITime = System.currentTimeMillis();
+
+      // update color
+      _shellContainer.getDisplay().asyncExec(() -> {
+
+         if (_shellContainer == null || _shellContainer.isDisposed()) {
+            return;
+         }
+
+         updateUI_Runnable_Colors();
+      });
+   }
+
+   private void updateUI_Runnable_Colors() {
+
+      UI.setColorForAllChildren(_shellContainer,
+            ThemeUtil.getDefaultForegroundColor_Table(),
+            ThemeUtil.getDefaultBackgroundColor_Table());
+
+      if (_isVisible_And_Available_Altimeter) {
+         updateUI_Color(_lblAltimeter, GraphColorManager.PREF_GRAPH_ALTIMETER);
+         updateUI_Color(_lblAltimeter_Unit, GraphColorManager.PREF_GRAPH_ALTIMETER);
+      }
+
+      if (_isVisible_And_Available_Cadence) {
+         updateUI_Color(_lblCadence, GraphColorManager.PREF_GRAPH_CADENCE);
+         updateUI_Color(_lblCadence_Unit, GraphColorManager.PREF_GRAPH_CADENCE);
+      }
+
+      if (_isVisible_And_Available_ChartZoomFactor) {
+         updateUI_Color(_lblChartZoomFactor, null);
+      }
+
+      if (_isVisible_And_Available_Distance) {
+         updateUI_Color(_lblDistance, GraphColorManager.PREF_GRAPH_DISTANCE);
+         updateUI_Color(_lblDistance_Unit, GraphColorManager.PREF_GRAPH_DISTANCE);
+      }
+
+      if (_isVisible_And_Available_Elevation) {
+         updateUI_Color(_lblElevation, GraphColorManager.PREF_GRAPH_ALTITUDE);
+         updateUI_Color(_lblElevation_Unit, GraphColorManager.PREF_GRAPH_ALTITUDE);
+      }
+
+      if (_isVisible_And_Available_Gears) {
+         updateUI_Color(_lblGears, GraphColorManager.PREF_GRAPH_GEAR);
+      }
+
+      if (_isVisible_And_Available_Gradient) {
+         updateUI_Color(_lblGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
+         updateUI_Color(_lblGradient_Unit, GraphColorManager.PREF_GRAPH_GRADIENT);
+      }
+
+      if (_isVisible_And_Available_Pace) {
+         updateUI_Color(_lblPace, GraphColorManager.PREF_GRAPH_PACE);
+         updateUI_Color(_lblPace_Unit, GraphColorManager.PREF_GRAPH_PACE);
+      }
+
+      if (_isVisible_And_Available_Power) {
+         updateUI_Color(_lblPower, GraphColorManager.PREF_GRAPH_POWER);
+         updateUI_Color(_lblPower_Unit, GraphColorManager.PREF_GRAPH_POWER);
+      }
+
+      if (_isVisible_And_Available_Pulse) {
+         updateUI_Color(_lblPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+         updateUI_Color(_lblPulse_Unit, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+      }
+
+      if (_isVisible_And_Available_Speed) {
+         updateUI_Color(_lblSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+         updateUI_Color(_lblSpeed_Unit, GraphColorManager.PREF_GRAPH_SPEED);
+      }
+
+      if (_isVisible_And_Available_Temperature) {
+         updateUI_Color(_lblTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+         updateUI_Color(_lblTemperature_Unit, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+      }
+
+      if (_isVisible_And_Available_TimeDuration) {
+         updateUI_Color(_lblTimeDuration, GraphColorManager.PREF_GRAPH_TIME);
+         updateUI_Color(_lblTimeDuration_Unit, GraphColorManager.PREF_GRAPH_TIME);
+      }
+
+      if (_isVisible_And_Available_TimeOfDay) {
+         updateUI_Color(_lblTimeOfDay, GraphColorManager.PREF_GRAPH_TIME);
+         updateUI_Color(_lblTimeOfDay_Unit, GraphColorManager.PREF_GRAPH_TIME);
+      }
+
+      if (_isVisible_And_Available_TimeSlice) {
+         updateUI_Color(_lblDataSerieCurrent, null);
+         updateUI_Color(_lblDataSerieMax, null);
+      }
+
+      if (_isVisible_And_Available_TourCompareResult) {
+         updateUI_Color(_lblTourCompareResult, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
+      }
+
+      if (_isVisible_And_Available_RunDyn_StanceTime) {
+         updateUI_Color(_lblRunDyn_StanceTime, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
+         updateUI_Color(_lblRunDyn_StanceTime_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
+      }
+      if (_isVisible_And_Available_RunDyn_StanceTimeBalance) {
+         updateUI_Color(_lblRunDyn_StanceTimeBalance, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+         updateUI_Color(_lblRunDyn_StanceTimeBalance_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+      }
+      if (_isVisible_And_Available_RunDyn_StepLength) {
+         updateUI_Color(_lblRunDyn_StepLength, GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+         updateUI_Color(_lblRunDyn_StepLength_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
+      }
+      if (_isVisible_And_Available_RunDyn_VerticalOscillation) {
+         updateUI_Color(_lblRunDyn_VerticalOscillation, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+         updateUI_Color(_lblRunDyn_VerticalOscillation_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+      }
+      if (_isVisible_And_Available_RunDyn_VerticalRatio) {
+         updateUI_Color(_lblRunDyn_VerticalRatio, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
+         updateUI_Color(_lblRunDyn_VerticalRatio_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
+      }
    }
 
 }

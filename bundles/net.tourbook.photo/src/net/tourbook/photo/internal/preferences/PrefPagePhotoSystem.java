@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.preferences;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -37,7 +37,7 @@ public class PrefPagePhotoSystem extends FieldEditorPreferencePage implements IW
 
 	public static final String		ID			= "net.tourbook.preferences.PrefPagePhotoSystemID"; //$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= Activator.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore	= PhotoActivator.getPrefStore();
 
 	private boolean					_isImageQualityModified;
 

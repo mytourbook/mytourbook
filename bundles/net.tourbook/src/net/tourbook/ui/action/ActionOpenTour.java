@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,20 +28,20 @@ import org.eclipse.jface.action.Action;
 
 public class ActionOpenTour extends Action {
 
-   private ITourProvider fTourProvider;
+   private ITourProvider _tourProvider;
 
    public ActionOpenTour(final ITourProvider tourProvider) {
 
-      fTourProvider = tourProvider;
+      _tourProvider = tourProvider;
 
       setText(Messages.app_action_open_tour);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourViewer));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourViewer));
    }
 
    @Override
    public void run() {
 
-      final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       if (selectedTours != null && selectedTours.size() > 0) {
          TourManager.getInstance().openTourInEditorArea(selectedTours.get(0).getTourId());

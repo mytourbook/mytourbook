@@ -1,0 +1,158 @@
+21.6.0                                                     20. June 2021
+
+New   
+===
+
+* Dark Theme
+
+  - The UI theme can be selected in the preference
+  - Hint: Dark theme + 2D map
+  - Lots and lots of color and symbol adjustments to make the dark theme
+    look really good now
+  - Example for W10 theme limits
+ 
+* Tour Book View (Frederic)
+
+  - Added the ability to delete values, for any given tour, such as 
+    elevation, time, gear, cadence...etc
+
+
+* Tour values deletion/re-import (Frederic)
+
+  - Added a confirmation dialog that will always be displayed to the user 
+    when re-importing or deleting tour values for the whole database
+  - Locking by default the UI controls to modify tour values on more 
+    than 1 tour at a time
+  - Separated calories in its own category
+
+ 
+Improvements   
+============
+
+* Tour Chart
+
+  - Displaying the night sections with a grey/blue color for a more 
+    intuitive chart and better readability (Frederic)
+  - More options to show R-R values together with other pulse graphs 
+    (R-R average, device value)
+
+ 
+* 2D Map (Frederic)
+
+  - Extending the zoom levels capacity from 20 to 23
+
+ 
+* 2.5D Map (Thomas)
+
+  - Upgrading VTM lib to 0.15 and further to 0.16 
+  - Size of photothumbnails can be changed via slideout 
+  - Show direction arrows on the tourpath, controlled via slideout 
+  - Tourtrack and Sliderpath have round ends like in 2D map 
+
+ 
+* 3D Map & Tour Chart Preferences (Frederic)
+
+  - "Squeezed" several transparency values to be in between 0 and 100 
+    instead of 0 & 255 or 0.0 and 1.0
+
+ 
+Changes  
+=======
+
+* Fitlog/FitlogEx import (Frederic)
+
+  - When re-importing tours, the complete list of tour types and tags 
+    are not re-imported anymore
+
+ 
+* SRTM Download
+
+  - The download of SRTM data files is still free but it requires that a 
+    user is authenticated. Username and password can be entered in the 
+    SRTM data preferences page which also contains information how to 
+    request a SRTM server account
+
+ 
+Bugfix   
+======
+
+* Fitlog/FitlogEx import (Frederic)
+
+  - Fixed an issue where in some cases the imported tour time zone could 
+    be wrong
+
+
+* FIT File: Pause Re-Import (Frederic)
+
+  - In some scenarii, the pause import could be erroneous and lead to 
+    negative paused time values
+
+ 
+* Tour Import View (Frederic)
+
+  - The kcal column was displaying values in calories units instead of 
+    kcalories
+
+ 
+* Statistic Values View (Frederic)
+
+  - Fixed a bug where the elevation gain value was incorrect
+
+
+* Tour Chart
+
+  - R-R values were not visible within tour breaks 
+  - Create Tourmarker: Same wording as on other places. 
+    "create marker" -> "create tour marker" (Thomas)
+
+ 
+* Tour Chart Tooltip (Frederic)
+
+  - Displaying the hour from 0 when a new day starts
+
+
+* Tour Chart Value Tooltip  (Frederic)
+
+  - Fixed a bug when importing tours (FIT, Suunto SML, Suunto XML, 
+    Garmin TCX) where in some cases, the tour start components were 
+    erroneous (the Time of Day value in the Value Point Tooltip was 
+    wrong). Now this data is adjusted with the tour's time zone.
+
+ 
+* Tour Data Editor
+
+  - Ctrl+S was setting the tour dirty again on Linux 124
+
+ 
+* Tour Type Preference page (Frederic)
+
+  - Fixed a bug in the tour type viewer when selecting several tour 
+    types and only the first one was deleted
+  - Disabling the "Rename" button when more than 1 tour type is selected
+
+ 
+* Map25 Mapprovider (Thomas)
+
+  - Map was not displayed correctly at the very first start of MyTourbook 
+
+ 
+* Compress Database
+
+  - Fixed SQL exception when the tour database size is too large to fit 
+    into an integer value
+
+ 
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+- Eclipse 2021-03
+- FIT SDK 21.54

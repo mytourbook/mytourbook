@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -31,8 +31,8 @@ public class ActionSetupImport extends Action {
 
       setToolTipText(Messages.Import_Data_Action_SetupEasyImport_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions_Disabled));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled));
    }
 
    @Override

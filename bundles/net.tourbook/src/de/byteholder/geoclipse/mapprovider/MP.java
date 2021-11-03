@@ -49,6 +49,7 @@ import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -131,7 +132,8 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    private static final ListenerList<IOfflineInfoListener> _offlineReloadEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
-   private int                                             _dimmingAlphaValue           = 0xFF;
+   private boolean                                         _isDimMap;
+   private int                                             _dimmingAlphaValue           = 0xff;
    private RGB                                             _dimmingColor;
 
    private final Projection                                _projection;
@@ -886,7 +888,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          // check if the old implementation was not correctly transfered to the cache with error tiles
          if (tile.isLoadingError()) {
-            StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
+            StatusUtil.logError("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
                   + tile.getTileKey());
 
             // ensure the error do not occur again for this tile
@@ -909,7 +911,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          // check if the old implementation was not correctly transfered to the cache with error tiles
          if (tile != null) {
-            StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
+            StatusUtil.logError("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
                   + tile.getTileKey());
          }
 
@@ -1133,6 +1135,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _maxZoomLevel = maxZoom;
 
       initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
+   }
+
+   public boolean isDimMap() {
+      return _isDimMap;
    }
 
    /**
@@ -1373,16 +1379,21 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       this._description = fDescription;
    }
 
-   public void setDimLevel(final int dimLevel, final RGB dimColor) {
+   public void setDimLevel(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
 
-      // check if dimming value is modified
-      if (_dimmingAlphaValue == dimLevel && _dimmingColor == dimColor) {
+      // convert dimLevel 0...10 into alpha value 0...255
+      final int dimAlphaValue = 255 - dimLevel * 255 / Map2View.MAX_DIM_STEPS;
+
+      // check if the dimming value is modified
+      if (_isDimMap == isDimMap && _dimmingAlphaValue == dimAlphaValue && dimColor.equals(_dimmingColor)) {
+
          // dimming value is not modified
          return;
       }
 
-      // set new dim level/color
-      _dimmingAlphaValue = dimLevel;
+      // keep dim fields
+      _isDimMap = isDimMap;
+      _dimmingAlphaValue = dimAlphaValue;
       _dimmingColor = dimColor;
 
       // dispose all cached images

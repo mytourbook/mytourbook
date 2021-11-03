@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.stream.Stream;
@@ -91,8 +91,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       TIME_FORMAT_SSS.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
    //
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private Map<Long, TourData>     _alreadyImportedTours;
+   private Map<Long, TourData>     _newlyImportedTours;
    private TourbookDevice          _device;
 
    private String                  _importFilePath;
@@ -158,8 +158,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    public SuuntoQuestSAXHandler(final TourbookDevice deviceDataReader,
                                 final String importFileName,
-                                final HashMap<Long, TourData> alreadyImportedTours,
-                                final HashMap<Long, TourData> newlyImportedTours) {
+                                final Map<Long, TourData> alreadyImportedTours,
+                                final Map<Long, TourData> newlyImportedTours) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -177,7 +177,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private void assignAdditionalData(final TourData tourData) {
 
       final ExerciseMode exerciseMode = _exerciseModesList.stream()
-            .filter((e) -> e.activity == _tourActivity)
+            .filter(e -> e.activity == _tourActivity)
             .findFirst()
             .orElse(null);
 
@@ -186,7 +186,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       }
 
       final TourType tourType = _allTourTypes.stream()
-            .filter((t) -> t.getName().equalsIgnoreCase(exerciseMode.name))
+            .filter(t -> t.getName().equalsIgnoreCase(exerciseMode.name))
             .findFirst()
             .orElse(null);
 
@@ -201,7 +201,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInCadence //
+      if (_isInCadence
             || _isInActivity
             || _isInCalories
             || _isInDistance
@@ -215,7 +215,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             || _isInWeight
             || _isInWeightUnit
             || _isInTime
-      //
+      
       ) {
          _characters.append(chars, startIndex, length);
       }
@@ -421,7 +421,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             final float milliSeconds = (float) (time - timeInSeconds * 1000) / 1000;
             _markerData.relativeTime = timeInSeconds + Math.round(milliSeconds);
          } catch (final ParseException e) {
-            TourLogManager.logError(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
+            TourLogManager.log_ERROR(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
          }
 
          //If existing, we need to use the previous marker relative time
@@ -489,7 +489,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
     * @param tourStartTime
     *           The tour start time that is used to compute the {@see TimeData#absoluteTime}
     */
-   private void finalizeSamples(final ZonedDateTime tourStartTime) {
+   private void finalizeSamples() {
 
       //Inserting
       int relativeTime = 0;
@@ -525,7 +525,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       //Converting the distance data to meters if needed
       if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
-         _sampleList.forEach((s) -> s.distance *= UI.UNIT_MILE);
+         _sampleList.forEach(s -> s.distance *= UI.UNIT_MILE);
       }
 
       //We sort the sample lists as it could be out of order if we added markers above
@@ -554,7 +554,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             TimeTools.UTC);
       tourData.setTourStartTime(tourStartTime);
 
-      finalizeSamples(tourStartTime);
+      finalizeSamples();
 
       assignAdditionalData(tourData);
 
@@ -574,7 +574,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       final Long tourId = tourData.createTourId(uniqueId);
 
       // check if the tour is already imported
-      if (_alreadyImportedTours.containsKey(tourId) == false) {
+      if (!_alreadyImportedTours.containsKey(tourId)) {
 
          // add new tour to other tours
          _newlyImportedTours.put(tourId, tourData);
@@ -600,6 +600,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
     *         The sum of the distances
     */
    private float getSamplesRangeAbsoluteDistance(final int endIndex) {
+
       final Stream<TimeData> samplesRange = _sampleList.stream().skip(0).limit(endIndex + 1);
 
       return samplesRange.map(sample -> sample.distance)
@@ -623,7 +624,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       for (final TimeData marker : _markerList) {
          //We search for a sample that is at the same point in time
          final TimeData equivalentSample = _sampleList.stream()
-               .filter((s) -> s.relativeTime == marker.relativeTime)
+               .filter(s -> s.relativeTime == marker.relativeTime)
                .findFirst()
                .orElse(null);
 
@@ -650,7 +651,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          } else {
             //If that doesn't exist, we insert the marker in the sample list and update the 2 adjacent elements
             TimeData closestSample = _sampleList.stream()
-                  .filter((s) -> s.relativeTime > marker.relativeTime)
+                  .filter(s -> s.relativeTime > marker.relativeTime)
                   .findFirst()
                   .orElse(null);
 

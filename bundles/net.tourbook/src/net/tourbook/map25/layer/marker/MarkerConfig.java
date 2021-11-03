@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,6 +38,7 @@ public class MarkerConfig {
    public boolean isShowPhoto           = true;
    public boolean isShowPhotoTitle      = true;
 
+   public int     markerPhoto_Size      = Map25ConfigManager.DEFAULT_MARKER_PHOTO_SIZE;
    public int     markerOrientation     = Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
    public RGB     markerFill_Color      = Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
    public int     markerFill_Opacity    = Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY;
@@ -63,7 +64,7 @@ public class MarkerConfig {
    public int                    clusterSymbol_Size     = Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
    public int                    clusterSymbol_Weight   = Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
 
-   
+
    @Override
    public boolean equals(final Object obj) {
 
@@ -111,6 +112,8 @@ public class MarkerConfig {
 
             + "iconClusterSizeDP=" + clusterSymbol_Size + ", " //$NON-NLS-1$ //$NON-NLS-2$
             + "iconMarkerSizeDP=" + markerSymbol_Size + ", " //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "markerPhotoSize=" + markerPhoto_Size + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
             + "clusterColorForeground=" + clusterOutline_Color + ", " //$NON-NLS-1$ //$NON-NLS-2$
             + "clusterColorBackground=" + clusterFill_Color + //$NON-NLS-1$

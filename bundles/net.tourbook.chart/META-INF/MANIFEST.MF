@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Chart-Engine
 Bundle-SymbolicName: net.tourbook.chart;singleton:=true
-Bundle-Version: 21.3.0.qualifier
-Bundle-Activator: net.tourbook.chart.Activator
+Bundle-Version: 21.9.0.qualifier
+Bundle-Activator: net.tourbook.chart.ChartActivator
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -16,5 +16,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: gnu.trove.list.array,
  net.tourbook.common,
  net.tourbook.common.form,
- net.tourbook.common.util
+ net.tourbook.common.util,
+ org.eclipse.e4.ui.css.swt.theme,
+ org.eclipse.e4.ui.services
 Automatic-Module-Name: net.tourbook.chart

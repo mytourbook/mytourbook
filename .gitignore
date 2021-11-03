@@ -8,15 +8,19 @@ repositories/
 **/tmp/
 **/node_modules/
 
-**/build/**/*.jar
+**/build/*repo/**/*.jar
+**/build/*update-site/**/*.jar
+**/build/**/build/sonar
 **/*vtm*/**/build/
 
-.apt_generated
-.log
 
+.apt_generated
 .gradle
-gradle
+.log
+.vs
 
 *.js.map
 *.js.uncompressed.js
+
+*.hprof
 

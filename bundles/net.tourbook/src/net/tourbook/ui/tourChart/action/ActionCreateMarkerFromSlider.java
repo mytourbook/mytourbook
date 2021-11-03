@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
@@ -47,7 +47,7 @@ public class ActionCreateMarkerFromSlider extends Action {
 
       super(text);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New_Disabled));
 
       _chartContextProvider = chartContextProvider;
@@ -81,7 +81,7 @@ public class ActionCreateMarkerFromSlider extends Action {
       final double[] longitudeSerie = tourData.longitudeSerie;
 
       // create a new marker
-      final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
+      final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
       tourMarker.setSerieIndex(serieIndex);
       tourMarker.setLabel(Messages.TourData_Label_new_marker);
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
