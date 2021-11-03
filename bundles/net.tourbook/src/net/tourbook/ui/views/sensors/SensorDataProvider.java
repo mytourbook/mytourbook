@@ -319,7 +319,7 @@ public class SensorDataProvider {
          allValues_WithTimeMargins[valueIndex + 1] = allXValues_NoMargin[valueIndex] + timeMargin;
       }
 
-      // set last value
+      // set last value, the first value is 0 
       allValues_WithTimeMargins[numValues_WithMargin - 1] = allValues_WithTimeMargins[numValues_WithMargin - 2] + timeMargin;
 
       return allValues_WithTimeMargins;

@@ -604,10 +604,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
 
       final int[] allXValues_ByTime = sensorData.allXValues_ByTime;
-      int numValues = allXValues_ByTime.length;
-
-      // add time margin items
-      numValues += 2;
+      final int numValues = allXValues_ByTime.length; 
 
       final RGB[] allRGBLine = new RGB[numValues];
       final RGB[] allRGBGradientBright = new RGB[numValues];
