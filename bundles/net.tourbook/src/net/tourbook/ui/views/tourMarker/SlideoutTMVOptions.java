@@ -48,9 +48,9 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    /*
     * UI controls
     */
-   private Button _rdoUseElapsedTime;
-   private Button _rdoUseMovingTime;
-   private Button _rdoUseRecordedTime;
+   private Button _rdoElapsedTime;
+   private Button _rdoMovingTime;
+   private Button _rdoRecordedTime;
 
    public SlideoutTMVOptions(final Control ownerControl, final ToolBar toolBar) {
 
@@ -145,23 +145,23 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
             /*
              * Use Elapsed time
              */
-            _rdoUseElapsedTime = new Button(timeContainer, SWT.RADIO);
-            _rdoUseElapsedTime.setText(Messages.Slideout_TMVOptions_Radio_ElapsedTime);
-            _rdoUseElapsedTime.addSelectionListener(_defaultSelectionListener);
+            _rdoElapsedTime = new Button(timeContainer, SWT.RADIO);
+            _rdoElapsedTime.setText(Messages.Slideout_TMVOptions_Radio_ElapsedTime);
+            _rdoElapsedTime.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Use Moving time
              */
-            _rdoUseMovingTime = new Button(timeContainer, SWT.RADIO);
-            _rdoUseMovingTime.setText(Messages.Slideout_TMVOptions_Radio_MovingTime);
-            _rdoUseMovingTime.addSelectionListener(_defaultSelectionListener);
+            _rdoMovingTime = new Button(timeContainer, SWT.RADIO);
+            _rdoMovingTime.setText(Messages.Slideout_TMVOptions_Radio_MovingTime);
+            _rdoMovingTime.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Use Recorded time
              */
-            _rdoUseRecordedTime = new Button(timeContainer, SWT.RADIO);
-            _rdoUseRecordedTime.setText(Messages.Slideout_TMVOptions_Radio_RecordedTime);
-            _rdoUseRecordedTime.addSelectionListener(_defaultSelectionListener);
+            _rdoRecordedTime = new Button(timeContainer, SWT.RADIO);
+            _rdoRecordedTime.setText(Messages.Slideout_TMVOptions_Radio_RecordedTime);
+            _rdoRecordedTime.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
@@ -182,26 +182,26 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    @Override
    public void resetToDefaults() {
 
-      _rdoUseElapsedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
-      _rdoUseMovingTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
-      _rdoUseRecordedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
+      _rdoElapsedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
+      _rdoMovingTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
+      _rdoRecordedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
 
       onChangeUI();
    }
 
    private void restoreState() {
 
-      _rdoUseElapsedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
-      _rdoUseMovingTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
-      _rdoUseRecordedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
+      _rdoElapsedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
+      _rdoMovingTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
+      _rdoRecordedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
 
    }
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME, _rdoUseElapsedTime.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, _rdoUseMovingTime.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, _rdoUseRecordedTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME, _rdoElapsedTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, _rdoMovingTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, _rdoRecordedTime.getSelection());
    }
 
 }
