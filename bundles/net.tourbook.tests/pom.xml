@@ -11,7 +11,7 @@
 
   <!-- Change properies below to your values -->
   <properties>
-    <autPath>${project.basedir}/../../path/to/aut</autPath>
+	  <autPath>${project.basedir}/src/test/ui/aut-runtime-mytourbook</autPath>
   </properties>
   
   <build>
