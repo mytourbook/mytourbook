@@ -24,22 +24,13 @@
         <configuration>
           <aut>
             <explicit>${autPath}</explicit>
+	    <vmArgs>
+	      <vmArg>-noverify</vmArg>
+            </vmArgs>
           </aut>
           <runner>
             <version>2.5.2-M1</version>
           </runner>
-		   <executions>
-          <execution>
-            <id>default-execute</id>
-            <configuration>
-              <aut>
-                <vmArgs>
-                  <vmArg>-noverify</vmArg>
-                </vmArgs>
-              </aut>
-            </configuration>
-          </execution>
-        </executions>	
         </configuration>
       </plugin>
     </plugins>
