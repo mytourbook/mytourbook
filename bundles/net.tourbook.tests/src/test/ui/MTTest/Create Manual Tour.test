@@ -5,7 +5,7 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _7QIIcDzqEeyqGo45QBxH4w
-Save-Time: 11/4/21, 3:43 PM
+Save-Time: 11/4/21, 6:01 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -21,4 +21,8 @@ Entry-Name: .content
 get-button "Create new tour/event (Ctrl+N)" | click
 get-view "Tour Editor" | get-section "Tour / Event" | get-combo -after [get-label Title] | set-text NewTour
 get-button "Save modified tour (M1+S)" | click
+with [get-view "Tour Editor" | get-section "Tour / Event" | get-combo -after [get-label Title]] {
+    get-property "isVisible()" | equals true | verify-true
+    get-property "toString()" | equals "Combo {NewTour}" | verify-true
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
