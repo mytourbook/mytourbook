@@ -40,6 +40,7 @@ mt_0_Build.dependsOn(
    'mt_10_CreateBuildFiles',
    'mt_20_BuildProduct',
    'mt_30_CopyProduct',
+   'mt_31_RunUIUnittests',
    'mt_40_ExtractWinFiles',
    'mt_50_CreateExeFiles',
    'mt_60_CleanupWinFiles',
@@ -84,7 +85,7 @@ task mt_20_BuildProduct {
       mavenexec {
 
          workingDir  buildDir
-         goals       'clean', 'verify' , 'package'
+         goals       'clean', 'verify'
          
          // repos can be used offline when this option "offline true" is set, 
          // by default it is disabled 
@@ -119,6 +120,23 @@ task mt_30_CopyProduct {
          }
 
          into _dirProductArchive
+      }
+   }
+}
+
+/*
+* 3. Run the UI unit tests
+*/
+task mt_31_RunUIUnittests {
+
+   doLast {
+
+      def buildDir = file('../..')
+
+      mavenexec {
+
+         workingDir  buildDir
+         goals       'clean', 'package'
       }
    }
 }
