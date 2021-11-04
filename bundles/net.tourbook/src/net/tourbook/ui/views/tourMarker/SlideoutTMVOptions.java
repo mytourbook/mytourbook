@@ -48,12 +48,12 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    /*
     * UI controls
     */
-   private Button _chkUseElapsedTime;
-   private Button _chkUseMovingTime;
-   private Button _chkUseRecordedTime;
+   private Label  _lblComputeTimes;
+   private Button _rdoUseElapsedTime;
+   private Button _rdoUseMovingTime;
+   private Button _rdoUseRecordedTime;
 
-   public SlideoutTMVOptions(final Control ownerControl,
-                             final ToolBar toolBar) {
+   public SlideoutTMVOptions(final Control ownerControl, final ToolBar toolBar) {
 
       super(ownerControl, toolBar);
    }
@@ -84,7 +84,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         GridLayoutFactory.fillDefaults().applyTo(container);
          {
             createUI_10_Header(container);
             createUI_20_Controls(container);
@@ -118,7 +118,6 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
                   .applyTo(toolbar);
 
             final ToolBarManager tbm = new ToolBarManager(toolbar);
-
             tbm.add(_actionRestoreDefaults);
 
             tbm.update(true);
@@ -129,38 +128,40 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    private void createUI_20_Controls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-      GridLayoutFactory.swtDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
+         /*
+          * Label: Compute times with
+          */
+         _lblComputeTimes = new Label(container, SWT.NONE);
+         _lblComputeTimes.setText(Messages.Slideout_TMVOptions_Label_ComputeTimesWith);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblComputeTimes);
+
+         final Composite paintingContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(paintingContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(paintingContainer);
          {
             /*
              * Use Elapsed time
              */
-            _chkUseElapsedTime = new Button(container, SWT.RADIO);
-            _chkUseElapsedTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseElapsedTime);
-            _chkUseElapsedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
-            _chkUseElapsedTime.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkUseElapsedTime);
-         }
-         {
+            _rdoUseElapsedTime = new Button(paintingContainer, SWT.RADIO);
+            _rdoUseElapsedTime.setText(Messages.Slideout_TMVOptions_Checkbox_ElapsedTime);
+            _rdoUseElapsedTime.addSelectionListener(_defaultSelectionListener);
+
             /*
              * Use Moving time
              */
-            _chkUseMovingTime = new Button(container, SWT.RADIO);
-            _chkUseMovingTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseMovingTime);
-            _chkUseMovingTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
-            _chkUseMovingTime.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkUseMovingTime);
-         }
-         {
+            _rdoUseMovingTime = new Button(paintingContainer, SWT.RADIO);
+            _rdoUseMovingTime.setText(Messages.Slideout_TMVOptions_Checkbox_MovingTime);
+            _rdoUseMovingTime.addSelectionListener(_defaultSelectionListener);
+
             /*
              * Use Recorded time
              */
-            _chkUseRecordedTime = new Button(container, SWT.RADIO);
-            _chkUseRecordedTime.setText(Messages.Slideout_TMVOptions_Checkbox_UseRecordedTime);
-            _chkUseRecordedTime.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
-            _chkUseRecordedTime.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkUseRecordedTime);
+            _rdoUseRecordedTime = new Button(paintingContainer, SWT.RADIO);
+            _rdoUseRecordedTime.setText(Messages.Slideout_TMVOptions_Checkbox_RecordedTime);
+            _rdoUseRecordedTime.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
@@ -181,26 +182,26 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    @Override
    public void resetToDefaults() {
 
-      _chkUseElapsedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
-      _chkUseMovingTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
-      _chkUseRecordedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
+      _rdoUseElapsedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
+      _rdoUseMovingTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
+      _rdoUseRecordedTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
 
       onChangeUI();
    }
 
    private void restoreState() {
 
-      _chkUseElapsedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
-      _chkUseMovingTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
-      _chkUseRecordedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
+      _rdoUseElapsedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME));
+      _rdoUseMovingTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME));
+      _rdoUseRecordedTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME));
 
    }
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME, _chkUseElapsedTime.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, _chkUseMovingTime.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, _chkUseRecordedTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME, _rdoUseElapsedTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, _rdoUseMovingTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, _rdoUseRecordedTime.getSelection());
    }
 
 }
