@@ -48,7 +48,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    /*
     * UI controls
     */
-   private Label  _lblComputeTimes;
+   private Label  _lblTimeUsedBetweenMarkers;
    private Button _rdoUseElapsedTime;
    private Button _rdoUseMovingTime;
    private Button _rdoUseRecordedTime;
@@ -132,11 +132,12 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          /*
-          * Label: Compute times with
+          * Label: Time used between markers
           */
-         _lblComputeTimes = new Label(container, SWT.NONE);
-         _lblComputeTimes.setText(Messages.Slideout_TMVOptions_Label_ComputeTimesWith);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblComputeTimes);
+         _lblTimeUsedBetweenMarkers = new Label(container, SWT.NONE);
+         _lblTimeUsedBetweenMarkers.setText(Messages.Slideout_TMVOptions_Label_TimeUsedBetweenMarkers);
+         _lblTimeUsedBetweenMarkers.setToolTipText(Messages.Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblTimeUsedBetweenMarkers);
 
          final Composite paintingContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(paintingContainer);

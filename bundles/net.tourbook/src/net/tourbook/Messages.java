@@ -2043,7 +2043,8 @@ public class Messages extends NLS {
 
    public static String        Slideout_StatisticOptions_Label_Title;
 
-   public static String        Slideout_TMVOptions_Label_ComputeTimesWith;
+   public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers;
+   public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip;
    public static String        Slideout_TMVOptions_Label_Title;
    public static String        Slideout_TMVOptions_Radio_ElapsedTime;
    public static String        Slideout_TMVOptions_Radio_MovingTime;
