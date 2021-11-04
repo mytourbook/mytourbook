@@ -236,6 +236,23 @@
                     </execution>
             </executions>
      </plugin>
+     <plugin>
+     	<groupId>org.eclipse.rcptt</groupId>
+     	<artifactId>rcptt-maven-plugin</artifactId>
+     	<version>2.5.2-M1</version>
+        <executions>
+          <execution>
+            <id>default-execute</id>
+            <configuration>
+              <aut>
+                <vmArgs>
+                  <vmArg>-noverify</vmArg>
+                </vmArgs>
+              </aut>
+            </configuration>
+          </execution>
+        </executions>	
+     </plugin>
 
     </plugins>
    </build>
