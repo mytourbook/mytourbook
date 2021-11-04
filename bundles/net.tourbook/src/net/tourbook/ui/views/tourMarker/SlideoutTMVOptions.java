@@ -48,7 +48,6 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    /*
     * UI controls
     */
-   private Label  _lblTimeUsedBetweenMarkers;
    private Button _rdoUseElapsedTime;
    private Button _rdoUseMovingTime;
    private Button _rdoUseRecordedTime;
@@ -134,33 +133,33 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
          /*
           * Label: Time used between markers
           */
-         _lblTimeUsedBetweenMarkers = new Label(container, SWT.NONE);
-         _lblTimeUsedBetweenMarkers.setText(Messages.Slideout_TMVOptions_Label_TimeUsedBetweenMarkers);
-         _lblTimeUsedBetweenMarkers.setToolTipText(Messages.Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblTimeUsedBetweenMarkers);
+         final Label lblTimeUsedBetweenMarkers = new Label(container, SWT.NONE);
+         lblTimeUsedBetweenMarkers.setText(Messages.Slideout_TMVOptions_Label_TimeUsedBetweenMarkers);
+         lblTimeUsedBetweenMarkers.setToolTipText(Messages.Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(lblTimeUsedBetweenMarkers);
 
-         final Composite paintingContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(paintingContainer);
-         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(paintingContainer);
+         final Composite timeContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(timeContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(timeContainer);
          {
             /*
              * Use Elapsed time
              */
-            _rdoUseElapsedTime = new Button(paintingContainer, SWT.RADIO);
+            _rdoUseElapsedTime = new Button(timeContainer, SWT.RADIO);
             _rdoUseElapsedTime.setText(Messages.Slideout_TMVOptions_Radio_ElapsedTime);
             _rdoUseElapsedTime.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Use Moving time
              */
-            _rdoUseMovingTime = new Button(paintingContainer, SWT.RADIO);
+            _rdoUseMovingTime = new Button(timeContainer, SWT.RADIO);
             _rdoUseMovingTime.setText(Messages.Slideout_TMVOptions_Radio_MovingTime);
             _rdoUseMovingTime.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Use Recorded time
              */
-            _rdoUseRecordedTime = new Button(paintingContainer, SWT.RADIO);
+            _rdoUseRecordedTime = new Button(timeContainer, SWT.RADIO);
             _rdoUseRecordedTime.setText(Messages.Slideout_TMVOptions_Radio_RecordedTime);
             _rdoUseRecordedTime.addSelectionListener(_defaultSelectionListener);
          }
