@@ -8643,6 +8643,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return startWeekYear;
    }
 
+   @JsonIgnore
    public short getStartYear() {
       return startYear;
    }
