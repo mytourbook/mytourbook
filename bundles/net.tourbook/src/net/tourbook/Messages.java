@@ -2045,9 +2045,9 @@ public class Messages extends NLS {
 
    public static String        Slideout_TMVOptions_Label_ComputeTimesWith;
    public static String        Slideout_TMVOptions_Label_Title;
-   public static String        Slideout_TMVOptions_Checkbox_ElapsedTime;
-   public static String        Slideout_TMVOptions_Checkbox_MovingTime;
-   public static String        Slideout_TMVOptions_Checkbox_RecordedTime;
+   public static String        Slideout_TMVOptions_Radio_ElapsedTime;
+   public static String        Slideout_TMVOptions_Radio_MovingTime;
+   public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
    public static String        Slideout_TourBlogOptions_Label_Title;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;

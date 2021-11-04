@@ -146,21 +146,21 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
              * Use Elapsed time
              */
             _rdoUseElapsedTime = new Button(paintingContainer, SWT.RADIO);
-            _rdoUseElapsedTime.setText(Messages.Slideout_TMVOptions_Checkbox_ElapsedTime);
+            _rdoUseElapsedTime.setText(Messages.Slideout_TMVOptions_Radio_ElapsedTime);
             _rdoUseElapsedTime.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Use Moving time
              */
             _rdoUseMovingTime = new Button(paintingContainer, SWT.RADIO);
-            _rdoUseMovingTime.setText(Messages.Slideout_TMVOptions_Checkbox_MovingTime);
+            _rdoUseMovingTime.setText(Messages.Slideout_TMVOptions_Radio_MovingTime);
             _rdoUseMovingTime.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Use Recorded time
              */
             _rdoUseRecordedTime = new Button(paintingContainer, SWT.RADIO);
-            _rdoUseRecordedTime.setText(Messages.Slideout_TMVOptions_Checkbox_RecordedTime);
+            _rdoUseRecordedTime.setText(Messages.Slideout_TMVOptions_Radio_RecordedTime);
             _rdoUseRecordedTime.addSelectionListener(_defaultSelectionListener);
          }
       }
