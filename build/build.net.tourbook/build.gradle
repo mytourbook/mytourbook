@@ -131,7 +131,7 @@ task mt_31_RunUIUnittests {
 
    doLast {
 
-      def buildDir = file('../..')
+      def buildDir = file('../../build/build.net.tourbook.functionaltests')
 
       mavenexec {
 

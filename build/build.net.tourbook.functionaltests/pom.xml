@@ -4,14 +4,21 @@
 
   <!-- Change groupId, artifactId and version -->
   <artifactId>rcpttTests</artifactId>
-  <groupId>net.tourbook.product</groupId>
+  <groupId>mytourbook-functionaltests</groupId>
   <version>21.9.0</version>
   
   <packaging>rcpttTest</packaging>
+	  <parent>
+      <artifactId>mytourbook-build</artifactId>      <groupId>net.tourbook</groupId>
+                                                   <version>21.9.0-SNAPSHOT</version>
+
+						   <relativePath>..</relativePath>
+   </parent>
 
   <!-- Change properies below to your values -->
   <properties>
-	  <autPath>${project.basedir}/../../../mytourbook-PRODUCT/21.9.0/mytourbook-21.9.0-win-64/mytourbook</autPath>
+	  <autPath>${project.basedir}/../../../../mytourbook-PRODUCT/21.9.0/mytourbook-21.9.0-win-64/mytourbook</autPath>
+		  <!-- or C:\Users\frederic\git\MT\mytourbook\build\build.net.tourbook.product\target\products\net.tourbook.product\win32\win32\x86_64\mytourbook-->
   </properties>
   
   <build>
