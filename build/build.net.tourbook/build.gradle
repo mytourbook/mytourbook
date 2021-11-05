@@ -40,8 +40,8 @@ mt_0_Build.dependsOn(
    'mt_10_CreateBuildFiles',
    'mt_20_BuildProduct',
    'mt_30_CopyProduct',
-   'mt_41_RunUIUnittests',
    'mt_40_ExtractWinFiles',
+   'mt_41_RunUIUnittests',
    'mt_50_CreateExeFiles',
    'mt_60_CleanupWinFiles',
    'mt_70_CopyReleaseNotes',
@@ -49,8 +49,8 @@ mt_0_Build.dependsOn(
 
 sonarqube {
   properties {
-    property "sonar.projectKey",       "wolfgang-ch_mytourbook"
-    property "sonar.organization",     "wolfgang-ch"
+    property "sonar.projectKey",       "FJBDev_mytourbook"
+    property "sonar.organization",     "fjbdev"
     property "sonar.host.url",         "https://sonarcloud.io"
     property "sonar.sources",          "bundles"
     property "sonar.exclusions",       "bundles/net.tourbook.ext.jars/**/*"
