@@ -5,7 +5,6 @@ on:
       - fb-rcptt
 jobs:
   build:
-    if: ${{ needs.check_date.outputs.should_run != 'false' }}
     name: Build
     runs-on: windows-latest
     steps:
