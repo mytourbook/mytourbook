@@ -28,6 +28,7 @@
 	    <vmArgs>
 	      <vmArg>-noverify</vmArg>
             </vmArgs>
+		     <reuseExistingWorkspace>true</reuseExistingWorkspace>
           </aut>
           <runner>
             <version>2.5.2-M1</version>

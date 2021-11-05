@@ -1,0 +1,17 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Basic
+Element-Type: testsuite
+Element-Version: 2.0
+Id: _c_vfwD6CEeyGzNeH_rtJkA
+Manually-Ordered: true
+Save-Time: 11/5/21, 9:51 PM
+
+------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8
+Content-Type: text/testcase
+Entry-Name: testcase-items
+
+_YQW08D6BEeyGzNeH_rtJkA	// kind: 'test' name: 'defdew' path: 'defdew.test'
+_7QIIcDzqEeyqGo45QBxH4w	// kind: 'test' name: 'Create Manual Tour' path: 'Create Manual Tour.test'
+
+------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8--
