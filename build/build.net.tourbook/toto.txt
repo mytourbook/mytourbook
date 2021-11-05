@@ -3,4 +3,3 @@
 ---------------------------------------------------------------------------------------
 
 [ant:echo] Delete old build files: ../../../../mytourbook-BUILD-autocreated
-[ant:echo] Copy core files into ../../../../mytourbook-BUILD-autocreated/core

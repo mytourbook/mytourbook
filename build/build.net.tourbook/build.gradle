@@ -40,7 +40,7 @@ mt_0_Build.dependsOn(
    'mt_10_CreateBuildFiles',
    'mt_20_BuildProduct',
    'mt_30_CopyProduct',
-   'mt_31_RunUIUnittests',
+   'mt_41_RunUIUnittests',
    'mt_40_ExtractWinFiles',
    'mt_50_CreateExeFiles',
    'mt_60_CleanupWinFiles',
@@ -124,22 +124,7 @@ task mt_30_CopyProduct {
    }
 }
 
-/*
-* 3. Run the UI unit tests
-*/
-task mt_31_RunUIUnittests {
 
-   doLast {
-
-      def buildDir = file('../../build/build.net.tourbook.functionaltests')
-
-      mavenexec {
-
-         workingDir  buildDir
-         goals       'clean', 'package'
-      }
-   }
-}
 
 
 /*
@@ -168,6 +153,24 @@ task mt_40_ExtractWinFiles {
    }
 }
 
+/*
+* Run the functional tests
+*/
+task mt_41_RunUIUnittests {
+
+   doLast {
+
+      def buildDir = file('../../build/build.net.tourbook.functionaltests')
+
+ println '\tFrom ' + buildDir   
+
+      mavenexec {
+
+         workingDir  buildDir
+         goals       'clean', 'package'
+      }
+   }
+}
 
 /*
  Create win exe files
