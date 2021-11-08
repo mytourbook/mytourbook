@@ -27,4 +27,4 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.export,
  org.eclipse.jface.preference,
  org.json
-Automatic-Module-Name: net.tourbook.tests
+Automatic-Module-Name: build.net.tourbook.tests.functionaltests
