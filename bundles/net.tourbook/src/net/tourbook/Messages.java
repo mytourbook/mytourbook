@@ -2041,6 +2041,14 @@ public class Messages extends NLS {
    public static String        Slideout_SegmenterOptions_Label_Title;
    public static String        Slideout_SegmenterOptions_Label_Totals;
 
+   public static String        Slideout_SensorTourFilter_Action_ResetValue_Tooltip;
+   public static String        Slideout_SensorTourFilter_Label_Duration;
+   public static String        Slideout_SensorTourFilter_Label_Title;
+   public static String        Slideout_SensorTourFilter_Link_ResetValue;
+   public static String        Slideout_SensorTourFilter_Radio_Day;
+   public static String        Slideout_SensorTourFilter_Radio_Month;
+   public static String        Slideout_SensorTourFilter_Radio_Year;
+
    public static String        Slideout_StatisticOptions_Label_Title;
 
    public static String        Slideout_TourBlogOptions_Label_Title;

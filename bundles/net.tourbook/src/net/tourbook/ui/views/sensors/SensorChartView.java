@@ -33,6 +33,10 @@ import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
@@ -47,7 +51,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -59,6 +62,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -103,7 +108,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private boolean                         _isUseTourFilter;
    private boolean                         _isInSelect;
 
-   private ActionAppTourFilter             _actionAppTourFilter;
+   private OpenDialogManager               _openDlgMgr                   = new OpenDialogManager();
+
+   private ActionTourFilter                _actionSensorFilterOptions;
 
    /*
     * UI controls
@@ -115,21 +122,35 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private Chart     _sensorChart;
 
-   private class ActionAppTourFilter extends Action {
+   private Composite _parent;
 
-      public ActionAppTourFilter() {
+   private class ActionTourFilter extends ActionToolbarSlideout {
 
-         super(null, AS_CHECK_BOX);
+      public ActionTourFilter() {
 
-         setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
+         super(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter),
+               CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+         isToggleAction = true;
+         notSelectedTooltip = "asdfasdfasdfu";
       }
 
       @Override
-      public void run() {
-         onAction_AppFilter(isChecked());
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new SlideoutSensorFilter(_parent, toolbar, SensorChartView.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         onAction_TourFilter(getSelection());
       }
    }
 
@@ -221,16 +242,28 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   /**
+    * Close all opened dialogs except the opening dialog.
+    *
+    * @param openingDialog
+    */
+   public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+      _openDlgMgr.closeOpenedDialogs(openingDialog);
+   }
+
    private void createActions() {
 
       _sensorChart.createChartActions();
-      _actionAppTourFilter = new ActionAppTourFilter();
+
+      _actionSensorFilterOptions = new ActionTourFilter();
 
       fillToolbar();
    }
 
    @Override
    public void createPartControl(final Composite parent) {
+
+      initUI(parent);
 
       createUI(parent);
       createActions();
@@ -240,7 +273,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       addSelectionListener();
       addTourEventListener();
 
-      restoreState();
+      // restore must be run async otherwise the filter slideout action is not selected !
+      parent.getShell().getDisplay().asyncExec(() -> {
+
+         restoreState();
+         enableActions();
+      });
    }
 
    /**
@@ -289,8 +327,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    }
 
    private void createUI(final Composite parent) {
-
-      initUI(parent);
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
@@ -370,7 +406,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void enableActions() {
 
+//      _actionSensorFilterOptions.setEnabled(_isChartDisplayed);
+
       _sensorChart.getAction_MouseWheelMode().setEnabled(_isChartDisplayed);
+      _sensorChart.setZoomActionsEnabled(_isChartDisplayed);
    }
 
    /*
@@ -381,7 +420,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_sensorChart.getAction_MouseWheelMode());
-      tbm.add(_actionAppTourFilter);
+      tbm.add(_actionSensorFilterOptions);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -401,12 +440,18 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       return selectedTours;
    }
 
+   Shell getShell() {
+      return _parent.getShell();
+   }
+
    private void initUI(final Composite parent) {
+
+      _parent = parent;
 
       _tk = new FormToolkit(parent.getDisplay());
    }
 
-   private void onAction_AppFilter(final boolean isSelected) {
+   private void onAction_TourFilter(final boolean isSelected) {
 
       _isUseTourFilter = isSelected;
 
@@ -454,7 +499,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOUR_ID, -1);
       _isUseTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
 
-      _actionAppTourFilter.setChecked(_isUseTourFilter);
+      _actionSensorFilterOptions.setSelection(_isUseTourFilter);
 
       /*
        * Select tour even when tour ID == -1 because this will set the selected bar selection flags
@@ -484,7 +529,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final MouseWheelMode mouseWheelMode = _sensorChart.getAction_MouseWheelMode().getMouseWheelMode();
       Util.setStateEnum(_state, STATE_MOUSE_WHEEL_MODE, mouseWheelMode);
 
-      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionAppTourFilter.isChecked());
+      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionSensorFilterOptions.getSelection());
    }
 
    /**
@@ -569,6 +614,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private void updateChart() {
 
       if (_selectedSensor == null) {
+
+         enableActions();
+
          return;
       }
 
@@ -577,18 +625,18 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       if (_sensorData.allTourIds.length == 0) {
 
          _isChartDisplayed = false;
-         enableActions();
 
          _pageBook.showPage(_pageNoBatteryData);
 
       } else {
 
          _isChartDisplayed = true;
-         enableActions();
 
          _pageBook.showPage(_sensorChart);
          updateChart(_sensorData);
       }
+
+      enableActions();
    }
 
    private void updateChart(final SensorData sensorData) {
@@ -604,7 +652,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
 
       final int[] allXValues_ByTime = sensorData.allXValues_ByTime;
-      final int numValues = allXValues_ByTime.length; 
+      final int numValues = allXValues_ByTime.length;
 
       final RGB[] allRGBLine = new RGB[numValues];
       final RGB[] allRGBGradientBright = new RGB[numValues];

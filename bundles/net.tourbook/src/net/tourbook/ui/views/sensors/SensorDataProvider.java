@@ -67,7 +67,6 @@ public class SensorDataProvider {
             ;
 
             sqlAppFilter = " AND TOURDATA_TourID IN (" + sqlTourIds + ")"; // //$NON-NLS-1$ //$NON-NLS-2$
-
          }
 
          sql = UI.EMPTY_STRING

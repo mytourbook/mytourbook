@@ -1994,7 +1994,7 @@ public class TourInfoUI {
             batteryLevel += UI.SPACE + UI.SYMBOL_PERCENTAGE;
 
             lblLevel.setText(batteryLevel);
-
+            lblLevel.setToolTipText(Messages.Tour_Tooltip_Label_BatteryLevel_Tooltip);
          }
 
          if (isBatteryStatus) {
@@ -2009,6 +2009,7 @@ public class TourInfoUI {
                   : statusStart_Name + UI.ELLIPSIS_WITH_SPACE + BatteryStatus.getLabelFromValue((short) batteryStatus_End);
 
             lblStatus.setText(batteryStatus);
+            lblStatus.setToolTipText(Messages.Tour_Tooltip_Label_BatteryStatus_Tooltip);
          }
 
          if (isBatteryVoltage) {
@@ -2024,6 +2025,7 @@ public class TourInfoUI {
             batteryVoltage += UI.SPACE + UI.UNIT_VOLT;
 
             lblVoltage.setText(batteryVoltage);
+            lblVoltage.setToolTipText(Messages.Tour_Tooltip_Label_BatteryVoltage_Tooltip);
          }
 
       }
