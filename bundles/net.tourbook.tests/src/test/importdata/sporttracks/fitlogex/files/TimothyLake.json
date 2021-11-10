@@ -232,7 +232,6 @@
   "training_TrainingPerformance" : 0.0,
   "validForSave" : true,
   "visiblePointsSaved_ForSurfing" : false,
-  "weather" : "\n      ",
   "weatherClouds" : "weather-cloudy",
   "weatherDataFromApi" : false,
   "weatherIndex" : 2,

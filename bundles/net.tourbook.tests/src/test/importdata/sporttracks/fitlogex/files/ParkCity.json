@@ -166,7 +166,6 @@
   "training_TrainingPerformance" : 0.0,
   "validForSave" : true,
   "visiblePointsSaved_ForSurfing" : false,
-  "weather" : "\n      ",
   "weatherClouds" : "weather-sunny",
   "weatherDataFromApi" : false,
   "weatherIndex" : 1,

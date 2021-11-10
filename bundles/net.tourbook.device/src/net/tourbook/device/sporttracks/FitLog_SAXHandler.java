@@ -160,7 +160,6 @@ public class FitLog_SAXHandler extends DefaultHandler {
    /**
     * Is currently disabled because it should work for all cases
     */
-   private boolean                         _isReimport;
    private boolean                         _isInActivity;
    private boolean                         _isInCustomDataFields;
    private boolean                         _isInHasStartTime;
@@ -1030,7 +1029,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
       } else if (_isInWeather) {
 
          _isInWeather = false;
-         _currentActivity.weatherText = _characters.toString();
+         _currentActivity.weatherText = _characters.toString().trim();
          _currentActivity.weatherWindSpeed = parseWindSpeed(_characters.toString());
 
       } else if (_isInTimeZoneUtcOffset) {
