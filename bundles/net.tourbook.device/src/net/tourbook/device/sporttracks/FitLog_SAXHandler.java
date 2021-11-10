@@ -160,6 +160,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
    /**
     * Is currently disabled because it should work for all cases
     */
+   private boolean                         _isReimport;
    private boolean                         _isInActivity;
    private boolean                         _isInCustomDataFields;
    private boolean                         _isInHasStartTime;
