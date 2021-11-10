@@ -56,7 +56,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -65,8 +64,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
@@ -87,7 +84,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private final IDialogSettings           _state                        = TourbookPlugin.getState(ID);
 
    private IPartListener2                  _partListener;
-   private ISelectionListener              _postSelectionListener;
    private IPropertyChangeListener         _prefChangeListener;
    private ITourEventListener              _tourEventListener;
 
@@ -206,25 +202,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   /**
-    * listen for events when a tour is selected
-    */
-   private void addSelectionListener() {
-
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-            if (part == SensorChartView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
-         }
-      };
-      getSite().getPage().addPostSelectionListener(_postSelectionListener);
-   }
-
    private void addTourEventListener() {
 
       _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
@@ -270,7 +247,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       addPartListener();
       addPrefListener();
-      addSelectionListener();
       addTourEventListener();
 
       // restore must be run async otherwise the filter slideout action is not selected !
@@ -396,7 +372,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-      getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
@@ -460,21 +435,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void onSelectionChanged(final ISelection selection) {
 
-      if (selection instanceof StructuredSelection) {
-
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-
-         if (firstElement instanceof DeviceSensor) {
-
-            // show data for a selected sensor
-
-            _selectedSensor = (DeviceSensor) firstElement;
-
-            updateChart();
-
-         }
-
-      } else if (selection instanceof SelectionSensor) {
+      if (selection instanceof SelectionSensor) {
 
          final SelectionSensor sensorSelection = (SelectionSensor) selection;
 
@@ -487,8 +448,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
             updateChart();
 
             // 2. select tour
-            _selectedTourId = sensorSelection.getTourId();
-            selectTour(_selectedTourId);
+            final Long tourId = sensorSelection.getTourId();
+            if (tourId != null) {
+
+               _selectedTourId = tourId;
+               selectTour(_selectedTourId);
+            }
          }
          _isInSelect = false;
       }

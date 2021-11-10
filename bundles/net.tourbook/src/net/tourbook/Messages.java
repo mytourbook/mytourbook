@@ -1753,6 +1753,8 @@ public class Messages extends NLS {
    public static String        Sensor_Type_GearShifting;
    public static String        Sensor_Type_Other;
 
+   public static String        Sensor_View_Action_OpenSensorChart;
+
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_DeleteProfile_Tooltip;
