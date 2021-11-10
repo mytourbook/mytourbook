@@ -3988,6 +3988,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
          paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
       }
+
+      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+         speedSerie[serieIndex] = (float) ((distance[serieIndex] / timeSerie[serieIndex]) * 3.6f);
+      }
    }
 
    /**
