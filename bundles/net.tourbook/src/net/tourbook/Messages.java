@@ -2038,13 +2038,20 @@ public class Messages extends NLS {
    public static String        Slideout_SegmenterChartOptions_Label_Title;
    public static String        Slideout_SegmenterChartOptions_Label_ValueFont;
    public static String        Slideout_SegmenterChartOptions_Label_ValueFont_Example;
+
    public static String        Slideout_SegmenterOptions_Label_AltitudeDown;
    public static String        Slideout_SegmenterOptions_Label_AltitudeUp;
    public static String        Slideout_SegmenterOptions_Label_Title;
    public static String        Slideout_SegmenterOptions_Label_Totals;
 
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryLevel;
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryStatus;
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryVoltage;
+   public static String        Slideout_SensorChartOptions_Label_Title;
+
    public static String        Slideout_SensorTourFilter_Action_ResetValue_Tooltip;
-   public static String        Slideout_SensorTourFilter_Label_Duration;
+   public static String        Slideout_SensorTourFilter_Checkbox_IsFilterDuration;
+   public static String        Slideout_SensorTourFilter_Checkbox_IsUseAppFilter;
    public static String        Slideout_SensorTourFilter_Label_Title;
    public static String        Slideout_SensorTourFilter_Link_ResetValue;
    public static String        Slideout_SensorTourFilter_Radio_Day;

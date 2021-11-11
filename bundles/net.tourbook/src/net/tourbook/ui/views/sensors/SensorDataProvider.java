@@ -23,12 +23,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.views.sensors.SlideoutSensorTourFilter.SensorTourFilter;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class SensorDataProvider {
 
@@ -41,9 +46,22 @@ public class SensorDataProvider {
     *
     * @param sensorId
     * @param isUseAppFilter
+    * @param state
     * @return
     */
-   SensorData getData(final long sensorId, final boolean isUseAppFilter) {
+   SensorData getData(final long sensorId, final boolean isUseTourFilter, final IDialogSettings state) {
+
+      final boolean isUseAppFilter = isUseTourFilter
+
+            && Util.getStateBoolean(state,
+                  SlideoutSensorTourFilter.STATE_IS_USE_APP_FILTER,
+                  SlideoutSensorTourFilter.STATE_IS_USE_APP_FILTER_DEFAULT);
+
+      final boolean isUseDurationFilter = isUseTourFilter
+
+            && Util.getStateBoolean(state,
+                  SlideoutSensorTourFilter.STATE_IS_USE_DURATION_FILTER,
+                  SlideoutSensorTourFilter.STATE_IS_USE_DURATION_FILTER_DEFAULT);
 
       String sql = null;
 
@@ -51,9 +69,13 @@ public class SensorDataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
          String sqlAppFilter = UI.EMPTY_STRING;
+         String sqlDurationFilter = UI.EMPTY_STRING;
 
+         /*
+          * Setup app filter
+          */
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
          if (isUseAppFilter) {
 
             final String sqlTourIds = UI.EMPTY_STRING
@@ -63,15 +85,27 @@ public class SensorDataProvider {
                   + " TourId" + NL //                                         //$NON-NLS-1$
                   + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //           //$NON-NLS-1$
 
-                  + " WHERE 1=1 " + appFilter.getWhereClause() + NL //        //$NON-NLS-1$
+                  + " WHERE 1=1 " //                                          //$NON-NLS-1$
+                  + "   " + appFilter.getWhereClause() + NL//                 //$NON-NLS-1$
             ;
 
             sqlAppFilter = " AND TOURDATA_TourID IN (" + sqlTourIds + ")"; // //$NON-NLS-1$ //$NON-NLS-2$
          }
 
-         sql = UI.EMPTY_STRING
+         /*
+          * Setup duration filter
+          */
+         ZonedDateTime durationFilter_DateTime = null;
+         if (isUseDurationFilter) {
 
-               + "SELECT" + NL
+            sqlDurationFilter = " AND TourStartTime >= ?"; //                   //$NON-NLS-1$
+
+            durationFilter_DateTime = getDurationFilter_DateTime(state);
+         }
+
+         sql = NL
+
+               + "SELECT" + NL //                                             //$NON-NLS-1$
 
                + "   DEVICESENSOR_SensorID," + NL //                       1  //$NON-NLS-1$
                + "   TOURDATA_TourID," + NL //                             2  //$NON-NLS-1$
@@ -91,6 +125,7 @@ public class SensorDataProvider {
 
                + "   DEVICESENSOR_SensorID = ?" + NL //                       //$NON-NLS-1$
                + "   " + sqlAppFilter + NL //                                 //$NON-NLS-1$
+               + "   " + sqlDurationFilter + NL //                            //$NON-NLS-1$
 
                + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
          ;
@@ -117,8 +152,16 @@ public class SensorDataProvider {
 
          stmt.setLong(1, sensorId);
 
+         int paramIndex = 2;
+
          if (isUseAppFilter) {
-            appFilter.setParameters(stmt, 2);
+            appFilter.setParameters(stmt, paramIndex);
+            paramIndex = appFilter.getLastParameterIndex();
+         }
+
+         if (isUseDurationFilter) {
+
+            stmt.setLong(paramIndex++, durationFilter_DateTime.toEpochSecond() * 1000);
          }
 
          final ResultSet result = stmt.executeQuery();
@@ -276,6 +319,49 @@ public class SensorDataProvider {
       return sensorData;
    }
 
+   /**
+    * @param state
+    * @return Returns the date/time after which the tours should be retrieved
+    */
+   private ZonedDateTime getDurationFilter_DateTime(final IDialogSettings state) {
+
+      final ZonedDateTime now = TimeTools.now();
+      ZonedDateTime firstTourStartTime;
+
+      final Enum<SensorTourFilter> seletedTourFilter = Util.getStateEnum(state,
+            SlideoutSensorTourFilter.STATE_SELECTED_TOUR_FILTER,
+            SlideoutSensorTourFilter.STATE_SELECTED_TOUR_FILTER_DEFAULT);
+
+      if (seletedTourFilter.equals(SlideoutSensorTourFilter.SensorTourFilter.DAY)) {
+
+         final int tourFilterDays = Util.getStateInt(state,
+               SlideoutSensorTourFilter.STATE_TOUR_FILTER_DAYS,
+               SlideoutSensorTourFilter.STATE_TOUR_FILTER_DAYS_DEFAULT);
+
+         firstTourStartTime = now.minusDays(tourFilterDays);
+
+      } else if (seletedTourFilter.equals(SlideoutSensorTourFilter.SensorTourFilter.MONTH)) {
+
+         final int tourFilterMonths = Util.getStateInt(state,
+               SlideoutSensorTourFilter.STATE_TOUR_FILTER_MONTHS,
+               SlideoutSensorTourFilter.STATE_TOUR_FILTER_MONTHS_DEFAULT);
+
+         firstTourStartTime = now.minusMonths(tourFilterMonths);
+
+      } else {
+
+         // years
+
+         final int tourFilterYears = Util.getStateInt(state,
+               SlideoutSensorTourFilter.STATE_TOUR_FILTER_YEARS,
+               SlideoutSensorTourFilter.STATE_TOUR_FILTER_YEARS_DEFAULT);
+
+         firstTourStartTime = now.minusYears(tourFilterYears);
+      }
+
+      return firstTourStartTime;
+   }
+
    private long[] getTourIDs_WithTimeMarginValues(final long[] allTourIDs) {
 
       final int numValues_NoMargin = allTourIDs.length;
@@ -318,7 +404,7 @@ public class SensorDataProvider {
          allValues_WithTimeMargins[valueIndex + 1] = allXValues_NoMargin[valueIndex] + timeMargin;
       }
 
-      // set last value, the first value is 0 
+      // set last value, the first value is 0
       allValues_WithTimeMargins[numValues_WithMargin - 1] = allValues_WithTimeMargins[numValues_WithMargin - 2] + timeMargin;
 
       return allValues_WithTimeMargins;

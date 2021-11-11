@@ -106,7 +106,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private OpenDialogManager               _openDlgMgr                   = new OpenDialogManager();
 
-   private ActionTourFilter                _actionSensorFilterOptions;
+   private ActionChartOptions              _actionChartOptions;
+   private ActionTourFilter                _actionTourFilterOptions;
 
    /*
     * UI controls
@@ -119,6 +120,20 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private Chart     _sensorChart;
 
    private Composite _parent;
+
+   private class ActionChartOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutSensorChartOptions(_parent, toolbar, SensorChartView.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
 
    private class ActionTourFilter extends ActionToolbarSlideout {
 
@@ -133,7 +148,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutSensorFilter(_parent, toolbar, SensorChartView.this, _state);
+
+         return new SlideoutSensorTourFilter(_parent, toolbar, SensorChartView.this, _state);
       }
 
       @Override
@@ -225,6 +241,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
     * @param openingDialog
     */
    public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+
       _openDlgMgr.closeOpenedDialogs(openingDialog);
    }
 
@@ -232,7 +249,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _sensorChart.createChartActions();
 
-      _actionSensorFilterOptions = new ActionTourFilter();
+      _actionTourFilterOptions = new ActionTourFilter();
+      _actionChartOptions = new ActionChartOptions();
 
       fillToolbar();
    }
@@ -395,7 +413,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_sensorChart.getAction_MouseWheelMode());
-      tbm.add(_actionSensorFilterOptions);
+      tbm.add(_actionTourFilterOptions);
+      tbm.add(_actionChartOptions);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -464,7 +483,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOUR_ID, -1);
       _isUseTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
 
-      _actionSensorFilterOptions.setSelection(_isUseTourFilter);
+      _actionTourFilterOptions.setSelection(_isUseTourFilter);
 
       /*
        * Select tour even when tour ID == -1 because this will set the selected bar selection flags
@@ -494,7 +513,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final MouseWheelMode mouseWheelMode = _sensorChart.getAction_MouseWheelMode().getMouseWheelMode();
       Util.setStateEnum(_state, STATE_MOUSE_WHEEL_MODE, mouseWheelMode);
 
-      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionSensorFilterOptions.getSelection());
+      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionTourFilterOptions.getSelection());
    }
 
    /**
@@ -576,7 +595,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _sensorChart.setFocus();
    }
 
-   private void updateChart() {
+   void updateChart() {
 
       if (_selectedSensor == null) {
 
@@ -585,7 +604,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          return;
       }
 
-      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseTourFilter);
+      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseTourFilter, _state);
 
       if (_sensorData.allTourIds.length == 0) {
 
@@ -605,6 +624,14 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    }
 
    private void updateChart(final SensorData sensorData) {
+
+// SET_FORMATTING_OFF
+
+      final boolean isShowBatteryLevel    = Util.getStateBoolean(_state, SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_LEVEL,    SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_LEVEL_DEFAULT);
+      final boolean isShowBatteryStatus   = Util.getStateBoolean(_state, SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_STATUS,   SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_STATUS_DEFAULT);
+      final boolean isShowBatteryVoltage  = Util.getStateBoolean(_state, SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_VOLTAGE,  SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_VOLTAGE_DEFAULT);
+
+// SET_FORMATTING_ON
 
       /*
        * Create sensor colors
@@ -644,33 +671,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final String sensorLabel = _selectedSensor.getLabel();
 
       /*
-       * Set y-axis values: Status
-       */
-      if (sensorData.isAvailable_Status) {
-
-         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
-               ChartType.BAR,
-               sensorData.allBatteryStatus_End,
-               sensorData.allBatteryStatus_Start,
-               true);
-
-         yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
-         yDataStatus.setUnitLabel("#");
-         yDataStatus.setShowYSlider(true);
-
-         yDataStatus.setRgbGraph_Line(rgbLine);
-         yDataStatus.setRgbGraph_Text(rgbText);
-         yDataStatus.setRgbBar_Line(allRGBLine);
-         yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
-
-         chartModel.addYData(yDataStatus);
-      }
-
-      /*
        * Set y-axis values: Level
        */
-      if (sensorData.isAvailable_Level) {
+      if (isShowBatteryLevel && sensorData.isAvailable_Level) {
 
          final ChartDataYSerie yDataLevel = new ChartDataYSerie(
                ChartType.BAR,
@@ -692,9 +695,33 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       }
 
       /*
+       * Set y-axis values: Status
+       */
+      if (isShowBatteryStatus && sensorData.isAvailable_Status) {
+
+         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
+               ChartType.BAR,
+               sensorData.allBatteryStatus_End,
+               sensorData.allBatteryStatus_Start,
+               true);
+
+         yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
+         yDataStatus.setUnitLabel("#");
+         yDataStatus.setShowYSlider(true);
+
+         yDataStatus.setRgbGraph_Line(rgbLine);
+         yDataStatus.setRgbGraph_Text(rgbText);
+         yDataStatus.setRgbBar_Line(allRGBLine);
+         yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
+         yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
+
+         chartModel.addYData(yDataStatus);
+      }
+
+      /*
        * Set y-axis values: Voltage
        */
-      if (sensorData.isAvailable_Voltage) {
+      if (isShowBatteryVoltage && sensorData.isAvailable_Voltage) {
 
          final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
                ChartType.BAR,
