@@ -32,6 +32,7 @@ import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -49,7 +50,6 @@ import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -143,7 +143,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
 
          isToggleAction = true;
-         notSelectedTooltip = "asdfasdfasdfu";
+         notSelectedTooltip = Messages.Sensor_Chart_Action_TourFilter_Tooltip;
       }
 
       @Override
@@ -324,8 +324,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
-      _pageNoBatteryData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
+      _pageNoData = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
+      _pageNoBatteryData = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
 
       _sensorChart = createUI_10_Chart();
 
@@ -681,8 +681,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                sensorData.allBatteryLevel_Start,
                true);
 
-         yDataLevel.setYTitle("Battery  Level ·  " + sensorLabel);
-         yDataLevel.setUnitLabel("%");
+         yDataLevel.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryLevel, sensorLabel));
+         yDataLevel.setUnitLabel(UI.SYMBOL_PERCENTAGE);
          yDataLevel.setShowYSlider(true);
 
          yDataLevel.setRgbGraph_Line(rgbLine);
@@ -705,8 +705,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                sensorData.allBatteryStatus_Start,
                true);
 
-         yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
-         yDataStatus.setUnitLabel("#");
+         yDataStatus.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryStatus, sensorLabel));
+         yDataStatus.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
          yDataStatus.setShowYSlider(true);
 
          yDataStatus.setRgbGraph_Line(rgbLine);
@@ -729,8 +729,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                sensorData.allBatteryVoltage_Start,
                true);
 
-         yDataVoltage.setYTitle("Battery Voltage ·  " + sensorLabel);
-         yDataVoltage.setUnitLabel("Volt");
+         yDataVoltage.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryVoltage, sensorLabel));
+         yDataVoltage.setUnitLabel(UI.UNIT_VOLTAGE);
          yDataVoltage.setShowYSlider(true);
          yDataVoltage.setSetMinMax_0Values(true);
 
@@ -748,7 +748,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
        */
 
       // set dummy title that the history labels are not truncated
-      chartModel.setTitle(UI.SPACE);
+      chartModel.setTitle(UI.SPACE1);
 
       // because the first and last values are dummy values, skip them when navigated
       chartModel.setSkipNavigationForFirstLastValues(true);
