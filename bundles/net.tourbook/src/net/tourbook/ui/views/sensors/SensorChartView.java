@@ -420,8 +420,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void enableActions() {
 
-//      _actionSensorFilterOptions.setEnabled(_isChartDisplayed);
-
       _sensorChart.getAction_MouseWheelMode().setEnabled(_isChartDisplayed);
       _sensorChart.setZoomActionsEnabled(_isChartDisplayed);
    }
@@ -511,8 +509,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
        */
       selectTour(_selectedTourId);
 
-      // mouse wheel mode
+      /*
+       * Set mouse wheel mode
+       */
       final Enum<MouseWheelMode> mouseWheelMode = Util.getStateEnum(_state, STATE_MOUSE_WHEEL_MODE, MouseWheelMode.Selection);
+      _sensorChart.setMouseWheelMode((MouseWheelMode) mouseWheelMode);
       _sensorChart.getAction_MouseWheelMode().setMouseWheelMode((MouseWheelMode) mouseWheelMode);
    }
 

@@ -151,7 +151,6 @@ public class SensorView extends ViewPart implements ITourViewer {
 
          onAction_OpenSensorChart();
       }
-
    }
 
    private class SensorComparator extends ViewerComparator {
@@ -1103,7 +1102,11 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       Util.showView(SensorChartView.ID, true);
 
-      final DeviceSensor selectedSensor = getSelectedSensor();
+      // reselect current sensor to update the sensor chart
+      final IStructuredSelection structuredSelection = _sensorViewer.getStructuredSelection();
+      if (structuredSelection.getFirstElement() != null) {
+         _sensorViewer.setSelection(structuredSelection);
+      }
    }
 
    private void onColumn_Select(final SelectionEvent e) {
