@@ -39,7 +39,7 @@ import net.tourbook.importdata.TourbookDevice;
 public class CiclotourTextDataReader extends TourbookDevice {
 
    private static final String FILE_HEADER_EN = "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:"; //$NON-NLS-1$
-   private static final String FILE_HEADER_DE = "Zeit:	Strecke:	H�he:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";          //$NON-NLS-1$
+   private static final String FILE_HEADER_DE = "Zeit:	Strecke:	Höhe:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";          //$NON-NLS-1$
 
    public CiclotourTextDataReader() {
       // plugin constructor
