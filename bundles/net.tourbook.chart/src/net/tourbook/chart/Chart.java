@@ -45,43 +45,43 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-   private static final String                       ACTION_ID_MOVE_LEFT_SLIDER_HERE  = "ACTION_ID_MOVE_LEFT_SLIDER_HERE";  //$NON-NLS-1$
-   private static final String                       ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
-   private static final String                       ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
-   private static final String                       ACTION_ID_ZOOM_FIT_GRAPH         = "ACTION_ID_ZOOM_FIT_GRAPH";         //$NON-NLS-1$
-   private static final String                       ACTION_ID_ZOOM_IN                = "ACTION_ID_ZOOM_IN";                //$NON-NLS-1$
-   private static final String                       ACTION_ID_ZOOM_IN_TO_SLIDER      = "ACTION_ID_ZOOM_IN_TO_SLIDER";      //$NON-NLS-1$
-   private static final String                       ACTION_ID_ZOOM_OUT               = "ACTION_ID_ZOOM_OUT";               //$NON-NLS-1$
+   private static final String ACTION_ID_MOVE_LEFT_SLIDER_HERE  = "ACTION_ID_MOVE_LEFT_SLIDER_HERE";  //$NON-NLS-1$
+   private static final String ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
+   private static final String ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
+   private static final String ACTION_ID_ZOOM_FIT_GRAPH         = "ACTION_ID_ZOOM_FIT_GRAPH";         //$NON-NLS-1$
+   private static final String ACTION_ID_ZOOM_IN_TO_SLIDER      = "ACTION_ID_ZOOM_IN_TO_SLIDER";      //$NON-NLS-1$
 
-   static final int                                  NO_BAR_SELECTION                 = -1;
+   static final int                                  NO_BAR_SELECTION            = -1;
 
-   public static final String                        CUSTOM_DATA_TOUR_ID              = "tourId";                           //$NON-NLS-1$
+   public static final String                        CUSTOM_DATA_TOUR_ID         = "tourId";            //$NON-NLS-1$
 
-   public static final int                           SYNCH_MODE_NO                    = 0;
-   public static final int                           SYNCH_MODE_BY_SCALE              = 1;
-   public static final int                           SYNCH_MODE_BY_SIZE               = 2;
+   public static final int                           SYNCH_MODE_NO               = 0;
+   public static final int                           SYNCH_MODE_BY_SCALE         = 1;
+   public static final int                           SYNCH_MODE_BY_SIZE          = 2;
 
-   private static final int                          MouseMove                        = 10;
-   private static final int                          MouseDown                        = 20;
-   private static final int                          MouseUp                          = 30;
-   private static final int                          MouseDoubleClick                 = 40;
-   private static final int                          MouseExit                        = 50;
-   private static final int                          KeyDown                          = 110;
-   private static final int                          ChartResized                     = 999;
+   private static final int                          MouseMove                   = 10;
+   private static final int                          MouseDown                   = 20;
+   private static final int                          MouseUp                     = 30;
+   private static final int                          MouseDoubleClick            = 40;
+   private static final int                          MouseExit                   = 50;
+   private static final int                          KeyDown                     = 110;
+   private static final int                          ChartResized                = 999;
 
    public static Color                               FOREGROUND_COLOR_GRID;
    public static Color                               FOREGROUND_COLOR_UNITS;
 
-   private final ListenerList<IBarSelectionListener> _barSelectionListeners           = new ListenerList<>();
-   private final ListenerList<IBarSelectionListener> _barDoubleClickListeners         = new ListenerList<>();
-   private final ListenerList<IHoveredValueListener> _chartHoveredValueListener       = new ListenerList<>();
-   private final ListenerList<IKeyListener>          _chartKeyListener                = new ListenerList<>();
-   private final ListenerList<IMouseListener>        _chartMouseListener              = new ListenerList<>();
-   private final ListenerList<IMouseListener>        _chartMouseMoveListener          = new ListenerList<>();
-   private final ListenerList<IChartOverlay>         _chartOverlayListener            = new ListenerList<>();
-   private final ListenerList<ISliderMoveListener>   _sliderMoveListeners             = new ListenerList<>();
+   private final ListenerList<IBarSelectionListener> _barSelectionListeners      = new ListenerList<>();
+   private final ListenerList<IBarSelectionListener> _barDoubleClickListeners    = new ListenerList<>();
+   private final ListenerList<IHoveredValueListener> _chartHoveredValueListener  = new ListenerList<>();
+   private final ListenerList<IKeyListener>          _chartKeyListener           = new ListenerList<>();
+   private final ListenerList<IMouseListener>        _chartMouseListener         = new ListenerList<>();
+   private final ListenerList<IMouseListener>        _chartMouseMoveListener     = new ListenerList<>();
+   private final ListenerList<IChartOverlay>         _chartOverlayListener       = new ListenerList<>();
+   private final ListenerList<ISliderMoveListener>   _sliderMoveListeners        = new ListenerList<>();
 
    private ActionMouseWheelMode                      _action_MouseWheelMode;
+   private ActionZoomIn                              _action_ZoomIn;
+   private ActionZoomOut                             _action_ZoomOut;
 
    private ChartComponents                           _chartComponents;
 
@@ -92,8 +92,8 @@ public class Chart extends ViewForm {
    private IToolBarManager                           _toolbarMgr;
    private IChartContextProvider                     _chartContextProvider;
 
-   private boolean                                   _isShowZoomActions               = false;
-   private boolean                                   _isShowMouseMode                 = false;
+   private boolean                                   _isShowZoomActions          = false;
+   private boolean                                   _isShowMouseMode            = false;
 
    private Color                                     _backgroundColor;
 
@@ -105,7 +105,7 @@ public class Chart extends ViewForm {
    private IHoveredValueTooltipListener              _hoveredValueTooltipListener;
 
    private HashMap<String, Action>                   _allChartActions;
-   private boolean                                   _isFillToolbar                   = true;
+   private boolean                                   _isFillToolbar              = true;
    private boolean                                   _isToolbarCreated;
 
    private int                                       _barSelectionSerieIndex;
@@ -116,27 +116,27 @@ public class Chart extends ViewForm {
    /**
     * <code>true</code> to start the bar chart at the bottom of the chart
     */
-   private boolean                                   _isDrawBarChartAtBottom          = true;
+   private boolean                                   _isDrawBarChartAtBottom     = true;
 
    /**
     * minimum width in pixel for one unit, this is only an approximate value because the pixel is
     * rounded up or down to fit a rounded unit
     */
-   protected int                                     gridVerticalDistance             = 30;
-   protected int                                     gridHorizontalDistance           = 70;
+   protected int                                     gridVerticalDistance        = 30;
+   protected int                                     gridHorizontalDistance      = 70;
 
-   protected boolean                                 isShowHorizontalGridLines        = false;
-   protected boolean                                 isShowVerticalGridLines          = false;
+   protected boolean                                 isShowHorizontalGridLines   = false;
+   protected boolean                                 isShowVerticalGridLines     = false;
 
    /**
     * Transparency of the graph lines
     */
-   protected int                                     graphTransparency_Line           = 0xFF;
+   protected int                                     graphTransparency_Line      = 0xFF;
 
    /**
     * Transparency of the graph fillings
     */
-   protected int                                     graphTransparency_Filling        = 0xE0;
+   protected int                                     graphTransparency_Filling   = 0xE0;
 
    /**
     * The graph transparency can be adjusted with this value. This value is multiplied with the
@@ -144,12 +144,12 @@ public class Chart extends ViewForm {
     * <p>
     * Opacity: 0.0 = transparent, 1.0 = opaque.
     */
-   double                                            graphTransparencyAdjustment      = 1.0;
+   double                                            graphTransparencyAdjustment = 1.0;
 
    /**
     * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
     */
-   public int                                        graphAntialiasing                = SWT.OFF;
+   public int                                        graphAntialiasing           = SWT.OFF;
 
    /*
     * Segment alternate color
@@ -279,14 +279,14 @@ public class Chart extends ViewForm {
       _allChartActions = new HashMap<>();
 
       _action_MouseWheelMode = new ActionMouseWheelMode(this);
+      _action_ZoomIn = new ActionZoomIn(this);
+      _action_ZoomOut = new ActionZoomOut(this);
 
       _allChartActions.put(ACTION_ID_MOVE_LEFT_SLIDER_HERE, new ActionMoveLeftSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_RIGHT_SLIDER_HERE, new ActionMoveRightSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_SLIDERS_TO_BORDER, new ActionMoveSlidersToBorder(this));
       _allChartActions.put(ACTION_ID_ZOOM_FIT_GRAPH, new ActionZoomFitGraph(this));
-      _allChartActions.put(ACTION_ID_ZOOM_IN, new ActionZoomIn(this));
       _allChartActions.put(ACTION_ID_ZOOM_IN_TO_SLIDER, new ActionZoomToSlider(this));
-      _allChartActions.put(ACTION_ID_ZOOM_OUT, new ActionZoomOut(this));
 
       enableActions();
    }
@@ -371,8 +371,8 @@ public class Chart extends ViewForm {
       final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
       final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
 
-      _allChartActions.get(ACTION_ID_ZOOM_IN).setEnabled(canZoomIn);
-      _allChartActions.get(ACTION_ID_ZOOM_OUT).setEnabled(canZoomOut);
+      _action_ZoomIn.setEnabled(canZoomIn);
+      _action_ZoomOut.setEnabled(canZoomOut);
 
       // zoom in to slider has no limits but when there are more than 10000 units, the units are not displayed
       _allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
@@ -505,8 +505,8 @@ public class Chart extends ViewForm {
 
             tbm.add(new Separator());
 
-            tbm.add(_allChartActions.get(ACTION_ID_ZOOM_IN));
-            tbm.add(_allChartActions.get(ACTION_ID_ZOOM_OUT));
+            tbm.add(_action_ZoomIn);
+            tbm.add(_action_ZoomOut);
          }
 
          if (refreshToolbar) {
@@ -1321,9 +1321,15 @@ public class Chart extends ViewForm {
     */
    public void setZoomActionsEnabled(final boolean isEnabled) {
 
+      final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
+
+      final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
+      final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
+
+      _action_ZoomIn.setEnabled(canZoomIn && isEnabled);
+      _action_ZoomOut.setEnabled(canZoomOut);
+
       _allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(isEnabled);
-      _allChartActions.get(ACTION_ID_ZOOM_IN).setEnabled(isEnabled);
-      _allChartActions.get(ACTION_ID_ZOOM_OUT).setEnabled(isEnabled);
    }
 
    public void switchSlidersTo2ndXData() {

@@ -529,6 +529,7 @@ public class UI {
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
    public static final String          UNIT_VOLT                  = "V";                        //$NON-NLS-1$
+   public static final String          UNIT_VOLTAGE               = "Volt";                     //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
 

@@ -38,13 +38,16 @@ public class SensorManager {
 
       ALL_SENSOR_TYPES = new ComboEnumEntry<?>[] {
 
-            new ComboEnumEntry<>(UI.EMPTY_STRING,                    DeviceSensorType.NONE),
-            new ComboEnumEntry<>(Messages.Sensor_Type_Other,         DeviceSensorType.OTHER),
-            new ComboEnumEntry<>(GRAPH_LABEL_CADENCE,                DeviceSensorType.CADENCE),
-            new ComboEnumEntry<>(GRAPH_LABEL_SPEED,                  DeviceSensorType.SPEED),
-            new ComboEnumEntry<>(GRAPH_LABEL_PACE,                   DeviceSensorType.PACE),
-            new ComboEnumEntry<>(GRAPH_LABEL_HEARTBEAT,              DeviceSensorType.HEARTBEAT),
-            new ComboEnumEntry<>(Messages.Sensor_Type_GearShifting,  DeviceSensorType.GEAR_SHIFTING),
+            new ComboEnumEntry<>(UI.EMPTY_STRING,                       DeviceSensorType.NONE),
+            new ComboEnumEntry<>(Messages.Sensor_Type_RecordingDevice,  DeviceSensorType.RECORDING_DEVICE),
+
+            new ComboEnumEntry<>(GRAPH_LABEL_CADENCE,                   DeviceSensorType.CADENCE),
+            new ComboEnumEntry<>(GRAPH_LABEL_SPEED,                     DeviceSensorType.SPEED),
+            new ComboEnumEntry<>(GRAPH_LABEL_PACE,                      DeviceSensorType.PACE),
+            new ComboEnumEntry<>(GRAPH_LABEL_HEARTBEAT,                 DeviceSensorType.HEARTBEAT),
+            new ComboEnumEntry<>(Messages.Sensor_Type_GearShifting,     DeviceSensorType.GEAR_SHIFTING),
+
+            new ComboEnumEntry<>(Messages.Sensor_Type_Other,            DeviceSensorType.OTHER),
       };
 
 // SET_FORMATTING_ON

@@ -22,6 +22,8 @@ public enum DeviceSensorType {
     */
    NONE,
 
+   RECORDING_DEVICE, //
+
    OTHER,
 
    /**

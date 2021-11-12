@@ -573,12 +573,23 @@
                label       ="%View_Name_TourMarkerAll"
                mnemonic    ="%View_Name_TourMarkerAll_Mnemonic"/>
 
+            <separator
+               name        ="net.tourbook.separator.Sensor"
+               visible     ="true"/>
+               
             <!-- Sensors -->
             <command
                commandId   ="command.net.tourbook.ui.views.sensors.SensorView"
                icon        ="icons/sensor.png"
                label       ="%View_Name_Sensor"
                mnemonic    ="%View_Name_Sensor_Mnemonic"/>
+
+            <!-- Sensor Chart -->
+            <command
+               commandId   ="command.net.tourbook.ui.views.sensors.SensorChartView"
+               icon        ="icons/sensor-chart.png"
+               label       ="%View_Name_SensorChart"
+               mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
 
 
             <!-- Sign Images 
@@ -762,12 +773,6 @@
                icon        ="icons/geo-parts.png"
                label       ="%Command_GeoParts"
                mnemonic    ="%Command_GeoParts_Mnemonic"/>
-
-            <command
-               commandId   ="command.net.tourbook.ui.views.sensors.SensorChartView"
-               icon        ="icons/sensor-chart.png"
-               label       ="%View_Name_SensorChart"
-               mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
                
             <command
                commandId   ="command.net.tourbook.ui.views.TourChartSmoothingView"
@@ -1981,6 +1986,12 @@
       <key
          commandId="command.net.tourbook.ui.views.TourMarkerAllView"
          sequence="%Shortcut_Key_App_TourMarker"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.ui.views.sensors.SensorView"
+         sequence="%Shortcut_Key_App_Sensors"
          contextId="org.eclipse.ui.contexts.window"
          schemeId="net.tourbook.scheme"/>
 
