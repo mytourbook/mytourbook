@@ -31,7 +31,6 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.views.sensors.SlideoutSensorTourFilter.SensorTourFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 
@@ -49,19 +48,17 @@ public class SensorDataProvider {
     * @param state
     * @return
     */
-   SensorData getData(final long sensorId, final boolean isUseTourFilter, final IDialogSettings state) {
+   SensorData getData(final long sensorId, final boolean useTourFilter, final IDialogSettings state) {
 
-      final boolean isUseAppFilter = isUseTourFilter
+// SET_FORMATTING_OFF
 
-            && Util.getStateBoolean(state,
-                  SlideoutSensorTourFilter.STATE_IS_USE_APP_FILTER,
-                  SlideoutSensorTourFilter.STATE_IS_USE_APP_FILTER_DEFAULT);
+      final boolean useAppFilter          = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_APP_FILTER,           SlideoutSensorTourFilter.STATE_USE_APP_FILTER_DEFAULT);
+      final boolean useDurationFilter     = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_DURATION_FILTER,      SlideoutSensorTourFilter.STATE_USE_DURATION_FILTER_DEFAULT);
 
-      final boolean isUseDurationFilter = isUseTourFilter
+      final boolean isAppFilter        = useTourFilter && useAppFilter;
+      final boolean isDurationFilter   = useTourFilter && useDurationFilter;
 
-            && Util.getStateBoolean(state,
-                  SlideoutSensorTourFilter.STATE_IS_USE_DURATION_FILTER,
-                  SlideoutSensorTourFilter.STATE_IS_USE_DURATION_FILTER_DEFAULT);
+// SET_FORMATTING_ON
 
       String sql = null;
 
@@ -76,7 +73,7 @@ public class SensorDataProvider {
           * Setup app filter
           */
          final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
-         if (isUseAppFilter) {
+         if (isAppFilter) {
 
             final String sqlTourIds = UI.EMPTY_STRING
 
@@ -96,7 +93,7 @@ public class SensorDataProvider {
           * Setup duration filter
           */
          ZonedDateTime durationFilter_DateTime = null;
-         if (isUseDurationFilter) {
+         if (isDurationFilter) {
 
             sqlDurationFilter = " AND TourStartTime >= ?"; //                   //$NON-NLS-1$
 
@@ -154,13 +151,12 @@ public class SensorDataProvider {
 
          int paramIndex = 2;
 
-         if (isUseAppFilter) {
+         if (isAppFilter) {
             appFilter.setParameters(stmt, paramIndex);
             paramIndex = appFilter.getLastParameterIndex();
          }
 
-         if (isUseDurationFilter) {
-
+         if (isDurationFilter) {
             stmt.setLong(paramIndex++, durationFilter_DateTime.toEpochSecond() * 1000);
          }
 
@@ -171,7 +167,7 @@ public class SensorDataProvider {
 
             final long dbTourId                 = result.getLong(2);
             final long dbTourStartTime          = result.getLong(3);
-//            final long dbTourEndTime            = result.getLong(4);
+//          final long dbTourEndTime            = result.getLong(4);
             final float dbBatteryLevel_Start    = result.getShort(5);
             final float dbBatteryLevel_End      = result.getShort(6);
             final float dbBatteryStatus_Start   = result.getShort(7);
@@ -325,38 +321,43 @@ public class SensorDataProvider {
     */
    private ZonedDateTime getDurationFilter_DateTime(final IDialogSettings state) {
 
-      final ZonedDateTime now = TimeTools.now();
-      ZonedDateTime firstTourStartTime;
+// SET_FORMATTING_OFF
 
-      final Enum<SensorTourFilter> seletedTourFilter = Util.getStateEnum(state,
-            SlideoutSensorTourFilter.STATE_SELECTED_TOUR_FILTER,
-            SlideoutSensorTourFilter.STATE_SELECTED_TOUR_FILTER_DEFAULT);
+      final boolean useTourFilter_Days    = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_TOUR_FILTER_DAYS, SlideoutSensorTourFilter.STATE_USE_TOUR_FILTER_DAYS_DEFAULT);
+      final boolean useTourFilter_Months  = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_TOUR_FILTER_MONTHS, SlideoutSensorTourFilter.STATE_USE_TOUR_FILTER_MONTHS_DEFAULT);
+      final boolean useTourFilter_Years   = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_TOUR_FILTER_YEARS, SlideoutSensorTourFilter.STATE_USE_TOUR_FILTER_YEARS_DEFAULT);
 
-      if (seletedTourFilter.equals(SlideoutSensorTourFilter.SensorTourFilter.DAY)) {
+// SET_FORMATTING_ON
+
+      ZonedDateTime firstTourStartTime = TimeTools.now();
+
+      if (useTourFilter_Days) {
 
          final int tourFilterDays = Util.getStateInt(state,
                SlideoutSensorTourFilter.STATE_TOUR_FILTER_DAYS,
                SlideoutSensorTourFilter.STATE_TOUR_FILTER_DAYS_DEFAULT);
 
-         firstTourStartTime = now.minusDays(tourFilterDays);
+         firstTourStartTime = firstTourStartTime.minusDays(tourFilterDays);
 
-      } else if (seletedTourFilter.equals(SlideoutSensorTourFilter.SensorTourFilter.MONTH)) {
+      }
+
+      if (useTourFilter_Months) {
 
          final int tourFilterMonths = Util.getStateInt(state,
                SlideoutSensorTourFilter.STATE_TOUR_FILTER_MONTHS,
                SlideoutSensorTourFilter.STATE_TOUR_FILTER_MONTHS_DEFAULT);
 
-         firstTourStartTime = now.minusMonths(tourFilterMonths);
+         firstTourStartTime = firstTourStartTime.minusMonths(tourFilterMonths);
 
-      } else {
+      }
 
-         // years
+      if (useTourFilter_Years) {
 
          final int tourFilterYears = Util.getStateInt(state,
                SlideoutSensorTourFilter.STATE_TOUR_FILTER_YEARS,
                SlideoutSensorTourFilter.STATE_TOUR_FILTER_YEARS_DEFAULT);
 
-         firstTourStartTime = now.minusYears(tourFilterYears);
+         firstTourStartTime = firstTourStartTime.minusYears(tourFilterYears);
       }
 
       return firstTourStartTime;

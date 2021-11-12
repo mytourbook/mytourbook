@@ -74,14 +74,25 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class SensorChartView extends ViewPart implements ITourProvider {
 
-   public static final String              ID                            = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
+   public static final String  ID                            = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
 
-   private static final String             STATE_IS_SELECTED_TOUR_FILTER = "STATE_IS_SELECTED_TOUR_FILTER";                    //$NON-NLS-1$
-   private static final String             STATE_MOUSE_WHEEL_MODE        = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
-   private static final String             STATE_SELECTED_TOUR_ID        = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
+   private static final String STATE_IS_SELECTED_TOUR_FILTER = "STATE_IS_SELECTED_TOUR_FILTER";                    //$NON-NLS-1$
+   private static final String STATE_MOUSE_WHEEL_MODE        = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
+   private static final String STATE_SELECTED_TOUR_ID        = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
 
-   private final IPreferenceStore          _prefStore                    = TourbookPlugin.getPrefStore();
-   private final IDialogSettings           _state                        = TourbookPlugin.getState(ID);
+// SET_FORMATTING_OFF
+
+   private static final String      GRID_PREF_PREFIX                    = "GRID_SENSOR_CHART__";                                            //$NON-NLS-1$
+
+   private static final String      GRID_IS_SHOW_VERTICAL_GRIDLINES     = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+   private static final String      GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+   private static final String      GRID_VERTICAL_DISTANCE              = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+   private static final String      GRID_HORIZONTAL_DISTANCE            = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+
+// SET_FORMATTING_ON
+
+   private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
+   private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
 
    private IPartListener2                  _partListener;
    private IPropertyChangeListener         _prefChangeListener;
@@ -93,18 +104,18 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private DeviceSensor                    _selectedSensor;
    private SensorData                      _sensorData;
-   private SensorDataProvider              _sensorDataProvider           = new SensorDataProvider();
+   private SensorDataProvider              _sensorDataProvider      = new SensorDataProvider();
 
    private Long                            _selectedTourId;
 
    private DelayedBarSelection_TourToolTip _tourToolTip;
-   private TourInfoIconToolTipProvider     _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
-   private TourInfoUI                      _tourInfoUI                   = new TourInfoUI();
+   private TourInfoIconToolTipProvider     _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private TourInfoUI                      _tourInfoUI              = new TourInfoUI();
 
    private boolean                         _isUseTourFilter;
    private boolean                         _isInSelect;
 
-   private OpenDialogManager               _openDlgMgr                   = new OpenDialogManager();
+   private OpenDialogManager               _openDlgMgr              = new OpenDialogManager();
 
    private ActionChartOptions              _actionChartOptions;
    private ActionTourFilter                _actionTourFilterOptions;
@@ -126,7 +137,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutSensorChartOptions(_parent, toolbar, SensorChartView.this, _state);
+         return new SlideoutSensorChartOptions(_parent, toolbar, SensorChartView.this, _state, GRID_PREF_PREFIX);
       }
 
       @Override
@@ -143,7 +154,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
 
          isToggleAction = true;
-         notSelectedTooltip = Messages.Sensor_Chart_Action_TourFilter_Tooltip;
+         notSelectedTooltip = Messages.Sensor_Chart_Action_TourQuickFilter_Tooltip;
       }
 
       @Override
@@ -211,8 +222,15 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
             updateChart();
-         }
 
+         } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+
+            // grid has changed, update chart
+            updateChartProperties();
+         }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
@@ -375,6 +393,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       sensorChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
+
+      // set chart properties
+      updateChartProperties();
 
       return sensorChart;
    }
@@ -760,5 +781,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       // try to select the previously selected tour
       selectTour(_selectedTourId);
+   }
+
+   private void updateChartProperties() {
+
+      net.tourbook.ui.UI.updateChartProperties(_sensorChart, GRID_PREF_PREFIX);
    }
 }

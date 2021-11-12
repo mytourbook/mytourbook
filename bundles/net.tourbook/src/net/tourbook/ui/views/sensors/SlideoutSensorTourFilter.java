@@ -45,18 +45,23 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutSensorTourFilter extends ToolbarSlideout implements IActionResetToDefault {
 
-   static final String            STATE_IS_USE_DURATION_FILTER         = "STATE_IS_USE_DURATION_FILTER"; //$NON-NLS-1$
-   static final boolean           STATE_IS_USE_DURATION_FILTER_DEFAULT = false;
-   static final String            STATE_IS_USE_APP_FILTER              = "STATE_IS_USE_APP_FILTER";      //$NON-NLS-1$
-   static final boolean           STATE_IS_USE_APP_FILTER_DEFAULT      = false;
-   static final String            STATE_SELECTED_TOUR_FILTER           = "STATE_SELECTED_TOUR_FILTER";   //$NON-NLS-1$
-   static final SensorTourFilter  STATE_SELECTED_TOUR_FILTER_DEFAULT   = SensorTourFilter.YEAR;
-   static final int               STATE_TOUR_FILTER_DAYS_DEFAULT       = 1;
+   static final String            STATE_USE_APP_FILTER                 = "STATE_USE_APP_FILTER";         //$NON-NLS-1$
+   static final boolean           STATE_USE_APP_FILTER_DEFAULT         = false;
+   static final String            STATE_USE_DURATION_FILTER            = "STATE_USE_DURATION_FILTER";    //$NON-NLS-1$
+   static final boolean           STATE_USE_DURATION_FILTER_DEFAULT    = false;
+   static final String            STATE_USE_TOUR_FILTER_DAYS           = "STATE_USE_TOUR_FILTER_DAYS";   //$NON-NLS-1$
+   static final boolean           STATE_USE_TOUR_FILTER_DAYS_DEFAULT   = false;
+   static final String            STATE_USE_TOUR_FILTER_MONTHS         = "STATE_USE_TOUR_FILTER_MONTHS"; //$NON-NLS-1$
+   static final boolean           STATE_USE_TOUR_FILTER_MONTHS_DEFAULT = false;
+   static final String            STATE_USE_TOUR_FILTER_YEARS          = "STATE_USE_TOUR_FILTER_YEARS";  //$NON-NLS-1$
+   static final boolean           STATE_USE_TOUR_FILTER_YEARS_DEFAULT  = true;
+
    static final String            STATE_TOUR_FILTER_DAYS               = "STATE_TOUR_FILTER_DAYS";       //$NON-NLS-1$
-   static final int               STATE_TOUR_FILTER_MONTHS_DEFAULT     = 1;
+   static final int               STATE_TOUR_FILTER_DAYS_DEFAULT       = 1;
    static final String            STATE_TOUR_FILTER_MONTHS             = "STATE_TOUR_FILTER_MONTHS";     //$NON-NLS-1$
-   static final int               STATE_TOUR_FILTER_YEARS_DEFAULT      = 1;
+   static final int               STATE_TOUR_FILTER_MONTHS_DEFAULT     = 1;
    static final String            STATE_TOUR_FILTER_YEARS              = "STATE_TOUR_FILTER_YEARS";      //$NON-NLS-1$
+   static final int               STATE_TOUR_FILTER_YEARS_DEFAULT      = 1;
 
    private static final String    RESET_VALUE                          = " X ";                          //$NON-NLS-1$
 
@@ -75,12 +80,11 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
    /*
     * UI controls
     */
-   private Button  _checkboxIsFilterDuration;
-   private Button  _checkboxIsUseAppFilter;
-
-   private Button  _radioDay;
-   private Button  _radioMonth;
-   private Button  _radioYear;
+   private Button  _checkboxUseAppFilter;
+   private Button  _checkboxUseFilterDuration;
+   private Button  _checkboxUseTourFilter_Day;
+   private Button  _checkboxUseTourFilter_Month;
+   private Button  _checkboxUseTourFilter_Year;
 
    private Spinner _spinnerDay;
    private Spinner _spinnerMonth;
@@ -109,11 +113,6 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
       }
    }
 
-   enum SensorTourFilter {
-
-      DAY, MONTH, YEAR
-   }
-
    public SlideoutSensorTourFilter(final Composite ownerControl,
                                    final ToolBar toolbar,
                                    final SensorChartView sensorChartView,
@@ -122,6 +121,7 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
       super(ownerControl, toolbar);
 
       _sensorChartView = sensorChartView;
+
       _state = state;
    }
 
@@ -209,9 +209,9 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // checkbox
-            _checkboxIsUseAppFilter = new Button(container, SWT.CHECK);
-            _checkboxIsUseAppFilter.setText(Messages.Slideout_SensorTourFilter_Checkbox_IsUseAppFilter);
-            _checkboxIsUseAppFilter.addSelectionListener(_defaultSelectionListener);
+            _checkboxUseAppFilter = new Button(container, SWT.CHECK);
+            _checkboxUseAppFilter.setText(Messages.Slideout_SensorTourFilter_Checkbox_IsUseAppFilter);
+            _checkboxUseAppFilter.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
@@ -219,9 +219,9 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // checkbox
-            _checkboxIsFilterDuration = new Button(container, SWT.CHECK);
-            _checkboxIsFilterDuration.setText(Messages.Slideout_SensorTourFilter_Checkbox_IsFilterDuration);
-            _checkboxIsFilterDuration.addSelectionListener(_defaultSelectionListener);
+            _checkboxUseFilterDuration = new Button(container, SWT.CHECK);
+            _checkboxUseFilterDuration.setText(Messages.Slideout_SensorTourFilter_Checkbox_IsFilterDuration);
+            _checkboxUseFilterDuration.addSelectionListener(_defaultSelectionListener);
 
             createUI_22_DurationFilter(container);
          }
@@ -243,13 +243,13 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // radio
-            _radioYear = new Button(durationContainer, SWT.RADIO);
-            _radioYear.setText(Messages.Slideout_SensorTourFilter_Radio_Year);
-            _radioYear.addSelectionListener(_defaultSelectionListener);
+            _checkboxUseTourFilter_Year = new Button(durationContainer, SWT.CHECK);
+            _checkboxUseTourFilter_Year.setText(Messages.Slideout_SensorTourFilter_Radio_Year);
+            _checkboxUseTourFilter_Year.addSelectionListener(_defaultSelectionListener);
 
             // spinner
             _spinnerYear = new Spinner(durationContainer, SWT.BORDER);
-            _spinnerYear.setMinimum(1);
+            _spinnerYear.setMinimum(0);
             _spinnerYear.setMaximum(999);
             _spinnerYear.addSelectionListener(_defaultSelectionListener);
             _spinnerYear.addMouseWheelListener(_defaultMouseWheelListener);
@@ -263,13 +263,13 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // radio
-            _radioMonth = new Button(durationContainer, SWT.RADIO);
-            _radioMonth.setText(Messages.Slideout_SensorTourFilter_Radio_Month);
-            _radioMonth.addSelectionListener(_defaultSelectionListener);
+            _checkboxUseTourFilter_Month = new Button(durationContainer, SWT.CHECK);
+            _checkboxUseTourFilter_Month.setText(Messages.Slideout_SensorTourFilter_Radio_Month);
+            _checkboxUseTourFilter_Month.addSelectionListener(_defaultSelectionListener);
 
             // spinner
             _spinnerMonth = new Spinner(durationContainer, SWT.BORDER);
-            _spinnerMonth.setMinimum(1);
+            _spinnerMonth.setMinimum(0);
             _spinnerMonth.setMaximum(999);
             _spinnerMonth.addSelectionListener(_defaultSelectionListener);
             _spinnerMonth.addMouseWheelListener(_defaultMouseWheelListener);
@@ -283,13 +283,13 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // radio
-            _radioDay = new Button(durationContainer, SWT.RADIO);
-            _radioDay.setText(Messages.Slideout_SensorTourFilter_Radio_Day);
-            _radioDay.addSelectionListener(_defaultSelectionListener);
+            _checkboxUseTourFilter_Day = new Button(durationContainer, SWT.CHECK);
+            _checkboxUseTourFilter_Day.setText(Messages.Slideout_SensorTourFilter_Radio_Day);
+            _checkboxUseTourFilter_Day.addSelectionListener(_defaultSelectionListener);
 
             // spinner
             _spinnerDay = new Spinner(durationContainer, SWT.BORDER);
-            _spinnerDay.setMinimum(1);
+            _spinnerDay.setMinimum(0);
             _spinnerDay.setMaximum(999);
             _spinnerDay.addSelectionListener(_defaultSelectionListener);
             _spinnerDay.addMouseWheelListener(_defaultMouseWheelListener);
@@ -321,44 +321,27 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
 
    private void enableControls() {
 
-      final boolean isFilterDuration = _checkboxIsFilterDuration.getSelection();
+      final boolean isFilterDuration = _checkboxUseFilterDuration.getSelection();
 
-      final boolean isDay = _radioDay.getSelection() && isFilterDuration;
-      final boolean isMonth = _radioMonth.getSelection() && isFilterDuration;
-      final boolean isYear = _radioYear.getSelection() && isFilterDuration;
+      final boolean isDay = _checkboxUseTourFilter_Day.getSelection() && isFilterDuration;
+      final boolean isMonth = _checkboxUseTourFilter_Month.getSelection() && isFilterDuration;
+      final boolean isYear = _checkboxUseTourFilter_Year.getSelection() && isFilterDuration;
 
       final int durationDays = _spinnerDay.getSelection();
       final int durationMonths = _spinnerMonth.getSelection();
       final int durationYears = _spinnerYear.getSelection();
 
-      _actionResetValue_Day.setEnabled(isDay && durationDays > 1);
-      _actionResetValue_Month.setEnabled(isMonth && durationMonths > 1);
-      _actionResetValue_Year.setEnabled(isYear && durationYears > 1);
+      _actionResetValue_Day.setEnabled(isDay && durationDays > 0);
+      _actionResetValue_Month.setEnabled(isMonth && durationMonths > 0);
+      _actionResetValue_Year.setEnabled(isYear && durationYears > 0);
 
-      _radioDay.setEnabled(isFilterDuration);
-      _radioMonth.setEnabled(isFilterDuration);
-      _radioYear.setEnabled(isFilterDuration);
+      _checkboxUseTourFilter_Day.setEnabled(isFilterDuration);
+      _checkboxUseTourFilter_Month.setEnabled(isFilterDuration);
+      _checkboxUseTourFilter_Year.setEnabled(isFilterDuration);
 
       _spinnerDay.setEnabled(isDay);
       _spinnerMonth.setEnabled(isMonth);
       _spinnerYear.setEnabled(isYear);
-   }
-
-   private SensorTourFilter getSelectedTourFilter() {
-
-      if (_radioDay.getSelection()) {
-
-         return SensorTourFilter.DAY;
-
-      } else if (_radioMonth.getSelection()) {
-
-         return SensorTourFilter.MONTH;
-
-      } else {
-
-         return STATE_SELECTED_TOUR_FILTER_DEFAULT;
-      }
-
    }
 
    private void initUI() {
@@ -378,14 +361,12 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
       enableControls();
 
       // update chart with new settings
-//      _tourChart.updateTourChart();
-
       _sensorChartView.updateChart();
    }
 
    private void onResetValue(final Spinner spinner) {
 
-      spinner.setSelection(1);
+      spinner.setSelection(0);
 
       onChangeUI();
    }
@@ -393,63 +374,46 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
    @Override
    public void resetToDefaults() {
 
-      _checkboxIsFilterDuration.setSelection(STATE_IS_USE_DURATION_FILTER_DEFAULT);
-      _checkboxIsUseAppFilter.setSelection(STATE_IS_USE_APP_FILTER_DEFAULT);
+      _checkboxUseAppFilter.setSelection(STATE_USE_APP_FILTER_DEFAULT);
+      _checkboxUseFilterDuration.setSelection(STATE_USE_DURATION_FILTER_DEFAULT);
+
+      _checkboxUseTourFilter_Day.setSelection(STATE_USE_TOUR_FILTER_DAYS_DEFAULT);
+      _checkboxUseTourFilter_Month.setSelection(STATE_USE_TOUR_FILTER_MONTHS_DEFAULT);
+      _checkboxUseTourFilter_Year.setSelection(STATE_USE_TOUR_FILTER_YEARS_DEFAULT);
 
       _spinnerDay.setSelection(STATE_TOUR_FILTER_DAYS_DEFAULT);
       _spinnerMonth.setSelection(STATE_TOUR_FILTER_MONTHS_DEFAULT);
       _spinnerYear.setSelection(STATE_TOUR_FILTER_YEARS_DEFAULT);
-
-      selectTourFilter(STATE_SELECTED_TOUR_FILTER_DEFAULT);
 
       onChangeUI();
    }
 
    private void restoreState() {
 
-      _checkboxIsFilterDuration.setSelection(Util.getStateBoolean(_state, STATE_IS_USE_DURATION_FILTER, STATE_IS_USE_DURATION_FILTER_DEFAULT));
-      _checkboxIsUseAppFilter.setSelection(Util.getStateBoolean(_state, STATE_IS_USE_APP_FILTER, STATE_IS_USE_APP_FILTER_DEFAULT));
+      _checkboxUseAppFilter.setSelection(Util.getStateBoolean(_state, STATE_USE_APP_FILTER, STATE_USE_APP_FILTER_DEFAULT));
+      _checkboxUseFilterDuration.setSelection(Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER, STATE_USE_DURATION_FILTER_DEFAULT));
+
+      _checkboxUseTourFilter_Day.setSelection(Util.getStateBoolean(_state, STATE_USE_TOUR_FILTER_DAYS, STATE_USE_TOUR_FILTER_DAYS_DEFAULT));
+      _checkboxUseTourFilter_Month.setSelection(Util.getStateBoolean(_state, STATE_USE_TOUR_FILTER_MONTHS, STATE_USE_TOUR_FILTER_MONTHS_DEFAULT));
+      _checkboxUseTourFilter_Year.setSelection(Util.getStateBoolean(_state, STATE_USE_TOUR_FILTER_YEARS, STATE_USE_TOUR_FILTER_YEARS_DEFAULT));
 
       _spinnerDay.setSelection(Util.getStateInt(_state, STATE_TOUR_FILTER_DAYS, STATE_TOUR_FILTER_DAYS_DEFAULT));
       _spinnerMonth.setSelection(Util.getStateInt(_state, STATE_TOUR_FILTER_MONTHS, STATE_TOUR_FILTER_MONTHS_DEFAULT));
       _spinnerYear.setSelection(Util.getStateInt(_state, STATE_TOUR_FILTER_YEARS, STATE_TOUR_FILTER_YEARS_DEFAULT));
-
-      final Enum<SensorTourFilter> seletedTourFilter = Util.getStateEnum(_state, STATE_SELECTED_TOUR_FILTER, STATE_SELECTED_TOUR_FILTER_DEFAULT);
-      selectTourFilter(seletedTourFilter);
    }
 
    private void saveState() {
 
-      _state.put(STATE_IS_USE_DURATION_FILTER, _checkboxIsFilterDuration.getSelection());
-      _state.put(STATE_IS_USE_APP_FILTER, _checkboxIsUseAppFilter.getSelection());
+      _state.put(STATE_USE_APP_FILTER, _checkboxUseAppFilter.getSelection());
+      _state.put(STATE_USE_DURATION_FILTER, _checkboxUseFilterDuration.getSelection());
+
+      _state.put(STATE_USE_TOUR_FILTER_DAYS, _checkboxUseTourFilter_Day.getSelection());
+      _state.put(STATE_USE_TOUR_FILTER_MONTHS, _checkboxUseTourFilter_Month.getSelection());
+      _state.put(STATE_USE_TOUR_FILTER_YEARS, _checkboxUseTourFilter_Year.getSelection());
 
       _state.put(STATE_TOUR_FILTER_DAYS, _spinnerDay.getSelection());
       _state.put(STATE_TOUR_FILTER_MONTHS, _spinnerMonth.getSelection());
       _state.put(STATE_TOUR_FILTER_YEARS, _spinnerYear.getSelection());
-
-      Util.setStateEnum(_state, STATE_SELECTED_TOUR_FILTER, getSelectedTourFilter());
-   }
-
-   private void selectTourFilter(final Enum<SensorTourFilter> seletedTourFilter) {
-
-      if (seletedTourFilter == SensorTourFilter.DAY) {
-
-         _radioDay.setSelection(true);
-         _radioMonth.setSelection(false);
-         _radioYear.setSelection(false);
-
-      } else if (seletedTourFilter == SensorTourFilter.MONTH) {
-
-         _radioDay.setSelection(false);
-         _radioMonth.setSelection(true);
-         _radioYear.setSelection(false);
-
-      } else {
-
-         _radioDay.setSelection(false);
-         _radioMonth.setSelection(false);
-         _radioYear.setSelection(true);
-      }
    }
 
 }

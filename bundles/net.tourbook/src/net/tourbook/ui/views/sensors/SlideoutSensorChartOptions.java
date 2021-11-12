@@ -23,6 +23,7 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -55,6 +56,7 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
    private ActionResetToDefaults  _actionRestoreDefaults;
 
    private SensorChartView        _sensorChartView;
+   private ChartOptions_Grid      _gridUI;
 
    /*
     * UI controls
@@ -66,12 +68,15 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
    public SlideoutSensorChartOptions(final Composite ownerControl,
                                      final ToolBar toolbar,
                                      final SensorChartView sensorChartView,
-                                     final IDialogSettings state) {
+                                     final IDialogSettings state,
+                                     final String gridPrefPrefix) {
 
       super(ownerControl, toolbar);
 
       _sensorChartView = sensorChartView;
       _state = state;
+
+      _gridUI = new ChartOptions_Grid(gridPrefPrefix);
    }
 
    private void createActions() {
@@ -114,6 +119,8 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
 
             createUI_20_BatteryCharts(container);
          }
+
+         _gridUI.createUI(container);
       }
 
       return shellContainer;
@@ -209,6 +216,8 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _checkboxBatteryStatus.setSelection(STATE_IS_SHOW_BATTERY_STATUS_DEFAULT);
       _checkboxBatteryVoltage.setSelection(STATE_IS_SHOW_BATTERY_VOLTAGE_DEFAULT);
 
+      _gridUI.resetToDefaults();
+
       onChangeUI();
    }
 
@@ -217,6 +226,8 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _checkboxBatteryLevel.setSelection(Util.getStateBoolean(_state, STATE_IS_SHOW_BATTERY_LEVEL, STATE_IS_SHOW_BATTERY_LEVEL_DEFAULT));
       _checkboxBatteryStatus.setSelection(Util.getStateBoolean(_state, STATE_IS_SHOW_BATTERY_STATUS, STATE_IS_SHOW_BATTERY_STATUS_DEFAULT));
       _checkboxBatteryVoltage.setSelection(Util.getStateBoolean(_state, STATE_IS_SHOW_BATTERY_VOLTAGE, STATE_IS_SHOW_BATTERY_VOLTAGE_DEFAULT));
+
+      _gridUI.restoreState();
    }
 
    private void saveState() {
@@ -224,6 +235,8 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _state.put(STATE_IS_SHOW_BATTERY_LEVEL, _checkboxBatteryLevel.getSelection());
       _state.put(STATE_IS_SHOW_BATTERY_STATUS, _checkboxBatteryStatus.getSelection());
       _state.put(STATE_IS_SHOW_BATTERY_VOLTAGE, _checkboxBatteryVoltage.getSelection());
+
+      _gridUI.saveState();
    }
 
 }

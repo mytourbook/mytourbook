@@ -1747,7 +1747,7 @@ public class Messages extends NLS {
    public static String        Search_View_Link_LinuxBrowser;
    public static String        Search_View_Link_SetupExternalBrowser;
 
-   public static String        Sensor_Chart_Action_TourFilter_Tooltip;
+   public static String        Sensor_Chart_Action_TourQuickFilter_Tooltip;
    public static String        Sensor_Chart_GraphLabel_BatteryLevel;
    public static String        Sensor_Chart_GraphLabel_BatteryStatus;
    public static String        Sensor_Chart_GraphLabel_BatteryVoltage;
