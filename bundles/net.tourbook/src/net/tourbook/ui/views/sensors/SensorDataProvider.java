@@ -24,11 +24,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
@@ -52,13 +54,16 @@ public class SensorDataProvider {
 
 // SET_FORMATTING_OFF
 
-      final boolean useAppFilter          = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_APP_FILTER,           SlideoutSensorTourFilter.STATE_USE_APP_FILTER_DEFAULT);
-      final boolean useDurationFilter     = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_DURATION_FILTER,      SlideoutSensorTourFilter.STATE_USE_DURATION_FILTER_DEFAULT);
+      final boolean useAppFilter       = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_APP_FILTER,           SlideoutSensorTourFilter.STATE_USE_APP_FILTER_DEFAULT);
+      final boolean useDurationFilter  = Util.getStateBoolean(state, SlideoutSensorTourFilter.STATE_USE_DURATION_FILTER,      SlideoutSensorTourFilter.STATE_USE_DURATION_FILTER_DEFAULT);
 
       final boolean isAppFilter        = useTourFilter && useAppFilter;
       final boolean isDurationFilter   = useTourFilter && useDurationFilter;
 
 // SET_FORMATTING_ON
+
+      final ArrayList<TourType> allTourTypesAsList = TourDatabase.getAllTourTypes();
+      final TourType[] allTourTypes = allTourTypesAsList.toArray(new TourType[allTourTypesAsList.size()]);
 
       String sql = null;
 
@@ -95,36 +100,41 @@ public class SensorDataProvider {
          ZonedDateTime durationFilter_DateTime = null;
          if (isDurationFilter) {
 
-            sqlDurationFilter = " AND TourStartTime >= ?"; //                   //$NON-NLS-1$
+            sqlDurationFilter = " AND DeviceSensorValue.TourStartTime >= ?"; //        //$NON-NLS-1$
 
             durationFilter_DateTime = getDurationFilter_DateTime(state);
          }
 
          sql = NL
 
-               + "SELECT" + NL //                                             //$NON-NLS-1$
+               + "SELECT" + NL //                                                      //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SensorID," + NL //                       1  //$NON-NLS-1$
-               + "   TOURDATA_TourID," + NL //                             2  //$NON-NLS-1$
+               + "   DeviceSensorValue.DEVICESENSOR_SensorID," + NL //              1  //$NON-NLS-1$
+               + "   DeviceSensorValue.TOURDATA_TourID," + NL //                    2  //$NON-NLS-1$
+               + "   DeviceSensorValue.TourStartTime," + NL //                      3  //$NON-NLS-1$
+               + "   DeviceSensorValue.TourEndTime," + NL //                        4  //$NON-NLS-1$
+               + "   DeviceSensorValue.BatteryLevel_Start," + NL //                 5  //$NON-NLS-1$
+               + "   DeviceSensorValue.BatteryLevel_End," + NL //                   6  //$NON-NLS-1$
+               + "   DeviceSensorValue.BatteryStatus_Start," + NL //                7  //$NON-NLS-1$
+               + "   DeviceSensorValue.BatteryStatus_End," + NL //                  8  //$NON-NLS-1$
+               + "   DeviceSensorValue.BatteryVoltage_Start," + NL //               9  //$NON-NLS-1$
+               + "   DeviceSensorValue.BatteryVoltage_End," + NL //                 10 //$NON-NLS-1$
 
-               + "   TourStartTime," + NL //                               3  //$NON-NLS-1$
-               + "   TourEndTime," + NL //                                 4  //$NON-NLS-1$
-               + "   BatteryLevel_Start," + NL //                          5  //$NON-NLS-1$
-               + "   BatteryLevel_End," + NL //                            6  //$NON-NLS-1$
-               + "   BatteryStatus_Start," + NL //                         7  //$NON-NLS-1$
-               + "   BatteryStatus_End," + NL //                           8  //$NON-NLS-1$
-               + "   BatteryVoltage_Start," + NL //                        9  //$NON-NLS-1$
-               + "   BatteryVoltage_End" + NL //                           10 //$NON-NLS-1$
+               + "   TourData.tourType_typeId" + NL //                              11 //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //     //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //              //$NON-NLS-1$
 
-               + "WHERE" + NL //                                              //$NON-NLS-1$
+               // get data for a tour
+               + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + NL //             //$NON-NLS-1$
+               + "   ON DeviceSensorValue.TOURDATA_TourID = TourData.tourId" + NL //   //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SensorID = ?" + NL //                       //$NON-NLS-1$
-               + "   " + sqlAppFilter + NL //                                 //$NON-NLS-1$
-               + "   " + sqlDurationFilter + NL //                            //$NON-NLS-1$
+               + "WHERE" + NL //                                                       //$NON-NLS-1$
 
-               + "ORDER BY TourStartTime" + NL //                             //$NON-NLS-1$
+               + "   DEVICESENSOR_SensorID = ?" + NL //                                //$NON-NLS-1$
+               + "   " + sqlAppFilter + NL //                                          //$NON-NLS-1$
+               + "   " + sqlDurationFilter + NL //                                     //$NON-NLS-1$
+
+               + "ORDER BY DeviceSensorValue.TourStartTime" + NL //                    //$NON-NLS-1$
          ;
 
          final TFloatArrayList allDbBatteryLevel_Start = new TFloatArrayList();
@@ -134,14 +144,15 @@ public class SensorDataProvider {
          final TFloatArrayList allDbBatteryVoltage_Start = new TFloatArrayList();
          final TFloatArrayList allDbBatteryVoltage_End = new TFloatArrayList();
 
+         final TLongArrayList allDbTourIds = new TLongArrayList();
+         final TLongArrayList allDbTourStartTime = new TLongArrayList();
+         final TIntArrayList allDbTypeColorIndices = new TIntArrayList();
+
          boolean isAvailable_Level = false;
          boolean isAvailable_Status = false;
          boolean isAvailable_Voltage = false;
 
          final TIntArrayList allDbXValues_ByTime = new TIntArrayList();
-
-         final TLongArrayList allTourIds = new TLongArrayList();
-         final TLongArrayList allTourStartTime = new TLongArrayList();
 
          long firstDateTime = Long.MIN_VALUE;
 
@@ -175,6 +186,7 @@ public class SensorDataProvider {
             final float dbBatteryVoltage_Start  = result.getFloat(9);
             final float dbBatteryVoltage_End    = result.getFloat(10);
 
+            final Object dbTourTypeIdObject     = result.getObject(11);
 
             // tour duration in seconds
 //            final float tourDuration = (dbTourEndTime - dbTourStartTime) / 1000;
@@ -235,8 +247,8 @@ public class SensorDataProvider {
 
             if (isAvailable_Start || isAvailable_End) {
 
-               allTourIds.add(dbTourId);
-               allTourStartTime.add(dbTourStartTime);
+               allDbTourIds.add(dbTourId);
+               allDbTourStartTime.add(dbTourStartTime);
 
                /*
                 * Set x-axis time
@@ -249,6 +261,28 @@ public class SensorDataProvider {
                final long relativeTimeDiffInSec = relativeTimeDiffInMS / 1000;
 
                allDbXValues_ByTime.add((int) relativeTimeDiffInSec);
+
+               /*
+                * Convert tour type id to the type index in the tour type array, this is also the
+                * color index for the tour type
+                */
+               int colorIndex = 0;
+               long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+               if (dbTourTypeIdObject instanceof Long) {
+
+                  dbTypeId = (Long) dbTourTypeIdObject;
+
+                  for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
+                     if (allTourTypes[typeIndex].getTypeId() == dbTypeId) {
+                        colorIndex = typeIndex;
+                        break;
+                     }
+                  }
+               }
+
+               // paint graph with tour type color
+               allDbTypeColorIndices.add(colorIndex);
             }
          }
 
@@ -300,11 +334,14 @@ public class SensorDataProvider {
          sensorData.allBatteryVoltage_Start  = getYData_WithTimeMarginValues(allBatteryVoltage_Start);
          sensorData.allBatteryVoltage_End    = getYData_WithTimeMarginValues(allBatteryVoltage_End);
 
+
          sensorData.isAvailable_Level        = isAvailable_Level;
          sensorData.isAvailable_Status       = isAvailable_Status;
          sensorData.isAvailable_Voltage      = isAvailable_Voltage;
 
-         sensorData.allTourIds               = getTourIDs_WithTimeMarginValues(allTourIds.toArray());
+         sensorData.allTourIds               = getTourIDs_WithTimeMarginValues(allDbTourIds.toArray());
+
+         sensorData.allTypeColorIndices      = getYData_WithTimeMarginValues(allDbTypeColorIndices.toArray());
 
 // SET_FORMATTING_ON
 
@@ -429,6 +466,28 @@ public class SensorDataProvider {
       // set dummy values, these values are skipped when navigated in the bar chart
       allValues_WithMargin[0] = Float.MIN_VALUE;
       allValues_WithMargin[numValues_WithMargin - 1] = Float.MIN_VALUE;
+
+      return allValues_WithMargin;
+   }
+
+   private int[] getYData_WithTimeMarginValues(final int[] allValues_NoMargin) {
+
+      final int numValues_NoMargin = allValues_NoMargin.length;
+
+      if (numValues_NoMargin == 0) {
+         return allValues_NoMargin;
+      }
+
+      // add time margin values
+      final int numValues_WithMargin = numValues_NoMargin + 2;
+
+      final int[] allValues_WithMargin = new int[numValues_WithMargin];
+
+      System.arraycopy(allValues_NoMargin, 0, allValues_WithMargin, 1, numValues_NoMargin);
+
+      // set dummy values, these values are skipped when navigated in the bar chart
+      allValues_WithMargin[0] = 0;
+      allValues_WithMargin[numValues_WithMargin - 1] = 0;
 
       return allValues_WithMargin;
    }

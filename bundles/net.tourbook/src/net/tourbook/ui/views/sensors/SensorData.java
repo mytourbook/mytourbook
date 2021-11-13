@@ -27,6 +27,7 @@ public class SensorData {
    public ZonedDateTime      firstDateTime;
 
    public long[]             allTourIds;
+   public int[]              allTypeColorIndices;
 
    /**
     * Relative time values in seconds, starting from 0
