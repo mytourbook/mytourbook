@@ -978,7 +978,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          final TourbookStatistic tourbookStatistic = allAvailableStatistics.get(statisticIndex);
 
-         if ("net.tourbook.statistics.graphs.StatisticBattery".equals(tourbookStatistic.plugin_StatisticId)) {
+         if ("net.tourbook.statistics.graphs.StatisticBattery".equals(tourbookStatistic.plugin_StatisticId)) { //$NON-NLS-1$
 
             comboIndex = statisticIndex;
             batterySocStatistic = tourbookStatistic;
