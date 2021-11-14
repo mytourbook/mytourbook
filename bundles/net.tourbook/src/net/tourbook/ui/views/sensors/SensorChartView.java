@@ -250,6 +250,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          if (tourEventId == TourEventId.SELECTION_SENSOR && eventData instanceof SelectionSensor) {
 
             onSelectionChanged((SelectionSensor) eventData);
+
+         } else if (tourEventId == TourEventId.TOUR_CHANGED) {
+
+            // tour type could be modified
+
+            updateChart();
          }
       };
 
@@ -611,7 +617,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
       // set the menu context provider
-//      chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_sensorChart, this));
+      chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new SensorChartContextProvider(_sensorChart, this));
    }
 
    @Override

@@ -309,9 +309,14 @@ public class SensorDataProvider {
              * visible
              * <p>
              * It took me a few days to finally implement this "simple" solution with hopefully no
-             * undiscovered side effects
+             * undiscovered side effects in the chart
              */
-            final double timeOffsetNotRounded = timeDuration_Seconds * 0.02;
+            double timeOffsetNotRounded = timeDuration_Seconds * 0.02;
+
+            // ensure there is a time margin
+            if (timeOffsetNotRounded < 1) {
+               timeOffsetNotRounded = 1;
+            }
 
             timeOffset = (int) timeOffsetNotRounded;
          }

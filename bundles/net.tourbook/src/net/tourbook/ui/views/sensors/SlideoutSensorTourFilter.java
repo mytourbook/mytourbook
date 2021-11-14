@@ -245,6 +245,7 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
             // radio
             _checkboxUseTourFilter_Year = new Button(durationContainer, SWT.CHECK);
             _checkboxUseTourFilter_Year.setText(Messages.Slideout_SensorTourFilter_Radio_Year);
+            _checkboxUseTourFilter_Year.setToolTipText(Messages.Slideout_SensorTourFilter_Radio_Year_Tooltip);
             _checkboxUseTourFilter_Year.addSelectionListener(_defaultSelectionListener);
 
             // spinner
@@ -265,6 +266,7 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
             // radio
             _checkboxUseTourFilter_Month = new Button(durationContainer, SWT.CHECK);
             _checkboxUseTourFilter_Month.setText(Messages.Slideout_SensorTourFilter_Radio_Month);
+            _checkboxUseTourFilter_Month.setToolTipText(Messages.Slideout_SensorTourFilter_Radio_Month_Tooltip);
             _checkboxUseTourFilter_Month.addSelectionListener(_defaultSelectionListener);
 
             // spinner
@@ -285,6 +287,7 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
             // radio
             _checkboxUseTourFilter_Day = new Button(durationContainer, SWT.CHECK);
             _checkboxUseTourFilter_Day.setText(Messages.Slideout_SensorTourFilter_Radio_Day);
+            _checkboxUseTourFilter_Day.setToolTipText(Messages.Slideout_SensorTourFilter_Radio_Day_Tooltip);
             _checkboxUseTourFilter_Day.addSelectionListener(_defaultSelectionListener);
 
             // spinner
