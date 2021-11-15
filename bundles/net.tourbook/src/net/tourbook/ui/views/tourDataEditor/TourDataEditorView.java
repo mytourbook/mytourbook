@@ -5657,7 +5657,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
                cell.setText(
                      _serieBreakTime[timeSlice.serieIndex]
-                           ? net.tourbook.ui.UI.BREAK_TIME_MARKER
+                           ? UI.SYMBOL_BOX
                            : UI.EMPTY_STRING);
             } else {
                cell.setText(UI.EMPTY_STRING);
