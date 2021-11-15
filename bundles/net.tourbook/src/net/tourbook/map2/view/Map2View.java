@@ -631,14 +631,14 @@ public class Map2View extends ViewPart implements
          // image 0: tour
          addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
 
-         // image 1: value point
-         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_ValuePoint));
-
-         // image 2: one slider
+         // image 1: one slider
          addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider));
 
-         // image 3: centered sliders
+         // image 2: centered sliders
          addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered));
+
+         // image 3: value point
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_ValuePoint));
 
          // image 4: other map
          addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_OtherMap));
@@ -677,17 +677,17 @@ public class Map2View extends ViewPart implements
       /**
        * Image: 1
        */
-      IsSyncWith_ValuePoint,
+      IsSyncWith_Slider_One,
 
       /**
        * Image: 2
        */
-      IsSyncWith_Slider_One,
+      IsSyncWith_Slider_Center,
 
       /**
        * Image: 3
        */
-      IsSyncWith_Slider_Center,
+      IsSyncWith_ValuePoint,
 
       /**
        * Image: 4
@@ -4226,15 +4226,15 @@ public class Map2View extends ViewPart implements
          _actionMap2_SyncMap.showOtherEnabledImage(0);
          break;
 
-      case IsSyncWith_ValuePoint:
+      case IsSyncWith_Slider_One:
          _actionMap2_SyncMap.showOtherEnabledImage(1);
          break;
 
-      case IsSyncWith_Slider_One:
+      case IsSyncWith_Slider_Center:
          _actionMap2_SyncMap.showOtherEnabledImage(2);
          break;
 
-      case IsSyncWith_Slider_Center:
+      case IsSyncWith_ValuePoint:
          _actionMap2_SyncMap.showOtherEnabledImage(3);
          break;
 
