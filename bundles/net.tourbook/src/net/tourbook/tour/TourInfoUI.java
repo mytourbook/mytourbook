@@ -129,19 +129,19 @@ public class TourInfoUI {
       _nf3.setMaximumFractionDigits(3);
    }
 
-   private boolean _hasRecordingDeviceBattery;
-   private boolean _hasDescription;
-   private boolean _hasGears;
-   private boolean _hasRunDyn;
-   private boolean _hasTags;
-   private boolean _hasTourType;
-   private boolean _hasWeather;
+   private boolean        _hasRecordingDeviceBattery;
+   private boolean        _hasDescription;
+   private boolean        _hasGears;
+   private boolean        _hasRunDyn;
+   private boolean        _hasTags;
+   private boolean        _hasTourType;
+   private boolean        _hasWeather;
 
-   private int     _defaultTextWidth;
+   private int            _defaultTextWidth;
 
-   private int     _descriptionLineCount;
-   private int     _descriptionScroll_Lines = 15;
-   private int     _descriptionScroll_Height;
+   private int            _descriptionLineCount;
+   private int            _descriptionScroll_Lines = 15;
+   private int            _descriptionScroll_Height;
 
    /**
     * Part which fired an event
@@ -305,7 +305,6 @@ public class TourInfoUI {
    private ArrayList<Label> _allSensorValue_Level;
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
-
 
    private class ActionCloseTooltip extends Action {
 
@@ -1224,12 +1223,8 @@ public class TourInfoUI {
       final ArrayList<DeviceSensorValue> allSortedSensorValues = new ArrayList<>(allSensorValues);
       Collections.sort(allSortedSensorValues, (sensorValue1, sensorValue2) -> {
 
-         if (sensorValue1.isDataAvailable() && sensorValue2.isDataAvailable()) {
-
-            return sensorValue1.getDeviceSensor().getLabel().compareTo(sensorValue2.getDeviceSensor().getLabel());
-         }
-
-         return 0;
+         return sensorValue1.getDeviceSensor().getLabel().compareTo(
+               sensorValue2.getDeviceSensor().getLabel());
       });
 
       for (final DeviceSensorValue sensorValue : allSortedSensorValues) {
@@ -1994,7 +1989,7 @@ public class TourInfoUI {
             batteryLevel += UI.SPACE + UI.SYMBOL_PERCENTAGE;
 
             lblLevel.setText(batteryLevel);
-
+            lblLevel.setToolTipText(Messages.Tour_Tooltip_Label_BatteryLevel_Tooltip);
          }
 
          if (isBatteryStatus) {
@@ -2009,6 +2004,7 @@ public class TourInfoUI {
                   : statusStart_Name + UI.ELLIPSIS_WITH_SPACE + BatteryStatus.getLabelFromValue((short) batteryStatus_End);
 
             lblStatus.setText(batteryStatus);
+            lblStatus.setToolTipText(Messages.Tour_Tooltip_Label_BatteryStatus_Tooltip);
          }
 
          if (isBatteryVoltage) {
@@ -2024,6 +2020,7 @@ public class TourInfoUI {
             batteryVoltage += UI.SPACE + UI.UNIT_VOLT;
 
             lblVoltage.setText(batteryVoltage);
+            lblVoltage.setToolTipText(Messages.Tour_Tooltip_Label_BatteryVoltage_Tooltip);
          }
 
       }

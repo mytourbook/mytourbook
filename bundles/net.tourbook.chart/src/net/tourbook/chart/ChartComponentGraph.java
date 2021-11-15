@@ -7403,6 +7403,12 @@ public class ChartComponentGraph extends Canvas {
 
       if (isMoveSlider) {
 
+         /*
+          * Reset hovered value index otherwise this values is used but is not correctly set, e.g.
+          * when navigating time slices in the tour editor
+          */
+         _hoveredValuePointIndex = -1;
+
          moveXSlider(_selectedXSlider, valueIndex, false, true, true, false);
 
          redraw();

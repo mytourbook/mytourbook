@@ -2521,11 +2521,11 @@ public class Util {
    }
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-                                                       final String key,
+                                                       final String stateKey,
                                                        final Enum<E> value) {
 
       if (value != null) {
-         state.put(key, value.name());
+         state.put(stateKey, value.name());
       }
    }
 

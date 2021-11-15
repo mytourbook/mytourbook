@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,9 +91,9 @@ public class Slideout_Map2_SyncMap extends ToolbarSlideout {
          // actions are managed in the map2 view but they are displayed in this slideout
 
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Tour));
-         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ValuePoint));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Slider_One));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Slider_Centered));
+         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ValuePoint));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Photo));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_OtherMap));
 

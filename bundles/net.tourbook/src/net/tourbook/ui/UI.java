@@ -110,7 +110,6 @@ public class UI {
    public static final String            SLASH_WITH_SPACE              = " / ";                                //$NON-NLS-1$
    public static final String            EMPTY_STRING_FORMAT           = "%s";                                 //$NON-NLS-1$
    public static final String            MNEMONIC                      = "&";                                  //$NON-NLS-1$
-   public static final String            BREAK_TIME_MARKER             = "x";                                  //$NON-NLS-1$
 
    /**
     * contains a new line
@@ -267,7 +266,7 @@ public class UI {
    }
 
    // pref store var cannot be set from a static field because it can be null !!!
-//	private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+// private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    private UI() {}
 
@@ -616,7 +615,7 @@ public class UI {
 
             String oldPattern = sdf.toPattern();
 
-            //	some short formats have only one M and d (e.g. ths US)
+            // some short formats have only one M and d (e.g. ths US)
             if (oldPattern.indexOf("MM") == -1 && oldPattern.indexOf("dd") == -1) {//$NON-NLS-1$ //$NON-NLS-2$
                String newPattern = UI.EMPTY_STRING;
                for (int i = 0; i < oldPattern.length(); i++) {
@@ -631,12 +630,12 @@ public class UI {
                sdf.applyPattern(newPattern);
             }
 
-            //	Unknown short format => use JDBC
+            // Unknown short format => use JDBC
             if (sdf.toPattern().length() != 8) {
                sdf.applyPattern("yyyy-MM-dd"); //$NON-NLS-1$
             }
 
-            //	4 digit year
+            // 4 digit year
             if (sdf.toPattern().indexOf("yyyy") == -1) { //$NON-NLS-1$
                oldPattern = sdf.toPattern();
                String newPattern = UI.EMPTY_STRING;
@@ -690,7 +689,7 @@ public class UI {
 
             final String oldPattern = sdf.toPattern();
 
-            //	some short formats have only one h (e.g. ths US)
+            // some short formats have only one h (e.g. ths US)
             if (oldPattern.indexOf("hh") == -1) {//$NON-NLS-1$
 
                String newPattern = UI.EMPTY_STRING;

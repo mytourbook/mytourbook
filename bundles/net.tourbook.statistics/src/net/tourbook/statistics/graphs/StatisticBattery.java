@@ -447,6 +447,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
+      // setup colors
       yData.setColorIndex(new int[][] { _batteryData.allTypeColorIndices });
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 

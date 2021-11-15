@@ -32,12 +32,20 @@ import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
@@ -45,23 +53,20 @@ import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.UI;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
@@ -72,17 +77,27 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class SensorChartView extends ViewPart implements ITourProvider {
 
-   public static final String              ID                            = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
+   public static final String  ID                            = "net.tourbook.ui.views.sensors.SensorChartView.ID"; //$NON-NLS-1$
 
-   private static final String             STATE_IS_SELECTED_TOUR_FILTER = "STATE_IS_SELECTED_TOUR_FILTER";                    //$NON-NLS-1$
-   private static final String             STATE_MOUSE_WHEEL_MODE        = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
-   private static final String             STATE_SELECTED_TOUR_ID        = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
+   private static final String STATE_IS_SELECTED_TOUR_FILTER = "STATE_IS_SELECTED_TOUR_FILTER";                    //$NON-NLS-1$
+   private static final String STATE_MOUSE_WHEEL_MODE        = "STATE_MOUSE_WHEEL_MODE";                           //$NON-NLS-1$
+   private static final String STATE_SELECTED_TOUR_ID        = "STATE_SELECTED_TOUR_ID";                           //$NON-NLS-1$
 
-   private final IPreferenceStore          _prefStore                    = TourbookPlugin.getPrefStore();
-   private final IDialogSettings           _state                        = TourbookPlugin.getState(ID);
+// SET_FORMATTING_OFF
+
+   private static final String      GRID_PREF_PREFIX                    = "GRID_SENSOR_CHART__";                                            //$NON-NLS-1$
+
+   private static final String      GRID_IS_SHOW_VERTICAL_GRIDLINES     = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+   private static final String      GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+   private static final String      GRID_VERTICAL_DISTANCE              = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+   private static final String      GRID_HORIZONTAL_DISTANCE            = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+
+// SET_FORMATTING_ON
+
+   private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
+   private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
 
    private IPartListener2                  _partListener;
-   private ISelectionListener              _postSelectionListener;
    private IPropertyChangeListener         _prefChangeListener;
    private ITourEventListener              _tourEventListener;
 
@@ -92,18 +107,21 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private DeviceSensor                    _selectedSensor;
    private SensorData                      _sensorData;
-   private SensorDataProvider              _sensorDataProvider           = new SensorDataProvider();
+   private SensorDataProvider              _sensorDataProvider      = new SensorDataProvider();
 
    private Long                            _selectedTourId;
 
    private DelayedBarSelection_TourToolTip _tourToolTip;
-   private TourInfoIconToolTipProvider     _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
-   private TourInfoUI                      _tourInfoUI                   = new TourInfoUI();
+   private TourInfoIconToolTipProvider     _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private TourInfoUI                      _tourInfoUI              = new TourInfoUI();
 
-   private boolean                         _isUseTourFilter;
+   private boolean                         _useTourFilter;
    private boolean                         _isInSelect;
 
-   private ActionAppTourFilter             _actionAppTourFilter;
+   private OpenDialogManager               _openDlgMgr              = new OpenDialogManager();
+
+   private ActionChartOptions              _actionChartOptions;
+   private ActionTourFilter                _actionTourFilterOptions;
 
    /*
     * UI controls
@@ -115,21 +133,50 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private Chart     _sensorChart;
 
-   private class ActionAppTourFilter extends Action {
+   private Composite _parent;
 
-      public ActionAppTourFilter() {
+   private class ActionChartOptions extends ActionToolbarSlideout {
 
-         super(null, AS_CHECK_BOX);
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
-
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+         return new SlideoutSensorChartOptions(_parent, toolbar, SensorChartView.this, _state, GRID_PREF_PREFIX);
       }
 
       @Override
-      public void run() {
-         onAction_AppFilter(isChecked());
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
+
+   private class ActionTourFilter extends ActionToolbarSlideout {
+
+      public ActionTourFilter() {
+
+         super(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter),
+               CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+
+         isToggleAction = true;
+         notSelectedTooltip = Messages.Sensor_Chart_Action_TourQuickFilter_Tooltip;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutSensorTourFilter(_parent, toolbar, SensorChartView.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         onAction_TourFilter(getSelection());
       }
    }
 
@@ -178,30 +225,18 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
             updateChart();
-         }
 
+         } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+
+            // grid has changed, update chart
+            updateChartProperties();
+         }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-   }
-
-   /**
-    * listen for events when a tour is selected
-    */
-   private void addSelectionListener() {
-
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-            if (part == SensorChartView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
-         }
-      };
-      getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
@@ -215,16 +250,34 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          if (tourEventId == TourEventId.SELECTION_SENSOR && eventData instanceof SelectionSensor) {
 
             onSelectionChanged((SelectionSensor) eventData);
+
+         } else if (tourEventId == TourEventId.TOUR_CHANGED) {
+
+            // tour type could be modified
+
+            updateChart();
          }
       };
 
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   /**
+    * Close all opened dialogs except the opening dialog.
+    *
+    * @param openingDialog
+    */
+   public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+
+      _openDlgMgr.closeOpenedDialogs(openingDialog);
+   }
+
    private void createActions() {
 
       _sensorChart.createChartActions();
-      _actionAppTourFilter = new ActionAppTourFilter();
+
+      _actionTourFilterOptions = new ActionTourFilter();
+      _actionChartOptions = new ActionChartOptions();
 
       fillToolbar();
    }
@@ -232,15 +285,21 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    @Override
    public void createPartControl(final Composite parent) {
 
+      initUI(parent);
+
       createUI(parent);
       createActions();
 
       addPartListener();
       addPrefListener();
-      addSelectionListener();
       addTourEventListener();
 
-      restoreState();
+      // restore must be run async otherwise the filter slideout action is not selected !
+      parent.getShell().getDisplay().asyncExec(() -> {
+
+         restoreState();
+         enableActions();
+      });
    }
 
    /**
@@ -290,12 +349,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void createUI(final Composite parent) {
 
-      initUI(parent);
-
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
-      _pageNoBatteryData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
+      _pageNoData = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
+      _pageNoBatteryData = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
 
       _sensorChart = createUI_10_Chart();
 
@@ -346,6 +403,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       sensorChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
 
+      // set chart properties
+      updateChartProperties();
+
       return sensorChart;
    }
 
@@ -360,7 +420,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-      getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
@@ -371,6 +430,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private void enableActions() {
 
       _sensorChart.getAction_MouseWheelMode().setEnabled(_isChartDisplayed);
+      _sensorChart.setZoomActionsEnabled(_isChartDisplayed);
    }
 
    /*
@@ -381,7 +441,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_sensorChart.getAction_MouseWheelMode());
-      tbm.add(_actionAppTourFilter);
+      tbm.add(_actionTourFilterOptions);
+      tbm.add(_actionChartOptions);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -401,35 +462,27 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       return selectedTours;
    }
 
+   Shell getShell() {
+      return _parent.getShell();
+   }
+
    private void initUI(final Composite parent) {
+
+      _parent = parent;
 
       _tk = new FormToolkit(parent.getDisplay());
    }
 
-   private void onAction_AppFilter(final boolean isSelected) {
+   private void onAction_TourFilter(final boolean isSelected) {
 
-      _isUseTourFilter = isSelected;
+      _useTourFilter = isSelected;
 
       updateChart();
    }
 
    private void onSelectionChanged(final ISelection selection) {
 
-      if (selection instanceof StructuredSelection) {
-
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-
-         if (firstElement instanceof DeviceSensor) {
-
-            // show data for a selected sensor
-
-            _selectedSensor = (DeviceSensor) firstElement;
-
-            updateChart();
-
-         }
-
-      } else if (selection instanceof SelectionSensor) {
+      if (selection instanceof SelectionSensor) {
 
          final SelectionSensor sensorSelection = (SelectionSensor) selection;
 
@@ -442,8 +495,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
             updateChart();
 
             // 2. select tour
-            _selectedTourId = sensorSelection.getTourId();
-            selectTour(_selectedTourId);
+            final Long tourId = sensorSelection.getTourId();
+            if (tourId != null) {
+
+               _selectedTourId = tourId;
+               selectTour(_selectedTourId);
+            }
          }
          _isInSelect = false;
       }
@@ -452,17 +509,20 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private void restoreState() {
 
       _selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOUR_ID, -1);
-      _isUseTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
+      _useTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
 
-      _actionAppTourFilter.setChecked(_isUseTourFilter);
+      _actionTourFilterOptions.setSelection(_useTourFilter);
 
       /*
        * Select tour even when tour ID == -1 because this will set the selected bar selection flags
        */
       selectTour(_selectedTourId);
 
-      // mouse wheel mode
+      /*
+       * Set mouse wheel mode
+       */
       final Enum<MouseWheelMode> mouseWheelMode = Util.getStateEnum(_state, STATE_MOUSE_WHEEL_MODE, MouseWheelMode.Selection);
+      _sensorChart.setMouseWheelMode((MouseWheelMode) mouseWheelMode);
       _sensorChart.getAction_MouseWheelMode().setMouseWheelMode((MouseWheelMode) mouseWheelMode);
    }
 
@@ -484,7 +544,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final MouseWheelMode mouseWheelMode = _sensorChart.getAction_MouseWheelMode().getMouseWheelMode();
       Util.setStateEnum(_state, STATE_MOUSE_WHEEL_MODE, mouseWheelMode);
 
-      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionAppTourFilter.isChecked());
+      _state.put(STATE_IS_SELECTED_TOUR_FILTER, _actionTourFilterOptions.getSelection());
    }
 
    /**
@@ -557,7 +617,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
       // set the menu context provider
-//      chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_sensorChart, this));
+      chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new SensorChartContextProvider(_sensorChart, this));
    }
 
    @Override
@@ -566,32 +626,95 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _sensorChart.setFocus();
    }
 
-   private void updateChart() {
+   private void setTourTypeColors(final ChartDataYSerie yData, final String graphName) {
+
+      TourManager.setGraphColors(yData, graphName);
+
+      /*
+       * Set tour type colors
+       */
+      final ArrayList<RGB> rgbGradient_Bright = new ArrayList<>();
+      final ArrayList<RGB> rgbGradient_Dark = new ArrayList<>();
+      final ArrayList<RGB> rgbLine = new ArrayList<>();
+
+      final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
+
+      if (allTourTypes.size() == 0) {
+
+         /**
+          * Tour types are not available
+          * <p>
+          * -> set tour type colors otherwise an exception is thrown when painting the bar graphs
+          */
+
+         rgbGradient_Bright.add(TourTypeColorDefinition.DEFAULT_GRADIENT_BRIGHT);
+         rgbGradient_Dark.add(TourTypeColorDefinition.DEFAULT_GRADIENT_DARK);
+
+         rgbLine.add(TourTypeColorDefinition.DEFAULT_LINE_COLOR);
+
+      } else {
+
+         // tour types are available
+
+         for (final TourType tourType : allTourTypes) {
+
+            rgbGradient_Bright.add(tourType.getRGB_Gradient_Bright());
+            rgbGradient_Dark.add(tourType.getRGB_Gradient_Dark());
+
+            rgbLine.add(tourType.getRGB_Line_Themed());
+         }
+      }
+
+      // put the colors into the chart data
+      yData.setRgbBar_Gradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
+      yData.setRgbBar_Gradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
+      yData.setRgbBar_Line(rgbLine.toArray(new RGB[rgbLine.size()]));
+   }
+
+   private void setupColors(final SensorData sensorData, final ChartDataYSerie yData) {
+
+      yData.setColorIndex(new int[][] { sensorData.allTypeColorIndices });
+
+      setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SENSOR);
+   }
+
+   void updateChart() {
 
       if (_selectedSensor == null) {
+
+         enableActions();
+
          return;
       }
 
-      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseTourFilter);
+      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _useTourFilter, _state);
 
       if (_sensorData.allTourIds.length == 0) {
 
          _isChartDisplayed = false;
-         enableActions();
 
          _pageBook.showPage(_pageNoBatteryData);
 
       } else {
 
          _isChartDisplayed = true;
-         enableActions();
 
          _pageBook.showPage(_sensorChart);
          updateChart(_sensorData);
       }
+
+      enableActions();
    }
 
    private void updateChart(final SensorData sensorData) {
+
+// SET_FORMATTING_OFF
+
+      final boolean isShowBatteryLevel    = Util.getStateBoolean(_state, SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_LEVEL,    SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_LEVEL_DEFAULT);
+      final boolean isShowBatteryStatus   = Util.getStateBoolean(_state, SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_STATUS,   SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_STATUS_DEFAULT);
+      final boolean isShowBatteryVoltage  = Util.getStateBoolean(_state, SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_VOLTAGE,  SlideoutSensorChartOptions.STATE_IS_SHOW_BATTERY_VOLTAGE_DEFAULT);
+
+// SET_FORMATTING_ON
 
       /*
        * Create sensor colors
@@ -599,15 +722,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final GraphColorManager colorMgr = GraphColorManager.getInstance();
 
       final RGB rgbLine = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getLineColor_Active_Themed();
-      final RGB rgbText = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getTextColor_Active_Themed();
       final RGB rgbGradientBright = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientBright_Active();
       final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
 
       final int[] allXValues_ByTime = sensorData.allXValues_ByTime;
-      int numValues = allXValues_ByTime.length;
-
-      // add time margin items
-      numValues += 2;
+      final int numValues = allXValues_ByTime.length;
 
       final RGB[] allRGBLine = new RGB[numValues];
       final RGB[] allRGBGradientBright = new RGB[numValues];
@@ -634,33 +753,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final String sensorLabel = _selectedSensor.getLabel();
 
       /*
-       * Set y-axis values: Status
-       */
-      if (sensorData.isAvailable_Status) {
-
-         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
-               ChartType.BAR,
-               sensorData.allBatteryStatus_End,
-               sensorData.allBatteryStatus_Start,
-               true);
-
-         yDataStatus.setYTitle("Battery  Status ·  " + sensorLabel);
-         yDataStatus.setUnitLabel("#");
-         yDataStatus.setShowYSlider(true);
-
-         yDataStatus.setRgbGraph_Line(rgbLine);
-         yDataStatus.setRgbGraph_Text(rgbText);
-         yDataStatus.setRgbBar_Line(allRGBLine);
-         yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
-
-         chartModel.addYData(yDataStatus);
-      }
-
-      /*
        * Set y-axis values: Level
        */
-      if (sensorData.isAvailable_Level) {
+      if (isShowBatteryLevel && sensorData.isAvailable_Level) {
 
          final ChartDataYSerie yDataLevel = new ChartDataYSerie(
                ChartType.BAR,
@@ -668,15 +763,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                sensorData.allBatteryLevel_Start,
                true);
 
-         yDataLevel.setYTitle("Battery  Level ·  " + sensorLabel);
-         yDataLevel.setUnitLabel("%");
+         yDataLevel.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryLevel, sensorLabel));
+         yDataLevel.setUnitLabel(UI.SYMBOL_PERCENTAGE);
          yDataLevel.setShowYSlider(true);
 
-         yDataLevel.setRgbGraph_Line(rgbLine);
-         yDataLevel.setRgbGraph_Text(rgbText);
-         yDataLevel.setRgbBar_Line(allRGBLine);
-         yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
+         setupColors(sensorData, yDataLevel);
 
          chartModel.addYData(yDataLevel);
       }
@@ -684,7 +775,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       /*
        * Set y-axis values: Voltage
        */
-      if (sensorData.isAvailable_Voltage) {
+      if (isShowBatteryVoltage && sensorData.isAvailable_Voltage) {
 
          final ChartDataYSerie yDataVoltage = new ChartDataYSerie(
                ChartType.BAR,
@@ -692,18 +783,34 @@ public class SensorChartView extends ViewPart implements ITourProvider {
                sensorData.allBatteryVoltage_Start,
                true);
 
-         yDataVoltage.setYTitle("Battery Voltage ·  " + sensorLabel);
-         yDataVoltage.setUnitLabel("Volt");
+         yDataVoltage.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryVoltage, sensorLabel));
+         yDataVoltage.setUnitLabel(UI.UNIT_VOLTAGE);
          yDataVoltage.setShowYSlider(true);
          yDataVoltage.setSetMinMax_0Values(true);
 
-         yDataVoltage.setRgbGraph_Line(rgbLine);
-         yDataVoltage.setRgbGraph_Text(rgbText);
-         yDataVoltage.setRgbBar_Line(allRGBLine);
-         yDataVoltage.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataVoltage.setRgbBar_Gradient_Dark(allRGBGradientDark);
+         setupColors(sensorData, yDataVoltage);
 
          chartModel.addYData(yDataVoltage);
+      }
+
+      /*
+       * Set y-axis values: Status
+       */
+      if (isShowBatteryStatus && sensorData.isAvailable_Status) {
+
+         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
+               ChartType.BAR,
+               sensorData.allBatteryStatus_End,
+               sensorData.allBatteryStatus_Start,
+               true);
+
+         yDataStatus.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryStatus, sensorLabel));
+         yDataStatus.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+         yDataStatus.setShowYSlider(true);
+
+         setupColors(sensorData, yDataStatus);
+
+         chartModel.addYData(yDataStatus);
       }
 
       /*
@@ -711,7 +818,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
        */
 
       // set dummy title that the history labels are not truncated
-      chartModel.setTitle(UI.SPACE);
+      chartModel.setTitle(UI.SPACE1);
 
       // because the first and last values are dummy values, skip them when navigated
       chartModel.setSkipNavigationForFirstLastValues(true);
@@ -723,5 +830,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       // try to select the previously selected tour
       selectTour(_selectedTourId);
+   }
+
+   private void updateChartProperties() {
+
+      net.tourbook.ui.UI.updateChartProperties(_sensorChart, GRID_PREF_PREFIX);
    }
 }

@@ -384,8 +384,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_ProductName;
    public static String        ColumnFactory_Sensor_ProductNumber;
    public static String        ColumnFactory_Sensor_SerialNumber;
-   public static String        ColumnFactory_Sensor_StateBatteryValues;
-   public static String        ColumnFactory_Sensor_StateBatteryValues_Tooltip;
    public static String        ColumnFactory_Sensor_Time_FirstUsed;
    public static String        ColumnFactory_Sensor_Time_LastUsed;
    public static String        ColumnFactory_Sensor_Type;
@@ -557,6 +555,9 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AvgSpeed;
    public static String        Tour_Tooltip_Label_Battery;
    public static String        Tour_Tooltip_Label_Battery_Tooltip;
+   public static String        Tour_Tooltip_Label_BatteryLevel_Tooltip;
+   public static String        Tour_Tooltip_Label_BatteryStatus_Tooltip;
+   public static String        Tour_Tooltip_Label_BatteryVoltage_Tooltip;
    public static String        Tour_Tooltip_Label_BodyWeight;
    public static String        Tour_Tooltip_Label_BreakTime;
    public static String        Tour_Tooltip_Label_Calories;
@@ -566,7 +567,6 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_DefaultTitle;
    public static String        Tour_Tooltip_Label_Description;
    public static String        Tour_Tooltip_Label_Distance;
-   public static String        Tour_Tooltip_Label_GearShiftingBattery;
    public static String        Tour_Tooltip_Label_GearShifts;
    public static String        Tour_Tooltip_Label_Hour;
    public static String        Tour_Tooltip_Label_MaxAltitude;

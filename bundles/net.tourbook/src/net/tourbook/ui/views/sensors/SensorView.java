@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -35,7 +37,6 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
@@ -48,6 +49,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -103,8 +105,6 @@ public class SensorView extends ViewPart implements ITourViewer {
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourPropertyListener;
 
-   private PostSelectionProvider   _postSelectionProvider;
-
    private TableViewer             _sensorViewer;
    private SensorComparator        _markerComparator               = new SensorComparator();
    private ColumnManager           _columnManager;
@@ -129,10 +129,29 @@ public class SensorView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private PixelConverter _pc;
-   private Composite      _viewerContainer;
+   private PixelConverter         _pc;
+   private Composite              _viewerContainer;
 
-   private Menu           _tableContextMenu;
+   private Menu                   _tableContextMenu;
+
+   private Action_OpenSensorChart _action_OpenSensorChartView;
+
+   private class Action_OpenSensorChart extends Action {
+
+      public Action_OpenSensorChart() {
+
+         setText(Messages.Sensor_View_Action_OpenSensorChart);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SensorChart));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SensorChart_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         onAction_OpenSensorChart();
+      }
+   }
 
    private class SensorComparator extends ViewerComparator {
 
@@ -486,6 +505,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void createActions() {
 
+      _action_OpenSensorChartView = new Action_OpenSensorChart();
    }
 
    private void createMenuManager() {
@@ -518,9 +538,6 @@ public class SensorView extends ViewPart implements ITourViewer {
       addPrefListener();
       addPartListener();
       addTourEventListener();
-
-      // set this view part as selection provider
-      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
       createActions();
       fillToolbar();
@@ -894,6 +911,10 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void enableActions() {
 
+      final DeviceSensor selectedSensor = getSelectedSensor();
+      final boolean isSensorSelected = selectedSensor != null;
+
+      _action_OpenSensorChartView.setEnabled(isSensorSelected);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -901,6 +922,8 @@ public class SensorView extends ViewPart implements ITourViewer {
       /*
        * Fill menu
        */
+
+      menuMgr.add(_action_OpenSensorChartView);
 
       enableActions();
    }
@@ -924,6 +947,19 @@ public class SensorView extends ViewPart implements ITourViewer {
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
+   }
+
+   private DeviceSensor getSelectedSensor() {
+
+      final IStructuredSelection selection = _sensorViewer.getStructuredSelection();
+      final Object firstElement = selection.getFirstElement();
+
+      if (firstElement != null) {
+
+         return ((SensorItem) firstElement).sensor;
+      }
+
+      return null;
    }
 
    /**
@@ -1062,6 +1098,17 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
    }
 
+   private void onAction_OpenSensorChart() {
+
+      Util.showView(SensorChartView.ID, true);
+
+      // reselect current sensor to update the sensor chart
+      final IStructuredSelection structuredSelection = _sensorViewer.getStructuredSelection();
+      if (structuredSelection.getFirstElement() != null) {
+         _sensorViewer.setSelection(structuredSelection);
+      }
+   }
+
    private void onColumn_Select(final SelectionEvent e) {
 
       _viewerContainer.setRedraw(false);
@@ -1128,11 +1175,19 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
 
       final IStructuredSelection selection = _sensorViewer.getStructuredSelection();
-      final DeviceSensor sensor = ((SensorItem) selection.getFirstElement()).sensor;
+      final Object firstElement = selection.getFirstElement();
 
-      if (selection.getFirstElement() != null) {
-         _postSelectionProvider.setSelection(new StructuredSelection(sensor));
+      if (firstElement == null) {
+         return;
       }
+
+      final DeviceSensor selectedSensor = ((SensorItem) firstElement).sensor;
+
+      // this view could be inactive -> selection is not fired with the SelectionProvider interface
+      TourManager.fireEventWithCustomData(
+            TourEventId.SELECTION_SENSOR,
+            new SelectionSensor(selectedSensor, null),
+            this);
    }
 
    @Override
@@ -1225,11 +1280,13 @@ public class SensorView extends ViewPart implements ITourViewer {
                    * When this value is too small, then the chart axis could not be painted
                    * correctly with the dark theme during the app startup
                    */
-                  500,
+                  1000,
 
                   () -> {
 
                      _sensorViewer.setSelection(new StructuredSelection(allSensors.toArray()), true);
+
+                     enableActions();
                   });
          }
       }

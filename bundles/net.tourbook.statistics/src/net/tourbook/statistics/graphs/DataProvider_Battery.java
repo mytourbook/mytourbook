@@ -195,8 +195,8 @@ public class DataProvider_Battery extends DataProvider {
 
          setupYearNumbers();
 
-         final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-         final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+         final ArrayList<TourType> allActiveTourTypes = TourDatabase.getActiveTourTypes();
+         final TourType[] allTourTypes = allActiveTourTypes.toArray(new TourType[allActiveTourTypes.size()]);
 
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -360,8 +360,8 @@ public class DataProvider_Battery extends DataProvider {
 
                   dbTypeId = (Long) dbTourTypeIdObject;
 
-                  for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-                     if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
+                  for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
+                     if (allTourTypes[typeIndex].getTypeId() == dbTypeId) {
                         colorIndex = typeIndex;
                         break;
                      }

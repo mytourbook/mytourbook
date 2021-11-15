@@ -1747,11 +1747,18 @@ public class Messages extends NLS {
    public static String        Search_View_Link_LinuxBrowser;
    public static String        Search_View_Link_SetupExternalBrowser;
 
+   public static String        Sensor_Chart_Action_TourQuickFilter_Tooltip;
+   public static String        Sensor_Chart_GraphLabel_BatteryLevel;
+   public static String        Sensor_Chart_GraphLabel_BatteryStatus;
+   public static String        Sensor_Chart_GraphLabel_BatteryVoltage;
    public static String        Sensor_Chart_Label_SensorIsNotSelected;
    public static String        Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected;
 
    public static String        Sensor_Type_GearShifting;
    public static String        Sensor_Type_Other;
+   public static String        Sensor_Type_RecordingDevice;
+
+   public static String        Sensor_View_Action_OpenSensorChart;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;
@@ -2036,10 +2043,28 @@ public class Messages extends NLS {
    public static String        Slideout_SegmenterChartOptions_Label_Title;
    public static String        Slideout_SegmenterChartOptions_Label_ValueFont;
    public static String        Slideout_SegmenterChartOptions_Label_ValueFont_Example;
+
    public static String        Slideout_SegmenterOptions_Label_AltitudeDown;
    public static String        Slideout_SegmenterOptions_Label_AltitudeUp;
    public static String        Slideout_SegmenterOptions_Label_Title;
    public static String        Slideout_SegmenterOptions_Label_Totals;
+
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryLevel;
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryStatus;
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryVoltage;
+   public static String        Slideout_SensorChartOptions_Label_Title;
+
+   public static String        Slideout_SensorTourFilter_Action_ResetValue_Tooltip;
+   public static String        Slideout_SensorTourFilter_Checkbox_IsFilterDuration;
+   public static String        Slideout_SensorTourFilter_Checkbox_IsUseAppFilter;
+   public static String        Slideout_SensorTourFilter_Label_Title;
+   public static String        Slideout_SensorTourFilter_Link_ResetValue;
+   public static String        Slideout_SensorTourFilter_Radio_Day;
+   public static String        Slideout_SensorTourFilter_Radio_Day_Tooltip;
+   public static String        Slideout_SensorTourFilter_Radio_Month;
+   public static String        Slideout_SensorTourFilter_Radio_Month_Tooltip;
+   public static String        Slideout_SensorTourFilter_Radio_Year;
+   public static String        Slideout_SensorTourFilter_Radio_Year_Tooltip;
 
    public static String        Slideout_StatisticOptions_Label_Title;
 
