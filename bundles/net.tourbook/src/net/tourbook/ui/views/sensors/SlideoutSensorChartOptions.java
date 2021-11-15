@@ -171,21 +171,21 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
          }
          {
             /*
-             * Battery status
-             */
-
-            _checkboxBatteryStatus = new Button(container, SWT.CHECK);
-            _checkboxBatteryStatus.setText(Messages.Slideout_SensorChartOptions_Checkbox_BatteryStatus);
-            _checkboxBatteryStatus.addSelectionListener(_defaultSelectionListener);
-         }
-         {
-            /*
              * Battery voltage
              */
 
             _checkboxBatteryVoltage = new Button(container, SWT.CHECK);
             _checkboxBatteryVoltage.setText(Messages.Slideout_SensorChartOptions_Checkbox_BatteryVoltage);
             _checkboxBatteryVoltage.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Battery status
+             */
+
+            _checkboxBatteryStatus = new Button(container, SWT.CHECK);
+            _checkboxBatteryStatus.setText(Messages.Slideout_SensorChartOptions_Checkbox_BatteryStatus);
+            _checkboxBatteryStatus.addSelectionListener(_defaultSelectionListener);
          }
       }
    }

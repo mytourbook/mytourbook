@@ -42,7 +42,10 @@ import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
@@ -112,7 +115,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private TourInfoIconToolTipProvider     _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
    private TourInfoUI                      _tourInfoUI              = new TourInfoUI();
 
-   private boolean                         _isUseTourFilter;
+   private boolean                         _useTourFilter;
    private boolean                         _isInSelect;
 
    private OpenDialogManager               _openDlgMgr              = new OpenDialogManager();
@@ -247,6 +250,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          if (tourEventId == TourEventId.SELECTION_SENSOR && eventData instanceof SelectionSensor) {
 
             onSelectionChanged((SelectionSensor) eventData);
+
+         } else if (tourEventId == TourEventId.TOUR_CHANGED) {
+
+            // tour type could be modified
+
+            updateChart();
          }
       };
 
@@ -466,7 +475,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void onAction_TourFilter(final boolean isSelected) {
 
-      _isUseTourFilter = isSelected;
+      _useTourFilter = isSelected;
 
       updateChart();
    }
@@ -500,9 +509,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private void restoreState() {
 
       _selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOUR_ID, -1);
-      _isUseTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
+      _useTourFilter = Util.getStateBoolean(_state, STATE_IS_SELECTED_TOUR_FILTER, false);
 
-      _actionTourFilterOptions.setSelection(_isUseTourFilter);
+      _actionTourFilterOptions.setSelection(_useTourFilter);
 
       /*
        * Select tour even when tour ID == -1 because this will set the selected bar selection flags
@@ -608,13 +617,65 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
       // set the menu context provider
-//      chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_sensorChart, this));
+      chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new SensorChartContextProvider(_sensorChart, this));
    }
 
    @Override
    public void setFocus() {
 
       _sensorChart.setFocus();
+   }
+
+   private void setTourTypeColors(final ChartDataYSerie yData, final String graphName) {
+
+      TourManager.setGraphColors(yData, graphName);
+
+      /*
+       * Set tour type colors
+       */
+      final ArrayList<RGB> rgbGradient_Bright = new ArrayList<>();
+      final ArrayList<RGB> rgbGradient_Dark = new ArrayList<>();
+      final ArrayList<RGB> rgbLine = new ArrayList<>();
+
+      final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
+
+      if (allTourTypes.size() == 0) {
+
+         /**
+          * Tour types are not available
+          * <p>
+          * -> set tour type colors otherwise an exception is thrown when painting the bar graphs
+          */
+
+         rgbGradient_Bright.add(TourTypeColorDefinition.DEFAULT_GRADIENT_BRIGHT);
+         rgbGradient_Dark.add(TourTypeColorDefinition.DEFAULT_GRADIENT_DARK);
+
+         rgbLine.add(TourTypeColorDefinition.DEFAULT_LINE_COLOR);
+
+      } else {
+
+         // tour types are available
+
+         for (final TourType tourType : allTourTypes) {
+
+            rgbGradient_Bright.add(tourType.getRGB_Gradient_Bright());
+            rgbGradient_Dark.add(tourType.getRGB_Gradient_Dark());
+
+            rgbLine.add(tourType.getRGB_Line_Themed());
+         }
+      }
+
+      // put the colors into the chart data
+      yData.setRgbBar_Gradient_Bright(rgbGradient_Bright.toArray(new RGB[rgbGradient_Bright.size()]));
+      yData.setRgbBar_Gradient_Dark(rgbGradient_Dark.toArray(new RGB[rgbGradient_Dark.size()]));
+      yData.setRgbBar_Line(rgbLine.toArray(new RGB[rgbLine.size()]));
+   }
+
+   private void setupColors(final SensorData sensorData, final ChartDataYSerie yData) {
+
+      yData.setColorIndex(new int[][] { sensorData.allTypeColorIndices });
+
+      setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SENSOR);
    }
 
    void updateChart() {
@@ -626,7 +687,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          return;
       }
 
-      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _isUseTourFilter, _state);
+      _sensorData = _sensorDataProvider.getData(_selectedSensor.getSensorId(), _useTourFilter, _state);
 
       if (_sensorData.allTourIds.length == 0) {
 
@@ -661,7 +722,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       final GraphColorManager colorMgr = GraphColorManager.getInstance();
 
       final RGB rgbLine = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getLineColor_Active_Themed();
-      final RGB rgbText = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getTextColor_Active_Themed();
       final RGB rgbGradientBright = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientBright_Active();
       final RGB rgbGradientDark = colorMgr.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SENSOR).getGradientDark_Active();
 
@@ -707,37 +767,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          yDataLevel.setUnitLabel(UI.SYMBOL_PERCENTAGE);
          yDataLevel.setShowYSlider(true);
 
-         yDataLevel.setRgbGraph_Line(rgbLine);
-         yDataLevel.setRgbGraph_Text(rgbText);
-         yDataLevel.setRgbBar_Line(allRGBLine);
-         yDataLevel.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataLevel.setRgbBar_Gradient_Dark(allRGBGradientDark);
+         setupColors(sensorData, yDataLevel);
 
          chartModel.addYData(yDataLevel);
-      }
-
-      /*
-       * Set y-axis values: Status
-       */
-      if (isShowBatteryStatus && sensorData.isAvailable_Status) {
-
-         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
-               ChartType.BAR,
-               sensorData.allBatteryStatus_End,
-               sensorData.allBatteryStatus_Start,
-               true);
-
-         yDataStatus.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryStatus, sensorLabel));
-         yDataStatus.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
-         yDataStatus.setShowYSlider(true);
-
-         yDataStatus.setRgbGraph_Line(rgbLine);
-         yDataStatus.setRgbGraph_Text(rgbText);
-         yDataStatus.setRgbBar_Line(allRGBLine);
-         yDataStatus.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataStatus.setRgbBar_Gradient_Dark(allRGBGradientDark);
-
-         chartModel.addYData(yDataStatus);
       }
 
       /*
@@ -756,13 +788,29 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          yDataVoltage.setShowYSlider(true);
          yDataVoltage.setSetMinMax_0Values(true);
 
-         yDataVoltage.setRgbGraph_Line(rgbLine);
-         yDataVoltage.setRgbGraph_Text(rgbText);
-         yDataVoltage.setRgbBar_Line(allRGBLine);
-         yDataVoltage.setRgbBar_Gradient_Bright(allRGBGradientBright);
-         yDataVoltage.setRgbBar_Gradient_Dark(allRGBGradientDark);
+         setupColors(sensorData, yDataVoltage);
 
          chartModel.addYData(yDataVoltage);
+      }
+
+      /*
+       * Set y-axis values: Status
+       */
+      if (isShowBatteryStatus && sensorData.isAvailable_Status) {
+
+         final ChartDataYSerie yDataStatus = new ChartDataYSerie(
+               ChartType.BAR,
+               sensorData.allBatteryStatus_End,
+               sensorData.allBatteryStatus_Start,
+               true);
+
+         yDataStatus.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryStatus, sensorLabel));
+         yDataStatus.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+         yDataStatus.setShowYSlider(true);
+
+         setupColors(sensorData, yDataStatus);
+
+         chartModel.addYData(yDataStatus);
       }
 
       /*
