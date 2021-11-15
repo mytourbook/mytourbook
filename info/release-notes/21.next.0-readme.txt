@@ -63,6 +63,10 @@ Changes
 Bugfix
 ======
 
+* Tour Chart      https://github.com/wolfgang-ch/mytourbook/issues/403
+  When moving a slider with the keyboard or mouse wheel, it did not move the selected time slice in the tour editor
+
+ 
 * Tour Segmenter
   - 2 labels where hidden in the break time segmenter, propably since 21.9 but there were no code modifications in MT, maybe because of changes in the SWT framework
 
