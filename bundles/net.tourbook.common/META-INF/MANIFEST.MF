@@ -44,5 +44,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,
  javax.inject,
- org.eclipse.e4.core.services.log
+ org.eclipse.e4.core.services.log,
+ org.junit.jupiter.api;version="5.7.1"
 Automatic-Module-Name: net.tourbook.common

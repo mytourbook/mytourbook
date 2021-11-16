@@ -24,6 +24,13 @@
     <artifactId>org.eclipse.core.runtime</artifactId>
     <version>3.7.0</version>
 </dependency>
+
+	<dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.8.1</version>
+        <scope>test</scope>
+    </dependency>
 </dependencies>
 	
    <properties>
@@ -201,6 +208,11 @@
                </environments>
             </configuration>
     </plugin>
+	     <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <version>3.0.0-M5</version>
+            </plugin>
     <plugin>
 	    <groupId>org.eclipse.tycho</groupId>
 	    <artifactId>tycho-surefire-plugin</artifactId>
@@ -209,7 +221,7 @@
 		    <useUIHarness>true</useUIHarness>
 		    <useUIThread>false</useUIThread>
 		    <product>org.eclipse.platform.ide</product>
-		    <skipTests>true</skipTests>
+		    <skipTests>false</skipTests>
 	    </configuration>
     </plugin>
     <plugin>
@@ -229,7 +241,7 @@
 				    <goal>report-aggregate</goal>
 		            </goals>
 			    <configuration>
-				    <skip>true</skip>
+				    <skip>false</skip>
 			    </configuration>
                     </execution>
             </executions>
