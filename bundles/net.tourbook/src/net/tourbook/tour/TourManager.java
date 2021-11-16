@@ -4952,7 +4952,7 @@ public class TourManager {
          yDataSpeed.setYTitle(GRAPH_LABEL_SPEED);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
-         yDataSpeed.setDisplayedFractionalDigits(1);
+         yDataSpeed.setDisplayedFractionalDigits(2);
          yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
          yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
 
