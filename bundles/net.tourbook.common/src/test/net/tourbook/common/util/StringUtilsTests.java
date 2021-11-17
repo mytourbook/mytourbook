@@ -23,10 +23,10 @@ import net.tourbook.common.util.StringUtils;
 
 import org.junit.jupiter.api.Test;
 
-public final class StringUtilsTests {
+public class StringUtilsTests {
 
    @Test
-   void testHasContent() {
+   public void testHasContent() {
 
       assertTrue(StringUtils.hasContent("string"));
       assertFalse(StringUtils.hasContent(" "));
@@ -35,7 +35,7 @@ public final class StringUtilsTests {
    }
 
    @Test
-   void testJoin() {
+   public void testJoin() {
 
       final String[] stringArray = { "1", "2", "3" };
       assertEquals(StringUtils.join(stringArray, ","), "1,2,3");
@@ -43,7 +43,7 @@ public final class StringUtilsTests {
    }
 
    @Test
-   void testSanitizeFileName() {
+   public void testSanitizeFileName() {
 
       final String fileName = "\\$%#filename.txt";
       assertEquals(StringUtils.sanitizeFileName(fileName), "----filename.txt");

@@ -24,13 +24,12 @@
     <artifactId>org.eclipse.core.runtime</artifactId>
     <version>3.7.0</version>
 </dependency>
-
 	<dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>5.8.1</version>
-        <scope>test</scope>
-    </dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+				<version>5.8.1</version>
+			<scope>test</scope>
+		</dependency>
 </dependencies>
 	
    <properties>
@@ -210,9 +209,9 @@
     </plugin>
 	     <plugin>
               <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <version>3.0.0-M5</version>
-            </plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+			</plugin>
     <plugin>
 	    <groupId>org.eclipse.tycho</groupId>
 	    <artifactId>tycho-surefire-plugin</artifactId>
