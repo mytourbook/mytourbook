@@ -183,9 +183,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT";                      //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE                                  = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE";                          //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED                       = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED";               //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED";                         //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED                      = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED";              //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE                           = "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";                   //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED";  //$NON-NLS-1$
@@ -201,9 +203,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT                         = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT                      = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT                          = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED_DEFAULT               = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT                         = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT                         = true;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT                         = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT              = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT                   = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT           = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT  = false;
@@ -221,9 +225,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String GRAPH_CONTRIBUTION_ID_GEARS                          = "GRAPH_CONTRIBUTION_ID_GEARS";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_GRADIENT                       = "GRAPH_CONTRIBUTION_ID_GRADIENT";                      //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PACE                           = "GRAPH_CONTRIBUTION_ID_PACE";                          //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED                = "GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED";               //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_POWER                          = "GRAPH_CONTRIBUTION_ID_POWER";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PULSE                          = "GRAPH_CONTRIBUTION_ID_PULSE";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED                          = "GRAPH_CONTRIBUTION_ID_SPEED";                         //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED               = "GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED";              //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE                    = "GRAPH_CONTRIBUTION_ID_TEMPERATURE";                   //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE                   = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";                  //$NON-NLS-1$
 
@@ -244,9 +250,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_GEARS,
       GRAPH_CONTRIBUTION_ID_GRADIENT,
       GRAPH_CONTRIBUTION_ID_PACE,
+      GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED,
       GRAPH_CONTRIBUTION_ID_POWER,
       GRAPH_CONTRIBUTION_ID_PULSE,
       GRAPH_CONTRIBUTION_ID_SPEED,
+      GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED,
       GRAPH_CONTRIBUTION_ID_TEMPERATURE,
 
       GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME,
@@ -262,16 +270,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 //SET_FORMATTING_ON
 
-   private static ImageDescriptor                           _imagePhoto;
-   private static ImageDescriptor                           _imagePhotoTooltip;
+   private static ImageDescriptor _imagePhoto;
+   private static ImageDescriptor _imagePhotoTooltip;
 
-   public static final PulseGraph                           PULSE_GRAPH_DEFAULT          = PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE;
+   public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE;
 
    /**
     * 1e-5 is too small for the min value, it do not correct the graph.
     */
-   public static final double                               MIN_ADJUSTMENT               = 1e-3;
-   public static final double                               MAX_ADJUSTMENT               = 1e-5;
+   public static final double     MIN_ADJUSTMENT      = 1e-3;
+   public static final double     MAX_ADJUSTMENT      = 1e-5;
+
    //
    private final IDialogSettings                            _state;
    private final IPreferenceStore                           _prefStore                   = TourbookPlugin.getPrefStore();
@@ -1355,12 +1364,28 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             GRAPH_CONTRIBUTION_ID_SPEED);
 
       createActions_12_GraphAction(
+            TourManager.GRAPH_SPEED_SUMMARIZED,
+            GRAPH_LABEL_SPEED,
+            Messages.Tour_Action_Graph_SpeedSummarized_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized),
+            ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized_Disabled),
+            GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED);
+
+      createActions_12_GraphAction(
             TourManager.GRAPH_PACE,
             GRAPH_LABEL_PACE,
             Messages.Tour_Action_graph_pace_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Pace),
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Disabled),
             GRAPH_CONTRIBUTION_ID_PACE);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_PACE_SUMMARIZED,
+            GRAPH_LABEL_PACE,
+            Messages.Tour_Action_Graph_PaceSummarized_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Pace_Summarized),
+            ThemeUtil.getThemedImageName(Images.Graph_Pace_Summarized_Disabled),
+            GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_POWER,
@@ -2898,9 +2923,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       fillToolbar_Graphs_Graph(
             tbm,
+            TourManager.GRAPH_SPEED_SUMMARIZED,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
             TourManager.GRAPH_PACE,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
+            TourManager.GRAPH_PACE_SUMMARIZED,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED_DEFAULT);
 
       fillToolbar_Graphs_Graph(
             tbm,
@@ -4894,6 +4931,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             Double.MIN_VALUE,
             isMinMaxEnabled);
 
+      isChartModified |= setMinDefaultValue(
+            property,
+            isChartModified,
+            ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+            ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+            TourManager.GRAPH_SPEED_SUMMARIZED,
+            0,
+            Double.MIN_VALUE,
+            isMinMaxEnabled);
+
+      isChartModified |= setMaxDefaultValue(
+            property,
+            isChartModified,
+            ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+            ITourbookPreferences.GRAPH_SPEED_MAX_VALUE,
+            TourManager.GRAPH_SPEED_SUMMARIZED,
+            0,
+            Double.MIN_VALUE,
+            isMinMaxEnabled);
+
       /*
        * Pace
        */
@@ -4913,6 +4970,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
             ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
             TourManager.GRAPH_PACE,
+            60,
+            Double.MIN_VALUE,
+            isMinMaxEnabled);
+
+      isChartModified |= setMinDefaultValue(
+            property,
+            isChartModified,
+            ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+            ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+            TourManager.GRAPH_PACE_SUMMARIZED,
+            60,
+            Double.MIN_VALUE,
+            isMinMaxEnabled);
+
+      isChartModified |= setMaxDefaultValue(
+            property,
+            isChartModified,
+            ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+            ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+            TourManager.GRAPH_PACE_SUMMARIZED,
             60,
             Double.MIN_VALUE,
             isMinMaxEnabled);
@@ -5233,7 +5310,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * set custom data for all graphs
+    * Set custom data for all graphs
     */
    private void setupGraphLayer() {
 
@@ -5244,7 +5321,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       /*
-       * the tour markers are displayed in the altitude graph, when this graph is not available, the
+       * The tour markers are displayed in the altitude graph, when this graph is not available, the
        * markers are painted in one of the other graphs
        */
       ChartDataYSerie yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);

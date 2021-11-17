@@ -74,6 +74,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    private Button    _chkShowInChartToolbar_Gradient_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Pace;
    private Button    _chkShowInChartToolbar_Pace_DefaultWhenOpened;
+   private Button    _chkShowInChartToolbar_Pace_Summarized;
+   private Button    _chkShowInChartToolbar_Pace_Summarized_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Power;
    private Button    _chkShowInChartToolbar_Power_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Pulse;
@@ -82,6 +84,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    private Button    _chkShowInChartToolbar_Tempterature_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Speed;
    private Button    _chkShowInChartToolbar_Speed_DefaultWhenOpened;
+   private Button    _chkShowInChartToolbar_Speed_Summarized;
+   private Button    _chkShowInChartToolbar_Speed_Summarized_DefaultWhenOpened;
 
    private Button    _chkShowInChartToolbar_RunDyn_StanceTime;
    private Button    _chkShowInChartToolbar_RunDyn_StanceTime_DefaultWhenOpened;
@@ -190,7 +194,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(18).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(20).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
@@ -201,16 +205,18 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Slideout_TourChartGraph_Label_DefaultWhenOpened);
 
-            _chkShowInChartToolbar_Elevation_DefaultWhenOpened       = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Pulse_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Speed_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Pace_DefaultWhenOpened            = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Power_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Tempterature_DefaultWhenOpened    = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Gradient_DefaultWhenOpened        = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Altimeter_DefaultWhenOpened       = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Cadence_DefaultWhenOpened         = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Gears_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Elevation_DefaultWhenOpened          = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Pulse_DefaultWhenOpened              = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Speed_DefaultWhenOpened              = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Speed_Summarized_DefaultWhenOpened   = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Pace_DefaultWhenOpened               = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Pace_Summarized_DefaultWhenOpened    = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Power_DefaultWhenOpened              = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Tempterature_DefaultWhenOpened       = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Gradient_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Altimeter_DefaultWhenOpened          = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Cadence_DefaultWhenOpened            = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Gears_DefaultWhenOpened              = createUI_DefaulWhenOpened(container);
 
             _chkShowInChartToolbar_RunDyn_StanceTime_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
             _chkShowInChartToolbar_RunDyn_StanceTimeBalance_DefaultWhenOpened    = createUI_DefaulWhenOpened(container);
@@ -232,7 +238,9 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             createUI_GraphAction(container, TourManager.GRAPH_ALTITUDE);
             createUI_GraphAction(container, TourManager.GRAPH_PULSE);
             createUI_GraphAction(container, TourManager.GRAPH_SPEED);
+            createUI_GraphAction(container, TourManager.GRAPH_SPEED_SUMMARIZED);
             createUI_GraphAction(container, TourManager.GRAPH_PACE);
+            createUI_GraphAction(container, TourManager.GRAPH_PACE_SUMMARIZED);
             createUI_GraphAction(container, TourManager.GRAPH_POWER);
             createUI_GraphAction(container, TourManager.GRAPH_TEMPERATURE);
             createUI_GraphAction(container, TourManager.GRAPH_GRADIENT);
@@ -257,16 +265,18 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Slideout_TourChartGraph_Label_ShowActionInToolbar);
 
-            _chkShowInChartToolbar_Elevation       = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Pulse           = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Speed           = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Pace            = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Power           = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Tempterature    = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Gradient        = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Altimeter       = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Cadence         = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Gears           = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Elevation          = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Pulse              = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Speed              = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Speed_Summarized   = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Pace               = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Pace_Summarized    = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Power              = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Tempterature       = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Gradient           = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Altimeter          = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Cadence            = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Gears              = createUI_ShowActionInToolbar(container);
 
             _chkShowInChartToolbar_RunDyn_StanceTime              = createUI_ShowActionInToolbar(container);
             _chkShowInChartToolbar_RunDyn_StanceTimeBalance       = createUI_ShowActionInToolbar(container);
@@ -362,9 +372,11 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS, 									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT);
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT, 								TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT);
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE, 									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED, 					TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED_DEFAULT);
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER, 									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT);
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE, 									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT);
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT);
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED, 					TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT);
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT);
 
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME, 				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT);
@@ -395,9 +407,11 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 		_chkShowInChartToolbar_Gears.setSelection(								Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT));
 		_chkShowInChartToolbar_Gradient.setSelection(							Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT,								TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT));
 		_chkShowInChartToolbar_Pace.setSelection(									Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT));
+		_chkShowInChartToolbar_Pace_Summarized.setSelection(					Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED,						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED_DEFAULT));
 		_chkShowInChartToolbar_Power.setSelection(								Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT));
 		_chkShowInChartToolbar_Pulse.setSelection(								Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT));
 		_chkShowInChartToolbar_Speed.setSelection(								Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT));
+		_chkShowInChartToolbar_Speed_Summarized.setSelection(					Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED,					TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT));
 		_chkShowInChartToolbar_Tempterature.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT));
 
 		_chkShowInChartToolbar_RunDyn_StanceTime.setSelection(				Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME,				TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT));
@@ -442,6 +456,10 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             _chkShowInChartToolbar_Pace_DefaultWhenOpened.setSelection(true);
          }
 
+         if (graphIdValue == TourManager.GRAPH_PACE_SUMMARIZED) {
+            _chkShowInChartToolbar_Pace_Summarized_DefaultWhenOpened.setSelection(true);
+         }
+
          if (graphIdValue == TourManager.GRAPH_POWER) {
             _chkShowInChartToolbar_Power_DefaultWhenOpened.setSelection(true);
          }
@@ -452,6 +470,10 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
          if (graphIdValue == TourManager.GRAPH_SPEED) {
             _chkShowInChartToolbar_Speed_DefaultWhenOpened.setSelection(true);
+         }
+
+         if (graphIdValue == TourManager.GRAPH_SPEED_SUMMARIZED) {
+            _chkShowInChartToolbar_Speed_Summarized_DefaultWhenOpened.setSelection(true);
          }
 
          if (graphIdValue == TourManager.GRAPH_TEMPERATURE) {
@@ -504,9 +526,11 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS, 									_chkShowInChartToolbar_Gears.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT, 								_chkShowInChartToolbar_Gradient.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE, 									_chkShowInChartToolbar_Pace.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED, 					_chkShowInChartToolbar_Pace_Summarized.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER, 									_chkShowInChartToolbar_Power.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE, 									_chkShowInChartToolbar_Pulse.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 									_chkShowInChartToolbar_Speed.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED, 					_chkShowInChartToolbar_Speed_Summarized.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							_chkShowInChartToolbar_Tempterature.getSelection());
 
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME, 				_chkShowInChartToolbar_RunDyn_StanceTime.getSelection());
@@ -549,6 +573,10 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_PACE));
       }
 
+      if (_chkShowInChartToolbar_Pace_Summarized_DefaultWhenOpened.getSelection()) {
+         allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_PACE_SUMMARIZED));
+      }
+
       if (_chkShowInChartToolbar_Power_DefaultWhenOpened.getSelection()) {
          allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_POWER));
       }
@@ -559,6 +587,10 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
       if (_chkShowInChartToolbar_Speed_DefaultWhenOpened.getSelection()) {
          allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_SPEED));
+      }
+
+      if (_chkShowInChartToolbar_Speed_Summarized_DefaultWhenOpened.getSelection()) {
+         allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_SPEED_SUMMARIZED));
       }
 
       if (_chkShowInChartToolbar_Tempterature_DefaultWhenOpened.getSelection()) {
