@@ -2263,6 +2263,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_Gradient;
    public static String        Tooltip_ValuePoint_Action_Value_Header;
    public static String        Tooltip_ValuePoint_Action_Value_Pace;
+   public static String        Tooltip_ValuePoint_Action_Value_Pace_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Power;
    public static String        Tooltip_ValuePoint_Action_Value_Pulse;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
@@ -2271,6 +2272,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio;
    public static String        Tooltip_ValuePoint_Action_Value_Speed;
+   public static String        Tooltip_ValuePoint_Action_Value_Speed_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Temperature;
    public static String        Tooltip_ValuePoint_Action_Value_TimeDuration;
    public static String        Tooltip_ValuePoint_Action_Value_TimeOfDay;
@@ -2422,6 +2424,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
+   public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;
    public static String        Tour_Action_graph_altimeter_tooltip;
