@@ -15,11 +15,7 @@
  *******************************************************************************/
 package test.java;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import net.tourbook.common.util.StringUtils;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,25 +23,25 @@ public class StringUtilsTests {
 
    @Test
    public void testHasContent() {
-
-      assertTrue(StringUtils.hasContent("string"));
-      assertFalse(StringUtils.hasContent(" "));
-      assertFalse(StringUtils.hasContent(""));
-      assertFalse(StringUtils.hasContent(null));
+      assertTrue(2 == 3);
+//      assertTrue(StringUtils.hasContent("string"));
+//      assertFalse(StringUtils.hasContent(" "));
+//      assertFalse(StringUtils.hasContent(""));
+//      assertFalse(StringUtils.hasContent(null));
    }
 
-   @Test
-   public void testJoin() {
+//   @Test
+//   public void testJoin() {
 
-      final String[] stringArray = { "1", "2", "3" };
-      assertEquals(StringUtils.join(stringArray, ","), "1,2,3");
-      assertEquals(StringUtils.join(new String[] { "1" }, ","), "1");
-   }
-
-   @Test
-   public void testSanitizeFileName() {
-
-      final String fileName = "\\$%#filename.txt";
-      assertEquals(StringUtils.sanitizeFileName(fileName), "----filename.txt");
-   }
+//      final String[] stringArray = { "1", "2", "3" };
+//      assertEquals(StringUtils.join(stringArray, ","), "1,2,3");
+//      assertEquals(StringUtils.join(new String[] { "1" }, ","), "1");
+//   }
+//
+//   @Test
+//   public void testSanitizeFileName() {
+//
+//      final String fileName = "\\$%#filename.txt";
+//      assertEquals(StringUtils.sanitizeFileName(fileName), "----filename.txt");
+//   }
 }
