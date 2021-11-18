@@ -246,10 +246,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkOptions_DisplayAbsoluteFilePath;
    private Button               _chkOptions_LiveUpdate;
    private Button               _chkOptions_LogDetails;
+   //
    private Button               _chkIC_CreateBackup;
    private Button               _chkIC_DeleteDeviceFiles;
    private Button               _chkIC_ImportFiles;
    private Button               _chkIC_TurnOffWatching;
+   //
+   private Button               _chkIL_ReplaceFirstTimeSliceElevation;
    private Button               _chkIL_AdjustTemperature;
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
@@ -652,7 +655,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _dialogEasyConfig.stateToolTipWidth                      = easyConfig.stateToolTipWidth;
       _dialogEasyConfig.tileSize                               = easyConfig.tileSize;
 
-// SET_FORMATTING_ON      
+// SET_FORMATTING_ON
 
       final ImportConfig activeImportConfig = easyConfig.getActiveImportConfig();
 
@@ -1836,7 +1839,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          createUI_550_IL_TourType(group);
          createUI_580_IL_LastMarker(group);
          createUI_590_IL_AdjustTemperature(group);
-         createUI_591_IL_RetrieveWeatherData(group);
+         createUI_591_IL_AdjustElevation(group);
+         createUI_595_IL_RetrieveWeatherData(group);
          createUI_599_IL_Save(group);
       }
    }
@@ -2382,7 +2386,25 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_591_IL_RetrieveWeatherData(final Composite parent) {
+   private void createUI_591_IL_AdjustElevation(final Composite parent) {
+      // TODO Auto-generated method stub
+
+      {
+         /*
+          * Checkbox: Adjust Elevation
+          */
+         _chkIL_ReplaceFirstTimeSliceElevation = new Button(parent, SWT.CHECK);
+         _chkIL_ReplaceFirstTimeSliceElevation.setText(Messages.Dialog_ImportConfig_Checkbox_SaveTour);
+         _chkIL_ReplaceFirstTimeSliceElevation.addSelectionListener(_ilSelectionListener);
+         _chkIL_ReplaceFirstTimeSliceElevation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(0, 5)
+               .applyTo(_chkIL_ReplaceFirstTimeSliceElevation);
+      }
+   }
+
+   private void createUI_595_IL_RetrieveWeatherData(final Composite parent) {
 
       /*
        * Checkbox: Retrieve Weather Data
@@ -3899,12 +3921,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.temperatureAdjustmentDuration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
       _selectedIL.tourAvgTemperature = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
+      _selectedIL.isReplaceFirstTimeSliceElevation = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
       _selectedIL.isRetrieveWeatherData = _chkIL_RetrieveWeatherData.getSelection();
-
       _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
-      _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
-
       _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
+      _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
 
       // update UI
       _ilViewer.update(_selectedIL, null);
@@ -4595,6 +4616,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          // Retrieve Weather Data
          _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
+
+         _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
 
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;
