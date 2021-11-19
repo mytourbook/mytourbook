@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package test.java;
+package test.net.tourbook.common.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,13 +23,13 @@ import net.tourbook.common.util.StringUtils;
 
 import org.junit.jupiter.api.Test;
 
-public class StringUtilsTests {
+public class StringUtilsTest {
 
    @Test
    public void testHasContent() {
 
       assertTrue(StringUtils.hasContent("string"));
-      assertFalse(StringUtils.hasContent(" "));
+      assertTrue(StringUtils.hasContent(" "));
       assertFalse(StringUtils.hasContent(""));
       assertFalse(StringUtils.hasContent(null));
    }

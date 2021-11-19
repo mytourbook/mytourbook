@@ -85,7 +85,7 @@ task mt_20_BuildProduct {
       mavenexec {
 
          workingDir  buildDir
-         goals       'clean', 'compiler:testCompile', 'surefire:test', 'verify'
+         goals       'clean', 'verify', 'test'
          
          // repos can be used offline when this option "offline true" is set, 
          // by default it is disabled 

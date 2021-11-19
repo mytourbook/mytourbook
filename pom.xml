@@ -24,11 +24,24 @@
     <artifactId>org.eclipse.core.runtime</artifactId>
     <version>3.7.0</version>
 </dependency>
+	<dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>5.0.0</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-surefire-provider</artifactId>
+        <version>1.0.0</version>
+     </dependency>
 </dependencies>
 	
    <properties>
       <tycho.version>2.5.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+	       <maven.compiler.source>11</maven.compiler.source>
+     <maven.compiler.target>11</maven.compiler.target>
    </properties>
 
    <modules>
@@ -133,6 +146,8 @@
    </repositories>
 
    <build>
+		   <!--<sourceDirectory>${project.basedir}/src</sourceDirectory>-->
+       <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
 
 <!-- 
       <defaultGoal>clean verify</defaultGoal>
@@ -201,51 +216,42 @@
                </environments>
             </configuration>
     </plugin>
-    <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-surefire-plugin</artifactId>
-	      <version>3.0.0-M5</version>
-	      <configuration>
-		      <skipTests>false</skipTests>
-              </configuration>
-	      <executions>
-		      <execution>
-			      <goals>
-				      <goal>test</goal>
-			      </goals>
-            	      </execution>
-   	      </executions>
-    </plugin>
-    <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>3.2.0</version>
-            <executions>
-                <execution>
-                    <id>add-test-source</id>
-                    <phase>generate-test-sources</phase>
-                    <goals>
-                        <goal>add-test-source</goal>
-                    </goals>
-                    <configuration>
-                        <sources>
-				<source>src/test/net/tourbook/common/util</source>
-                        </sources>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    <plugin>
-	    <groupId>org.eclipse.tycho</groupId>
-	    <artifactId>tycho-surefire-plugin</artifactId>
-	    <version>${tycho.version}</version>
-	    <configuration>
-		    <useUIHarness>true</useUIHarness>
-		    <useUIThread>false</useUIThread>
-		    <product>org.eclipse.platform.ide</product>
-		    <skipTests>false</skipTests>
-	    </configuration>
-    </plugin>
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>none</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**/*Test</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+ 
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>2.5.1</version>
+    <executions>
+      <execution>
+        <id>compiletests</id>
+        <phase>test-compile</phase>
+        <goals>
+          <goal>testCompile</goal>
+        </goals>
+      </execution>
+    </executions>
+  </plugin>
     <plugin>
 	    <groupId>org.jacoco</groupId>
 	    <artifactId>jacoco-maven-plugin</artifactId>
