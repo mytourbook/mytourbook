@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1435,12 +1437,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       {
          _linkIC_ILActions = new Link(parent, SWT.NONE);
          _linkIC_ILActions.setText(Messages.Dialog_ImportConfig_Link_OtherActions);
-         _linkIC_ILActions.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_IC_LauncherActions();
-            }
-         });
+         _linkIC_ILActions.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_LauncherActions()));
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .span(2, 1)
@@ -1474,7 +1471,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          }
          {
             /*
-             * Label: Delete INFo
+             * Label: Delete Info
              */
             _lblIC_DeleteFilesInfo = new Label(container, SWT.NONE);
             _lblIC_DeleteFilesInfo.setForeground(COLOR_RED);
@@ -1970,34 +1967,35 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          _lblIL_One_TourTypeIcon = new Label(container, SWT.NONE);
+         _lblIL_One_TourTypeIcon.setText(UI.EMPTY_STRING);
          GridDataFactory.fillDefaults()
                .hint(16, 16)
                .applyTo(_lblIL_One_TourTypeIcon);
-         _lblIL_One_TourTypeIcon.setText(UI.EMPTY_STRING);
 
          /*
-          * tour type
+          * Tour type
           */
          _linkTT_One_TourType = new Link(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTT_One_TourType);
          _linkTT_One_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
-         _linkTT_One_TourType.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType);
-            }
-         });
+         _linkTT_One_TourType.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType)));
+
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTT_One_TourType);
 
          _lblIL_One_TourTypeCadenceLabel = new Label(container, SWT.NONE);
          _lblIL_One_TourTypeCadenceLabel.setText(Messages.Tour_Editor_Label_Cadence);
 
-         _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-
+         /*
+          * Cadence
+          */
          final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
                RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
                RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
+         _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          _comboIL_One_TourType_Cadence.setSelection(cadence);
       }
 
@@ -2123,12 +2121,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              * Link: Tour type
              */
             final Link linkTourType = new Link(_speedTourType_Container, SWT.NONE);
+            linkTourType.setText(Messages.tour_editor_label_tour_type);
+            linkTourType.addSelectionListener(_speedTourTypeListener);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(linkTourType);
-            linkTourType.setText(Messages.tour_editor_label_tour_type);
-            linkTourType.addSelectionListener(_speedTourTypeListener);
 
             /*
              * Combo: Cadence
@@ -2136,11 +2134,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             final Label lblCadence = new Label(_speedTourType_Container, SWT.NONE);
             lblCadence.setText(Messages.Tour_Editor_Label_Cadence);
 
-            final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
-
             final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
                   RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
                   RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
+            final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
             comboCadence.setSelection(cadence);
 
             /*
@@ -2149,6 +2147,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             final MenuManager menuMgr = new MenuManager();
             menuMgr.setRemoveAllWhenShown(true);
             menuMgr.addMenuListener(menuManager -> fillSpeedTourTypeMenu(menuManager, linkTourType));
+
             final Menu ttContextMenu = menuMgr.createContextMenu(linkTourType);
             linkTourType.setMenu(ttContextMenu);
 
@@ -2387,21 +2386,18 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    }
 
    private void createUI_591_IL_AdjustElevation(final Composite parent) {
-      // TODO Auto-generated method stub
 
-      {
-         /*
-          * Checkbox: Adjust Elevation
-          */
-         _chkIL_ReplaceFirstTimeSliceElevation = new Button(parent, SWT.CHECK);
-         _chkIL_ReplaceFirstTimeSliceElevation.setText(Messages.Dialog_ImportConfig_Checkbox_SaveTour);
-         _chkIL_ReplaceFirstTimeSliceElevation.addSelectionListener(_ilSelectionListener);
-         _chkIL_ReplaceFirstTimeSliceElevation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .indent(0, 5)
-               .applyTo(_chkIL_ReplaceFirstTimeSliceElevation);
-      }
+      /*
+       * Checkbox: Adjust Elevation
+       */
+      _chkIL_ReplaceFirstTimeSliceElevation = new Button(parent, SWT.CHECK);
+      _chkIL_ReplaceFirstTimeSliceElevation.setText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation);
+      _chkIL_ReplaceFirstTimeSliceElevation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip);
+      _chkIL_ReplaceFirstTimeSliceElevation.addSelectionListener(_ilSelectionListener);
+      GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .indent(0, 5)
+            .applyTo(_chkIL_ReplaceFirstTimeSliceElevation);
    }
 
    private void createUI_595_IL_RetrieveWeatherData(final Composite parent) {
@@ -2772,8 +2768,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       defineColumnIL_30_LastMarkerDistance();
       defineColumnIL_40_AdjustTemperature();
       defineColumnIL_50_RetrieveWeatherData();
-      defineColumnIL_88_IsSaveTour();
-      defineColumnIL_90_ShowInDashboard();
+      defineColumnIL_80_IsSaveTour();
+      defineColumnIL_82_IsAdjustElevation();
+      defineColumnIL_90_IsShowInDashboard();
       defineColumnIL_99_Description();
    }
 
@@ -3117,7 +3114,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Is save tour
     */
-   private void defineColumnIL_88_IsSaveTour() {
+   private void defineColumnIL_80_IsSaveTour() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
 
@@ -3144,9 +3141,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    }
 
    /**
+    * Column: Is adjust elevation
+    */
+   private void defineColumnIL_82_IsAdjustElevation() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isAdjustElevation", SWT.CENTER); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustElevation_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustElevation_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+      colDef.setColumnWeightData(new ColumnWeightData(7));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((ImportLauncher) cell.getElement()).isReplaceFirstTimeSliceElevation
+                  ? Messages.App_Label_BooleanYes
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
     * Column: Show in dashboard
     */
-   private void defineColumnIL_90_ShowInDashboard() {
+   private void defineColumnIL_90_IsShowInDashboard() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.CENTER); //$NON-NLS-1$
 
@@ -3164,7 +3188,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             cell.setText(
                   ((ImportLauncher) cell.getElement()).isShowInDashboard
                         ? Messages.App_Label_BooleanYes
-                        : Messages.App_Label_BooleanNo);
+                        : UI.EMPTY_STRING);
          }
       });
    }
@@ -4617,6 +4641,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          // Retrieve Weather Data
          _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
 
+         // adjust elevation
          _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
 
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;

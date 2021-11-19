@@ -1997,6 +1997,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
+      // adjust elevation
+      {
+         sb.append(NL);
+
+         sb.append(importLauncher.isReplaceFirstTimeSliceElevation
+               ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
+               : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+      }
+
       // retrieve weather data
       {
          sb.append(NL);
@@ -4669,6 +4678,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
+      // clear old tours which can cause problems when they are reimported
+//      TourManager.getInstance().clearTourDataCache();
+
       /*
        * Run easy import
        */
@@ -4676,9 +4688,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final ImportState_Process importState_Process = new ImportState_Process()
 
-            .setIsEasyImport(true)
-
-      ;
+            .setIsEasyImport(true);
 
       if (easyConfig.isLogDetails == false) {
 
@@ -4747,10 +4757,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          /*
-          * 6. Retrieve weather data
+          * 6. Adjust elevation
+          */
+         if (importLauncher.isReplaceFirstTimeSliceElevation) {
+            runEasyImport_006_ReplaceFirstTimeSliceElevation(importLauncher, importedTours);
+         }
+
+         /*
+          * 50. Retrieve weather data
           */
          if (importLauncher.isRetrieveWeatherData) {
-            runEasyImport_006_RetrieveWeatherData(importLauncher, importedTours);
+            runEasyImport_050_RetrieveWeatherData(importLauncher, importedTours);
          }
 
          ArrayList<TourData> importedAndSavedTours;
@@ -4875,6 +4892,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final float temperature = UI.convertTemperatureFromMetric(avgMinimumTemperature);
       final int durationTime = importLauncher.temperatureAdjustmentDuration;
 
+      // "5. Adjust tour start temperature values - {0} < {1} {2}"
       TourLogManager.log_DEFAULT(NLS.bind(
             EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
             new Object[] {
@@ -4889,7 +4907,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.subLog_INFO(String.format(
+            // "%s . . . %.2f > %.0f °C"
+            TourLogManager.subLog_DEFAULT(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -4902,11 +4921,66 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void runEasyImport_006_RetrieveWeatherData(final ImportLauncher importLauncher,
+   private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ImportLauncher importLauncher,
+                                                                 final ArrayList<TourData> importedTours) {
+      // "6. Replace first time slice elevation value"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION);
+
+      for (final TourData tourData : importedTours) {
+
+         final float[] altitudeSerie = tourData.altitudeSerie;
+
+         if (altitudeSerie == null || altitudeSerie.length < 2) {
+
+            continue;
+         }
+
+         final float firstElevation = altitudeSerie[0];
+         final float secondElevation = altitudeSerie[1];
+
+         final int[] timeSerie = tourData.timeSerie;
+         final float timeDiff = timeSerie[1];
+
+         final float elevationDiff = Math.abs(firstElevation - secondElevation);
+         final float timeElevationDiff = elevationDiff / timeDiff;
+
+         if (timeElevationDiff > 0.5) {
+
+            // adjust elevation
+
+            altitudeSerie[0] = secondElevation;
+
+            // discard computed elevation values
+            tourData.clearAltitudeSeries();
+
+            tourData.computeAltitudeUpDown();
+            tourData.computeComputedValues();
+
+            // "%s - %.1f Δ %s"
+            TourLogManager.subLog_OK(String.format(
+                  EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION_TOUR,
+                  TourManager.getTourDateTimeShort(tourData),
+                  timeDiff,
+                  elevationDiff,
+                  UI.UNIT_LABEL_ELEVATION));
+         } else {
+
+            // "%s - %.1f Δ %s"
+            TourLogManager.subLog_DEFAULT(String.format(
+                  EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION_TOUR,
+                  TourManager.getTourDateTimeShort(tourData),
+                  timeDiff,
+                  elevationDiff,
+                  UI.UNIT_LABEL_ELEVATION));
+         }
+      }
+   }
+
+   private void runEasyImport_050_RetrieveWeatherData(final ImportLauncher importLauncher,
                                                       final ArrayList<TourData> importedTours) {
 
       TourLogManager.log_DEFAULT(NLS.bind(
-            EasyImportManager.LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA,
+            EasyImportManager.LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA,
             new Object[] {
                   getDurationText(importLauncher),
                   UI.UNIT_LABEL_TEMPERATURE }));
@@ -5708,7 +5782,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //
 //                     System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                           + (String.format("Event: %s\tFile: %s", kind, event.context())));
-//                     // TODO remove SYSTEM.OUT.PRINTLN
+//                     // remove SYSTEM.OUT.PRINTLN
 //                  }
 
                // do not update the device state when the import is running otherwise the import file list can be wrong
