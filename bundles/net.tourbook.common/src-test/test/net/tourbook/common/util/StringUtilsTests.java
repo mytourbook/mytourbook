@@ -23,7 +23,7 @@ import net.tourbook.common.util.StringUtils;
 
 import org.junit.jupiter.api.Test;
 
-public class StringUtilsTest {
+public class StringUtilsTests {
 
    @Test
    public void testHasContent() {
