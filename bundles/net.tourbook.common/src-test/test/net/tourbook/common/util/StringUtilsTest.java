@@ -29,7 +29,7 @@ public class StringUtilsTest {
    public void testHasContent() {
 
       assertTrue(StringUtils.hasContent("string"));
-      assertTrue(StringUtils.hasContent(" "));
+      assertFalse(StringUtils.hasContent(" "));
       assertFalse(StringUtils.hasContent(""));
       assertFalse(StringUtils.hasContent(null));
    }
