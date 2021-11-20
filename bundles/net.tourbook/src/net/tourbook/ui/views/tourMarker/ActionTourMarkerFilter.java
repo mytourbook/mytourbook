@@ -15,19 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMarker;
 
-import net.tourbook.application.TourbookPlugin;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,8 +30,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourMarkerFilter extends ContributionItem {
-
-   private IDialogSettings          _state = TourbookPlugin.getState(getClass().getSimpleName());
 
    private ToolBar                  _toolBar;
    private ToolItem                 _actionToolItem;
@@ -69,22 +61,14 @@ public class ActionTourMarkerFilter extends ContributionItem {
 
          _toolBar = toolbar;
 
-         toolbar.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               onDispose();
-            }
-         });
+         toolbar.addDisposeListener(disposeEvent -> onDispose());
 
-         toolbar.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(mouseEvent -> {
 
-               final Point mousePosition = new Point(e.x, e.y);
-               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-               onMouseMove(hoveredItem, e);
-            }
+            onMouseMove(hoveredItem);
          });
 
          _actionToolItem = new ToolItem(toolbar, SWT.PUSH);
@@ -92,14 +76,10 @@ public class ActionTourMarkerFilter extends ContributionItem {
          // !!! image must be set before enable state is set
          _actionToolItem.setImage(_actionImage);
 
-         _actionToolItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect();
-            }
-         });
+         _actionToolItem.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> onSelect()));
 
-         _slideoutTourMarkerFilter = new SlideoutTourMarkerFilter(_parent, _toolBar, _state, _tourMarkerAllView);
+         _slideoutTourMarkerFilter = new SlideoutTourMarkerFilter(_parent, _toolBar, _tourMarkerAllView);
       }
    }
 
@@ -111,7 +91,7 @@ public class ActionTourMarkerFilter extends ContributionItem {
       _actionToolItem = null;
    }
 
-   private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
+   private void onMouseMove(final ToolItem hoveredItem) {
 
       final boolean isToolItemHovered = hoveredItem == _actionToolItem;
 

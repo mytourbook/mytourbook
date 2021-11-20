@@ -28,6 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -59,6 +60,7 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -98,34 +100,36 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
+
    private final IDialogSettings    _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
 
    private TourData                 _tourData;
-
    private PostSelectionProvider    _postSelectionProvider;
    private ISelectionListener       _postSelectionListener;
    private IPropertyChangeListener  _prefChangeListener;
    private IPropertyChangeListener  _prefChangeListener_Common;
    private ITourEventListener       _tourEventListener;
+
    private IPartListener2           _partListener;
-
    private MenuManager              _viewerMenuManager;
-   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
+   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ActionOpenMarkerDialog   _actionEditTourMarkers;
+
    private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
 
+   private ActionToolbarSlideout    _actionTmvOptions;
+
    private PixelConverter           _pc;
-
    private TableViewer              _markerViewer;
+
    private ColumnManager            _columnManager;
-
    private boolean                  _isInUpdate;
+
    private boolean                  _isMultipleTours;
-
    private ColumnDefinition         _colDefName;
-   private ColumnDefinition         _colDefVisibility;
 
+   private ColumnDefinition         _colDefVisibility;
    private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
@@ -137,6 +141,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     */
    private PageBook  _pageBook;
    private Composite _pageNoData;
+
    private Composite _viewerContainer;
 
    private Font      _boldFont;
@@ -272,9 +277,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _markerViewer.refresh();
-         } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)) {
 
-            // Pace and speed value computation has changed
+         } else if (property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME) ||
+               property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME) ||
+               property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME)) {
 
             refreshView();
          }
@@ -436,14 +442,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             / UI.UNIT_VALUE_DISTANCE
             / 1000;
 
-      int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex];
-      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-
-      if (isPaceAndSpeedFromRecordedTime) {
-         timeDifference -= _tourData.getPausedTime(previousMarkerIndex, currentMarkerIndex);
-      } else {
-         timeDifference -= _tourData.getBreakTime(previousMarkerIndex, currentMarkerIndex);
-      }
+      final int timeDifference = timeSerie[currentMarkerIndex] - timeSerie[previousMarkerIndex] - getStoppedTimeBetweenIndices(previousMarkerIndex,
+            currentMarkerIndex);
 
       final double averageSpeed = timeDifference == 0 ? 0.0 : 3600 * distanceDifference / timeDifference;
 
@@ -452,6 +452,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
+      _actionTmvOptions = new ActionTmvOptions(_pageBook);
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
    }
@@ -924,10 +925,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          public void update(final ViewerCell cell) {
 
             final TourMarker marker = (TourMarker) cell.getElement();
-            final long time = marker.getTime();
+            final long time = marker.getTime() - getStoppedTimeBetweenIndices(0, marker.getSerieIndex());
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
          }
+
       });
    }
 
@@ -944,12 +946,19 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
             int lastTime = 0;
+            int lastSerieIndex = 0;
             TourData lastTourData = null;
             if (null != lastRow) {
+
                final Object element = lastRow.getElement();
+
                if (element instanceof TourMarker) {
-                  lastTime = ((TourMarker) element).getTime();
-                  lastTourData = ((TourMarker) element).getTourData();
+
+                  final TourMarker tourMarker = (TourMarker) element;
+
+                  lastTime = tourMarker.getTime();
+                  lastSerieIndex = tourMarker.getSerieIndex();
+                  lastTourData = tourMarker.getTourData();
                }
             }
 
@@ -961,6 +970,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             if (lastTourData != null && !lastTourData.getTourId().equals(currentTourData.getTourId())) {
                timeDifference = currentTime;
             }
+
+            int currentMarkerIndex = getCurrentMarkerIndex(cell);
+            if (_tourData.isMultipleTours()) {
+               currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
+            }
+
+            timeDifference -= getStoppedTimeBetweenIndices(lastSerieIndex, currentMarkerIndex);
 
             cell.setText(net.tourbook.common.UI.format_hh_mm_ss(timeDifference));
 
@@ -1067,6 +1083,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void fillToolbar() {
 
+      /*
+       * View toolbar
+       */
+      final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+      toolBarManager.add(_actionTmvOptions);
+
 //      final IActionBars actionBars = getViewSite().getActionBars();
 
       /*
@@ -1147,6 +1169,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       }
 
       return selectedTours;
+   }
+
+   private int getStoppedTimeBetweenIndices(final int previousMarkerIndex, final int currentMarkerIndex) {
+
+      if (useRecordedTime()) {
+         return _tourData.getPausedTime(previousMarkerIndex, currentMarkerIndex);
+      } else if (useMovingTime()) {
+         return _tourData.getBreakTime(previousMarkerIndex, currentMarkerIndex);
+      }
+
+      return 0;
    }
 
    @Override
@@ -1384,5 +1417,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       }
 
       enableActions();
+   }
+
+   private boolean useMovingTime() {
+
+      return _prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME);
+   }
+
+   private boolean useRecordedTime() {
+
+      return _prefStore.getBoolean(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME);
    }
 }
