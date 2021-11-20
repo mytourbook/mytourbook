@@ -2271,7 +2271,7 @@ public class RawDataManager {
 
             if (importState_Process.isLog_OK()) {
 
-               // {0} ← {1}
+               // {0} <- {1}
                final String defaultMessage = NLS.bind(Messages.Log_Import_Tour_Imported,
                      TourManager.getTourDateTimeShort(importedTourData),
                      osFilePath);
@@ -3739,7 +3739,7 @@ public class RawDataManager {
                new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                      true, // fork
                      false, // cancelable
-                     newMonitor -> updateTourData_InImportView_FromDb_Runnable(newMonitor));
+                     this::updateTourData_InImportView_FromDb_Runnable);
 
             } else {
 

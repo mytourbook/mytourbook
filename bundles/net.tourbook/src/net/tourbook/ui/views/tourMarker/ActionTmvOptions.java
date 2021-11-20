@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,33 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package net.tourbook.ui.views.tourMarker;
 
-import net.tourbook.Images;
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.view.Map2View;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.part.PageBook;
 
-public class ActionShowTourPauses extends Action {
+public class ActionTmvOptions extends ActionToolbarSlideout {
 
-   private Map2View _mapView;
+   private Control _ownerControl;
 
-   public ActionShowTourPauses(final Map2View mapView) {
-
-      super(null, AS_CHECK_BOX);
-
-      _mapView = mapView;
-
-      setText(Messages.Tour_Action_ShowTourPauses);
-
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses_Disabled));
+   public ActionTmvOptions(final PageBook pageBook) {
+      _ownerControl = pageBook;
    }
 
    @Override
-   public void run() {
-      _mapView.actionSetShowTourPausesInMap();
+   protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+      final SlideoutTMVOptions slideoutTMVOptions = new SlideoutTMVOptions(
+            _ownerControl,
+            toolbar);
+
+      return slideoutTMVOptions;
    }
 }

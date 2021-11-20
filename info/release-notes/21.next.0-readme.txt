@@ -53,13 +53,17 @@ New
 Improvements
 ============
 
-* Easy Import
+* Easy Import           420   https://github.com/wolfgang-ch/mytourbook/issues/420
   - New import launcher option: Replace the elevation value of the first time slice with the elevation value from the second time slice
     This is fixing an issue after updating the Garmin Edge 1030 firmware version to 12.20, mostly it has total wrong elevation value for the first time slice
   
 
 * GPX Import
   - Tours can be imported also with the date/time format "yyyy-MM-dd'T'HH:mm:ss.SSSS"
+
+* Tour Marker View (Frederic)
+  - Added the ability to select between elapsed, moving and recorded time
+  https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/?page=1#32dc
 
 
 Changes  

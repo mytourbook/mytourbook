@@ -15,6 +15,8 @@
  *******************************************************************************/
 package tourdata.cadence;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -33,7 +35,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -99,10 +100,10 @@ public class CadenceTests {
 
       tour.computeCadenceZonesTimes();
 
-      Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      Assertions.assertEquals(852, tour.getCadenceZone_FastTime());
-      Assertions.assertEquals(9795, tour.getCadenceZone_SlowTime());
-      Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
+      assertEquals(70, tour.getCadenceZones_DelimiterValue());
+      assertEquals(852, tour.getCadenceZone_FastTime());
+      assertEquals(9795, tour.getCadenceZone_SlowTime());
+      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
             tour.getTourComputedTime_Moving());
    }
 
@@ -133,10 +134,10 @@ public class CadenceTests {
 
       tour.computeCadenceZonesTimes();
 
-      Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      Assertions.assertEquals(2125, tour.getCadenceZone_FastTime());
-      Assertions.assertEquals(14663, tour.getCadenceZone_SlowTime());
-      Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
+      assertEquals(70, tour.getCadenceZones_DelimiterValue());
+      assertEquals(2125, tour.getCadenceZone_FastTime());
+      assertEquals(14663, tour.getCadenceZone_SlowTime());
+      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
             tour.getTourDeviceTime_Recorded() - 1);
    }
 
@@ -163,10 +164,10 @@ public class CadenceTests {
 
       tour.computeCadenceZonesTimes();
 
-      Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      Assertions.assertEquals(294, tour.getCadenceZone_FastTime());
-      Assertions.assertEquals(1601, tour.getCadenceZone_SlowTime());
-      Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
+      assertEquals(70, tour.getCadenceZones_DelimiterValue());
+      assertEquals(294, tour.getCadenceZone_FastTime());
+      assertEquals(1601, tour.getCadenceZone_SlowTime());
+      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
             tour.getTourComputedTime_Moving());
    }
 
@@ -195,10 +196,10 @@ public class CadenceTests {
 
       tour.computeCadenceZonesTimes();
 
-      Assertions.assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      Assertions.assertEquals(294, tour.getCadenceZone_FastTime());
-      Assertions.assertEquals(1601, tour.getCadenceZone_SlowTime());
-      Assertions.assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
+      assertEquals(70, tour.getCadenceZones_DelimiterValue());
+      assertEquals(294, tour.getCadenceZone_FastTime());
+      assertEquals(1601, tour.getCadenceZone_SlowTime());
+      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
             tour.getTourDeviceTime_Recorded());
    }
 }

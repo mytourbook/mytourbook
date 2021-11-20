@@ -489,7 +489,7 @@ public class TourExporter {
        */
       if (_useDescription) {
          final String notes = _tourData.getTourDescription();
-         if ((notes != null) && (notes.length() > 0)) {
+         if (net.tourbook.common.util.StringUtils.hasContent(notes)) {
             lap.setNotes(notes);
          }
       }
