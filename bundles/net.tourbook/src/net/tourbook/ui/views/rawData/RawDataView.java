@@ -217,7 +217,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    // db state
    private static final String           IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";               //$NON-NLS-1$
    private static final String           IMAGE_DATABASE                             = "IMAGE_DATABASE";                         //$NON-NLS-1$
-
+   //
    private static final String           IMAGE_DATABASE_OTHER_PERSON                = "IMAGE_DATABASE_OTHER_PERSON";            //$NON-NLS-1$
    private static final String           IMAGE_DELETE                               = "IMAGE_DELETE";                           //$NON-NLS-1$
    private static final String           IMAGE_ICON_PLACEHOLDER                     = "IMAGE_ICON_PLACEHOLDER";                 //$NON-NLS-1$
@@ -300,6 +300,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static String                 HREF_ACTION_SERIAL_PORT_CONFIGURED;
    private static String                 HREF_ACTION_SERIAL_PORT_DIRECTLY;
    private static String                 HREF_ACTION_SETUP_EASY_IMPORT;
+   //
+   private static final String           LOG_TOUR_DETAILS                           = "%s · %.0f s · %5.1f Δ %s";               //$NON-NLS-1$
    //
    static {
 
@@ -4958,7 +4960,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // "%s - %.1f Δ %s"
             TourLogManager.subLog_OK(String.format(
-                  EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION_TOUR,
+                  LOG_TOUR_DETAILS,
                   TourManager.getTourDateTimeShort(tourData),
                   timeDiff,
                   elevationDiff,
@@ -4967,7 +4969,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // "%s - %.1f Δ %s"
             TourLogManager.subLog_DEFAULT(String.format(
-                  EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION_TOUR,
+                  LOG_TOUR_DETAILS,
                   TourManager.getTourDateTimeShort(tourData),
                   timeDiff,
                   elevationDiff,
