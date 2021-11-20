@@ -379,14 +379,7 @@ public class TourManager {
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
-
-            clearTourDataCache();
-
-            // fire modify event
-            Display.getDefault().asyncExec(() -> fireEvent(TourEventId.UPDATE_UI));
-
-         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
             /*
              * multiple tours can have the wrong person for hr zones

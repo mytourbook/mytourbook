@@ -1897,7 +1897,7 @@ public class RawDataManager {
 
             final String message = NLS.bind(Messages.Dialog_ReplaceImportFilename_Message,
                   new Object[] {
-                        TourManager.getTourDateTimeShort(dbTourData),
+                        dbTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_SM),
                         importedFilePathName,
                         dbFilePathName == null
                               ? Messages.App_Label_NotAvailable

@@ -34,7 +34,6 @@ public interface ITourbookPreferences {
     * System
     */
    public static final String TOUR_CACHE_SIZE      = "TourCacheSize";        //$NON-NLS-1$
-   public static final String CLEAR_TOURDATA_CACHE = "CLEAR_TOURDATA_CACHE"; //$NON-NLS-1$
 
    /*
     * Tour database
