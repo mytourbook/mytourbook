@@ -1141,7 +1141,6 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_004_SetLastMarker;
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
    public static String        Log_EasyImport_006_AdjustElevation;
-   public static String        Log_EasyImport_006_AdjustElevation_Tour;
    public static String        Log_EasyImport_050_RetrieveWeatherData;
    public static String        Log_EasyImport_099_SaveTour;
    public static String        Log_EasyImport_100_DeleteTourFiles;
@@ -2066,7 +2065,6 @@ public class Messages extends NLS {
    public static String        Slideout_SensorTourFilter_Checkbox_IsFilterDuration;
    public static String        Slideout_SensorTourFilter_Checkbox_IsUseAppFilter;
    public static String        Slideout_SensorTourFilter_Label_Title;
-   public static String        Slideout_SensorTourFilter_Link_ResetValue;
    public static String        Slideout_SensorTourFilter_Radio_Day;
    public static String        Slideout_SensorTourFilter_Radio_Day_Tooltip;
    public static String        Slideout_SensorTourFilter_Radio_Month;
