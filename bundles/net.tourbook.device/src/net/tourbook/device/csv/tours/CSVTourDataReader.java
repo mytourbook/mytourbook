@@ -42,7 +42,7 @@ public class CSVTourDataReader extends TourbookDevice {
    // csv import data samples
    //
    // Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;
-   // 2008-09-02;08-20;1200;300;8500;zur Arbeit;kein Kommentar, siehe n�chste Tour;Rennvelo;Arbeitsfahrt am Abend, new tag
+   // 2008-09-02;08-20;1200;300;8500;zur Arbeit;kein Kommentar, siehe nächste Tour;Rennvelo;Arbeitsfahrt am Abend, new tag
    // 2008-09-01;14-30;1500;20;6000;auf Fremersberg;;MTB;FB
    // 2008-08-28;18-00;780;120;12000;Feierabendrunde;;TestTourType;no tags
 

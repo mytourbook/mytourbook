@@ -13,19 +13,25 @@
                                              <version>21.12.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
-	   <dependencies>
-		<dependency>
-			<groupId>org.eclipse.pde</groupId>
-			<artifactId>org.eclipse.pde.junit.runtime</artifactId>
-			<version>3.6.0</version>
-		</dependency>
-		<dependency>
-    <groupId>org.eclipse.core</groupId>
-    <artifactId>org.eclipse.core.runtime</artifactId>
-    <version>3.7.0</version>
-</dependency>
-</dependencies>
-	
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.pde</groupId>
+      <artifactId>org.eclipse.pde.junit.runtime</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>	
+
    <properties>
       <tycho.version>2.5.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
@@ -128,111 +134,153 @@
 
    </repositories>
 
-   <build>
-
-<!-- 
+ <build>
+    <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
+    <!-- 
       <defaultGoal>clean verify</defaultGoal>
 -->
-   
-      <plugins>
-
-         <plugin>
-            <artifactId>tycho-maven-plugin</artifactId>              <groupId>org.eclipse.tycho</groupId>
-                                                                     <version>${tycho.version}</version>
-            <extensions>true</extensions>
-         </plugin>
-
-         <plugin>
-            <artifactId>tycho-compiler-plugin</artifactId>           <groupId>org.eclipse.tycho</groupId>
-                                                                     <version>${tycho.version}</version>
-            <configuration>
-
-
-               <!-- Fix this problem (and propably others)
+    <plugins>
+      <plugin>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <version>${tycho.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <!-- Fix this problem (and propably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
                 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
 
                 -->
-               <compilerArgument>-warn:none</compilerArgument>     
-               <compilerArgument>-err:none</compilerArgument>      
-            </configuration>
-         </plugin>
-
-         <plugin>
-            <artifactId>tycho-packaging-plugin</artifactId>          <groupId>org.eclipse.tycho</groupId>
-                                                                     <version>${tycho.version}</version>
-            <configuration>
-
-               <!-- !!! Hide default user name in manifest files and set a new name !!! -->
-               <archive>
-                  <addMavenDescriptor>false</addMavenDescriptor>
-                  <manifestEntries>
-                     <Built-By>MyTourbook App Builder</Built-By>
-                  </manifestEntries>
-               </archive>
-
-               <!-- set qualifier date format, 'v' is a prefix 
+          <compilerArgument>-warn:none</compilerArgument>
+          <compilerArgument>-err:none</compilerArgument>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <!-- !!! Hide default user name in manifest files and set a new name !!! -->
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifestEntries>
+              <Built-By>MyTourbook App Builder</Built-By>
+            </manifestEntries>
+          </archive>
+          <!-- set qualifier date format, 'v' is a prefix 
                <format>'v'yyyyMMdd-HHmm</format>
 
                the 'v' do NOT work with the update site (testing translated texts)
 
                -->
-               <format>yyyyMMdd-HHmm</format>
-
-            </configuration>
-         </plugin>         
-
-         <plugin>
-            <artifactId>target-platform-configuration</artifactId>   <groupId>org.eclipse.tycho</groupId>
-                                                                     <version>${tycho.version}</version>
+          <format>yyyyMMdd-HHmm</format>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>target-platform-configuration</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+          <environments>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86_64</arch>
+            </environment>
+          </environments>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <executions>
+          <execution>
+            <id>compiletests</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <useUIHarness>true</useUIHarness>
+          <useUIThread>false</useUIThread>
+          <product>org.eclipse.platform.ide</product>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.7</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>all-tests-report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report-aggregate</goal>
+            </goals>
             <configuration>
-               <resolver>p2</resolver>
-               <environments>
-
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
-                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
-                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>      </environment>
-
-               </environments>
+              <skip>true</skip>
             </configuration>
-    </plugin>
-    <plugin>
-	    <groupId>org.eclipse.tycho</groupId>
-	    <artifactId>tycho-surefire-plugin</artifactId>
-	    <version>${tycho.version}</version>
-	    <configuration>
-		    <useUIHarness>true</useUIHarness>
-		    <useUIThread>false</useUIThread>
-		    <product>org.eclipse.platform.ide</product>
-		    <skipTests>true</skipTests>
-	    </configuration>
-    </plugin>
-    <plugin>
-	    <groupId>org.jacoco</groupId>
-	    <artifactId>jacoco-maven-plugin</artifactId>
-	    <version>0.8.7</version>
-	    <executions>
-		    <execution>
-			    <goals>
-				    <goal>prepare-agent</goal>
-		            </goals>
-		    </execution>
-		    <execution>
-			    <id>report</id>
-		            <phase>verify</phase>
-			    <goals>
-				    <goal>report-aggregate</goal>
-		            </goals>
-			    <configuration>
-				    <skip>true</skip>
-			    </configuration>
-                    </execution>
-            </executions>
-     </plugin>
-
+          </execution>
+          <execution>
+            <id>unit-tests-report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
-   </build>
+  </build>
 
 </project>
 
