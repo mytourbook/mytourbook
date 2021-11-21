@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.KeyListener.keyReleasedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.net.URI;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -75,6 +78,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -85,8 +90,10 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -747,15 +754,37 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
          // Combo
          _comboMarkerName = new Combo(parent, SWT.BORDER | SWT.FLAT);
-         _comboMarkerName.addKeyListener(new KeyAdapter() {
+         _comboMarkerName.addListener(SWT.ALL,
+               new Listener() {
+          @Override
+          public void handleEvent(final Event event) {
+
+                     System.out.println("in addListener");
+          }
+       });
+
+         _comboMarkerName.addKeyListener(keyReleasedAdapter(keyEvent -> {
+
+            onChangeMarkerUI();
+            System.out.println("in addKeyListener");
+         }));
+         _comboMarkerName.addMouseListener(new MouseAdapter() {
+
             @Override
-            public void keyReleased(final KeyEvent e) {
+            public void mouseDoubleClick(final MouseEvent e) {
                onChangeMarkerUI();
+               System.out.println("mouse double click");
+            }
+
+            @Override
+            public void mouseDown(final MouseEvent e) {
+               System.out.println("mouse down");
+               // onMouse_Down(e);
             }
          });
-         GridDataFactory.fillDefaults()
-               .grab(true, false)
 
+         _comboMarkerName.addSelectionListener(widgetSelectedAdapter(selectionEvent -> System.out.println("in selection listener")));
+         GridDataFactory.fillDefaults().grab(true, false)
                // !!! hint must be set otherwise the control could be too large, because the width is adjusted to the content
                .hint(_contentWidthHint, SWT.DEFAULT)
                .applyTo(_comboMarkerName);
@@ -1441,7 +1470,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       updateModel_FromUI(_selectedTourMarker);
 
       _tourChart.updateUI_MarkerLayer(true);
-
+      //todo fb
+      System.out.println(_selectedTourMarker.getLabel());
       _markerViewer.update(_selectedTourMarker, null);
 
       enableControls();
