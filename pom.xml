@@ -13,18 +13,18 @@
                                              <version>21.12.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.pde</groupId>
-      <artifactId>org.eclipse.pde.junit.runtime</artifactId>
-      <version>3.6.0</version>
-    </dependency>
-    <dependency>
+   <dependencies>
+      <dependency>
+         <groupId>org.eclipse.pde</groupId>
+         <artifactId>org.eclipse.pde.junit.runtime</artifactId>
+         <version>3.6.0</version>
+      </dependency>
+   <dependency>
       <groupId>org.eclipse.core</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
       <version>3.7.0</version>
-    </dependency>
-    <dependency>
+   </dependency>
+   <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <version>5.8.1</version>
@@ -77,7 +77,6 @@
 
 
    <repositories>
-   
 
       <!-- Eclipse E4 web repository -->
       
@@ -101,112 +100,107 @@
       </repository>   
       
       -->
-   
+
       <!-- 
-      
+
       Eclipse local repositories downloaded from https://download.eclipse.org/eclipse/downloads/
       do not work anymore
-      
+
       <repository>
          <id>eclipse.platform.4.10</id>                                  <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.platform-4.10.zip!/</url>
       </repository>
-   
+
       <repository>
          <id>eclipse.rcp.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.rcp-4.10.zip!/</url>
       </repository>
-   
+
       <repository>
          <id>eclipse.jdt.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.jdt-4.10.zip!/</url>
       </repository>
-   
+
       <repository>
          <id>eclipse.pde.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.pde-4.10.zip!/</url>
       </repository>
-      
-      -->
-      
-      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
+      -->
+
+      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
    </repositories>
 
- <build>
-    <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
-    <!-- 
+   <build>
+      <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
+
+<!-- 
       <defaultGoal>clean verify</defaultGoal>
 -->
-    <plugins>
-      <plugin>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <groupId>org.eclipse.tycho</groupId>
-        <version>${tycho.version}</version>
-        <extensions>true</extensions>
-      </plugin>
-      <plugin>
-        <artifactId>tycho-compiler-plugin</artifactId>
-        <groupId>org.eclipse.tycho</groupId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <!-- Fix this problem (and propably others)
+      <plugins>
+
+         <plugin>
+            <artifactId>tycho-maven-plugin</artifactId>              <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <extensions>true</extensions>
+         </plugin>
+
+         <plugin>
+            <artifactId>tycho-compiler-plugin</artifactId>           <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
+
+               <!-- Fix this problem (and propably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
                 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
 
                 -->
-          <compilerArgument>-warn:none</compilerArgument>
-          <compilerArgument>-err:none</compilerArgument>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>tycho-packaging-plugin</artifactId>
-        <groupId>org.eclipse.tycho</groupId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <!-- !!! Hide default user name in manifest files and set a new name !!! -->
-          <archive>
-            <addMavenDescriptor>false</addMavenDescriptor>
-            <manifestEntries>
-              <Built-By>MyTourbook App Builder</Built-By>
-            </manifestEntries>
-          </archive>
-          <!-- set qualifier date format, 'v' is a prefix 
+               <compilerArgument>-warn:none</compilerArgument>
+               <compilerArgument>-err:none</compilerArgument>
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <artifactId>tycho-packaging-plugin</artifactId>          <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
+
+               <!-- !!! Hide default user name in manifest files and set a new name !!! -->
+               <archive>
+                  <addMavenDescriptor>false</addMavenDescriptor>
+                  <manifestEntries>
+                     <Built-By>MyTourbook App Builder</Built-By>
+                  </manifestEntries>
+               </archive>
+
+               <!-- set qualifier date format, 'v' is a prefix 
                <format>'v'yyyyMMdd-HHmm</format>
 
                the 'v' do NOT work with the update site (testing translated texts)
 
                -->
-          <format>yyyyMMdd-HHmm</format>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>target-platform-configuration</artifactId>
-        <groupId>org.eclipse.tycho</groupId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <resolver>p2</resolver>
-          <environments>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>macosx</os>
-              <ws>cocoa</ws>
-              <arch>x86_64</arch>
-            </environment>
-          </environments>
-        </configuration>
-      </plugin>
+               <format>yyyyMMdd-HHmm</format>
+
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <artifactId>target-platform-configuration</artifactId>   <groupId>org.eclipse.tycho</groupId>
+                                                                     <version>${tycho.version}</version>
+            <configuration>
+               <resolver>p2</resolver>
+               <environments>
+
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>      </environment>
+
+               </environments>
+            </configuration>
+         </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
