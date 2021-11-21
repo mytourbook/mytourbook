@@ -116,8 +116,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private ActionOpenMarkerDialog   _actionEditTourMarkers;
    private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
-   private ActionToolbarSlideout    _actionTmvOptions;
-   
+   private ActionToolbarSlideout    _actionTourMarkerOptions;
+
    private PixelConverter           _pc;
 
    private TableViewer              _markerViewer;
@@ -450,7 +450,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
-      _actionTmvOptions = new ActionTmvOptions(_pageBook);
+      _actionTourMarkerOptions = new ActionTourMarkerOptions(_pageBook);
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
    }
@@ -1085,7 +1085,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
        * View toolbar
        */
       final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-      toolBarManager.add(_actionTmvOptions);
+      toolBarManager.add(_actionTourMarkerOptions);
 
 //      final IActionBars actionBars = getViewSite().getActionBars();
 
