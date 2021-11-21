@@ -1765,6 +1765,7 @@ public class Messages extends NLS {
    public static String        Sensor_Type_Other;
    public static String        Sensor_Type_RecordingDevice;
 
+   public static String        Sensor_View_Action_EditSensor;
    public static String        Sensor_View_Action_OpenSensorChart;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
