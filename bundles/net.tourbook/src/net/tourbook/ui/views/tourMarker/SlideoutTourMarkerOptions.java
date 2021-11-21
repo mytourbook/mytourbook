@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetToDefault {
+public class SlideoutTourMarkerOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
@@ -52,7 +52,7 @@ public class SlideoutTMVOptions extends ToolbarSlideout implements IActionResetT
    private Button _rdoMovingTime;
    private Button _rdoRecordedTime;
 
-   public SlideoutTMVOptions(final Control ownerControl, final ToolBar toolBar) {
+   public SlideoutTourMarkerOptions(final Control ownerControl, final ToolBar toolBar) {
 
       super(ownerControl, toolBar);
    }

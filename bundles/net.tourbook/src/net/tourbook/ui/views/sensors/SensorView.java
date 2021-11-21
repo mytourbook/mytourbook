@@ -62,8 +62,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -126,15 +124,33 @@ public class SensorView extends ViewPart implements ITourViewer {
       _nf3.setMaximumFractionDigits(3);
    }
 
+   private Action_EditSensor      _action_EditSensor;
+   private Action_OpenSensorChart _action_OpenSensorChartView;
+
    /*
     * UI controls
     */
-   private PixelConverter         _pc;
-   private Composite              _viewerContainer;
+   private PixelConverter _pc;
+   private Composite      _viewerContainer;
 
-   private Menu                   _tableContextMenu;
+   private Menu           _tableContextMenu;
 
-   private Action_OpenSensorChart _action_OpenSensorChartView;
+   private class Action_EditSensor extends Action {
+
+      public Action_EditSensor() {
+
+         setText(Messages.Sensor_View_Action_EditSensor);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Sensor));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Sensor_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         onAction_EditSensor();
+      }
+   }
 
    private class Action_OpenSensorChart extends Action {
 
@@ -506,6 +522,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private void createActions() {
 
       _action_OpenSensorChartView = new Action_OpenSensorChart();
+      _action_EditSensor = new Action_EditSensor();
    }
 
    private void createMenuManager() {
@@ -584,12 +601,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.setComparator(_markerComparator);
 
       _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
-      _sensorViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onSensor_DoubleClick();
-         }
-      });
+      _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_EditSensor());
 
       updateUI_SetSortDirection(
             _markerComparator.__sortColumnId,
@@ -923,6 +935,7 @@ public class SensorView extends ViewPart implements ITourViewer {
        * Fill menu
        */
 
+      menuMgr.add(_action_EditSensor);
       menuMgr.add(_action_OpenSensorChartView);
 
       enableActions();
@@ -1098,34 +1111,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onAction_OpenSensorChart() {
-
-      Util.showView(SensorChartView.ID, true);
-
-      // reselect current sensor to update the sensor chart
-      final IStructuredSelection structuredSelection = _sensorViewer.getStructuredSelection();
-      if (structuredSelection.getFirstElement() != null) {
-         _sensorViewer.setSelection(structuredSelection);
-      }
-   }
-
-   private void onColumn_Select(final SelectionEvent e) {
-
-      _viewerContainer.setRedraw(false);
-      {
-         // keep selection
-         final ISelection selectionBackup = getViewerSelection();
-         {
-            // update viewer with new sorting
-            _markerComparator.setSortColumn(e.widget);
-            _sensorViewer.refresh();
-         }
-         updateUI_SelectSensor(selectionBackup);
-      }
-      _viewerContainer.setRedraw(true);
-   }
-
-   private void onSensor_DoubleClick() {
+   private void onAction_EditSensor() {
 
       final Object firstElement = _sensorViewer.getStructuredSelection().getFirstElement();
 
@@ -1166,6 +1152,33 @@ public class SensorView extends ViewPart implements ITourViewer {
          TourManager.getInstance().clearTourDataCache();
          TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, this);
       }
+   }
+
+   private void onAction_OpenSensorChart() {
+
+      Util.showView(SensorChartView.ID, true);
+
+      // reselect current sensor to update the sensor chart
+      final IStructuredSelection structuredSelection = _sensorViewer.getStructuredSelection();
+      if (structuredSelection.getFirstElement() != null) {
+         _sensorViewer.setSelection(structuredSelection);
+      }
+   }
+
+   private void onColumn_Select(final SelectionEvent e) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = getViewerSelection();
+         {
+            // update viewer with new sorting
+            _markerComparator.setSortColumn(e.widget);
+            _sensorViewer.refresh();
+         }
+         updateUI_SelectSensor(selectionBackup);
+      }
+      _viewerContainer.setRedraw(true);
    }
 
    private void onSensor_Select() {

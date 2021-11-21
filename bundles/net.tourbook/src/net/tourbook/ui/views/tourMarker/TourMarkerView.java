@@ -100,36 +100,35 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
-
    private final IDialogSettings    _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
 
    private TourData                 _tourData;
+
    private PostSelectionProvider    _postSelectionProvider;
    private ISelectionListener       _postSelectionListener;
    private IPropertyChangeListener  _prefChangeListener;
    private IPropertyChangeListener  _prefChangeListener_Common;
    private ITourEventListener       _tourEventListener;
-
    private IPartListener2           _partListener;
+
    private MenuManager              _viewerMenuManager;
-
    private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
+
    private ActionOpenMarkerDialog   _actionEditTourMarkers;
-
    private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
-
-   private ActionToolbarSlideout    _actionTmvOptions;
+   private ActionToolbarSlideout    _actionTourMarkerOptions;
 
    private PixelConverter           _pc;
+
    private TableViewer              _markerViewer;
-
    private ColumnManager            _columnManager;
+
    private boolean                  _isInUpdate;
-
    private boolean                  _isMultipleTours;
-   private ColumnDefinition         _colDefName;
 
+   private ColumnDefinition         _colDefName;
    private ColumnDefinition         _colDefVisibility;
+
    private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
@@ -141,7 +140,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     */
    private PageBook  _pageBook;
    private Composite _pageNoData;
-
    private Composite _viewerContainer;
 
    private Font      _boldFont;
@@ -452,7 +450,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
-      _actionTmvOptions = new ActionTmvOptions(_pageBook);
+      _actionTourMarkerOptions = new ActionTourMarkerOptions(_pageBook);
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
    }
@@ -1087,7 +1085,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
        * View toolbar
        */
       final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-      toolBarManager.add(_actionTmvOptions);
+      toolBarManager.add(_actionTourMarkerOptions);
 
 //      final IActionBars actionBars = getViewSite().getActionBars();
 

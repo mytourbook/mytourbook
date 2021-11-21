@@ -223,6 +223,7 @@ public class Images {
    public static final String SearchTours_ByLocation                     = "map-search-tour-by-location.png";                     //$NON-NLS-1$
    public static final String SearchTours_ByLocation_Scroll              = "map-search-tour-by-location-scroll.png";              //$NON-NLS-1$
    public static final String Sensor                                     = "sensor.png";                                          //$NON-NLS-1$
+   public static final String Sensor_Disabled                            = "sensor-disabled.png";                                 //$NON-NLS-1$
    public static final String SensorChart                                = "sensor-chart.png";                                    //$NON-NLS-1$
    public static final String SensorChart_Disabled                       = "sensor-chart-disabled.png";                           //$NON-NLS-1$
    public static final String SetFavoritePosition                        = "map-set-favorite-position.png";                       //$NON-NLS-1$

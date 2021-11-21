@@ -22,21 +22,21 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 
-public class ActionTmvOptions extends ActionToolbarSlideout {
+public class ActionTourMarkerOptions extends ActionToolbarSlideout {
 
    private Control _ownerControl;
 
-   public ActionTmvOptions(final PageBook pageBook) {
+   public ActionTourMarkerOptions(final PageBook pageBook) {
       _ownerControl = pageBook;
    }
 
    @Override
    protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-      final SlideoutTMVOptions slideoutTMVOptions = new SlideoutTMVOptions(
+      final SlideoutTourMarkerOptions slideoutTourMarkerOptions = new SlideoutTourMarkerOptions(
             _ownerControl,
             toolbar);
 
-      return slideoutTMVOptions;
+      return slideoutTourMarkerOptions;
    }
 }
