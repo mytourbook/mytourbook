@@ -131,7 +131,6 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_004_SET_LAST_MARKER                = Messages.Log_EasyImport_004_SetLastMarker;
    public static final String       LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE             = Messages.Log_EasyImport_005_AdjustTemperatureValues;
    public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION               = Messages.Log_EasyImport_006_AdjustElevation;
-   public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION_TOUR          = Messages.Log_EasyImport_006_AdjustElevation_Tour;
    public static final String       LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_050_RetrieveWeatherData;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR                      = Messages.Log_EasyImport_099_SaveTour;
    public static final String       LOG_EASY_IMPORT_100_DELETE_TOUR_FILES              = Messages.Log_EasyImport_100_DeleteTourFiles;

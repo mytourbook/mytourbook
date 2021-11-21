@@ -369,13 +369,10 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_Sensor_BatteryState_Level_Header;
    public static String        ColumnFactory_Sensor_BatteryState_Level_Label;
-   public static String        ColumnFactory_Sensor_BatteryState_Level_Tooltip;
    public static String        ColumnFactory_Sensor_BatteryState_Status_Header;
    public static String        ColumnFactory_Sensor_BatteryState_Status_Label;
-   public static String        ColumnFactory_Sensor_BatteryState_Status_Tooltip;
    public static String        ColumnFactory_Sensor_BatteryState_Voltage_Header;
    public static String        ColumnFactory_Sensor_BatteryState_Voltage_Label;
-   public static String        ColumnFactory_Sensor_BatteryState_Voltage_Tooltip;
    public static String        ColumnFactory_Sensor_Description;
    public static String        ColumnFactory_Sensor_ManufacturerName;
    public static String        ColumnFactory_Sensor_ManufacturerNumber;
