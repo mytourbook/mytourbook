@@ -3435,7 +3435,7 @@ public class ChartComponentGraph extends Canvas {
                continue;
             }
 
-            final int devBarHeight = (int) (barHeight * scaleY);
+            int devBarHeight = (int) (barHeight * scaleY);
 
             // get the old y position for stacked bars
             int devYPreviousHeight = 0;
@@ -3504,7 +3504,32 @@ public class ChartComponentGraph extends Canvas {
             }
 
             /*
-             * draw bar
+             * Make the bars more visible
+             */
+            if (yData.isShowBarsMoreVisible()) {
+
+               if (devShapeBarWidth < 3 && devBarHeight < 3) {
+
+                  devShapeBarWidth = 3;
+
+                  gcGraph.setLineWidth(3);
+
+               } else {
+
+                  gcGraph.setLineWidth(1);
+               }
+
+               if (devBarHeight < 3) {
+                  devBarHeight = 3;
+               }
+
+            } else {
+
+               gcGraph.setLineWidth(1);
+            }
+
+            /*
+             * Draw bar
              */
             final Rectangle barShapeCanvas = new Rectangle(
                   devXPosShape,
@@ -3532,20 +3557,20 @@ public class ChartComponentGraph extends Canvas {
                      barShapeCanvas.x,
                      barShapeCanvas.y,
                      barShapeCanvas.x,
-                     (barShapeCanvas.y + barShapeCanvas.height));
+                     barShapeCanvas.y + barShapeCanvas.height);
             }
 
-            barRecangles[serieIndex][valueIndex] = new Rectangle( //
+            barRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape,
                   devYPosChart,
                   devShapeBarWidth,
                   devBarHeight);
 
-            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
+            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape - 2,
-                  (devYPosChart - 2),
+                  devYPosChart - 2,
                   devShapeBarWidth + 4,
-                  (devBarHeight + 7));
+                  devBarHeight + 7);
 
             // keep the height for the bar
             devHeightSummary[valueIndex] += devBarHeight;

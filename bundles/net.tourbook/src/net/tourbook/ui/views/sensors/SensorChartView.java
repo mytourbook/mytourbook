@@ -790,6 +790,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          yDataLevel.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryLevel, sensorLabel));
          yDataLevel.setUnitLabel(UI.SYMBOL_PERCENTAGE);
          yDataLevel.setShowYSlider(true);
+         yDataLevel.setShowBarsMoreVisible(true);
 
          setupColors(sensorData, yDataLevel);
 
@@ -811,6 +812,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          yDataVoltage.setUnitLabel(UI.UNIT_VOLTAGE);
          yDataVoltage.setShowYSlider(true);
          yDataVoltage.setSetMinMax_0Values(true);
+         yDataVoltage.setShowBarsMoreVisible(true);
 
          setupColors(sensorData, yDataVoltage);
 
@@ -831,6 +833,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          yDataStatus.setYTitle(String.format(Messages.Sensor_Chart_GraphLabel_BatteryStatus, sensorLabel));
          yDataStatus.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
          yDataStatus.setShowYSlider(true);
+         yDataStatus.setShowBarsMoreVisible(true);
 
          setupColors(sensorData, yDataStatus);
 
