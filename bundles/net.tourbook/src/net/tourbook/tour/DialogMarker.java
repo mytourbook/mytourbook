@@ -748,7 +748,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          // Combo
          _comboMarkerName = new Combo(parent, SWT.BORDER | SWT.FLAT);
          _comboMarkerName.addModifyListener(_defaultModifyListener);
-         GridDataFactory.fillDefaults().grab(true, false)
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+
                // !!! hint must be set otherwise the control could be too large, because the width is adjusted to the content
                .hint(_contentWidthHint, SWT.DEFAULT)
                .applyTo(_comboMarkerName);
@@ -1434,6 +1436,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       updateModel_FromUI(_selectedTourMarker);
 
       _tourChart.updateUI_MarkerLayer(true);
+
       _markerViewer.update(_selectedTourMarker, null);
 
       enableControls();
