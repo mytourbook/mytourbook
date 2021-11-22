@@ -34,6 +34,7 @@ public class Messages extends NLS {
    public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
    public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
    public static String        PrefPage_CloudConnectivity_Label_RefreshToken;
+   public static String        PrefPage_CloudConnectivity_Label_RevokeAccess;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Message;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Title;
    public static String        PrefPage_CloudConnectivity_Label_WebPage;

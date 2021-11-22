@@ -60,6 +60,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RevokeAccess;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
@@ -82,6 +83,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private Label                   _labelExpiresAt_Value;
    private Label                   _labelRefreshToken;
    private Label                   _labelRefreshToken_Value;
+   private Link                    _linkRevokeAccess;
 
    @Override
    protected void createFieldEditors() {
@@ -160,7 +162,9 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START +
+                  Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link +
+                  UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
                   Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link)));
@@ -191,6 +195,14 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
             _labelExpiresAt_Value = new Label(_group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+         }
+         {
+            _linkRevokeAccess = new Link(_group, SWT.NONE);
+            _linkRevokeAccess.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS);
+            _linkRevokeAccess.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> WEB.openUrl(
+                        "https://www.dropbox.com/account/connected_apps")));//$NON-NLS-1$
+            GridDataFactory.fillDefaults().applyTo(_linkRevokeAccess);
          }
       }
    }
@@ -289,9 +301,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    @Override
    protected void performDefaults() {
 
-      _labelAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
+      _labelAccessToken_Value.setText(
+            _prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
-      _labelRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
+      _labelRefreshToken_Value.setText(
+            _prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
 
       updateTokensInformationGroup();
 
@@ -334,11 +348,13 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void updateTokensInformationGroup() {
 
-      final boolean isAuthorized = StringUtils.hasContent(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
+      final boolean isAuthorized = StringUtils.hasContent(
+            _prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
 
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
+      _linkRevokeAccess.setEnabled(isAuthorized);
    }
 
 }

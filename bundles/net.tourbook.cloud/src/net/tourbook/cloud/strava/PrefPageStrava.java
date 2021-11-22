@@ -64,6 +64,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RevokeAccess;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
@@ -96,11 +97,12 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Label              _labelRefreshToken_Value;
    private Button             _chkSendDescription;
    private Button             _chkUseTourTypeMapping;
-
    private Link               _linkAthleteWebPage;
+   private Link               _linkRevokeAccess;
    private PreferenceLinkArea _linkTourTypeFilters;
 
    private String constructAthleteWebPageLink(final String athleteId) {
+
       if (StringUtils.hasContent(athleteId)) {
          return "https://www.strava.com/athletes/" + athleteId; //$NON-NLS-1$
       }
@@ -109,6 +111,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    }
 
    private String constructAthleteWebPageLinkWithTags(final String athleteId) {
+
       return UI.LINK_TAG_START + constructAthleteWebPageLink(athleteId) + UI.LINK_TAG_END;
    }
 
@@ -178,7 +181,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          buttonConnect.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(buttonConnect);
       }
-
    }
 
    private void createUI_20_AccountInformation(final Composite parent) {
@@ -242,6 +244,13 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
             _labelExpiresAt_Value = new Label(group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+         }
+         {
+            _linkRevokeAccess = new Link(group, SWT.NONE);
+            _linkRevokeAccess.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS);
+            _linkRevokeAccess.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> WEB.openUrl("https://www.strava.com/settings/apps")));//$NON-NLS-1$
+            GridDataFactory.fillDefaults().applyTo(_linkRevokeAccess);
          }
       }
    }
@@ -310,6 +319,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _labelRefreshToken_Value.setEnabled(isAuthorized);
       _labelExpiresAt_Value.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
+      _linkRevokeAccess.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
       _chkUseTourTypeMapping.setEnabled(isAuthorized);
 
