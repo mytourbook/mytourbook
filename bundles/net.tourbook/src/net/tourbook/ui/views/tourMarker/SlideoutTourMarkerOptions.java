@@ -166,9 +166,6 @@ public class SlideoutTourMarkerOptions extends ToolbarSlideout implements IActio
       }
    }
 
-   /*
-    * UI controls
-    */
    private void initUI() {
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
