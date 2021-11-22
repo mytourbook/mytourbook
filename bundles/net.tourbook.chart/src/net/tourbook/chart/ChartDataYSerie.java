@@ -130,6 +130,11 @@ public class ChartDataYSerie extends ChartDataSerie {
    protected boolean              isSetVisibleMinMax_0_Values;
 
    /**
+    * When <code>true</code> then a bar with 1x1 pixel is displayed with 3x3 pixel
+    */
+   private boolean                _isShowBarsMoreVisible;
+
+   /**
     * When this value is > 0 a line chart will not draw a line to the next value point when the
     * difference in the x-data values is greater than this value.
     * <p>
@@ -422,6 +427,10 @@ public class ChartDataYSerie extends ChartDataSerie {
     */
    public boolean isIgnoreMinMaxZero() {
       return _isIgnoreMinMaxZero;
+   }
+
+   public boolean isShowBarsMoreVisible() {
+      return _isShowBarsMoreVisible;
    }
 
    /**
@@ -776,6 +785,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    public void setSetMinMax_0Values(final boolean isSetMinMax_0Values) {
       this.isSetVisibleMinMax_0_Values = isSetMinMax_0Values;
+   }
+
+   /**
+    * Show bar charts more visible, a bar with 1x1 pixel is displayed with 3x3 pixel
+    *
+    * @param isShowBarsMoreVisible
+    */
+   public void setShowBarsMoreVisible(final boolean isShowBarsMoreVisible) {
+      _isShowBarsMoreVisible = isShowBarsMoreVisible;
    }
 
    /**

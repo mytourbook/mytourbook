@@ -574,11 +574,11 @@ public class SensorView extends ViewPart implements ITourViewer {
       _viewerContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
       {
-         createUI_10_MarkerViewer(_viewerContainer);
+         createUI_10_SensorViewer(_viewerContainer);
       }
    }
 
-   private void createUI_10_MarkerViewer(final Composite parent) {
+   private void createUI_10_SensorViewer(final Composite parent) {
 
       /*
        * Create table
@@ -601,7 +601,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.setComparator(_markerComparator);
 
       _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
-      _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_EditSensor());
+      _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
 
       updateUI_SetSortDirection(
             _markerComparator.__sortColumnId,
@@ -1213,7 +1213,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          {
             _sensorViewer.getTable().dispose();
 
-            createUI_10_MarkerViewer(_viewerContainer);
+            createUI_10_SensorViewer(_viewerContainer);
 
             // update UI
             _viewerContainer.layout();

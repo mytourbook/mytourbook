@@ -3435,7 +3435,7 @@ public class ChartComponentGraph extends Canvas {
                continue;
             }
 
-            final int devBarHeight = (int) (barHeight * scaleY);
+            int devBarHeight = (int) (barHeight * scaleY);
 
             // get the old y position for stacked bars
             int devYPreviousHeight = 0;
@@ -3504,7 +3504,32 @@ public class ChartComponentGraph extends Canvas {
             }
 
             /*
-             * draw bar
+             * Make the bars more visible
+             */
+            if (yData.isShowBarsMoreVisible()) {
+
+               if (devShapeBarWidth < 3 && devBarHeight < 3) {
+
+                  devShapeBarWidth = 3;
+
+                  gcGraph.setLineWidth(3);
+
+               } else {
+
+                  gcGraph.setLineWidth(1);
+               }
+
+               if (devBarHeight < 3) {
+                  devBarHeight = 3;
+               }
+
+            } else {
+
+               gcGraph.setLineWidth(1);
+            }
+
+            /*
+             * Draw bar
              */
             final Rectangle barShapeCanvas = new Rectangle(
                   devXPosShape,
@@ -3532,20 +3557,20 @@ public class ChartComponentGraph extends Canvas {
                      barShapeCanvas.x,
                      barShapeCanvas.y,
                      barShapeCanvas.x,
-                     (barShapeCanvas.y + barShapeCanvas.height));
+                     barShapeCanvas.y + barShapeCanvas.height);
             }
 
-            barRecangles[serieIndex][valueIndex] = new Rectangle( //
+            barRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape,
                   devYPosChart,
                   devShapeBarWidth,
                   devBarHeight);
 
-            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
+            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape - 2,
-                  (devYPosChart - 2),
+                  devYPosChart - 2,
                   devShapeBarWidth + 4,
-                  (devBarHeight + 7));
+                  devBarHeight + 7);
 
             // keep the height for the bar
             devHeightSummary[valueIndex] += devBarHeight;
@@ -8498,8 +8523,89 @@ public class ChartComponentGraph extends Canvas {
 //      redraw();
    }
 
+   int selectBarItem(final int keyCode) {
+
+      int selectedIndex = Chart.NO_BAR_SELECTION;
+
+      if (_selectedBarItems == null || _selectedBarItems.length == 0) {
+         return selectedIndex;
+      }
+
+      final int numItems = _selectedBarItems.length;
+
+      // find selected index and reset last selected bar item(s)
+      for (int index = 0; index < numItems; index++) {
+
+         if (selectedIndex == Chart.NO_BAR_SELECTION && _selectedBarItems[index]) {
+            selectedIndex = index;
+         }
+
+         _selectedBarItems[index] = false;
+      }
+
+      final int lastIndex = numItems - 1;
+
+      switch (keyCode) {
+
+      case SWT.HOME:
+         selectedIndex = 0;
+         break;
+
+      case SWT.END:
+         selectedIndex = lastIndex;
+         break;
+
+      case SWT.PAGE_UP:
+
+         selectedIndex -= 10;
+
+         if (selectedIndex < 0) {
+            selectedIndex = lastIndex;
+         }
+
+         break;
+
+      case SWT.PAGE_DOWN:
+
+         selectedIndex += 10;
+
+         if (selectedIndex > lastIndex) {
+            selectedIndex = 0;
+         }
+
+         break;
+
+      default:
+         break;
+      }
+
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2) {
+
+            if (selectedIndex == 0) {
+
+               selectedIndex = 1;
+
+            } else if (selectedIndex == lastIndex) {
+
+               selectedIndex = numItems - 2;
+            }
+         }
+      }
+
+      _selectedBarItems[selectedIndex] = true;
+
+      setChartPosition(selectedIndex);
+
+      redrawSelection();
+
+      return selectedIndex;
+   }
+
    /**
-    * select the next bar item
+    * Select the next bar item
     */
    int selectBarItem_Next() {
 
@@ -8564,7 +8670,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * select the previous bar item
+    * Select the previous bar item
     */
    int selectBarItem_Previous() {
 
