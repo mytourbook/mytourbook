@@ -82,6 +82,9 @@ Bugfix
 * Tour Segmenter
   - 2 labels where hidden in the break time segmenter, propably since 21.9 but there were no code modifications in MT, maybe because of changes in the SWT framework
 
+* Tour Marker Editor (Frederic)
+  - When double clicking on a marker label combo entry, the tour marker name was not updated
+
 
 Translation    
 ===========
