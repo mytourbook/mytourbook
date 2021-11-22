@@ -8523,8 +8523,89 @@ public class ChartComponentGraph extends Canvas {
 //      redraw();
    }
 
+   int selectBarItem(final int keyCode) {
+
+      int selectedIndex = Chart.NO_BAR_SELECTION;
+
+      if (_selectedBarItems == null || _selectedBarItems.length == 0) {
+         return selectedIndex;
+      }
+
+      final int numItems = _selectedBarItems.length;
+
+      // find selected index and reset last selected bar item(s)
+      for (int index = 0; index < numItems; index++) {
+
+         if (selectedIndex == Chart.NO_BAR_SELECTION && _selectedBarItems[index]) {
+            selectedIndex = index;
+         }
+
+         _selectedBarItems[index] = false;
+      }
+
+      final int lastIndex = numItems - 1;
+
+      switch (keyCode) {
+
+      case SWT.HOME:
+         selectedIndex = 0;
+         break;
+
+      case SWT.END:
+         selectedIndex = lastIndex;
+         break;
+
+      case SWT.PAGE_UP:
+
+         selectedIndex -= 10;
+
+         if (selectedIndex < 0) {
+            selectedIndex = lastIndex;
+         }
+
+         break;
+
+      case SWT.PAGE_DOWN:
+
+         selectedIndex += 10;
+
+         if (selectedIndex > lastIndex) {
+            selectedIndex = 0;
+         }
+
+         break;
+
+      default:
+         break;
+      }
+
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2) {
+
+            if (selectedIndex == 0) {
+
+               selectedIndex = 1;
+
+            } else if (selectedIndex == lastIndex) {
+
+               selectedIndex = numItems - 2;
+            }
+         }
+      }
+
+      _selectedBarItems[selectedIndex] = true;
+
+      setChartPosition(selectedIndex);
+
+      redrawSelection();
+
+      return selectedIndex;
+   }
+
    /**
-    * select the next bar item
+    * Select the next bar item
     */
    int selectBarItem_Next() {
 
@@ -8589,7 +8670,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * select the previous bar item
+    * Select the previous bar item
     */
    int selectBarItem_Previous() {
 
