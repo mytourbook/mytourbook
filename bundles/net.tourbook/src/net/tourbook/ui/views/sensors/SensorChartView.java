@@ -299,6 +299,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
          restoreState();
          enableActions();
+
+         // repaint otherwise the tour info tooltip icon looks not as enabled
+         parent.redraw();
       });
    }
 
