@@ -116,7 +116,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private TourInfoUI                      _tourInfoUI              = new TourInfoUI();
 
    private boolean                         _useTourFilter;
+   private boolean                         _isInStartup;
    private boolean                         _isInSelect;
+
+   private ISelection                      _startupSelection;
 
    private OpenDialogManager               _openDlgMgr              = new OpenDialogManager();
 
@@ -294,6 +297,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       addPrefListener();
       addTourEventListener();
 
+      // prevent selection before fully setup, the tour filter was not enabled when a selection event occurred
+      // -> tours were not filtered
+      _isInStartup = true;
+
       // restore must be run async otherwise the filter slideout action is not selected !
       parent.getShell().getDisplay().asyncExec(() -> {
 
@@ -302,6 +309,15 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
          // repaint otherwise the tour info tooltip icon looks not as enabled
          parent.redraw();
+
+         _isInStartup = false;
+
+         if (_startupSelection != null) {
+
+            onSelectionChanged(_startupSelection);
+
+            _startupSelection = null;
+         }
       });
    }
 
@@ -485,6 +501,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void onSelectionChanged(final ISelection selection) {
 
+      if (_isInStartup) {
+         _startupSelection = selection;
+         return;
+      }
+
       if (selection instanceof SelectionSensor) {
 
          final SelectionSensor sensorSelection = (SelectionSensor) selection;
@@ -517,16 +538,16 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       _actionTourFilterOptions.setSelection(_useTourFilter);
 
       /*
-       * Select tour even when tour ID == -1 because this will set the selected bar selection flags
-       */
-      selectTour(_selectedTourId);
-
-      /*
        * Set mouse wheel mode
        */
       final Enum<MouseWheelMode> mouseWheelMode = Util.getStateEnum(_state, STATE_MOUSE_WHEEL_MODE, MouseWheelMode.Selection);
       _sensorChart.setMouseWheelMode((MouseWheelMode) mouseWheelMode);
       _sensorChart.getAction_MouseWheelMode().setMouseWheelMode((MouseWheelMode) mouseWheelMode);
+
+      /*
+       * Select tour even when tour ID == -1 because this will set the selected bar selection flags
+       */
+      selectTour(_selectedTourId);
    }
 
    private void saveState() {
