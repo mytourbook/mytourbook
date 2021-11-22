@@ -2326,11 +2326,17 @@ public class ChartComponents extends Composite {
       final int[] selectedIndex = new int[] { Chart.NO_BAR_SELECTION };
 
       switch (event.keyCode) {
+
       case SWT.ARROW_RIGHT:
          selectedIndex[0] = componentGraph.selectBarItem_Next();
          break;
+
       case SWT.ARROW_LEFT:
          selectedIndex[0] = componentGraph.selectBarItem_Previous();
+         break;
+
+      default:
+         selectedIndex[0] = componentGraph.selectBarItem(event.keyCode);
          break;
       }
 

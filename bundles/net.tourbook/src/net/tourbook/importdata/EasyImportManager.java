@@ -109,6 +109,7 @@ public class EasyImportManager {
    //
    private static final String      ATTR_IL_DESCRIPTION                                = "description";                                      //$NON-NLS-1$
    private static final String      ATTR_IL_IS_ADJUST_TEMPERATURE                      = "isAdjustTemperature";                              //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION      = "isReplaceFirstTimeSliceElevation";                 //$NON-NLS-1$
    private static final String      ATTR_IL_IS_RETRIEVE_WEATHER_DATA                   = "isRetrieveWeatherData";                            //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SAVE_TOUR                               = "isSaveTour";                                       //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD                       = "isShowInDashBoard";                                //$NON-NLS-1$
@@ -129,7 +130,8 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM                 = Messages.Log_EasyImport_003_TourType_Item;
    public static final String       LOG_EASY_IMPORT_004_SET_LAST_MARKER                = Messages.Log_EasyImport_004_SetLastMarker;
    public static final String       LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE             = Messages.Log_EasyImport_005_AdjustTemperatureValues;
-   public static final String       LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_006_RetrieveWeatherData;
+   public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION               = Messages.Log_EasyImport_006_AdjustElevation;
+   public static final String       LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_050_RetrieveWeatherData;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR                      = Messages.Log_EasyImport_099_SaveTour;
    public static final String       LOG_EASY_IMPORT_100_DELETE_TOUR_FILES              = Messages.Log_EasyImport_100_DeleteTourFiles;
    public static final String       LOG_EASY_IMPORT_101_TURN_WATCHING_OFF              = Messages.Log_EasyImport_101_TurnWatchingOff;
@@ -793,6 +795,9 @@ public class EasyImportManager {
       // retrieve weather data
       importLauncher.isRetrieveWeatherData = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_WEATHER_DATA, false);
 
+      // adjust elevation
+      importLauncher.isReplaceFirstTimeSliceElevation = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, false);
+
       // set your type, default is true to preserve previous saved tour types before this field was introduced
       importLauncher.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_TYPE, true);
 
@@ -929,7 +934,6 @@ public class EasyImportManager {
             final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(deviceOSFolder);
 
             deviceOSFolder = deviceOSFolder.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
-
          }
 
          MessageDialog.openInformation(
@@ -1186,6 +1190,9 @@ public class EasyImportManager {
 
          // Retrieve weather data
          xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA, importLauncher.isRetrieveWeatherData);
+
+         // adjust elevation
+         xmlConfig.putBoolean(ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, importLauncher.isReplaceFirstTimeSliceElevation);
 
          // Set tour type
          xmlConfig.putBoolean(ATTR_IL_IS_SET_TOUR_TYPE, importLauncher.isSetTourType);

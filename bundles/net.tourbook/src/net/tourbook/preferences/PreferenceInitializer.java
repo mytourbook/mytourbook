@@ -551,6 +551,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
 
+      /*
+       * Tour Marker View
+       */
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME,true);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, false);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, false);
+
 // SET_FORMATTING_ON
    }
 

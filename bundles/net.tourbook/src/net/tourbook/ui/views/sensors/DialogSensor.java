@@ -17,8 +17,10 @@ package net.tourbook.ui.views.sensors;
 
 import de.byteholder.geoclipse.map.UI;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorType;
@@ -29,6 +31,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -56,6 +59,8 @@ public class DialogSensor extends TitleAreaDialog {
    private Text  _txtDescription;
    private Text  _txtName;
 
+   private Image _imageDialog;
+
    public DialogSensor(final Shell parentShell, final DeviceSensor sensor) {
 
       super(parentShell);
@@ -65,6 +70,9 @@ public class DialogSensor extends TitleAreaDialog {
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
+
+      _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.Sensor).createImage();
+      setDefaultImage(_imageDialog);
    }
 
    @Override
@@ -107,6 +115,7 @@ public class DialogSensor extends TitleAreaDialog {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
+
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
       createUI(dlgContainer);
@@ -115,6 +124,8 @@ public class DialogSensor extends TitleAreaDialog {
 
       _txtName.selectAll();
       _txtName.setFocus();
+
+      parent.addDisposeListener(disposeEvent -> onDispose());
 
       return dlgContainer;
    }
@@ -200,8 +211,6 @@ public class DialogSensor extends TitleAreaDialog {
       return (DeviceSensorType) selectedItem.value;
    }
 
-
-
    @Override
    protected void okPressed() {
 
@@ -216,6 +225,11 @@ public class DialogSensor extends TitleAreaDialog {
       _sensor_Original.updateFromModified(_sensor_Clone);
 
       super.okPressed();
+   }
+
+   private void onDispose() {
+
+      Util.disposeResource(_imageDialog);
    }
 
    private void restoreState() {

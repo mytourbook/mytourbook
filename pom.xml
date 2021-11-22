@@ -10,28 +10,28 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>21.9.0-SNAPSHOT</version>
+                                             <version>21.12.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
-	   <dependencies>
-		<dependency>
-			<groupId>org.eclipse.pde</groupId>
-			<artifactId>org.eclipse.pde.junit.runtime</artifactId>
-			<version>3.6.0</version>
-		</dependency>
-		<dependency>
-    <groupId>org.eclipse.core</groupId>
-    <artifactId>org.eclipse.core.runtime</artifactId>
-    <version>3.7.0</version>
-</dependency>
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-engine</artifactId>
-        <version>5.8.1</version>
-        <scope>test</scope>
+   <dependencies>
+      <dependency>
+         <groupId>org.eclipse.pde</groupId>
+         <artifactId>org.eclipse.pde.junit.runtime</artifactId>
+         <version>3.6.0</version>
+      </dependency>
+   <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>3.7.0</version>
+   </dependency>
+   <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.8.1</version>
+      <scope>test</scope>
     </dependency>
-</dependencies>
-	
+  </dependencies>	
+
    <properties>
       <tycho.version>2.5.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
@@ -79,7 +79,6 @@
 
 
    <repositories>
-   
 
       <!-- Eclipse E4 web repository -->
       
@@ -107,47 +106,44 @@
       </repository>   
       
       -->
-   
+
       <!-- 
-      
+
       Eclipse local repositories downloaded from https://download.eclipse.org/eclipse/downloads/
       do not work anymore
-      
+
       <repository>
          <id>eclipse.platform.4.10</id>                                  <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.platform-4.10.zip!/</url>
       </repository>
-   
+
       <repository>
          <id>eclipse.rcp.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.rcp-4.10.zip!/</url>
       </repository>
-   
+
       <repository>
          <id>eclipse.jdt.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.jdt-4.10.zip!/</url>
       </repository>
-   
+
       <repository>
          <id>eclipse.pde.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.pde-4.10.zip!/</url>
       </repository>
-      
-      -->
-      
-      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
+      -->
+
+      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
    </repositories>
 
    <build>
-		   <!--<sourceDirectory>${project.basedir}/src</sourceDirectory>-->
-       <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
+      <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
 
 <!-- 
       <defaultGoal>clean verify</defaultGoal>
 -->
-   
       <plugins>
 
          <plugin>
@@ -161,15 +157,14 @@
                                                                      <version>${tycho.version}</version>
             <configuration>
 
-
                <!-- Fix this problem (and propably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
                 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
 
                 -->
-               <compilerArgument>-warn:none</compilerArgument>     
-               <compilerArgument>-err:none</compilerArgument>      
+               <compilerArgument>-warn:none</compilerArgument>
+               <compilerArgument>-err:none</compilerArgument>
             </configuration>
          </plugin>
 
@@ -195,7 +190,7 @@
                <format>yyyyMMdd-HHmm</format>
 
             </configuration>
-         </plugin>         
+         </plugin>
 
          <plugin>
             <artifactId>target-platform-configuration</artifactId>   <groupId>org.eclipse.tycho</groupId>
@@ -210,72 +205,82 @@
 
                </environments>
             </configuration>
-    </plugin>
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-		<version>3.0.0-M5</version>
-		<configuration>
-			<skipTests>true</skipTests>
-		</configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
- 
-  <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <version>3.8.1</version>
-    <executions>
-      <execution>
-        <id>compiletests</id>
-        <phase>test-compile</phase>
-        <goals>
-          <goal>testCompile</goal>
-        </goals>
-      </execution>
-    </executions>
-  </plugin>
-  <plugin>
-	    <groupId>org.eclipse.tycho</groupId>
-	    <artifactId>tycho-surefire-plugin</artifactId>
-	    <version>${tycho.version}</version>
-	    <configuration>
-		    <useUIHarness>true</useUIHarness>
-		    <useUIThread>false</useUIThread>
-		    <product>org.eclipse.platform.ide</product>
-		    <skipTests>true</skipTests>
-	    </configuration>
-    </plugin>
-    <plugin>
-	    <groupId>org.jacoco</groupId>
-	    <artifactId>jacoco-maven-plugin</artifactId>
-	    <version>0.8.7</version>
-	    <executions>
-		    <execution>
-			    <goals>
-				    <goal>prepare-agent</goal>
-		            </goals>
-		    </execution>
-		    <execution>
-			    <id>report</id>
-		            <phase>verify</phase>
-			    <goals>
-				    <goal>report-aggregate</goal>
-		            </goals>
-			    <configuration>
-				    <skip>false</skip>
-			    </configuration>
-                    </execution>
-            </executions>
-     </plugin>
+         </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <executions>
+          <execution>
+            <id>compiletests</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <useUIHarness>true</useUIHarness>
+          <useUIThread>false</useUIThread>
+          <product>org.eclipse.platform.ide</product>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.7</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>all-tests-report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report-aggregate</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unit-tests-report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
-   </build>
+  </build>
 
 </project>
 

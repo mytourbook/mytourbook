@@ -2440,7 +2440,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                _isPartVisible = true;
 
-               Display.getCurrent().asyncExec(() -> updateUI_FromModelRunnable());
+               Display.getCurrent().asyncExec(TourDataEditorView.this::updateUI_FromModelRunnable);
             }
          }
       };

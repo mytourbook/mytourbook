@@ -2864,7 +2864,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Level_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Level_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Level_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Level_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2884,7 +2884,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Status_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Status_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Status_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Status_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2904,7 +2904,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Voltage_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Voltage_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Voltage_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Voltage_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

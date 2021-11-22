@@ -619,6 +619,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation;
+   public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData;
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour;
@@ -627,6 +629,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_TourType;
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
+   public static String        Dialog_ImportConfig_Column_AdjustElevation_Header;
+   public static String        Dialog_ImportConfig_Column_AdjustElevation_Label;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Tooltip;
@@ -1061,6 +1065,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
+   public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_No;
+   public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes;
    public static String        Import_Data_HTML_RetrieveWeatherData_No;
    public static String        Import_Data_HTML_RetrieveWeatherData_Yes;
    public static String        Import_Data_HTML_SaveTour_No;
@@ -1134,7 +1140,8 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_003_TourType_Item;
    public static String        Log_EasyImport_004_SetLastMarker;
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
-   public static String        Log_EasyImport_006_RetrieveWeatherData;
+   public static String        Log_EasyImport_006_AdjustElevation;
+   public static String        Log_EasyImport_050_RetrieveWeatherData;
    public static String        Log_EasyImport_099_SaveTour;
    public static String        Log_EasyImport_100_DeleteTourFiles;
    public static String        Log_EasyImport_101_TurnWatchingOff;
@@ -1758,6 +1765,7 @@ public class Messages extends NLS {
    public static String        Sensor_Type_Other;
    public static String        Sensor_Type_RecordingDevice;
 
+   public static String        Sensor_View_Action_EditSensor;
    public static String        Sensor_View_Action_OpenSensorChart;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
@@ -2058,7 +2066,6 @@ public class Messages extends NLS {
    public static String        Slideout_SensorTourFilter_Checkbox_IsFilterDuration;
    public static String        Slideout_SensorTourFilter_Checkbox_IsUseAppFilter;
    public static String        Slideout_SensorTourFilter_Label_Title;
-   public static String        Slideout_SensorTourFilter_Link_ResetValue;
    public static String        Slideout_SensorTourFilter_Radio_Day;
    public static String        Slideout_SensorTourFilter_Radio_Day_Tooltip;
    public static String        Slideout_SensorTourFilter_Radio_Month;
@@ -2067,6 +2074,13 @@ public class Messages extends NLS {
    public static String        Slideout_SensorTourFilter_Radio_Year_Tooltip;
 
    public static String        Slideout_StatisticOptions_Label_Title;
+
+   public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers;
+   public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip;
+   public static String        Slideout_TMVOptions_Label_Title;
+   public static String        Slideout_TMVOptions_Radio_ElapsedTime;
+   public static String        Slideout_TMVOptions_Radio_MovingTime;
+   public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
    public static String        Slideout_TourBlogOptions_Label_Title;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;
@@ -2256,6 +2270,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_Gradient;
    public static String        Tooltip_ValuePoint_Action_Value_Header;
    public static String        Tooltip_ValuePoint_Action_Value_Pace;
+   public static String        Tooltip_ValuePoint_Action_Value_Pace_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Power;
    public static String        Tooltip_ValuePoint_Action_Value_Pulse;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
@@ -2264,6 +2279,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio;
    public static String        Tooltip_ValuePoint_Action_Value_Speed;
+   public static String        Tooltip_ValuePoint_Action_Value_Speed_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Temperature;
    public static String        Tooltip_ValuePoint_Action_Value_TimeDuration;
    public static String        Tooltip_ValuePoint_Action_Value_TimeOfDay;
@@ -2415,6 +2431,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
+   public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;
    public static String        Tour_Action_graph_altimeter_tooltip;
