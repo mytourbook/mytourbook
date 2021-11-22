@@ -90,9 +90,9 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    public static boolean getValidTokens() {
 
-      if (!OAuth2Utils.isAccessTokenExpired(
-            _prefStore.getLong(Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String()) + _prefStore.getLong(
-                  Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String()) * 1000)) {
+      if (OAuth2Utils.isAccessTokenValid(
+            _prefStore.getLong(Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String()) +
+                  _prefStore.getLong(Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String()) * 1000)) {
          return true;
       }
 

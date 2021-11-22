@@ -29,13 +29,13 @@ public class OAuth2Utils {
    }
 
    /**
-    * We consider that an access token is expired if there are less
+    * We consider that an access token is valid (non expired) if there are more
     * than 5 mins remaining until the actual expiration
     *
     * @return
     */
-   public static boolean isAccessTokenExpired(final long tokenExpirationDate) {
+   public static boolean isAccessTokenValid(final long tokenExpirationDate) {
 
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 < 0;
+      return tokenExpirationDate - System.currentTimeMillis() - 300000 > 0;
    }
 }

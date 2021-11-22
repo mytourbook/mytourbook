@@ -222,6 +222,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    }
 
    private String getAccessToken() {
+      //if active person has no token and all people have a token, we take the all people token
       return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
    }
 
@@ -235,6 +236,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    @Override
    protected boolean isReady() {
+
       return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken()) &&
             StringUtils.hasContent(getDownloadFolder());
    }
