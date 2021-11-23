@@ -32,7 +32,7 @@ import utils.FilesUtils;
 
 public class FitDataReaderTests {
 
-   private static final String            FILES_PATH = FilesUtils.rootPath + "importdata/garmin/fit/files/"; //$NON-NLS-1$
+   private static final String            FILES_PATH = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
 
    private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
