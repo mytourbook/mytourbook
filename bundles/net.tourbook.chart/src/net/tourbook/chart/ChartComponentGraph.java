@@ -8557,20 +8557,20 @@ public class ChartComponentGraph extends Canvas {
 
       case SWT.PAGE_UP:
 
-         selectedIndex -= 10;
+         selectedIndex += 10;
 
-         if (selectedIndex < 0) {
-            selectedIndex = lastIndex;
+         if (selectedIndex > lastIndex) {
+            selectedIndex = 0;
          }
 
          break;
 
       case SWT.PAGE_DOWN:
 
-         selectedIndex += 10;
+         selectedIndex -= 10;
 
-         if (selectedIndex > lastIndex) {
-            selectedIndex = 0;
+         if (selectedIndex < 0) {
+            selectedIndex = lastIndex;
          }
 
          break;
