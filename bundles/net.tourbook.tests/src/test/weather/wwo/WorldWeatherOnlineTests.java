@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import utils.Initializer;
 
-public class WWOTester {
+public class WorldWeatherOnlineTests {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
@@ -41,7 +41,6 @@ public class WWOTester {
 
       API_KEY = Initializer.getCredential("WorldWeatherOnline"); //$NON-NLS-1$
       _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, API_KEY);
-
    }
 
    /**

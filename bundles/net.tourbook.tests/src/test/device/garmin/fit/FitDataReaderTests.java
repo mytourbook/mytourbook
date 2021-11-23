@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package importdata.garmin.fit;
+package device.garmin.fit;
 
 import java.util.HashMap;
 
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import utils.Comparison;
 import utils.FilesUtils;
 
-public class GarminFitTests {
+public class FitDataReaderTests {
 
    private static final String            FILES_PATH = FilesUtils.rootPath + "importdata/garmin/fit/files/"; //$NON-NLS-1$
 
