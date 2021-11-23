@@ -24,6 +24,7 @@ public class OAuth2UtilsTests {
 
    @Test
    public void testIsAccessTokenValid() {
+
       // Token expiring date: Friday, November 22, 2999 11:26:27 PM
       assertTrue(OAuth2Utils.isAccessTokenValid(32500308387000L));
       // Token expiring date: Wednesday, November 22, 2000 11:26:27 PM
