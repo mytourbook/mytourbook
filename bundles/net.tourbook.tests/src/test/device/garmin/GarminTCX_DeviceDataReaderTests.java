@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package importdata.garmin.tcx;
+package device.garmin;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,10 +36,10 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
-public class GarminTcxTests {
+public class GarminTCX_DeviceDataReaderTests {
 
    private static SAXParser                  parser;
-   private static final String               IMPORT_PATH = "/importdata/garmin/tcx/files/"; //$NON-NLS-1$
+   public static final String                IMPORT_PATH = "/device/garmin/tcx/files/"; //$NON-NLS-1$
 
    private static DeviceData                 deviceData;
    private static HashMap<Long, TourData>    newlyImportedTours;
@@ -72,7 +72,7 @@ public class GarminTcxTests {
 
       final String filePathWithoutExtension = IMPORT_PATH + "Move_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTcxTests.class.getResourceAsStream(importFilePath);
+      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
 
       final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(deviceDataReader,
             importFilePath,
@@ -96,7 +96,7 @@ public class GarminTcxTests {
 
       final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTcxTests.class.getResourceAsStream(importFilePath);
+      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
 
       final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(deviceDataReader,
             importFilePath,

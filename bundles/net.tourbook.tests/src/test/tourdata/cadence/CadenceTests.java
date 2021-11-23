@@ -39,7 +39,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
-import importdata.garmin.tcx.GarminTcxTests;
+import device.garmin.GarminTCX_DeviceDataReaderTests;
 import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
@@ -47,7 +47,7 @@ import utils.Initializer;
 public class CadenceTests {
 
    private static SAXParser                  parser;
-   private static final String               GARMIN_IMPORT_PATH      = "/importdata/garmin/tcx/files/";                   //$NON-NLS-1$
+   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.IMPORT_PATH;
    private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto9/files/"; //$NON-NLS-1$
    private static final String               JSON_GZ                 = ".json.gz";                                        //$NON-NLS-1$
 
@@ -149,7 +149,7 @@ public class CadenceTests {
 
       final String filePathWithoutExtension = GARMIN_IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTcxTests.class.getResourceAsStream(importFilePath);
+      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
 
       final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(garminDeviceDataReader,
             importFilePath,
@@ -181,7 +181,7 @@ public class CadenceTests {
 
       final String filePathWithoutExtension = GARMIN_IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTcxTests.class.getResourceAsStream(importFilePath);
+      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
 
       final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(garminDeviceDataReader,
             importFilePath,
