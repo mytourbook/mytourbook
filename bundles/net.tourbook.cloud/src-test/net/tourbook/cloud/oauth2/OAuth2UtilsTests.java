@@ -15,28 +15,21 @@
  *******************************************************************************/
 package net.tourbook.cloud.oauth2;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OAuth2Utils {
+import org.junit.jupiter.api.Test;
 
-   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime,
-                                                         final long accessTokenExpiresIn) {
+public class OAuth2UtilsTests {
 
-      final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
+   @Test
+   public void testIsAccessTokenValid() {
+      // Token expiring date: Friday, November 22, 2999 11:26:27 PM
+      assertTrue(OAuth2Utils.isAccessTokenValid(32500308387000L));
+      // Token expiring date: Wednesday, November 22, 2000 11:26:27 PM
+      assertFalse(OAuth2Utils.isAccessTokenValid(974935587000L));
 
-      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
+      // Token expiring date: Current time + 5min & 1ms
+      assertTrue(OAuth2Utils.isAccessTokenValid(System.currentTimeMillis() + 300001));
    }
-
-   /**
-    * We consider that an access token is valid (non expired) if there are more
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   public static boolean isAccessTokenValid(final long tokenExpirationDate) {
-
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 > 0;
-   }
-
 }
