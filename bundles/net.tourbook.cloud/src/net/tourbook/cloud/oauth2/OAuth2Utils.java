@@ -38,5 +38,4 @@ public class OAuth2Utils {
 
       return tokenExpirationDate - System.currentTimeMillis() - 300000 > 0;
    }
-
 }

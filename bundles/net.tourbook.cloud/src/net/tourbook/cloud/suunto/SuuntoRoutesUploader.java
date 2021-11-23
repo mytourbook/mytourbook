@@ -71,6 +71,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
 
+   private boolean                 _useActivePerson;
+   private boolean                 _useAllPeople;
+
    public SuuntoRoutesUploader() {
       super("SUUNTO", Messages.VendorName_Suunto_Routes); //$NON-NLS-1$
 
@@ -257,6 +260,13 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
 
+      _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
+
+      _useAllPeople = false;
+      if (!_useActivePerson) {
+         _useAllPeople = SuuntoTokensRetrievalHandler.isReady_AllPeople();
+      }
+
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
 
@@ -269,7 +279,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
-            if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
+            if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
                TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
                return;
             }
@@ -299,11 +309,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
-            if (SuuntoTokensRetrievalHandler.getValidTokens()) {
-               numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries, monitor);
-            } else {
-               TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
-            }
+            numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries, monitor);
 
             monitor.worked(toursWithGpsSeries.size());
 
