@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package importdata.sporttracks.fitlog;
+package device.sporttracks;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,9 +36,9 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
-public class FitLogTests {
+public class FitLog_SAXHandlerTests {
 
-   private static final String            IMPORT_PATH = "/importdata/sporttracks/fitlog/files/"; //$NON-NLS-1$
+   private static final String            IMPORT_PATH = "/device/sporttracks/fitlog/files/"; //$NON-NLS-1$
 
    private static SAXParser               parser;
    private static HashMap<Long, TourData> newlyImportedTours;
@@ -67,7 +67,7 @@ public class FitLogTests {
 
       final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlog"; //$NON-NLS-1$
-      final InputStream fitLogFile = FitLogTests.class.getResourceAsStream(importFilePath);
+      final InputStream fitLogFile = FitLog_SAXHandlerTests.class.getResourceAsStream(importFilePath);
 
       final FitLog_SAXHandler handler = new FitLog_SAXHandler(importFilePath,
             alreadyImportedTours,

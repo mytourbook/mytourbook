@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package importdata.gpx;
+package device.gpx;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,7 +65,7 @@ class GPX_SAX_HandlerTests {
     * Resource path to GPX file, generally available from net.tourbook Plugin
     * in test/net.tourbook
     */
-   public static final String                IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/gpx/files/test.gpx"; //$NON-NLS-1$
+   public static final String                IMPORT_FILE_PATH = FilesUtils.rootPath + "device/gpx/files/test.gpx"; //$NON-NLS-1$
 
    @BeforeAll
    static void initAll() {

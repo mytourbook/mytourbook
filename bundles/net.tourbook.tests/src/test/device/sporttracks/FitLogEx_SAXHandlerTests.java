@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package importdata.sporttracks.fitlogex;
+package device.sporttracks;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,9 +39,9 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
-class FitLogExTests {
+class FitLogEx_SAXHandlerTests {
 
-   private static final String           IMPORT_PATH = "/importdata/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+   private static final String           IMPORT_PATH = "/device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
 
    private static SAXParser              parser;
    private static Map<Long, TourData>    newlyImportedTours;
@@ -79,9 +79,9 @@ class FitLogExTests {
 
       final String filePathWithoutExtension = IMPORT_PATH + "ParkCity"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
-      final InputStream fitLogExFile = FitLogExTests.class.getResourceAsStream(importFilePath);
+      final InputStream fitLogExFile = FitLogEx_SAXHandlerTests.class.getResourceAsStream(importFilePath);
 
-      final URL importFile_BundleUrl = FitLogExTests.class.getResource(importFilePath);
+      final URL importFile_BundleUrl = FitLogEx_SAXHandlerTests.class.getResource(importFilePath);
 
       final FitLog_SAXHandler handler = new FitLog_SAXHandler(NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
             alreadyImportedTours,
@@ -106,8 +106,8 @@ class FitLogExTests {
 
       final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
-      final InputStream fitLogExFile = FitLogExTests.class.getResourceAsStream(importFilePath);
-      final URL importFile_BundleUrl = FitLogExTests.class.getResource(importFilePath);
+      final InputStream fitLogExFile = FitLogEx_SAXHandlerTests.class.getResourceAsStream(importFilePath);
+      final URL importFile_BundleUrl = FitLogEx_SAXHandlerTests.class.getResource(importFilePath);
 
       final FitLog_SAXHandler handler = new FitLog_SAXHandler(NIO.getAbsolutePathFromBundleUrl(importFile_BundleUrl),
             alreadyImportedTours,
