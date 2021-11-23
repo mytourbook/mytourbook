@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package importdata.suunto9;
+package device.suunto;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -35,9 +35,9 @@ import org.junit.jupiter.api.Test;
 import utils.Comparison;
 import utils.FilesUtils;
 
-class Suunto9Tests {
+class Suunto9_DeviceDataReaderTests {
 
-   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto9/files/"; //$NON-NLS-1$
+   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
    private static final String             JSON_GZ          = ".json.gz";                                        //$NON-NLS-1$
 

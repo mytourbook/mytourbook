@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package tourdata.cadence;
+package data.cadence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,7 +48,7 @@ public class CadenceTests {
 
    private static SAXParser                  parser;
    private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.IMPORT_PATH;
-   private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "importdata/suunto9/files/"; //$NON-NLS-1$
+   private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
    private static final String               JSON_GZ                 = ".json.gz";                                        //$NON-NLS-1$
 
    private static DeviceData                 deviceData;
