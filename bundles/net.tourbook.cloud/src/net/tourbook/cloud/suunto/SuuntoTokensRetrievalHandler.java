@@ -52,7 +52,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
    }
 
    public static String getAccessToken_ActivePerson() {
-      //todo fb if active person has no token and all people have a token, we take the all people token
+
       return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
    }
 

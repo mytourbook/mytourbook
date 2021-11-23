@@ -34,9 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
-import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
@@ -57,24 +55,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.json.JSONObject;
 
 public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
-   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   private static final String LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
+   private static final String LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
+   private static HttpClient   _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static TourExporter _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
 
-   private boolean                 _useActivePerson;
-   private boolean                 _useAllPeople;
+   private boolean             _useActivePerson;
+   private boolean             _useAllPeople;
 
    public SuuntoRoutesUploader() {
+
       super("SUUNTO", Messages.VendorName_Suunto_Routes); //$NON-NLS-1$
 
       _tourExporter.setUseDescription(true);
@@ -149,11 +146,24 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    }
 
    private String getAccessToken() {
-      return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
+
+      if (_useActivePerson) {
+         return SuuntoTokensRetrievalHandler.getAccessToken_ActivePerson();
+      } else if (_useAllPeople) {
+         return SuuntoTokensRetrievalHandler.getAccessToken_AllPeople();
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    private String getRefreshToken() {
-      return _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String());
+
+      if (_useActivePerson) {
+         return SuuntoTokensRetrievalHandler.getRefreshToken_ActivePerson();
+      } else if (_useAllPeople) {
+         return SuuntoTokensRetrievalHandler.getRefreshToken_AllPeople();
+      }
+      return UI.EMPTY_STRING;
    }
 
    @Override
@@ -163,6 +173,14 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    @Override
    protected boolean isReady() {
+
+      _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
+
+      _useAllPeople = false;
+      if (!_useActivePerson) {
+         _useAllPeople = SuuntoTokensRetrievalHandler.isReady_AllPeople();
+      }
+
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
    }
 
@@ -259,13 +277,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
-
-      _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
-
-      _useAllPeople = false;
-      if (!_useActivePerson) {
-         _useAllPeople = SuuntoTokensRetrievalHandler.isReady_AllPeople();
-      }
 
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
