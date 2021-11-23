@@ -25,19 +25,20 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
 
-   public static String        PrefPage_CloudConnectivity_Label_AccessToken;
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
    public static String        PrefPage_CloudConnectivity_Group_CloudAccount;
    public static String        PrefPage_CloudConnectivity_Group_TourDownload;
    public static String        PrefPage_CloudConnectivity_Group_TourUpload;
+   public static String        PrefPage_CloudConnectivity_Label_AccessToken;
+   public static String        PrefPage_CloudConnectivity_Label_Cleanup;
    public static String        PrefPage_CloudConnectivity_Label_ExpiresAt;
    public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
    public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
    public static String        PrefPage_CloudConnectivity_Label_RefreshToken;
    public static String        PrefPage_CloudConnectivity_Label_RevokeAccess;
+   public static String        PrefPage_CloudConnectivity_Label_WebPage;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Message;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Title;
-   public static String        PrefPage_CloudConnectivity_Label_WebPage;
 
    //DROPBOX
    public static String Dialog_DropboxBrowser_Button_ParentFolder_Tooltip;

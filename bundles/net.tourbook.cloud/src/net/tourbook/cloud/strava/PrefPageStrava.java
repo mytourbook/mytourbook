@@ -62,6 +62,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURUPLOAD   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_TourUpload;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_CLEANUP      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_Cleanup;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RevokeAccess;
@@ -86,6 +87,9 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
+   private Button             _btnCleanup;
+   private Button             _chkSendDescription;
+   private Button             _chkUseTourTypeMapping;
    private Label              _labelAccessToken;
    private Label              _labelAccessToken_Value;
    private Label              _labelAthleteName;
@@ -95,8 +99,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Label              _labelExpiresAt_Value;
    private Label              _labelRefreshToken;
    private Label              _labelRefreshToken_Value;
-   private Button             _chkSendDescription;
-   private Button             _chkUseTourTypeMapping;
    private Link               _linkAthleteWebPage;
    private Link               _linkRevokeAccess;
    private PreferenceLinkArea _linkTourTypeFilters;
@@ -160,6 +162,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       createUI_10_Connect(parent);
       createUI_20_AccountInformation(parent);
       createUI_30_TourUpload(parent);
+      createUI_100_AccountCleanup(parent);
    }
 
    private void createUI_10_Connect(final Composite parent) {
@@ -180,6 +183,22 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          buttonConnect.setImage(_imageStravaConnect);
          buttonConnect.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(buttonConnect);
+      }
+   }
+
+   private void createUI_100_AccountCleanup(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         /*
+          * Clean-up button
+          */
+         _btnCleanup = new Button(container, SWT.NONE);
+         _btnCleanup.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_CLEANUP);
+         _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
       }
    }
 
@@ -322,6 +341,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _linkRevokeAccess.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
       _chkUseTourTypeMapping.setEnabled(isAuthorized);
+      _btnCleanup.setEnabled(isAuthorized);
 
       _linkTourTypeFilters.getControl().setEnabled(_chkUseTourTypeMapping.getSelection());
    }
@@ -338,6 +358,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    private void initUI() {
 
+      noDefaultAndApplyButton();
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
    }
 
