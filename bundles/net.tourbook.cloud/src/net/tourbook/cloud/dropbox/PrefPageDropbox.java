@@ -220,10 +220,12 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          {
             _linkRevokeAccess = new Link(_group, SWT.NONE);
             _linkRevokeAccess.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS);
-            _linkRevokeAccess.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> WEB.openUrl(
-                        "https://www.dropbox.com/account/connected_apps")));//$NON-NLS-1$
-            GridDataFactory.fillDefaults().applyTo(_linkRevokeAccess);
+            _linkRevokeAccess.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+                  "https://www.dropbox.com/account/connected_apps")));//$NON-NLS-1$
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(0, 16)
+                  .applyTo(_linkRevokeAccess);
          }
       }
    }

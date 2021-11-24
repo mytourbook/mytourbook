@@ -269,7 +269,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _linkRevokeAccess.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS);
             _linkRevokeAccess.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> WEB.openUrl("https://www.strava.com/settings/apps")));//$NON-NLS-1$
-            GridDataFactory.fillDefaults().applyTo(_linkRevokeAccess);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(0, 16)
+                  .applyTo(_linkRevokeAccess);
          }
       }
    }
