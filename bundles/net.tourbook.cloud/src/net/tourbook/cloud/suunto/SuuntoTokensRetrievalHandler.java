@@ -51,6 +51,36 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       _selectedPersonId = selectedPersonId;
    }
 
+   public static String getAccessToken_ActivePerson() {
+
+      return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
+   }
+
+   public static String getAccessToken_AllPeople() {
+
+      return _prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(UI.EMPTY_STRING));
+   }
+
+   public static String getDownloadFolder_ActivePerson() {
+
+      return _prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String());
+   }
+
+   public static String getDownloadFolder_AllPeople() {
+
+      return _prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(UI.EMPTY_STRING));
+   }
+
+   public static String getRefreshToken_ActivePerson() {
+
+      return _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String());
+   }
+
+   public static String getRefreshToken_AllPeople() {
+
+      return _prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(UI.EMPTY_STRING));
+   }
+
    public static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
       final JSONObject body = new JSONObject();
@@ -88,27 +118,59 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       return null;
    }
 
-   public static boolean getValidTokens() {
+   public static boolean getValidTokens(final boolean useActivePerson, final boolean useAllPeople) {
 
-      if (!OAuth2Utils.isAccessTokenExpired(
-            _prefStore.getLong(Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String()) + _prefStore.getLong(
-                  Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String()) * 1000)) {
+      if (!useActivePerson && !useAllPeople) {
+         return false;
+      }
+
+      String suuntoAccessTokenIssueDateTime = Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String();
+      String suuntoAccessTokenExpiresIn = Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String();
+      String suuntoRefreshToken = Preferences.getSuuntoRefreshToken_Active_Person_String();
+      String suuntoAccessToken = Preferences.getSuuntoAccessToken_Active_Person_String();
+
+      if (useAllPeople) {
+         suuntoAccessTokenIssueDateTime = Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(UI.EMPTY_STRING);
+         suuntoAccessTokenExpiresIn = Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(UI.EMPTY_STRING);
+         suuntoRefreshToken = Preferences.getPerson_SuuntoRefreshToken_String(UI.EMPTY_STRING);
+         suuntoAccessToken = Preferences.getPerson_SuuntoAccessToken_String(UI.EMPTY_STRING);
+      }
+
+      //if active person has no tokens and all people has, take the tokens from all people
+
+      if (OAuth2Utils.isAccessTokenValid(
+            _prefStore.getLong(suuntoAccessTokenIssueDateTime) +
+                  _prefStore.getLong(suuntoAccessTokenExpiresIn) * 1000)) {
          return true;
       }
 
-      final SuuntoTokens newTokens = getTokens(UI.EMPTY_STRING, true, _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String()));
+      final SuuntoTokens newTokens = getTokens(UI.EMPTY_STRING, true, _prefStore.getString(suuntoRefreshToken));
 
       boolean isTokenValid = false;
       if (newTokens != null) {
 
-         _prefStore.setValue(Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String(), newTokens.getExpires_in());
-         _prefStore.setValue(Preferences.getSuuntoRefreshToken_Active_Person_String(), newTokens.getRefresh_token());
-         _prefStore.setValue(Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(), System.currentTimeMillis());
-         _prefStore.setValue(Preferences.getSuuntoAccessToken_Active_Person_String(), newTokens.getAccess_token());
+         _prefStore.setValue(suuntoAccessTokenExpiresIn, newTokens.getExpires_in());
+         _prefStore.setValue(suuntoRefreshToken, newTokens.getRefresh_token());
+         _prefStore.setValue(suuntoAccessTokenIssueDateTime, System.currentTimeMillis());
+         _prefStore.setValue(suuntoAccessToken, newTokens.getAccess_token());
          isTokenValid = true;
       }
 
       return isTokenValid;
+   }
+
+   public static boolean isReady_ActivePerson() {
+
+      return StringUtils.hasContent(getAccessToken_ActivePerson()) &&
+            StringUtils.hasContent(getRefreshToken_ActivePerson()) &&
+            StringUtils.hasContent(getDownloadFolder_ActivePerson());
+   }
+
+   public static boolean isReady_AllPeople() {
+
+      return StringUtils.hasContent(getAccessToken_AllPeople()) &&
+            StringUtils.hasContent(getRefreshToken_AllPeople()) &&
+            StringUtils.hasContent(getDownloadFolder_AllPeople());
    }
 
    @Override

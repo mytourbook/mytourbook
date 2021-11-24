@@ -13,29 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.oauth2;
+package cloud.oauth2;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class OAuth2Utils {
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 
-   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime,
-                                                         final long accessTokenExpiresIn) {
+import org.junit.jupiter.api.Test;
 
-      final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
+public class OAuth2UtilsTests {
 
-      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
-   }
+   @Test
+   public void testComputeAccessTokenExpirationDate() {
 
-   /**
-    * We consider that an access token is valid (non expired) if there are more
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   public static boolean isAccessTokenValid(final long tokenExpirationDate) {
+      assertEquals(
+            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 0),
+            "2000-11-22T23:26:27Z[UTC]");
 
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 > 0;
+      assertEquals(
+            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 300000),
+            "2000-11-22T23:31:27Z[UTC]");
+
+      assertEquals(OAuth2Utils.computeAccessTokenExpirationDate(0, 0), "");
    }
 }

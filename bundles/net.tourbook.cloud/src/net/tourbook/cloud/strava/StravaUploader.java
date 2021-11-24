@@ -215,54 +215,6 @@ public class StravaUploader extends TourbookCloudUploader {
       return gzipFile(absoluteTourFilePath);
    }
 
-   private void processTours(final List<TourData> selectedTours,
-                             final IProgressMonitor monitor,
-                             final Map<String, TourData> toursWithTimeSeries,
-                             final Map<TourData, String> manualTours) {
-
-      for (final TourData tourData : selectedTours) {
-
-         if (monitor.isCanceled()) {
-            return;
-         }
-
-         final String stravaActivityName = DialogExportTour.StravaActivityTypes[0];
-         if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
-
-            final TourType tourType = tourData.getTourType();
-
-            final List<String> stravaActivityNames = mapTourTypeToStravaActivity(tourType);
-
-            final boolean useActivityType = stravaActivityNames.size() == 1;
-
-            if (stravaActivityNames.size() > 1) {
-
-               TourLogManager.log_ERROR(NLS.bind(
-                     Messages.Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes,
-                     new Object[] {
-                           TourManager.getTourDateTimeShort(tourData),
-                           tourType.getName(),
-                           String.join(UI.COMMA_SPACE, stravaActivityNames) }));
-
-               continue;
-            }
-            _tourExporter.setUseActivityType(useActivityType);
-
-            if (useActivityType) {
-               _tourExporter.setActivityType(stravaActivityNames.get(0));
-            }
-         }
-
-         if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
-
-            processManualTour(monitor, tourData, stravaActivityName, manualTours);
-         } else {
-
-            createCompressedTcxTourFile(monitor, toursWithTimeSeries, tourData);
-         }
-      }
-   }
-
    private String getAccessToken() {
       return _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN);
    }
@@ -288,7 +240,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private boolean getValidTokens() {
 
-      if (!OAuth2Utils.isAccessTokenExpired(getAccessTokenExpirationDate())) {
+      if (OAuth2Utils.isAccessTokenValid(getAccessTokenExpirationDate())) {
          return true;
       }
 
@@ -403,6 +355,54 @@ public class StravaUploader extends TourbookCloudUploader {
 
          manualTours.put(tourData, stravaActivityName);
          monitor.worked(1);
+      }
+   }
+
+   private void processTours(final List<TourData> selectedTours,
+                             final IProgressMonitor monitor,
+                             final Map<String, TourData> toursWithTimeSeries,
+                             final Map<TourData, String> manualTours) {
+
+      for (final TourData tourData : selectedTours) {
+
+         if (monitor.isCanceled()) {
+            return;
+         }
+
+         final String stravaActivityName = DialogExportTour.StravaActivityTypes[0];
+         if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
+
+            final TourType tourType = tourData.getTourType();
+
+            final List<String> stravaActivityNames = mapTourTypeToStravaActivity(tourType);
+
+            final boolean useActivityType = stravaActivityNames.size() == 1;
+
+            if (stravaActivityNames.size() > 1) {
+
+               TourLogManager.log_ERROR(NLS.bind(
+                     Messages.Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes,
+                     new Object[] {
+                           TourManager.getTourDateTimeShort(tourData),
+                           tourType.getName(),
+                           String.join(UI.COMMA_SPACE, stravaActivityNames) }));
+
+               continue;
+            }
+            _tourExporter.setUseActivityType(useActivityType);
+
+            if (useActivityType) {
+               _tourExporter.setActivityType(stravaActivityNames.get(0));
+            }
+         }
+
+         if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
+
+            processManualTour(monitor, tourData, stravaActivityName, manualTours);
+         } else {
+
+            createCompressedTcxTourFile(monitor, toursWithTimeSeries, tourData);
+         }
       }
    }
 

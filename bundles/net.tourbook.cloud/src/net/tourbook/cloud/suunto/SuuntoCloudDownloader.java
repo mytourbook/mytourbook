@@ -73,6 +73,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private int[]                   _numberOfAvailableTours;
 
+   private boolean                 _useActivePerson;
+   private boolean                 _useAllPeople;
+
    public SuuntoCloudDownloader() {
 
       super("SUUNTO", //$NON-NLS-1$
@@ -119,7 +122,14 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    @Override
    public void downloadTours() {
 
-      if (!isReady()) {
+      _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
+
+      _useAllPeople = false;
+      if (!_useActivePerson) {
+         _useAllPeople = SuuntoTokensRetrievalHandler.isReady_AllPeople();
+      }
+
+      if (!_useActivePerson && !_useAllPeople) {
 
          final int returnResult = PreferencesUtil.createPreferenceDialogOn(
                Display.getCurrent().getActiveShell(),
@@ -144,7 +154,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
-            if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
+            if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
                TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
                return;
             }
@@ -194,7 +204,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.worked(1);
          }
-
       };
 
       try {
@@ -222,21 +231,41 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    }
 
    private String getAccessToken() {
-      return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
+
+      if (_useActivePerson) {
+         return SuuntoTokensRetrievalHandler.getAccessToken_ActivePerson();
+      } else if (_useAllPeople) {
+         return SuuntoTokensRetrievalHandler.getAccessToken_AllPeople();
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    private String getDownloadFolder() {
-      return _prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String());
+
+      if (_useActivePerson) {
+         return SuuntoTokensRetrievalHandler.getDownloadFolder_ActivePerson();
+      } else if (_useAllPeople) {
+         return SuuntoTokensRetrievalHandler.getDownloadFolder_AllPeople();
+      }
+
+      return UI.EMPTY_STRING;
    }
 
-   private String getRefreshToken() {
-      return _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String());
+   private long getSuuntoWorkoutFilterSinceDate() {
+
+      if (_useActivePerson) {
+         return _prefStore.getLong(Preferences.getSuuntoWorkoutFilterSinceDate_Active_Person_String());
+      } else if (_useAllPeople) {
+         return _prefStore.getLong(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(UI.EMPTY_STRING));
+      }
+
+      return 0;
    }
 
    @Override
    protected boolean isReady() {
-      return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken()) &&
-            StringUtils.hasContent(getDownloadFolder());
+      return false;
    }
 
    private boolean logDownloadResult(final WorkoutDownload workoutDownload) {
@@ -281,7 +310,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private Workouts retrieveWorkoutsList() {
 
-      final var sinceDateFilter = _prefStore.getLong(Preferences.getSuuntoWorkoutFilterSinceDate_Active_Person_String());
+      final var sinceDateFilter = getSuuntoWorkoutFilterSinceDate();
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=" + sinceDateFilter))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
@@ -330,8 +359,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          fileName = contentDisposition.get().replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
-      final Path filePath = Paths.get(_prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String()),
-            StringUtils.sanitizeFileName(fileName));
+      final Path filePath = Paths.get(getDownloadFolder(), StringUtils.sanitizeFileName(fileName));
       workoutDownload.setAbsoluteFilePath(filePath.toAbsolutePath().toString());
 
       if (filePath.toFile().exists()) {

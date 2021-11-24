@@ -492,6 +492,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _markerViewer.setSelection(new StructuredSelection(_initialTourMarker), true);
       }
 
+      //todo fb ici, bug inlinux?
       _comboMarkerName.setFocus();
 
       enableControls();
@@ -747,12 +748,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
          // Combo
          _comboMarkerName = new Combo(parent, SWT.BORDER | SWT.FLAT);
-         _comboMarkerName.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(final KeyEvent e) {
-               onChangeMarkerUI();
-            }
-         });
+         _comboMarkerName.addModifyListener(_defaultModifyListener);
          GridDataFactory.fillDefaults()
                .grab(true, false)
 
