@@ -51,8 +51,6 @@ Bugfix
 
 * 
 
-* Tour Marker Editor (Frederic)
-  - When double clicking on a marker label combo entry, the tour marker name was not updated
 
 
 Translation    
