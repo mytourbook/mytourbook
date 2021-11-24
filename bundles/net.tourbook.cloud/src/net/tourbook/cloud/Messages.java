@@ -31,6 +31,7 @@ public class Messages extends NLS {
    public static String        PrefPage_CloudConnectivity_Group_TourUpload;
    public static String        PrefPage_CloudConnectivity_Label_AccessToken;
    public static String        PrefPage_CloudConnectivity_Label_Cleanup;
+   public static String        PrefPage_CloudConnectivity_Label_Cleanup_Tooltip;
    public static String        PrefPage_CloudConnectivity_Label_ExpiresAt;
    public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
    public static String        PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;

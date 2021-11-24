@@ -58,7 +58,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private static final String PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_CLEANUP      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_Cleanup;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REVOKEACCESS = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RevokeAccess;
@@ -162,7 +161,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
           * Clean-up button
           */
          _btnCleanup = new Button(container, SWT.NONE);
-         _btnCleanup.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_CLEANUP);
+         _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
+         _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
          _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
       }
