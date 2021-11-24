@@ -493,6 +493,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
 
       //todo fb ici, bug inlinux?
+      _groupText.setFocus();
       _comboMarkerName.setFocus();
 
       enableControls();
