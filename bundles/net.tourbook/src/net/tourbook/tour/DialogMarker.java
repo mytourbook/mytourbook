@@ -493,8 +493,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
 
       //todo fb ici, bug inlinux?
-      _groupText.setFocus();
-      _comboMarkerName.setFocus();
+      //are there any other places in MT that use setFocus() and for which it works on linux ?
+      // _groupText.setFocus();
+      // does it return false ? They both return false on Windows
+      var toto = _innerFixedPart.setFocus();
+      toto = _comboMarkerName.setFocus();
 
       enableControls();
 
@@ -681,7 +684,12 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          }
       });
 
-      _markerViewer.addDoubleClickListener(doubleClickEvent -> _comboMarkerName.setFocus());
+      _markerViewer.addDoubleClickListener(doubleClickEvent ->
+      {
+
+         final var toto =  _comboMarkerName.setFocus();
+         System.out.print(toto);
+      });
 
       return layoutContainer;
    }
