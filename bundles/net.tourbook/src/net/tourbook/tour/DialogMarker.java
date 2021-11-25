@@ -453,7 +453,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    @Override
    public void create() {
       super.create();
-      final var toto = _comboMarkerName.forceFocus();
+      final var toto = _comboMarkerName.setFocus();
    }
 
    @Override
@@ -464,6 +464,15 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       final String okText = net.tourbook.ui.UI.convertOKtoSaveUpdateButton(_tourData);
 
       getButton(IDialogConstants.OK_ID).setText(okText);
+   }
+
+   @Override
+   protected Control createContents(final Composite parent) {
+
+      final Control contents = super.createContents(parent);
+
+      final var toto = _comboMarkerName.forceFocus();
+      return contents;
    }
 
    @Override
@@ -652,7 +661,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
-      
+
       table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
          if (keyEvent.character == ' ') {
