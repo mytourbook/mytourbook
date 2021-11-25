@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.net.URI;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -70,14 +73,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
@@ -453,6 +451,12 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    }
 
    @Override
+   public void create() {
+      super.create();
+      final var toto = _comboMarkerName.forceFocus();
+   }
+
+   @Override
    protected final void createButtonsForButtonBar(final Composite parent) {
 
       super.createButtonsForButtonBar(parent);
@@ -498,8 +502,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       // does it return false ? They both return false on Windowsvar
 
       //try forceFocus()??
-      var toto = _innerFixedPart.setFocus();
-      toto = _comboMarkerName.setFocus();
+      //  var toto = _innerFixedPart.setFocus();
+      final var toto = _comboMarkerName.forceFocus();
 
       enableControls();
 
@@ -648,16 +652,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
+      
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
-      table.addKeyListener(new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
-
-            if (e.character == ' ') {
-               toggleMarkerVisibility();
-            }
+         if (keyEvent.character == ' ') {
+            toggleMarkerVisibility();
          }
-      });
+      }));
 
       _markerViewer = new TableViewer(table);
 
@@ -686,10 +687,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          }
       });
 
-      _markerViewer.addDoubleClickListener(doubleClickEvent ->
-      {
+      _markerViewer.addDoubleClickListener(doubleClickEvent -> {
 
-         final var toto =  _comboMarkerName.setFocus();
+         final var toto = _comboMarkerName.setFocus();
          System.out.print(toto);
       });
 
@@ -884,16 +884,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    private void createUI_60_Url(final Composite parent) {
 
-      final FocusAdapter focusAdapterSelectAllText = new FocusAdapter() {
-         @Override
-         public void focusGained(final FocusEvent e) {
+      final FocusListener focusListenerSelectAllText = FocusListener.focusGainedAdapter(focusEvent -> {
 
-            /*
-             * !!! This feature is not working for all cases !!!
-             */
-            ((Text) e.widget).selectAll();
-         }
-      };
+         /*
+          * !!! This feature is not working for all cases !!!
+          */
+         ((Text) focusEvent.widget).selectAll();
+      });
 
       /*
        * Link Text
@@ -910,7 +907,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          // text
          _txtUrlText = new Text(parent, SWT.BORDER);
          _txtUrlText.addModifyListener(_defaultModifyListener);
-         _txtUrlText.addFocusListener(focusAdapterSelectAllText);
+         _txtUrlText.addFocusListener(focusListenerSelectAllText);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_txtUrlText);
@@ -919,12 +916,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnPasteText = new Button(parent, SWT.NONE);
          _btnPasteText.setImage(_imagePaste);
          _btnPasteText.setToolTipText(Messages.Dlg_TourMarker_Button_PasteFromClipboard_Tooltip);
-         _btnPasteText.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionPastText(_txtUrlText);
-            }
-         });
+         _btnPasteText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionPastText(_txtUrlText)));
       }
 
       /*
@@ -941,7 +933,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
          // text
          _txtUrlAddress = new Text(parent, SWT.BORDER);
-         _txtUrlAddress.addFocusListener(focusAdapterSelectAllText);
+         _txtUrlAddress.addFocusListener(focusListenerSelectAllText);
          _txtUrlAddress.addModifyListener(_defaultModifyListener);
          GridDataFactory.fillDefaults()
                .grab(true, true)
@@ -951,12 +943,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnPasteUrl = new Button(parent, SWT.NONE);
          _btnPasteUrl.setImage(_imagePaste);
          _btnPasteUrl.setToolTipText(Messages.Dlg_TourMarker_Button_PasteFromClipboard_Tooltip);
-         _btnPasteUrl.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionPastText(_txtUrlAddress);
-            }
-         });
+         _btnPasteUrl.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionPastText(_txtUrlText)));
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_btnPasteUrl);
@@ -972,12 +959,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _chkVisibility = new Button(parent, SWT.CHECK);
          _chkVisibility.setText(Messages.Dlg_TourMarker_Checkbox_MarkerVisibility);
          _chkVisibility.setToolTipText(TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP);
-         _chkVisibility.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               toggleMarkerVisibility();
-            }
-         });
+         _chkVisibility.addSelectionListener(widgetSelectedAdapter(selectionEvent -> toggleMarkerVisibility()));
          GridDataFactory.fillDefaults()
 //					.span(2, 1)
 //					.align(SWT.END, SWT.FILL)
@@ -1036,12 +1018,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnDelete = new Button(container, SWT.NONE);
          _btnDelete.setText(Messages.Dlg_TourMarker_Button_delete);
          _btnDelete.setToolTipText(Messages.Dlg_TourMarker_Button_delete_tooltip);
-         _btnDelete.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionDeleteMarker();
-            }
-         });
+         _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionDeleteMarker()));
          setButtonLayoutData(_btnDelete);
 
          /*
@@ -1051,14 +1028,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnUndo.getLayoutData();
          _btnUndo.setText(Messages.Dlg_TourMarker_Button_undo);
          _btnUndo.setToolTipText(Messages.Dlg_TourMarker_Button_undo_tooltip);
-         _btnUndo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               _selectedTourMarker.restoreMarkerFromBackup(_backupMarker);
-               updateUI_FromModel();
-               onChangeMarkerUI();
-            }
-         });
+         _btnUndo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _selectedTourMarker.restoreMarkerFromBackup(_backupMarker);
+            updateUI_FromModel();
+            onChangeMarkerUI();
+         }));
          setButtonLayoutData(_btnUndo);
 
          /*
@@ -1068,12 +1042,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnShowAll.getLayoutData();
          _btnShowAll.setText(Messages.Dlg_TourMarker_Button_ShowAllMarker);
          _btnShowAll.setToolTipText(Messages.Dlg_TourMarker_Button_ShowAllMarker_Tooltip);
-         _btnShowAll.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionShowHideAll(true);
-            }
-         });
+         _btnShowAll.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionShowHideAll(true)));
          setButtonLayoutData(_btnShowAll);
 
          /*
@@ -1083,12 +1052,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnHideAll.getLayoutData();
          _btnHideAll.setText(Messages.Dlg_TourMarker_Button_HideAllMarker);
          _btnHideAll.setToolTipText(Messages.Dlg_TourMarker_Button_HideAllMarker_Tooltip);
-         _btnHideAll.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionShowHideAll(false);
-            }
-         });
+         _btnHideAll.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionShowHideAll(false)));
          setButtonLayoutData(_btnHideAll);
       }
    }
