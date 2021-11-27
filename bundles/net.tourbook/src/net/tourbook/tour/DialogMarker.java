@@ -491,12 +491,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _markerViewer.setSelection(new StructuredSelection(_initialTourMarker), true);
       }
 
-      //TODO Bug in linux: The setFocus doesn't work
-      _comboMarkerName.setFocus();
-
       enableControls();
 
       _isInCreateUI = false;
+
+      Display.getCurrent().asyncExec(() -> _comboMarkerName.setFocus());
 
       return dlgContainer;
    }
