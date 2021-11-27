@@ -675,11 +675,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          }
       });
 
-      _markerViewer.addDoubleClickListener(doubleClickEvent -> {
-
-         final var toto = _comboMarkerName.setFocus();
-         System.out.print(toto);
-      });
+      _markerViewer.addDoubleClickListener(doubleClickEvent -> _comboMarkerName.setFocus());
 
       return layoutContainer;
    }
@@ -689,7 +685,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       /*
        * container: marker details
        */
-      final Composite container = new Composite(parent, SWT.BORDER);
+      final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(container);
