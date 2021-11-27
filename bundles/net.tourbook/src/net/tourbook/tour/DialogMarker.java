@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.FocusListener.focusGainedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
@@ -491,7 +492,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
 
       //TODO Bug in linux: The setFocus doesn't work
-      _comboMarkerName.forceFocus();
+      _comboMarkerName.setFocus();
 
       enableControls();
 
@@ -868,7 +869,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    private void createUI_60_Url(final Composite parent) {
 
-      final FocusListener focusListenerSelectAllText = FocusListener.focusGainedAdapter(focusEvent -> {
+      final FocusListener focusListenerSelectAllText = focusGainedAdapter(focusEvent -> {
 
          /*
           * !!! This feature is not working for all cases !!!
