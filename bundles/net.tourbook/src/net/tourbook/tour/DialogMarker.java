@@ -450,10 +450,14 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       shell.addDisposeListener(disposeEvent -> dispose());
    }
 
+
    @Override
-   public void create() {
-      super.create();
-      final var toto = _comboMarkerName.setFocus();
+   protected Control createButtonBar(final Composite parent) {
+
+      final Control containerButtonBar = super.createButtonBar(parent);
+      _groupText.forceFocus();
+
+      return containerButtonBar;
    }
 
    @Override
@@ -464,15 +468,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       final String okText = net.tourbook.ui.UI.convertOKtoSaveUpdateButton(_tourData);
 
       getButton(IDialogConstants.OK_ID).setText(okText);
-   }
-
-   @Override
-   protected Control createContents(final Composite parent) {
-
-      final Control contents = super.createContents(parent);
-
-      final var toto = _comboMarkerName.forceFocus();
-      return contents;
    }
 
    @Override
@@ -505,14 +500,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _markerViewer.setSelection(new StructuredSelection(_initialTourMarker), true);
       }
 
-      //todo fb ici, bug inlinux?
-      //are there any other places in MT that use setFocus() and for which it works on linux ?
-      // _groupText.setFocus();
-      // does it return false ? They both return false on Windowsvar
-
-      //try forceFocus()??
-      //  var toto = _innerFixedPart.setFocus();
-      final var toto = _comboMarkerName.forceFocus();
+      //TODO Bug in linux: The setFocus doesn't work
+      _comboMarkerName.forceFocus();
 
       enableControls();
 
@@ -710,7 +699,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       /*
        * container: marker details
        */
-      final Composite container = new Composite(parent, SWT.NONE);
+      final Composite container = new Composite(parent, SWT.BORDER);
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(container);
