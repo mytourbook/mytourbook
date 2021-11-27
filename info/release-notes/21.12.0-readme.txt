@@ -51,6 +51,7 @@ Bugfix
   When moving a slider with the keyboard or mouse wheel, it did not move the selected time slice in the tour editor
 
 * Tour Marker Editor (Frederic)
+  - When opening the dialog, the focus was not set in the label (Linux only)
   - When double clicking on a marker label combo entry, the tour marker name was not updated
  
 * Tour Segmenter
@@ -71,4 +72,4 @@ System
 ======
 
 * Eclipse 2021-06
-* FIT SDK 21.60
+* FIT SDK 21.67
