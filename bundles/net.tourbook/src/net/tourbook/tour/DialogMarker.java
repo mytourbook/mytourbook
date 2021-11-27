@@ -450,16 +450,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       shell.addDisposeListener(disposeEvent -> dispose());
    }
 
-
-   @Override
-   protected Control createButtonBar(final Composite parent) {
-
-      final Control containerButtonBar = super.createButtonBar(parent);
-      _groupText.forceFocus();
-
-      return containerButtonBar;
-   }
-
    @Override
    protected final void createButtonsForButtonBar(final Composite parent) {
 
