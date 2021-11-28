@@ -257,7 +257,9 @@ public class SensorView extends ViewPart implements ITourViewer {
             final DeviceSensorType sensorType2 = item2.sensor.getSensorType();
 
             if (sensorType1 != null && sensorType2 != null) {
-               rc = sensorType1.compareTo(sensorType2);
+               final String sensorTypeName1 = SensorManager.getSensorTypeName(sensorType1);
+               final String sensorTypeName2 = SensorManager.getSensorTypeName(sensorType2);
+               rc = sensorTypeName1.compareToIgnoreCase(sensorTypeName2);
             }
 
             break;
