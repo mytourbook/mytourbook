@@ -162,8 +162,6 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
                _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-               _batteryDataProvider.setSelectedTourId(_selectedTourId);
-
                // don't fire an event when preferences are updated
                if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
                   return;
@@ -189,8 +187,6 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
                _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
-
-               _batteryDataProvider.setSelectedTourId(_selectedTourId);
 
                ActionEditQuick.doAction(StatisticBattery.this);
             }
@@ -288,7 +284,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
 
    @Override
    protected String getGridPrefPrefix() {
-      return GRID_TOUR_TIME;
+      return GRID_BATTERY;
    }
 
    @Override
@@ -443,19 +439,15 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       // set the bar low/high data
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            Util.convertShortToFloat(_batteryData.allBatteryPercentage_End), //
-            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start) //
-      );
-//      final ChartDataYSerie yData = new ChartDataYSerie(
-//            ChartType.LINE,
-//            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start),
-//            true //
-//      );
+            Util.convertShortToFloat(_batteryData.allBatteryPercentage_End),
+            Util.convertShortToFloat(_batteryData.allBatteryPercentage_Start));
+
       yData.setYTitle(Messages.LABEL_GRAPH_BATTERY);
       yData.setUnitLabel(UI.SYMBOL_PERCENTAGE);
       yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
 
+      // setup colors
       yData.setColorIndex(new int[][] { _batteryData.allTypeColorIndices });
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 
@@ -492,27 +484,36 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       _currentYear = statContext.statSelectedYear;
       _numberOfYears = statContext.statNumberOfYears;
 
-      /*
-       * get currently selected tour id
-       */
+      final Long statTourId = statContext.statTourId;
       long selectedTourId = -1;
-      final ISelection selection = _chart.getSelection();
-      if (selection instanceof SelectionBarChart) {
-         final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-         if (barChartSelection.serieIndex != -1 && _batteryData != null) {
+      if (statTourId == null) {
 
-            int selectedValueIndex = barChartSelection.valueIndex;
-            final long[] tourIds = _batteryData.allTourIds;
+         /*
+          * Get currently selected tour id
+          */
+         final ISelection selection = _chart.getSelection();
+         if (selection instanceof SelectionBarChart) {
+            final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-            if (tourIds.length > 0) {
-               if (selectedValueIndex >= tourIds.length) {
-                  selectedValueIndex = tourIds.length - 1;
+            if (barChartSelection.serieIndex != -1 && _batteryData != null) {
+
+               int selectedValueIndex = barChartSelection.valueIndex;
+               final long[] tourIds = _batteryData.allTourIds;
+
+               if (tourIds.length > 0) {
+                  if (selectedValueIndex >= tourIds.length) {
+                     selectedValueIndex = tourIds.length - 1;
+                  }
+
+                  selectedTourId = tourIds[selectedValueIndex];
                }
-
-               selectedTourId = tourIds[selectedValueIndex];
             }
          }
+
+      } else {
+
+         selectedTourId = statTourId;
       }
 
       _batteryData = _batteryDataProvider.getTourTimeData(

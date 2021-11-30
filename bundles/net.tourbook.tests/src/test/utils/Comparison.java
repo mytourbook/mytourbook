@@ -15,6 +15,9 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -26,7 +29,6 @@ import java.util.Map;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.data.TourData;
 
-import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -76,7 +78,7 @@ public class Comparison {
          writeErroneousFiles(controlFileName + "-GeneratedFromTests" + JSON, testJson); //$NON-NLS-1$
       }
 
-      Assertions.assertTrue(result.passed(), result.getMessage());
+      assertTrue(result.passed(), result.getMessage());
    }
 
    public static void compareXmlAgainstControl(final String controlTourFilePath,
@@ -106,7 +108,7 @@ public class Comparison {
          writeErroneousFiles(controlTourFilePath, testTour);
       }
 
-      Assertions.assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
+      assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
    }
 
    public static String readFileContent(final String controlDocumentFileName) {

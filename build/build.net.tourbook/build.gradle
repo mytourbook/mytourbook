@@ -48,12 +48,14 @@ mt_0_Build.dependsOn(
 
 sonarqube {
   properties {
-    property "sonar.projectKey",       "wolfgang-ch_mytourbook"
-    property "sonar.organization",     "wolfgang-ch"
-    property "sonar.host.url",         "https://sonarcloud.io"
-    property "sonar.sources",          "bundles"
-    property "sonar.exclusions",       "bundles/net.tourbook.chart/src/net/tourbook/chart/ChartComponentGraph.java,bundles/net.tourbook.ext.jars/**/*"
-    property "sonar.java.binaries",    "."
+    property 'sonar.projectKey',                     'wolfgang-ch_mytourbook'
+    property 'sonar.organization',                   'wolfgang-ch'
+    property 'sonar.host.url',                       'https://sonarcloud.io'
+    property 'sonar.sources',                        'bundles'
+    property 'sonar.exclusions',                     'bundles/net.tourbook.ext.jars/**/*'
+    property 'sonar.coverage.exclusions',            'bundles/net.tourbook.tests/**/*.*, **src-test/**/*.*'
+    property 'sonar.java.binaries',                  '.'
+    property 'sonar.java.libraries',                 'bundles/net.tourbook.ext.jars/**/*.jar'
     property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml'
   }
 }

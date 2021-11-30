@@ -362,13 +362,15 @@ public class Util {
          return null;
       }
 
-      if (intValues.length == 0) {
+      final int numValues = intValues.length;
+
+      if (numValues == 0) {
          return new double[0];
       }
 
-      final double[] doubleValues = new double[intValues.length];
+      final double[] doubleValues = new double[numValues];
 
-      for (int valueIndex = 0; valueIndex < intValues.length; valueIndex++) {
+      for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
          doubleValues[valueIndex] = intValues[valueIndex];
       }
 
@@ -2519,11 +2521,11 @@ public class Util {
    }
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-                                                       final String key,
+                                                       final String stateKey,
                                                        final Enum<E> value) {
 
       if (value != null) {
-         state.put(key, value.name());
+         state.put(stateKey, value.name());
       }
    }
 

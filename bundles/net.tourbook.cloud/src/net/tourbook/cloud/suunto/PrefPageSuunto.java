@@ -65,18 +65,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   //SET_FORMATTING_OFF
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE                         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURDOWNLOAD                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_TourDownload;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN                        = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT                          = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT         = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT_TOOLTIP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN                       = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE                            = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
-   //SET_FORMATTING_ON
-
    private static final String     APP_BTN_BROWSE                   = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE = net.tourbook.Messages.dialog_export_dir_dialog_message;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_TEXT    = net.tourbook.Messages.dialog_export_dir_dialog_text;
@@ -97,6 +85,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
+   private Button   _btnCleanup;
+   private Button   _btnSelectFolder;
+   private Button   _chkUseDateFilter;
+   private Combo    _comboDownloadFolderPath;
+   private Combo    _comboPeopleList;
+   private DateTime _dtFilterSince;
    private Group    _groupCloudAccount;
    private Label    _labelAccessToken;
    private Label    _labelAccessToken_Value;
@@ -105,14 +99,11 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    private Label    _labelRefreshToken;
    private Label    _labelRefreshToken_Value;
    private Label    _labelDownloadFolder;
-   private Combo    _comboDownloadFolderPath;
-   private Button   _btnSelectFolder;
-   private Button   _chkUseDateFilter;
-   private DateTime _dtFilterSince;
-   private Combo    _comboPeopleList;
 
    @Override
    protected void createFieldEditors() {
+
+      initUI();
 
       createUI();
 
@@ -158,6 +149,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
       createUI_30_TourDownload(parent);
+      createUI_100_AccountCleanup(parent);
 
       return parent;
    }
@@ -169,8 +161,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
       {
          final Label labelPerson = new Label(container, SWT.NONE);
-         labelPerson.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT);
-         labelPerson.setToolTipText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_PERSONLINKEDTOCLOUDACCOUNT_TOOLTIP);
+         labelPerson.setText(Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount);
+         labelPerson.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_PersonLinkedToCloudAccount_Tooltip);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(labelPerson);
 
          /*
@@ -185,9 +177,26 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
           */
          final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
          setButtonLayoutData(btnAuthorizeConnection);
-         btnAuthorizeConnection.setText(PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE);
+         btnAuthorizeConnection.setText(Messages.PrefPage_CloudConnectivity_Button_Authorize);
          btnAuthorizeConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(btnAuthorizeConnection);
+      }
+   }
+
+   private void createUI_100_AccountCleanup(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         /*
+          * Clean-up button
+          */
+         _btnCleanup = new Button(container, SWT.NONE);
+         _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
+         _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+         _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
       }
    }
 
@@ -197,12 +206,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       _groupCloudAccount = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupCloudAccount);
-      _groupCloudAccount.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT);
+      _groupCloudAccount.setText(Messages.PrefPage_CloudConnectivity_Group_CloudAccount);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupCloudAccount);
       {
          {
             final Label labelWebPage = new Label(_groupCloudAccount, SWT.NONE);
-            labelWebPage.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE);
+            labelWebPage.setText(Messages.PrefPage_CloudConnectivity_Label_WebPage);
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_groupCloudAccount, SWT.NONE);
@@ -214,7 +223,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelAccessToken = new Label(_groupCloudAccount, SWT.NONE);
-            _labelAccessToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN);
+            _labelAccessToken.setText(Messages.PrefPage_CloudConnectivity_Label_AccessToken);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
             _labelAccessToken_Value = new Label(_groupCloudAccount, SWT.WRAP);
@@ -222,7 +231,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelRefreshToken = new Label(_groupCloudAccount, SWT.NONE);
-            _labelRefreshToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN);
+            _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_groupCloudAccount, SWT.WRAP);
@@ -230,7 +239,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelExpiresAt = new Label(_groupCloudAccount, SWT.NONE);
-            _labelExpiresAt.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT);
+            _labelExpiresAt.setText(Messages.PrefPage_CloudConnectivity_Label_ExpiresAt);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
             _labelExpiresAt_Value = new Label(_groupCloudAccount, SWT.NONE);
@@ -243,7 +252,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_TOURDOWNLOAD);
+      group.setText(Messages.PrefPage_CloudConnectivity_Group_TourDownload);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
          {
@@ -298,6 +307,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _btnSelectFolder.setEnabled(isAuthorized);
       _chkUseDateFilter.setEnabled(isAuthorized);
       _dtFilterSince.setEnabled(isAuthorized && _chkUseDateFilter.getSelection());
+      _btnCleanup.setEnabled(isAuthorized);
    }
 
    private long getFilterSinceDate() {
@@ -328,6 +338,11 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    @Override
    public void init(final IWorkbench workbench) {}
+
+   private void initUI() {
+
+      noDefaultAndApplyButton();
+   }
 
    @Override
    public boolean okToLeave() {

@@ -85,10 +85,12 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
    @Override
    public void onMesg(final EventMesg mesg) {
 
+      /*
+       * Time data
+       */
       final Event event = mesg.getEvent();
       final EventType eventType = mesg.getEventType();
-      final long javaTime = FitUtils.convertGarminTimeToJavaTime(
-            mesg.getTimestamp().getTimestamp());
+      final long javaTime = FitUtils.convertGarminTimeToJavaTime(mesg.getTimestamp().getTimestamp());
 
       if (event != null && event == Event.TIMER && eventType != null) {
 
@@ -113,18 +115,21 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          }
       }
 
+      /*
+       * Gear data
+       */
       final Long gearChangeData = mesg.getGearChangeData();
 
       // check if gear data are available, it can be null
-      if (gearChangeData == null) {
-         return;
+      if (gearChangeData != null) {
+
+         // create gear data for the current time
+         final GearData gearData = new GearData();
+
+         gearData.absoluteTime = javaTime;
+         gearData.gears = gearChangeData;
+
+         _gearData.add(gearData);
       }
-
-      // create gear data for the current time
-      final GearData gearData = new GearData();
-      gearData.absoluteTime = javaTime;
-      gearData.gears = gearChangeData;
-
-      _gearData.add(gearData);
    }
 }

@@ -118,6 +118,8 @@ public class Images {
    public static final String Graph_Overlapped                           = "graph-overlapped.png";                                //$NON-NLS-1$
    public static final String Graph_Pace                                 = "graph-pace.png";                                      //$NON-NLS-1$
    public static final String Graph_Pace_Disabled                        = "graph-pace-disabled.png";                             //$NON-NLS-1$
+   public static final String Graph_Pace_Summarized                      = "graph-pace-summarized.png";                           //$NON-NLS-1$
+   public static final String Graph_Pace_Summarized_Disabled             = "graph-pace-summarized-disabled.png";                  //$NON-NLS-1$
    public static final String Graph_Power                                = "graph-power.png";                                     //$NON-NLS-1$
    public static final String Graph_Power_Disabled                       = "graph-power-disabled.png";                            //$NON-NLS-1$
    public static final String Graph_RunDyn_StanceTime                    = "graph-run-dyn-stance-time.png";                       //$NON-NLS-1$
@@ -132,6 +134,8 @@ public class Images {
    public static final String Graph_RunDyn_VerticalRatio_Disabled        = "graph-run-dyn-vertical-ratio-disabled.png";           //$NON-NLS-1$
    public static final String Graph_Speed                                = "graph-speed.png";                                     //$NON-NLS-1$
    public static final String Graph_Speed_Disabled                       = "graph-speed-disabled.png";                            //$NON-NLS-1$
+   public static final String Graph_Speed_Summarized                     = "graph-speed-summarized.png";                          //$NON-NLS-1$
+   public static final String Graph_Speed_Summarized_Disabled            = "graph-speed-summarized-disabled.png";                 //$NON-NLS-1$
    public static final String Graph_Swim_Strokes                         = "graph-swim-strokes.png";                              //$NON-NLS-1$
    public static final String Graph_Swim_Strokes_Disabled                = "graph-swim-strokes-disabled.png";                     //$NON-NLS-1$
    public static final String Graph_Swim_Swolf                           = "graph-swim-swolf.png";                                //$NON-NLS-1$
@@ -218,6 +222,10 @@ public class Images {
    public static final String SearchTours                                = "search.png";                                          //$NON-NLS-1$
    public static final String SearchTours_ByLocation                     = "map-search-tour-by-location.png";                     //$NON-NLS-1$
    public static final String SearchTours_ByLocation_Scroll              = "map-search-tour-by-location-scroll.png";              //$NON-NLS-1$
+   public static final String Sensor                                     = "sensor.png";                                          //$NON-NLS-1$
+   public static final String Sensor_Disabled                            = "sensor-disabled.png";                                 //$NON-NLS-1$
+   public static final String SensorChart                                = "sensor-chart.png";                                    //$NON-NLS-1$
+   public static final String SensorChart_Disabled                       = "sensor-chart-disabled.png";                           //$NON-NLS-1$
    public static final String SetFavoritePosition                        = "map-set-favorite-position.png";                       //$NON-NLS-1$
    public static final String ShowFavoritePosition                       = "map-show-favorite-position.png";                      //$NON-NLS-1$
    public static final String ShowAllPhotos_InMap                        = "photo-show-all-photos.png";                           //$NON-NLS-1$

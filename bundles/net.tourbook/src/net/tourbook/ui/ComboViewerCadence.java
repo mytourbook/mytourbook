@@ -13,12 +13,14 @@ import org.eclipse.swt.widgets.Composite;
 public class ComboViewerCadence extends ComboViewer {
 
    public ComboViewerCadence(final Composite container) {
+
       super(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 
       init();
    }
 
    public ComboViewerCadence(final Composite container, final int i) {
+
       super(container, i);
 
       init();
@@ -30,10 +32,12 @@ public class ComboViewerCadence extends ComboViewer {
    }
 
    public CadenceMultiplier getSelectedCadence() {
+
       return (CadenceMultiplier) getStructuredSelection().getFirstElement();
    }
 
    private void init() {
+
       setContentProvider(ArrayContentProvider.getInstance());
 
       setLabelProvider(new LabelProvider() {
@@ -46,7 +50,10 @@ public class ComboViewerCadence extends ComboViewer {
          }
       });
 
-      final CadenceMultiplier[] cadences = new CadenceMultiplier[] { CadenceMultiplier.NONE, CadenceMultiplier.RPM, CadenceMultiplier.SPM };
+      final CadenceMultiplier[] cadences = new CadenceMultiplier[] {
+            CadenceMultiplier.NONE,
+            CadenceMultiplier.RPM,
+            CadenceMultiplier.SPM };
 
       setInput(cadences);
    }

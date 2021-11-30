@@ -89,14 +89,13 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 
    public SlideoutTourMarkerFilter(final Control ownerControl,
                                    final ToolBar toolBar,
-                                   final IDialogSettings state,
                                    final TourMarkerAllView tourMarkerAllView) {
 
       super(ownerControl);
 
       _tourMarkerAllView = tourMarkerAllView;
 
-      addListener(ownerControl, toolBar);
+      addListener(toolBar);
 
       setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
       setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
@@ -106,7 +105,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
       setFadeOutDelaySteps(1);
    }
 
-   private void addListener(final Control ownerControl, final ToolBar toolBar) {
+   private void addListener(final ToolBar toolBar) {
 
       toolBar.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> {
 
@@ -143,7 +142,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 
    private Composite createUI(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       _shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
@@ -235,9 +234,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
                UI.adjustSpinnerValueOnMouseScroll(event);
                onSelect_GeoFilter();
             });
-            _spinnerGeoFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               onSelect_GeoFilter();
-            }));
+            _spinnerGeoFilter.addSelectionListener(
+                  widgetSelectedAdapter(selectionEvent -> onSelect_GeoFilter()));
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(_spinnerGeoFilter);
@@ -254,10 +252,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 
    private void createUI_30_LatLonDigits(final Composite parent) {
 
-      final SelectionListener _selectionListener_LatLonDigits = widgetSelectedAdapter(selectionEvent -> {
-
-         onSelect_LatLonDigits();
-      });
+      final SelectionListener _selectionListener_LatLonDigits =
+            widgetSelectedAdapter(selectionEvent -> onSelect_LatLonDigits());
 
       /*
        * Lat/lon digits
@@ -323,7 +319,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
       return new Point(devX, devY);
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {//final Composite parent) {
 
 //      _pc = new PixelConverter(parent);
    }

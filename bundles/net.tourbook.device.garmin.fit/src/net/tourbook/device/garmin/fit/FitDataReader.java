@@ -28,6 +28,7 @@ import com.garmin.fit.MesgNum;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -95,6 +96,30 @@ public class FitDataReader extends TourbookDevice {
       return null;
    }
 
+   private String getMessageName(final Mesg mesg, final int mesgNum) {
+
+      String messageName = MesgNum.getStringFromValue(mesgNum);
+
+      if (messageName.length() == 0) {
+
+         switch (mesgNum) {
+         case 104:
+            messageName = "Device Battery (not documented)"; //$NON-NLS-1$
+            break;
+
+         case 147:
+            messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
+            break;
+
+         default:
+            messageName = mesg.getName();
+            break;
+         }
+      }
+
+      return messageName;
+   }
+
    @Override
    public SerialParameters getPortParameters(final String portName) {
       return null;
@@ -110,6 +135,220 @@ public class FitDataReader extends TourbookDevice {
       return 0;
    }
 
+   @SuppressWarnings("unused")
+   private boolean isEventHidden(final Collection<Field> allMessageFields) {
+
+      boolean isEventHidden = false;
+
+      for (final Field field : allMessageFields) {
+
+         final int fieldNum = field.getNum();
+         final Object fieldValue = field.getValue();
+
+         short eventField = -1;
+
+         if (fieldNum == 0) {
+
+            // event field
+
+            if (fieldValue instanceof Short) {
+               eventField = (short) fieldValue;
+            }
+         }
+
+         switch (eventField) {
+
+         case 0: // timer
+            isEventHidden = true;
+            break;
+
+         case 3: // workout
+         case 4: // workout_step
+         case 5: // power_down
+         case 6: // power_up
+            isEventHidden = true;
+            break;
+
+         case 7: // off_course
+            isEventHidden = true;
+            break;
+
+         case 8: // session
+            isEventHidden = true;
+            break;
+
+         case 9: // lap
+         case 10: // course_point
+         case 11: // battery
+         case 12: // virtual_partner_pace
+         case 13: // hr_high_alert
+         case 14: // hr_low_alert
+         case 15: // speed_high_alert
+         case 16: // speed_low_alert
+         case 17: // cad_high_alert
+         case 18: // cad_low_alert
+         case 19: // power_high_alert
+         case 20: // power_low_alert
+         case 21: // recovery_hr
+         case 22: // battery_low
+         case 23: // time_duration_alert
+         case 24: // distance_duration_alert
+         case 25: // calorie_duration_alert
+         case 26: // activity
+         case 27: // fitness_equipment
+         case 28: // length
+         case 32: // user_marker
+         case 33: // sport_point
+         case 36: // calibration
+         case 38: // 'recovery_time' # guess (in minutes)
+         case 39: // 'recovery_info' # guess (in minutes, < 24 good, > 24h poor)
+            isEventHidden = true;
+            break;
+
+         case 42: // front gear change
+         case 43: // rear gear change
+            break;
+
+         case 48: // 'functional_threshold_power' # guess (in Watt)
+            isEventHidden = true;
+            break;
+
+         default:
+            break;
+         }
+      }
+
+//    Source: https://github.com/GoldenCheetah/GoldenCheetah/blob/master/src/FileIO/FitRideFile.cpp
+//
+//    case 0:  // Timer event
+//    case 3:  /* workout */
+//    case 4:  /* workout_step */
+//    case 5:  /* power_down */
+//    case 6:  /* power_up */
+//    case 7:  /* off_course */
+//    case 8:  /* session */
+//    case 9:  /* lap */
+//    case 10: /* course_point */
+//    case 11: /* battery */
+//    case 12: /* virtual_partner_pace */
+//    case 13: /* hr_high_alert */
+//    case 14: /* hr_low_alert */
+//    case 15: /* speed_high_alert */
+//    case 16: /* speed_low_alert */
+//    case 17: /* cad_high_alert */
+//    case 18: /* cad_low_alert */
+//    case 19: /* power_high_alert */
+//    case 20: /* power_low_alert */
+//    case 21: /* recovery_hr */
+//    case 22: /* battery_low */
+//    case 23: /* time_duration_alert */
+//    case 24: /* distance_duration_alert */
+//    case 25: /* calorie_duration_alert */
+//    case 26: /* activity */
+//    case 27: /* fitness_equipment */
+//    case 28: /* length */
+//    case 32: /* user_marker */
+//    case 33: /* sport_point */
+//    case 36: // Calibration event
+//    case 42: /* front_gear_change */
+//    case 43: /* rear_gear_change */
+//
+//
+//    Source: https://www.rubydoc.info/gems/fit4ruby/Fit4Ruby
+//
+//    entry 0, 'timer'
+//    entry 3, 'workout'
+//    entry 4, 'workout_step'
+//    entry 5, 'power_down'
+//    entry 6, 'power_up'
+//    entry 7, 'off_course'
+//    entry 8, 'session'
+//    entry 9, 'lap'
+//    entry 10, 'course_point'
+//    entry 11, 'battery'
+//    entry 12, 'virtual_partner_pace'
+//    entry 13, 'hr_high_alert'
+//    entry 14, 'hr_low_alert'
+//    entry 15, 'speed_high_alert'
+//    entry 16, 'speed_low_alert'
+//    entry 17, 'cad_high_alert'
+//    entry 18, 'cad_low_alert'
+//    entry 19, 'power_high_alert'
+//    entry 20, 'power_low_alert'
+//    entry 21, 'recovery_hr'
+//    entry 22, 'battery_low'
+//    entry 23, 'time_duration_alert'
+//    entry 24, 'distance_duration_alert'
+//    entry 25, 'calorie_duration_alert'
+//    entry 26, 'activity'
+//    entry 27, 'fitness_equipment'
+//    entry 28, 'length'
+//    entry 32, 'user_marker'
+//    entry 33, 'sport_point'
+//    entry 36, 'calibration'
+//    entry 37, 'vo2max' # guess
+//    entry 38, 'recovery_time' # guess (in minutes)
+//    entry 39, 'recovery_info' # guess (in minutes, < 24 good, > 24h poor)
+//    entry 42, 'front_gear_change'
+//    entry 43, 'rear_gear_change'
+//    entry 44, 'rider_position_change'
+//    entry 45, 'elev_high_alert'
+//    entry 46, 'elev_low_alert'
+//    entry 47, 'comm_timeout'
+//    entry 48, 'functional_threshold_power' # guess (in Watt)
+//    entry 49, 'lactate_threshold_heart_rate' # guess (in BPM)
+//    entry 50, 'lactate_threshold_speed' # guess (in m/s)
+//
+//
+//    Source: https://pkg.go.dev/github.com/tormoder/fit
+//
+//    EventTimer                 Event = 0  // Group 0.  Start / stop_all
+//    EventWorkout               Event = 3  // start / stop
+//    EventWorkoutStep           Event = 4  // Start at beginning of workout.  Stop at end of each step.
+//    EventPowerDown             Event = 5  // stop_all group 0
+//    EventPowerUp               Event = 6  // stop_all group 0
+//    EventOffCourse             Event = 7  // start / stop group 0
+//    EventSession               Event = 8  // Stop at end of each session.
+//    EventLap                   Event = 9  // Stop at end of each lap.
+//    EventCoursePoint           Event = 10 // marker
+//    EventBattery               Event = 11 // marker
+//    EventVirtualPartnerPace    Event = 12 // Group 1. Start at beginning of activity if VP enabled, when VP pace is changed during activity or VP enabled mid activity.  stop_disable when VP disabled.
+//    EventHrHighAlert           Event = 13 // Group 0.  Start / stop when in alert condition.
+//    EventHrLowAlert            Event = 14 // Group 0.  Start / stop when in alert condition.
+//    EventSpeedHighAlert        Event = 15 // Group 0.  Start / stop when in alert condition.
+//    EventSpeedLowAlert         Event = 16 // Group 0.  Start / stop when in alert condition.
+//    EventCadHighAlert          Event = 17 // Group 0.  Start / stop when in alert condition.
+//    EventCadLowAlert           Event = 18 // Group 0.  Start / stop when in alert condition.
+//    EventPowerHighAlert        Event = 19 // Group 0.  Start / stop when in alert condition.
+//    EventPowerLowAlert         Event = 20 // Group 0.  Start / stop when in alert condition.
+//    EventRecoveryHr            Event = 21 // marker
+//    EventBatteryLow            Event = 22 // marker
+//    EventTimeDurationAlert     Event = 23 // Group 1.  Start if enabled mid activity (not required at start of activity). Stop when duration is reached.  stop_disable if disabled.
+//    EventDistanceDurationAlert Event = 24 // Group 1.  Start if enabled mid activity (not required at start of activity). Stop when duration is reached.  stop_disable if disabled.
+//    EventCalorieDurationAlert  Event = 25 // Group 1.  Start if enabled mid activity (not required at start of activity). Stop when duration is reached.  stop_disable if disabled.
+//    EventActivity              Event = 26 // Group 1..  Stop at end of activity.
+//    EventFitnessEquipment      Event = 27 // marker
+//    EventLength                Event = 28 // Stop at end of each length.
+//    EventUserMarker            Event = 32 // marker
+//    EventSportPoint            Event = 33 // marker
+//    EventCalibration           Event = 36 // start/stop/marker
+//    EventFrontGearChange       Event = 42 // marker
+//    EventRearGearChange        Event = 43 // marker
+//    EventRiderPositionChange   Event = 44 // marker
+//    EventElevHighAlert         Event = 45 // Group 0.  Start / stop when in alert condition.
+//    EventElevLowAlert          Event = 46 // Group 0.  Start / stop when in alert condition.
+//    EventCommTimeout           Event = 47 // marker
+//    EventRadarThreatAlert      Event = 75 // start/stop/marker
+//    EventInvalid               Event = 0xFF
+      return isEventHidden;
+   }
+
+   /**
+    * Set fields which should NOT be displayed in the log
+    *
+    * @param fieldName
+    * @return
+    */
    private boolean isFieldSkipped(final String fieldName) {
 
       final boolean isSkipped = false
@@ -464,7 +703,7 @@ public class FitDataReader extends TourbookDevice {
     * @param fitData
     */
    @SuppressWarnings("unused")
-   private void onMesg_104_DeviceBattery_0(final Mesg mesg, final FitData fitData) {
+   private void onMesg_104_DeviceBattery_Field0(final Mesg mesg, final FitData fitData) {
 
       final Field fieldTime = mesg.getField(253);
       final Field field_0 = mesg.getField(0);
@@ -488,7 +727,7 @@ public class FitDataReader extends TourbookDevice {
       }
    }
 
-   private void onMesg_104_DeviceBattery_2(final Mesg mesg, final FitData fitData) {
+   private void onMesg_104_DeviceBattery_Field2(final Mesg mesg, final FitData fitData) {
 
       final Field fieldTime = mesg.getField(253);
       final Field fieldPercentage = mesg.getField(2);
@@ -514,87 +753,91 @@ public class FitDataReader extends TourbookDevice {
 
    private void onMesg_ForDebugLogging(final Mesg mesg, final int[] logCounter) {
 
-      long garminTimestamp = 0;
-
       final int mesgNum = mesg.getNum();
 
-      final boolean isSkipMessage = false
+      boolean isSkipMessage = false
 
-//            || mesgNum == 13 //     13    unknown
-//            || mesgNum == 22 //     22    unknown
-//            || mesgNum == 79 //     79    unknown
-//            || mesgNum == 113 //    113   unknown
-//            || mesgNum == 140 //    140   unknown
-//            || mesgNum == 216 //    216   unknown
-//            || mesgNum == 288 //    288   unknown
-//
-//            || mesgNum == 34 //     ACTIVITY
+            || mesgNum == 13 //     13    unknown
+            || mesgNum == 22 //     22    unknown
+            || mesgNum == 79 //     79    unknown
+            || mesgNum == 113 //    113   unknown
+            || mesgNum == 140 //    140   unknown
+            || mesgNum == 216 //    216   unknown
+            || mesgNum == 261 //    261   unknown
+            || mesgNum == 288 //    288   unknown
+
+            || mesgNum == 0 //      FILE_ID
+            || mesgNum == 2 //      DEVICE_SETTINGS
+            || mesgNum == 3 //      USER_PROFILE
+            || mesgNum == 7 //      ZONES_TARGET
+            || mesgNum == 12 //     SPORT
+            || mesgNum == 18 //     SESSION
+            || mesgNum == 19 //     LAP
+            || mesgNum == 20 //     RECORD
+            || mesgNum == 21 //     EVENT
 //            || mesgNum == 23 //     DEVICE_INFO
-//            || mesgNum == 2 //      DEVICE_SETTINGS
-//            || mesgNum == 21 //     EVENT
-//            || mesgNum == 0 //      FILE_ID
-//            || mesgNum == 49 //     FILE_CREATOR
-//            || mesgNum == 78 //     HRV
-//            || mesgNum == 19 //     LAP
-//            || mesgNum == 20 //     RECORD
-//            || mesgNum == 18 //     SESSION
-//            || mesgNum == 12 //     SPORT
-//            || mesgNum == 3 //      USER_PROFILE
-//            || mesgNum == 7 //      ZONES_TARGET
-//
-//            || mesgNum == 104 //    Device Battery (not documented)
-//            || mesgNum == 147 //    Registered Device Sensor (not documented)
+            || mesgNum == 34 //     ACTIVITY
+            || mesgNum == 49 //     FILE_CREATOR
+            || mesgNum == 72 //     TRAINING_FILE
+            || mesgNum == 78 //     HRV
+
+            || mesgNum == 104 //    Device Battery (not documented)
+            || mesgNum == 147 //    Registered Device Sensor (not documented)
 
       ;
 
-      if (isSkipMessage == false) {
+      // hide IDE warning
+      isSkipMessage = !!isSkipMessage;
 
-         String messageName = MesgNum.getStringFromValue(mesgNum);
+      isSkipMessage = false;
 
-         if (messageName.length() == 0) {
-
-            switch (mesgNum) {
-            case 104:
-               messageName = "Device Battery (not documented)"; //$NON-NLS-1$
-               break;
-
-            case 147:
-               messageName = "Registered Device Sensor (not documented)"; //$NON-NLS-1$
-               break;
-
-            default:
-               messageName = mesg.getName();
-               break;
-            }
-
-         }
-
-         final boolean isLogMessageHeader = true;
-         if (isLogMessageHeader) {
-
-            System.out.println(String.format("Message  %3d   %s  Fields: %d", //$NON-NLS-1$
-
-                  mesgNum,
-                  messageName,
-                  mesg.getNumFields()));
-         }
+      if (isSkipMessage) {
+         return;
       }
 
-      for (final Field field : mesg.getFields()) {
+//      if (isEventHidden(allMessageFields)) {
+//         return;
+//      }
 
+      final boolean isLogMessageHeader = true;
+      if (isLogMessageHeader) {
+
+         System.out.println(String.format("Message  %3d   %s  Fields: %d", //$NON-NLS-1$
+
+               mesgNum,
+               getMessageName(mesg, mesgNum),
+               mesg.getNumFields()));
+      }
+
+      final Collection<Field> allMessageFields = mesg.getFields();
+
+      long garminTimestamp = 0;
+
+      for (final Field field : allMessageFields) {
+
+         final int fieldNum = field.getNum();
          final String fieldName = field.getName();
+         final Object fieldValue = field.getValue();
 
-         if (fieldName.equals("timestamp")) { //$NON-NLS-1$
-            garminTimestamp = (Long) field.getValue();
+         if ("timestamp".equals(fieldName)) { //$NON-NLS-1$
+            garminTimestamp = (Long) fieldValue;
          }
 
-         /*
-          * Set fields which should NOT be displayed in the log
-          */
+//         boolean isShow_FieldNum = false
+//
+//               || fieldNum == 0 // event
+//               || fieldNum == 32 // battery_level
+//         ;
+//
+//         isShow_FieldNum = !!isShow_FieldNum;
+//         isShow_FieldNum = true;
+//
+//         if (isShow_FieldNum == false) {
+//            continue;
+//         }
 
          if (StringUtils.isNullOrEmpty(fieldName)
 
-               || isSkipMessage
                || isFieldSkipped(fieldName)
 
          ) {
@@ -612,10 +855,10 @@ public class FitDataReader extends TourbookDevice {
 
                + " %-42s %-10d  %-10s  " //  time     //$NON-NLS-1$
 
-               + " %5d" //       Num                  //$NON-NLS-1$
-               + " %40s" //      Name                 //$NON-NLS-1$
-               + " %20s" //      Value                //$NON-NLS-1$
-               + " %-12s" //     Units                //$NON-NLS-1$
+               + " %5d" //       Field Num            //$NON-NLS-1$
+               + " %40s" //      Field Name           //$NON-NLS-1$
+               + " %20s" //      Field Value          //$NON-NLS-1$
+               + " %-12s" //     Field Units          //$NON-NLS-1$
 
 //             + " %s" //        RawValue             //$NON-NLS-1$
 
@@ -629,13 +872,13 @@ public class FitDataReader extends TourbookDevice {
                javaTime / 1000, //                       java time in s
                Long.toString(garminTimestamp), //        garmin timestamp
 
-               field.getNum(), //         Num
+               fieldNum, //               Num
                fieldName, //              Name
 
-               field.getValue(), //       Value
+               fieldValue, //             Value
                field.getUnits() //        Units
 
-//             field.getRawValue().getClass().getCanonicalName()
+//               field.getRawValue().getClass().getCanonicalName()
 
          );
 
@@ -685,7 +928,7 @@ public class FitDataReader extends TourbookDevice {
                + " %20s" //                  Value             //$NON-NLS-1$
                + " %-12s" //                 Units             //$NON-NLS-1$
 
-//             + " %s" //                    RawValue          //$NON-NLS-1$
+//               + " %s" //                    RawValue          //$NON-NLS-1$
 
                + UI.EMPTY_STRING,
 
@@ -703,7 +946,7 @@ public class FitDataReader extends TourbookDevice {
                field.getValue(), //                      Value
                field.getUnits() //                       Units
 
-//             field.getRawValue().getClass().getCanonicalName()
+//               field.getRawValue().getClass().getCanonicalName()
 
          ));
       }
@@ -715,7 +958,7 @@ public class FitDataReader extends TourbookDevice {
 
       switch (mesgNum) {
       case 104:
-         onMesg_104_DeviceBattery_2(mesg, fitData);
+         onMesg_104_DeviceBattery_Field2(mesg, fitData);
          break;
 
       case 147:
@@ -760,9 +1003,10 @@ public class FitDataReader extends TourbookDevice {
          fitBroadcaster.addListener(new MesgListener_Record(fitData));
          fitBroadcaster.addListener(new MesgListener_Session(fitData));
          fitBroadcaster.addListener(new MesgListener_Sport(fitData));
+
          fitBroadcaster.addListener((MesgListener) mesg -> onMesg_ForNotDocumentedMesg(mesg, fitData));
 
-         if (_isLogging_FitData) {
+         if (_isLogging_FitData || false) {
 
             // show debug info
 

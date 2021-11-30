@@ -27,6 +27,7 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
@@ -78,15 +79,15 @@ public class FitData {
 
    private final List<TimeData>          _allTimeData           = new ArrayList<>();
 
-//   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
    private final List<GearData>          _allGearData           = new ArrayList<>();
    private final List<SwimData>          _allSwimData           = new ArrayList<>();
    private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
-   private List<Long>                    _pausedTime_Start      = new ArrayList<>();
+   private final List<Long>              _pausedTime_Start      = new ArrayList<>();
    private final List<Long>              _pausedTime_End        = new ArrayList<>();
 
    private final List<Long>              _allBatteryTime        = new ArrayList<>();
    private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
+   private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
 
    private TimeData                      _current_TimeData;
    private TimeData                      _lastAdded_TimeData;
@@ -253,9 +254,10 @@ public class FitData {
 
          finalizeTour_Elevation(_tourData);
          finalizeTour_Battery(_tourData);
+         finalizeTour_Sensors(_tourData);
 
          // must be called after time series are created
-         finalizeTour_Gears(_tourData, _allGearData);
+         finalizeTour_Gears(_tourData);
 
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
@@ -304,13 +306,13 @@ public class FitData {
 
       if (tourData.getTourAltUp() == 0 && tourData.getTourAltDown() == 0) {
 
-         _tourData.computeAltitudeUpDown();
+         tourData.computeAltitudeUpDown();
       }
    }
 
-   private void finalizeTour_Gears(final TourData tourData, final List<GearData> gearList) {
+   private void finalizeTour_Gears(final TourData tourData) {
 
-      if (gearList == null) {
+      if (_allGearData.size() == 0) {
          return;
       }
 
@@ -328,7 +330,7 @@ public class FitData {
       final List<GearData> validatedGearList = new ArrayList<>();
       GearData startGear = null;
 
-      for (final GearData gearData : gearList) {
+      for (final GearData gearData : _allGearData) {
 
          final long gearTime = gearData.absoluteTime;
 
@@ -498,6 +500,28 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
+   private void finalizeTour_Sensors(final TourData tourData) {
+
+      /*
+       * Set tour info into the sensor values
+       */
+      for (final DeviceSensorValue deviceSensorValue : _allDeviceSensorValues) {
+
+         deviceSensorValue.setTourTime_Start(tourData.getTourStartTimeMS());
+         deviceSensorValue.setTourTime_End(tourData.getTourEndTimeMS());
+
+         deviceSensorValue.setTourData(tourData);
+      }
+
+      /*
+       * Set sensor values into tour data
+       */
+      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
+
+      allTourData_SensorValues.clear();
+      allTourData_SensorValues.addAll(_allDeviceSensorValues);
+   }
+
    private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
@@ -537,6 +561,10 @@ public class FitData {
             break;
          }
       }
+   }
+
+   public List<DeviceSensorValue> getAllDeviceSensorValues() {
+      return _allDeviceSensorValues;
    }
 
    public List<TimeData> getAllTimeData() {
@@ -585,9 +613,9 @@ public class FitData {
       return deviceName.toString();
    }
 
-//   public List<DeviceSensorValue> getDeviceSensorValues() {
-//      return _allDeviceSensorValues;
-//   }
+   public List<DeviceSensorValue> getDeviceSensorValues() {
+      return _allDeviceSensorValues;
+   }
 
    public List<GearData> getGearData() {
       return _allGearData;
@@ -595,6 +623,10 @@ public class FitData {
 
    public String getImportFilePathName() {
       return _importFilePathName;
+   }
+
+   public ImportState_Process getImportState_Process() {
+      return _importState_Process;
    }
 
    public TimeData getLastAdded_TimeData() {

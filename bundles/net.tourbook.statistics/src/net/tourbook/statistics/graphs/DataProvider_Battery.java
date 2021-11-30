@@ -41,8 +41,6 @@ import net.tourbook.ui.TourTypeFilter;
 
 public class DataProvider_Battery extends DataProvider {
 
-   private Long                      _selectedTourId;
-
    private TourStatisticData_Battery _batteryData;
 
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
@@ -156,10 +154,6 @@ public class DataProvider_Battery extends DataProvider {
       return statistic_RawStatisticValues;
    }
 
-   public Long getSelectedTourId() {
-      return _selectedTourId;
-   }
-
    /**
     * Retrieve chart data from the database
     *
@@ -201,8 +195,8 @@ public class DataProvider_Battery extends DataProvider {
 
          setupYearNumbers();
 
-         final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-         final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+         final ArrayList<TourType> allActiveTourTypes = TourDatabase.getActiveTourTypes();
+         final TourType[] allTourTypes = allActiveTourTypes.toArray(new TourType[allActiveTourTypes.size()]);
 
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -366,8 +360,8 @@ public class DataProvider_Battery extends DataProvider {
 
                   dbTypeId = (Long) dbTourTypeIdObject;
 
-                  for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-                     if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
+                  for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
+                     if (allTourTypes[typeIndex].getTypeId() == dbTypeId) {
                         colorIndex = typeIndex;
                         break;
                      }
@@ -428,7 +422,4 @@ public class DataProvider_Battery extends DataProvider {
       return _batteryData;
    }
 
-   void setSelectedTourId(final Long selectedTourId) {
-      _selectedTourId = selectedTourId;
-   }
 }

@@ -50,6 +50,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -100,7 +101,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private final IPreferenceStore       _prefStore_Common        = CommonActivator.getPrefStore();
    private final IDialogSettings        _state                   = TourbookPlugin.getState("TourStatisticsView"); //$NON-NLS-1$
 
-
    private IPartListener2               _partListener;
    private IPropertyChangeListener      _prefChangeListener;
    private IPropertyChangeListener      _prefChangeListener_Common;
@@ -125,6 +125,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private Action_StatisticOptions      _action_StatisticOptions;
    private ActionSynchChartScale        _action_SynchChartScale;
 
+   private boolean                      _isInTourSelection;
    private boolean                      _isSynchScaleEnabled;
    private boolean                      _isVerticalOrderDisabled;
 
@@ -189,7 +190,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
       _activeStatistic.updateStatistic(
-            new StatisticContext(//
+            new StatisticContext(
                   _activePerson,
                   _activeTourTypeFilter,
                   _selectedYear,
@@ -324,35 +325,41 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
+      _tourEventListener = (part, tourEventId, eventData) -> {
 
-            if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+         if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-               if (part == StatisticView.this) {
-                  return;
-               }
-
-               if (((TourEvent) propertyData).isTourModified) {
-                  /*
-                   * ignore edit changes because the statistics show data only from saved data
-                   */
-                  return;
-               }
-
-               _isInUpdateUI = true;
-
-               // update statistics
-               updateStatistic();
-
-               _isInUpdateUI = false;
-
-            } else if (eventId == TourEventId.UPDATE_UI || //
-                  eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
-               updateStatistic();
+            if (part == StatisticView.this) {
+               return;
             }
+
+            if (((TourEvent) eventData).isTourModified) {
+               /*
+                * ignore edit changes because the statistics show data only from saved data
+                */
+               return;
+            }
+
+            _isInUpdateUI = true;
+
+            // update statistics
+            updateStatistic();
+
+            _isInUpdateUI = false;
+
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if (tourEventId == TourEventId.UPDATE_UI ||
+               tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+            updateStatistic();
+
+         } else if (tourEventId == TourEventId.SELECTION_RECORDING_DEVICE_BATTERY
+               && eventData instanceof SelectionRecordingDeviceBattery) {
+
+            selectBatterySoCStatistic((SelectionRecordingDeviceBattery) eventData);
          }
       };
       TourManager.getInstance().addTourEventListener(_tourEventListener);
@@ -684,13 +691,29 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.setBarVerticalOrder(_comboBarVerticalOrder.getSelectionIndex());
    }
 
+   private void onSelectionChanged(final ISelection selection) {
+      // TODO Auto-generated method stub
+
+//      if (selection instanceof SelectionTourId) {
+//
+//         final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+//         tourIdSelection.getTourId();
+//
+//         _isInTourSelection = true;
+//
+//         updateStatistic_10_NoReload(tourIdSelection.getTourId());
+//
+//         _isInTourSelection = false;
+//      }
+   }
+
    private void onSelectStatistic() {
 
       if (setActiveStatistic() == false) {
          return;
       }
 
-      updateStatistic_10_NoReload();
+      updateStatistic_10_NoReload(null);
    }
 
    private void onSelectYear(final boolean isUpdateStatistic) {
@@ -725,7 +748,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
          if (isUpdateStatistic) {
-            updateStatistic_10_NoReload();
+            updateStatistic_10_NoReload(null);
          }
       }
    }
@@ -933,6 +956,69 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _state.put(STATE_SELECTED_YEAR, _selectedYear);
    }
 
+   /**
+    * Select tour in the battery SoC statistic
+    *
+    * @param batterySoCSelection
+    */
+   private void selectBatterySoCStatistic(final SelectionRecordingDeviceBattery batterySoCSelection) {
+
+      final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
+      if (allAvailableStatistics.isEmpty()) {
+         return;
+      }
+
+      /*
+       * Get battery SoC statistic
+       */
+      int comboIndex = -1;
+      TourbookStatistic batterySocStatistic = null;
+
+      for (int statisticIndex = 0; statisticIndex < allAvailableStatistics.size(); statisticIndex++) {
+
+         final TourbookStatistic tourbookStatistic = allAvailableStatistics.get(statisticIndex);
+
+         if ("net.tourbook.statistics.graphs.StatisticBattery".equals(tourbookStatistic.plugin_StatisticId)) { //$NON-NLS-1$
+
+            comboIndex = statisticIndex;
+            batterySocStatistic = tourbookStatistic;
+            break;
+         }
+      }
+
+      if (batterySocStatistic == null) {
+         return;
+      }
+
+      /*
+       * Select battery SoC statistic
+       */
+      if (_activeStatistic != batterySocStatistic) {
+
+         // select battery SoC statistic
+
+         _comboStatistics.select(comboIndex);
+         onSelectStatistic();
+      }
+
+      /*
+       * Select year
+       */
+      final short tourYear = batterySoCSelection.getTourYear();
+      if (_selectedYear != tourYear) {
+
+         // year is not selected -> load/select year
+
+         selectYear(tourYear);
+         onSelectYear(false);
+      }
+
+      /*
+       * Select tour
+       */
+      updateStatistic_10_NoReload(batterySoCSelection.getTourId());
+   }
+
    private void selectYear(final int defaultYear) {
 
       int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
@@ -1054,8 +1140,10 @@ public class StatisticView extends ViewPart implements ITourProvider {
    }
 
    /**
+    * @param tourId
+    *           Tour which should be selected or <code>null</code>
     */
-   private void updateStatistic_10_NoReload() {
+   private void updateStatistic_10_NoReload(final Long tourId) {
 
       // keep current year
       if (_selectedYear == -1) {
@@ -1078,7 +1166,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _activePerson,
             _activeTourTypeFilter,
             _selectedYear,
-            getNumberOfYears());
+            getNumberOfYears(),
+            tourId);
 
       _activeStatistic.updateStatistic(statContext);
 

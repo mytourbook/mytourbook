@@ -44,6 +44,11 @@ public class StatisticContext {
    public int            statSelectedYear;
 
    /**
+    * Tour ID which should be selected, is ignored when <code>null</code>
+    */
+   public Long           statTourId;
+
+   /**
     * Number of years which should be displayed in the statistic
     */
    public int            statNumberOfYears;
@@ -89,11 +94,37 @@ public class StatisticContext {
                            final int selectedYear,
                            final int numberOfYears) {
 
+      this(activePerson,
+            activeTourTypeFilter,
+            selectedYear,
+            numberOfYears,
+            null);
+   }
+
+   /**
+    * @param person
+    *           Active person or <code>null</code> when no person (all people) is selected
+    * @param activeTourTypeFilter
+    *           Tour type filter
+    * @param year
+    *           Year for the statistic, when multiple years are displayed, this is the youngest year
+    * @param numberOfYears
+    *           Number of years which should be displayed in the statistic
+    * @param tourId
+    *           Tour which should be selected or <code>null</code>
+    */
+   public StatisticContext(final TourPerson activePerson,
+                           final TourTypeFilter activeTourTypeFilter,
+                           final int selectedYear,
+                           final int numberOfYears,
+                           final Long tourId) {
+
       this.appPerson = activePerson;
       this.appTourTypeFilter = activeTourTypeFilter;
 
       this.statSelectedYear = selectedYear;
       this.statNumberOfYears = numberOfYears;
+      this.statTourId = tourId;
    }
 
    /**

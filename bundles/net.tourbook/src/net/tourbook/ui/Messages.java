@@ -202,6 +202,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_Power;
    public static String        ColumnFactory_Category_Powertrain;
    public static String        ColumnFactory_Category_RunDyn;
+   public static String        ColumnFactory_Category_Sensor;
    public static String        ColumnFactory_Category_State;
    public static String        ColumnFactory_Category_Surfing;
    public static String        ColumnFactory_Category_Swimming;
@@ -213,28 +214,28 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_CollateEvent_Label;
    public static String        ColumnFactory_CollateEvent_Tooltip;
+
    public static String        ColumnFactory_Device_BatterySoC_End_Header;
-
    public static String        ColumnFactory_Device_BatterySoC_End_Header_Tooltip;
-
    public static String        ColumnFactory_Device_BatterySoC_End_Label;
-
    public static String        ColumnFactory_Device_BatterySoC_Start_Header;
-
    public static String        ColumnFactory_Device_BatterySoC_Start_Header_Tooltip;
-
    public static String        ColumnFactory_Device_BatterySoC_Start_Label;
 
    public static String        ColumnFactory_Diff_Header;
+
    public static String        ColumnFactory_DistanceDelta_Label;
    public static String        ColumnFactory_DistanceDelta_Tooltip;
+
    public static String        ColumnFactory_DPTolerance_Header;
    public static String        ColumnFactory_DPTolerance_Label;
    public static String        ColumnFactory_DPTolerance_Tooltip;
+
    public static String        ColumnFactory_ElevationGainDelta_Label;
    public static String        ColumnFactory_ElevationLossDelta_Label;
    public static String        ColumnFactory_ElevationGainDelta_Tooltip;
    public static String        ColumnFactory_ElevationLossDelta_Tooltip;
+
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;
    public static String        ColumnFactory_GearFrontShiftCount_Tooltip;
@@ -247,15 +248,20 @@ public class Messages extends NLS {
    public static String        ColumnFactory_GearTeeth_Header;
    public static String        ColumnFactory_GearTeeth_Label;
    public static String        ColumnFactory_GearTeeth_Tooltip;
+
    public static String        ColumnFactory_Id_Label;
    public static String        ColumnFactory_Id_Tooltip;
+
    public static String        ColumnFactory_ImportStatus_Header;
    public static String        ColumnFactory_ImportStatus_Label;
    public static String        ColumnFactory_ImportStatus_Tooltip;
+
    public static String        ColumnFactory_InetAddress_Label;
    public static String        ColumnFactory_InetAddress_Url;
+
    public static String        ColumnFactory_Motion_Altimeter;
    public static String        ColumnFactory_Motion_Altimeter_Tooltip;
+
    public static String        ColumnFactory_NumberOfGPSPhotos_Header;
    public static String        ColumnFactory_NumberOfGPSPhotos_Label;
    public static String        ColumnFactory_NumberOfGPSPhotos_Tooltip;
@@ -274,9 +280,11 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
+
    public static String        ColumnFactory_PhotoTimeAdjustment_Header;
    public static String        ColumnFactory_PhotoTimeAdjustment_Label;
    public static String        ColumnFactory_PhotoTimeAdjustment_Tooltip;
+
    public static String        ColumnFactory_Power_Avg_Header;
    public static String        ColumnFactory_Power_Avg_Label;
    public static String        ColumnFactory_Power_Avg_Tooltip;
@@ -320,6 +328,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
    public static String        ColumnFactory_Power_TrainingStressScore_Label;
    public static String        ColumnFactory_Power_TrainingStressScore_Tooltip;
+
    public static String        ColumnFactory_Pulse_RR;
    public static String        ColumnFactory_Pulse_RR_Index;
    public static String        ColumnFactory_Pulse_RR_Index_Tooltip;
@@ -330,6 +339,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_restpulse_label;
    public static String        ColumnFactory_restpulse;
    public static String        ColumnFactory_restpulse_tooltip;
+
    public static String        ColumnFactory_RunDyn_StanceTime_Avg;
    public static String        ColumnFactory_RunDyn_StanceTime_Avg_Header;
    public static String        ColumnFactory_RunDyn_StanceTime_Max;
@@ -351,10 +361,31 @@ public class Messages extends NLS {
    public static String        ColumnFactory_RunDyn_VerticalRatio_Avg;
    public static String        ColumnFactory_RunDyn_VerticalRatio_Max;
    public static String        ColumnFactory_RunDyn_VerticalRatio_Min;
+
    public static String        ColumnFactory_Segment_Ascent_Label;
    public static String        ColumnFactory_Segment_Ascent_Tooltip;
    public static String        ColumnFactory_Segment_Descent_Label;
    public static String        ColumnFactory_Segment_Descent_Tooltip;
+
+   public static String        ColumnFactory_Sensor_BatteryState_Level_Header;
+   public static String        ColumnFactory_Sensor_BatteryState_Level_Label;
+   public static String        ColumnFactory_Sensor_BatteryState_Status_Header;
+   public static String        ColumnFactory_Sensor_BatteryState_Status_Label;
+   public static String        ColumnFactory_Sensor_BatteryState_Voltage_Header;
+   public static String        ColumnFactory_Sensor_BatteryState_Voltage_Label;
+   public static String        ColumnFactory_Sensor_Description;
+   public static String        ColumnFactory_Sensor_ManufacturerName;
+   public static String        ColumnFactory_Sensor_ManufacturerNumber;
+   public static String        ColumnFactory_Sensor_Name;
+   public static String        ColumnFactory_Sensor_Name_Tooltip;
+   public static String        ColumnFactory_Sensor_ProductName;
+   public static String        ColumnFactory_Sensor_ProductNumber;
+   public static String        ColumnFactory_Sensor_SerialNumber;
+   public static String        ColumnFactory_Sensor_Time_FirstUsed;
+   public static String        ColumnFactory_Sensor_Time_LastUsed;
+   public static String        ColumnFactory_Sensor_Type;
+   public static String        ColumnFactory_Sensor_Type_Tooltip;
+
    public static String        ColumnFactory_SerieIndex;
    public static String        ColumnFactory_SerieIndex_Label;
    public static String        ColumnFactory_SerieIndex_Tooltip;
@@ -520,6 +551,10 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AvgPulse;
    public static String        Tour_Tooltip_Label_AvgSpeed;
    public static String        Tour_Tooltip_Label_Battery;
+   public static String        Tour_Tooltip_Label_Battery_Tooltip;
+   public static String        Tour_Tooltip_Label_BatteryLevel_Tooltip;
+   public static String        Tour_Tooltip_Label_BatteryStatus_Tooltip;
+   public static String        Tour_Tooltip_Label_BatteryVoltage_Tooltip;
    public static String        Tour_Tooltip_Label_BodyWeight;
    public static String        Tour_Tooltip_Label_BreakTime;
    public static String        Tour_Tooltip_Label_Calories;

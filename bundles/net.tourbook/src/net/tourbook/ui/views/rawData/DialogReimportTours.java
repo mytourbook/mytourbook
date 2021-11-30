@@ -109,11 +109,14 @@ public class DialogReimportTours extends TitleAreaDialog {
    private static final int    VERTICAL_SECTION_MARGIN                      = 10;
 
    //
-   private static final IDialogSettings    _state          = TourbookPlugin.getState("DialogReimportTours");     //$NON-NLS-1$
+   private static final IDialogSettings    _state          = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
 
    private static ThreadPoolExecutor       _reimport_Executor;
-   private static ArrayBlockingQueue<Long> _reimport_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
    private static CountDownLatch           _reimport_CountDownLatch;
+   private static ArrayBlockingQueue<Long> _reimport_Queue = new ArrayBlockingQueue<>(
+         RawDataManager.isSingleThreadTourImport()
+               ? 1
+               : Util.NUMBER_OF_PROCESSORS);
 
    static {
 
@@ -127,7 +130,11 @@ public class DialogReimportTours extends TitleAreaDialog {
          return thread;
       };
 
-      _reimport_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+      _reimport_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
+            RawDataManager.isSingleThreadTourImport()
+                  ? 1
+                  : Util.NUMBER_OF_PROCESSORS,
+            threadFactory);
    }
 
    private final ITourViewer3 _tourViewer;

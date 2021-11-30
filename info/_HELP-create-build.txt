@@ -1,3 +1,12 @@
+#####################################
+Version update - simplified
+#####################################
+
+Replace by using <Ctrl-H-> the old version with the new version, e.g. from "21.9.0" -> "21.12.0" 
+
+BUT REVIEW IT MANUALLY IN ALL MODIFIED FILES, subversions must not be modified everywhere, 
+take care with feature.net.tourbook.app.nl/feature.xml 
+
 
 #####################################
  One Click build process (since 18.1)

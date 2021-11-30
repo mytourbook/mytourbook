@@ -444,6 +444,8 @@ public class Messages extends NLS {
    public static String        DataImport_Error_file_does_not_exist_msg;
    public static String        DataImport_Error_file_does_not_exist_title;
 
+   public static String        Db_Field_SensorDescription;
+   public static String        Db_Field_SensorName;
    public static String        Db_Field_TourData_Description;
    public static String        Db_Field_TourData_EndPlace;
    public static String        Db_Field_TourData_StartPlace;
@@ -617,6 +619,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation;
+   public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData;
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour;
@@ -625,6 +629,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_TourType;
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
+   public static String        Dialog_ImportConfig_Column_AdjustElevation_Header;
+   public static String        Dialog_ImportConfig_Column_AdjustElevation_Label;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Tooltip;
@@ -740,6 +746,9 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
+   public static String        Dialog_Label_Description;
+   public static String        Dialog_Label_Name;
+
    public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Checkbox_BatteryValues;
@@ -806,6 +815,9 @@ public class Messages extends NLS {
    public static String        Dialog_SaveTags_Radio_RemoveTags_Selected;
    public static String        Dialog_SaveTags_Radio_ReplaceTags;
    public static String        Dialog_SaveTags_Wizard_Title;
+
+   public static String        Dialog_Sensor_EditSensor_Title;
+   public static String        Dialog_Sensor_Label_SensorType;
 
    public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
    public static String        Dialog_SetTimeZone_Dialog_Title;
@@ -1053,6 +1065,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
+   public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_No;
+   public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes;
    public static String        Import_Data_HTML_RetrieveWeatherData_No;
    public static String        Import_Data_HTML_RetrieveWeatherData_Yes;
    public static String        Import_Data_HTML_SaveTour_No;
@@ -1126,7 +1140,8 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_003_TourType_Item;
    public static String        Log_EasyImport_004_SetLastMarker;
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
-   public static String        Log_EasyImport_006_RetrieveWeatherData;
+   public static String        Log_EasyImport_006_AdjustElevation;
+   public static String        Log_EasyImport_050_RetrieveWeatherData;
    public static String        Log_EasyImport_099_SaveTour;
    public static String        Log_EasyImport_100_DeleteTourFiles;
    public static String        Log_EasyImport_101_TurnWatchingOff;
@@ -1739,6 +1754,20 @@ public class Messages extends NLS {
    public static String        Search_View_Link_LinuxBrowser;
    public static String        Search_View_Link_SetupExternalBrowser;
 
+   public static String        Sensor_Chart_Action_TourQuickFilter_Tooltip;
+   public static String        Sensor_Chart_GraphLabel_BatteryLevel;
+   public static String        Sensor_Chart_GraphLabel_BatteryStatus;
+   public static String        Sensor_Chart_GraphLabel_BatteryVoltage;
+   public static String        Sensor_Chart_Label_SensorIsNotSelected;
+   public static String        Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected;
+
+   public static String        Sensor_Type_GearShifting;
+   public static String        Sensor_Type_Other;
+   public static String        Sensor_Type_RecordingDevice;
+
+   public static String        Sensor_View_Action_EditSensor;
+   public static String        Sensor_View_Action_OpenSensorChart;
+
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_DeleteProfile_Tooltip;
@@ -2022,12 +2051,36 @@ public class Messages extends NLS {
    public static String        Slideout_SegmenterChartOptions_Label_Title;
    public static String        Slideout_SegmenterChartOptions_Label_ValueFont;
    public static String        Slideout_SegmenterChartOptions_Label_ValueFont_Example;
+
    public static String        Slideout_SegmenterOptions_Label_AltitudeDown;
    public static String        Slideout_SegmenterOptions_Label_AltitudeUp;
    public static String        Slideout_SegmenterOptions_Label_Title;
    public static String        Slideout_SegmenterOptions_Label_Totals;
 
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryLevel;
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryStatus;
+   public static String        Slideout_SensorChartOptions_Checkbox_BatteryVoltage;
+   public static String        Slideout_SensorChartOptions_Label_Title;
+
+   public static String        Slideout_SensorTourFilter_Action_ResetValue_Tooltip;
+   public static String        Slideout_SensorTourFilter_Checkbox_IsFilterDuration;
+   public static String        Slideout_SensorTourFilter_Checkbox_IsUseAppFilter;
+   public static String        Slideout_SensorTourFilter_Label_Title;
+   public static String        Slideout_SensorTourFilter_Radio_Day;
+   public static String        Slideout_SensorTourFilter_Radio_Day_Tooltip;
+   public static String        Slideout_SensorTourFilter_Radio_Month;
+   public static String        Slideout_SensorTourFilter_Radio_Month_Tooltip;
+   public static String        Slideout_SensorTourFilter_Radio_Year;
+   public static String        Slideout_SensorTourFilter_Radio_Year_Tooltip;
+
    public static String        Slideout_StatisticOptions_Label_Title;
+
+   public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers;
+   public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip;
+   public static String        Slideout_TMVOptions_Label_Title;
+   public static String        Slideout_TMVOptions_Radio_ElapsedTime;
+   public static String        Slideout_TMVOptions_Radio_MovingTime;
+   public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
    public static String        Slideout_TourBlogOptions_Label_Title;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;
@@ -2217,6 +2270,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_Gradient;
    public static String        Tooltip_ValuePoint_Action_Value_Header;
    public static String        Tooltip_ValuePoint_Action_Value_Pace;
+   public static String        Tooltip_ValuePoint_Action_Value_Pace_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Power;
    public static String        Tooltip_ValuePoint_Action_Value_Pulse;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
@@ -2225,6 +2279,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio;
    public static String        Tooltip_ValuePoint_Action_Value_Speed;
+   public static String        Tooltip_ValuePoint_Action_Value_Speed_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Temperature;
    public static String        Tooltip_ValuePoint_Action_Value_TimeDuration;
    public static String        Tooltip_ValuePoint_Action_Value_TimeOfDay;
@@ -2376,6 +2431,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
+   public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;
    public static String        Tour_Action_graph_altimeter_tooltip;

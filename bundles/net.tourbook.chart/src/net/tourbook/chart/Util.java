@@ -244,7 +244,7 @@ public class Util {
 
       } else {
 
-         valueText = Util.formatValue(rawValue, unitType, valueDivisor, true);
+         valueText = Util.formatValue(rawValue, unitType, valueDivisor, true, -1);
       }
 
       return valueText;
@@ -253,7 +253,8 @@ public class Util {
    public static String formatValue(final double value,
                                     final int unitType,
                                     final float divisor,
-                                    boolean isShowSeconds) {
+                                    boolean isShowSeconds,
+                                    final double graphUnit) {
 
       String valueText = UI.EMPTY_STRING;
 
@@ -266,7 +267,11 @@ public class Util {
 
          if (divValue % 1 == 0) {
 
+            // no decimal -> show whole value
+
             if (divValue <= -1_000_000 || divValue >= 1_000_000) {
+
+               // format very large/small values
 
                valueText = _nfE.format(divValue);
 
@@ -276,7 +281,39 @@ public class Util {
             }
 
          } else {
-            valueText = _nf1.format(divValue);
+
+            if (graphUnit == -1) {
+
+               // use original formatting
+
+               valueText = _nf1.format(divValue);
+
+            } else {
+
+               // show more decimals when necessary
+
+               if (graphUnit < 0.1) {
+
+                  // show 2 decimals
+
+                  valueText = _nf2.format(divValue);
+
+                  // truncate trailing 0
+
+                  final int numCharacters = valueText.length();
+
+                  if (valueText.charAt(numCharacters - 1) == '0') {
+                     valueText = valueText.substring(0, numCharacters - 1);
+                  }
+
+               } else {
+
+                  // show 1 decimal
+
+                  valueText = _nf1.format(divValue);
+               }
+
+            }
          }
          break;
 
@@ -333,7 +370,8 @@ public class Util {
     * @return
     */
    public static String formatValue(final int value, final int unitType) {
-      return formatValue(value, unitType, 1, false);
+
+      return formatValue(value, unitType, 1, false, -1);
    }
 
 }

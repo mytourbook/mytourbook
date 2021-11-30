@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="dropbox-core-sdk-4.0.0.jar"/> <!-- https://mvnrepository.com/artifact/com.dropbox.core/dropbox-core-sdk -->
 	<classpathentry kind="lib" path="httpcore-4.4.14.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
 	<classpathentry kind="lib" path="httpclient-4.5.13.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 	<classpathentry kind="lib" path="java7-fs-dropbox-0.0.3.jar"/> <!-- Modified and built with https://github.com/FJBDev/java7-fs-dropbox --> 
 	<classpathentry kind="lib" path="java7-fs-base-0.0.3.jar"/> <!-- Modified and built with https://github.com/FJBDev/java7-fs-base/tree/topic/java8 -->
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
