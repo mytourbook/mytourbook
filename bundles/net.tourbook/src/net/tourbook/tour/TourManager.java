@@ -1076,13 +1076,17 @@ public class TourManager {
          final long[] pausedTime_Start = fromTourData.getPausedTime_Start();
 
          if (pausedTime_Start != null) {
+
             final long[] pausedTime_End = fromTourData.getPausedTime_End();
+            final long[] pausedTime_Data = fromTourData.getPausedTime_Data();
+
             for (int index = 0; index < pausedTime_Start.length; ++index) {
 
                final List<Long> fromTourPausesList = new ArrayList<>();
 
                fromTourPausesList.add(pausedTime_Start[index]);
                fromTourPausesList.add(pausedTime_End[index]);
+               fromTourPausesList.add(pausedTime_Data[index]);
 
                allTourPauses.add(fromTourPausesList);
             }

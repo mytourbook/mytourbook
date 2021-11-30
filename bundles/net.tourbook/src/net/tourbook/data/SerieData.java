@@ -169,6 +169,11 @@ public class SerieData implements Serializable {
    public long[]               pausedTime_End;
 
    /**
+    * An auto-pause happened when a value is 1, otherwise the pause was triggered by the user with a device button
+    */
+   public long[]               pausedTime_Data;
+
+   /**
     * This field is never used but it must be kept for old data
     */
    public int[]                deviceMarker;

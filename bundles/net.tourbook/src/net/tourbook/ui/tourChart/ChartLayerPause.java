@@ -24,12 +24,14 @@ import net.tourbook.chart.IChartOverlay;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
+import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
@@ -85,7 +87,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
-      DrawPausePointAndLabel(gc, drawingData, chart);
+      drawPausePointAndLabel(gc, drawingData, chart);
 
       gc.setClipping((Rectangle) null);
    }
@@ -117,7 +119,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       gc.setAlpha(0x30);
 
-      gc.setBackground(getLabelColor());
+      gc.setBackground(getLabelColor(chartLabelPause.isAutoPause()));
 
       /*
        * Rectangles can be merged into a union with regions, took me some time to find this solution
@@ -153,7 +155,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       gc.setClipping((Region) null);
    }
 
-   private void DrawPausePointAndLabel(final GC gc,
+   private void drawPausePointAndLabel(final GC gc,
                                        final GraphDrawingData graphDrawingData,
                                        final Chart chart) {
 
@@ -198,7 +200,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          /*
           * Draw pause point
           */
-         gc.setBackground(getLabelColor());
+         gc.setBackground(getLabelColor(chartLabelPause.isAutoPause()));
 
          // draw pause point
          gc.fillRectangle(devXPauseTopLeft, devYPauseTopLeft, PAUSE_POINT_SIZE, PAUSE_POINT_SIZE);
@@ -206,7 +208,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          /*
           * Draw pause label
           */
-         gc.setForeground(getLabelColor());
+         gc.setForeground(getLabelColor(chartLabelPause.isAutoPause()));
          final int labelWidth = labelExtend.x;
          final int labelHeight = labelExtend.y;
 
@@ -258,11 +260,23 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       return _hoveredLabel;
    }
 
-   private Color getLabelColor() {
+   private Color getLabelColor(final boolean isAutoPause) {
 
-      final Color color = UI.isDarkTheme()
-            ? new Color(new RGB(0xa0, 0xa0, 0xa0))
-            : new Color(new RGB(0x60, 0x60, 0x60));
+      Color color;
+
+      if (isAutoPause) {
+
+         color = UI.isDarkTheme()
+               ? new Color(new RGB(0xa0, 0xa0, 0xa0))
+               : new Color(new RGB(0x60, 0x60, 0x60));
+
+      } else {
+
+         color = UI.isDarkTheme()
+               ? Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW)
+               : Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+      }
+
       return color;
    }
 

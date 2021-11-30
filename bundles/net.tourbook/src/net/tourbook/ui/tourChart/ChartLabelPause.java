@@ -19,10 +19,12 @@ import net.tourbook.common.UI;
 
 public class ChartLabelPause extends ChartLabel {
 
-   private long   _pausedTime_Start;
-   private long   _pausedTime_End;
+   private long    _pausedTime_Start;
+   private long    _pausedTime_End;
 
-   private String timeZoneId;
+   private boolean _isAutoPause;
+
+   private String  timeZoneId;
 
    /*
     * Painted label positions
@@ -46,6 +48,14 @@ public class ChartLabelPause extends ChartLabel {
 
    public String getTimeZoneId() {
       return timeZoneId;
+   }
+
+   public boolean isAutoPause() {
+      return _isAutoPause;
+   }
+
+   public void setIsAutoPause(final boolean isAutoPause) {
+      _isAutoPause = isAutoPause;
    }
 
    public void setPausedTime_End(final long pausedTime_End) {

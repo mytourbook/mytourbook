@@ -1251,6 +1251,7 @@ public class TourMapPainter extends MapPainter {
 
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
+               final long pausedTime_Data = allTourPauses.get(currentTourPauseIndex).get(2);
 
                final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
 
@@ -1268,6 +1269,8 @@ public class TourMapPainter extends MapPainter {
                   }
                }
 
+               final boolean isAutoPause = pausedTime_Data == 1;
+
                // draw tour pause
                if (drawTourPauses(
                      gcTile,
@@ -1276,7 +1279,8 @@ public class TourMapPainter extends MapPainter {
                      latitudeSerie[tourSerieIndex],
                      longitudeSerie[tourSerieIndex],
                      pauseDuration,
-                     parts)) {
+                     parts,
+                     isAutoPause)) {
 
                   pauseCounter++;
                }
@@ -1298,6 +1302,7 @@ public class TourMapPainter extends MapPainter {
          }
 
          final long[] pausedTime_End = tourData.getPausedTime_End();
+         final long[] pausedTime_Data = tourData.getPausedTime_Data();
 
          // draw tour pauses durations
 
@@ -1330,6 +1335,8 @@ public class TourMapPainter extends MapPainter {
 
             final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
+            final boolean isAutoPause = pausedTime_Data[index] == 1;
+
             // draw tour pause
             if (drawTourPauses(
                   gcTile,
@@ -1338,7 +1345,8 @@ public class TourMapPainter extends MapPainter {
                   latitudeSerie[serieIndex],
                   longitudeSerie[serieIndex],
                   pauseDuration,
-                  parts)) {
+                  parts,
+                  isAutoPause)) {
 
                pauseCounter++;
             }
@@ -1991,6 +1999,7 @@ public class TourMapPainter extends MapPainter {
     * @param longitude
     * @param tourTimerPause
     * @param parts
+    * @param isAutoPause
     * @return Returns <code>true</code> when pause duration has been painted
     */
    private boolean drawTourPauses(final GC gcTile,
@@ -1999,7 +2008,8 @@ public class TourMapPainter extends MapPainter {
                                   final double latitude,
                                   final double longitude,
                                   final long pauseDuration,
-                                  final int parts) {
+                                  final int parts,
+                                  final boolean isAutoPause) {
 
       final MP mp = map.getMapProvider();
       final int zoomLevel = map.getZoom();
@@ -2058,7 +2068,6 @@ public class TourMapPainter extends MapPainter {
 
    /**
     * create an image for the tour pause
-    *
     */
    private Image drawTourPauses_Image(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
 

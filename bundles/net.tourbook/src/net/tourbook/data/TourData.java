@@ -1553,7 +1553,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * List containing all the tour pauses used only for multiple tours.
     */
    @Transient
-   public List<List<Long>>   multiTourPauses;
+   public List<List<Long>>    multiTourPauses;
 
 
    @Transient
@@ -1753,6 +1753,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    private long[]       pausedTime_End;
+
+   /**
+    * An auto-pause happened when a value is 1, otherwise it was triggered by the user.
+    * This field could also be <code>null</code> when pause data are not available.
+    */
+   @Transient
+   private long[]       pausedTime_Data;
 
    /**
     * Containing the battery time in seconds, relative to the tour start time
@@ -7139,21 +7146,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *           A given array of paused time start times
     * @param pausedTime_End
     *           A given array of paused time end times
+    * @param pausedTime_Data
+    *           A value of 1 indicate that it is an auto-pause
     */
    public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
-                                        final List<Long> pausedTime_End) {
+                                        final List<Long> pausedTime_End,
+                                        List<Long> pausedTime_Data) {
 
       if (pausedTime_Start == null || pausedTime_Start.isEmpty() ||
             pausedTime_End == null || pausedTime_End.isEmpty()) {
+
          return;
       }
 
-      if (pausedTime_Start.size() > pausedTime_End.size()) {
-         pausedTime_Start = pausedTime_Start.subList(0, pausedTime_End.size());
+      final int numPauses = pausedTime_End.size();
+
+      /*
+       * Ensure bounds
+       */
+      if (pausedTime_Start.size() > numPauses) {
+         pausedTime_Start = pausedTime_Start.subList(0, numPauses);
+      }
+      if (pausedTime_Data != null && pausedTime_Data.size() > numPauses) {
+         pausedTime_Data = pausedTime_Data.subList(0, numPauses);
       }
 
       setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
       setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
+
+      if (pausedTime_Data != null) {
+         setPausedTime_Data(pausedTime_Data.stream().mapToLong(l -> l).toArray());
+      }
 
       setTourDeviceTime_Paused(getTotalTourTimerPauses());
    }
@@ -8104,6 +8127,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return totalPausedTime;
+   }
+
+   public long[] getPausedTime_Data() {
+      return pausedTime_Data;
    }
 
    public long[] getPausedTime_End() {
@@ -9845,6 +9872,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       speedSerie           = serieData.speedSerie20;
       pausedTime_Start     = serieData.pausedTime_Start;
       pausedTime_End       = serieData.pausedTime_End;
+      pausedTime_Data      = serieData.pausedTime_Data;
 
       if (serieData.latitude != null) {
 
@@ -9929,6 +9957,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       serieData.temperatureSerie20  = temperatureSerie;
       serieData.pausedTime_Start    = pausedTime_Start;
       serieData.pausedTime_End      = pausedTime_End;
+      serieData.pausedTime_Data     = pausedTime_Data;
 
       /*
        * don't save computed data series
@@ -10433,6 +10462,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setMergeTargetTourId(final Long mergeTargetTourId) {
       this.mergeTargetTourId = mergeTargetTourId;
+   }
+
+   public void setPausedTime_Data(final long[] pausedTime_Data) {
+      this.pausedTime_Data = pausedTime_Data;
    }
 
    public void setPausedTime_End(final long[] pausedTime_End) {

@@ -2098,6 +2098,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private ChartLabelPause createLayer_Pause_ChartLabel(final long pausedTime_Start,
                                                         final long pausedTime_End,
+                                                        final boolean isAutoPause,
                                                         final String timeZoneId,
                                                         final double[] xAxisSerie,
                                                         final int xAxisSerieIndex) {
@@ -2108,6 +2109,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       chartLabelPause.serieIndex = xAxisSerieIndex;
       chartLabelPause.setPausedTime_Start(pausedTime_Start);
       chartLabelPause.setPausedTime_End(pausedTime_End);
+      chartLabelPause.setIsAutoPause(isAutoPause);
       chartLabelPause.setTimeZoneId(timeZoneId);
 
       return chartLabelPause;
@@ -2183,6 +2185,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
+               final long pausedTime_Data = allTourPauses.get(currentTourPauseIndex).get(2);
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
@@ -2200,9 +2203,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                if (tourSerieIndex < xAxisSerie.length) {
 
+                  final boolean isAutoPause = pausedTime_Data == 1;
+
                   final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                         pausedTime_Start,
                         pausedTime_End,
+                        isAutoPause,
                         tourTimeZoneId,
                         xAxisSerie,
                         tourSerieIndex);
@@ -2217,6 +2223,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       } else {
 
          final long[] pausedTime_Start = _tourData.getPausedTime_Start();
+         final long[] pausedTime_Data = _tourData.getPausedTime_Data();
 
          if (pausedTime_Start == null) {
             return;
@@ -2242,9 +2249,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                continue;
             }
 
+            final boolean isAutoPause = pausedTime_Data == null
+                  ? false
+                  : pausedTime_Data[index] == 1;
+
             final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
                   pausedTime_Start[index],
                   pausedTime_End[index],
+                  isAutoPause,
                   _tourData.getTimeZoneId(),
                   xAxisSerie,
                   serieIndex);
