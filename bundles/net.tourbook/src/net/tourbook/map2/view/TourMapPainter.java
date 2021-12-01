@@ -1335,7 +1335,9 @@ public class TourMapPainter extends MapPainter {
 
             final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
-            final boolean isAutoPause = pausedTime_Data[index] == 1;
+            final boolean isAutoPause = pausedTime_Data == null
+                  ? false
+                  : pausedTime_Data[index] == 1;
 
             // draw tour pause
             if (drawTourPauses(
@@ -2048,7 +2050,7 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourPauses_Image(gcTile.getDevice(), pauseDurationText, pauseBounds);
+         final Image tourMarkerImage = drawTourPauses_Image(gcTile.getDevice(), pauseDurationText, pauseBounds, isAutoPause);
          {
             devX = devMarkerPosX - pauseBounds.width / 2;
             devY = devMarkerPosY - pauseBounds.height;
@@ -2067,9 +2069,18 @@ public class TourMapPainter extends MapPainter {
    }
 
    /**
-    * create an image for the tour pause
+    * Create an image for the tour pause
+    *
+    * @param device
+    * @param pauseDurationText
+    * @param pauseBounds
+    * @param isAutoPause
+    * @return
     */
-   private Image drawTourPauses_Image(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
+   private Image drawTourPauses_Image(final Device device,
+                                      final String pauseDurationText,
+                                      final Rectangle pauseBounds,
+                                      final boolean isAutoPause) {
 
       final int bannerWidth = pauseBounds.x;
       final int bannerHeight = pauseBounds.y;
@@ -2099,15 +2110,30 @@ public class TourMapPainter extends MapPainter {
       Color textColor;
       Color bannerColor;
 
-      if (_tourPaintConfig.isBackgroundDark) {
+      final boolean isBackgroundDark = _tourPaintConfig.isBackgroundDark;
 
-         textColor = ThemeUtil.getDefaultForegroundColor_Shell();
+      if (isBackgroundDark) {
+
          bannerColor = ThemeUtil.getDefaultBackgroundColor_Shell();
 
       } else {
 
-         textColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
          bannerColor = new Color(0xFF, 0xFF, 0xFF);
+      }
+
+      if (isAutoPause) {
+
+         textColor = isBackgroundDark
+               ? new Color(new RGB(0xff, 0xff, 0xff))
+               : new Color(new RGB(0x0, 0x0, 0x0));
+
+      } else {
+
+         // user started/stopped pause
+
+         textColor = isBackgroundDark
+               ? Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW)
+               : Display.getCurrent().getSystemColor(SWT.COLOR_RED);
       }
 
       final GC gc = new GC(markerImage);
