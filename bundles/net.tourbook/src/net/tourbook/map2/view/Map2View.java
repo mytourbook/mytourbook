@@ -1111,7 +1111,7 @@ public class Map2View extends ViewPart implements
    public void actionZoomShowEntireTour() {
 
       /*
-       * reset position for all tours, it was really annoying that previous selected tours moved to
+       * Reset position for all tours, it was really annoying that previous selected tours moved to
        * their previous positions, implemented in 11.8.2
        */
       TourManager.getInstance().resetMapPositions();
@@ -2401,6 +2401,11 @@ public class Map2View extends ViewPart implements
 
          final double tourMaxLatitude = geoPosition[1].latitude;
          final double tourMaxLongitude = geoPosition[1].longitude;
+
+         if (tourMinLatitude == 0 && tourMaxLatitude == 0
+               && tourMinLongitude == 0 && tourMaxLatitude == 0) {
+            continue;
+         }
 
          if (allMinLatitude == Double.MIN_VALUE) {
 
