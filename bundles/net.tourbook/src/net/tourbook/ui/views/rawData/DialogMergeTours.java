@@ -123,6 +123,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
     */
    private Button _chkMergeAltitude;
    private Button _chkMergePulse;
+   private Button _chkMergeSpeed;
    private Button _chkMergeTemperature;
    private Button _chkMergeCadence;
 
@@ -162,6 +163,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private TourType                                       _backupSourceTourType;
 
    private float[]                                        _backupTargetPulseSerie;
+   private float[]                                        _backupTargetSpeedSerie;
    private float[]                                        _backupTargetTemperatureSerie;
    private float[]                                        _backupTargetCadenceSerie;
 
@@ -307,6 +309,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final int[] sourceTimeSerie = _sourceTour.timeSerie;
       final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
       final float[] sourcePulseSerie = _sourceTour.pulseSerie;
+      final float[] sourceSpeedSerie = _sourceTour.speedSerie;
       final float[] sourceTemperatureSerie = _sourceTour.temperatureSerie;
       final float[] sourceCadenceSerie = _sourceTour.getCadenceSerie();
 
@@ -320,6 +323,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       // check if the data series are available
       final boolean isSourceTemperature = sourceTemperatureSerie != null;
       final boolean isSourcePulse = sourcePulseSerie != null;
+      final boolean isSourceSpeed = sourceSpeedSerie != null;
       final boolean isSourceCadence = sourceCadenceSerie != null;
       final boolean isSourceAltitude = sourceAltitudeSerie != null;
 
@@ -333,6 +337,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final float[] newSourceAltiDiffSerie = new float[serieLength];
 
       final float[] newTargetPulseSerie = new float[serieLength];
+      final float[] newTargetSpeedSerie = new float[serieLength];
       final float[] newTargetTemperatureSerie = new float[serieLength];
       final float[] newTargetCadenceSerie = new float[serieLength];
 
@@ -425,6 +430,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          if (isSourcePulse) {
             newTargetPulseSerie[targetIndex] = sourcePulseSerie[sourceIndex];
          }
+         if (isSourceSpeed) {
+            newTargetSpeedSerie[targetIndex] = sourceSpeedSerie[sourceIndex];
+         }
          if (isSourceTemperature) {
             newTargetTemperatureSerie[targetIndex] = sourceTemperatureSerie[sourceIndex];
          }
@@ -453,16 +461,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
+      _targetTour.speedSerie = _chkMergeSpeed.getSelection()
+            ? newTargetSpeedSerie
+            : _backupTargetSpeedSerie;
+
       if (_chkMergeTemperature.getSelection()) {
          _targetTour.temperatureSerie = newTargetTemperatureSerie;
       } else {
          _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
-      }
-
-      if (_chkMergeSpeed.getSelection()) {
-         _targetTour.speedSerie = newTargetTemperatureSerie;
-      } else {
-         _targetTour.speedSerie = _backupTargetTemperatureSerie;
       }
 
       if (_chkMergeCadence.getSelection()) {
@@ -665,6 +671,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _backupSourceTourType = _sourceTour.getTourType();
 
       _backupTargetPulseSerie = Util.createFloatCopy(_targetTour.pulseSerie);
+      _backupTargetSpeedSerie = Util.createFloatCopy(_targetTour.speedSerie);
       _backupTargetTemperatureSerie = Util.createFloatCopy(_targetTour.temperatureSerie);
       _backupTargetCadenceSerie = Util.createFloatCopy(_targetTour.getCadenceSerie());
 
@@ -1011,6 +1018,17 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
        * checkbox: merge temperature
        */
       //TODO FB ca se passe ici
+      _chkMergeSpeed = createUIMergeAction(
+            group,
+            TourManager.GRAPH_SPEED,
+            "Messages.merge_tour_source_graph_speed",
+            "Messages.merge_tour_source_graph_speed_tooltip",
+            Images.Graph_Speed,
+            _sourceTour.speedSerie != null);
+
+      /*
+       * checkbox: merge temperature
+       */
       _chkMergeTemperature = createUIMergeAction(
             group,
             TourManager.GRAPH_TEMPERATURE,
@@ -1327,11 +1345,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final boolean isAltitude = _sourceTour.altitudeSerie != null && _targetTour.altitudeSerie != null;
       final boolean isSourcePulse = _sourceTour.pulseSerie != null;
+      final boolean isSourceSpeed = _sourceTour.speedSerie != null;
       final boolean isSourceTemperature = _sourceTour.temperatureSerie != null;
       final boolean isSourceCadence = _sourceTour.getCadenceSerie() != null;
 
       _chkMergeAltitude.setEnabled(isAltitude);
       _chkMergePulse.setEnabled(isSourcePulse);
+      _chkMergeSpeed.setEnabled(isSourceSpeed);
       _chkMergeTemperature.setEnabled(isSourceTemperature);
       _chkMergeCadence.setEnabled(isSourceCadence);
 
@@ -1343,6 +1363,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
       if (isSourcePulse == false) {
          _chkMergePulse.setSelection(false);
+      }
+      if (isSourceSpeed == false) {
+         _chkMergeSpeed.setSelection(false);
       }
       if (isSourceTemperature == false) {
          _chkMergeTemperature.setSelection(false);
@@ -1516,6 +1539,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _sourceTour.altitudeSerie = Util.createFloatCopy(_backupSourceAltitudeSerie);
 
       _targetTour.pulseSerie = Util.createFloatCopy(_backupTargetPulseSerie);
+      _targetTour.speedSerie = Util.createFloatCopy(_backupTargetSpeedSerie);
       _targetTour.temperatureSerie = Util.createFloatCopy(_backupTargetTemperatureSerie);
       _targetTour.setCadenceSerie(Util.createFloatCopy(_backupTargetCadenceSerie));
 
@@ -1540,6 +1564,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _sourceTour.setTourType(_backupSourceTourType);
 
       _targetTour.pulseSerie = _backupTargetPulseSerie;
+      _targetTour.speedSerie = _backupTargetSpeedSerie;
       _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
 
@@ -1585,6 +1610,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       // restore merge graph state
       _chkMergeAltitude.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE));
       _chkMergePulse.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE));
+      _chkMergeSpeed
+            .setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_SPEED));
       _chkMergeTemperature
             .setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE));
       _chkMergeCadence.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE));
@@ -1615,6 +1642,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       // save merged tour graphs
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE, _chkMergeAltitude.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, _chkMergePulse.getSelection());
+      prefStore
+            .setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_SPEED, _chkMergeSpeed.getSelection());
       prefStore
             .setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, _chkMergeTemperature.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, _chkMergeCadence.getSelection());
@@ -1648,6 +1677,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       } else {
          // restore original pulse values because these values should not be saved
          _targetTour.pulseSerie = _backupTargetPulseSerie;
+      }
+
+      if (_chkMergeSpeed.getSelection()) {
+         // speed is already merged
+         isMerged = true;
+      } else {
+         // restore original temperature values because these values should not be saved
+         _targetTour.speedSerie = _backupTargetSpeedSerie;
       }
 
       if (_chkMergeTemperature.getSelection()) {
@@ -1706,6 +1743,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          if (visibleGraphs.contains(TourManager.GRAPH_PULSE) == false) {
             visibleGraphs.add(TourManager.GRAPH_PULSE);
          }
+      }
+
+      if (_chkMergeSpeed.getSelection() && visibleGraphs.contains(TourManager.GRAPH_SPEED) == false) {
+         visibleGraphs.add(TourManager.GRAPH_SPEED);
       }
 
       if (_chkMergeTemperature.getSelection()) {
