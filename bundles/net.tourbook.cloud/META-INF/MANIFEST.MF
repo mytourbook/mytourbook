@@ -44,3 +44,4 @@ Import-Package: com.fasterxml.jackson.core,
  org.apache.http.util,
  org.json
 Automatic-Module-Name: net.tourbook.cloud
+Export-Package: net.tourbook.cloud.oauth2

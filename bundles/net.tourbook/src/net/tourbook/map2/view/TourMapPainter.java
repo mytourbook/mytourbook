@@ -2098,6 +2098,7 @@ public class TourMapPainter extends MapPainter {
       } else {
 
          textColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+
          bannerColor = new Color(0xFF, 0xFF, 0xFF);
       }
 

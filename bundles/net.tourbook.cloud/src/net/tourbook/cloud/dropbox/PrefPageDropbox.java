@@ -54,15 +54,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   //SET_FORMATTING_OFF
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
-   //SET_FORMATTING_ON
-
    public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
    public static final String      ClientId      = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
@@ -75,6 +66,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    /*
     * UI controls
     */
+   private Button                  _btnCleanup;
    private Group                   _group;
    private Label                   _labelAccessToken;
    private Label                   _labelAccessToken_Value;
@@ -82,9 +74,12 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private Label                   _labelExpiresAt_Value;
    private Label                   _labelRefreshToken;
    private Label                   _labelRefreshToken_Value;
+   private Link                    _linkRevokeAccess;
 
    @Override
    protected void createFieldEditors() {
+
+      initUI();
 
       createUI();
 
@@ -106,7 +101,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
                   _group.redraw();
 
-                  updateTokensInformationGroup();
+                  enableControls();
                }
 
                if (_server != null) {
@@ -124,6 +119,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
+      createUI_100_AccountCleanup(parent);
 
       return parent;
    }
@@ -139,9 +135,26 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
           */
          final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
          setButtonLayoutData(btnAuthorizeConnection);
-         btnAuthorizeConnection.setText(PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE);
+         btnAuthorizeConnection.setText(Messages.PrefPage_CloudConnectivity_Button_Authorize);
          btnAuthorizeConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(btnAuthorizeConnection);
+      }
+   }
+
+   private void createUI_100_AccountCleanup(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         /*
+          * Clean-up button
+          */
+         _btnCleanup = new Button(container, SWT.NONE);
+         _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
+         _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+         _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
       }
    }
 
@@ -151,16 +164,18 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(PREFPAGE_CLOUDCONNECTIVITY_GROUP_CLOUDACCOUNT);
+      _group.setText(Messages.PrefPage_CloudConnectivity_Group_CloudAccount);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
          {
             final Label labelWebPage = new Label(_group, SWT.NONE);
-            labelWebPage.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE);
+            labelWebPage.setText(Messages.PrefPage_CloudConnectivity_Label_WebPage);
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START +
+                  Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link +
+                  UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
                   Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link)));
@@ -168,7 +183,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          }
          {
             _labelAccessToken = new Label(_group, SWT.NONE);
-            _labelAccessToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN);
+            _labelAccessToken.setText(Messages.PrefPage_CloudConnectivity_Label_AccessToken);
             _labelAccessToken.setToolTipText(Messages.PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
@@ -178,7 +193,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          }
          {
             _labelRefreshToken = new Label(_group, SWT.NONE);
-            _labelRefreshToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_REFRESHTOKEN);
+            _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
@@ -186,13 +201,35 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          }
          {
             _labelExpiresAt = new Label(_group, SWT.NONE);
-            _labelExpiresAt.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_EXPIRESAT);
+            _labelExpiresAt.setText(Messages.PrefPage_CloudConnectivity_Label_ExpiresAt);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
             _labelExpiresAt_Value = new Label(_group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
+         {
+            _linkRevokeAccess = new Link(_group, SWT.NONE);
+            _linkRevokeAccess.setText(Messages.PrefPage_CloudConnectivity_Label_RevokeAccess);
+            _linkRevokeAccess.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+                  "https://www.dropbox.com/account/connected_apps")));//$NON-NLS-1$
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(0, 16)
+                  .applyTo(_linkRevokeAccess);
+         }
       }
+   }
+
+   private void enableControls() {
+
+      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) &&
+            StringUtils.hasContent(_labelRefreshToken_Value.getText());
+
+      _labelRefreshToken.setEnabled(isAuthorized);
+      _labelExpiresAt.setEnabled(isAuthorized);
+      _labelAccessToken.setEnabled(isAuthorized);
+      _linkRevokeAccess.setEnabled(isAuthorized);
+      _btnCleanup.setEnabled(isAuthorized);
    }
 
    private String generateCodeChallenge(final String codeVerifier) {
@@ -221,6 +258,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    @Override
    public void init(final IWorkbench workbench) {
       //Not needed
+   }
+
+   private void initUI() {
+
+      noDefaultAndApplyButton();
    }
 
    @Override
@@ -289,11 +331,13 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    @Override
    protected void performDefaults() {
 
-      _labelAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
+      _labelAccessToken_Value.setText(
+            _prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
-      _labelRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
+      _labelRefreshToken_Value.setText(
+            _prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
 
-      updateTokensInformationGroup();
+      enableControls();
 
       super.performDefaults();
    }
@@ -329,16 +373,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             _prefStore.getInt(Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN)));
       _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
 
-      updateTokensInformationGroup();
-   }
-
-   private void updateTokensInformationGroup() {
-
-      final boolean isAuthorized = StringUtils.hasContent(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
-
-      _labelRefreshToken.setEnabled(isAuthorized);
-      _labelExpiresAt.setEnabled(isAuthorized);
-      _labelAccessToken.setEnabled(isAuthorized);
+      enableControls();
    }
 
 }
