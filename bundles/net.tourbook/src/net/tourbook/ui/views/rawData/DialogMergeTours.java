@@ -1015,14 +1015,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _sourceTour.pulseSerie != null);
 
       /*
-       * checkbox: merge temperature
+       * checkbox: merge speed
        */
-      //TODO FB ca se passe ici
       _chkMergeSpeed = createUIMergeAction(
             group,
             TourManager.GRAPH_SPEED,
-            "Messages.merge_tour_source_graph_speed",
-            "Messages.merge_tour_source_graph_speed_tooltip",
+            Messages.merge_tour_source_graph_speed,
+            Messages.merge_tour_source_graph_speed_tooltip,
             Images.Graph_Speed,
             _sourceTour.speedSerie != null);
 
