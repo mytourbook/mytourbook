@@ -1076,7 +1076,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * system is imperial
     */
    @Transient
-   private float[]               speedSerie;
+   public float[]               speedSerie;
 
    @Transient
    private float[]               speedSerie_Mile;

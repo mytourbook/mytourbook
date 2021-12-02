@@ -459,6 +459,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       }
 
+      if (_chkMergeSpeed.getSelection()) {
+         _targetTour.speedSerie = newTargetTemperatureSerie;
+      } else {
+         _targetTour.speedSerie = _backupTargetTemperatureSerie;
+      }
+
       if (_chkMergeCadence.getSelection()) {
          _targetTour.setCadenceSerie(newTargetCadenceSerie);
       } else {
@@ -1004,6 +1010,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       /*
        * checkbox: merge temperature
        */
+      //TODO FB ca se passe ici
       _chkMergeTemperature = createUIMergeAction(
             group,
             TourManager.GRAPH_TEMPERATURE,
