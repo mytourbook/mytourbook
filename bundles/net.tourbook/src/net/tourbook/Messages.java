@@ -1992,6 +1992,9 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Bookmark_Label_Title;
    public static String        Slideout_Map_Options_Checkbox_ChartSlider;
    public static String        Slideout_Map_Options_Checkbox_DimMap;
+   public static String        Slideout_Map_Options_Checkbox_PauseFilter_AutoPause;
+   public static String        Slideout_Map_Options_Checkbox_PauseFilter_Duration;
+   public static String        Slideout_Map_Options_Checkbox_PauseFilter_User;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
@@ -2002,6 +2005,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning;
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
+   public static String        Slideout_Map_Options_Checkbox_TourPauseFilter;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ZoomWithMousePosition;

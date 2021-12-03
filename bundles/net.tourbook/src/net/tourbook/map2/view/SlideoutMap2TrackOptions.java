@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String           MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -145,7 +145,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
     * @param map2View
     * @param map2State
     */
-   public Slideout_Map2_TrackOptions(final Control ownerControl,
+   public SlideoutMap2TrackOptions(final Control ownerControl,
                                      final ToolBar toolBar,
                                      final Map2View map2View,
                                      final IDialogSettings map2State) {

@@ -1339,6 +1339,13 @@ public class TourMapPainter extends MapPainter {
                   ? false
                   : pausedTime_Data[index] == 1;
 
+            // exclude pauses
+            if (_tourPaintConfig.isFilterTourPauses
+                  && isTourPauseVisible(pauseDuration, isAutoPause) == false) {
+
+               continue;
+            }
+
             // draw tour pause
             if (drawTourPauses(
                   gcTile,
@@ -2105,23 +2112,23 @@ public class TourMapPainter extends MapPainter {
       final Rectangle markerImageBounds = markerImage.getBounds();
 
       final Color transparentColor = new Color(rgbTransparent);
-      final Color bannerBorderColor = new Color(0x69, 0xAF, 0x3D);
 
-      Color textColor;
       Color bannerColor;
+      Color bannerBorderColor;
+      Color textColor;
+
+      final Color systemColorRed = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+      final Color systemColorYellow = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
 
       final boolean isBackgroundDark = _tourPaintConfig.isBackgroundDark;
 
-      if (isBackgroundDark) {
-
-         bannerColor = ThemeUtil.getDefaultBackgroundColor_Shell();
-
-      } else {
-
-         bannerColor = new Color(0xFF, 0xFF, 0xFF);
-      }
-
       if (isAutoPause) {
+
+         bannerColor = isBackgroundDark
+               ? ThemeUtil.getDefaultBackgroundColor_Shell()
+               : new Color(0xFF, 0xFF, 0xFF);
+
+         bannerBorderColor = new Color(0x69, 0xAF, 0x3D);
 
          textColor = isBackgroundDark
                ? new Color(new RGB(0xff, 0xff, 0xff))
@@ -2131,9 +2138,17 @@ public class TourMapPainter extends MapPainter {
 
          // user started/stopped pause
 
+         bannerColor = isBackgroundDark
+               ? ThemeUtil.getDefaultBackgroundColor_Shell()
+               : new Color(0xFF, 0xFF, 0xFF);
+
+         bannerBorderColor = isBackgroundDark
+               ? systemColorYellow
+               : systemColorRed;
+
          textColor = isBackgroundDark
-               ? Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW)
-               : Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+               ? systemColorYellow
+               : systemColorRed;
       }
 
       final GC gc = new GC(markerImage);
@@ -2708,6 +2723,11 @@ public class TourMapPainter extends MapPainter {
          return true;
       }
 
+      return false;
+   }
+
+   private boolean isTourPauseVisible(final long pauseDuration, final boolean isAutoPause) {
+      // TODO Auto-generated method stub
       return false;
    }
 

@@ -290,17 +290,21 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR               = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
 
    public static final int       MAX_DIM_STEPS                                         = 10;
-   public static final String    STATE_IS_MAP_DIMMED                                   = "STATE_IS_MAP_DIMMED";                                    //$NON-NLS-1$
+   public static final String    STATE_IS_MAP_DIMMED                                   = "STATE_IS_MAP_DIMMED";                                 //$NON-NLS-1$
    public static final boolean   STATE_IS_MAP_DIMMED_DEFAULT                           = false;
-   public static final String    STATE_DIM_MAP_COLOR                                   = "STATE_DIM_MAP_COLOR";                                    //$NON-NLS-1$
+   public static final String    STATE_DIM_MAP_COLOR                                   = "STATE_DIM_MAP_COLOR";                                 //$NON-NLS-1$
    public static final RGB       STATE_DIM_MAP_COLOR_DEFAULT                           = new RGB(0x2f, 0x2f, 0x2f);
-   public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                    //$NON-NLS-1$
+   public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                 //$NON-NLS-1$
    public static final int       STATE_DIM_MAP_VALUE_DEFAULT                           = MAX_DIM_STEPS / 2;
 
+   static final String           STATE_IS_FILTER_TOUR_PAUSES                           = "STATE_IS_FILTER_TOUR_PAUSES";                         //$NON-NLS-1$
+   static final String           STATE_IS_PAUSE_FILTER_DURATION                        = "STATE_IS_PAUSE_FILTER_DURATION";                      //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_PAUSE_AUTO_PAUSES                       = "STATE_IS_SHOW_PAUSE_AUTO_PAUSES";                     //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_PAUSE_USER_INITIATED                    = "STATE_IS_SHOW_PAUSE_USER_INITIATED";                  //$NON-NLS-1$
 
    private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
 
-   private static final MapGraphId[]         _allGraphContribId       = {
+   private static final MapGraphId[]   _allGraphContribId = {
 
          MapGraphId.Altitude,
          MapGraphId.Gradient,
@@ -313,9 +317,7 @@ public class Map2View extends ViewPart implements
          MapGraphId.HrZone,
    };
 
-
-
-   // SET_FORMATTING_ON
+// SET_FORMATTING_ON
    //
    private static final IPreferenceStore _prefStore         = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common  = CommonActivator.getPrefStore();
@@ -527,7 +529,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_Map2_Options(_parent, toolbar, Map2View.this, _state);
+         return new SlideoutMap2Options(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
@@ -595,7 +597,7 @@ public class Map2View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new Slideout_Map2_TrackOptions(_parent, toolbar, Map2View.this, _state);
+         return new SlideoutMap2TrackOptions(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
