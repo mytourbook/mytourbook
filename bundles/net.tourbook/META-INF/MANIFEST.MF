@@ -62,7 +62,8 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui,
  net.tourbook.ui.action,
  net.tourbook.ui.tourChart,
- net.tourbook.ui.views.rawData
+ net.tourbook.ui.views.rawData,
+ net.tourbook.weather
 Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
  com.javadocmd.simplelatlng,
