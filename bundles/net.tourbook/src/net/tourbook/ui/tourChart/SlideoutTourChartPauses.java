@@ -26,9 +26,11 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -46,36 +48,19 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart pauses properties slideout.
  */
-public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutTourChartPauses extends ToolbarSlideout implements
+      IColorSelectorListener,
+      IActionResetToDefault,
+      IChangeUIListener {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    private SelectionListener      _defaultSelectionListener;
    private FocusListener          _keepOpenListener;
 
-   {
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+   private ActionResetToDefaults  _actionRestoreDefaults;
 
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent focusEvent) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent focusEvent) {
-            setIsAnotherDialogOpened(false);
-         }
-      };
-   }
-
-   private ActionResetToDefaults _actionRestoreDefaults;
+//   private TourPauseUI            _tourPauseUI;
 
    /*
     * UI controls
@@ -88,11 +73,14 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
    public SlideoutTourChartPauses(final Control ownerControl,
                                   final ToolBar toolBar,
-                                  final TourChart tourChart) {
+                                  final TourChart tourChart,
+                                  final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
       _tourChart = tourChart;
+
+//      _tourPauseUI = new TourPauseUI(state, this, this);
    }
 
    @Override
@@ -124,6 +112,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
+      initUI();
+
       createActions();
 
       final Composite ui = createUI(parent);
@@ -146,6 +136,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
             createUI_10_Header(container);
             createUI_20_Controls(container);
          }
+
+//         _tourPauseUI.createContent(shellContainer, isShowTourPauses);
       }
 
       return shellContainer;
@@ -222,6 +214,29 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       Arrays.asList(ChartPauseToolTip.TOOLTIP_POSITIONS).forEach(tooltipPosition -> _comboTooltipPosition.add(tooltipPosition));
    }
 
+   private void initUI() {
+
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent focusEvent) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent focusEvent) {
+            setIsAnotherDialogOpened(false);
+         }
+      };
+   }
+
    private void onChangeUI() {
 
       final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
@@ -239,6 +254,12 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
       // update chart with new settings
       _tourChart.updateUI_PausesLayer(true);
+   }
+
+   @Override
+   public void onChangeUI_External() {
+
+//      onch
    }
 
    @Override

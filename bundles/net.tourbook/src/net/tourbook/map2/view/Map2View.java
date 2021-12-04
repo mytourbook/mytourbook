@@ -297,11 +297,6 @@ public class Map2View extends ViewPart implements
    public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                 //$NON-NLS-1$
    public static final int       STATE_DIM_MAP_VALUE_DEFAULT                           = MAX_DIM_STEPS / 2;
 
-   static final String           STATE_IS_FILTER_TOUR_PAUSES                           = "STATE_IS_FILTER_TOUR_PAUSES";                         //$NON-NLS-1$
-   static final String           STATE_IS_PAUSE_FILTER_DURATION                        = "STATE_IS_PAUSE_FILTER_DURATION";                      //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_PAUSE_AUTO_PAUSES                       = "STATE_IS_SHOW_PAUSE_AUTO_PAUSES";                     //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_PAUSE_USER_INITIATED                    = "STATE_IS_SHOW_PAUSE_USER_INITIATED";                  //$NON-NLS-1$
-
    private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
 
    private static final MapGraphId[]   _allGraphContribId = {

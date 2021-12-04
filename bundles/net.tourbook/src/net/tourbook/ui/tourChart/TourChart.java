@@ -1320,7 +1320,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _actionGraphMinMax = new ActionGraphMinMax();
       _actionTourInfo = new Action_TourChart_Info(this, _parent);
       _actionTourMarker = new ActionTourChartMarker(this, _parent);
-      _actionTourChartPauses = new ActionTourChartPauses(this, _parent);
+      _actionTourChartPauses = new ActionTourChartPauses(this, _parent, _state);
 
       _allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionCanAutoZoomToSlider(this));
       _allTourChartActions.put(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, new ActionCanMoveSlidersWhenZoomed(this));

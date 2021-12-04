@@ -4,8 +4,8 @@
 TODO's
 ======
 
-https://adoptium.net/ Temurin
-
+* Bundle MT with JRE       
+                  https://github.com/mytourbook/mytourbook/issues/381#issue-971079239
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page

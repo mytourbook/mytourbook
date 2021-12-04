@@ -25,22 +25,19 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
-import net.tourbook.tour.filter.TourFilterFieldOperator;
+import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -50,45 +47,21 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D Map properties
  */
-public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutMap2Options extends ToolbarSlideout implements
+
+      IColorSelectorListener,
+      IActionResetToDefault,
+      IChangeUIListener {
 
    private static IDialogSettings         _state;
-
-   /**
-    * Filter operator MUST be in sync with filter labels
-    */
-   private TourFilterFieldOperator[]      _allFilter_Value   = {
-
-         TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
-         TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
-         TourFilterFieldOperator.EQUALS,
-
-   };
-
-   /**
-    * Filter labels MUST be in sync with filter operator
-    */
-   private String[]                       _allFilter_Label   = {
-
-         Messages.Tour_Filter_Operator_GreaterThanOrEqual,
-         Messages.Tour_Filter_Operator_LessThanOrEqual,
-         Messages.Tour_Filter_Operator_Equals,
-
-   };
 
    private IPropertyChangeListener        _defaultChangePropertyListener;
    private SelectionListener              _defaultSelectionListener;
    private MouseWheelListener             _defaultMouseWheelListener;
-   private FocusListener                  _keepOpenListener;
 
    private ActionResetToDefaults          _actionRestoreDefaults;
 
    private Map2View                       _map2View;
-   private PixelConverter                 _pc;
-
-   private int                            _firstColumnIndent;
-   private GridDataFactory                _firstColoumLayoutData;
-   private GridDataFactory                _secondColoumLayoutData;
 
    private final TourPainterConfiguration _tourPainterConfig = TourPainterConfiguration.getInstance();
 
@@ -96,18 +69,13 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
     * UI controls
     */
    private Button                _chkIsDimMap;
-   private Button                _chkIsFilterTourPauses;
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkIsZoomWithMousePosition;
-   private Button                _chkIsShowPauses_AutoPause;
-   private Button                _chkIsPauseFilter_Duration;
-   private Button                _chkIsShowPauses_UserInitiated;
-
-   private Combo                 _comboPauseFilter_Duration;
 
    private Spinner               _spinnerDimValue;
 
    private ColorSelectorExtended _colorMapDimmColor;
+   private TourPauseUI           _tourPausesUI;
 
    /**
     * @param ownerControl
@@ -124,6 +92,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
 
       _map2View = map2View;
       _state = map2State;
+
+      _tourPausesUI = new TourPauseUI(map2State, this, this);
    }
 
    @Override
@@ -145,8 +115,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
 
       final Composite ui = createUI(parent);
 
-      setupUI();
-
       restoreState();
       enableControls();
 
@@ -160,7 +128,10 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
       {
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
-         createUI_30_TourPauseFilter(shellContainer);
+
+         final boolean isShowTourPauses = _tourPainterConfig.isShowTourPauses;
+
+         _tourPausesUI.createContent(shellContainer, isShowTourPauses);
       }
 
       return shellContainer;
@@ -263,84 +234,17 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
       }
    }
 
-   private void createUI_30_TourPauseFilter(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            /*
-             * Fiter tour pauses
-             */
-            _chkIsFilterTourPauses = new Button(container, SWT.CHECK);
-            _chkIsFilterTourPauses.setText(Messages.Slideout_Map_Options_Checkbox_TourPauseFilter);
-            _chkIsFilterTourPauses.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsFilterTourPauses);
-         }
-         {
-            /*
-             * Pauses Filter: Auto pause
-             */
-            _chkIsShowPauses_AutoPause = new Button(container, SWT.CHECK);
-            _chkIsShowPauses_AutoPause.setText(Messages.Slideout_Map_Options_Checkbox_PauseFilter_AutoPause);
-            _chkIsShowPauses_AutoPause.addSelectionListener(_defaultSelectionListener);
-            _firstColoumLayoutData.span(2, 1).applyTo(_chkIsShowPauses_AutoPause);
-         }
-         {
-            /*
-             * Pauses Filter: User started/stopped
-             */
-            _chkIsShowPauses_UserInitiated = new Button(container, SWT.CHECK);
-            _chkIsShowPauses_UserInitiated.setText(Messages.Slideout_Map_Options_Checkbox_PauseFilter_User);
-            _chkIsShowPauses_UserInitiated.addSelectionListener(_defaultSelectionListener);
-            _firstColoumLayoutData.span(2, 1).applyTo(_chkIsShowPauses_UserInitiated);
-         }
-         {
-            /*
-             * Pauses Filter: Duration
-             */
-            _chkIsPauseFilter_Duration = new Button(container, SWT.CHECK);
-            _chkIsPauseFilter_Duration.setText(Messages.Slideout_Map_Options_Checkbox_PauseFilter_Duration);
-            _chkIsPauseFilter_Duration.addSelectionListener(_defaultSelectionListener);
-            _firstColoumLayoutData.applyTo(_chkIsPauseFilter_Duration);
-
-            final Composite containerDuration = new Composite(parent, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerDuration);
-            GridLayoutFactory.fillDefaults().numColumns(5).applyTo(containerDuration);
-            {
-               // combo
-               _comboPauseFilter_Duration = new Combo(containerDuration, SWT.DROP_DOWN | SWT.READ_ONLY);
-               _comboPauseFilter_Duration.setVisibleItemCount(5);
-               _comboPauseFilter_Duration.addSelectionListener(_defaultSelectionListener);
-               _comboPauseFilter_Duration.addFocusListener(_keepOpenListener);
-               _secondColoumLayoutData.applyTo(_comboPauseFilter_Duration);
-            }
-         }
-      }
-   }
-
    private void enableControls() {
 
       final boolean isDimMap = _chkIsDimMap.getSelection();
-      final boolean isShowTourPauses = _tourPainterConfig.isShowTourPauses;
-      final boolean isFilterTourPauses = _chkIsFilterTourPauses.getSelection();
-      final boolean isDurationFilter = _chkIsPauseFilter_Duration.getSelection();
-      final boolean isPausesFilter = isShowTourPauses && isFilterTourPauses;
 
       _colorMapDimmColor.setEnabled(isDimMap);
       _spinnerDimValue.setEnabled(isDimMap);
 
-      _chkIsFilterTourPauses.setEnabled(isShowTourPauses);
-      _chkIsShowPauses_AutoPause.setEnabled(isPausesFilter);
-      _chkIsShowPauses_UserInitiated.setEnabled(isPausesFilter);
-      _chkIsPauseFilter_Duration.setEnabled(isPausesFilter);
-      _comboPauseFilter_Duration.setEnabled(isPausesFilter && isDurationFilter);
+      _tourPausesUI.enableControls();
    }
 
    private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI_UpdateMap());
 
@@ -351,34 +255,12 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onChangeUI_UpdateMap();
       };
+   }
 
-      _keepOpenListener = new FocusListener() {
+   @Override
+   public void onChangeUI_External() {
 
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsAnotherDialogOpened(false);
-         }
-      };
-
-      _firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
-
-      _firstColoumLayoutData = GridDataFactory.fillDefaults()
-            .indent(_firstColumnIndent, 0)
-            .align(SWT.FILL, SWT.CENTER);
-
-      _secondColoumLayoutData = GridDataFactory.fillDefaults()
-            .indent(2 * _firstColumnIndent, 0)
-            .align(SWT.FILL, SWT.CENTER);
+      _map2View.restoreState_Map2_Options();
    }
 
    private void onChangeUI_UpdateMap() {
@@ -407,6 +289,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_ON
 
+      _tourPausesUI.resetToDefaults();
+
       onChangeUI_UpdateMap();
    }
 
@@ -425,6 +309,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
       _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
 
 // SET_FORMATTING_ON
+
+      _tourPausesUI.restoreState();
    }
 
    private void saveState() {
@@ -441,22 +327,9 @@ public class SlideoutMap2Options extends ToolbarSlideout implements IColorSelect
       _state.put(Map2View.STATE_DIM_MAP_VALUE,                 _spinnerDimValue.getSelection());
       Util.setState(_state,Map2View.STATE_DIM_MAP_COLOR,       _colorMapDimmColor.getColorValue());
 
-      /*
-       * Tour filter
-       */
-      _state.put(Map2View.STATE_IS_FILTER_TOUR_PAUSES,         _chkIsFilterTourPauses.getSelection());
-      _state.put(Map2View.STATE_IS_PAUSE_FILTER_DURATION,      _chkIsPauseFilter_Duration.getSelection());
-      _state.put(Map2View.STATE_IS_SHOW_PAUSE_AUTO_PAUSES,     _chkIsShowPauses_AutoPause.getSelection());
-      _state.put(Map2View.STATE_IS_SHOW_PAUSE_USER_INITIATED,  _chkIsShowPauses_UserInitiated.getSelection());
-
 // SET_FORMATTING_ON
-   }
 
-   private void setupUI() {
-
-      for (final String label : _allFilter_Label) {
-         _comboPauseFilter_Duration.add(label);
-      }
+      _tourPausesUI.saveState();
    }
 
 }
