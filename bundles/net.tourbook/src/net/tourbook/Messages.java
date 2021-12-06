@@ -1992,9 +1992,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Bookmark_Label_Title;
    public static String        Slideout_Map_Options_Checkbox_ChartSlider;
    public static String        Slideout_Map_Options_Checkbox_DimMap;
-   public static String        Slideout_Map_Options_Checkbox_PauseFilter_AutoPause;
-   public static String        Slideout_Map_Options_Checkbox_PauseFilter_Duration;
-   public static String        Slideout_Map_Options_Checkbox_PauseFilter_User;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
@@ -2005,7 +2002,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning;
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
-   public static String        Slideout_Map_Options_Checkbox_TourPauseFilter;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
@@ -2825,6 +2821,14 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_minutes;
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
+
+   public static String        Tour_Pauses_Checkbox_AutoPauses;
+   public static String        Tour_Pauses_Checkbox_Duration_Hours;
+   public static String        Tour_Pauses_Checkbox_Duration_Minutes;
+   public static String        Tour_Pauses_Checkbox_Duration_Seconds;
+   public static String        Tour_Pauses_Checkbox_PauseDurationFilter;
+   public static String        Tour_Pauses_Checkbox_UserPauses;
+   public static String        Tour_Pauses_Checkbox_TourPauseFilter;
 
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;

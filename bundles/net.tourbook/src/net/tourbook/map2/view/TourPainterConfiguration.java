@@ -22,6 +22,7 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 
 /**
  * Contains data which are needed to paint a tour into a map.
@@ -43,7 +44,6 @@ public class TourPainterConfiguration {
    private IMapColorProvider               _mapColorProvider;
 
    boolean                                 isBackgroundDark;
-   boolean                                 isFilterTourPauses;
    boolean                                 isShowStartEndInMap;
    boolean                                 isShowTourMarker;
    boolean                                 isShowTourPauses;
@@ -51,12 +51,18 @@ public class TourPainterConfiguration {
    boolean                                 isPhotoVisible;
    boolean                                 isTourVisible;
 
-
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
    boolean                                 isLinkPhotoDisplayed;
+
+   boolean                                 isFilterTourPauses;
+   boolean                                 isFilterPauseDuration;
+   boolean                                 isShowAutoPauses;
+   boolean                                 isShowUserPauses;
+   long                                    pauseDuration;
+   Enum<TourFilterFieldOperator>           pauseDurationOperator;
 
    private TourPainterConfiguration() {}
 

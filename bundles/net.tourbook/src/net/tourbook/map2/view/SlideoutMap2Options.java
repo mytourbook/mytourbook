@@ -129,9 +129,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
 
-         final boolean isShowTourPauses = _tourPainterConfig.isShowTourPauses;
-
-         _tourPausesUI.createContent(shellContainer, isShowTourPauses);
+         _tourPausesUI.createContent(shellContainer, _tourPainterConfig.isShowTourPauses);
       }
 
       return shellContainer;

@@ -66,6 +66,7 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPage_Map2_Appearance;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.core.runtime.Assert;
@@ -1269,7 +1270,12 @@ public class TourMapPainter extends MapPainter {
                   }
                }
 
-               final boolean isAutoPause = pausedTime_Data == 1;
+               final boolean isPauseAnAutoPause = pausedTime_Data == 1;
+
+               // exclude pauses
+               if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
+                  continue;
+               }
 
                // draw tour pause
                if (drawTourPauses(
@@ -1280,7 +1286,7 @@ public class TourMapPainter extends MapPainter {
                      longitudeSerie[tourSerieIndex],
                      pauseDuration,
                      parts,
-                     isAutoPause)) {
+                     isPauseAnAutoPause)) {
 
                   pauseCounter++;
                }
@@ -1335,14 +1341,12 @@ public class TourMapPainter extends MapPainter {
 
             final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
-            final boolean isAutoPause = pausedTime_Data == null
+            final boolean isPauseAnAutoPause = pausedTime_Data == null
                   ? false
                   : pausedTime_Data[index] == 1;
 
             // exclude pauses
-            if (_tourPaintConfig.isFilterTourPauses
-                  && isTourPauseVisible(pauseDuration, isAutoPause) == false) {
-
+            if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
                continue;
             }
 
@@ -1355,7 +1359,7 @@ public class TourMapPainter extends MapPainter {
                   longitudeSerie[serieIndex],
                   pauseDuration,
                   parts,
-                  isAutoPause)) {
+                  isPauseAnAutoPause)) {
 
                pauseCounter++;
             }
@@ -2726,9 +2730,61 @@ public class TourMapPainter extends MapPainter {
       return false;
    }
 
-   private boolean isTourPauseVisible(final long pauseDuration, final boolean isAutoPause) {
-      // TODO Auto-generated method stub
-      return false;
+   /**
+    * @param isPauseAnAutoPause
+    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
+    * @param pauseDuration
+    *           Pause duration in seconds
+    * @return
+    */
+   private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
+
+      if (_tourPaintConfig.isFilterTourPauses == false) {
+
+         // nothing is filtered
+         return true;
+      }
+
+      boolean isPauseVisible = false;
+
+      if (_tourPaintConfig.isShowAutoPauses && isPauseAnAutoPause) {
+
+         // pause is an auto-pause
+         isPauseVisible = true;
+      }
+
+      if (_tourPaintConfig.isShowUserPauses && !isPauseAnAutoPause) {
+
+         // pause is a user-pause
+         isPauseVisible = true;
+      }
+
+      if (isPauseVisible && _tourPaintConfig.isFilterPauseDuration) {
+
+         // filter by pause duration -> hide pause when condition is true
+
+         final long requiredPauseDuration = _tourPaintConfig.pauseDuration;
+         final Enum<TourFilterFieldOperator> pauseDurationOperator = _tourPaintConfig.pauseDurationOperator;
+
+         if (TourFilterFieldOperator.GREATER_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration >= requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.LESS_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration <= requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.EQUALS.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration == requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.NOT_EQUALS.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration != requiredPauseDuration) == false;
+         }
+      }
+
+      return isPauseVisible;
    }
 
    /**
