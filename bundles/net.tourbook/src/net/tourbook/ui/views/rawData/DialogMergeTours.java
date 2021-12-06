@@ -309,7 +309,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final int[] sourceTimeSerie = _sourceTour.timeSerie;
       final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
       final float[] sourcePulseSerie = _sourceTour.pulseSerie;
-      final float[] sourceSpeedSerie = _sourceTour.speedSerie;
+      final float[] sourceSpeedSerie = _sourceTour.getSpeedSerie();
       final float[] sourceTemperatureSerie = _sourceTour.temperatureSerie;
       final float[] sourceCadenceSerie = _sourceTour.getCadenceSerie();
 
@@ -461,9 +461,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
-      _targetTour.speedSerie = _chkMergeSpeed.getSelection()
+      _targetTour.setSpeedSerie(_chkMergeSpeed.getSelection()
             ? newTargetSpeedSerie
-            : _backupTargetSpeedSerie;
+            : _backupTargetSpeedSerie);
 
       if (_chkMergeTemperature.getSelection()) {
          _targetTour.temperatureSerie = newTargetTemperatureSerie;
@@ -671,7 +671,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _backupSourceTourType = _sourceTour.getTourType();
 
       _backupTargetPulseSerie = Util.createFloatCopy(_targetTour.pulseSerie);
-      _backupTargetSpeedSerie = Util.createFloatCopy(_targetTour.speedSerie);
+      _backupTargetSpeedSerie = Util.createFloatCopy(_targetTour.getSpeedSerie());
       _backupTargetTemperatureSerie = Util.createFloatCopy(_targetTour.temperatureSerie);
       _backupTargetCadenceSerie = Util.createFloatCopy(_targetTour.getCadenceSerie());
 
@@ -1023,7 +1023,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             Messages.merge_tour_source_graph_speed,
             Messages.merge_tour_source_graph_speed_tooltip,
             Images.Graph_Speed,
-            _sourceTour.speedSerie != null);
+            _sourceTour.getSpeedSerie() != null);
 
       /*
        * checkbox: merge temperature
@@ -1344,7 +1344,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final boolean isAltitude = _sourceTour.altitudeSerie != null && _targetTour.altitudeSerie != null;
       final boolean isSourcePulse = _sourceTour.pulseSerie != null;
-      final boolean isSourceSpeed = _sourceTour.speedSerie != null;
+      final boolean isSourceSpeed = _sourceTour.getSpeedSerie() != null;
       final boolean isSourceTemperature = _sourceTour.temperatureSerie != null;
       final boolean isSourceCadence = _sourceTour.getCadenceSerie() != null;
 
@@ -1538,7 +1538,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _sourceTour.altitudeSerie = Util.createFloatCopy(_backupSourceAltitudeSerie);
 
       _targetTour.pulseSerie = Util.createFloatCopy(_backupTargetPulseSerie);
-      _targetTour.speedSerie = Util.createFloatCopy(_backupTargetSpeedSerie);
+      _targetTour.setSpeedSerie(Util.createFloatCopy(_backupTargetSpeedSerie));
       _targetTour.temperatureSerie = Util.createFloatCopy(_backupTargetTemperatureSerie);
       _targetTour.setCadenceSerie(Util.createFloatCopy(_backupTargetCadenceSerie));
 
@@ -1563,7 +1563,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _sourceTour.setTourType(_backupSourceTourType);
 
       _targetTour.pulseSerie = _backupTargetPulseSerie;
-      _targetTour.speedSerie = _backupTargetSpeedSerie;
+      _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
       _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
 
@@ -1683,7 +1683,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          isMerged = true;
       } else {
          // restore original temperature values because these values should not be saved
-         _targetTour.speedSerie = _backupTargetSpeedSerie;
+         _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
       }
 
       if (_chkMergeTemperature.getSelection()) {
