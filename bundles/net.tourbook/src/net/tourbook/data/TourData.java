@@ -1076,7 +1076,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * system is imperial
     */
    @Transient
-   private float[]               speedSerie;
+   public float[]               speedSerie;
 
    @Transient
    private float[]               speedSerie_Mile;
@@ -9848,7 +9848,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (serieData.latitude != null) {
 
-         // use exising lat/lon double serie data from older versions
+         // use existing lat/lon double serie data from older versions
          // -> saving the tour will convert them into E6 format
 
          latitudeSerie        = serieData.latitude;
