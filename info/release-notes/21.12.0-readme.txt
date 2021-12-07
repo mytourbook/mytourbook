@@ -1,40 +1,57 @@
-21.12.0                                                 ?.December 2021
+21.12.0                                                 7. December 2021
 
   
 New
 ===
 
-* Tour Chart            205   https://sourceforge.net/p/mytourbook/feature-requests/205/
-  - New graph to show the summarized average speed
-
-* Sensor Battery        376   https://github.com/wolfgang-ch/mytourbook/issues/376
-  - Sensor view displays all sensors 
-  - Sensor chart displays sensor battery history values 
+* Sensor Battery                       
+  - Sensor view displays all available sensors
+  - Sensor chart displays all tours of a selected sensor
   - Tour info displays the sensor battery values from a tour
 
-* Suunto App Integration: (Frederic)
+  https://github.com/wolfgang-ch/mytourbook/issues/376
+
+
+* Tour Chart                           
+  - Graph displays the summarized average speed
+
+  https://sourceforge.net/p/mytourbook/feature-requests/205/
+
+
+* Suunto App Integration: (Frederic)   
   - Added support for multiple accounts
+
   https://sourceforge.net/p/mytourbook/feature-requests/197/
 
-* Strava Integration: (Frederic)
+
+* Strava Integration: (Frederic)       
   - Added the ability to upload a tour with or without its description
-  - Added the ability to map tour types to Strava activities for a more precise tour upload
+  - Added the ability to map tour types to Strava activities for a more 
+    precise tour upload
+
   https://sourceforge.net/p/mytourbook/discussion/622811/thread/e07bd4d3d7/
 
 
 Improvements
 ============
 
-* Easy Import           420   https://github.com/wolfgang-ch/mytourbook/issues/420
-  - New import launcher option: Replace the elevation value of the first time slice with the elevation value from the second time slice
-    This is fixing an issue after updating the Garmin Edge 1030 firmware version to 12.20, mostly it has total wrong elevation value for the first time slice
+* Easy Import                          
+  - New import launcher option: Replace the elevation value of the first 
+    time slice with the elevation value from the second time slice
+    This is fixing an issue after updating the Garmin Edge 1030 firmware 
+    version to 12.20, mostly it has total wrong elevation value for the 
+    first time slice
+    
+  https://github.com/wolfgang-ch/mytourbook/issues/420
   
 
 * GPX Import
-  - Tours can be imported also with the date/time format "yyyy-MM-dd'T'HH:mm:ss.SSSS"
+  - Tours can be imported also with the date/time format 
+    "yyyy-MM-dd'T'HH:mm:ss.SSSS"
 
-* Tour Marker View (Frederic)
+* Tour Marker View (Frederic)          
   - Added the ability to select between elapsed, moving and recorded time
+
   https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/?page=1#32dc
 
 
@@ -47,29 +64,34 @@ Changes
 Bugfix
 ======
 
-* Tour Chart            403   https://github.com/wolfgang-ch/mytourbook/issues/403
-  When moving a slider with the keyboard or mouse wheel, it did not move the selected time slice in the tour editor
+* Tour Chart                           
+  - When moving a slider with the keyboard or mouse wheel, it did not 
+    move the selected time slice in the tour editor
+  
+  https://github.com/wolfgang-ch/mytourbook/issues/403
+
 
 * Tour Marker Editor (Frederic)
   - When opening the dialog, the focus was not set in the label (Linux only)
-  - When double clicking on a marker label combo entry, the tour marker name was not updated
+  - When double clicking on a marker label combo entry, the tour 
+    marker name was not updated
+
  
 * Tour Segmenter
-  - 2 labels where hidden in the break time segmenter, propably since 21.9 but there were no code modifications in MT, maybe because of changes in the SWT framework
+  - 2 labels where hidden in the break time segmenter, propably since 21.9 
+    but there were no code modifications in MT, maybe because of changes 
+    in the SWT framework
 
 
 Translation    
 ===========
 
-- Czech 20.11 (Lukas)
 - Dutch (Maarten)
 - French (Frederic)
 - German
-- Italian (Doriano)
 
  
 System   
 ======
 
-* Eclipse 2021-06
 * FIT SDK 21.67

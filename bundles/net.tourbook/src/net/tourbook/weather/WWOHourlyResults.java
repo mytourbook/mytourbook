@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,7 +40,7 @@ public class WWOHourlyResults {
     * Feels like temperature in degrees Celsius (windchill)
     */
    @JsonProperty("FeelsLikeC")
-   private String                 FeelsLikeC;
+   private String                 feelsLikeC;
 
    /**
     * Temperature in degrees Celsius
@@ -63,7 +63,7 @@ public class WWOHourlyResults {
    private String                 precipMM;
 
    public int getFeelsLikeC() {
-      return Integer.parseInt(FeelsLikeC);
+      return Integer.parseInt(feelsLikeC);
    }
 
    public int getHumidity() {
@@ -95,7 +95,7 @@ public class WWOHourlyResults {
    }
 
    public String getWeatherDescription() {
-      return weatherDesc.get(0).getValue();
+      return getWeatherDesc().get(0).getValue();
    }
 
    public int getWinddirDegree() {
