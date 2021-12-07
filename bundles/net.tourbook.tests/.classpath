@@ -6,6 +6,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry exported="true" kind="lib" path="jsonassert-1.5.0.jar"/> <!-- https://github.com/skyscreamer/JSONassert/releases -->
 	<classpathentry exported="true" kind="lib" path="xmlunit-core-2.8.3.jar"/> <!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-core -->
+	<classpathentry exported="true" kind="lib" path="HttpClientMock-1.0.0.jar"/> <!-- https://mvnrepository.com/artifact/com.pgs-soft/HttpClientMock -->
+	<classpathentry exported="true" kind="lib" path="hamcrest-all-1.3.jar"/> <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all -->
 	<classpathentry exported="true" kind="lib" path="hibernate-entitymanager.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
