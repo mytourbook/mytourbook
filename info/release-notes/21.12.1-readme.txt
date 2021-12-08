@@ -1,0 +1,8 @@
+21.12.1                                                 ?. December 2021
+
+  
+Improvements
+============
+
+* Daum Import                          
+  - Support additional date format
