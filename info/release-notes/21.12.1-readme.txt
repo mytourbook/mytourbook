@@ -1,0 +1,10 @@
+21.12.1                                                 10. December 2021
+
+  
+Improvements
+============
+
+* Daum Import                          
+  Support for an additional date format which is read from the filename
+  Current  ... 03_02_2021 ...
+  New      ... 17 May 2021 ...
