@@ -82,6 +82,7 @@ import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -2173,6 +2174,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          long tourStartTime = 0;
          final List<List<Long>> allTourPauses = _tourData.multiTourPauses;
          int currentTourPauseIndex = 0;
+
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
             final ZonedDateTime currentTourZonedStartTime = multipleTourZonedStartTime[tourIndex];
@@ -2203,17 +2205,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                if (tourSerieIndex < xAxisSerie.length) {
 
-                  final boolean isAutoPause = pausedTime_Data == 1;
+                  final boolean isPauseAnAutoPause = pausedTime_Data == 1;
 
-                  final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
-                        pausedTime_Start,
-                        pausedTime_End,
-                        isAutoPause,
-                        tourTimeZoneId,
-                        xAxisSerie,
-                        tourSerieIndex);
+                  final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
 
-                  chartPauseConfig.chartLabelPauses.add(chartLabelPause);
+                  // exclude pauses
+                  if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
+
+                     final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
+                           pausedTime_Start,
+                           pausedTime_End,
+                           isPauseAnAutoPause,
+                           tourTimeZoneId,
+                           xAxisSerie,
+                           tourSerieIndex);
+
+                     chartPauseConfig.chartLabelPauses.add(chartLabelPause);
+                  }
                }
 
                ++currentTourPauseIndex;
@@ -2222,25 +2230,28 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       } else {
 
-         final long[] pausedTime_Start = _tourData.getPausedTime_Start();
-         final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+         final long[] allPausedTime_Start = _tourData.getPausedTime_Start();
+         final long[] allPausedTime_Data = _tourData.getPausedTime_Data();
 
-         if (pausedTime_Start == null) {
+         if (allPausedTime_Start == null) {
             return;
          }
 
-         final long[] pausedTime_End = _tourData.getPausedTime_End();
+         final long[] allPausedTime_End = _tourData.getPausedTime_End();
 
          int serieIndex = 0;
          final int[] timeSerie = _tourData.timeSerie;
          final long tourStartTime = _tourData.getTourStartTimeMS();
-         for (int index = 0; index < pausedTime_Start.length; ++index) {
 
+         // loop: pauses
+         for (int pausesIndex = 0; pausesIndex < allPausedTime_Start.length; ++pausesIndex) {
+
+            final long pausedTime_Start = allPausedTime_Start[pausesIndex];
             for (; serieIndex < timeSerie.length && serieIndex < xAxisSerie.length; ++serieIndex) {
 
                final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
 
-               if (currentTime > pausedTime_Start[index]) {
+               if (currentTime > pausedTime_Start) {
                   break;
                }
             }
@@ -2249,19 +2260,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                continue;
             }
 
-            final boolean isAutoPause = pausedTime_Data == null
+            final long pausedTime_End = allPausedTime_End[pausesIndex];
+            final boolean isPauseAnAutoPause = allPausedTime_Data == null
                   ? false
-                  : pausedTime_Data[index] == 1;
+                  : allPausedTime_Data[pausesIndex] == 1;
 
-            final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
-                  pausedTime_Start[index],
-                  pausedTime_End[index],
-                  isAutoPause,
-                  _tourData.getTimeZoneId(),
-                  xAxisSerie,
-                  serieIndex);
+            final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
 
-            chartPauseConfig.chartLabelPauses.add(chartLabelPause);
+            // exclude pauses
+            if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
+
+               final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
+                     pausedTime_Start,
+                     pausedTime_End,
+                     isPauseAnAutoPause,
+                     _tourData.getTimeZoneId(),
+                     xAxisSerie,
+                     serieIndex);
+
+               chartPauseConfig.chartLabelPauses.add(chartLabelPause);
+            }
          }
       }
    }
@@ -3449,6 +3467,63 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                       final long time) {
 
       return time >= sunsetTimes.toEpochSecond() || time <= sunriseTimes.toEpochSecond();
+   }
+
+   /**
+    * @param isPauseAnAutoPause
+    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
+    * @param pauseDuration
+    *           Pause duration in seconds
+    * @return
+    */
+   private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
+
+      if (_tourChartConfiguration.isFilterTourPauses == false) {
+
+         // nothing is filtered
+         return true;
+      }
+
+      boolean isPauseVisible = false;
+
+      if (_tourChartConfiguration.isShowAutoPauses && isPauseAnAutoPause) {
+
+         // pause is an auto-pause
+         isPauseVisible = true;
+      }
+
+      if (_tourChartConfiguration.isShowUserPauses && !isPauseAnAutoPause) {
+
+         // pause is a user-pause
+         isPauseVisible = true;
+      }
+
+      if (isPauseVisible && _tourChartConfiguration.isFilterPauseDuration) {
+
+         // filter by pause duration -> hide pause when condition is true
+
+         final long requiredPauseDuration = _tourChartConfiguration.pauseDuration;
+         final TourFilterFieldOperator pauseDurationOperator = _tourChartConfiguration.pauseDurationOperator;
+
+         if (TourFilterFieldOperator.GREATER_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration >= requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.LESS_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration <= requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.EQUALS.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration == requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.NOT_EQUALS.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration != requiredPauseDuration) == false;
+         }
+      }
+
+      return isPauseVisible;
    }
 
    private void onChart_KeyDown(final ChartKeyEvent keyEvent) {

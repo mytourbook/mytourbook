@@ -198,7 +198,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
             //
             //
             ) {
-               _tourChartConfig = TourManager.createDefaultTourChartConfig();
+               _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
 
                if (_tourChart != null) {
                   _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -438,7 +438,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       _tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
       _tourChart.setContextProvider(new TourChartContextProvider(this), true);
 
-      _tourChartConfig = TourManager.createDefaultTourChartConfig();
+      _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
 
       _tourChartConfig.canUseGeoCompareTool = true;
 

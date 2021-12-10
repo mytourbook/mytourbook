@@ -1273,22 +1273,21 @@ public class TourMapPainter extends MapPainter {
                final boolean isPauseAnAutoPause = pausedTime_Data == 1;
 
                // exclude pauses
-               if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
-                  continue;
-               }
+               if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
 
-               // draw tour pause
-               if (drawTourPauses(
-                     gcTile,
-                     map,
-                     tile,
-                     latitudeSerie[tourSerieIndex],
-                     longitudeSerie[tourSerieIndex],
-                     pauseDuration,
-                     parts,
-                     isPauseAnAutoPause)) {
+                  // draw tour pause
+                  if (drawTourPauses(
+                        gcTile,
+                        map,
+                        tile,
+                        latitudeSerie[tourSerieIndex],
+                        longitudeSerie[tourSerieIndex],
+                        pauseDuration,
+                        parts,
+                        isPauseAnAutoPause)) {
 
-                  pauseCounter++;
+                     pauseCounter++;
+                  }
                }
 
                ++relativeTourPauseIndex;

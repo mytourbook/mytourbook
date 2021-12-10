@@ -92,6 +92,7 @@ import net.tourbook.weather.WeatherData;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -714,11 +715,12 @@ public class TourManager {
    /**
     * Create a tour chart configuration by reading the settings from the pref store.
     *
+    * @param state
     * @return Returns a new tour chart configuration.
     */
-   public static TourChartConfiguration createDefaultTourChartConfig() {
+   public static TourChartConfiguration createDefaultTourChartConfig(final IDialogSettings state) {
 
-      final TourChartConfiguration tcc = new TourChartConfiguration(true);
+      final TourChartConfiguration tcc = new TourChartConfiguration(true, state);
 
       /*
        * convert graph ids from the preferences into visible graphs in the chart panel configuration

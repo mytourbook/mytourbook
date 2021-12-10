@@ -28,6 +28,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -60,16 +61,18 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
 
    private ActionResetToDefaults  _actionRestoreDefaults;
 
-//   private TourPauseUI            _tourPauseUI;
+   private TourPauseUI            _tourPausesUI;
 
    /*
     * UI controls
     */
-   private TourChart _tourChart;
+   private TourChart       _tourChart;
 
-   private Button    _chkShowPauseTooltip;
+   private Button          _chkShowPauseTooltip;
 
-   private Combo     _comboTooltipPosition;
+   private Combo           _comboTooltipPosition;
+
+   private IDialogSettings _state;
 
    public SlideoutTourChartPauses(final Control ownerControl,
                                   final ToolBar toolBar,
@@ -79,8 +82,9 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
       super(ownerControl, toolBar);
 
       _tourChart = tourChart;
+      _state = state;
 
-//      _tourPauseUI = new TourPauseUI(state, this, this);
+      _tourPausesUI = new TourPauseUI(state, this, this);
    }
 
    @Override
@@ -137,7 +141,10 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
             createUI_20_Controls(container);
          }
 
-//         _tourPauseUI.createContent(shellContainer, isShowTourPauses);
+         _tourPausesUI.createContent(shellContainer,
+
+               // this slideout is only displayed when pauses are visible
+               true);
       }
 
       return shellContainer;
@@ -239,18 +246,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
 
    private void onChangeUI() {
 
-      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
-      final int tooltipPosition = _comboTooltipPosition.getSelectionIndex();
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION, tooltipPosition);
-
-      /*
-       * Update chart config
-       */
-      final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
-      tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
-      tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
+      saveState();
 
       // update chart with new settings
       _tourChart.updateUI_PausesLayer(true);
@@ -259,7 +255,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
    @Override
    public void onChangeUI_External() {
 
-//      onch
+      onChangeUI();
    }
 
    @Override
@@ -267,6 +263,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
 
       _chkShowPauseTooltip.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP));
       _comboTooltipPosition.select(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION));
+
+      _tourPausesUI.resetToDefaults();
 
       onChangeUI();
    }
@@ -282,6 +280,29 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
             : tourChartConfiguration.pauseTooltipPosition;
 
       _comboTooltipPosition.select(pauseTooltipPosition);
+
+      _tourPausesUI.restoreState();
    }
 
+   private void saveState() {
+
+      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
+      final int tooltipPosition = _comboTooltipPosition.getSelectionIndex();
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION, tooltipPosition);
+
+      /*
+       * Update chart config
+       */
+      final TourChartConfiguration tourChartConfig = _tourChart.getTourChartConfig();
+      tourChartConfig.isShowPauseTooltip = isShowPauseTooltip;
+      tourChartConfig.pauseTooltipPosition = tooltipPosition;
+
+      // 1. Save pause values into the state
+      _tourPausesUI.saveState();
+
+      // 2. Save pause values from the state into the tour chart config
+      tourChartConfig.updateStateValues(_state);
+   }
 }

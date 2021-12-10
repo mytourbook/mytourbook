@@ -927,7 +927,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       /*
        * create chart configuration
        */
-      _tourChartConfig = new TourChartConfiguration(true);
+      _tourChartConfig = new TourChartConfiguration(true, _state);
 
       // set altitude visible
       _tourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
