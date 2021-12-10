@@ -184,7 +184,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private boolean                                        _isAdjustAltiFromStartBackup;
 
    private org.eclipse.jface.util.IPropertyChangeListener _prefChangeListener;
-   private float[] _newTargetSpeedSerie;
+   private float[]                                        _newTargetSpeedSerie;
 
    /**
     * @param parentShell
@@ -348,7 +348,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       float sourceAlti = 0;
       float sourceAltiPrev = 0;
 
-      int targetTime = targetTimeSerie[0];
       float newSourceAltitude;
 
       if (isSourceAltitude) {
@@ -365,7 +364,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
        */
       for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
-         targetTime = targetTimeSerie[targetIndex];
+         final int targetTime = targetTimeSerie[targetIndex];
 
          /*
           * target tour is the leading time data serie, move source time forward to reach target
@@ -730,13 +729,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       createUISectionAdjustments(columnDisplay);
 
       createUISectionResetButtons(columnContainer);
-
    }
 
    /**
     * group: adjust time
     */
-   private void createUIGroupHorizAdjustment(final Composite parent) {
+   private void createUIGroupHorizontalAdjustment(final Composite parent) {
 
       final int valueWidth = _pc.convertWidthInCharsToPixels(4);
       Label label;
@@ -750,7 +748,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             .applyTo(groupTime);
 
       /*
-       * checkbox: keep horiz. and vert. adjustments
+       * Checkbox: keep horizontal and vertical adjustments
        */
       _chkSynchStartTime = new Button(groupTime, SWT.CHECK);
       GridDataFactory.fillDefaults().applyTo(_chkSynchStartTime);
@@ -920,7 +918,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 
-      createUIGroupHorizAdjustment(container);
+      createUIGroupHorizontalAdjustment(container);
       createUIGroupVertAdjustment(container);
       createUISectionDisplayOptions(container);
    }
@@ -960,7 +958,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             updateTourChart();
          }
       }));
-
    }
 
    private void createUISectionResetButtons(final Composite parent) {
@@ -1539,7 +1536,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private void onSelectResetValues() {
 
       /*
-       * get original data from the backuped data
+       * Get original data from the backed up data
        */
       _sourceTour.timeSerie = Util.createIntegerCopy(_backupSourceTimeSerie);
       _sourceTour.distanceSerie = Util.createFloatCopy(_backupSourceDistanceSerie);
@@ -1560,8 +1557,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    /**
     * Restore values which have been modified in the dialog
-    *
-    * @param selectedTour
     */
    private void restoreDataBackup() {
 
@@ -1686,8 +1681,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
-
-
       if (_chkMergeTemperature.getSelection()) {
          // temperature is already merged
          isMerged = true;
@@ -1711,17 +1704,18 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _sourceTour.setTourType(_backupSourceTourType);
       }
 
-      if (isMerged) {
-         _targetTour.computeComputedValues();
-      }
-
       if (_chkMergeSpeed.getSelection()) {
          // speed is already merged
          isMerged = true;
          _targetTour.setSpeedSerie(_newTargetSpeedSerie);
+         _targetTour.computeSpeedSeries();
       } else {
          // restore original temperature values because these values should not be saved
          _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
+      }
+
+      if (isMerged) {
+         _targetTour.computeComputedValues();
       }
 
       // set tour id into which the tour is merged
