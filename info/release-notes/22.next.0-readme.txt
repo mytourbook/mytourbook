@@ -1,8 +1,10 @@
-21.next.0                                                 ?.Month 2021
+22.next.0                                                 ?.Month 2021
 
 
 TODO's
 ======
+
+* Update          Replace screenshot on website with correct update url
 
 * Bundle MT with JRE       
                   https://github.com/mytourbook/mytourbook/issues/381#issue-971079239
