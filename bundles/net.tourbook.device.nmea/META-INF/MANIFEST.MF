@@ -17,3 +17,4 @@ Import-Package: net.tourbook.common.util,
 Bundle-ClassPath: org.opengts.util-MT-2015-02-23.jar,
  .
 Automatic-Module-Name: net.tourbook.device.nmea
+Export-Package: net.tourbook.device.nmea
