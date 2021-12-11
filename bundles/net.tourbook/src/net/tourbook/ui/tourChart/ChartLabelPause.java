@@ -42,6 +42,9 @@ public class ChartLabelPause extends ChartLabel {
       return _pausedTime_Start;
    }
 
+   /**
+    * @return Format paused time into hh:mm:ss
+    */
    public String getPauseDuration() {
       return UI.format_hh_mm_ss(Math.round((_pausedTime_End - _pausedTime_Start) / 1000f));
    }
@@ -72,11 +75,13 @@ public class ChartLabelPause extends ChartLabel {
 
    @Override
    public String toString() {
-      return "ChartLabel [" // //$NON-NLS-1$
-//				+ ("serieIndex=" + serieIndex + ", ")
-//				+ ("graphX=" + graphX + ", ")
-            + ("pauseDuration=" + getPauseDuration()) //$NON-NLS-1$
-            + "]"; //$NON-NLS-1$
+
+      return "ChartLabelPause [" //                      //$NON-NLS-1$
+
+            + "pauseDuration=" + getPauseDuration() //   //$NON-NLS-1$
+
+            + "]" //                                     //$NON-NLS-1$
+      ;
    }
 
 }

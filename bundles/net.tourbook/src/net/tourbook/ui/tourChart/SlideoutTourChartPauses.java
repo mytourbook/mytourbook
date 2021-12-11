@@ -124,6 +124,7 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
 
       fillUI();
       restoreState();
+      enableControls();
 
       return ui;
    }
@@ -216,6 +217,13 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
       }
    }
 
+   private void enableControls() {
+
+      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
+
+      _comboTooltipPosition.setEnabled(isShowPauseTooltip);
+   }
+
    private void fillUI() {
 
       Arrays.asList(ChartPauseToolTip.TOOLTIP_POSITIONS).forEach(tooltipPosition -> _comboTooltipPosition.add(tooltipPosition));
@@ -247,6 +255,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements
    private void onChangeUI() {
 
       saveState();
+
+      enableControls();
 
       // update chart with new settings
       _tourChart.updateUI_PausesLayer(true);

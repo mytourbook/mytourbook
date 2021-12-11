@@ -5667,7 +5667,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    private void setupTourSegmenter() {
 
-      final boolean isSegmenterActive = Util.getStateBoolean(//
+      final boolean isSegmenterActive = Util.getStateBoolean(
             _tourSegmenterState,
             TourSegmenterView.STATE_IS_SEGMENTER_ACTIVE,
             false);

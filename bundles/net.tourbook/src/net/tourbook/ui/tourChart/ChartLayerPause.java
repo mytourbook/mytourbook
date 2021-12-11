@@ -87,75 +87,12 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
-      drawPausePointAndLabel(gc, drawingData, chart);
+      draw_PausePointAndLabel(gc, drawingData, chart);
 
       gc.setClipping((Rectangle) null);
    }
 
-   /**
-    * This is painting the hovered pause.
-    * <p>
-    * {@inheritDoc}
-    */
-   @Override
-   public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
-
-      final ChartLabelPause hoveredLabel = _hoveredLabel;
-
-      if (hoveredLabel == null) {
-         return;
-      }
-
-      // the label is hovered
-      drawOverlay_Label(hoveredLabel, gc);
-   }
-
-   private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
-                                  final GC gc) {
-
-      if (chartLabelPause == null) {
-         return;
-      }
-
-      gc.setAlpha(0x30);
-
-      gc.setBackground(getLabelColor(chartLabelPause.isAutoPause()));
-
-      /*
-       * Rectangles can be merged into a union with regions, took me some time to find this solution
-       * :-)
-       */
-      final Region region = new Region(gc.getDevice());
-
-      final Rectangle paintedLabel = chartLabelPause.paintedLabel;
-      if (paintedLabel != null) {
-
-         final int devLabelX = paintedLabel.x - PAUSE_HOVER_SIZE;
-         final int devLabelY = paintedLabel.y - PAUSE_HOVER_SIZE;
-         final int devLabelWidth = paintedLabel.width + 2 * PAUSE_HOVER_SIZE;
-         final int devLabelHeight = paintedLabel.height + 2 * PAUSE_HOVER_SIZE;
-
-         region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
-      }
-
-      final int devPauseX = chartLabelPause.devXPause - PAUSE_HOVER_SIZE;
-      final int devPauseY = chartLabelPause.devYPause - PAUSE_HOVER_SIZE;
-      final int devPauseSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
-
-      region.add(devPauseX, devPauseY, devPauseSize, devPauseSize);
-
-      // get whole chart rectangle
-      final Rectangle clientRectangle = gc.getClipping();
-
-      gc.setClipping(region);
-      {
-         gc.fillRectangle(clientRectangle);
-      }
-      region.dispose();
-      gc.setClipping((Region) null);
-   }
-
-   private void drawPausePointAndLabel(final GC gc,
+   private void draw_PausePointAndLabel(final GC gc,
                                        final GraphDrawingData graphDrawingData,
                                        final Chart chart) {
 
@@ -254,6 +191,69 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          chartLabelPause.devYTop = devYTop;
          chartLabelPause.devGraphWidth = devVisibleChartWidth;
       }
+   }
+
+   /**
+    * This is painting the hovered pause.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
+
+      final ChartLabelPause hoveredLabel = _hoveredLabel;
+
+      if (hoveredLabel == null) {
+         return;
+      }
+
+      // the label is hovered
+      drawOverlay_Label(hoveredLabel, gc);
+   }
+
+   private void drawOverlay_Label(final ChartLabelPause chartLabelPause,
+                                  final GC gc) {
+
+      if (chartLabelPause == null) {
+         return;
+      }
+
+      gc.setAlpha(0x30);
+
+      gc.setBackground(getLabelColor(chartLabelPause.isAutoPause()));
+
+      /*
+       * Rectangles can be merged into a union with regions, took me some time to find this solution
+       * :-)
+       */
+      final Region region = new Region(gc.getDevice());
+
+      final Rectangle paintedLabel = chartLabelPause.paintedLabel;
+      if (paintedLabel != null) {
+
+         final int devLabelX = paintedLabel.x - PAUSE_HOVER_SIZE;
+         final int devLabelY = paintedLabel.y - PAUSE_HOVER_SIZE;
+         final int devLabelWidth = paintedLabel.width + 2 * PAUSE_HOVER_SIZE;
+         final int devLabelHeight = paintedLabel.height + 2 * PAUSE_HOVER_SIZE;
+
+         region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
+      }
+
+      final int devPauseX = chartLabelPause.devXPause - PAUSE_HOVER_SIZE;
+      final int devPauseY = chartLabelPause.devYPause - PAUSE_HOVER_SIZE;
+      final int devPauseSize = PAUSE_POINT_SIZE + 2 * PAUSE_HOVER_SIZE;
+
+      region.add(devPauseX, devPauseY, devPauseSize, devPauseSize);
+
+      // get whole chart rectangle
+      final Rectangle clientRectangle = gc.getClipping();
+
+      gc.setClipping(region);
+      {
+         gc.fillRectangle(clientRectangle);
+      }
+      region.dispose();
+      gc.setClipping((Region) null);
    }
 
    public ChartLabelPause getHoveredLabel() {
