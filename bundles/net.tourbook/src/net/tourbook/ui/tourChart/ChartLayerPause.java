@@ -46,30 +46,11 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    private ChartLabelPause  _hoveredLabel;
    private ChartLabelPause  _tooltipLabel;
 
-   private int              _devXPause;
-   private int              _devYPause;
-
    private TourChart        _tourChart;
 
    public ChartLayerPause(final TourChart tourChart) {
 
       _tourChart = tourChart;
-   }
-
-   /**
-    * Adjust label to the requested position
-    *
-    * @param labelWidth
-    * @param labelHeight
-    */
-   private void adjustLabelPosition(final int labelWidth,
-                                    final int labelHeight) {
-
-      final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
-
-      //LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED:
-      _devXPause -= labelWidth / 2;
-      _devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
    }
 
    /**
@@ -93,8 +74,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    }
 
    private void draw_PausePointAndLabel(final GC gc,
-                                       final GraphDrawingData graphDrawingData,
-                                       final Chart chart) {
+                                        final GraphDrawingData graphDrawingData,
+                                        final Chart chart) {
 
       final int devYTop = graphDrawingData.getDevYTop();
       final int devYBottom = graphDrawingData.getDevYBottom();
@@ -108,6 +89,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final double scaleY = graphDrawingData.getScaleY();
       final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
 
+      final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(20);
+
       for (final ChartLabelPause chartLabelPause : _chartPauseConfig.chartLabelPauses) {
 
          // check if a pause should be displayed
@@ -119,8 +102,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
          final double virtualXPos = chartLabelPause.graphX * scaleX;
-         _devXPause = (int) (virtualXPos - devVirtualGraphImageOffset);
-         _devYPause = devYBottom - devYGraph;
+         int devXPause = (int) (virtualXPos - devVirtualGraphImageOffset);
+         int devYPause = devYBottom - devYGraph;
 
          final String pauseDurationText = chartLabelPause.getPauseDuration();
          final Point labelExtend = gc.textExtent(pauseDurationText);
@@ -128,63 +111,86 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          /*
           * Get pause point top/left position
           */
-         final int devXPauseTopLeft = _devXPause - pausePointSize2;
-         final int devYPauseTopLeft = _devYPause - pausePointSize2;
+         final int devXPauseTopLeft = devXPause - pausePointSize2;
+         final int devYPauseTopLeft = devYPause - pausePointSize2;
 
          chartLabelPause.devXPause = devXPauseTopLeft;
          chartLabelPause.devYPause = devYPauseTopLeft;
 
+         final Color labelColor = getLabelColor(chartLabelPause.isAutoPause());
+
          /*
           * Draw pause point
           */
-         gc.setBackground(getLabelColor(chartLabelPause.isAutoPause()));
-
-         // draw pause point
+         gc.setBackground(labelColor);
          gc.fillRectangle(devXPauseTopLeft, devYPauseTopLeft, PAUSE_POINT_SIZE, PAUSE_POINT_SIZE);
 
          /*
           * Draw pause label
           */
-         gc.setForeground(getLabelColor(chartLabelPause.isAutoPause()));
+         gc.setForeground(labelColor);
          final int labelWidth = labelExtend.x;
          final int labelHeight = labelExtend.y;
 
-         adjustLabelPosition(labelWidth, labelHeight);
+         // center label to the pause point
+         devXPause -= labelWidth / 2;
+         devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
 
          // add an additional offset which is defined for all pauses in the pause properties slideout
-         _devXPause += chartLabelPause.labelXOffset;
-         _devYPause -= chartLabelPause.labelYOffset;
+         devXPause += chartLabelPause.labelXOffset;
+         devYPause -= chartLabelPause.labelYOffset;
 
          // don't draw the pause to the left of the chart
-         if (devVirtualGraphImageOffset == 0 && _devXPause < 0) {
-            _devXPause = 0;
+         if (devVirtualGraphImageOffset == 0 && devXPause < 0) {
+            devXPause = 0;
          }
 
          // don't draw the pause to the right of the chart
          final double devPauseRightPos = isGraphZoomed
                ? virtualXPos + labelWidth
-               : _devXPause + labelWidth;
+               : devXPause + labelWidth;
          if (devPauseRightPos > devVirtualGraphWidth) {
-            _devXPause = (int) (devVirtualGraphWidth - labelWidth - devVirtualGraphImageOffset - 2);
+            devXPause = (int) (devVirtualGraphWidth - labelWidth - devVirtualGraphImageOffset - 2);
          }
 
          // force label to be not below the bottom
-         if (_devYPause + labelHeight > devYBottom) {
-            _devYPause = devYBottom - labelHeight;
+         if (devYPause + labelHeight > devYBottom) {
+            devYPause = devYBottom - labelHeight;
          }
 
          // force label to be not above the top
-         if (_devYPause < devYTop) {
-            _devYPause = devYTop;
+         if (devYPause < devYTop) {
+            devYPause = devYTop;
          }
 
-         // keep painted positions to identify and paint hovered positions
-         chartLabelPause.paintedLabel = new Rectangle(_devXPause, _devYPause, labelWidth, labelHeight);
+         /*
+          * Ensure the value text do not overlap, if possible :-)
+          */
+         final int borderWidth = PAUSE_HOVER_SIZE;
+         final int borderWidth2 = 2 * borderWidth;
+         final int borderHeight = 0; // PAUSE_HOVER_SIZE;
+         final int borderHeight2 = 2 * borderHeight;
+         final int textHeightWithBorder = labelHeight + borderHeight2;
+
+         final Rectangle textRect = new Rectangle(
+               devXPause - borderWidth2,
+               devYPause - borderHeight,
+               labelWidth + borderWidth2,
+               textHeightWithBorder);
+
+         final Rectangle validRect = overlapChecker.getValidRect(
+               textRect,
+               true, // isValueUp,
+               textHeightWithBorder);
 
          // draw label
-         gc.drawText(pauseDurationText, _devXPause, _devYPause, true);
+         gc.drawText(pauseDurationText, devXPause, validRect.y, true);
+
+         // keep current valid rectangle
+         overlapChecker.setupNext(validRect);
 
          // keep painted positions to identify and paint hovered positions
+         chartLabelPause.paintedLabel = new Rectangle(devXPause, validRect.y, labelWidth, labelHeight);
          chartLabelPause.devPointSize = PAUSE_POINT_SIZE;
          chartLabelPause.devHoverSize = PAUSE_HOVER_SIZE;
          chartLabelPause.devYBottom = devYBottom;

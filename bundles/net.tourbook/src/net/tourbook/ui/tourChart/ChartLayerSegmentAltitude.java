@@ -354,15 +354,15 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                final float segmentWidth2 = segmentWidth / 2;
                final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
 
+               /*
+                * Ensure the value text do not overlap, if possible :-)
+                */
                final int borderWidth = 5;
                final int borderWidth2 = 2 * borderWidth;
                final int borderHeight = 0;
                final int borderHeight2 = 2 * borderHeight;
                final int textHeightWithBorder = textHeight + borderHeight2;
 
-               /*
-                * Ensure the value text do not overlap, if possible :-)
-                */
                final Rectangle textRect = new Rectangle(
                      devXText - borderWidth2,
                      devYText - borderHeight,
@@ -372,8 +372,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                final Rectangle validRect = overlapChecker.getValidRect(
                      textRect,
                      isValueUp,
-                     textHeightWithBorder,
-                     valueText);
+                     textHeightWithBorder);
 
                // don't draw over the graph borders
                if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
@@ -381,7 +380,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                   if (isShowValueText) {
 
                      // keep current valid rectangle
-                     overlapChecker.setupNext(validRect, isValueUp);
+                     overlapChecker.setupNext(validRect);
 
                      gc.setAlpha(0xff);
                      gc.setForeground(paintedColor);

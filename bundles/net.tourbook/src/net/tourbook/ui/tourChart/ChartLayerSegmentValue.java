@@ -356,8 +356,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                   final Rectangle validRect = overlapChecker.getValidRect(
                         textRect,
                         isValueUp,
-                        textHeightWithBorder,
-                        valueText);
+                        textHeightWithBorder);
 
                   // don't draw over the graph borders
                   if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
@@ -365,7 +364,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                      if (isShowValueText) {
 
                         // keep current valid rectangle
-                        overlapChecker.setupNext(validRect, isValueUp);
+                        overlapChecker.setupNext(validRect);
 
                         gc.setAlpha(0xff);
                         gc.drawText(//

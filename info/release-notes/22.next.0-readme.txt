@@ -39,8 +39,18 @@ New
 Improvements
 ============
 
-* 
+* Tour Chart
+  - Filter tour pauses
+  - Stack tour pauses that they don't overlap
+  
+  https://github.com/mytourbook/mytourbook/issues/428
 
+
+* 2D Map
+  - Filter tour pauses
+
+  https://github.com/mytourbook/mytourbook/issues/428
+  
 
 Changes  
 =======
