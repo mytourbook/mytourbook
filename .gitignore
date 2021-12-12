@@ -17,6 +17,7 @@ repositories/
 .apt_generated
 .gradle
 .log
+.polyglot.build.properties
 .vs
 
 *.js.map

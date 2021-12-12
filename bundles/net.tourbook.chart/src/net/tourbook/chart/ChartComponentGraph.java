@@ -10011,6 +10011,11 @@ public class ChartComponentGraph extends Canvas {
 
             for (final ChartXSliderLabel topLabel : allTopLabels) {
 
+               // fixed java.lang.IndexOutOfBoundsException
+               if (labelIndex >= allValuePointLabels.size()) {
+                  break;
+               }
+
                final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
 
                final int topWidth2 = topLabel.width / 2;

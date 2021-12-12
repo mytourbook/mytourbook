@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData"; //$NON-NLS-1$
+   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                                      //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
    private static HttpClient    httpClient                 = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
@@ -108,6 +108,70 @@ public class HistoricalWeatherRetriever {
 
    public static String getBaseApiUrl() {
       return baseApiUrl;
+   }
+
+   private void ComputeFinalWeatherData(final WeatherData weatherData,
+                                        final List<WWOHourlyResults> rawWeatherData) {
+
+      boolean isTourStartData = false;
+      boolean isTourEndData = false;
+      int numHourlyDatasets = 0;
+      int sumHumidity = 0;
+      int sumPressure = 0;
+      float sumPrecipitation = 0f;
+      int sumWindChill = 0;
+      int sumWindDirection = 0;
+      int sumWindSpeed = 0;
+      int sumTemperature = 0;
+      int maxTemperature = Integer.MIN_VALUE;
+      int minTemperature = Integer.MAX_VALUE;
+
+      for (int index = 0; index < rawWeatherData.size() && !isTourEndData; index++) {
+
+         final WWOHourlyResults hourlyData = rawWeatherData.get(index);
+
+         // Within the hourly data, find the times that corresponds to the tour time
+         // and extract all the weather data.
+         if (hourlyData.gettime().equals(startTime)) {
+            isTourStartData = true;
+            weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
+            weatherData.setWeatherType(hourlyData.getWeatherCode());
+         }
+         if (hourlyData.gettime().equals(endTime)) {
+            isTourEndData = true;
+         }
+
+         if (isTourStartData || isTourEndData) {
+
+            sumWindDirection += hourlyData.getWinddirDegree();
+            sumWindSpeed += hourlyData.getWindspeedKmph();
+            sumHumidity += hourlyData.getHumidity();
+            sumPrecipitation += hourlyData.getPrecipMM();
+            sumPressure += hourlyData.getPressure();
+            sumWindChill += hourlyData.getFeelsLikeC();
+            sumTemperature += hourlyData.getTempC();
+
+            if (hourlyData.getTempC() < minTemperature) {
+               minTemperature = hourlyData.getTempC();
+            }
+
+            if (hourlyData.getTempC() > maxTemperature) {
+               maxTemperature = hourlyData.getTempC();
+            }
+
+            ++numHourlyDatasets;
+         }
+      }
+
+      weatherData.setWindDirection((int) Math.ceil((double) sumWindDirection / (double) numHourlyDatasets));
+      weatherData.setWindSpeed((int) Math.ceil((double) sumWindSpeed / (double) numHourlyDatasets));
+      weatherData.setTemperatureMax(maxTemperature);
+      weatherData.setTemperatureMin(minTemperature);
+      weatherData.setTemperatureAverage((int) Math.ceil((double) sumTemperature / (double) numHourlyDatasets));
+      weatherData.setWindChill((int) Math.ceil((double) sumWindChill / (double) numHourlyDatasets));
+      weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
+      weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
+      weatherData.setPrecipitation(sumPrecipitation);
    }
 
    /**
@@ -185,64 +249,7 @@ public class HistoricalWeatherRetriever {
 
          final List<WWOHourlyResults> rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
-         boolean isTourStartData = false;
-         boolean isTourEndData = false;
-         int numHourlyDatasets = 0;
-         int sumHumidity = 0;
-         int sumPressure = 0;
-         float sumPrecipitation = 0f;
-         int sumWindChill = 0;
-         int sumWindDirection = 0;
-         int sumWindSpeed = 0;
-         int sumTemperature = 0;
-         int maxTemperature = Integer.MIN_VALUE;
-         int minTemperature = Integer.MAX_VALUE;
-
-         for (final WWOHourlyResults hourlyData : rawWeatherData) {
-            // Within the hourly data, find the times that corresponds to the tour time
-            // and extract all the weather data.
-            if (hourlyData.gettime().equals(startTime)) {
-               isTourStartData = true;
-               weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
-               weatherData.setWeatherType(hourlyData.getWeatherCode());
-            }
-            if (hourlyData.gettime().equals(endTime)) {
-               isTourEndData = true;
-            }
-
-            if (isTourStartData || isTourEndData) {
-               sumWindDirection += hourlyData.getWinddirDegree();
-               sumWindSpeed += hourlyData.getWindspeedKmph();
-               sumHumidity += hourlyData.getHumidity();
-               sumPrecipitation += hourlyData.getPrecipMM();
-               sumPressure += hourlyData.getPressure();
-               sumWindChill += hourlyData.getFeelsLikeC();
-               sumTemperature += hourlyData.getTempC();
-
-               if (hourlyData.getTempC() < minTemperature) {
-                  minTemperature = hourlyData.getTempC();
-               }
-
-               if (hourlyData.getTempC() > maxTemperature) {
-                  maxTemperature = hourlyData.getTempC();
-               }
-
-               ++numHourlyDatasets;
-               if (isTourEndData) {
-                  break;
-               }
-            }
-         }
-
-         weatherData.setWindDirection((int) Math.ceil((double) sumWindDirection / (double) numHourlyDatasets));
-         weatherData.setWindSpeed((int) Math.ceil((double) sumWindSpeed / (double) numHourlyDatasets));
-         weatherData.setTemperatureMax(maxTemperature);
-         weatherData.setTemperatureMin(minTemperature);
-         weatherData.setTemperatureAverage((int) Math.ceil((double) sumTemperature / (double) numHourlyDatasets));
-         weatherData.setWindChill((int) Math.ceil((double) sumWindChill / (double) numHourlyDatasets));
-         weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
-         weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
-         weatherData.setPrecipitation(sumPrecipitation);
+         ComputeFinalWeatherData(weatherData, rawWeatherData);
 
       } catch (final Exception e) {
          StatusUtil.logError(

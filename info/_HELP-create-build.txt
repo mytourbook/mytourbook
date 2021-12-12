@@ -5,7 +5,10 @@ Version update - simplified
 Replace by using <Ctrl-H-> the old version with the new version, e.g. from "21.9.0" -> "21.12.0" 
 
 BUT REVIEW IT MANUALLY IN ALL MODIFIED FILES, subversions must not be modified everywhere, 
-take care with feature.net.tourbook.app.nl/feature.xml 
+take care with
+   "feature.xml" in "feature.net.tourbook.app"
+   "feature.xml" in "feature.net.tourbook.app.nl" 
+
 
 
 #####################################
@@ -156,6 +159,12 @@ Build Product
 
 Build Update site
 ------------------
+
+   BEFORE !!!
+   
+   1. Set version numbers like in this commit https://github.com/mytourbook/mytourbook/commit/4ad360673bea889647dfb54f7c754c8bb41984b0
+   2. Run "CREATE_MT_BuildFiles.xml" BEFORE the following commands
+
    Open cmd
       - Select folder "C:\DAT\MT\mytourbook"
       - Run "mvn verify -P build-update-site"

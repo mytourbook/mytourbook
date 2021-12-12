@@ -15,11 +15,6 @@
  *******************************************************************************/
 package utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -31,9 +26,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
@@ -44,52 +36,6 @@ import net.tourbook.importdata.ImportState_Process;
 import org.xml.sax.SAXException;
 
 public class Initializer {
-
-   private static ObjectMapper            _mapper                   = new ObjectMapper();
-
-   private static HashMap<String, String> _vendorCredentials        = new HashMap<>();
-
-   private static final String            VendorCredentialsFileName = "Credentials.json";                         //$NON-NLS-1$
-   private static final String            UTIL_FILE_PATH            = utils.FilesUtils.rootPath + "utils/files/"; //$NON-NLS-1$
-
-   static {
-      deserializeVendorCredentials();
-   }
-
-   public static boolean deserializeVendorCredentials() {
-
-      final String vendorCredentialsFilePath = utils.FilesUtils.getAbsoluteFilePath(
-            UTIL_FILE_PATH + VendorCredentialsFileName);
-
-      final File vendorCredentialsFile = new File(vendorCredentialsFilePath);
-
-      if (!vendorCredentialsFile.exists()) {
-         return false;
-      }
-      final String fileContent = FilesUtils.readFileContentString(vendorCredentialsFilePath);
-      if (StringUtils.isNullOrEmpty(fileContent)) {
-         return false;
-      }
-
-      final TypeReference<HashMap<String, String>> typeReference = new TypeReference<>() {};
-      try {
-         _vendorCredentials = _mapper.readValue(fileContent, typeReference);
-      } catch (final JsonProcessingException e) {
-         StatusUtil.log(e);
-         return false;
-      }
-
-      return true;
-   }
-
-   public static String getCredential(final String vendorName) {
-
-      if (_vendorCredentials.isEmpty()) {
-         return UI.EMPTY_STRING;
-      }
-
-      return _vendorCredentials.get(vendorName);
-   }
 
    public static TourData importTour() {
 
