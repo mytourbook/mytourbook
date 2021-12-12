@@ -369,7 +369,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                      textWidth + borderWidth2,
                      textHeightWithBorder);
 
-               final Rectangle validRect = overlapChecker.getValidRect(
+               final Rectangle validRect = overlapChecker.getNotOverlappedRectangle(
                      textRect,
                      isValueUp,
                      textHeightWithBorder);

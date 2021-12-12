@@ -353,7 +353,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                         textWidth + borderWidth2,
                         textHeightWithBorder);
 
-                  final Rectangle validRect = overlapChecker.getValidRect(
+                  final Rectangle validRect = overlapChecker.getNotOverlappedRectangle(
                         textRect,
                         isValueUp,
                         textHeightWithBorder);

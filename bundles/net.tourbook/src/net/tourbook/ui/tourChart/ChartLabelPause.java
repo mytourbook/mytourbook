@@ -29,10 +29,16 @@ public class ChartLabelPause extends ChartLabel {
    /*
     * Painted label positions
     */
-   public int devXPause;
-   public int devYPause;
+   public int             devXPause;
+   public int             devYPause;
+
+   private LabelAlignment _labelAlignment = LabelAlignment.CENTER;
 
    ChartLabelPause() {}
+
+   public LabelAlignment getLabelAlignment() {
+      return _labelAlignment;
+   }
 
    public long getPausedTime_End() {
       return _pausedTime_End;
@@ -59,6 +65,10 @@ public class ChartLabelPause extends ChartLabel {
 
    public void setIsAutoPause(final boolean isAutoPause) {
       _isAutoPause = isAutoPause;
+   }
+
+   public void setLabelAlignment(final LabelAlignment labelAlignment) {
+      _labelAlignment = labelAlignment;
    }
 
    public void setPausedTime_End(final long pausedTime_End) {

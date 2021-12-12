@@ -55,20 +55,26 @@ public class TourPauseUI implements IColorSelectorListener {
    public static final boolean STATE_IS_SHOW_USER_PAUSES_DEFAULT      = true;
 
    // pause duration
-   private static final String                 STATE_DURATION_FILTER_HOURS       = "STATE_DURATION_FILTER_HOURS";             //$NON-NLS-1$
-   private static final String                 STATE_DURATION_FILTER_MINUTES     = "STATE_DURATION_FILTER_MINUTES";           //$NON-NLS-1$
-   private static final String                 STATE_DURATION_FILTER_SECONDS     = "STATE_DURATION_FILTER_SECONDS";           //$NON-NLS-1$
-   public static final String                  STATE_DURATION_FILTER_SUMMARIZED  = "STATE_DURATION_FILTER_SUMMARIZED";        //$NON-NLS-1$
-   public static final String                  STATE_DURATION_OPERATOR           = "STATE_DURATION_OPERATOR";                 //$NON-NLS-1$
-   public static final TourFilterFieldOperator STATE_DURATION_OPERATOR_DEFAULT   = TourFilterFieldOperator.LESS_THAN_OR_EQUAL;
-   private static final String                 STATE_USE_DURATION_FILTER_HOURS   = "STATE_USE_DURATION_FILTER_HOURS";         //$NON-NLS-1$
-   private static final String                 STATE_USE_DURATION_FILTER_MINUTES = "STATE_USE_DURATION_FILTER_MINUTES";       //$NON-NLS-1$
-   private static final String                 STATE_USE_DURATION_FILTER_SECONDS = "STATE_USE_DURATION_FILTER_SECONDS";       //$NON-NLS-1$
+   private static final String                 STATE_DURATION_FILTER_HOURS               = "STATE_DURATION_FILTER_HOURS";             //$NON-NLS-1$
+   private static final int                    STATE_DURATION_FILTER_HOURS_DEFAULT       = 1;
+   private static final String                 STATE_DURATION_FILTER_MINUTES             = "STATE_DURATION_FILTER_MINUTES";           //$NON-NLS-1$
+   private static final int                    STATE_DURATION_FILTER_MINUTES_DEFAULT     = 1;
+   private static final String                 STATE_DURATION_FILTER_SECONDS             = "STATE_DURATION_FILTER_SECONDS";           //$NON-NLS-1$
+   private static final int                    STATE_DURATION_FILTER_SECONDS_DEFAULT     = 5;
+   public static final String                  STATE_DURATION_FILTER_SUMMARIZED          = "STATE_DURATION_FILTER_SUMMARIZED";        //$NON-NLS-1$
+   public static final String                  STATE_DURATION_OPERATOR                   = "STATE_DURATION_OPERATOR";                 //$NON-NLS-1$
+   public static final TourFilterFieldOperator STATE_DURATION_OPERATOR_DEFAULT           = TourFilterFieldOperator.LESS_THAN_OR_EQUAL;
+   private static final String                 STATE_USE_DURATION_FILTER_HOURS           = "STATE_USE_DURATION_FILTER_HOURS";         //$NON-NLS-1$
+   private static final boolean                STATE_USE_DURATION_FILTER_HOURS_DEFAULT   = false;
+   private static final String                 STATE_USE_DURATION_FILTER_MINUTES         = "STATE_USE_DURATION_FILTER_MINUTES";       //$NON-NLS-1$
+   private static final boolean                STATE_USE_DURATION_FILTER_MINUTES_DEFAULT = false;
+   private static final String                 STATE_USE_DURATION_FILTER_SECONDS         = "STATE_USE_DURATION_FILTER_SECONDS";       //$NON-NLS-1$
+   private static final boolean                STATE_USE_DURATION_FILTER_SECONDS_DEFAULT = true;
 
    /**
     * Filter operator MUST be in sync with filter labels
     */
-   private static TourFilterFieldOperator[]    _allDurationOperator_Value        = {
+   private static TourFilterFieldOperator[]    _allDurationOperator_Value                = {
 
          TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
          TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
@@ -80,7 +86,7 @@ public class TourPauseUI implements IColorSelectorListener {
    /**
     * Filter labels MUST be in sync with filter operator
     */
-   private static String[]                     _allDurationOperator_Label        = {
+   private static String[]                     _allDurationOperator_Label                = {
 
          Messages.Tour_Filter_Operator_LessThanOrEqual,
          Messages.Tour_Filter_Operator_GreaterThanOrEqual,
@@ -189,7 +195,6 @@ public class TourPauseUI implements IColorSelectorListener {
       setupUI();
 
       restoreState();
-      enableControls();
       updateUI();
 
       return ui;
@@ -493,46 +498,50 @@ public class TourPauseUI implements IColorSelectorListener {
 
 // SET_FORMATTING_OFF
 
-      _chkIsFilter_TourPauses.setSelection(     STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
-      _chkIsFilter_PauseDuration.setSelection(  STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
+      _chkIsFilter_TourPauses.setSelection(        STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
+      _chkIsFilter_PauseDuration.setSelection(     STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
 
-      _chkIsShow_AutoPauses.setSelection(       STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
-      _chkIsShow_UserPauses.setSelection(       STATE_IS_SHOW_USER_PAUSES_DEFAULT);
+      _chkIsShow_AutoPauses.setSelection(          STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
+      _chkIsShow_UserPauses.setSelection(          STATE_IS_SHOW_USER_PAUSES_DEFAULT);
 
-      _chkUseDurationFilter_Hours.setSelection(    false);
-      _chkUseDurationFilter_Minutes.setSelection(  false);
-      _chkUseDurationFilter_Seconds.setSelection(  false);
+      _chkUseDurationFilter_Hours.setSelection(    STATE_USE_DURATION_FILTER_HOURS_DEFAULT);
+      _chkUseDurationFilter_Minutes.setSelection(  STATE_USE_DURATION_FILTER_MINUTES_DEFAULT);
+      _chkUseDurationFilter_Seconds.setSelection(  STATE_USE_DURATION_FILTER_SECONDS_DEFAULT);
 
-      _spinnerHours.setSelection(                  0);
-      _spinnerMinutes.setSelection(                0);
-      _spinnerSeconds.setSelection(                0);
+      _spinnerHours.setSelection(                  STATE_DURATION_FILTER_HOURS_DEFAULT);
+      _spinnerMinutes.setSelection(                STATE_DURATION_FILTER_MINUTES_DEFAULT);
+      _spinnerSeconds.setSelection(                STATE_DURATION_FILTER_SECONDS_DEFAULT);
 
 // SET_FORMATTING_ON
 
       selectPauseDurationOperator(STATE_DURATION_OPERATOR_DEFAULT);
+
+      enableControls();
    }
 
    public void restoreState() {
 
 // SET_FORMATTING_OFF
 
-      _chkIsFilter_TourPauses.setSelection(        Util.getStateBoolean(_state, STATE_IS_FILTER_TOUR_PAUSES,      STATE_IS_FILTER_TOUR_PAUSES_DEFAULT));
-      _chkIsFilter_PauseDuration.setSelection(     Util.getStateBoolean(_state, STATE_IS_FILTER_PAUSE_DURATION,   STATE_IS_FILTER_PAUSE_DURATION_DEFAULT));
+      _chkIsFilter_TourPauses.setSelection(        Util.getStateBoolean(_state, STATE_IS_FILTER_TOUR_PAUSES,         STATE_IS_FILTER_TOUR_PAUSES_DEFAULT));
+      _chkIsFilter_PauseDuration.setSelection(     Util.getStateBoolean(_state, STATE_IS_FILTER_PAUSE_DURATION,      STATE_IS_FILTER_PAUSE_DURATION_DEFAULT));
 
-      _chkIsShow_AutoPauses.setSelection(          Util.getStateBoolean(_state, STATE_IS_SHOW_AUTO_PAUSES,        STATE_IS_SHOW_AUTO_PAUSES_DEFAULT));
-      _chkIsShow_UserPauses.setSelection(          Util.getStateBoolean(_state, STATE_IS_SHOW_USER_PAUSES,        STATE_IS_SHOW_USER_PAUSES_DEFAULT));
+      _chkIsShow_AutoPauses.setSelection(          Util.getStateBoolean(_state, STATE_IS_SHOW_AUTO_PAUSES,           STATE_IS_SHOW_AUTO_PAUSES_DEFAULT));
+      _chkIsShow_UserPauses.setSelection(          Util.getStateBoolean(_state, STATE_IS_SHOW_USER_PAUSES,           STATE_IS_SHOW_USER_PAUSES_DEFAULT));
 
-      _chkUseDurationFilter_Hours.setSelection(    Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER_HOURS,     false));
-      _chkUseDurationFilter_Minutes.setSelection(  Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER_MINUTES,   false));
-      _chkUseDurationFilter_Seconds.setSelection(  Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER_SECONDS,   false));
+      _chkUseDurationFilter_Hours.setSelection(    Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER_HOURS,     STATE_USE_DURATION_FILTER_HOURS_DEFAULT));
+      _chkUseDurationFilter_Minutes.setSelection(  Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER_MINUTES,   STATE_USE_DURATION_FILTER_MINUTES_DEFAULT));
+      _chkUseDurationFilter_Seconds.setSelection(  Util.getStateBoolean(_state, STATE_USE_DURATION_FILTER_SECONDS,   STATE_USE_DURATION_FILTER_SECONDS_DEFAULT));
 
-      _spinnerHours.setSelection(                  Util.getStateInt(_state,      STATE_DURATION_FILTER_HOURS,     0));
-      _spinnerMinutes.setSelection(                Util.getStateInt(_state,      STATE_DURATION_FILTER_MINUTES,   0));
-      _spinnerSeconds.setSelection(                Util.getStateInt(_state,      STATE_DURATION_FILTER_SECONDS,   0));
+      _spinnerHours.setSelection(                  Util.getStateInt(_state,      STATE_DURATION_FILTER_HOURS,        STATE_DURATION_FILTER_HOURS_DEFAULT));
+      _spinnerMinutes.setSelection(                Util.getStateInt(_state,      STATE_DURATION_FILTER_MINUTES,      STATE_DURATION_FILTER_MINUTES_DEFAULT));
+      _spinnerSeconds.setSelection(                Util.getStateInt(_state,      STATE_DURATION_FILTER_SECONDS,      STATE_DURATION_FILTER_SECONDS_DEFAULT));
 
 // SET_FORMATTING_ON
 
       selectPauseDurationOperator(Util.getStateEnum(_state, STATE_DURATION_OPERATOR, STATE_DURATION_OPERATOR_DEFAULT));
+
+      enableControls();
    }
 
    public void saveState() {
