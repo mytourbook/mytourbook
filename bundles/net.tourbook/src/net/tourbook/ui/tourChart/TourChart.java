@@ -5487,7 +5487,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SPEED);
       }
       if (yDataWithLabels == null) {
+         yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SPEED_SUMMARIZED);
+      }
+      if (yDataWithLabels == null) {
          yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PACE);
+      }
+      if (yDataWithLabels == null) {
+         yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PACE_SUMMARIZED);
       }
       if (yDataWithLabels == null) {
          yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_POWER);
@@ -5597,26 +5603,32 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          cfgCadence.minValueAdjustment = Double.MIN_VALUE;
       }
 
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, yDataWithLabels, cfgAltimeter);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE, yDataWithLabels, cfgAltitude);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, yDataWithLabels, cfgCadence);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO, yDataWithLabels, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, yDataWithLabels, cfgGradient);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, null, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, yDataWithLabels, cfgPulse);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED, yDataWithLabels, cfgSpeed);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE, yDataWithLabels, cfgPace);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, yDataWithLabels, cfgPower);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, yDataWithLabels, null);
+// SET_FORMATTING_OFF
 
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME, yDataWithLabels, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE, yDataWithLabels, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH, yDataWithLabels, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION, yDataWithLabels, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO, yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER,                      yDataWithLabels, cfgAltimeter);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE,                       yDataWithLabels, cfgAltitude);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE,                        yDataWithLabels, cfgCadence);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO,                     yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT,                       yDataWithLabels, cfgGradient);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY,                        null,            null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE,                          yDataWithLabels, cfgPulse);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED,                          yDataWithLabels, cfgSpeed);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED_SUMMARIZED,               yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE,                           yDataWithLabels, cfgPace);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE_SUMMARIZED,                yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER,                          yDataWithLabels, cfgPower);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE,                    yDataWithLabels, null);
 
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_STROKES, yDataWithLabels, null);
-      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_SWOLF, yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_STROKES,                   yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_SWOLF,                     yDataWithLabels, null);
+
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME,            yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE,    yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_STEP_LENGTH,            yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION,   yDataWithLabels, null);
+      setupGraphLayer_Layer(TourManager.CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO,         yDataWithLabels, null);
+
+// SET_FORMATTING_ON
    }
 
    /**
