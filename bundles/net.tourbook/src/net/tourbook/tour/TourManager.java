@@ -1087,7 +1087,10 @@ public class TourManager {
                final List<Long> fromTourPausesList = new ArrayList<>();
 
                final long pauseData = pausedTime_Data == null
-                     ? 0
+
+                     // pause data are not available -> it will be displayed as an auto-pause
+                     ? -1
+
                      : pausedTime_Data[index];
 
                fromTourPausesList.add(pausedTime_Start[index]);

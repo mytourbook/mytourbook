@@ -2214,7 +2214,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                if (tourSerieIndex < xAxisSerie.length) {
 
-                  final boolean isPauseAnAutoPause = pausedTime_Data == 1;
+                  final boolean isPauseAnAutoPause = pausedTime_Data == -1 || pausedTime_Data == 1;
 
                   final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
 
@@ -2299,7 +2299,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             final long pausedTime_End = allPausedTime_End[pausesIndex];
             final boolean isPauseAnAutoPause = allPausedTime_Data == null
-                  ? false
+                  ? true
                   : allPausedTime_Data[pausesIndex] == 1;
 
             final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);

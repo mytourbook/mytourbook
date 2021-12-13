@@ -114,8 +114,9 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          case STOP:
          case STOP_ALL:
 
-            /*
-             * eventData == 1 indicate an auto-stop
+            /**
+             * eventData == 0: user stop<br>
+             * eventData == 1: auto-stop
              */
             final Long eventData = mesg.getData();
 

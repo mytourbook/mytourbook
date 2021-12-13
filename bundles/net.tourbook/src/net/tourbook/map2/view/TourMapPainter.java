@@ -1270,7 +1270,7 @@ public class TourMapPainter extends MapPainter {
                   }
                }
 
-               final boolean isPauseAnAutoPause = pausedTime_Data == 1;
+               final boolean isPauseAnAutoPause = pausedTime_Data == -1 || pausedTime_Data == 1;
 
                // exclude pauses
                if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
@@ -1341,7 +1341,7 @@ public class TourMapPainter extends MapPainter {
             final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
             final boolean isPauseAnAutoPause = pausedTime_Data == null
-                  ? false
+                  ? true
                   : pausedTime_Data[index] == 1;
 
             // exclude pauses
