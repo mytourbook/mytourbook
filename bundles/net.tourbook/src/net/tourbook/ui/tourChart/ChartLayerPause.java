@@ -152,11 +152,11 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          /*
           * Debug: Make alignment visible
           */
-         if (labelAlignment.equals(LabelAlignment.LEFT)) {
-            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-         } else if (labelAlignment.equals(LabelAlignment.RIGHT)) {
-            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-         }
+//         if (labelAlignment.equals(LabelAlignment.LEFT)) {
+//            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//         } else if (labelAlignment.equals(LabelAlignment.RIGHT)) {
+//            gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//         }
 
          devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
 
