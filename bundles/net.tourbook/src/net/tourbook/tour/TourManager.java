@@ -1945,7 +1945,7 @@ public class TourManager {
 
          try {
 
-            final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+            final IRunnableWithProgress runnable = new IRunnableWithProgress() {
                @Override
                public void run(final IProgressMonitor monitor)
                      throws InvocationTargetException, InterruptedException {
@@ -1976,7 +1976,7 @@ public class TourManager {
              * Ensure to run in the app shell that a slideoutshell can get hidden without hiding the
              * progress dialog, complicated !
              */
-            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
+            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
