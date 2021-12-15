@@ -537,7 +537,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    @Override
    public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
-      // TODO Auto-generated method stub
 
       if (part == TourChartView.this) {
          return;
@@ -591,10 +590,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       if (_isInSaving) {
          return;
       }
-
-//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//            + ("\t\t\tonSelectionChanged:\t" + selection));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       _isInSelectionChanged = true;
       {
@@ -887,7 +882,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       _tourChart.setFocus();
 
       /*
-       * fire tour selection
+       * Fire tour selection
        */
       if (_tourData == null) {
 

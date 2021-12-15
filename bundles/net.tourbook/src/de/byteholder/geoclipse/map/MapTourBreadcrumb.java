@@ -33,25 +33,31 @@ import org.eclipse.swt.widgets.Display;
 
 public class MapTourBreadcrumb {
 
-   private static final Color         SYSTEM_COLOR_BLUE      = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-   private static final Color         SYSTEM_COLOR_BLACK     = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-   private static final Color         SYSTEM_COLOR_RED       = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-   private static final Color         SYSTEM_COLOR_WHITE     = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+   private static final Color         SYSTEM_COLOR_BLUE  = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+   private static final Color         SYSTEM_COLOR_BLACK = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+   private static final Color         SYSTEM_COLOR_RED   = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+   private static final Color         SYSTEM_COLOR_WHITE = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
-   private static final String        CRUMB_SEPARATOR        = " >";                                                                //$NON-NLS-1$
+   private static final String        CRUMB_SEPARATOR    = " >";                                                                //$NON-NLS-1$
 
-   private static final int           NOT_HOVERED_INDEX      = -1;
+   private static final int           NOT_HOVERED_INDEX  = -1;
 
-   private ArrayList<ArrayList<Long>> _allTours              = new ArrayList<>();
-   private ArrayList<Rectangle>       _allCrumbs             = new ArrayList<>();
+   private ArrayList<ArrayList<Long>> _allTours          = new ArrayList<>();
+   private ArrayList<Rectangle>       _allCrumbs         = new ArrayList<>();
 
    private Rectangle                  _outline;
 
-   private int                        _hoveredCrumbIndex     = NOT_HOVERED_INDEX;
+   private int                        _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
-   private Font                       _boldFont              = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                       _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private Map                        _map;
+
+   /**
+    * Contains number of multiple tours when one tour data contains multiple tours, otherwise -1 is
+    * set.
+    */
+   private int                        _multipleTours;
 
    public MapTourBreadcrumb(final Map map) {
 
@@ -254,12 +260,19 @@ public class MapTourBreadcrumb {
          final ArrayList<Long> tourDataCrumb = _allTours.get(crumbIndex);
          final String numTourDataCrumbs = Integer.toString(tourDataCrumb.size());
 
+         final String numMultipleTours = _multipleTours > 0
+               ? String.format(" (%d)", _multipleTours)
+               : UI.EMPTY_STRING;
+
          final String crumbText = crumbIndex == 0
-               ? Messages.Map2_TourBreadcrumb_Label_Tours 
-                     + net.tourbook.common.UI.SPACE 
-                     + net.tourbook.common.UI.SPACE 
-                     + net.tourbook.common.UI.SPACE
+
+               ? Messages.Map2_TourBreadcrumb_Label_Tours
+                     + UI.SPACE
+                     + UI.SPACE
+                     + UI.SPACE
                      + numTourDataCrumbs
+                     + numMultipleTours
+
                : numTourDataCrumbs;
 
          final Point contentSize = gc.textExtent(crumbText);
@@ -353,6 +366,21 @@ public class MapTourBreadcrumb {
       }
 
       _allTours.add(allTourIds);
+
+      /*
+       * Setup multiple tours indicator
+       */
+      if (numNewTours == 1) {
+
+         final TourData tourData = allTourData.get(0);
+
+         _multipleTours = tourData.isMultipleTours()
+               ? tourData.multipleTourIds.length
+               : -1;
+
+      } else {
+         _multipleTours = -1;
+      }
    }
 
    public void setTours(final TourData tourData) {
@@ -362,6 +390,10 @@ public class MapTourBreadcrumb {
 
       _allTours.clear();
       _allTours.add(singleTour);
+
+      _multipleTours = tourData.isMultipleTours()
+            ? tourData.multipleTourIds.length
+            : -1;
    }
 
 }

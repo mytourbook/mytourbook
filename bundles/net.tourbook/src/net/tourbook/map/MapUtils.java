@@ -65,7 +65,7 @@ public class MapUtils {
        *
        * </code>
        */
-      final List<TourData> allTourDataThreadSave = new ArrayList<>(allTourData);
+      final List<TourData> allTourData_ThreadSafe = new ArrayList<>(allTourData);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -87,7 +87,7 @@ public class MapUtils {
 
          boolean setInitialValue = true;
 
-         for (final TourData tourData : allTourDataThreadSave) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getAltitudeSerie();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -99,7 +99,11 @@ public class MapUtils {
              */
             for (final float dataValue : dataSerie) {
 
-               if (dataValue == Float.MIN_VALUE) {
+               if (dataValue == Float.MIN_VALUE
+
+                     // 0 values can occure when multiple tours are displayed where some tours do not have an elevation
+                     || dataValue == 0) {
+
                   // skip invalid values
                   continue;
                }
@@ -148,7 +152,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourDataThreadSave) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getGradientSerie();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -208,7 +212,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourDataThreadSave) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getPaceSerieSeconds();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -272,7 +276,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourDataThreadSave) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.pulseSerie;
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -332,7 +336,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourDataThreadSave) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getSpeedSerie();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -392,7 +396,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourDataThreadSave) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getRunDyn_StepLength();
             if ((dataSerie == null) || (dataSerie.length == 0)) {

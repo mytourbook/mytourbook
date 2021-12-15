@@ -1358,8 +1358,7 @@ public class Map2View extends ViewPart implements
             final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
             if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
-               _allTourData.clear();
-               _allTourData.addAll(modifiedTours);
+               setTourData(modifiedTours);
 
                resetMap();
             }
@@ -2721,6 +2720,8 @@ public class Map2View extends ViewPart implements
 
          if (tourData != null) {
 
+            _map.tourBreadcrumb().setTours(tourData);
+
             positionMapTo_0_TourSliders(
                   tourData,
                   chartInfo.leftSliderValuesIndex,
@@ -3278,8 +3279,7 @@ public class Map2View extends ViewPart implements
        * set tour into tour data list, this is currently used to draw the legend, it's also used to
        * figure out if multiple tours are selected
        */
-      _allTourData.clear();
-      _allTourData.add(tourData);
+      setTourData(tourData);
       _hash_AllTourData = _allTourData.hashCode();
 
       // reset also ALL tour id's, otherwise a reselected multiple tour is not displayed
@@ -3563,8 +3563,13 @@ public class Map2View extends ViewPart implements
 
       final int sliderIndex = Math.max(0, Math.min(valueIndex, latitudeSerie.length - 1));
 
-      _map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
+      final double latitude = latitudeSerie[sliderIndex];
+      final double longitude = longitudeSerie[sliderIndex];
 
+      // ignore lat/lon == 0, this occure when there are no geo data
+      if (latitude != 0 && longitude != 0) {
+         _map.setMapCenter(new GeoPosition(latitude, longitude));
+      }
    }
 
    public void redrawMap() {
@@ -3840,7 +3845,6 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-
       // create legend image after the dim level is modified
       createLegendImage(_tourPainterConfig.getMapColorProvider());
 
@@ -4073,6 +4077,28 @@ public class Map2View extends ViewPart implements
       _map.setFocus();
    }
 
+   /**
+    * Set tour data for the map, this is a central point to set the data to debug it easier!
+    *
+    * @param tourData
+    */
+   private void setTourData(final ArrayList<TourData> allTourData) {
+
+      _allTourData.clear();
+      _allTourData.addAll(allTourData);
+   }
+
+   /**
+    * Set tour data for the map, this is a central point to set the data to debug it easier!
+    *
+    * @param tourData
+    */
+   private void setTourData(final TourData tourData) {
+
+      _allTourData.clear();
+      _allTourData.add(tourData);
+   }
+
    private void setTourPainterColorProvider(final MapGraphId colorId) {
 
       _tourColorId = colorId;
@@ -4175,8 +4201,7 @@ public class Map2View extends ViewPart implements
          final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
          if (tourDataList != null) {
 
-            _allTourData.clear();
-            _allTourData.addAll(tourDataList);
+            setTourData(tourDataList);
             _hash_AllTourData = _allTourData.hashCode();
 
             paintTours_10_All();
@@ -4461,8 +4486,8 @@ public class Map2View extends ViewPart implements
 
          // tour is not yet visible, show it now
 
-         _allTourData.clear();
-         _allTourData.add(tourData);
+         setTourData(tourData);
+
          _hash_AllTourData = _allTourData.hashCode();
          _hash_AllTourIds = tourData.getTourId().hashCode();
 
