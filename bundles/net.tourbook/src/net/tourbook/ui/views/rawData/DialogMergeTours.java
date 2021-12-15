@@ -249,7 +249,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    }
 
    /**
-    * set button width
+    * Set button width
     */
    private void adjustButtonWidth() {
 
@@ -484,7 +484,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       float altiDiffTime = 0;
-      float altiDiffDist = 0;
+      float altiDiffDistance = 0;
 
       if (isSourceAltitude && isTargetAltitude && isTargetDistance) {
 
@@ -542,7 +542,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                   : startAltiDiff / targetEndTime * 60;
 
             // meter/meter
-            altiDiffDist = targetEndDistance == 0 ? //
+            altiDiffDistance = targetEndDistance == 0 ? //
                   0f
                   : ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
 
@@ -555,7 +555,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          }
       }
 
-      updateUI(altiDiffTime, altiDiffDist);
+      updateUI(altiDiffTime, altiDiffDistance);
    }
 
    @Override
