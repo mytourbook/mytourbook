@@ -3603,7 +3603,9 @@ public class TourManager {
       }
 
       tourData.computeSpeedSeries();
-      tourData.computeAltimeterGradientSerie();
+      float[] speedSerie = tourData.speedSerie;
+      tourData.computeAltimeterGradientSerie(); //cest ici que ca part en sucette
+      speedSerie = tourData.speedSerie;
 
       computeValueClipping(tourData);
 

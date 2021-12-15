@@ -443,6 +443,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       /*
        * create new time/distance serie for the source tour according to the time of the target tour
        */
+      int previousSourceTime = 0;
+      int previousTargetTime = 0;
       for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
          final int targetTime = targetTimeSerie[targetIndex];
@@ -472,9 +474,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             }
          }
 
+         //TODO FB
          //get the speed between previous sourcetime and current sourcetime
+         final int diffsourcetime = sourceTime - previousSourceTime;
+         final int difftargettime = targetTime - previousTargetTime;
 
-         //apply the same speed from the previous target and the current target
+         //apply the same speed to the previous target and the current target
+//i.e. manipulate the time taking into account the distance so that the speed match the expected value
 
          if (isSourceAltitude) {
 
@@ -524,6 +530,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          if (isSourceCadence) {
             newTargetCadenceSerie[targetIndex] = sourceCadenceSerie[sourceIndex];
          }
+
+         previousTargetTime = targetTime;
+         previousSourceTime = sourceTime;
       }
 
       _sourceTour.dataSerieAdjustedAlti = null;
