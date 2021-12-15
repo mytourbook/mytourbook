@@ -472,6 +472,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             }
          }
 
+         //get the speed between previous sourcetime and current sourcetime
+
+         //apply the same speed from the previous target and the current target
+
          if (isSourceAltitude) {
 
             if (isLinearInterpolation) {
