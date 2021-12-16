@@ -247,6 +247,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   private void addVisibleGraph(final int graphId) {
+
+      final ArrayList<Integer> visibleGraphs = _tourChartConfig.getVisibleGraphs();
+
+      if (visibleGraphs.contains(graphId) == false) {
+         visibleGraphs.add(graphId);
+      }
+   }
+
    /**
     * Set button width
     */
@@ -436,14 +445,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          newSourceAltitude = sourceAlti;
       }
 
-      final boolean isLinearInterpolation = _chkAdjustAltiFromSource.getSelection()
-            && _chkAdjustAltiSmoothly.getSelection();
+      if (isSourceTime) {
 
-      if (_chkMergeSpeed.getSelection()) {
-         //todo fb merge speed
          float sourceDistance = 0;
          int sourceIndex2 = 0;
          final int lastSourceIndex2 = sourceDistanceSerie.length - 1;
+
          for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
             final float targetDistance = targetDistanceSerie[targetIndex];
@@ -475,6 +482,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             newTargetTimeSerie[targetIndex] = previousSourceTime;
          }
       }
+
+      final boolean isLinearInterpolation = _chkAdjustAltiFromSource.getSelection()
+            && _chkAdjustAltiSmoothly.getSelection();
+
       /*
        * create new time/distance serie for the source tour according to the time of the target tour
        */
@@ -506,15 +517,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                sourceAlti = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
             }
          }
-
-//         //TODO FB
-//         //get the speed between previous sourcetime and current sourcetime
-//         final int diffsourcetime = sourceTime - previousSourceTime;
-//         final int difftargettime = targetTime - previousTargetTime;
-
-         //apply the same speed to the previous target and the current target
-//i.e. manipulate the time taking into account the distance so that the speed match the expected value
-         //i.e. Use the interpolation like for the altitude
 
          if (isSourceAltitude) {
 
@@ -561,8 +563,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          if (isSourceCadence) {
             newTargetCadenceSerie[targetIndex] = sourceCadenceSerie[sourceIndex];
          }
-
-         previousSourceTime = sourceTime;
       }
 
       _sourceTour.dataSerieAdjustedAlti = null;
@@ -905,7 +905,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    /**
     * group: adjust altitude
     */
-   private void createUIGroupVertAdjustment(final Composite parent) {
+   private void createUIGroupVerticalAdjustment(final Composite parent) {
 
       _groupAltitude = new Group(parent, SWT.NONE);
       _groupAltitude.setText(Messages.tour_merger_group_adjust_altitude);
@@ -985,7 +985,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 
       createUIGroupHorizontalAdjustment(container);
-      createUIGroupVertAdjustment(container);
+      createUIGroupVerticalAdjustment(container);
       createUISectionDisplayOptions(container);
    }
 
@@ -1798,34 +1798,24 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    private void setMergedGraphsVisible() {
 
-      final ArrayList<Integer> visibleGraphs = _tourChartConfig.getVisibleGraphs();
-
       if (_chkMergeAltitude.getSelection()) {
-         if (visibleGraphs.contains(TourManager.GRAPH_ALTITUDE) == false) {
-            visibleGraphs.add(TourManager.GRAPH_ALTITUDE);
-         }
+         addVisibleGraph(TourManager.GRAPH_ALTITUDE);
       }
 
       if (_chkMergePulse.getSelection()) {
-         if (visibleGraphs.contains(TourManager.GRAPH_PULSE) == false) {
-            visibleGraphs.add(TourManager.GRAPH_PULSE);
-         }
+         addVisibleGraph(TourManager.GRAPH_PULSE);
       }
 
-      if (_chkMergeSpeed.getSelection() && visibleGraphs.contains(TourManager.GRAPH_SPEED) == false) {
-         visibleGraphs.add(TourManager.GRAPH_SPEED);
+      if (_chkMergeSpeed.getSelection()) {
+         addVisibleGraph(TourManager.GRAPH_SPEED);
       }
 
       if (_chkMergeTemperature.getSelection()) {
-         if (visibleGraphs.contains(TourManager.GRAPH_TEMPERATURE) == false) {
-            visibleGraphs.add(TourManager.GRAPH_TEMPERATURE);
-         }
+         addVisibleGraph(TourManager.GRAPH_TEMPERATURE);
       }
 
       if (_chkMergeCadence.getSelection()) {
-         if (visibleGraphs.contains(TourManager.GRAPH_CADENCE) == false) {
-            visibleGraphs.add(TourManager.GRAPH_CADENCE);
-         }
+         addVisibleGraph(TourManager.GRAPH_CADENCE);
       }
    }
 
