@@ -265,12 +265,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final int btnResetValues = _btnResetValues.getBounds().width;
       final int newWidth = Math.max(btnResetAdj, btnResetValues);
 
-      GridData gd;
-      gd = (GridData) _btnResetAdjustment.getLayoutData();
-      gd.widthHint = newWidth;
+      GridData gridData;
+      gridData = (GridData) _btnResetAdjustment.getLayoutData();
+      gridData.widthHint = newWidth;
 
-      gd = (GridData) _btnResetValues.getLayoutData();
-      gd.widthHint = newWidth;
+      gridData = (GridData) _btnResetValues.getLayoutData();
+      gridData.widthHint = newWidth;
    }
 
    @Override
