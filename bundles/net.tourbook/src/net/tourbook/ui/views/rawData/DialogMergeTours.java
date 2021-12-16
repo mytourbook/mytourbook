@@ -163,8 +163,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private TourType                                       _backupSourceTourType;
 
    private float[]                                        _backupTargetPulseSerie;
-   private float[]                                        _backupTargetSpeedSerie;
    private float[]                                        _backupTargetTemperatureSerie;
+   private int[]                                          _backupTargetTimeSerie;
    private float[]                                        _backupTargetCadenceSerie;
 
    private int                                            _backupTargetTimeOffset;
@@ -184,7 +184,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private boolean                                        _isAdjustAltiFromStartBackup;
 
    private org.eclipse.jface.util.IPropertyChangeListener _prefChangeListener;
-   private float[]                                        _newTargetSpeedSerie;
 
    /**
     * @param parentShell
@@ -392,7 +391,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
       final float[] sourceDistanceSerie = _sourceTour.distanceSerie;
       final float[] sourcePulseSerie = _sourceTour.pulseSerie;
-      final float[] sourceSpeedSerie = _sourceTour.speedSerie;
       final float[] sourceTemperatureSerie = _sourceTour.temperatureSerie;
       final float[] sourceCadenceSerie = _sourceTour.getCadenceSerie();
 
@@ -404,11 +402,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       // check if the data series are available
-      final boolean isSourceTemperature = sourceTemperatureSerie != null;
-      final boolean isSourcePulse = sourcePulseSerie != null;
-      final boolean isSourceSpeed = sourceSpeedSerie != null;
-      final boolean isSourceCadence = sourceCadenceSerie != null;
       final boolean isSourceAltitude = sourceAltitudeSerie != null;
+      final boolean isSourceCadence = sourceCadenceSerie != null;
+      final boolean isSourcePulse = sourcePulseSerie != null;
+      final boolean isSourceTemperature = sourceTemperatureSerie != null;
+      final boolean isSourceTime = sourceTimeSerie != null;
 
       final boolean isTargetDistance = targetDistanceSerie != null;
       final boolean isTargetAltitude = targetAltitudeSerie != null;
@@ -421,7 +419,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final float[] newTargetPulseSerie = new float[serieLength];
       final int[] newTargetTimeSerie = new int[serieLength];
-      _newTargetSpeedSerie = new float[serieLength];
       final float[] newTargetTemperatureSerie = new float[serieLength];
       final float[] newTargetCadenceSerie = new float[serieLength];
 
@@ -432,7 +429,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       float previousSourceAltitude = 0;
 
       float newSourceAltitude;
-      final int newSourceTime;
 
       if (isSourceAltitude) {
          sourceAlti = sourceAltitudeSerie[0] + yMergeOffset;
@@ -471,7 +467,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                sourceTime = sourceTimeSerie[sourceIndex2];
                sourceDistance = sourceDistanceSerie[sourceIndex2];
 
-               if (isSourceSpeed) {
+               if (isSourceTime) {
                   previousSourceTime = sourceTime;
                }
             }
@@ -482,7 +478,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       /*
        * create new time/distance serie for the source tour according to the time of the target tour
        */
-      int previousTargetTime = 0;
       for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
          final int targetTime = targetTimeSerie[targetIndex];
@@ -512,10 +507,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             }
          }
 
-         //TODO FB
-         //get the speed between previous sourcetime and current sourcetime
-         final int diffsourcetime = sourceTime - previousSourceTime;
-         final int difftargettime = targetTime - previousTargetTime;
+//         //TODO FB
+//         //get the speed between previous sourcetime and current sourcetime
+//         final int diffsourcetime = sourceTime - previousSourceTime;
+//         final int difftargettime = targetTime - previousTargetTime;
 
          //apply the same speed to the previous target and the current target
 //i.e. manipulate the time taking into account the distance so that the speed match the expected value
@@ -560,12 +555,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          if (isSourcePulse) {
             newTargetPulseSerie[targetIndex] = sourcePulseSerie[sourceIndex];
          }
-         if (isSourceSpeed) {
-            //TODO FB For now, for ease of coding, the time is modified with the altitude code
-            // so the altitude must be checked
-            //when the code works, let's put oit here
-            //  _newTargetSpeedSerie[targetIndex] = sourceSpeedSerie[sourceIndex];
-         }
          if (isSourceTemperature) {
             newTargetTemperatureSerie[targetIndex] = sourceTemperatureSerie[sourceIndex];
          }
@@ -573,7 +562,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             newTargetCadenceSerie[targetIndex] = sourceCadenceSerie[sourceIndex];
          }
 
-         previousTargetTime = targetTime;
          previousSourceTime = sourceTime;
       }
 
@@ -600,7 +588,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       if (_chkMergeSpeed.getSelection()) {
          _targetTour.timeSerie = newTargetTimeSerie;
       } else {
-         // _targetTour.timeSerie = _backupTargetTimeSerie;
+         _targetTour.timeSerie = _backupTargetTimeSerie;
       }
 
 //      _targetTour.setSpeedSerie(_chkMergeSpeed.getSelection()
@@ -755,8 +743,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _backupSourceTourType = _sourceTour.getTourType();
 
       _backupTargetPulseSerie = Util.createFloatCopy(_targetTour.pulseSerie);
-      _backupTargetSpeedSerie = Util.createFloatCopy(_targetTour.speedSerie);
       _backupTargetTemperatureSerie = Util.createFloatCopy(_targetTour.temperatureSerie);
+      _backupTargetTimeSerie = Util.createIntegerCopy(_targetTour.timeSerie);
       _backupTargetCadenceSerie = Util.createFloatCopy(_targetTour.getCadenceSerie());
 
       _backupTargetTimeOffset = _targetTour.getMergedTourTimeOffset();
@@ -1099,14 +1087,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       /*
        * checkbox: merge speed
        */
-      final var toto = _sourceTour.isSpeedSerieFromDevice();
       _chkMergeSpeed = createUIMergeAction(
             group,
             TourManager.GRAPH_SPEED,
             Messages.merge_tour_source_graph_speed,
             Messages.merge_tour_source_graph_speed_tooltip,
             Images.Graph_Speed,
-            _sourceTour.speedSerie != null);
+            _sourceTour.timeSerie != null);
 
       /*
        * checkbox: merge temperature
@@ -1427,13 +1414,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final boolean isAltitude = _sourceTour.altitudeSerie != null && _targetTour.altitudeSerie != null;
       final boolean isSourcePulse = _sourceTour.pulseSerie != null;
-      final boolean isSourceSpeed = _sourceTour.speedSerie != null;
+      final boolean isSourceTime = _sourceTour.timeSerie != null;
       final boolean isSourceTemperature = _sourceTour.temperatureSerie != null;
       final boolean isSourceCadence = _sourceTour.getCadenceSerie() != null;
 
       _chkMergeAltitude.setEnabled(isAltitude);
       _chkMergePulse.setEnabled(isSourcePulse);
-      _chkMergeSpeed.setEnabled(isSourceSpeed);
+      _chkMergeSpeed.setEnabled(isSourceTime);
       _chkMergeTemperature.setEnabled(isSourceTemperature);
       _chkMergeCadence.setEnabled(isSourceCadence);
 
@@ -1446,7 +1433,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       if (isSourcePulse == false) {
          _chkMergePulse.setSelection(false);
       }
-      if (isSourceSpeed == false) {
+      if (isSourceTime == false) {
          _chkMergeSpeed.setSelection(false);
       }
       if (isSourceTemperature == false) {
@@ -1621,8 +1608,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _sourceTour.altitudeSerie = Util.createFloatCopy(_backupSourceAltitudeSerie);
 
       _targetTour.pulseSerie = Util.createFloatCopy(_backupTargetPulseSerie);
-      _targetTour.setSpeedSerie(Util.createFloatCopy(_backupTargetSpeedSerie));
       _targetTour.temperatureSerie = Util.createFloatCopy(_backupTargetTemperatureSerie);
+      _targetTour.timeSerie = Util.createIntegerCopy(_backupTargetTimeSerie);
       _targetTour.setCadenceSerie(Util.createFloatCopy(_backupTargetCadenceSerie));
 
       _targetTour.setMergedTourTimeOffset(_backupTargetTimeOffset);
@@ -1644,8 +1631,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _sourceTour.setTourType(_backupSourceTourType);
 
       _targetTour.pulseSerie = _backupTargetPulseSerie;
-      _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
       _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
+      _targetTour.timeSerie = _backupTargetTimeSerie;
       _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
 
       _targetTour.setMergedTourTimeOffset(_backupTargetTimeOffset);
@@ -1783,13 +1770,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       if (_chkMergeSpeed.getSelection()) {
-         // speed is already merged
+         // time is already merged
          isMerged = true;
-         _targetTour.setSpeedSerie(_newTargetSpeedSerie);
-         _targetTour.computeSpeedSeries();
       } else {
-         // restore original temperature values because these values should not be saved
-         _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
+         // restore original time values because these values should not be saved
+         _targetTour.timeSerie = _backupTargetTimeSerie;
       }
 
       if (isMerged) {
