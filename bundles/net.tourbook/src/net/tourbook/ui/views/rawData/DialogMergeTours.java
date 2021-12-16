@@ -443,42 +443,42 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final boolean isLinearInterpolation = _chkAdjustAltiFromSource.getSelection()
             && _chkAdjustAltiSmoothly.getSelection();
 
-      //todo fb merge speed
-      float sourceDistance = 0;
-      int sourceIndex2 = 0;
-      final int lastSourceIndex2 = sourceDistanceSerie.length - 1;
-      for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
+      if (_chkMergeSpeed.getSelection()) {
+         //todo fb merge speed
+         float sourceDistance = 0;
+         int sourceIndex2 = 0;
+         final int lastSourceIndex2 = sourceDistanceSerie.length - 1;
+         for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
-         final float targetDistance = targetDistanceSerie[targetIndex];
+            final float targetDistance = targetDistanceSerie[targetIndex];
 
-         /*
-          * target tour is the leading distance data serie, move source distance
-          * forward to reach target distance
-          */
-         while (sourceDistance < targetDistance) {
+            /*
+             * target tour is the leading distance data serie, move source distance
+             * forward to reach target distance
+             */
+            while (sourceDistance < targetDistance) {
 
-            sourceIndex2++;
+               sourceIndex2++;
 
-            // check array bounds
-            sourceIndex2 = (sourceIndex2 <= lastSourceIndex2) ? sourceIndex2 : lastSourceIndex2;
+               // check array bounds
+               sourceIndex2 = (sourceIndex2 <= lastSourceIndex2) ? sourceIndex2 : lastSourceIndex2;
 
-            if (sourceIndex2 == lastSourceIndex2) {
-               //prevent endless loops
-               break;
+               if (sourceIndex2 == lastSourceIndex2) {
+                  //prevent endless loops
+                  break;
+               }
+
+               sourceTime = sourceTimeSerie[sourceIndex2];
+               sourceDistance = sourceDistanceSerie[sourceIndex2];
+
+               if (isSourceSpeed) {
+                  previousSourceTime = sourceTime;
+               }
             }
 
-            sourceTime = sourceTimeSerie[sourceIndex2];
-            sourceDistance = sourceDistanceSerie[sourceIndex2];
-
-            if (isSourceSpeed) {
-               previousSourceTime = sourceTime;
-            }
+            newTargetTimeSerie[targetIndex] = previousSourceTime;
          }
-
-         newTargetTimeSerie[targetIndex] = previousSourceTime;
-
       }
-
       /*
        * create new time/distance serie for the source tour according to the time of the target tour
        */
