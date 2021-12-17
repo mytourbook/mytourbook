@@ -492,7 +492,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    private void fireHoveredValue(final int hoveredValuePointIndex) {
 
-      final HoveredValueData hoveredValueData = new HoveredValueData(hoveredValuePointIndex);
+      final HoveredValueData hoveredValueData = new HoveredValueData(_tourData, hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
             TourEventId.HOVERED_VALUE_POSITION,
@@ -894,7 +894,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
          _postSelectionProvider.setSelectionNoFireEvent(selection);
 
-         fireSliderPosition();
+//         fireSliderPosition();
       }
    }
 

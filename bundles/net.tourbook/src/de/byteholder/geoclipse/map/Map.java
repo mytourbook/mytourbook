@@ -558,17 +558,17 @@ public class Map extends Canvas {
 
    private int                       _overlayAlpha           = 0xff;
 
-   private MapGridData               _grid_Data_Hovered;
-   private MapGridData               _grid_Data_Selected;
+   private MapGridData               _geoGrid_Data_Hovered;
+   private MapGridData               _geoGrid_Data_Selected;
 
-   private boolean                   _grid_Label_IsHovered;
+   private boolean                   _geoGrid_Label_IsHovered;
+   private Rectangle                 _geoGrid_Label_Outline;
 
-   private Rectangle                 _grid_Label_Outline;
-   private GeoPosition               _grid_MapGeoCenter;
-   private int                       _grid_MapZoomLevel;
-   private int[]                     _grid_AutoScrollCounter = new int[1];
+   private GeoPosition               _geoGrid_MapGeoCenter;
+   private int                       _geoGrid_MapZoomLevel;
+   private int[]                     _geoGrid_AutoScrollCounter = new int[1];
 
-   private boolean                   _grid_IsGridAutoScroll;
+   private boolean                   _geoGrid_IsGridAutoScroll;
 
    private ActionManageOfflineImages _actionManageOfflineImages;
 
@@ -725,7 +725,7 @@ public class Map extends Canvas {
 
    public void actionSearchTourByLocation(final Event event) {
 
-      _grid_Data_Hovered = new MapGridData();
+      _geoGrid_Data_Hovered = new MapGridData();
 
       // auto open geo filter slideout
       final boolean isAutoOpenSlideout = Util.getStateBoolean(TourGeoFilter_Manager.getState(),
@@ -742,7 +742,7 @@ public class Map extends Canvas {
             _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X,
             _worldPixel_TopLeft_Viewport.y + _mouseMove_DevPosition_Y);
 
-      _grid_Data_Hovered.geo_MouseMove = _mp.pixelToGeo(
+      _geoGrid_Data_Hovered.geo_MouseMove = _mp.pixelToGeo(
             new Point2D.Double(worldMousePosition.x, worldMousePosition.y),
             _mapZoomLevel);
 
@@ -1777,23 +1777,23 @@ public class Map extends Canvas {
 
       final int AUTO_SCROLL_INTERVAL = 50; // 20ms == 50fps
 
-      _grid_IsGridAutoScroll = true;
-      _grid_AutoScrollCounter[0]++;
+      _geoGrid_IsGridAutoScroll = true;
+      _geoGrid_AutoScrollCounter[0]++;
       setCursor(_cursorSearchTour_Scroll);
 
       getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
 
-         final int __runnableScrollCounter = _grid_AutoScrollCounter[0];
+         final int __runnableScrollCounter = _geoGrid_AutoScrollCounter[0];
 
          @Override
          public void run() {
 
-            if (__runnableScrollCounter != _grid_AutoScrollCounter[0]) {
+            if (__runnableScrollCounter != _geoGrid_AutoScrollCounter[0]) {
                // a new runnable is created
                return;
             }
 
-            if (isDisposed() || _grid_IsGridAutoScroll == false) {
+            if (isDisposed() || _geoGrid_IsGridAutoScroll == false) {
                // auto scrolling is stopped
                return;
             }
@@ -1825,7 +1825,7 @@ public class Map extends Canvas {
             if (isRepeatScrolling) {
                getDisplay().timerExec(AUTO_SCROLL_INTERVAL, this);
             } else {
-               _grid_IsGridAutoScroll = false;
+               _geoGrid_IsGridAutoScroll = false;
                setCursor(_cursorSearchTour);
             }
          }
@@ -1939,16 +1939,16 @@ public class Map extends Canvas {
    /**
     * Update geo grid positions after map relocation
     */
-   private void grid_UpdateGridData() {
+   private void grid_UpdateGeoGridData() {
 
-      if (_grid_Data_Hovered != null) {
+      if (_geoGrid_Data_Hovered != null) {
 
-         if (_grid_Data_Hovered.geo_Start != null) {
+         if (_geoGrid_Data_Hovered.geo_Start != null) {
 
-            final GeoPosition geo_Start = _grid_Data_Hovered.geo_Start;
-            final GeoPosition geo_End = _grid_Data_Hovered.geo_End;
+            final GeoPosition geo_Start = _geoGrid_Data_Hovered.geo_Start;
+            final GeoPosition geo_End = _geoGrid_Data_Hovered.geo_End;
 
-            grid_Convert_StartEnd_2_TopLeft(geo_Start, geo_End, _grid_Data_Hovered);
+            grid_Convert_StartEnd_2_TopLeft(geo_Start, geo_End, _geoGrid_Data_Hovered);
 
          } else {
 
@@ -1957,20 +1957,20 @@ public class Map extends Canvas {
              * be updated from the mouse move positions
              */
 
-            final GeoPosition geo_MouseMove = _grid_Data_Hovered.geo_MouseMove;
+            final GeoPosition geo_MouseMove = _geoGrid_Data_Hovered.geo_MouseMove;
             if (geo_MouseMove != null) {
 
-               grid_Convert_StartEnd_2_TopLeft(geo_MouseMove, geo_MouseMove, _grid_Data_Hovered);
+               grid_Convert_StartEnd_2_TopLeft(geo_MouseMove, geo_MouseMove, _geoGrid_Data_Hovered);
             }
          }
       }
 
-      if (_grid_Data_Selected != null && _grid_Data_Selected.geo_Start != null) {
+      if (_geoGrid_Data_Selected != null && _geoGrid_Data_Selected.geo_Start != null) {
 
-         final GeoPosition geo_Start = _grid_Data_Selected.geo_Start;
-         final GeoPosition geo_End = _grid_Data_Selected.geo_End;
+         final GeoPosition geo_Start = _geoGrid_Data_Selected.geo_Start;
+         final GeoPosition geo_End = _geoGrid_Data_Selected.geo_End;
 
-         grid_Convert_StartEnd_2_TopLeft(geo_Start, geo_End, _grid_Data_Selected);
+         grid_Convert_StartEnd_2_TopLeft(geo_Start, geo_End, _geoGrid_Data_Selected);
       }
 
       redraw();
@@ -2168,7 +2168,7 @@ public class Map extends Canvas {
     */
    public boolean isSearchTourByLocation() {
 
-      return _grid_Data_Hovered != null || _grid_IsGridAutoScroll == true;
+      return _geoGrid_Data_Hovered != null || _geoGrid_IsGridAutoScroll == true;
 
    }
 
@@ -2576,10 +2576,10 @@ public class Map extends Canvas {
       }
 
       // stop tour search by location
-      if (_grid_Data_Hovered != null) {
+      if (_geoGrid_Data_Hovered != null) {
 
-         _grid_Data_Hovered = null;
-         _grid_IsGridAutoScroll = false;
+         _geoGrid_Data_Hovered = null;
+         _geoGrid_IsGridAutoScroll = false;
 
          grid_DisableGridBoxSelection();
 
@@ -2675,21 +2675,21 @@ public class Map extends Canvas {
 
          redraw();
 
-      } else if (_grid_Data_Hovered != null) {
+      } else if (_geoGrid_Data_Hovered != null) {
 
-         _grid_Data_Hovered.isSelectionStarted = true;
+         _geoGrid_Data_Hovered.isSelectionStarted = true;
 
          final Point worldMousePosition = new Point(
                _worldPixel_TopLeft_Viewport.x + mouseEvent.x,
                _worldPixel_TopLeft_Viewport.y + mouseEvent.y);
 
-         _grid_Data_Hovered.isSelectionStarted = true;
+         _geoGrid_Data_Hovered.isSelectionStarted = true;
 
          final GeoPosition geoMousePosition = _mp.pixelToGeo(new Point2D.Double(worldMousePosition.x, worldMousePosition.y), _mapZoomLevel);
-         _grid_Data_Hovered.geo_Start = geoMousePosition;
-         _grid_Data_Hovered.geo_End = geoMousePosition;
+         _geoGrid_Data_Hovered.geo_Start = geoMousePosition;
+         _geoGrid_Data_Hovered.geo_End = geoMousePosition;
 
-         grid_Convert_StartEnd_2_TopLeft(geoMousePosition, geoMousePosition, _grid_Data_Hovered);
+         grid_Convert_StartEnd_2_TopLeft(geoMousePosition, geoMousePosition, _geoGrid_Data_Hovered);
 
          redraw();
 
@@ -2697,19 +2697,19 @@ public class Map extends Canvas {
 
          // tour breadcrumb is selected, show it's tours in the map
 
-         final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getCrumbToursAndReset();
+         final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getHoveredCrumbedTours_WithReset();
 
          // hide crumb selection state, this must be done after the crumb is reset
          redraw();
 
          fireEvent_TourSelection(new SelectionTourIds(crumbTourIds), true);
 
-      } else if (_grid_Label_IsHovered) {
+      } else if (_geoGrid_Label_IsHovered) {
 
          // set map location to the selected geo filter default position
 
          // hide hover color
-         _grid_Label_IsHovered = false;
+         _geoGrid_Label_IsHovered = false;
 
          setCursor(_cursorDefault);
 
@@ -2718,11 +2718,11 @@ public class Map extends Canvas {
          _isZoomWithMousePosition = false;
          {
             // set zoom level first, that recalculation is correct
-            setZoom(_grid_MapZoomLevel);
+            setZoom(_geoGrid_MapZoomLevel);
          }
          _isZoomWithMousePosition = isZoomWithMousePosition;
 
-         setMapCenter(new GeoPosition(_grid_MapGeoCenter.latitude, _grid_MapGeoCenter.longitude));
+         setMapCenter(new GeoPosition(_geoGrid_MapGeoCenter.latitude, _geoGrid_MapGeoCenter.longitude));
 
       } else if (_allHoveredTourIds.size() > 0) {
 
@@ -2778,9 +2778,9 @@ public class Map extends Canvas {
       _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
 
       // stop grid autoscrolling
-      _grid_IsGridAutoScroll = false;
+      _geoGrid_IsGridAutoScroll = false;
 
-      _grid_Label_IsHovered = false;
+      _geoGrid_Label_IsHovered = false;
 
       if (_isShowHoveredSelectedTour) {
 
@@ -2833,14 +2833,14 @@ public class Map extends Canvas {
          return;
       }
 
-      if (_grid_Data_Hovered != null) {
+      if (_geoGrid_Data_Hovered != null) {
 
          // tour geo filter is hovered
 
-         _grid_Data_Hovered.geo_MouseMove = geoMouseMove;
-         grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
+         _geoGrid_Data_Hovered.geo_MouseMove = geoMouseMove;
+         grid_UpdateEndPosition(mouseEvent, _geoGrid_Data_Hovered);
 
-         _tourBreadcrumb.resetTours();
+         _tourBreadcrumb.resetAllBreadcrumbs();
 
          // pan map when mouse is near map border
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
@@ -2856,7 +2856,7 @@ public class Map extends Canvas {
          paint();
 
          fireEvent_MapInfo();
-         fireEvent_MapGrid(false, _grid_Data_Hovered);
+         fireEvent_MapGrid(false, _geoGrid_Data_Hovered);
 
          return;
       }
@@ -2916,17 +2916,17 @@ public class Map extends Canvas {
          }
       }
 
-      if (!isSomethingHit && _grid_Label_Outline != null) {
+      if (!isSomethingHit && _geoGrid_Label_Outline != null) {
 
          // check if mouse has hovered the grid label
 
-         final boolean isHovered = _grid_Label_IsHovered;
+         final boolean isHovered = _geoGrid_Label_IsHovered;
 
-         _grid_Label_IsHovered = false;
+         _geoGrid_Label_IsHovered = false;
 
-         if (_grid_Label_Outline.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y)) {
+         if (_geoGrid_Label_Outline.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y)) {
 
-            _grid_Label_IsHovered = true;
+            _geoGrid_Label_IsHovered = true;
 
             setCursor(_cursorHand);
 
@@ -3013,18 +3013,18 @@ public class Map extends Canvas {
 
          offline_OpenOfflineImageDialog();
 
-      } else if (_grid_Data_Hovered != null) {
+      } else if (_geoGrid_Data_Hovered != null) {
 
          // finalize grid selecting
 
          _isContextMenuEnabled = false;
 
-         if (_grid_Data_Hovered.isSelectionStarted == false) {
+         if (_geoGrid_Data_Hovered.isSelectionStarted == false) {
 
             // this can happen when the right mouse button is clicked
 
-            _grid_Data_Hovered = null;
-            _grid_IsGridAutoScroll = true;
+            _geoGrid_Data_Hovered = null;
+            _geoGrid_IsGridAutoScroll = true;
 
             grid_DisableGridBoxSelection();
 
@@ -3035,19 +3035,19 @@ public class Map extends Canvas {
           * Show selected grid box
           */
 
-         grid_UpdateEndPosition(mouseEvent, _grid_Data_Hovered);
+         grid_UpdateEndPosition(mouseEvent, _geoGrid_Data_Hovered);
 
-         _grid_Data_Selected = _grid_Data_Hovered;
+         _geoGrid_Data_Selected = _geoGrid_Data_Hovered;
 
-         _grid_Data_Hovered = null;
-         _grid_IsGridAutoScroll = true;
+         _geoGrid_Data_Hovered = null;
+         _geoGrid_IsGridAutoScroll = true;
 
          grid_DisableGridBoxSelection();
 
          redraw();
          paint();
 
-         fireEvent_MapGrid(true, _grid_Data_Selected);
+         fireEvent_MapGrid(true, _geoGrid_Data_Selected);
 
       } else {
 
@@ -3149,12 +3149,12 @@ public class Map extends Canvas {
 
          final boolean isPaintTourInfo = paint_HoveredTour(gc);
 
-         _grid_Label_Outline = null;
-         if (_grid_Data_Selected != null) {
-            paint_GridBox_10_Selected(gc, _grid_Data_Selected);
+         _geoGrid_Label_Outline = null;
+         if (_geoGrid_Data_Selected != null) {
+            paint_GridBox_10_Selected(gc, _geoGrid_Data_Selected);
          }
-         if (_grid_Data_Hovered != null) {
-            paint_GridBox_20_Hovered(gc, _grid_Data_Hovered);
+         if (_geoGrid_Data_Hovered != null) {
+            paint_GridBox_20_Hovered(gc, _geoGrid_Data_Hovered);
          }
 
          // paint tooltip icon in the map
@@ -3541,7 +3541,7 @@ public class Map extends Canvas {
       Color fgColor;
       Color bgColor;
 
-      if (_grid_Label_IsHovered) {
+      if (_geoGrid_Label_IsHovered) {
          fgColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
          bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
       } else {
@@ -3549,7 +3549,7 @@ public class Map extends Canvas {
          bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
       }
 
-      _grid_Label_Outline = paint_Text_Label(gc,
+      _geoGrid_Label_Outline = paint_Text_Label(gc,
             devTopLeft.x,
             devTopLeft.y,
             mapGridData.gridBox_Text,
@@ -6489,7 +6489,7 @@ public class Map extends Canvas {
     *           Show geo grid box for this geo filter, when <code>null</code> the selected grid box
     *           is set to hidden
     */
-   public void showGeoGrid(final TourGeoFilter tourGeoFilter) {
+   public void showGeoSearchGrid(final TourGeoFilter tourGeoFilter) {
 
       if (_mp == null) {
          // the map has currently no map provider
@@ -6501,7 +6501,7 @@ public class Map extends Canvas {
       if (tourGeoFilter == null) {
 
          // hide geo grid
-         _grid_Data_Selected = null;
+         _geoGrid_Data_Selected = null;
 
          redraw();
 
@@ -6516,8 +6516,8 @@ public class Map extends Canvas {
                TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION,
                TourGeoFilter_Manager.STATE_IS_SYNC_MAP_POSITION_DEFAULT);
 
-         _grid_MapZoomLevel = tourGeoFilter.mapZoomLevel;
-         _grid_MapGeoCenter = tourGeoFilter.mapGeoCenter;
+         _geoGrid_MapZoomLevel = tourGeoFilter.mapZoomLevel;
+         _geoGrid_MapGeoCenter = tourGeoFilter.mapGeoCenter;
 
          if (isSyncMapPosition) {
 
@@ -6526,7 +6526,7 @@ public class Map extends Canvas {
             _isZoomWithMousePosition = false;
             {
                // set zoom level first, that recalculation is correct
-               setZoom(_grid_MapZoomLevel);
+               setZoom(_geoGrid_MapZoomLevel);
             }
             _isZoomWithMousePosition = isZoomWithMousePosition;
          }
@@ -6551,7 +6551,7 @@ public class Map extends Canvas {
             tourGeoFilter.mapGridData = mapGridData;
          }
 
-         _grid_Data_Selected = mapGridData;
+         _geoGrid_Data_Selected = mapGridData;
 
          final Rectangle world_MapViewPort = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
 
@@ -6562,8 +6562,8 @@ public class Map extends Canvas {
 
             // chck if grid box is already visible
 
-            if (world_MapViewPort.contains(_grid_Data_Selected.world_Start)
-                  && world_MapViewPort.contains(_grid_Data_Selected.world_End)) {
+            if (world_MapViewPort.contains(_geoGrid_Data_Selected.world_Start)
+                  && world_MapViewPort.contains(_geoGrid_Data_Selected.world_End)) {
 
                // grid box is visile -> nothing to do
 
@@ -6571,7 +6571,7 @@ public class Map extends Canvas {
 
                // recenter map to make it visible
 
-               setMapCenter(new GeoPosition(_grid_MapGeoCenter.latitude, _grid_MapGeoCenter.longitude));
+               setMapCenter(new GeoPosition(_geoGrid_MapGeoCenter.latitude, _geoGrid_MapGeoCenter.longitude));
             }
 
          } else {
@@ -6868,7 +6868,7 @@ public class Map extends Canvas {
       _devGridPixelSize_X = Math.abs(worldGrid2.x - worldGrid1.x);
       _devGridPixelSize_Y = Math.abs(worldGrid2.y - worldGrid1.y);
 
-      grid_UpdateGridData();
+      grid_UpdateGeoGridData();
    }
 
    public void zoomIn() {

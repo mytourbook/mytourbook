@@ -23,6 +23,7 @@ import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.MapTourBreadcrumb;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -1392,12 +1393,12 @@ public class Map2View extends ViewPart implements
 
                // show geo filter
 
-               _map.tourBreadcrumb().resetTours();
+               _map.tourBreadcrumb().resetAllBreadcrumbs();
 
                final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
-               // show search rectangle
-               _map.showGeoGrid(tourGeoFilter);
+               // show geo search rectangle
+               _map.showGeoSearchGrid(tourGeoFilter);
 
                // show tours in search rectangle
                geoFilter_10_Loader(tourGeoFilter.mapGridData, tourGeoFilter);
@@ -2212,7 +2213,7 @@ public class Map2View extends ViewPart implements
             return;
          }
 
-         _map.showGeoGrid(tourGeoFilter);
+         _map.showGeoSearchGrid(tourGeoFilter);
 
          if (_isShowTour) {
 
@@ -2470,7 +2471,7 @@ public class Map2View extends ViewPart implements
 
    private void hideGeoGrid() {
 
-      _map.showGeoGrid(null);
+      _map.showGeoSearchGrid(null);
    }
 
    /**
@@ -2587,16 +2588,17 @@ public class Map2View extends ViewPart implements
 
       _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
 
+      paintToursAndPhotos(hoveredValueData.tourData, null);
       updateUI_HoveredValuePoint();
    }
 
    /**
     * @param selection
-    * @param isExternalEvent
-    *           Is <code>true</code> when the event is from another part, otherwise
-    *           <code>false</code> when the event is internal
+    * @param isResetBreadcrumbs
+    *           Is <code>true</code> when the breadcrums should be reset, otherwise
+    *           <code>false</code>
     */
-   private void onSelectionChanged(final ISelection selection, final boolean isExternalEvent) {
+   private void onSelectionChanged(final ISelection selection, final boolean isResetBreadcrumbs) {
 
       if (_isPartVisible == false) {
 
@@ -2610,8 +2612,10 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      if (isExternalEvent) {
-         _map.tourBreadcrumb().resetTours();
+      final MapTourBreadcrumb tourBreadcrumb = _map.tourBreadcrumb();
+
+      if (isResetBreadcrumbs) {
+         tourBreadcrumb.resetAllBreadcrumbs();
       }
 
       if (selection instanceof SelectionTourData) {
@@ -2621,10 +2625,7 @@ public class Map2View extends ViewPart implements
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
 
-         paintTours_20_One(tourData, false);
-         paintPhotoSelection(selection);
-
-         enableActions();
+         paintToursAndPhotos(tourData, selection);
 
       } else if (selection instanceof SelectionTourId) {
 
@@ -2633,10 +2634,7 @@ public class Map2View extends ViewPart implements
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-         paintTours_20_One(tourData, false);
-         paintPhotoSelection(selection);
-
-         enableActions();
+         paintToursAndPhotos(tourData, selection);
 
       } else if (selection instanceof SelectionTourIds) {
 
@@ -2653,7 +2651,6 @@ public class Map2View extends ViewPart implements
 
             if (allPhotos.size() > 0) {
 
-//               centerPhotos(allPhotos, false);
                showDefaultMap(true);
 
                enableActions();
@@ -2665,10 +2662,7 @@ public class Map2View extends ViewPart implements
 
             final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
 
-            paintTours_20_One(tourData, false);
-            paintPhotoSelection(selection);
-
-            enableActions();
+            paintToursAndPhotos(tourData, selection);
 
          } else {
 
@@ -2720,7 +2714,7 @@ public class Map2View extends ViewPart implements
 
          if (tourData != null) {
 
-            _map.tourBreadcrumb().setTours(tourData);
+//            tourBreadcrumb.setBreadcrumbForOneTour(tourData);
 
             positionMapTo_0_TourSliders(
                   tourData,
@@ -2868,6 +2862,8 @@ public class Map2View extends ViewPart implements
             _allTourData.add(refTourData);
             _allTourData.add(comparedTourData);
             _hash_AllTourData = _allTourData.hashCode();
+
+            _map.tourBreadcrumb().resetAllBreadcrumbs();
 
             paintTours_10_All();
 
@@ -3041,7 +3037,7 @@ public class Map2View extends ViewPart implements
       _directMappingPainter.disablePaintContext();
 
       _map.resetHoveredSelectedTours();
-      _map.tourBreadcrumb().setTours(_allTourData);
+//      _map.tourBreadcrumb().setTours(_allTourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3147,7 +3143,7 @@ public class Map2View extends ViewPart implements
           * Ensure the tour breadcrumb shows the correct values, the value is hidden when a geo tour
           * filter is reselected
           */
-         _map.tourBreadcrumb().setTours(_allTourData);
+         _map.tourBreadcrumb().setBreadcrumbTours(_allTourData);
 
          return;
       }
@@ -3168,7 +3164,11 @@ public class Map2View extends ViewPart implements
 
          // tour data needs to be loaded
 
-         newOverlayKey = TourManager.loadTourData(allTourIds, _allTourData, true);
+         final ArrayList<TourData> allLoadedTourData = new ArrayList<>();
+
+         newOverlayKey = TourManager.loadTourData(allTourIds, allLoadedTourData, true);
+
+         setTourData(allLoadedTourData);
 
          /*
           * Sort tours by date otherwise the chart value point, which is sorted by date, could show
@@ -3187,7 +3187,7 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
 
       _map.resetHoveredSelectedTours();
-      _map.tourBreadcrumb().setTours(_allTourData);
+//      _map.tourBreadcrumb().setTours(_allTourData);
 
       if (_previousOverlayKey != newOverlayKey) {
 
@@ -3259,6 +3259,9 @@ public class Map2View extends ViewPart implements
 
       // prevent loading the same tour
       if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
+
+         _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
+
          return;
       }
 
@@ -3315,7 +3318,7 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setTourBounds(tourBoundsSet);
 
       _map.resetHoveredSelectedTours();
-      _map.tourBreadcrumb().setTours(tourData);
+//      _map.tourBreadcrumb().setTour(tourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3382,7 +3385,7 @@ public class Map2View extends ViewPart implements
       _directMappingPainter.disablePaintContext();
 
       _map.resetHoveredSelectedTours();
-      _map.tourBreadcrumb().setTours(_allTourData);
+//      _map.tourBreadcrumb().setTours(_allTourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3406,6 +3409,14 @@ public class Map2View extends ViewPart implements
       createLegendImage(_tourPainterConfig.getMapColorProvider());
 
       _map.paint();
+   }
+
+   private void paintToursAndPhotos(final TourData tourData, final ISelection selection) {
+
+      paintTours_20_One(tourData, false);
+      paintPhotoSelection(selection);
+
+      enableActions();
    }
 
    @Override
@@ -4078,7 +4089,7 @@ public class Map2View extends ViewPart implements
    }
 
    /**
-    * Set tour data for the map, this is a central point to set the data to debug it easier!
+    * Set tour data for the map, this is a central point to set the data.
     *
     * @param tourData
     */
@@ -4086,10 +4097,12 @@ public class Map2View extends ViewPart implements
 
       _allTourData.clear();
       _allTourData.addAll(allTourData);
+
+      _map.tourBreadcrumb().addBreadcrumTours(allTourData);
    }
 
    /**
-    * Set tour data for the map, this is a central point to set the data to debug it easier!
+    * Set tour data for the map, this is a central point to set the data.
     *
     * @param tourData
     */
@@ -4097,6 +4110,8 @@ public class Map2View extends ViewPart implements
 
       _allTourData.clear();
       _allTourData.add(tourData);
+
+      _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
    }
 
    private void setTourPainterColorProvider(final MapGraphId colorId) {
@@ -4144,7 +4159,7 @@ public class Map2View extends ViewPart implements
 
       _map.resetHoveredSelectedTours();
 
-      _map.tourBreadcrumb().resetTours();
+      _map.tourBreadcrumb().resetAllBreadcrumbs();
 
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);
@@ -4490,8 +4505,6 @@ public class Map2View extends ViewPart implements
 
          _hash_AllTourData = _allTourData.hashCode();
          _hash_AllTourIds = tourData.getTourId().hashCode();
-
-         _map.tourBreadcrumb().resetTours();
 
          paintTours_10_All();
       }

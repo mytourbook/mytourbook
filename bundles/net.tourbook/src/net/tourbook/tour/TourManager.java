@@ -3992,10 +3992,24 @@ public class TourManager {
       return new ChartDataYSerie(chartType, dataSerie);
    }
 
+   /**
+    * 0 values will be ignored when computing min/maxvalues.
+    *
+    * @param dataSerie
+    * @param chartType
+    * @return
+    */
    private ChartDataYSerie createChartDataSerieNoZero(final float[] dataSerie, final ChartType chartType) {
       return new ChartDataYSerie(chartType, dataSerie, true);
    }
 
+   /**
+    * 0 values will be ignored when computing min/maxvalues.
+    *
+    * @param dataSerie
+    * @param chartType
+    * @return
+    */
    private ChartDataYSerie createChartDataSerieNoZero(final float[][] dataSerie, final ChartType chartType) {
       return new ChartDataYSerie(chartType, dataSerie, true);
    }
@@ -4164,7 +4178,7 @@ public class TourManager {
          }
 
          if (yDataElevation == null) {
-            yDataElevation = createChartDataSerie(altitudeSerie, chartType);
+            yDataElevation = createChartDataSerieNoZero(altitudeSerie, chartType);
          }
 
          yDataElevation.setYTitle(GRAPH_LABEL_ALTITUDE);

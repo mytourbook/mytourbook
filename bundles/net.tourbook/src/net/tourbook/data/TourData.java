@@ -1223,7 +1223,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 2nd item contains lat/lon maximum values<br>
     */
    @Transient
-   private GeoPosition[]         _gpsBounds;
+   private GeoPosition[]         _geoBounds;
+
+   /**
+    * Is <code>true</code> when geo bounds are checked
+    */
+   @Transient
+   private boolean               _isGeoBoundsChecked;
 
    /**
     * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
@@ -2167,7 +2173,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       srtmSerie = null;
       srtmSerieImperial = null;
 
-      _gpsBounds = null;
+      _geoBounds = null;
+      _isGeoBoundsChecked = false;
+
       _rasterizedLatLon = null;
       geoGrid = null;
 //      latitudeMinE6 = 0;
@@ -4076,23 +4084,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void computeGeo_Bounds() {
 
-      if (latitudeSerie == null || longitudeSerie == null || latitudeSerie.length == 0 || longitudeSerie.length == 0) {
+      if (latitudeSerie == null || longitudeSerie == null
+            || latitudeSerie.length == 0 || longitudeSerie.length == 0
+            || _isGeoBoundsChecked) {
+
          return;
       }
 
-      /*
-       * get min/max longitude/latitude
-       */
+      double minLatitude = Double.MIN_VALUE;
+      double maxLatitude = Double.MIN_VALUE;
+      double minLongitude = Double.MIN_VALUE;
+      double maxLongitude = Double.MIN_VALUE;
 
-      double minLatitude = latitudeSerie[0];
-      double maxLatitude = latitudeSerie[0];
-      double minLongitude = longitudeSerie[0];
-      double maxLongitude = longitudeSerie[0];
+      int serieIndex = 0;
 
-      for (int serieIndex = 1; serieIndex < latitudeSerie.length; serieIndex++) {
+      // find first value where lat/long != 0
+      for (; serieIndex < latitudeSerie.length; serieIndex++) {
 
          final double latitude = latitudeSerie[serieIndex];
          final double longitude = longitudeSerie[serieIndex];
+
+         if (latitude != 0 || longitude != 0) {
+
+            minLatitude = latitudeSerie[serieIndex];
+            maxLatitude = latitudeSerie[serieIndex];
+            minLongitude = longitudeSerie[serieIndex];
+            maxLongitude = longitudeSerie[serieIndex];
+
+            break;
+         }
+      }
+
+      for (; serieIndex < latitudeSerie.length; serieIndex++) {
+
+         final double latitude = latitudeSerie[serieIndex];
+         final double longitude = longitudeSerie[serieIndex];
+
+         // ignore lat/long == 0
+         if (latitude == 0 && longitude == 0) {
+            continue;
+         }
 
          minLatitude = latitude < minLatitude ? latitude : minLatitude;
          maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
@@ -4105,15 +4136,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-//      latitudeMinE6 = (int) (minLatitude * 1_000_000);
-//      longitudeMinE6 = (int) (minLongitude * 1_000_000);
-//
-//      latitudeMaxE6 = (int) (maxLatitude * 1_000_000);
-//      longitudeMaxE6 = (int) (maxLongitude * 1_000_000);
+      _isGeoBoundsChecked = true;
 
-      _gpsBounds = new GeoPosition[] {
-            new GeoPosition(minLatitude, minLongitude),
-            new GeoPosition(maxLatitude, maxLongitude) };
+      _geoBounds = minLatitude == Double.MIN_VALUE
+
+            ? null
+
+            // geo data are available
+            : new GeoPosition[] {
+                  new GeoPosition(minLatitude, minLongitude),
+                  new GeoPosition(maxLatitude, maxLongitude) };
    }
 
    /**
@@ -7817,11 +7849,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public GeoPosition[] getGeoBounds() {
 
-      if (_gpsBounds == null) {
+      if (_geoBounds == null) {
          computeGeo_Bounds();
       }
 
-      return _gpsBounds;
+      return _geoBounds;
    }
 
    /**

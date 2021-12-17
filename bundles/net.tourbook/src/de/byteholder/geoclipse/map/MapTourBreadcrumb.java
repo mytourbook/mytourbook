@@ -33,23 +33,23 @@ import org.eclipse.swt.widgets.Display;
 
 public class MapTourBreadcrumb {
 
-   private static final Color         SYSTEM_COLOR_BLUE  = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-   private static final Color         SYSTEM_COLOR_BLACK = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-   private static final Color         SYSTEM_COLOR_RED   = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-   private static final Color         SYSTEM_COLOR_WHITE = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+   private static final Color         SYSTEM_COLOR_BLUE   = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+   private static final Color         SYSTEM_COLOR_BLACK  = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+   private static final Color         SYSTEM_COLOR_RED    = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+   private static final Color         SYSTEM_COLOR_WHITE  = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
-   private static final String        CRUMB_SEPARATOR    = " >";                                                                //$NON-NLS-1$
+   private static final String        CRUMB_SEPARATOR     = " >";                                                                //$NON-NLS-1$
 
-   private static final int           NOT_HOVERED_INDEX  = -1;
+   private static final int           NOT_HOVERED_INDEX   = -1;
 
-   private ArrayList<ArrayList<Long>> _allTours          = new ArrayList<>();
-   private ArrayList<Rectangle>       _allCrumbs         = new ArrayList<>();
+   private ArrayList<ArrayList<Long>> _allCrumbTours      = new ArrayList<>();
+   private ArrayList<Rectangle>       _allCrumbRectangles = new ArrayList<>();
 
-   private Rectangle                  _outline;
+   private Rectangle                  _breadCrumbOutline;
 
-   private int                        _hoveredCrumbIndex = NOT_HOVERED_INDEX;
+   private int                        _hoveredCrumbIndex  = NOT_HOVERED_INDEX;
 
-   private Font                       _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                       _boldFont           = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private Map                        _map;
 
@@ -57,7 +57,7 @@ public class MapTourBreadcrumb {
     * Contains number of multiple tours when one tour data contains multiple tours, otherwise -1 is
     * set.
     */
-   private int                        _multipleTours;
+   private int                        _numMultipleTours;
 
    public MapTourBreadcrumb(final Map map) {
 
@@ -65,23 +65,71 @@ public class MapTourBreadcrumb {
    }
 
    /**
-    * Reset bread crumbs to the hovered crumb, all following crums are removed
+    * Add new tours to the existing bread crumbs.
+    *
+    * @param allTourData
+    */
+   public void addBreadcrumTours(final ArrayList<TourData> allTourData) {
+
+      // keep only tour id's, allTourData list will be reused !!!
+
+      final int numNewTours = allTourData.size();
+      final int numAllOldTours = _allCrumbTours.size();
+
+      int numPreviousTours = -1;
+
+      if (numAllOldTours > 0) {
+         numPreviousTours = _allCrumbTours.get(numAllOldTours - 1).size();
+      }
+
+      if (numNewTours == numPreviousTours) {
+
+         // prevent to show the same bread crumb again and again
+
+         return;
+      }
+
+      final ArrayList<Long> allTourIds = new ArrayList<>(numNewTours);
+      for (final TourData tourData : allTourData) {
+         allTourIds.add(tourData.getTourId());
+      }
+
+      _allCrumbTours.add(allTourIds);
+
+      /*
+       * Setup multiple tours indicator
+       */
+      if (numNewTours == 1) {
+
+         final TourData tourData = allTourData.get(0);
+
+         _numMultipleTours = tourData.isMultipleTours()
+               ? tourData.multipleTourIds.length
+               : -1;
+
+      } else {
+         _numMultipleTours = -1;
+      }
+   }
+
+   /**
+    * Reset bread crumbs of the hovered crumb, all following crums are removed
     *
     * @return Returns crumb tour id's or <code>null</code> when crumbs are not hovered
     */
-   public ArrayList<Long> getCrumbToursAndReset() {
+   public ArrayList<Long> getHoveredCrumbedTours_WithReset() {
 
       if (_hoveredCrumbIndex == NOT_HOVERED_INDEX) {
          return null;
       }
 
-      final ArrayList<Long> crumbTours = _allTours.get(_hoveredCrumbIndex);
-      final int numCrumbs = _allCrumbs.size();
+      final ArrayList<Long> crumbTours = _allCrumbTours.get(_hoveredCrumbIndex);
+      final int numCrumbs = _allCrumbRectangles.size();
 
       for (int crumbIndex = numCrumbs - 1; crumbIndex >= _hoveredCrumbIndex; crumbIndex--) {
 
-         _allTours.remove(crumbIndex);
-         _allCrumbs.remove(crumbIndex);
+         _allCrumbTours.remove(crumbIndex);
+         _allCrumbRectangles.remove(crumbIndex);
       }
 
       _hoveredCrumbIndex = NOT_HOVERED_INDEX;
@@ -107,13 +155,13 @@ public class MapTourBreadcrumb {
          return false;
       }
 
-      if (_outline != null && _outline.contains(devMousePosition)) {
+      if (_breadCrumbOutline != null && _breadCrumbOutline.contains(devMousePosition)) {
 
          // get hovered crumb
 
-         for (int crumbIndex = 0; crumbIndex < _allCrumbs.size(); crumbIndex++) {
+         for (int crumbIndex = 0; crumbIndex < _allCrumbRectangles.size(); crumbIndex++) {
 
-            final Rectangle crumb = _allCrumbs.get(crumbIndex);
+            final Rectangle crumb = _allCrumbRectangles.get(crumbIndex);
 
             if (crumb.contains(devMousePosition)) {
                _hoveredCrumbIndex = crumbIndex;
@@ -141,11 +189,11 @@ public class MapTourBreadcrumb {
 
       _hoveredCrumbIndex = NOT_HOVERED_INDEX;
 
-      if (_outline != null && _outline.contains(devMousePosition)) {
+      if (_breadCrumbOutline != null && _breadCrumbOutline.contains(devMousePosition)) {
 
          // get crumb which is hovered
 
-         final int numCrumbs = _allCrumbs.size();
+         final int numCrumbs = _allCrumbRectangles.size();
 
          // 1. crumb can only be selected when there are multiple crumbs
          // last crumb can never be selected
@@ -153,7 +201,7 @@ public class MapTourBreadcrumb {
 
             for (int crumbIndex = 0; crumbIndex < numCrumbs - 1; crumbIndex++) {
 
-               final Rectangle crumb = _allCrumbs.get(crumbIndex);
+               final Rectangle crumb = _allCrumbRectangles.get(crumbIndex);
 
                if (crumb.contains(devMousePosition)) {
 
@@ -178,7 +226,7 @@ public class MapTourBreadcrumb {
 
    public void paint(final GC gc, final boolean isShowTourPaintMethodEnhancedWarning) {
 
-      if (_allTours.isEmpty()) {
+      if (_allCrumbTours.isEmpty()) {
          return;
       }
 
@@ -223,12 +271,12 @@ public class MapTourBreadcrumb {
       final Point crumbSepSize = gc.textExtent(crumbSepText);
       final int crumbHeight = crumbSepSize.y + 2 * marginVertical;
 
-      _allCrumbs.clear();
+      _allCrumbRectangles.clear();
 
       /*
        * Draw breadcrumbs
        */
-      for (int crumbIndex = 0; crumbIndex < _allTours.size(); crumbIndex++) {
+      for (int crumbIndex = 0; crumbIndex < _allCrumbTours.size(); crumbIndex++) {
 
          if (crumbIndex > 0) {
 
@@ -257,11 +305,11 @@ public class MapTourBreadcrumb {
           * Paint crumb
           */
 
-         final ArrayList<Long> tourDataCrumb = _allTours.get(crumbIndex);
+         final ArrayList<Long> tourDataCrumb = _allCrumbTours.get(crumbIndex);
          final String numTourDataCrumbs = Integer.toString(tourDataCrumb.size());
 
-         final String numMultipleTours = _multipleTours > 0
-               ? String.format(" (%d)", _multipleTours)
+         final String numMultipleTours = _numMultipleTours > 0
+               ? String.format(" (%d)", _numMultipleTours)
                : UI.EMPTY_STRING;
 
          final String crumbText = crumbIndex == 0
@@ -283,7 +331,7 @@ public class MapTourBreadcrumb {
                contentSize.x + 2 * marginHorizontal_Crumb,
                contentSize.y + 2 * marginVertical);
 
-         _allCrumbs.add(crumbRectangle);
+         _allCrumbRectangles.add(crumbRectangle);
 
          final Color crumbFgColor = crumbIndex == _hoveredCrumbIndex ? fgColorHovered : fgColor;
          final Color crumbBgColor = crumbIndex == _hoveredCrumbIndex ? bgColorHovered : bgColor;
@@ -329,71 +377,43 @@ public class MapTourBreadcrumb {
          gc.setFont(oldFont);
       }
 
-      _outline = new Rectangle(0, 0, devX, crumbHeight);
+      _breadCrumbOutline = new Rectangle(0, 0, devX, crumbHeight);
    }
 
-   public void resetTours() {
+   public void resetAllBreadcrumbs() {
 
-      _allTours.clear();
-      _allCrumbs.clear();
+      _allCrumbTours.clear();
+      _allCrumbRectangles.clear();
 
-      _outline = null;
+      _breadCrumbOutline = null;
    }
 
-   public void setTours(final ArrayList<TourData> allTourData) {
-
-      // keep only tour id's, allTourData list will be reused !!!
-
-      final int numNewTours = allTourData.size();
-      final int numAllOldTours = _allTours.size();
-
-      int numPreviousTours = -1;
-
-      if (numAllOldTours > 0) {
-         numPreviousTours = _allTours.get(numAllOldTours - 1).size();
-      }
-
-      if (numNewTours == numPreviousTours) {
-
-         // prevent to show the same bread crumb again and again
-
-         return;
-      }
-
-      final ArrayList<Long> allTourIds = new ArrayList<>(numNewTours);
-      for (final TourData tourData : allTourData) {
-         allTourIds.add(tourData.getTourId());
-      }
-
-      _allTours.add(allTourIds);
-
-      /*
-       * Setup multiple tours indicator
-       */
-      if (numNewTours == 1) {
-
-         final TourData tourData = allTourData.get(0);
-
-         _multipleTours = tourData.isMultipleTours()
-               ? tourData.multipleTourIds.length
-               : -1;
-
-      } else {
-         _multipleTours = -1;
-      }
-   }
-
-   public void setTours(final TourData tourData) {
+   public void setBreadcrumbForOneTour(final TourData tourData) {
 
       final ArrayList<Long> singleTour = new ArrayList<>();
       singleTour.add(tourData.getTourId());
 
-      _allTours.clear();
-      _allTours.add(singleTour);
+      _allCrumbTours.clear();
+      _allCrumbTours.add(singleTour);
 
-      _multipleTours = tourData.isMultipleTours()
+      /*
+       * Setup multiple tours indicator
+       */
+      _numMultipleTours = tourData.isMultipleTours()
             ? tourData.multipleTourIds.length
             : -1;
+   }
+
+   /**
+    * Set bread crumb with new tours
+    *
+    * @param allTourData
+    */
+   public void setBreadcrumbTours(final ArrayList<TourData> allTourData) {
+
+      _allCrumbTours.clear();
+
+      addBreadcrumTours(allTourData);
    }
 
 }
