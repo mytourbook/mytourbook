@@ -429,11 +429,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final float[] newSourceAltiDiffSerie = new float[serieLength];
 
       final float[] newTargetPulseSerie = new float[serieLength];
-      final int[] newTargetTimeSerie = new int[serieLength];
       final float[] newTargetTemperatureSerie = new float[serieLength];
       final float[] newTargetCadenceSerie = new float[serieLength];
 
-      int sourceTime = sourceTimeSerie[0] + xMergeOffset;
+      int sourceTime = sourceTimeSerie[0];
       int previousSourceTime = 0;
       float previousSourceDistance = 0;
       if (isSourceTime && isSourceDistance) {
@@ -486,7 +485,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
             final float xDiff = x3 - x1;
 
-            newTargetTimeSerie[targetIndex] = xDiff == 0 ? previousSourceTime : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
+            targetTimeSerie[targetIndex] = xDiff == 0 ? previousSourceTime : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
          }
       }
 
@@ -506,6 +505,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
        * create new time/distance serie for the source tour according to the time of the target tour
        */
       int sourceIndex = 0;
+      sourceTime = sourceTimeSerie[0] + xMergeOffset;
       for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
          final int targetTime = targetTimeSerie[targetIndex];
@@ -603,22 +603,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       if (_chkMergeSpeed.getSelection()) {
-         _targetTour.timeSerie = newTargetTimeSerie;
+         _targetTour.timeSerie = targetTimeSerie;
          _targetTour.setSpeedSerie(null);
       } else {
          _targetTour.timeSerie = _backupTargetTimeSerie;
          _targetTour.setSpeedSerie(_backupSourceSpeedSerie);
       }
-
-//      _targetTour.setSpeedSerie(_chkMergeSpeed.getSelection()
-//            ? _newTargetSpeedSerie
-//            : _backupTargetSpeedSerie);
-
-//      if (_chkMergeSpeed.getSelection()) {
-//         _targetTour.speedSerie = newTargetSpeedSerie;
-//      } else {
-//         _targetTour.speedSerie = _backupTargetSpeedSerie;
-//      }
 
       if (_chkMergeTemperature.getSelection()) {
          _targetTour.temperatureSerie = newTargetTemperatureSerie;

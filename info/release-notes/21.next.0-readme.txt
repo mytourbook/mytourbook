@@ -37,7 +37,8 @@ New
 Improvements
 ============
 
-* 
+* Tour Merging (Frederic):
+ - Added the possibility to merge speed
 
 
 Changes  
