@@ -445,6 +445,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          newSourceAltitude = sourceAlti;
       }
 
+      int newSourceTime;
+      float previousSourceDistance = 0;
       if (isSourceTime) {
 
          float sourceDistance = 0;
@@ -474,12 +476,30 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                sourceTime = sourceTimeSerie[sourceIndex2];
                sourceDistance = sourceDistanceSerie[sourceIndex2];
 
-               if (isSourceTime) {
-                  previousSourceTime = sourceTime;
-               }
+               previousSourceTime = sourceTimeSerie[sourceIndex2 - 1];
+               previousSourceDistance = sourceDistanceSerie[sourceIndex2 - 1];
             }
 
-            newTargetTimeSerie[targetIndex] = previousSourceTime;
+            /**
+             * do linear interpolation for the time
+             * <p>
+             * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
+             */
+
+            //TODO FB
+            //refactor as the linear interpolation is used somewhere else
+            //or use common math ?
+            final float x1 = previousSourceDistance;
+            final float x2 = targetDistance;
+            final float x3 = sourceDistance;
+            final int y1 = previousSourceTime;
+            final int y3 = sourceTime;
+
+            final float xDiff = x3 - x1;
+
+            newSourceTime = xDiff == 0 ? previousSourceTime : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
+
+            newTargetTimeSerie[targetIndex] = newSourceTime;
          }
       }
 
@@ -1283,7 +1303,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       GridDataFactory.swtDefaults().grab(true, false).applyTo(_lblTourType);
 
       /*
-       * checkbox: keep horiz. and vert. adjustments
+       * checkbox: keep horizontal and vertical adjustments
        */
       _chkKeepHVAdjustments = new Button(group, SWT.CHECK);
       _chkKeepHVAdjustments.setText(Messages.tour_merger_chk_keep_horiz_vert_adjustments);
