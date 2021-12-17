@@ -485,7 +485,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
             final float xDiff = x3 - x1;
 
-            targetTimeSerie[targetIndex] = xDiff == 0 ? previousSourceTime : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
+            targetTimeSerie[targetIndex] = xDiff == 0
+                  ? previousSourceTime
+                  : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
          }
       }
 
@@ -1423,6 +1425,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private void enableGraphActions() {
 
       final boolean isAltitude = _sourceTour.altitudeSerie != null && _targetTour.altitudeSerie != null;
+      final boolean isSourceDistance = _sourceTour.distanceSerie != null;
       final boolean isSourcePulse = _sourceTour.pulseSerie != null;
       final boolean isSourceTime = _sourceTour.timeSerie != null;
       final boolean isSourceTemperature = _sourceTour.temperatureSerie != null;
@@ -1443,7 +1446,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       if (isSourcePulse == false) {
          _chkMergePulse.setSelection(false);
       }
-      if (isSourceTime == false) {
+      if (isSourceTime == false || isSourceDistance == false) {
          _chkMergeSpeed.setSelection(false);
       }
       if (isSourceTemperature == false) {
