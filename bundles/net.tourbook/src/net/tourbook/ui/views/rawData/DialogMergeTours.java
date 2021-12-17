@@ -159,6 +159,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private int[]                                          _backupSourceTimeSerie;
    private float[]                                        _backupSourceDistanceSerie;
    private float[]                                        _backupSourceAltitudeSerie;
+   private float[]                                        _backupSourceSpeedSerie;
 
    private TourType                                       _backupSourceTourType;
 
@@ -413,6 +414,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       // check if the data series are available
       final boolean isSourceAltitude = sourceAltitudeSerie != null;
       final boolean isSourceCadence = sourceCadenceSerie != null;
+      final boolean isSourceDistance = sourceDistanceSerie != null;
       final boolean isSourcePulse = sourcePulseSerie != null;
       final boolean isSourceTemperature = sourceTemperatureSerie != null;
       final boolean isSourceTime = sourceTimeSerie != null;
@@ -431,26 +433,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final float[] newTargetTemperatureSerie = new float[serieLength];
       final float[] newTargetCadenceSerie = new float[serieLength];
 
-      int sourceIndex = 0;
       int sourceTime = sourceTimeSerie[0] + xMergeOffset;
       int previousSourceTime = 0;
-      float sourceAlti = 0;
-      float previousSourceAltitude = 0;
-
-      float newSourceAltitude;
-
-      if (isSourceAltitude) {
-         sourceAlti = sourceAltitudeSerie[0] + yMergeOffset;
-         previousSourceAltitude = sourceAlti;
-         newSourceAltitude = sourceAlti;
-      }
-
-      int newSourceTime;
       float previousSourceDistance = 0;
-      if (isSourceTime) {
+      if (isSourceTime && isSourceDistance) {
 
          float sourceDistance = 0;
-         int sourceIndex2 = 0;
+         int sourceIndex = 0;
          final int lastSourceIndex2 = sourceDistanceSerie.length - 1;
 
          for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
@@ -463,21 +452,21 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
              */
             while (sourceDistance < targetDistance) {
 
-               sourceIndex2++;
+               sourceIndex++;
 
                // check array bounds
-               sourceIndex2 = (sourceIndex2 <= lastSourceIndex2) ? sourceIndex2 : lastSourceIndex2;
+               sourceIndex = (sourceIndex <= lastSourceIndex2) ? sourceIndex : lastSourceIndex2;
 
-               if (sourceIndex2 == lastSourceIndex2) {
+               if (sourceIndex == lastSourceIndex2) {
                   //prevent endless loops
                   break;
                }
 
-               sourceTime = sourceTimeSerie[sourceIndex2];
-               sourceDistance = sourceDistanceSerie[sourceIndex2];
+               sourceTime = sourceTimeSerie[sourceIndex];
+               sourceDistance = sourceDistanceSerie[sourceIndex];
 
-               previousSourceTime = sourceTimeSerie[sourceIndex2 - 1];
-               previousSourceDistance = sourceDistanceSerie[sourceIndex2 - 1];
+               previousSourceTime = sourceTimeSerie[sourceIndex - 1];
+               previousSourceDistance = sourceDistanceSerie[sourceIndex - 1];
             }
 
             /**
@@ -497,10 +486,17 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
             final float xDiff = x3 - x1;
 
-            newSourceTime = xDiff == 0 ? previousSourceTime : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
-
-            newTargetTimeSerie[targetIndex] = newSourceTime;
+            newTargetTimeSerie[targetIndex] = xDiff == 0 ? previousSourceTime : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
          }
+      }
+
+      float sourceAlti = 0;
+      float previousSourceAltitude = 0;
+      float newSourceAltitude;
+      if (isSourceAltitude) {
+         sourceAlti = sourceAltitudeSerie[0] + yMergeOffset;
+         previousSourceAltitude = sourceAlti;
+         newSourceAltitude = sourceAlti;
       }
 
       final boolean isLinearInterpolation = _chkAdjustAltiFromSource.getSelection()
@@ -509,6 +505,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       /*
        * create new time/distance serie for the source tour according to the time of the target tour
        */
+      int sourceIndex = 0;
       for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
          final int targetTime = targetTimeSerie[targetIndex];
@@ -607,8 +604,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       if (_chkMergeSpeed.getSelection()) {
          _targetTour.timeSerie = newTargetTimeSerie;
+         _targetTour.setSpeedSerie(null);
       } else {
          _targetTour.timeSerie = _backupTargetTimeSerie;
+         _targetTour.setSpeedSerie(_backupSourceSpeedSerie);
       }
 
 //      _targetTour.setSpeedSerie(_chkMergeSpeed.getSelection()
@@ -760,6 +759,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _backupSourceTimeSerie = Util.createIntegerCopy(_sourceTour.timeSerie);
       _backupSourceDistanceSerie = Util.createFloatCopy(_sourceTour.distanceSerie);
       _backupSourceAltitudeSerie = Util.createFloatCopy(_sourceTour.altitudeSerie);
+      _backupSourceSpeedSerie = Util.createFloatCopy(_sourceTour.getSpeedSerie());
       _backupSourceTourType = _sourceTour.getTourType();
 
       _backupTargetPulseSerie = Util.createFloatCopy(_targetTour.pulseSerie);
