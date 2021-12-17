@@ -1103,7 +1103,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             Messages.merge_tour_source_graph_speed,
             Messages.merge_tour_source_graph_speed_tooltip,
             Images.Graph_Speed,
-            _sourceTour.timeSerie != null);
+            _sourceTour.timeSerie != null && _sourceTour.distanceSerie != null);
 
       /*
        * checkbox: merge temperature
