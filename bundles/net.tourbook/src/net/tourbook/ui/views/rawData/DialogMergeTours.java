@@ -468,26 +468,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                previousSourceDistance = sourceDistanceSerie[sourceIndex - 1];
             }
 
-            /**
-             * do linear interpolation for the time
-             * <p>
-             * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
-             */
-
-            //TODO FB
-            //refactor as the linear interpolation is used somewhere else
-            //or use common math ?
-            final float x1 = previousSourceDistance;
-            final float x2 = targetDistance;
-            final float x3 = sourceDistance;
-            final int y1 = previousSourceTime;
-            final int y3 = sourceTime;
-
-            final float xDiff = x3 - x1;
-
-            targetTimeSerie[targetIndex] = xDiff == 0
-                  ? previousSourceTime
-                  : Math.round((x2 - x1) * (y3 - y1) / xDiff + y1);
+            targetTimeSerie[targetIndex] = Math.round(
+                  linearInterpolate(previousSourceDistance,
+                        targetDistance,
+                        sourceDistance,
+                        previousSourceTime,
+                        sourceTime));
          }
       }
 
@@ -541,20 +527,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
             if (isLinearInterpolation) {
 
-               /**
-                * do linear interpolation for the altitude
-                * <p>
-                * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
-                */
-               final int x1 = previousSourceTime;
-               final int x2 = targetTime;
-               final int x3 = sourceTime;
-               final float y1 = previousSourceAltitude;
-               final float y3 = sourceAlti;
-
-               final int xDiff = x3 - x1;
-
-               newSourceAltitude = xDiff == 0 ? previousSourceAltitude : (x2 - x1) * (y3 - y1) / xDiff + y1;
+               newSourceAltitude = linearInterpolate(
+                     previousSourceTime,
+                     targetTime,
+                     sourceTime,
+                     previousSourceAltitude,
+                     sourceAlti);
 
             } else {
 
@@ -1508,6 +1486,23 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       selectedTours.add(_sourceTour);
 
       return selectedTours;
+   }
+
+   /**
+    * Compute a linear interpolation based on the below formula
+    * <p>
+    * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
+    */
+   private float linearInterpolate(final float x1,
+                                   final float x2,
+                                   final float x3,
+                                   final float y1,
+                                   final float y3) {
+      final float xDiff = x3 - x1;
+
+      final float interpolatedValue = xDiff == 0 ? y1 : (x2 - x1) * (y3 - y1) / xDiff + y1;
+
+      return interpolatedValue;
    }
 
    @Override
