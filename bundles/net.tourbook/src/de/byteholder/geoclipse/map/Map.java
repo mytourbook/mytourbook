@@ -90,6 +90,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
@@ -268,40 +269,40 @@ public class Map extends Canvas {
             : new RGB(0xfe, 0xfe, 0xfe);
    }
 
-   private Color                  SYS_COLOR_BLACK;
-   private Color                  SYS_COLOR_DARK_GRAY;
-   private Color                  SYS_COLOR_GRAY;
-   private Color                  SYS_COLOR_WHITE;
-   private Color                  SYS_COLOR_YELLOW;
+   private Color                          SYS_COLOR_BLACK;
+   private Color                          SYS_COLOR_DARK_GRAY;
+   private Color                          SYS_COLOR_GRAY;
+   private Color                          SYS_COLOR_WHITE;
+   private Color                          SYS_COLOR_YELLOW;
 
    /**
     * Map zoom level which is currently be used to display tiles. Normally a value between around 0
     * and 20.
     */
-   private int                    _mapZoomLevel;
-   private boolean                _isZoomWithMousePosition;
+   private int                            _mapZoomLevel;
+   private boolean                        _isZoomWithMousePosition;
 
    /**
     * This image contains the map which is painted in the map viewport
     */
-   private Image                  _mapImage;
+   private Image                          _mapImage;
 
-   private Image                  _9PartImage;
-   private GC                     _9PartGC;
+   private Image                          _9PartImage;
+   private GC                             _9PartGC;
 
    /**
     * Indicates whether or not to draw the borders between tiles. Defaults to false. not very nice
     * looking, very much a product of testing Consider whether this should really be a property or
     * not.
     */
-   private boolean                _isShowDebug_TileInfo;
-   private boolean                _isShowDebug_TileBorder;
-   private boolean                _isShowDebug_GeoGrid;
+   private boolean                        _isShowDebug_TileInfo;
+   private boolean                        _isShowDebug_TileBorder;
+   private boolean                        _isShowDebug_GeoGrid;
 
    /**
     * Factory used by this component to grab the tiles necessary for painting the map.
     */
-   private MP                     _mp;
+   private MP                             _mp;
 
    /**
     * The position in latitude/longitude of the "address" being mapped. This is a special coordinate
@@ -310,44 +311,45 @@ public class Map extends Canvas {
     * when panning or zooming. Whenever the addressLocation is changed, however, the map will be
     * repositioned.
     */
-   private GeoPosition            _addressLocation;
+   private GeoPosition                    _addressLocation;
 
    /**
     * The overlay to delegate to for painting the "foreground" of the map component. This would
-    * include painting waypoints, day/night, etc. Also receives mouse events.
+    * include painting waypoints, day/night, etc. also receives mouse events.
     */
-   private final List<MapPainter> _overlays                = new ArrayList<>();
+   private final List<MapPainter>         _allMapPainter           = new ArrayList<>();
+   private final TourPainterConfiguration _tourPainterConfig       = TourPainterConfiguration.getInstance();
 
-   private final TileLoadObserver _tileImageLoadObserver   = new TileLoadObserver();
+   private final TileLoadObserver         _tileImageLoadObserver   = new TileLoadObserver();
 
-   private final Cursor           _cursorCross;
-   private final Cursor           _cursorDefault;
-   private final Cursor           _cursorHand;
-   private final Cursor           _cursorPan;
-   private final Cursor           _cursorSearchTour;
-   private final Cursor           _cursorSearchTour_Scroll;
+   private final Cursor                   _cursorCross;
+   private final Cursor                   _cursorDefault;
+   private final Cursor                   _cursorHand;
+   private final Cursor                   _cursorPan;
+   private final Cursor                   _cursorSearchTour;
+   private final Cursor                   _cursorSearchTour_Scroll;
 
-   private final AtomicInteger    _redrawMapCounter        = new AtomicInteger();
-   private final AtomicInteger    _overlayRunnableCounter  = new AtomicInteger();
+   private final AtomicInteger            _redrawMapCounter        = new AtomicInteger();
+   private final AtomicInteger            _overlayRunnableCounter  = new AtomicInteger();
 
-   private boolean                _isLeftMouseButtonPressed;
-   private boolean                _isMapPanned;
+   private boolean                        _isLeftMouseButtonPressed;
+   private boolean                        _isMapPanned;
 
-   private Point                  _mouseDownPosition;
-   private int                    _mouseMove_DevPosition_X = Integer.MIN_VALUE;
-   private int                    _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
-   private int                    _mouseMove_DevPosition_X_Last;
-   private int                    _mouseMove_DevPosition_Y_Last;
-   private GeoPosition            _mouseMove_GeoPosition;
+   private Point                          _mouseDownPosition;
+   private int                            _mouseMove_DevPosition_X = Integer.MIN_VALUE;
+   private int                            _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
+   private int                            _mouseMove_DevPosition_X_Last;
+   private int                            _mouseMove_DevPosition_Y_Last;
+   private GeoPosition                    _mouseMove_GeoPosition;
 
-   private Thread                 _overlayThread;
+   private Thread                         _overlayThread;
 
-   private long                   _nextOverlayRedrawTime;
-   private final NumberFormat     _nf1;
+   private long                           _nextOverlayRedrawTime;
+   private final NumberFormat             _nf1;
 
-   private final NumberFormat     _nf2;
-   private final NumberFormat     _nf3;
-   private final NumberFormat     _nfLatLon;
+   private final NumberFormat             _nf2;
+   private final NumberFormat             _nf3;
+   private final NumberFormat             _nfLatLon;
    {
       _nf1 = NumberFormat.getNumberInstance();
       _nf2 = NumberFormat.getNumberInstance();
@@ -548,15 +550,15 @@ public class Map extends Canvas {
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean                   _isContextMenuEnabled   = true;
+   private boolean                   _isContextMenuEnabled      = true;
 
    private DropTarget                _dropTarget;
 
-   private boolean                   _isRedrawEnabled        = true;
+   private boolean                   _isRedrawEnabled           = true;
 
    private HoveredAreaContext        _hoveredAreaContext;
 
-   private int                       _overlayAlpha           = 0xff;
+   private int                       _overlayAlpha              = 0xff;
 
    private MapGridData               _geoGrid_Data_Hovered;
    private MapGridData               _geoGrid_Data_Selected;
@@ -896,7 +898,7 @@ public class Map extends Canvas {
     */
    public void addOverlayPainter(final MapPainter overlay) {
 
-      _overlays.add(overlay);
+      _allMapPainter.add(overlay);
 
       paint();
    }
@@ -1202,10 +1204,10 @@ public class Map extends Canvas {
       }
    }
 
-   private void fireEvent_TourSelection(final ISelection selection, final boolean isSelectAlsoInThisView) {
+   private void fireEvent_TourSelection(final ISelection selection) {
 
       for (final Object selectionListener : _allTourSelectionListener.getListeners()) {
-         ((ITourSelectionListener) selectionListener).onSelection(selection, isSelectAlsoInThisView);
+         ((ITourSelectionListener) selectionListener).onSelection(selection);
       }
    }
 
@@ -1323,7 +1325,7 @@ public class Map extends Canvas {
     * @return Returns the overlay map painter which are defined as plugin extension
     */
    public List<MapPainter> getMapPainter() {
-      return _overlays;
+      return _allMapPainter;
    }
 
    /**
@@ -2227,9 +2229,6 @@ public class Map extends Canvas {
       int hoveredTileIndex_X = 0;
       int hoveredTileIndex_Y = 0;
 
-      /*
-       * Get tile which is hovered
-       */
       final int devMouseX = _mouseMove_DevPosition_X;
       final int devMouseY = _mouseMove_DevPosition_Y;
 
@@ -2239,6 +2238,9 @@ public class Map extends Canvas {
       int devHoveredTileX = 0;
       int devHoveredTileY = 0;
 
+      /*
+       * Get tile which is hovered
+       */
       tileLoop:
 
       for (int tilePosX = _tilePos_MinX; tilePosX <= _tilePos_MaxX; tilePosX++) {
@@ -2281,8 +2283,8 @@ public class Map extends Canvas {
          return false;
       }
 
-      final ArrayList<Rectangle> allPainted_HoveredRectangleList = hoveredTile.allPainted_HoverRectangle;
-      if (allPainted_HoveredRectangleList.isEmpty()) {
+      final ArrayList<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
+      if (allPainted_HoveredRectangle_List.isEmpty()) {
 
          // nothing is painted in this tile
          return false;
@@ -2294,11 +2296,13 @@ public class Map extends Canvas {
 
       // optimize performance by removing object references
       final long[] allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
-      final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangleList.toArray(new Rectangle[allPainted_HoveredRectangleList.size()]);
+
+      final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangle_List.toArray(
+            new Rectangle[allPainted_HoveredRectangle_List.size()]);
 
       long painted_HoveredTourId = -1;
-
       final int numPainted_HoveredTourId = allPainted_HoveredTourId.length;
+
       for (int hoverIndex = 0; hoverIndex < numPainted_HoveredTourId; hoverIndex++) {
 
          final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
@@ -2507,7 +2511,7 @@ public class Map extends Canvas {
       disposeResource(_cursorSearchTour_Scroll);
 
       // dispose resources in the overlay plugins
-      for (final MapPainter overlay : _overlays) {
+      for (final MapPainter overlay : _allMapPainter) {
          overlay.dispose();
       }
 
@@ -2702,7 +2706,7 @@ public class Map extends Canvas {
          // hide crumb selection state, this must be done after the crumb is reset
          redraw();
 
-         fireEvent_TourSelection(new SelectionTourIds(crumbTourIds), true);
+         fireEvent_TourSelection(new SelectionTourIds(crumbTourIds, true));
 
       } else if (_geoGrid_Label_IsHovered) {
 
@@ -2738,7 +2742,7 @@ public class Map extends Canvas {
 
                _hovered_SelectedTourId = hoveredTour;
 
-               fireEvent_TourSelection(new SelectionTourId(_hovered_SelectedTourId), false);
+               fireEvent_TourSelection(new SelectionTourId(_hovered_SelectedTourId));
 
             } else {
 
@@ -2752,7 +2756,11 @@ public class Map extends Canvas {
             // hide single tour selection
             _hovered_SelectedTourId = Long.MIN_VALUE;
 
-            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds), true);
+            // clone tour id's becauses they will be removed
+            final ArrayList<Long> allClonedTourIds = new ArrayList<>();
+            allClonedTourIds.addAll(_allHoveredTourIds);
+
+            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds, true));
          }
 
          redraw();
@@ -4011,6 +4019,11 @@ public class Map extends Canvas {
       gc.setTransform(null);
    }
 
+   /**
+    * Show number of tours, e.g. "Tours 21" when tours are hovered
+    *
+    * @param gc
+    */
    private void paint_HoveredTour_50_TourInfo(final GC gc) {
 
       /*
@@ -4047,33 +4060,45 @@ public class Map extends Canvas {
 
       final int numTours = _allHoveredTourIds.size();
 
-      if (numTours == 1) {
+//      if (numTours == 1 && numSubTours == 1) {
+//
+//         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
+//
+//         if (tourData == null) {
+//
+//            // this occurred, it can be that previously a history/multiple tour was displayed
+//
+//         } else {
+//
+//            // tour data are available
+//
+//            paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
+//         }
+//
+//      } else {
+//
+////         String hoverText = Messages.Map2_Hovered_Tours + UI.SPACE + Integer.toString(numTours)         ;
+//
 
-         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
+      String hoverText;
 
-         if (tourData == null) {
+      if (_tourPainterConfig.isContainsSubTours()) {
 
-            // this occurred, it can be that previously a history/multiple tour was displayed
-
-         } else {
-
-            // tour data are available
-
-            paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
-         }
+         hoverText = String.format("Subtours %d", numTours);
 
       } else {
 
-         final String hoverText = Messages.Map2_Hovered_Tours + UI.SPACE + Integer.toString(numTours);
-
-         paint_Text_Label(gc,
-               devXMouse,
-               devYMouse,
-               hoverText,
-               Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
-               Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
-               true);
+         hoverText = String.format("Tours %d", numTours);
       }
+
+      paint_Text_Label(gc,
+            devXMouse,
+            devYMouse,
+            hoverText,
+            Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
+            Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
+            true);
+//      }
    }
 
    private void paint_HoveredTour_52_TourDetail(final GC gc, final int devXMouse, final int devYMouse, final TourData tourData) {
@@ -4480,9 +4505,9 @@ public class Map extends Canvas {
                 */
                boolean isPaintingNeeded = false;
 
-               for (final MapPainter overlayPainter : _overlays) {
+               for (final MapPainter mapPainter : _allMapPainter) {
 
-                  isPaintingNeeded = overlayPainter.isPaintingNeeded(Map.this, tile);
+                  isPaintingNeeded = mapPainter.isPaintingNeeded(Map.this, tile);
 
                   if (isPaintingNeeded) {
                      break;
@@ -4542,7 +4567,7 @@ public class Map extends Canvas {
 
       {
          // paint all overlays for the current tile
-         for (final MapPainter overlayPainter : _overlays) {
+         for (final MapPainter overlayPainter : _allMapPainter) {
 
             final boolean isPainted = overlayPainter.doPaint(
                   gc1Part,
@@ -4601,7 +4626,7 @@ public class Map extends Canvas {
          _9PartGC.fillRectangle(_9PartImage.getBounds());
 
          // paint all overlays for the current tile
-         for (final MapPainter overlayPainter : _overlays) {
+         for (final MapPainter overlayPainter : _allMapPainter) {
 
             final boolean isPainted = overlayPainter.doPaint(
                   _9PartGC,
@@ -5251,7 +5276,7 @@ public class Map extends Canvas {
       if (_isShowDebug_TileBorder) {
 
          // draw tile border
-         gc.setForeground(SYS_COLOR_DARK_GRAY);
+         gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
          gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
       }
 
@@ -5776,7 +5801,7 @@ public class Map extends Canvas {
     */
    public void removeOverlayPainter(final MapPainter overlay) {
 
-      _overlays.remove(overlay);
+      _allMapPainter.remove(overlay);
 
       paint();
    }

@@ -1490,7 +1490,6 @@ public class TourMapPainter extends MapPainter {
                                       final int refTourEndIndex) {
 
       boolean isTourInTile = false;
-      final Long tourId = tourData.getTourId();
 
       final MP mp = map.getMapProvider();
       final int mapZoomLevel = map.getZoom();
@@ -1509,6 +1508,27 @@ public class TourMapPainter extends MapPainter {
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;
       final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie;
+
+      final boolean isMultipleTours = tourData.isMultipleTours();
+      final Long[] allMultipleTourIds = tourData.multipleTourIds;
+      final int[] allMultipleTour_StartIndex = tourData.multipleTourStartIndex;
+
+      final int numTimeSlices = latitudeSerie.length;
+      final int numMultipleTours = isMultipleTours && allMultipleTourIds != null
+            ? allMultipleTourIds.length
+            : 0;
+
+      final int nextTour_StartIndex = isMultipleTours
+            ? numMultipleTours > 1
+                  ? allMultipleTour_StartIndex[1]
+                  : numTimeSlices
+            : -1;
+
+      int subTourIndex = 0;
+      Long tourId = isMultipleTours
+            ? allMultipleTourIds[0]
+            : tourData.getTourId();
+
 
       boolean isFirstVisibleDataPoint = false;
       boolean isPrevVisibleDataPoint = false;
@@ -1618,8 +1638,9 @@ public class TourMapPainter extends MapPainter {
                   continue;
                }
 
-               Color color = null;
-
+               /*
+                * Check surfing points
+                */
                boolean isVisibleDataPoint = true;
                if (visibleDataPointSerie != null) {
 
@@ -1631,10 +1652,34 @@ public class TourMapPainter extends MapPainter {
                   }
                }
 
-               // this condition is an inline for:
-               // tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+               /*
+                * Get sub tour
+                */
+               if (isMultipleTours) {
 
-               // check if position is in the viewport
+                  if (serieIndex >= nextTour_StartIndex) {
+
+                     // advance to the next sub tour
+
+                     for (; subTourIndex < numMultipleTours; subTourIndex++) {
+
+                        final int nextSubTour_StartIndex = allMultipleTour_StartIndex[subTourIndex];
+
+                        if (serieIndex < nextSubTour_StartIndex) {
+                           break;
+                        }
+                     }
+
+                     tourId = subTourIndex >= numMultipleTours
+                           ? allMultipleTourIds[numMultipleTours - 1]
+                           : allMultipleTourIds[subTourIndex];
+                  }
+               }
+
+               Color color = null;
+
+               // check if position is in the viewport, this condition is an inline for:
+               // tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
                if ((tourWorldPixelX >= tileWorldPixelX)
                      && (tourWorldPixelY >= tileWorldPixelY)
                      && tourWorldPixelX < (tileWorldPixelX + tileWidth)
@@ -1663,7 +1708,12 @@ public class TourMapPainter extends MapPainter {
                               gcTile.setForeground(color);
                            }
 
-                           drawTour_40_Dot(gcTile, devFrom_WithOffsetX, devFrom_WithOffsetY, color, tile, tourId);
+                           drawTour_40_Dot(gcTile,
+                                 devFrom_WithOffsetX,
+                                 devFrom_WithOffsetY,
+                                 color,
+                                 tile,
+                                 tourId);
 
                         }
 
@@ -1687,7 +1737,7 @@ public class TourMapPainter extends MapPainter {
                if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
 
                   /*
-                   * this position is the first which is outside of the tile, draw a line from
+                   * This position is the first which is outside of the tile, draw a line from
                    * the last inside to the first outside position
                    */
 
@@ -1724,8 +1774,10 @@ public class TourMapPainter extends MapPainter {
                   // optimize drawing: check if position has changed
                   if (!(devX == devFrom_WithOffsetX && devY == devFrom_WithOffsetY)) {
 
+                     /*
+                      * Check surfing points
+                      */
                      boolean isVisibleDataPoint = true;
-
                      if (visibleDataPointSerie != null) {
                         isVisibleDataPoint = visibleDataPointSerie[serieIndex];
                      }
@@ -1733,6 +1785,30 @@ public class TourMapPainter extends MapPainter {
                      if (isVisibleDataPoint) {
 
                         isTourInTile = true;
+
+                        /*
+                         * Get sub tour
+                         */
+                        if (isMultipleTours) {
+
+                           if (serieIndex >= nextTour_StartIndex) {
+
+                              // advance to the next sub tour
+
+                              for (; subTourIndex < numMultipleTours; subTourIndex++) {
+
+                                 final int nextSubTour_StartIndex = allMultipleTour_StartIndex[subTourIndex];
+
+                                 if (serieIndex < nextSubTour_StartIndex) {
+                                    break;
+                                 }
+                              }
+
+                              tourId = subTourIndex >= numMultipleTours
+                                    ? allMultipleTourIds[numMultipleTours - 1]
+                                    : allMultipleTourIds[subTourIndex];
+                           }
+                        }
 
                         // adjust positions with the part offset
                         devX += devPartOffset;
@@ -1762,7 +1838,6 @@ public class TourMapPainter extends MapPainter {
 //                           + ("\tskipped: " + devX + " " + devY)
 ////                           + ("\t: " + )
 //                           );
-//// TODO remove SYSTEM.OUT.PRINTLN
                   }
                }
             }

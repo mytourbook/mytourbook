@@ -1146,22 +1146,17 @@ public class Map2View extends ViewPart implements
          _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != Integer.MIN_VALUE);
       });
 
-      _map.addTourSelectionListener((selection, isSelectAlsoInThisView) -> {
+      _map.addTourSelectionListener((selection) -> {
 
-         if (isSelectAlsoInThisView) {
+         if (selection instanceof SelectionTourIds) {
 
             _map.getDisplay().asyncExec(() -> {
 
-               if (selection instanceof SelectionTourIds) {
+               final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
 
-                  // clone tour id's otherwise the original could be removed
-                  final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+               final boolean isResetBreadCrumbs = selectionTourIds.isKeepBreadCrumbs() == false;
 
-                  final ArrayList<Long> allTourIds = new ArrayList<>();
-                  allTourIds.addAll(selectionTourIds.getTourIds());
-
-                  onSelectionChanged(new SelectionTourIds(allTourIds), false);
-               }
+               onSelectionChanged(selection, isResetBreadCrumbs);
             });
          }
 
@@ -2595,7 +2590,7 @@ public class Map2View extends ViewPart implements
    /**
     * @param selection
     * @param isResetBreadcrumbs
-    *           Is <code>true</code> when the breadcrums should be reset, otherwise
+    *           Is <code>true</code> when the breadcrumbs should be reset, otherwise
     *           <code>false</code>
     */
    private void onSelectionChanged(final ISelection selection, final boolean isResetBreadcrumbs) {

@@ -17,17 +17,33 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * selection contains multiple tour ids
+ * Selection contains multiple tour id's
  */
 public class SelectionTourIds implements ISelection {
 
-   private ArrayList<Long> _tourIds;
+   private static final char NL = UI.NEW_LINE;
+
+   private ArrayList<Long>   _tourIds;
+   private boolean           _isKeepBreadCrumbs;
 
    public SelectionTourIds(final ArrayList<Long> tourIds) {
+
       _tourIds = tourIds;
+   }
+
+   /**
+    * @param tourIds
+    * @param isKeepBreadCrumbs
+    */
+   public SelectionTourIds(final ArrayList<Long> tourIds, final boolean isKeepBreadCrumbs) {
+
+      _tourIds = tourIds;
+      _isKeepBreadCrumbs = isKeepBreadCrumbs;
    }
 
    public ArrayList<Long> getTourIds() {
@@ -39,9 +55,23 @@ public class SelectionTourIds implements ISelection {
       return false;
    }
 
+   public boolean isKeepBreadCrumbs() {
+      return _isKeepBreadCrumbs;
+   }
+
    @Override
    public String toString() {
-      return "SelectionTourIds\n[\n_tourIds=" + _tourIds + "\n]";
+
+      return UI.EMPTY_STRING
+
+            + "SelectionTourIds" + NL //                          //$NON-NLS-1$
+
+            + "[" + NL
+
+            + "_tourIds=" + _tourIds + NL //                      //$NON-NLS-1$
+            + "_isKeepBreadCrumbs=" + _isKeepBreadCrumbs + NL //  //$NON-NLS-1$
+
+            + "]"; //                                             //$NON-NLS-1$
    }
 
 }

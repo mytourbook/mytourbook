@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -33,23 +34,23 @@ import org.eclipse.swt.widgets.Display;
 
 public class MapTourBreadcrumb {
 
-   private static final Color         SYSTEM_COLOR_BLUE   = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-   private static final Color         SYSTEM_COLOR_BLACK  = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-   private static final Color         SYSTEM_COLOR_RED    = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-   private static final Color         SYSTEM_COLOR_WHITE  = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+   private static final Color         SYSTEM_COLOR_BLUE      = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+   private static final Color         SYSTEM_COLOR_BLACK     = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+   private static final Color         SYSTEM_COLOR_RED       = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+   private static final Color         SYSTEM_COLOR_WHITE     = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
-   private static final String        CRUMB_SEPARATOR     = " >";                                                                //$NON-NLS-1$
+   private static final String        CRUMB_SEPARATOR        = " >";                                                                //$NON-NLS-1$
 
-   private static final int           NOT_HOVERED_INDEX   = -1;
+   private static final int           NOT_HOVERED_INDEX      = -1;
 
-   private ArrayList<ArrayList<Long>> _allCrumbTours      = new ArrayList<>();
-   private ArrayList<Rectangle>       _allCrumbRectangles = new ArrayList<>();
+   private ArrayList<ArrayList<Long>> _allCrumbsWithAllTours = new ArrayList<>();
+   private ArrayList<Rectangle>       _allCrumbRectangles    = new ArrayList<>();
 
    private Rectangle                  _breadCrumbOutline;
 
-   private int                        _hoveredCrumbIndex  = NOT_HOVERED_INDEX;
+   private int                        _hoveredCrumbIndex     = NOT_HOVERED_INDEX;
 
-   private Font                       _boldFont           = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                       _boldFont              = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private Map                        _map;
 
@@ -74,12 +75,12 @@ public class MapTourBreadcrumb {
       // keep only tour id's, allTourData list will be reused !!!
 
       final int numNewTours = allTourData.size();
-      final int numAllOldTours = _allCrumbTours.size();
+      final int numAllOldTours = _allCrumbsWithAllTours.size();
 
       int numPreviousTours = -1;
 
       if (numAllOldTours > 0) {
-         numPreviousTours = _allCrumbTours.get(numAllOldTours - 1).size();
+         numPreviousTours = _allCrumbsWithAllTours.get(numAllOldTours - 1).size();
       }
 
       if (numNewTours == numPreviousTours) {
@@ -94,7 +95,7 @@ public class MapTourBreadcrumb {
          allTourIds.add(tourData.getTourId());
       }
 
-      _allCrumbTours.add(allTourIds);
+      _allCrumbsWithAllTours.add(allTourIds);
 
       /*
        * Setup multiple tours indicator
@@ -123,18 +124,49 @@ public class MapTourBreadcrumb {
          return null;
       }
 
-      final ArrayList<Long> crumbTours = _allCrumbTours.get(_hoveredCrumbIndex);
       final int numCrumbs = _allCrumbRectangles.size();
+      final ArrayList<Long> allCrumbTours = _allCrumbsWithAllTours.get(_hoveredCrumbIndex);
 
-      for (int crumbIndex = numCrumbs - 1; crumbIndex >= _hoveredCrumbIndex; crumbIndex--) {
+      if (_hoveredCrumbIndex == numCrumbs - 1) {
 
-         _allCrumbTours.remove(crumbIndex);
-         _allCrumbRectangles.remove(crumbIndex);
+         /*
+          * The last crumb is selected -> reselect this crumb which can be helpful
+          */
+
+      } else {
+
+         for (int crumbIndex = numCrumbs - 1; crumbIndex >= _hoveredCrumbIndex; crumbIndex--) {
+
+            _allCrumbsWithAllTours.remove(crumbIndex);
+            _allCrumbRectangles.remove(crumbIndex);
+         }
+
+         _hoveredCrumbIndex = NOT_HOVERED_INDEX;
       }
 
-      _hoveredCrumbIndex = NOT_HOVERED_INDEX;
+      return allCrumbTours;
+   }
 
-      return crumbTours;
+   private boolean isCollectionContainedInAllBreadcrums(final ArrayList<TourData> allTourData) {
+
+      if (_allCrumbsWithAllTours.isEmpty()) {
+         return false;
+      }
+
+      // get all tour id's
+      final ArrayList<Long> allTourIds = new ArrayList<>(allTourData.size());
+      for (final TourData tourData : allTourData) {
+         allTourIds.add(tourData.getTourId());
+      }
+
+      for (final ArrayList<Long> allToursInOneCrumb : _allCrumbsWithAllTours) {
+
+         if (CollectionUtils.isEqualCollection(allTourIds, allToursInOneCrumb)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    /**
@@ -195,23 +227,18 @@ public class MapTourBreadcrumb {
 
          final int numCrumbs = _allCrumbRectangles.size();
 
-         // 1. crumb can only be selected when there are multiple crumbs
-         // last crumb can never be selected
-         if (numCrumbs > 1) {
+         for (int crumbIndex = 0; crumbIndex < numCrumbs; crumbIndex++) {
 
-            for (int crumbIndex = 0; crumbIndex < numCrumbs - 1; crumbIndex++) {
+            final Rectangle crumb = _allCrumbRectangles.get(crumbIndex);
 
-               final Rectangle crumb = _allCrumbRectangles.get(crumbIndex);
+            if (crumb.contains(devMousePosition)) {
 
-               if (crumb.contains(devMousePosition)) {
-
-                  _hoveredCrumbIndex = crumbIndex;
-                  break;
-               }
+               _hoveredCrumbIndex = crumbIndex;
+               break;
             }
-
-            return true;
          }
+
+         return true;
       }
 
       if (oldHoveredCrumbIndex != _hoveredCrumbIndex) {
@@ -226,7 +253,7 @@ public class MapTourBreadcrumb {
 
    public void paint(final GC gc, final boolean isShowTourPaintMethodEnhancedWarning) {
 
-      if (_allCrumbTours.isEmpty()) {
+      if (_allCrumbsWithAllTours.isEmpty()) {
          return;
       }
 
@@ -276,7 +303,7 @@ public class MapTourBreadcrumb {
       /*
        * Draw breadcrumbs
        */
-      for (int crumbIndex = 0; crumbIndex < _allCrumbTours.size(); crumbIndex++) {
+      for (int crumbIndex = 0; crumbIndex < _allCrumbsWithAllTours.size(); crumbIndex++) {
 
          if (crumbIndex > 0) {
 
@@ -305,7 +332,7 @@ public class MapTourBreadcrumb {
           * Paint crumb
           */
 
-         final ArrayList<Long> tourDataCrumb = _allCrumbTours.get(crumbIndex);
+         final ArrayList<Long> tourDataCrumb = _allCrumbsWithAllTours.get(crumbIndex);
          final String numTourDataCrumbs = Integer.toString(tourDataCrumb.size());
 
          final String numMultipleTours = _numMultipleTours > 0
@@ -382,7 +409,7 @@ public class MapTourBreadcrumb {
 
    public void resetAllBreadcrumbs() {
 
-      _allCrumbTours.clear();
+      _allCrumbsWithAllTours.clear();
       _allCrumbRectangles.clear();
 
       _breadCrumbOutline = null;
@@ -393,8 +420,8 @@ public class MapTourBreadcrumb {
       final ArrayList<Long> singleTour = new ArrayList<>();
       singleTour.add(tourData.getTourId());
 
-      _allCrumbTours.clear();
-      _allCrumbTours.add(singleTour);
+      _allCrumbsWithAllTours.clear();
+      _allCrumbsWithAllTours.add(singleTour);
 
       /*
        * Setup multiple tours indicator
@@ -411,7 +438,13 @@ public class MapTourBreadcrumb {
     */
    public void setBreadcrumbTours(final ArrayList<TourData> allTourData) {
 
-      _allCrumbTours.clear();
+      // keep all breadcrums when a new tour collection is contained in it
+      if (isCollectionContainedInAllBreadcrums(allTourData)) {
+
+         return;
+      }
+
+      _allCrumbsWithAllTours.clear();
 
       addBreadcrumTours(allTourData);
    }

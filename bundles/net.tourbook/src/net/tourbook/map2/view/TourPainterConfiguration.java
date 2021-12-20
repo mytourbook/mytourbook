@@ -25,14 +25,14 @@ import net.tourbook.photo.Photo;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 
 /**
- * Contains data which are needed to paint a tour into a map.
+ * Contains data which are needed to paint a tour into the 2D map.
  */
 public class TourPainterConfiguration {
 
    private static TourPainterConfiguration _instance;
 
-   private final ArrayList<TourData>       _tourDataList = new ArrayList<>();
-   private final ArrayList<Photo>          _photos       = new ArrayList<>();
+   private final ArrayList<TourData>       _allTourData = new ArrayList<>();
+   private final ArrayList<Photo>          _allPhotos   = new ArrayList<>();
 
    /**
     * contains the upper left and lower right position for a tour
@@ -44,6 +44,8 @@ public class TourPainterConfiguration {
    private IMapColorProvider               _mapColorProvider;
 
    boolean                                 isBackgroundDark;
+   boolean                                 isContainsSubTours;
+
    boolean                                 isShowStartEndInMap;
    boolean                                 isShowTourMarker;
    boolean                                 isShowTourPauses;
@@ -80,7 +82,7 @@ public class TourPainterConfiguration {
    }
 
    public ArrayList<Photo> getPhotos() {
-      return _photos;
+      return _allPhotos;
    }
 
    /**
@@ -94,11 +96,15 @@ public class TourPainterConfiguration {
     * @return Returns the current {@link TourData} which is selected in a view or editor
     */
    public ArrayList<TourData> getTourData() {
-      return _tourDataList;
+      return _allTourData;
    }
 
    public int getZoomLevelAdjustment() {
       return _zoomLevelAdjustment;
+   }
+
+   public boolean isContainsSubTours() {
+      return isContainsSubTours;
    }
 
    /**
@@ -108,8 +114,8 @@ public class TourPainterConfiguration {
     */
    public void resetTourData() {
 
-      _tourDataList.clear();
-      _tourDataList.add(null);
+      _allTourData.clear();
+      _allTourData.add(null);
    }
 
    public void setMapColorProvider(final IMapColorProvider mapColorProvider) {
@@ -125,13 +131,13 @@ public class TourPainterConfiguration {
     */
    public void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
 
-      _photos.clear();
+      _allPhotos.clear();
 
       if (allPhotos != null) {
-         _photos.addAll(allPhotos);
+         _allPhotos.addAll(allPhotos);
       }
 
-      isPhotoVisible = isShowPhoto && _photos.size() > 0;
+      isPhotoVisible = isShowPhoto && _allPhotos.size() > 0;
 
       isLinkPhotoDisplayed = isLinkPhoto;
    }
@@ -148,13 +154,14 @@ public class TourPainterConfiguration {
     */
    public void setTourData(final ArrayList<TourData> tourDataList, final boolean isShowTour) {
 
-      _tourDataList.clear();
+      _allTourData.clear();
 
       if (tourDataList != null) {
-         _tourDataList.addAll(tourDataList);
+         _allTourData.addAll(tourDataList);
       }
 
-      isTourVisible = isShowTour && _tourDataList.size() > 0;
+      isTourVisible = isShowTour && _allTourData.size() > 0;
+      isContainsSubTours = false;
    }
 
    /**
@@ -166,10 +173,11 @@ public class TourPainterConfiguration {
     */
    public void setTourData(final TourData tourData, final boolean isShowTour) {
 
-      _tourDataList.clear();
-      _tourDataList.add(tourData);
+      _allTourData.clear();
+      _allTourData.add(tourData);
 
-      isTourVisible = isShowTour && _tourDataList.size() > 0;
+      isTourVisible = isShowTour && _allTourData.size() > 0;
+      isContainsSubTours = tourData.isMultipleTours();
    }
 
    public void setZoomLevelAdjustment(final int zoomLevel) {

@@ -1505,8 +1505,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private double[]           timeSerieWithTimeZoneAdjustment;
 
    /**
-    * {@link TourData} contains multiple tours or a virtual tour. It is created when multiple tours
-    * are selected to be displayed in the {@link TourChart}.
+    * {@link TourData} contains multiple tours or a virtual tour or sub tours. It is created when
+    * multiple tours are selected to be displayed in the {@link TourChart}.
     */
    @Transient
    private boolean            isMultipleTours;
