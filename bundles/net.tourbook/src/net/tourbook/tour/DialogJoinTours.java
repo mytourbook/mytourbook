@@ -218,8 +218,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                   | SWT.CLOSE
                   | SWT.MIN
 //            | SWT.MAX
-                  | SWT.RESIZE
-                  | SWT.NONE;
+                  | SWT.RESIZE;
       setShellStyle(shellStyle);
    }
 
