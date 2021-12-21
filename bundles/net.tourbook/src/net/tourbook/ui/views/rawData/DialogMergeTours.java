@@ -70,6 +70,9 @@ import org.eclipse.swt.widgets.Widget;
 
 public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2, I2ndAltiLayer {
 
+   //TODO FB shouldn't the elapsed time of the target tour be equal to the target
+   // time of the source tour is the speed is merged ?
+
    private static final int       MAX_ADJUST_SECONDS     = 120;
    private static final int       MAX_ADJUST_MINUTES     = 120;                                             // x 60
    private static final int       MAX_ADJUST_ALTITUDE_1  = 20;
@@ -281,11 +284,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                                    final float[] newTargetCadenceSerie,
                                    final int[] targetTimeSerie) {
 
-      final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
       // check if the data series are available
-      final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
-      final boolean isTargetAltitude = targetAltitudeSerie != null;
-      final boolean isSourceAltitude = sourceAltitudeSerie != null;
+      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
+      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
 
       _sourceTour.dataSerieAdjustedAlti = null;
 
@@ -396,13 +397,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                                            final float[] newSourceAltitudeSerie,
                                            final float[] newSourceAltiDiffSerie) {
 
-      final float[] altitudeDifferences = new float[2];
       final float[] targetDistanceSerie = _targetTour.distanceSerie;
-      final boolean isTargetDistance = targetDistanceSerie != null;
-      final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
-      final boolean isTargetAltitude = targetAltitudeSerie != null;
-      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
 
+      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
+      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
+      final boolean isTargetDistance = targetDistanceSerie != null;
+
+      final float[] altitudeDifferences = new float[2];
       if (!isSourceAltitude || !isTargetAltitude || !isTargetDistance) {
          return altitudeDifferences;
       }
@@ -476,13 +477,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    private void computeMergedData() {
 
-      int xMergeOffset = _targetTour.getMergedTourTimeOffset();
-      if (_chkSynchStartTime.getSelection()) {
-
-         // synchronize start time
-         xMergeOffset = _tourStartTimeSynchOffset;
-      }
-
       final int serieLength = _targetTour.timeSerie.length;
       final float[] newSourceAltitudeSerie = new float[serieLength];
       final float[] newSourceAltiDiffSerie = new float[serieLength];
@@ -492,6 +486,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final float[] newTargetCadenceSerie = new float[serieLength];
 
       final int[] targetTimeSerie = mergeSpeed();
+
+      int xMergeOffset = _targetTour.getMergedTourTimeOffset();
+      if (_chkSynchStartTime.getSelection()) {
+
+         // synchronize start time
+         xMergeOffset = _tourStartTimeSynchOffset;
+      }
 
       createNewTimeAndDistanceSerie(xMergeOffset,
             newSourceAltitudeSerie,
