@@ -32,9 +32,11 @@ import de.byteholder.gpx.PointOfInterest;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -2024,32 +2026,32 @@ public class Map2View extends ViewPart implements
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
-      fillMapContextMenu(menuMgr, actionManageOfflineImages);
-   }
-
-   private void fillMapContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
-
       menuMgr.add(_actionSearchTourByLocation);
-      menuMgr.add(new Separator());
-
-      menuMgr.add(_actionShowLegendInMap);
-      menuMgr.add(_actionShowScaleInMap);
-      menuMgr.add(_actionShowValuePoint);
-      menuMgr.add(_actionShowSliderInMap);
-      menuMgr.add(_actionShowSliderInLegend);
-
-      menuMgr.add(new Separator());
       menuMgr.add(_actionCreateTourMarkerFromMap);
+
+      /*
+       * Show tour features
+       */
+      menuMgr.add(new Separator());
       menuMgr.add(_actionShowTourMarker);
       menuMgr.add(_actionShowTourPauses);
       menuMgr.add(_actionShowWayPoints);
       menuMgr.add(_actionShowPOI);
       menuMgr.add(_actionShowStartEndInMap);
-      menuMgr.add(_actionShowTourInfoInMap);
-
       if (isShowTrackColor_InContextMenu()) {
          menuMgr.add(_actionMap2_Color);
       }
+
+      /*
+       * Show map features
+       */
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionShowTourInfoInMap);
+      menuMgr.add(_actionShowLegendInMap);
+      menuMgr.add(_actionShowScaleInMap);
+      menuMgr.add(_actionShowValuePoint);
+      menuMgr.add(_actionShowSliderInMap);
+      menuMgr.add(_actionShowSliderInLegend);
 
       menuMgr.add(new Separator());
 
@@ -2251,6 +2253,14 @@ public class Map2View extends ViewPart implements
    @Override
    public ArrayList<Photo> getFilteredPhotos() {
       return _filteredPhotos;
+   }
+
+   private List<Long> getManyToursFromMultipleRours(final TourData tourData) {
+
+      List<Long> tourIds = new ArrayList<>();
+      tourIds = Arrays.asList(tourData.multipleTourIds);
+
+      return tourIds;
    }
 
    public Map getMap() {
@@ -2583,7 +2593,10 @@ public class Map2View extends ViewPart implements
 
       _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
 
-      paintToursAndPhotos(hoveredValueData.tourData, null);
+      final TourData tourData = hoveredValueData.tourData;
+
+      paintToursAndPhotos(tourData, null);
+
       updateUI_HoveredValuePoint();
    }
 
@@ -2607,11 +2620,11 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      final MapTourBreadcrumb tourBreadcrumb = _map.tourBreadcrumb();
-
-      if (isResetBreadcrumbs) {
-         tourBreadcrumb.resetAllBreadcrumbs();
-      }
+//      final MapTourBreadcrumb tourBreadcrumb = _map.tourBreadcrumb();
+//
+//      if (isResetBreadcrumbs) {
+//         tourBreadcrumb.resetAllBreadcrumbs();
+//      }
 
       if (selection instanceof SelectionTourData) {
 
@@ -3125,7 +3138,7 @@ public class Map2View extends ViewPart implements
       return allPhotos;
    }
 
-   private void paintTours(final ArrayList<Long> allTourIds) {
+   private void paintTours(final List<Long> allTourIds) {
 
       /*
        * TESTING if a map redraw can be avoided, 15.6.2015
@@ -3255,7 +3268,7 @@ public class Map2View extends ViewPart implements
       // prevent loading the same tour
       if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
 
-         _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
+//         _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
 
          return;
       }
@@ -3408,7 +3421,21 @@ public class Map2View extends ViewPart implements
 
    private void paintToursAndPhotos(final TourData tourData, final ISelection selection) {
 
-      paintTours_20_One(tourData, false);
+      if (tourData.isMultipleTours()) {
+
+         /*
+          * Convert one multiple tour with sub-tours into many tours, this makes some processings
+          * much easier
+          */
+         final List<Long> manyTours = getManyToursFromMultipleRours(tourData);
+
+         paintTours(manyTours);
+
+      } else {
+
+         paintTours_20_One(tourData, false);
+      }
+
       paintPhotoSelection(selection);
 
       enableActions();
@@ -4106,7 +4133,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
+//      _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
    }
 
    private void setTourPainterColorProvider(final MapGraphId colorId) {

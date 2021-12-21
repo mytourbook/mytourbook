@@ -44,7 +44,6 @@ public class TourPainterConfiguration {
    private IMapColorProvider               _mapColorProvider;
 
    boolean                                 isBackgroundDark;
-   boolean                                 isContainsSubTours;
 
    boolean                                 isShowStartEndInMap;
    boolean                                 isShowTourMarker;
@@ -103,10 +102,6 @@ public class TourPainterConfiguration {
       return _zoomLevelAdjustment;
    }
 
-   public boolean isContainsSubTours() {
-      return isContainsSubTours;
-   }
-
    /**
     * Do not draw a tour
     *
@@ -161,7 +156,6 @@ public class TourPainterConfiguration {
       }
 
       isTourVisible = isShowTour && _allTourData.size() > 0;
-      isContainsSubTours = false;
    }
 
    /**
@@ -177,7 +171,6 @@ public class TourPainterConfiguration {
       _allTourData.add(tourData);
 
       isTourVisible = isShowTour && _allTourData.size() > 0;
-      isContainsSubTours = tourData.isMultipleTours();
    }
 
    public void setZoomLevelAdjustment(final int zoomLevel) {

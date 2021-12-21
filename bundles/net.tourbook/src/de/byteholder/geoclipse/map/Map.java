@@ -2699,14 +2699,23 @@ public class Map extends Canvas {
 
       } else if (_isShowHoveredSelectedTour && _tourBreadcrumb.onMouseDown(devMousePosition)) {
 
-         // tour breadcrumb is selected, show it's tours in the map
+         // a breadcrumb is selected, show it's tours in the map
 
-         final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getHoveredCrumbedTours_WithReset();
+         if (_tourBreadcrumb.isResetButtonSelected()) {
 
-         // hide crumb selection state, this must be done after the crumb is reset
-         redraw();
+            _tourBreadcrumb.resetAllBreadcrumbs();
 
-         fireEvent_TourSelection(new SelectionTourIds(crumbTourIds, true));
+            redraw();
+
+         } else {
+
+            final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getHoveredCrumbedTours_WithReset();
+
+            // hide crumb selection state, this must be done after the crumb is reset
+            redraw();
+
+            fireEvent_TourSelection(new SelectionTourIds(crumbTourIds, true));
+         }
 
       } else if (_geoGrid_Label_IsHovered) {
 
@@ -2952,7 +2961,7 @@ public class Map extends Canvas {
          }
       }
 
-      if (!isSomethingHit && _isShowHoveredSelectedTour) {
+      if (isSomethingHit == false && _isShowHoveredSelectedTour) {
 
          final int numOldHoveredTours = _allHoveredTourIds.size();
 
@@ -4060,45 +4069,33 @@ public class Map extends Canvas {
 
       final int numTours = _allHoveredTourIds.size();
 
-//      if (numTours == 1 && numSubTours == 1) {
-//
-//         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
-//
-//         if (tourData == null) {
-//
-//            // this occurred, it can be that previously a history/multiple tour was displayed
-//
-//         } else {
-//
-//            // tour data are available
-//
-//            paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
-//         }
-//
-//      } else {
-//
-////         String hoverText = Messages.Map2_Hovered_Tours + UI.SPACE + Integer.toString(numTours)         ;
-//
+      if (numTours == 1) {
 
-      String hoverText;
+         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
 
-      if (_tourPainterConfig.isContainsSubTours()) {
+         if (tourData == null) {
 
-         hoverText = String.format("Subtours %d", numTours);
+            // this occurred, it can be that previously a history/multiple tour was displayed
+
+         } else {
+
+            // tour data are available
+
+            paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
+         }
 
       } else {
 
-         hoverText = String.format("Tours %d", numTours);
-      }
+         final String hoverText = Messages.Map2_Hovered_Tours + UI.SPACE + Integer.toString(numTours);
 
-      paint_Text_Label(gc,
-            devXMouse,
-            devYMouse,
-            hoverText,
-            Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
-            Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
-            true);
-//      }
+         paint_Text_Label(gc,
+               devXMouse,
+               devYMouse,
+               hoverText,
+               Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
+               Display.getCurrent().getSystemColor(SWT.COLOR_BLUE),
+               true);
+      }
    }
 
    private void paint_HoveredTour_52_TourDetail(final GC gc, final int devXMouse, final int devYMouse, final TourData tourData) {
