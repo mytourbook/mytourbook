@@ -79,6 +79,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
     * Is <code>true</code> when the mouse is hovering a hovered location
     */
    private boolean            _isHovered  = false;
+
    private int                _xPos;
    private int                _yPos;
 
@@ -94,13 +95,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
       createInfoIcon();
 
-      _tourInfoHoveredAreaContext = new HoveredAreaContext(
-            this,
-            this,
-            xPos,
-            yPos,
-            _tourInfoImageSize.width,
-            _tourInfoImageSize.height);
+      setHoveredAreaContext();
    }
 
    @Override
@@ -238,6 +233,17 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       _tourInfoUI.setActionsEnabled(isEnabled);
    }
 
+   private void setHoveredAreaContext() {
+
+      _tourInfoHoveredAreaContext = new HoveredAreaContext(
+            this,
+            this,
+            _xPos,
+            _yPos,
+            _tourInfoImageSize.width,
+            _tourInfoImageSize.height);
+   }
+
    @Override
    public boolean setHoveredLocation(final int x, final int y) {
 
@@ -255,6 +261,14 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       _isHovered = hoveredContext != null;
 
       return _isHovered;
+   }
+
+   public void setIconPosition(final int tooltipDevX, final int tooltipDevY) {
+
+      _xPos = tooltipDevX;
+      _yPos = tooltipDevY;
+
+      setHoveredAreaContext();
    }
 
    /**

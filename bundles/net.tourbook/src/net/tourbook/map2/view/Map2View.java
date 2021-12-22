@@ -23,7 +23,6 @@ import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.MapTourBreadcrumb;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -223,6 +222,8 @@ public class Map2View extends ViewPart implements
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
+   static final String           STATE_VISIBLE_BREADCRUMBS                                      = "STATE_VISIBLE_BREADCRUMBS";                              //$NON-NLS-1$
+   static final int              STATE_VISIBLE_BREADCRUMBS_DEFAULT                              = 5;
    static final String           STATE_HOVERED_SELECTED__HOVERED_OPACITY                        = "STATE_HOVERED_SELECTED__HOVERED_OPACITY";             //$NON-NLS-1$
    static final int              STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT                = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__HOVERED_RGB                            = "STATE_HOVERED_SELECTED__HOVERED_RGB";                 //$NON-NLS-1$
@@ -319,14 +320,17 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
    //
-   private static final IPreferenceStore _prefStore         = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common  = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state             = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _state_MapProvider = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
-   private static final IDialogSettings  _state_PhotoFilter = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore          = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common   = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state              = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_MapProvider  = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
+   private static final IDialogSettings  _state_PhotoFilter  = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
+
+   public static final int               TOUR_INFO_TOOLTIP_X = 3;
+   public static final int               TOUR_INFO_TOOLTIP_Y = 23;
    //
    //
-   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(3, 23);
+   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
    //
@@ -1148,25 +1152,7 @@ public class Map2View extends ViewPart implements
          _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != Integer.MIN_VALUE);
       });
 
-      _map.addTourSelectionListener((selection) -> {
-
-         if (selection instanceof SelectionTourIds) {
-
-            _map.getDisplay().asyncExec(() -> {
-
-               final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
-
-               final boolean isResetBreadCrumbs = selectionTourIds.isKeepBreadCrumbs() == false;
-
-               onSelectionChanged(selection, isResetBreadCrumbs);
-            });
-         }
-
-         TourManager.fireEventWithCustomData(
-               TourEventId.TOUR_SELECTION,
-               selection,
-               Map2View.this);
-      });
+      _map.addTourSelectionListener(this::onSelection_InsideMap);
 
       _map.addMapGridBoxListener((map_ZoomLevel, map_GeoCenter, isGridSelected, mapGridData) -> {
 
@@ -2600,6 +2586,33 @@ public class Map2View extends ViewPart implements
       updateUI_HoveredValuePoint();
    }
 
+   private void onSelection_InsideMap(final ISelection selection) {
+
+      if (selection instanceof SelectionTourIds) {
+
+         _map.getDisplay().asyncExec(() -> {
+
+            final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+
+            final boolean isResetBreadCrumbs = selectionTourIds.isKeepBreadCrumbs() == false;
+
+            onSelectionChanged(selection, isResetBreadCrumbs);
+         });
+
+      } else if (selection instanceof SelectionTourId) {
+
+         final Long tourId = ((SelectionTourId) selection).getTourId();
+         final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+         _tourInfoToolTipProvider.setTourData(tourData);
+      }
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_SELECTION,
+            selection,
+            Map2View.this);
+   }
+
    /**
     * @param selection
     * @param isResetBreadcrumbs
@@ -2619,12 +2632,6 @@ public class Map2View extends ViewPart implements
          }
          return;
       }
-
-//      final MapTourBreadcrumb tourBreadcrumb = _map.tourBreadcrumb();
-//
-//      if (isResetBreadcrumbs) {
-//         tourBreadcrumb.resetAllBreadcrumbs();
-//      }
 
       if (selection instanceof SelectionTourData) {
 
@@ -2721,8 +2728,6 @@ public class Map2View extends ViewPart implements
          }
 
          if (tourData != null) {
-
-//            tourBreadcrumb.setBreadcrumbForOneTour(tourData);
 
             positionMapTo_0_TourSliders(
                   tourData,
@@ -3045,7 +3050,6 @@ public class Map2View extends ViewPart implements
       _directMappingPainter.disablePaintContext();
 
       _map.resetHoveredSelectedTours();
-//      _map.tourBreadcrumb().setTours(_allTourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3195,7 +3199,6 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
 
       _map.resetHoveredSelectedTours();
-//      _map.tourBreadcrumb().setTours(_allTourData);
 
       if (_previousOverlayKey != newOverlayKey) {
 
@@ -3268,8 +3271,6 @@ public class Map2View extends ViewPart implements
       // prevent loading the same tour
       if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
 
-//         _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
-
          return;
       }
 
@@ -3326,7 +3327,6 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setTourBounds(tourBoundsSet);
 
       _map.resetHoveredSelectedTours();
-//      _map.tourBreadcrumb().setTour(tourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3393,7 +3393,6 @@ public class Map2View extends ViewPart implements
       _directMappingPainter.disablePaintContext();
 
       _map.resetHoveredSelectedTours();
-//      _map.tourBreadcrumb().setTours(_allTourData);
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3806,6 +3805,7 @@ public class Map2View extends ViewPart implements
        */
       final boolean isShowHoveredSelectedTour   = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
 
+      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                                  Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
       final int hoveredOpacity                  = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
       final int hoveredAndSelectedOpacity       = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
       final int selectedOpacity                 = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
@@ -3815,6 +3815,7 @@ public class Map2View extends ViewPart implements
 
       _map.setConfig_HoveredSelectedTour(
             isShowHoveredSelectedTour,
+            numVisibleBreadcrumbs,
             hoveredRGB,
             hoveredOpacity,
             hoveredAndSelectedRGB,
@@ -3822,6 +3823,7 @@ public class Map2View extends ViewPart implements
             selectedRGB,
             selectedOpacity
       );
+
 
       /*
        * Tour direction
@@ -3877,6 +3879,17 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.pauseDurationOperator  = pauseDurationOperator;
 
 // SET_FORMATTING_ON
+
+      // adjust tour info tooltip according to the breadcrumb toolbar visibility
+      final int devXTooltip = TOUR_INFO_TOOLTIP_X;
+      final int devYTooltip = numVisibleBreadcrumbs == 0
+
+            // breadcrumb is not visible -> "center" icon in the top left corner
+            ? TOUR_INFO_TOOLTIP_X
+
+            : TOUR_INFO_TOOLTIP_Y;
+
+      _tourInfoToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
 
       // create legend image after the dim level is modified
       createLegendImage(_tourPainterConfig.getMapColorProvider());
@@ -4133,7 +4146,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-//      _map.tourBreadcrumb().setBreadcrumbForOneTour(tourData);
+      // a single tour is not added to the breadcrumb
    }
 
    private void setTourPainterColorProvider(final MapGraphId colorId) {

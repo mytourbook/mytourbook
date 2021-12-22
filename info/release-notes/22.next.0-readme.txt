@@ -47,9 +47,8 @@ Improvements
 
 
 * 2D Map
-  - Filter tour pauses
-
-  https://github.com/mytourbook/mytourbook/issues/428
+  - Filter tour pauses https://github.com/mytourbook/mytourbook/issues/428
+  - Tour breadcrumbs https://github.com/mytourbook/mytourbook/issues/431
   
 
 Changes  

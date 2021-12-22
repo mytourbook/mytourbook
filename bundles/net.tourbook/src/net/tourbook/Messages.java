@@ -1990,6 +1990,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Bookmark_Label_NumContextMenuItems;
    public static String        Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
    public static String        Slideout_Map_Bookmark_Label_Title;
+
    public static String        Slideout_Map_Options_Checkbox_ChartSlider;
    public static String        Slideout_Map_Options_Checkbox_DimMap;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
@@ -2008,6 +2009,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String        Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String        Slideout_Map_Options_Group_TourTrack;
+   public static String        Slideout_Map_Options_Label_BreadcrumbHistory_Items;
+   public static String        Slideout_Map_Options_Label_BreadcrumbHistory_Items_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor;
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredColor;

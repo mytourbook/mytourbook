@@ -2699,15 +2699,23 @@ public class Map extends Canvas {
 
       } else if (_isShowHoveredSelectedTour && _tourBreadcrumb.onMouseDown(devMousePosition)) {
 
-         // a breadcrumb is selected, show it's tours in the map
+         // a breadcrumb is selected
 
-         if (_tourBreadcrumb.isResetButtonSelected()) {
+         if (_tourBreadcrumb.isResetAllButtonSelected()) {
 
             _tourBreadcrumb.resetAllBreadcrumbs();
 
             redraw();
 
+         } else if (_tourBreadcrumb.isResetLastButtonSelected()) {
+
+            _tourBreadcrumb.resetLastBreadcrumb();
+
+            redraw();
+
          } else {
+
+            // show bread crum tours in the map
 
             final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getHoveredCrumbedTours_WithReset();
 
@@ -5840,6 +5848,7 @@ public class Map extends Canvas {
    }
 
    public void setConfig_HoveredSelectedTour(final boolean isVisible,
+                                             final int breadcrumbItems,
                                              final RGB hoveredRGB,
                                              final int hoveredOpacity,
                                              final RGB hoveredAndSelectedRGB,
@@ -5861,6 +5870,8 @@ public class Map extends Canvas {
       _hoveredSelectedTour_Selected_Opacity           = UI.convertOpacity(selectedOpacity);
 
 // SET_FORMATTING_ON
+
+      _tourBreadcrumb.setVisibleBreadcrumbs(breadcrumbItems);
 
       if (isVisible == false) {
 
