@@ -2815,7 +2815,7 @@ public class Messages extends NLS {
    public static String        tour_merger_chk_use_synced_start_time_tooltip;
    public static String        tour_merger_dialog_header_message;
    public static String        tour_merger_dialog_header_title;
-   public static String        tour_merger_dialog_title;
+   public static String        Dialog_MergeTours_Dialog_Title;
    public static String        tour_merger_group_adjust_altitude;
    public static String        tour_merger_group_adjust_time;
    public static String        tour_merger_group_save_actions;
