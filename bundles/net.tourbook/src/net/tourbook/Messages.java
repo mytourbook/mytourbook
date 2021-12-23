@@ -2390,8 +2390,8 @@ public class Messages extends NLS {
    public static String        TourChart_Smoothing_Label_RepeatedTau;
    public static String        TourChart_Smoothing_Label_RepeatedTau_Tooltip;
    public static String        TourChart_Smoothing_Label_SmoothingAlgorithm;
-   public static String        TourChart_Smoothing_Label_SpeedSmoothing;
-   public static String        TourChart_Smoothing_Label_SpeedSmoothing_Tooltip;
+   public static String        TourChart_Smoothing_Label_SpeedAndPaceSmoothing;
+   public static String        TourChart_Smoothing_Label_SpeedAndPaceSmoothing_Tooltip;
    public static String        TourChart_Smoothing_Label_TauParameter;
    public static String        TourChart_Smoothing_Link_PrefBreakTime;
    public static String        TourChart_Smoothing_Link_SmoothingOnlineDocumentation;
