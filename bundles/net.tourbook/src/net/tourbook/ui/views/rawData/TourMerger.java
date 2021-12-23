@@ -17,16 +17,20 @@ package net.tourbook.ui.views.rawData;
 
 import java.util.Arrays;
 
-import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
-
-import org.eclipse.swt.widgets.Shell;
 
 public class TourMerger {
 
    private TourData _sourceTour;
    private TourData _targetTour;
+
+   private boolean  mergePulse;
+   private boolean  mergeSpeed;
+   private boolean  mergeTemperature;
+   private boolean  mergePulse;
+   private boolean  mergePulse;
+   private boolean  mergePulse;
 
    public TourMerger(final TourData sourceTour, final TourData targetTour) {
 
@@ -61,13 +65,13 @@ public class TourMerger {
          _sourceTour.dataSerieDiffTo2ndAlti = null;
       }
 
-      if (_chkMergePulse.getSelection()) {
+      if (mergePulse) {
          _targetTour.pulseSerie = newTargetPulseSerie;
       } else {
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
-      if (_chkMergeSpeed.getSelection()) {
+      if (mergeSpeed) {
          _targetTour.timeSerie = targetTimeSerie;
          _targetTour.setSpeedSerie(null);
       } else {
@@ -273,19 +277,6 @@ public class TourMerger {
 
       return newSourceAltitude;
    }
-
-   @Override
-   protected void configureShell(final Shell shell) {
-
-      super.configureShell(shell);
-
-      shell.setText(Messages.Dialog_MergeTours_Dialog_Title);
-
-      shell.addDisposeListener(disposeEvent -> onDispose());
-   }
-
-
-
 
 
    /**
