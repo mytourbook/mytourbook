@@ -145,7 +145,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.Transform;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -4002,8 +4001,12 @@ public class Map extends Canvas {
 
                final float directionRotation = (float) MtMath.angleOf(devX1, devY1, devX2, devY2);
 
-               final int xPos1 = DPIUtil.autoScaleUp(devX1);
-               final int yPos1 = DPIUtil.autoScaleUp(devY1);
+//               final int xPos1 = DPIUtil.autoScaleUp(devX1);
+//               final int yPos1 = DPIUtil.autoScaleUp(devY1);
+
+               // when debugging then autoScapeUp provided the wrong values when using a 4k display !!!
+               final int xPos1 = devX1;
+               final int yPos1 = devY1;
 
                // VERY IMPORTANT: Reset previous positions !!!
                transform.identity();
