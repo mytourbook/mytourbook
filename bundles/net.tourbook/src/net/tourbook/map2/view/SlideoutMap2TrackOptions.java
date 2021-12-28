@@ -90,6 +90,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private Composite             _parent;
 
    private Button                _chkPaintWithBorder;
+   private Button                _chkShowBreadcrumbs;
    private Button                _chkShowEnhancedWarning;
    private Button                _chkShowHoveredSelectedTour;
    private Button                _chkShowSlider_Location;
@@ -449,26 +450,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       }
       {
          /*
-          * Breadcrumb history
-          */
-
-         // label
-         _lblBreadcrumbItems = new Label(parent, SWT.NONE);
-         _lblBreadcrumbItems.setText(Messages.Slideout_Map_Options_Label_BreadcrumbHistory_Items);
-         _lblBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbHistory_Items_Tooltip);
-         _firstColoumLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
-
-         // number of crumbs
-         _spinnerBreadcrumbItems = new Spinner(parent, SWT.BORDER);
-         _spinnerBreadcrumbItems.setMinimum(0); // 0 will hide the bread crumb
-         _spinnerBreadcrumbItems.setMaximum(99);
-         _spinnerBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbHistory_Items_Tooltip);
-         _spinnerBreadcrumbItems.addSelectionListener(_defaultMapOptions_SelectionListener);
-         _spinnerBreadcrumbItems.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
-         _spinnerLayoutData.applyTo(_spinnerBreadcrumbItems);
-      }
-      {
-         /*
           * Hovered color
           */
 
@@ -558,10 +539,50 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
          }
       }
 
-      createUI_42_TourDirection(parent);
+      createUI_42_Breadcrumb(parent);
+      createUI_44_TourDirection(parent);
    }
 
-   private void createUI_42_TourDirection(final Composite parent) {
+   /**
+    * Breadcrumb history
+    *
+    * @param parent
+    */
+   private void createUI_42_Breadcrumb(final Composite parent) {
+
+      {
+         /*
+          * Show breadcrumbs
+          */
+         _chkShowBreadcrumbs = new Button(parent, SWT.CHECK);
+         _chkShowBreadcrumbs.setText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs);
+         _chkShowBreadcrumbs.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip);
+         _chkShowBreadcrumbs.addSelectionListener(_defaultMapOptions_SelectionListener);
+         _firstColoumLayoutData.span(2, 1).applyTo(_chkShowBreadcrumbs);
+      }
+      {
+         /*
+          * Number of crumbs
+          */
+
+         // label
+         _lblBreadcrumbItems = new Label(parent, SWT.NONE);
+         _lblBreadcrumbItems.setText(Messages.Slideout_Map_Options_Label_BreadcrumbItems);
+         _lblBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
+         _secondColoumLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
+
+         // number of crumbs
+         _spinnerBreadcrumbItems = new Spinner(parent, SWT.BORDER);
+         _spinnerBreadcrumbItems.setMinimum(0); // 0 will hide the bread crumb
+         _spinnerBreadcrumbItems.setMaximum(99);
+         _spinnerBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
+         _spinnerBreadcrumbItems.addSelectionListener(_defaultMapOptions_SelectionListener);
+         _spinnerBreadcrumbItems.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
+         _spinnerLayoutData.applyTo(_spinnerBreadcrumbItems);
+      }
+   }
+
+   private void createUI_44_TourDirection(final Composite parent) {
 
       {
          /*
@@ -755,6 +776,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       final boolean isHoveredSelected = _chkShowHoveredSelectedTour.getSelection();
       final boolean isShowTourDirection = _chkShowTourDirections.getSelection() && isHoveredSelected;
+      final boolean isShowBreadcrumbs = _chkShowBreadcrumbs.getSelection() && isHoveredSelected;
 
       _spinnerTrackOpacity.setEnabled(isUseTrackOpacity);
 
@@ -780,17 +802,20 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _chkShowEnhancedWarning       .setEnabled(isEnhancedPaintingMode);
 
       // hovered + selected
-      _lblBreadcrumbItems                                .setEnabled(isHoveredSelected);
       _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelected);
       _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelected);
       _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelected);
       _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelected);
       _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelected);
       _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelected);
-      _spinnerBreadcrumbItems                            .setEnabled(isHoveredSelected);
       _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelected);
       _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelected);
       _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelected);
+
+      // breadcrumbs
+      _chkShowBreadcrumbs                       .setEnabled(isHoveredSelected);
+      _lblBreadcrumbItems                       .setEnabled(isShowBreadcrumbs);
+      _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs);
 
       // tour direction
       _chkShowTourDirections                    .setEnabled(isHoveredSelected);
@@ -974,13 +999,16 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // hovered/selected tour
       _chkShowHoveredSelectedTour.setSelection(                         Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
-      _spinnerBreadcrumbItems.setSelection(                             Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
       _spinnerHoveredSelected_HoveredOpacity.setSelection(              Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
       _spinnerHoveredSelected_HoveredAndSelectedOpacity.setSelection(   Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
       _spinnerHoveredSelected_SelectedOpacity.setSelection(             Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
       _colorHoveredSelected_Hovered.setColorValue(                      Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT);
       _colorHoveredSelected_HoveredAndSelected.setColorValue(           Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT);
       _colorHoveredSelected_Selected.setColorValue(                     Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
+
+      // breadcrumbs
+      _chkShowBreadcrumbs.setSelection(                                 Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
+      _spinnerBreadcrumbItems.setSelection(                             Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
 
       // tour direction
       _chkShowTourDirections.setSelection(            Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
@@ -1031,13 +1059,16 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // hovered/selected tour
       _chkShowHoveredSelectedTour.setSelection(                         Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
-      _spinnerBreadcrumbItems.setSelection(                             Util.getStateInt(_state,      Map2View.STATE_VISIBLE_BREADCRUMBS,                                  Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT));
       _spinnerHoveredSelected_HoveredOpacity.setSelection(              Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT));
       _spinnerHoveredSelected_HoveredAndSelectedOpacity.setSelection(   Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT));
       _spinnerHoveredSelected_SelectedOpacity.setSelection(             Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT));
       _colorHoveredSelected_Hovered.setColorValue(                      Util.getStateRGB(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB,                     Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT));
       _colorHoveredSelected_HoveredAndSelected.setColorValue(           Util.getStateRGB(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,        Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT));
       _colorHoveredSelected_Selected.setColorValue(                     Util.getStateRGB(_state,      Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB,                    Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT));
+
+      // breadcrumbs
+      _chkShowBreadcrumbs.setSelection(                                 Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT));
+      _spinnerBreadcrumbItems.setSelection(                             Util.getStateInt(_state,      Map2View.STATE_VISIBLE_BREADCRUMBS,                               Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT));
 
       // tour direction
       _chkShowTourDirections.setSelection(            Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_TOUR_DIRECTION,       Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT));
@@ -1085,13 +1116,16 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // hovered/selected tour
       _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                            _chkShowHoveredSelectedTour.getSelection());
-      _state.put(Map2View.STATE_VISIBLE_BREADCRUMBS,                                         _spinnerBreadcrumbItems.getSelection());
       _state.put(Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                        _spinnerHoveredSelected_HoveredOpacity.getSelection());
       _state.put(Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,           _spinnerHoveredSelected_HoveredAndSelectedOpacity.getSelection());
       _state.put(Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                       _spinnerHoveredSelected_SelectedOpacity.getSelection());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB,                 _colorHoveredSelected_Hovered.getColorValue());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,    _colorHoveredSelected_HoveredAndSelected.getColorValue());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB,                _colorHoveredSelected_Selected.getColorValue());
+
+      // breadcrumbs
+      _state.put(Map2View.STATE_IS_SHOW_BREADCRUMBS,                                      _chkShowBreadcrumbs.getSelection());
+      _state.put(Map2View.STATE_VISIBLE_BREADCRUMBS,                                      _spinnerBreadcrumbItems.getSelection());
 
       // tour direction
       _state.put(Map2View.STATE_IS_SHOW_TOUR_DIRECTION,           _chkShowTourDirections.getSelection());

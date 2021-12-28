@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -222,8 +222,6 @@ public class Map2View extends ViewPart implements
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
-   static final String           STATE_VISIBLE_BREADCRUMBS                                      = "STATE_VISIBLE_BREADCRUMBS";                              //$NON-NLS-1$
-   static final int              STATE_VISIBLE_BREADCRUMBS_DEFAULT                              = 5;
    static final String           STATE_HOVERED_SELECTED__HOVERED_OPACITY                        = "STATE_HOVERED_SELECTED__HOVERED_OPACITY";             //$NON-NLS-1$
    static final int              STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT                = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__HOVERED_RGB                            = "STATE_HOVERED_SELECTED__HOVERED_RGB";                 //$NON-NLS-1$
@@ -236,6 +234,11 @@ public class Map2View extends ViewPart implements
    static final int              STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT               = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__SELECTED_RGB                           = "STATE_HOVERED_SELECTED__SELECTED_RGB";                //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT                   = new RGB(0, 255, 0);
+
+   static final String           STATE_IS_SHOW_BREADCRUMBS                                      = "STATE_IS_SHOW_BREADCRUMBS";//$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_BREADCRUMBS_DEFAULT                              = true;
+   static final String           STATE_VISIBLE_BREADCRUMBS                                      = "STATE_VISIBLE_BREADCRUMBS";                              //$NON-NLS-1$
+   static final int              STATE_VISIBLE_BREADCRUMBS_DEFAULT                              = 5;
 
    static final String           STATE_IS_SHOW_TOUR_DIRECTION                          = "STATE_IS_SHOW_TOUR_DIRECTION";                        //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT                  = true;
@@ -328,6 +331,7 @@ public class Map2View extends ViewPart implements
 
    public static final int               TOUR_INFO_TOOLTIP_X = 3;
    public static final int               TOUR_INFO_TOOLTIP_Y = 23;
+
    //
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
@@ -354,6 +358,7 @@ public class Map2View extends ViewPart implements
     */
    private final ArrayList<TourData>         _allTourData             = new ArrayList<>();
    private TourData                          _previousTourData;
+   private Long                              _lastSelectedTourInsideMap;
    //
    /**
     * contains photos which are displayed in the map
@@ -1184,7 +1189,7 @@ public class Map2View extends ViewPart implements
 
                if (_selectionWhenHidden != null) {
 
-                  onSelectionChanged(_selectionWhenHidden, true);
+                  onSelectionChanged(_selectionWhenHidden);
 
                   _selectionWhenHidden = null;
                }
@@ -1320,7 +1325,7 @@ public class Map2View extends ViewPart implements
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = (part, selection) -> onSelectionChanged(selection, true);
+      _postSelectionListener = (part, selection) -> onSelectionChanged(selection);
 
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
@@ -1364,19 +1369,17 @@ public class Map2View extends ViewPart implements
 
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-            onSelectionChanged((ISelection) eventData, true);
+            onSelectionChanged((ISelection) eventData);
 
          } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
-            onSelectionChanged((ISelection) eventData, true);
+            onSelectionChanged((ISelection) eventData);
 
          } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
             if (eventData instanceof TourGeoFilter) {
 
                // show geo filter
-
-               _map.tourBreadcrumb().resetAllBreadcrumbs();
 
                final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
@@ -2241,7 +2244,7 @@ public class Map2View extends ViewPart implements
       return _filteredPhotos;
    }
 
-   private List<Long> getManyToursFromMultipleRours(final TourData tourData) {
+   private List<Long> getManyToursFromMultipleTours(final TourData tourData) {
 
       List<Long> tourIds = new ArrayList<>();
       tourIds = Arrays.asList(tourData.multipleTourIds);
@@ -2590,22 +2593,37 @@ public class Map2View extends ViewPart implements
 
       if (selection instanceof SelectionTourIds) {
 
-         _map.getDisplay().asyncExec(() -> {
-
-            final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
-
-            final boolean isResetBreadCrumbs = selectionTourIds.isKeepBreadCrumbs() == false;
-
-            onSelectionChanged(selection, isResetBreadCrumbs);
-         });
+         _lastSelectedTourInsideMap = null;
 
       } else if (selection instanceof SelectionTourId) {
 
-         final Long tourId = ((SelectionTourId) selection).getTourId();
+         /*
+          * Update tour info tooltip
+          */
+         final SelectionTourId selectionTourId = (SelectionTourId) selection;
+
+         final Long tourId = selectionTourId.getTourId();
          final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
          _tourInfoToolTipProvider.setTourData(tourData);
+
+         /*
+          * Show single tour only when it's selected the 2nd time
+          */
+         final boolean isSetBreadcrumbOnly =
+
+               _lastSelectedTourInsideMap == null
+                     || tourId.equals(_lastSelectedTourInsideMap) == false;
+
+         selectionTourId.setIsSetBreadcrumbOnly(isSetBreadcrumbOnly);
+
+         _lastSelectedTourInsideMap = tourId;
       }
+
+      _map.getDisplay().asyncExec(() -> {
+
+         onSelectionChanged(selection);
+      });
 
       TourManager.fireEventWithCustomData(
             TourEventId.TOUR_SELECTION,
@@ -2615,11 +2633,8 @@ public class Map2View extends ViewPart implements
 
    /**
     * @param selection
-    * @param isResetBreadcrumbs
-    *           Is <code>true</code> when the breadcrumbs should be reset, otherwise
-    *           <code>false</code>
     */
-   private void onSelectionChanged(final ISelection selection, final boolean isResetBreadcrumbs) {
+   private void onSelectionChanged(final ISelection selection) {
 
       if (_isPartVisible == false) {
 
@@ -2647,9 +2662,19 @@ public class Map2View extends ViewPart implements
          hideGeoGrid();
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-         final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-         paintToursAndPhotos(tourData, selection);
+         if (tourIdSelection.isSetBreadcrumbOnly()) {
+
+            // special case :-)
+
+            _map.tourBreadcrumb().addBreadcrumTour(tourIdSelection.getTourId());
+
+         } else {
+
+            final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+            paintToursAndPhotos(tourData, selection);
+         }
 
       } else if (selection instanceof SelectionTourIds) {
 
@@ -2875,8 +2900,6 @@ public class Map2View extends ViewPart implements
             _allTourData.add(refTourData);
             _allTourData.add(comparedTourData);
             _hash_AllTourData = _allTourData.hashCode();
-
-            _map.tourBreadcrumb().resetAllBreadcrumbs();
 
             paintTours_10_All();
 
@@ -3423,10 +3446,10 @@ public class Map2View extends ViewPart implements
       if (tourData.isMultipleTours()) {
 
          /*
-          * Convert one multiple tour with sub-tours into many tours, this makes some processings
-          * much easier
+          * Convert one multiple tour with it's sub-tours into many tours, this makes some
+          * processings much easier
           */
-         final List<Long> manyTours = getManyToursFromMultipleRours(tourData);
+         final List<Long> manyTours = getManyToursFromMultipleTours(tourData);
 
          paintTours(manyTours);
 
@@ -3447,11 +3470,11 @@ public class Map2View extends ViewPart implements
 
          if (data instanceof TourPhotoLinkSelection) {
 
-            onSelectionChanged((TourPhotoLinkSelection) data, true);
+            onSelectionChanged((TourPhotoLinkSelection) data);
 
          } else if (data instanceof PhotoSelection) {
 
-            onSelectionChanged((PhotoSelection) data, true);
+            onSelectionChanged((PhotoSelection) data);
          }
 
       } else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
@@ -3804,6 +3827,7 @@ public class Map2View extends ViewPart implements
        * Hovered/selected tour
        */
       final boolean isShowHoveredSelectedTour   = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
+      final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
 
       final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                                  Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
       final int hoveredOpacity                  = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
@@ -3815,6 +3839,7 @@ public class Map2View extends ViewPart implements
 
       _map.setConfig_HoveredSelectedTour(
             isShowHoveredSelectedTour,
+            isShowBreadcrumbs,
             numVisibleBreadcrumbs,
             hoveredRGB,
             hoveredOpacity,
@@ -4146,7 +4171,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      // a single tour is not added to the breadcrumb
+      _map.tourBreadcrumb().addBreadcrumTour(tourData.getTourId());
    }
 
    private void setTourPainterColorProvider(final MapGraphId colorId) {
@@ -4194,7 +4219,7 @@ public class Map2View extends ViewPart implements
 
       _map.resetHoveredSelectedTours();
 
-      _map.tourBreadcrumb().resetAllBreadcrumbs();
+      _map.tourBreadcrumb().removeAllCrumbs();
 
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);

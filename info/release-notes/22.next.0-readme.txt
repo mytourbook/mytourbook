@@ -4,8 +4,6 @@
 TODO's
 ======
 
-* Update          Replace screenshot on website with correct update url
-
 * Bundle MT with JRE       
                   https://github.com/mytourbook/mytourbook/issues/381#issue-971079239
 
@@ -47,8 +45,8 @@ Improvements
 
 
 * 2D Map
-  - Filter tour pauses https://github.com/mytourbook/mytourbook/issues/428
-  - Tour breadcrumbs https://github.com/mytourbook/mytourbook/issues/431
+  - Filter tour pauses 		https://github.com/mytourbook/mytourbook/issues/428
+  - Tour breadcrumbs 		https://github.com/mytourbook/mytourbook/issues/431
   
 
 Changes  

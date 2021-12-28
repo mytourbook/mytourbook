@@ -29,21 +29,10 @@ public class SelectionTourIds implements ISelection {
    private static final char NL = UI.NEW_LINE;
 
    private ArrayList<Long>   _tourIds;
-   private boolean           _isKeepBreadCrumbs;
 
    public SelectionTourIds(final ArrayList<Long> tourIds) {
 
       _tourIds = tourIds;
-   }
-
-   /**
-    * @param tourIds
-    * @param isKeepBreadCrumbs
-    */
-   public SelectionTourIds(final ArrayList<Long> tourIds, final boolean isKeepBreadCrumbs) {
-
-      _tourIds = tourIds;
-      _isKeepBreadCrumbs = isKeepBreadCrumbs;
    }
 
    public ArrayList<Long> getTourIds() {
@@ -53,10 +42,6 @@ public class SelectionTourIds implements ISelection {
    @Override
    public boolean isEmpty() {
       return false;
-   }
-
-   public boolean isKeepBreadCrumbs() {
-      return _isKeepBreadCrumbs;
    }
 
    @Override
@@ -69,7 +54,6 @@ public class SelectionTourIds implements ISelection {
             + "[" + NL
 
             + "_tourIds=" + _tourIds + NL //                      //$NON-NLS-1$
-            + "_isKeepBreadCrumbs=" + _isKeepBreadCrumbs + NL //  //$NON-NLS-1$
 
             + "]"; //                                             //$NON-NLS-1$
    }

@@ -1993,6 +1993,8 @@ public class Messages extends NLS {
 
    public static String        Slideout_Map_Options_Checkbox_ChartSlider;
    public static String        Slideout_Map_Options_Checkbox_DimMap;
+   public static String        Slideout_Map_Options_Checkbox_ShowBreadcrumbs;
+   public static String        Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
    public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
@@ -2009,8 +2011,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String        Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String        Slideout_Map_Options_Group_TourTrack;
-   public static String        Slideout_Map_Options_Label_BreadcrumbHistory_Items;
-   public static String        Slideout_Map_Options_Label_BreadcrumbHistory_Items_Tooltip;
+   public static String        Slideout_Map_Options_Label_BreadcrumbItems;
+   public static String        Slideout_Map_Options_Label_BreadcrumbItems_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor;
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredColor;

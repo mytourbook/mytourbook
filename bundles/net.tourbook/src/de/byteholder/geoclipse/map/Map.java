@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -597,8 +597,9 @@ public class Map extends Canvas {
    private int               _fastMapPainting_skippedValues;
 
    private MapTourBreadcrumb _tourBreadcrumb;
+   private boolean           _isShowBreadcrumbs = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
 
-   private Font              _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font              _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -2696,17 +2697,23 @@ public class Map extends Canvas {
 
          redraw();
 
-      } else if (_isShowHoveredSelectedTour && _tourBreadcrumb.onMouseDown(devMousePosition)) {
+      } else if (_isShowHoveredSelectedTour
+            && _isShowBreadcrumbs
+            && _tourBreadcrumb.onMouseDown(devMousePosition)) {
 
-         // a breadcrumb is selected
+         // a crumb is selected
 
-         if (_tourBreadcrumb.isResetAllButtonSelected()) {
+         if (_tourBreadcrumb.isAction_RemoveAllCrumbs()) {
 
-            _tourBreadcrumb.resetAllBreadcrumbs();
+            // crumb action: remove all crumbs
+
+            _tourBreadcrumb.removeAllCrumbs();
 
             redraw();
 
-         } else if (_tourBreadcrumb.isResetLastButtonSelected()) {
+         } else if (_tourBreadcrumb.isAction_UpliftLastCrumb()) {
+
+            // crumb action: set last crumb to the first/top crumb
 
             _tourBreadcrumb.resetLastBreadcrumb();
 
@@ -2721,7 +2728,7 @@ public class Map extends Canvas {
             // hide crumb selection state, this must be done after the crumb is reset
             redraw();
 
-            fireEvent_TourSelection(new SelectionTourIds(crumbTourIds, true));
+            fireEvent_TourSelection(new SelectionTourIds(crumbTourIds));
          }
 
       } else if (_geoGrid_Label_IsHovered) {
@@ -2776,7 +2783,7 @@ public class Map extends Canvas {
             final ArrayList<Long> allClonedTourIds = new ArrayList<>();
             allClonedTourIds.addAll(_allHoveredTourIds);
 
-            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds, true));
+            fireEvent_TourSelection(new SelectionTourIds(_allHoveredTourIds));
          }
 
          redraw();
@@ -2864,8 +2871,6 @@ public class Map extends Canvas {
          _geoGrid_Data_Hovered.geo_MouseMove = geoMouseMove;
          grid_UpdateEndPosition(mouseEvent, _geoGrid_Data_Hovered);
 
-         _tourBreadcrumb.resetAllBreadcrumbs();
-
          // pan map when mouse is near map border
          final Point mouseBorderPosition = grid_GetMouseBorderPosition();
          if (mouseBorderPosition != null) {
@@ -2940,7 +2945,7 @@ public class Map extends Canvas {
          }
       }
 
-      if (!isSomethingHit && _geoGrid_Label_Outline != null) {
+      if (isSomethingHit == false && _geoGrid_Label_Outline != null) {
 
          // check if mouse has hovered the grid label
 
@@ -2972,7 +2977,7 @@ public class Map extends Canvas {
 
          final int numOldHoveredTours = _allHoveredTourIds.size();
 
-         if (_tourBreadcrumb.onMouseMove(devMousePosition)) {
+         if (_isShowBreadcrumbs && _tourBreadcrumb.onMouseMove(devMousePosition)) {
 
             // breadcrumb is hovered
 
@@ -3765,16 +3770,15 @@ public class Map extends Canvas {
    private boolean paint_HoveredTour(final GC gc) {
 
       boolean isHoveredAndSelectedTour = false;
-
       boolean isPaintTourInfo = false;
-      boolean isPaintBreadCrumb = false;
+      boolean isPaintBreadcrumbs = false;
 
       /*
        * Paint hovered tour
        */
       if (_isShowHoveredSelectedTour) {
 
-         isPaintBreadCrumb = true;
+         isPaintBreadcrumbs = _isShowBreadcrumbs;
 
          final int numTours = _allDevHoveredPoints.size();
 
@@ -3830,7 +3834,7 @@ public class Map extends Canvas {
          paint_HoveredTour_10(gc, _hovered_SelectedTourId);
       }
 
-      if (isPaintBreadCrumb) {
+      if (isPaintBreadcrumbs) {
 
          final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
 
@@ -5851,6 +5855,8 @@ public class Map extends Canvas {
    }
 
    public void setConfig_HoveredSelectedTour(final boolean isVisible,
+                                             final boolean isShowBreadcrumbs,
+
                                              final int breadcrumbItems,
                                              final RGB hoveredRGB,
                                              final int hoveredOpacity,
@@ -5862,6 +5868,7 @@ public class Map extends Canvas {
 // SET_FORMATTING_OFF
 
       _isShowHoveredSelectedTour                      = isVisible;
+      _isShowBreadcrumbs                              = isShowBreadcrumbs;
 
       _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
       _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
