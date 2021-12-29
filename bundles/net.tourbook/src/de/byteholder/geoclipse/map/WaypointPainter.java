@@ -21,13 +21,13 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Paints waypoints on a {@link Map2}. This is an instance of {@link MapPainter} that in turn only
+ * Paints waypoints on a {@link Map2}. This is an instance of {@link Map2Painter} that in turn only
  * can draw on top of Maps.
  *
  * @author rbair
  * @author Michael Kanis
  */
-public class WaypointPainter extends MapPainter {
+public class WaypointPainter extends Map2Painter {
 
    private WaypointRenderer renderer = new DefaultWaypointRenderer();
 

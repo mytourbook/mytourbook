@@ -16,7 +16,7 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.MapPainter;
+import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 
@@ -89,7 +89,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * Paints a tour into the 2D map.
  */
-public class TourMapPainter extends MapPainter {
+public class TourMapPainter extends Map2Painter {
 
    private static final Font               DEFAULT_FONT      = net.tourbook.common.UI.AWT_DIALOG_FONT;
 

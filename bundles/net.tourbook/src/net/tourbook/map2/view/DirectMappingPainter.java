@@ -19,7 +19,7 @@ import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.MapPainter;
+import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.List;
@@ -408,14 +408,14 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      final List<MapPainter> allMapPainter = _map.getMapPainter();
+      final List<Map2Painter> allMapPainter = _map.getMapPainter();
       if (allMapPainter == null || allMapPainter.isEmpty()) {
          return;
       }
 
       // get first tour painter
       TourMapPainter tourPainter = null;
-      for (final MapPainter mapPainter : allMapPainter) {
+      for (final Map2Painter mapPainter : allMapPainter) {
          if (mapPainter instanceof TourMapPainter) {
             tourPainter = (TourMapPainter) mapPainter;
             break;

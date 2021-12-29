@@ -317,7 +317,7 @@ public class Map2 extends Canvas {
     * The overlay to delegate to for painting the "foreground" of the map component. This would
     * include painting waypoints, day/night, etc. also receives mouse events.
     */
-   private final List<MapPainter>         _allMapPainter           = new ArrayList<>();
+   private final List<Map2Painter>         _allMapPainter           = new ArrayList<>();
    private final TourPainterConfiguration _tourPainterConfig       = TourPainterConfiguration.getInstance();
 
    private final TileLoadObserver         _tileImageLoadObserver   = new TileLoadObserver();
@@ -902,7 +902,7 @@ public class Map2 extends Canvas {
     *           the map overlay to use
     * @see org.jdesktop.swingx.painters.Painter
     */
-   public void addOverlayPainter(final MapPainter overlay) {
+   public void addOverlayPainter(final Map2Painter overlay) {
 
       _allMapPainter.add(overlay);
 
@@ -1337,7 +1337,7 @@ public class Map2 extends Canvas {
    /**
     * @return Returns the overlay map painter which are defined as plugin extension
     */
-   public List<MapPainter> getMapPainter() {
+   public List<Map2Painter> getMapPainter() {
       return _allMapPainter;
    }
 
@@ -2524,7 +2524,7 @@ public class Map2 extends Canvas {
       disposeResource(_cursorSearchTour_Scroll);
 
       // dispose resources in the overlay plugins
-      for (final MapPainter overlay : _allMapPainter) {
+      for (final Map2Painter overlay : _allMapPainter) {
          overlay.dispose();
       }
 
@@ -4533,7 +4533,7 @@ public class Map2 extends Canvas {
                 */
                boolean isPaintingNeeded = false;
 
-               for (final MapPainter mapPainter : _allMapPainter) {
+               for (final Map2Painter mapPainter : _allMapPainter) {
 
                   isPaintingNeeded = mapPainter.isPaintingNeeded(Map2.this, tile);
 
@@ -4595,7 +4595,7 @@ public class Map2 extends Canvas {
 
       {
          // paint all overlays for the current tile
-         for (final MapPainter overlayPainter : _allMapPainter) {
+         for (final Map2Painter overlayPainter : _allMapPainter) {
 
             final boolean isPainted = overlayPainter.doPaint(
                   gc1Part,
@@ -4654,7 +4654,7 @@ public class Map2 extends Canvas {
          _9PartGC.fillRectangle(_9PartImage.getBounds());
 
          // paint all overlays for the current tile
-         for (final MapPainter overlayPainter : _allMapPainter) {
+         for (final Map2Painter overlayPainter : _allMapPainter) {
 
             final boolean isPainted = overlayPainter.doPaint(
                   _9PartGC,
@@ -5827,7 +5827,7 @@ public class Map2 extends Canvas {
     *
     * @return the current map overlay
     */
-   public void removeOverlayPainter(final MapPainter overlay) {
+   public void removeOverlayPainter(final Map2Painter overlay) {
 
       _allMapPainter.remove(overlay);
 

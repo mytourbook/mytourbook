@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.MapPainter;
+import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 
 public class GeoclipseExtensions {
@@ -61,8 +61,8 @@ public class GeoclipseExtensions {
 				e.printStackTrace();
 			}
 
-			if (o != null && o instanceof MapPainter) {
-				map.addOverlayPainter((MapPainter) o);
+			if (o != null && o instanceof Map2Painter) {
+				map.addOverlayPainter((Map2Painter) o);
 			}
 		}
 	}
