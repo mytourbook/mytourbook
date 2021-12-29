@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -1045,7 +1045,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
          final Map2View map2View = (Map2View) view;
 
-         final Map map = map2View.getMap();
+         final Map2 map = map2View.getMap();
 
          map.disposeTiles();
          map.disposeOverlayImageCache();

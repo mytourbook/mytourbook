@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -156,10 +156,10 @@ public class TourMapPainter extends MapPainter {
 
    private class LoadCallbackImage implements ILoadCallBack {
 
-      private Map  __map;
+      private Map2  __map;
       private Tile __tile;
 
-      public LoadCallbackImage(final Map map, final Tile tile) {
+      public LoadCallbackImage(final Map2 map, final Tile tile) {
          __map = map;
          __tile = tile;
       }
@@ -810,7 +810,7 @@ public class TourMapPainter extends MapPainter {
 
    @Override
    protected boolean doPaint(final GC gcTile,
-                             final Map map,
+                             final Map2 map,
                              final Tile tile,
                              final int parts,
                              final boolean isFastPainting,
@@ -1098,7 +1098,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    private boolean doPaint_Marker(final GC gcTile,
-                                  final Map map,
+                                  final Map2 map,
                                   final Tile tile,
                                   final int parts,
                                   boolean isContentInTile,
@@ -1216,7 +1216,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    private boolean doPaint_Pauses(final GC gcTile,
-                                  final Map map,
+                                  final Map2 map,
                                   final Tile tile,
                                   final int parts,
                                   boolean isContentInTile,
@@ -1370,7 +1370,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    private boolean drawPhoto(final GC gcTile,
-                             final Map map,
+                             final Map2 map,
                              final Tile tile,
                              final Photo photo,
                              final Point photoWorldPixel,
@@ -1434,7 +1434,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    private boolean drawStaticMarker(final GC gcTile,
-                                    final Map map,
+                                    final Map2 map,
                                     final Tile tile,
                                     final double latitude,
                                     final double longitude,
@@ -1480,7 +1480,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    private boolean drawTour_10_InTile(final GC gcTile,
-                                      final Map map,
+                                      final Map2 map,
                                       final Tile tile,
                                       final TourData tourData,
                                       final int parts,
@@ -1911,10 +1911,10 @@ public class TourMapPainter extends MapPainter {
        * Keep area to detect the hovered tour and enlarge it with a margin to easier hit it
        */
       final Rectangle hoveredRect = new Rectangle(
-            (paintedDevX - Map.EXPANDED_HOVER_SIZE2),
-            (paintedDevY - Map.EXPANDED_HOVER_SIZE2),
-            (_lineWidth + Map.EXPANDED_HOVER_SIZE),
-            (_lineWidth + Map.EXPANDED_HOVER_SIZE));
+            (paintedDevX - Map2.EXPANDED_HOVER_SIZE2),
+            (paintedDevY - Map2.EXPANDED_HOVER_SIZE2),
+            (_lineWidth + Map2.EXPANDED_HOVER_SIZE),
+            (_lineWidth + Map2.EXPANDED_HOVER_SIZE));
 
       tile.allPainted_HoverRectangle.add(hoveredRect);
       tile.allPainted_HoverTourID.add(tourId);
@@ -1931,7 +1931,7 @@ public class TourMapPainter extends MapPainter {
     * @return Returns <code>true</code> when marker has been painted
     */
    private boolean drawTourMarker(final GC gcTile,
-                                  final Map map,
+                                  final Map2 map,
                                   final Tile tile,
                                   final double latitude,
                                   final double longitude,
@@ -2017,7 +2017,7 @@ public class TourMapPainter extends MapPainter {
 
       final int arcSize = 5;
 
-      final RGB rgbTransparent = Map.getTransparentRGB();
+      final RGB rgbTransparent = Map2.getTransparentRGB();
 
       final ImageData markerImageData = new ImageData(
             markerImageWidth,
@@ -2090,7 +2090,7 @@ public class TourMapPainter extends MapPainter {
     * @return Returns <code>true</code> when pause duration has been painted
     */
    private boolean drawTourPauses(final GC gcTile,
-                                  final Map map,
+                                  final Map2 map,
                                   final Tile tile,
                                   final double latitude,
                                   final double longitude,
@@ -2176,7 +2176,7 @@ public class TourMapPainter extends MapPainter {
 
       final int arcSize = 5;
 
-      final RGB rgbTransparent = Map.getTransparentRGB();
+      final RGB rgbTransparent = Map2.getTransparentRGB();
 
       final ImageData markerImageData = new ImageData(
             markerImageWidth,
@@ -2269,7 +2269,7 @@ public class TourMapPainter extends MapPainter {
     * @return Returns <code>true</code> when way point has been painted
     */
    private boolean drawTourWayPoint(final GC gcTile,
-                                    final Map map,
+                                    final Map2 map,
                                     final Tile tile,
                                     final TourWayPoint twp,
                                     final Point twpWorldPixel,
@@ -2392,7 +2392,7 @@ public class TourMapPainter extends MapPainter {
     * @param tile
     * @return Returns the photo image or <code>null</code> when image is not loaded.
     */
-   private Image getPhotoImage(final Photo photo, final Map map, final Tile tile) {
+   private Image getPhotoImage(final Photo photo, final Map2 map, final Tile tile) {
 
       Image photoImage = null;
 
@@ -2576,7 +2576,7 @@ public class TourMapPainter extends MapPainter {
    }
 
    @Override
-   protected boolean isPaintingNeeded(final Map map, final Tile tile) {
+   protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
       final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
       final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();

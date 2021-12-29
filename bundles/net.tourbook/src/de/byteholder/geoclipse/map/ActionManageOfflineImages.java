@@ -22,9 +22,9 @@ import de.byteholder.geoclipse.Messages;
 
 public class ActionManageOfflineImages extends Action {
 
-	private Map	_map;
+	private Map2	_map;
 
-	public ActionManageOfflineImages(final Map map) {
+	public ActionManageOfflineImages(final Map2 map) {
 
 		_map = map;
 

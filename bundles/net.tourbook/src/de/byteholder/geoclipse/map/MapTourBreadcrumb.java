@@ -71,9 +71,9 @@ public class MapTourBreadcrumb {
 
    private Font                       _boldFont                      = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-   private Map                        _map;
+   private Map2                        _map;
 
-   public MapTourBreadcrumb(final Map map) {
+   public MapTourBreadcrumb(final Map2 map) {
 
       _map = map;
    }

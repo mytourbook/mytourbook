@@ -870,7 +870,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                .applyTo(_toolbar);
       }
 
-      _map = new de.byteholder.geoclipse.map.Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
+      _map = new de.byteholder.geoclipse.map.Map2(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
       GridDataFactory.fillDefaults()//
             .grab(true, true)
             .applyTo(_map);

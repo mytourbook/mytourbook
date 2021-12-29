@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
@@ -1682,7 +1682,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       _selectedMP = mp;
 
-      final Map map = _map2View.getMap();
+      final Map2 map = _map2View.getMap();
 
       map.setMapProvider(mp);
 

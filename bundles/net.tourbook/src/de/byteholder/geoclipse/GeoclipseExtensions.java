@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 
@@ -43,7 +43,7 @@ public class GeoclipseExtensions {
 		return _instance;
 	}
 
-	public static void registerOverlays(final Map map) {
+	public static void registerOverlays(final Map2 map) {
 
 		final IExtensionRegistry registry = RegistryFactory.getRegistry();
 		final IExtensionPoint point = registry.getExtensionPoint("net.tourbook.mapOverlay"); //$NON-NLS-1$

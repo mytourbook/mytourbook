@@ -41,6 +41,6 @@ public abstract class AbstractPainter<T> {
     * @param tile
     * @return Returns <code>true</code> when the tile needs to be painted in the map
     */
-   protected abstract boolean isPaintingNeeded(Map map, Tile tile);
+   protected abstract boolean isPaintingNeeded(Map2 map, Tile tile);
 
 }

@@ -151,7 +151,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 
-public class Map extends Canvas {
+public class Map2 extends Canvas {
 
    private static final String          TOUR_TOOLTIP_LABEL_DISTANCE      = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME   = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
@@ -634,7 +634,7 @@ public class Map extends Canvas {
     *
     * @param state
     */
-   public Map(final Composite parent, final int style, final IDialogSettings state) {
+   public Map2(final Composite parent, final int style, final IDialogSettings state) {
 
       super(parent, style | SWT.DOUBLE_BUFFERED);
 
@@ -1038,7 +1038,7 @@ public class Map extends Canvas {
 
    private void createActions() {
 
-      _actionManageOfflineImages = new ActionManageOfflineImages(Map.this);
+      _actionManageOfflineImages = new ActionManageOfflineImages(Map2.this);
    }
 
    /**
@@ -4535,7 +4535,7 @@ public class Map extends Canvas {
 
                for (final MapPainter mapPainter : _allMapPainter) {
 
-                  isPaintingNeeded = mapPainter.isPaintingNeeded(Map.this, tile);
+                  isPaintingNeeded = mapPainter.isPaintingNeeded(Map2.this, tile);
 
                   if (isPaintingNeeded) {
                      break;
@@ -4599,7 +4599,7 @@ public class Map extends Canvas {
 
             final boolean isPainted = overlayPainter.doPaint(
                   gc1Part,
-                  Map.this,
+                  Map2.this,
                   tile,
                   1,
                   _isFastMapPainting && _isFastMapPainting_Active,
@@ -4658,7 +4658,7 @@ public class Map extends Canvas {
 
             final boolean isPainted = overlayPainter.doPaint(
                   _9PartGC,
-                  Map.this,
+                  Map2.this,
                   tile,
                   parts,
                   _isFastMapPainting && _isFastMapPainting_Active,

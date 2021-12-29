@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -69,7 +69,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       if (view instanceof Map2View) {
 
          final Map2View map2View = (Map2View) view;
-         final Map map = map2View.getMap();
+         final Map2 map = map2View.getMap();
 
          map.setIsFastMapPainting_Active(isSelected);
       }

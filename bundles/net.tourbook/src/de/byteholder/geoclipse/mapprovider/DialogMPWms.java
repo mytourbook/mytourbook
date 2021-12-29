@@ -16,7 +16,7 @@
 package de.byteholder.geoclipse.mapprovider;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IPositionListener;
@@ -962,7 +962,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
                .applyTo(_toolbar);
       }
 
-      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
+      _map = new Map2(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
       GridDataFactory.fillDefaults()//
             .grab(true, true)
             .applyTo(_map);

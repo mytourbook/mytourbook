@@ -49,7 +49,7 @@ public class Tile extends Observable {
     */
 
    private static final ReentrantLock      TILE_LOCK                 = new ReentrantLock();
-   private static final int                MAX_BOUNDS                = Map.MAP_MAX_ZOOM_LEVEL + 1;
+   private static final int                MAX_BOUNDS                = Map2.MAP_MAX_ZOOM_LEVEL + 1;
 
    private OverlayTourState                _overlayTourState         = OverlayTourState.TILE_IS_NOT_CHECKED;
 

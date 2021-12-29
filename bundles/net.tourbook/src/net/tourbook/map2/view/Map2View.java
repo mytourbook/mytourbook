@@ -20,7 +20,7 @@ import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.IMapContextProvider;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
@@ -505,7 +505,7 @@ public class Map2View extends ViewPart implements
     * UI controls
     */
    private Composite _parent;
-   private Map       _map;
+   private Map2       _map;
 
    private class ActionMap2_Graphs extends ActionToolbarSlideout {
 
@@ -1685,7 +1685,7 @@ public class Map2View extends ViewPart implements
 
       _mapLegend = new MapLegend();
 
-      _map = new Map(parent, SWT.NONE, _state);
+      _map = new Map2(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
       _map.setDirectPainter(_directMappingPainter);
@@ -2255,7 +2255,7 @@ public class Map2View extends ViewPart implements
       return tourIds;
    }
 
-   public Map getMap() {
+   public Map2 getMap() {
       return _map;
    }
 
