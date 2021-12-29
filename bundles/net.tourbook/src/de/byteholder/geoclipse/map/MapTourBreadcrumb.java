@@ -202,8 +202,22 @@ public class MapTourBreadcrumb {
       return allCrumbTours;
    }
 
-   public int getVisibleBreadcrumbs() {
+   public int getUsedCrumbs() {
+      return _allCrumbsWithAllTours.size();
+   }
+
+   public int getVisibleCrumbs() {
       return _numVisibleCrumbs;
+   }
+
+   public boolean isAction_RemoveAllCrumbs() {
+
+      return _isAction_RemoveAll_Selected;
+   }
+
+   public boolean isAction_UpliftLastCrumb() {
+
+      return _isAction_UpliftLastCrumb_Selected;
    }
 
    private boolean isCollectionContainedInAllBreadcrums(final ArrayList<TourData> allTourData) {
@@ -236,16 +250,6 @@ public class MapTourBreadcrumb {
       return _hoveredCrumbIndex != NOT_HOVERED_INDEX
             || _isAction_RemoveAll_Hovered
             || _isAction_UpliftLastCrumb_Hovered;
-   }
-
-   public boolean isAction_RemoveAllCrumbs() {
-
-      return _isAction_RemoveAll_Selected;
-   }
-
-   public boolean isAction_UpliftLastCrumb() {
-
-      return _isAction_UpliftLastCrumb_Selected;
    }
 
    /**

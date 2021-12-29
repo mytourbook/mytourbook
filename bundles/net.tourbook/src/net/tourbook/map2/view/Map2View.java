@@ -23,6 +23,7 @@ import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -191,6 +192,7 @@ public class Map2View extends ViewPart implements
       IMapPositionListener,
       IMapSyncListener,
       IMapInfoListener,
+      IBreadcrumbListener,
       IMapWithPhotos {
 
 // SET_FORMATTING_OFF
@@ -1173,6 +1175,7 @@ public class Map2View extends ViewPart implements
 
       _map.addMapInfoListener(this);
       _map.addMapPositionListener(this);
+      _map.addBreadcrumbListener(this);
 
       _map.setMapContextProvider(this);
    }
@@ -2668,6 +2671,7 @@ public class Map2View extends ViewPart implements
             // special case :-)
 
             _map.tourBreadcrumb().addBreadcrumTour(tourIdSelection.getTourId());
+            setTourInfoIconPosition();
 
          } else {
 
@@ -3179,6 +3183,7 @@ public class Map2View extends ViewPart implements
           * filter is reselected
           */
          _map.tourBreadcrumb().setBreadcrumbTours(_allTourData);
+         setTourInfoIconPosition();
 
          return;
       }
@@ -3849,6 +3854,8 @@ public class Map2View extends ViewPart implements
             selectedOpacity
       );
 
+      _tourPainterConfig.isShowBreadcrumbs   = isShowBreadcrumbs;
+
 
       /*
        * Tour direction
@@ -3905,16 +3912,7 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-      // adjust tour info tooltip according to the breadcrumb toolbar visibility
-      final int devXTooltip = TOUR_INFO_TOOLTIP_X;
-      final int devYTooltip = numVisibleBreadcrumbs == 0
-
-            // breadcrumb is not visible -> "center" icon in the top left corner
-            ? TOUR_INFO_TOOLTIP_X
-
-            : TOUR_INFO_TOOLTIP_Y;
-
-      _tourInfoToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
+      setTourInfoIconPosition();
 
       // create legend image after the dim level is modified
       createLegendImage(_tourPainterConfig.getMapColorProvider());
@@ -4159,6 +4157,7 @@ public class Map2View extends ViewPart implements
       _allTourData.addAll(allTourData);
 
       _map.tourBreadcrumb().addBreadcrumTours(allTourData);
+      setTourInfoIconPosition();
    }
 
    /**
@@ -4172,6 +4171,27 @@ public class Map2View extends ViewPart implements
       _allTourData.add(tourData);
 
       _map.tourBreadcrumb().addBreadcrumTour(tourData.getTourId());
+      setTourInfoIconPosition();
+   }
+
+   /**
+    * Adjust tour info tooltip according to the breadcrumb toolbar visibility
+    */
+   private void setTourInfoIconPosition() {
+
+      final int devXTooltip = TOUR_INFO_TOOLTIP_X;
+      final int devYTooltip =
+
+            _tourPainterConfig.isShowBreadcrumbs
+            && _map.tourBreadcrumb().getUsedCrumbs() > 0
+
+                  // show tooltip icon below the crumbs
+                  ? TOUR_INFO_TOOLTIP_Y
+
+                  // breadcrumb is not visible -> "center" icon in the top left corner
+                  : TOUR_INFO_TOOLTIP_X;
+
+      _tourInfoToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
    }
 
    private void setTourPainterColorProvider(final MapGraphId colorId) {
@@ -4220,6 +4240,7 @@ public class Map2View extends ViewPart implements
       _map.resetHoveredSelectedTours();
 
       _map.tourBreadcrumb().removeAllCrumbs();
+      setTourInfoIconPosition();
 
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);
@@ -4436,6 +4457,13 @@ public class Map2View extends ViewPart implements
 
       // run in UI thread
       _parent.getDisplay().asyncExec(runnable);
+   }
+
+   @Override
+   public void updateBreadcrumb() {
+
+      // update the tour info icon depending if breadcrumbs are visible
+      setTourInfoIconPosition();
    }
 
    private void updateFilteredPhotos() {

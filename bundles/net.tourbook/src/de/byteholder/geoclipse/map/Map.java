@@ -39,6 +39,7 @@
 package de.byteholder.geoclipse.map;
 
 import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
 import de.byteholder.geoclipse.map.event.IHoveredTourListener;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
@@ -365,7 +366,7 @@ public class Map extends Canvas {
       _nfLatLon.setMinimumFractionDigits(4);
       _nfLatLon.setMaximumFractionDigits(4);
    }
-   private final TextWrapPainter                      _textWrapper              = new TextWrapPainter();
+   private final TextWrapPainter                      _textWrapper               = new TextWrapPainter();
 
    /**
     * cache for overlay images
@@ -375,7 +376,7 @@ public class Map extends Canvas {
    /**
     * This queue contains tiles which overlay image must be painted
     */
-   private final ConcurrentLinkedQueue<Tile>          _tileOverlayPaintQueue    = new ConcurrentLinkedQueue<>();
+   private final ConcurrentLinkedQueue<Tile>          _tileOverlayPaintQueue     = new ConcurrentLinkedQueue<>();
 
    private boolean                                    _isRunningDrawOverlay;
 
@@ -386,7 +387,7 @@ public class Map extends Canvas {
     */
    private IDirectPainter                             _directMapPainter;
 
-   private final DirectPainterContext                 _directMapPainterContext  = new DirectPainterContext();
+   private final DirectPainterContext                 _directMapPainterContext   = new DirectPainterContext();
 
    /**
     * When <code>true</code> the overlays are painted
@@ -413,7 +414,7 @@ public class Map extends Canvas {
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * <br>
     */
-   private Point2D                                    _worldPixel_MapCenter     = null;
+   private Point2D                                    _worldPixel_MapCenter      = null;
 
    /**
     * Viewport in the map where the {@link #_mapImage} is painted <br>
@@ -454,13 +455,14 @@ public class Map extends Canvas {
     */
    private Rectangle                                  _clientArea;
 
-   private final ListenerList<IMapGridListener>       _allMapGridListener       = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<IMapInfoListener>       _allMapInfoListener       = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<IMapPositionListener>   _allMapPositionListener   = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<ITourSelectionListener> _allTourSelectionListener = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<IPositionListener>      _mousePositionListeners   = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<IPOIListener>           _poiListeners             = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<IHoveredTourListener>   _hoveredTourListeners     = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IBreadcrumbListener>    _allBreadcrumbListener     = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IHoveredTourListener>   _allHoveredTourListeners   = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IMapGridListener>       _allMapGridListener        = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IMapInfoListener>       _allMapInfoListener        = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IMapPositionListener>   _allMapPositionListener    = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPositionListener>      _allMousePositionListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPOIListener>           _allPOIListeners           = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<ITourSelectionListener> _allTourSelectionListener  = new ListenerList<>(ListenerList.IDENTITY);
 
    // measurement system
    private float       _distanceUnitValue = 1;
@@ -824,6 +826,10 @@ public class Map extends Canvas {
       addTraverseListener(traverseEvent -> traverseEvent.doit = true);
    }
 
+   public void addBreadcrumbListener(final IBreadcrumbListener listener) {
+      _allBreadcrumbListener.add(listener);
+   }
+
    /**
     * Set map as drop target
     */
@@ -869,7 +875,7 @@ public class Map extends Canvas {
    }
 
    public void addHoveredTourListener(final IHoveredTourListener hoveredTourListener) {
-      _hoveredTourListeners.add(hoveredTourListener);
+      _allHoveredTourListeners.add(hoveredTourListener);
    }
 
    public void addMapGridBoxListener(final IMapGridListener mapListener) {
@@ -885,7 +891,7 @@ public class Map extends Canvas {
    }
 
    public void addMousePositionListener(final IPositionListener mapListener) {
-      _mousePositionListeners.add(mapListener);
+      _allMousePositionListeners.add(mapListener);
    }
 
    /**
@@ -904,7 +910,7 @@ public class Map extends Canvas {
    }
 
    public void addPOIListener(final IPOIListener poiListener) {
-      _poiListeners.add(poiListener);
+      _allPOIListeners.add(poiListener);
    }
 
    public void addTourSelectionListener(final ITourSelectionListener iTourSelectionListener) {
@@ -1198,9 +1204,26 @@ public class Map extends Canvas {
       final GeoPosition geoPosition = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
       final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
 
-      final Object[] listeners = _mousePositionListeners.getListeners();
+      final Object[] listeners = _allMousePositionListeners.getListeners();
       for (final Object listener : listeners) {
          ((IPositionListener) listener).setPosition(event);
+      }
+   }
+
+   private void fireEvent_POI(final GeoPosition geoPosition, final String poiText) {
+
+      final MapPOIEvent event = new MapPOIEvent(geoPosition, _mapZoomLevel, poiText);
+
+      final Object[] listeners = _allPOIListeners.getListeners();
+      for (final Object listener : listeners) {
+         ((IPOIListener) listener).setPOI(event);
+      }
+   }
+
+   private void fireEvent_TourBreadcrumb() {
+
+      for (final Object selectionListener : _allBreadcrumbListener.getListeners()) {
+         ((IBreadcrumbListener) selectionListener).updateBreadcrumb();
       }
    }
 
@@ -1208,16 +1231,6 @@ public class Map extends Canvas {
 
       for (final Object selectionListener : _allTourSelectionListener.getListeners()) {
          ((ITourSelectionListener) selectionListener).onSelection(selection);
-      }
-   }
-
-   private void firePOIEvent(final GeoPosition geoPosition, final String poiText) {
-
-      final MapPOIEvent event = new MapPOIEvent(geoPosition, _mapZoomLevel, poiText);
-
-      final Object[] listeners = _poiListeners.getListeners();
-      for (final Object listener : listeners) {
-         ((IPOIListener) listener).setPOI(event);
       }
    }
 
@@ -2353,7 +2366,7 @@ public class Map extends Canvas {
        * Above there are return statements which do not fire this event !!!
        */
       final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId());
-      for (final Object listener : _hoveredTourListeners.getListeners()) {
+      for (final Object listener : _allHoveredTourListeners.getListeners()) {
          ((IHoveredTourListener) listener).setHoveredTourId(event);
       }
 
@@ -2708,6 +2721,9 @@ public class Map extends Canvas {
             // crumb action: remove all crumbs
 
             _tourBreadcrumb.removeAllCrumbs();
+
+            // set tour info icon position in the map
+            fireEvent_TourBreadcrumb();
 
             redraw();
 
@@ -5742,7 +5758,7 @@ public class Map extends Canvas {
 
                _isPoiVisible = true;
 
-               firePOIEvent(poiGeoPosition, poiText);
+               fireEvent_POI(poiGeoPosition, poiText);
 
                return true;
             }
@@ -5803,7 +5819,7 @@ public class Map extends Canvas {
    }
 
    public void removeMousePositionListener(final IPositionListener listener) {
-      _mousePositionListeners.remove(listener);
+      _allMousePositionListeners.remove(listener);
    }
 
    /**
