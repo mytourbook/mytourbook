@@ -199,7 +199,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_YearStatisticOptions(_pageBook, toolbar, GRID_PREF_PREFIX);
+         return new SlideoutYearStatisticOptions(_pageBook, toolbar, GRID_PREF_PREFIX);
       }
    }
 

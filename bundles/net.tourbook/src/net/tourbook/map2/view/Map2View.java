@@ -520,7 +520,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_Map2_TourColors(_parent, toolbar, Map2View.this, _state);
+         return new SlideoutMap2_TourColors(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
@@ -578,7 +578,7 @@ public class Map2View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new Slideout_Map2_PhotoOptions(_parent, toolbar, Map2View.this, _state);
+         return new SlideoutMap2_PhotoOptions(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
@@ -663,7 +663,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_Map2_SyncMap(_parent, toolbar, Map2View.this);
+         return new SlideoutMap2_SyncMap(_parent, toolbar, Map2View.this);
       }
 
       @Override

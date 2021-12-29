@@ -106,7 +106,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * 2D Map provider slideout
  */
-public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITourViewer, IMapProviderListener {
+public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourViewer, IMapProviderListener {
 
 // SET_FORMATTING_OFF
 
@@ -386,7 +386,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
     * @param map2View
     * @param map2State
     */
-   public Slideout_Map2_MapProvider(final ToolItem toolItem, final Map2View map2View, final IDialogSettings state_MapProvider) {
+   public SlideoutMap2_MapProvider(final ToolItem toolItem, final Map2View map2View, final IDialogSettings state_MapProvider) {
 
       super(toolItem.getParent(), state_MapProvider, new int[] { 325, 400, 325, 400 });
 

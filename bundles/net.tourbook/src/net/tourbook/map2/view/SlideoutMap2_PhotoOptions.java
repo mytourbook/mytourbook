@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IActionResetToDefault {
+public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final String   MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -85,7 +85,7 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IActi
     * @param map2View
     * @param map2State
     */
-   public Slideout_Map2_PhotoOptions(final Control ownerControl,
+   public SlideoutMap2_PhotoOptions(final Control ownerControl,
                                      final ToolBar toolBar,
                                      final Map2View map2View,
                                      final IDialogSettings map2State) {
