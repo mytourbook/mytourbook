@@ -620,6 +620,17 @@ public class UI {
    public static final String    IMAGE_CONFIGURE_COLUMNS                = "IMAGE_CONFIGURE_COLUMNS";                 //$NON-NLS-1$
    public static final String    IMAGE_EMPTY_16                         = "_empty16";                                //$NON-NLS-1$
 
+
+   public static Color           SYS_COLOR_BLACK;
+   public static Color           SYS_COLOR_BLUE;
+   public static Color           SYS_COLOR_DARK_GRAY;
+   public static Color           SYS_COLOR_GRAY;
+   public static Color           SYS_COLOR_GREEN;
+   public static Color           SYS_COLOR_MAGENTA;
+   public static Color           SYS_COLOR_RED;
+   public static Color           SYS_COLOR_WHITE;
+   public static Color           SYS_COLOR_YELLOW;
+
 // SET_FORMATTING_ON
 
    public static final ImageRegistry IMAGE_REGISTRY;
@@ -658,6 +669,16 @@ public class UI {
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getImageDescriptor(CommonImages.Weather_Snow));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getImageDescriptor(CommonImages.Weather_ScatteredShowers));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getImageDescriptor(CommonImages.Weather_Severe));
+
+      SYS_COLOR_BLACK       = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
+      SYS_COLOR_BLUE        = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+      SYS_COLOR_DARK_GRAY   = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+      SYS_COLOR_GRAY        = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+      SYS_COLOR_GREEN       = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
+      SYS_COLOR_MAGENTA     = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
+      SYS_COLOR_RED         = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+      SYS_COLOR_WHITE       = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+      SYS_COLOR_YELLOW      = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
 
 // SET_FORMATTING_ON
 

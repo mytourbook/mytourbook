@@ -41,12 +41,13 @@ Improvements
   - Filter tour pauses
   - Stack tour pauses that they don't overlap
   
-  https://github.com/mytourbook/mytourbook/issues/428
-
+  							https://github.com/mytourbook/mytourbook/issues/428
 
 * 2D Map
   - Filter tour pauses 		https://github.com/mytourbook/mytourbook/issues/428
   - Tour breadcrumbs 		https://github.com/mytourbook/mytourbook/issues/431
+  - Update tour geo filter default location and zoom level 
+                          	https://github.com/mytourbook/mytourbook/issues/433
   
 
 Changes  

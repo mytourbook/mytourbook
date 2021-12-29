@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -152,8 +152,8 @@ public class TourGeoFilter {
             + "geoParts_Height      =" + geoParts_Height + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "numGeoParts          =" + numGeoParts + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-//            + "mapZoomLevel         =" + mapZoomLevel + "\n"
-//            + "mapGeoCenter         =" + mapGeoCenter + "\n"
+            + "mapZoomLevel         =" + mapZoomLevel + "\n"
+            + "mapGeoCenter         =" + mapGeoCenter + "\n"
 //
 //            + "id                   =" + id + "\n"
 //            + "created              =" + created + "\n"
