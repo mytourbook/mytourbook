@@ -91,16 +91,6 @@
       </repository>   
 
 
-
-      <!-- Repo for Chromium is/was not supported in Eclipse
-      
-      <repository>
-         <id>com.make.chromium.cef</id>                                 <layout>p2</layout>
-         <url>http://dl.maketechnology.io/chromium-cef/rls/repository</url>
-      </repository>   
-      
-      -->
-
       <!-- 
 
       Eclipse local repositories downloaded from https://download.eclipse.org/eclipse/downloads/
