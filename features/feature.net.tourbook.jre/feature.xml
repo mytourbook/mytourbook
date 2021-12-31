@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.jre"
       label="OpenJDK 11"
-      version="11.0.7.qualifier"
+      version="11.0.13.qualifier"
       plugin="net.tourbook.branding">
 
    <description url="https://adoptium.net/">

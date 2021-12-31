@@ -79,7 +79,7 @@ task mt_20_BuildProduct {
 
    doLast {
 
-      //run: mvn verify -P build-release
+      // run: mvn verify -P build-release
 
       def buildDir = file('../..')
 

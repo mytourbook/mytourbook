@@ -15,22 +15,19 @@
    
    <dependencies>
       <dependency>
-         <groupId>org.eclipse.pde</groupId>
-         <artifactId>org.eclipse.pde.junit.runtime</artifactId>
-         <version>3.6.0</version>
+         <artifactId>org.eclipse.pde.junit.runtime</artifactId>         <groupId>org.eclipse.pde</groupId>
+                                                                        <version>3.6.0</version>
       </dependency>
-   <dependency>
-      <groupId>org.eclipse.core</groupId>
-      <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>3.7.0</version>
-   </dependency>
-   <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>	
+      <dependency>
+         <artifactId>org.eclipse.core.runtime</artifactId>              <groupId>org.eclipse.core</groupId>
+                                                                        <version>3.7.0</version>
+      </dependency>
+      <dependency>
+         <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
+                                                                        <version>5.8.1</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>	
 
    <properties>
       <tycho.version>2.5.0</tycho.version>
@@ -192,77 +189,77 @@
          </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
-        <configuration>
-          <skipTests>true</skipTests>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
+         <artifactId>maven-surefire-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
+                                                               <version>3.0.0-M5</version>
+         <configuration>
+            <skipTests>true</skipTests>
+         </configuration>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>test</goal>
+               </goals>
+            </execution>
+         </executions>
       </plugin>
+      
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <executions>
-          <execution>
-            <id>compiletests</id>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
+                                                               <version>3.8.1</version>
+         <executions>
+            <execution>
+               <id>compiletests</id>
+               <phase>test-compile</phase>
+               <goals>
+                  <goal>testCompile</goal>
+               </goals>
+            </execution>
+         </executions>
       </plugin>
+      
       <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-surefire-plugin</artifactId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <useUIHarness>true</useUIHarness>
-          <useUIThread>false</useUIThread>
-          <product>org.eclipse.platform.ide</product>
-          <skipTests>true</skipTests>
-        </configuration>
+        <artifactId>tycho-surefire-plugin</artifactId>         <groupId>org.eclipse.tycho</groupId>
+                                                               <version>${tycho.version}</version>
+         <configuration>
+             <useUIHarness>true</useUIHarness>
+             <useUIThread>false</useUIThread>
+             <product>org.eclipse.platform.ide</product>
+             <skipTests>true</skipTests>
+         </configuration>
       </plugin>
+      
       <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.7</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>all-tests-report</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>report-aggregate</goal>
-            </goals>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </execution>
-          <execution>
-            <id>unit-tests-report</id>
-            <phase>test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </execution>
-        </executions>
+         <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
+                                                               <version>0.8.7</version>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>prepare-agent</goal>
+               </goals>
+            </execution>
+            <execution>
+               <id>all-tests-report</id>
+               <phase>verify</phase>
+               <goals>
+                  <goal>report-aggregate</goal>
+               </goals>
+               <configuration>
+                  <skip>true</skip>
+               </configuration>
+            </execution>
+            <execution>
+               <id>unit-tests-report</id>
+               <phase>test</phase>
+               <goals>
+                  <goal>report</goal>
+               </goals>
+               <configuration>
+                  <skip>true</skip>
+               </configuration>
+            </execution>
+         </executions>
       </plugin>
+      
     </plugins>
   </build>
 

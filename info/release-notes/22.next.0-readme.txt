@@ -4,8 +4,6 @@
 TODO's
 ======
 
-* Bundle MT with JRE       
-                  https://github.com/mytourbook/mytourbook/issues/381#issue-971079239
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
                   - Set default graphs in the graph slideout, sorting still needs the pref page
@@ -32,7 +30,9 @@ Experimental
 New
 ===
 
-* 
+* MyTourbook for Windows is bundled with a JRE       
+                           https://github.com/mytourbook/mytourbook/issues/381
+
 
 Improvements
 ============
@@ -41,7 +41,7 @@ Improvements
   - Filter tour pauses
   - Stack tour pauses that they don't overlap
   
-  							https://github.com/mytourbook/mytourbook/issues/428
+  							      https://github.com/mytourbook/mytourbook/issues/428
 
 * 2D Map
   - Filter tour pauses 		https://github.com/mytourbook/mytourbook/issues/428

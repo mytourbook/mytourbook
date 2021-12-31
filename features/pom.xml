@@ -27,6 +27,8 @@
       <module>feature.net.tourbook.ext.rxtx</module>
       <module>feature.net.tourbook.ext.vtm</module>
       <module>feature.net.tourbook.ext.worldwind</module>
+      
+      <module>feature.net.tourbook.jre</module>
    </modules>
 
 </project>
