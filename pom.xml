@@ -87,6 +87,10 @@
          <url>http://download.eclipse.org/nattable/releases/2.0.0/repository</url>
       </repository>   
 
+      <repository>
+         <id>eclipse.4.17.nl</id>                                       <layout>p2</layout>
+         <url>file:build/build.eclipse.4.17.nl.repo</url>
+      </repository>
 
       <!-- 
 
@@ -115,11 +119,10 @@
 
       -->
 
-      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
-
    </repositories>
 
    <build>
+   
       <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
 
 <!-- 

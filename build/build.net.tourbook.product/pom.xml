@@ -19,9 +19,9 @@
 
    <build>
 
-       <finalName>myproduct-${unqualifiedVersion}</finalName>
+      <finalName>myproduct-${unqualifiedVersion}</finalName>
 
-     <plugins>
+      <plugins>
 
          <plugin>
             <artifactId>tycho-p2-director-plugin</artifactId>     <groupId>org.eclipse.tycho</groupId>
@@ -38,14 +38,16 @@
 
             <configuration>
                <products>
+
+                  <!-- 
+                  
+                     MT without JRE
+                   
+                   -->
                   <product>
 
                      <!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
                      <id>net.tourbook.product</id>
-
-                     <!--
-                     <attachId>mytourbook_attachId</attachId>
-                     -->
 
                      <!-- optional parameters -->
                      <rootFolder>mytourbook</rootFolder>
@@ -61,9 +63,34 @@
                         <macosx>MyTourbook.app</macosx>
                      </rootFolders>
                   </product>
+
+                  <!-- 
+                  
+                     MT with embedded JRE
+                   
+                   -->
+                  <product>
+
+                     <!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
+                     <id>net.tourbook.with.jre.product</id>
+
+                     <!-- Is needed for the 2nd product !!! -->
+                     <attachId>net.tourbook.with.jre.product</attachId>
+        
+                     <!-- optional parameters -->
+                     <rootFolder>mytourbook</rootFolder>
+
+                     <archiveFileName>mytourbook-jre-${unqualifiedVersion}</archiveFileName>
+
+                     <!-- macosx adjustment -->
+                     <rootFolders>
+                        <macosx>MyTourbook.app</macosx>
+                     </rootFolders>
+                  </product>
+                  
                </products>
             </configuration>
-           </plugin>
+         </plugin>
 
          <!-- macosx adjustment -->
          <plugin>

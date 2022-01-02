@@ -3,15 +3,15 @@
 #include AddBackslash(SourcePath) + "mytourbook-include-languages.iss"
 
 [Setup]
-AppName              = MyTourbook (64bit)
-AppVerName           = MyTourbook {#AppVersion} (64bit)
+AppName              = MyTourbook with Java Runtime (64bit)
+AppVerName           = MyTourbook with Java Runtime {#AppVersion} (64bit)
 AppVersion           = {#AppVersion}
 AppPublisher         = MyTourbook Contributors
 AppCopyright         = MyTourbook Contributors 2005, {#AppYear}
 AppID                = {{A20227AD-322E-4B3D-B67A-9C1FECF7B4A6}
 
 OutputDir            = {#ProductRoot}{#AppVersion}
-OutputBaseFilename   = mytourbook-{#AppVersion}{#AppSubVersion}-win-setup
+OutputBaseFilename   = mytourbook-with-java-runtime-{#AppVersion}{#AppSubVersion}-win-setup
 
 DefaultGroupName     = MyTourbook
 DefaultDirName       = {pf}\MyTourbook
@@ -34,7 +34,7 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook-jre-{#AppVersion}{#AppSubVersion}-win\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*;              Type: files

@@ -5,9 +5,9 @@
 
    version           ="22.1.0.qualifier" 
 
-   name              ="MyTourbook Product" 
-   id                ="net.tourbook.product" 
-   uid               ="net.tourbook.product" 
+   name              ="MyTourbook Product - With Java Runtime" 
+   id                ="net.tourbook.with.jre.product" 
+   uid               ="net.tourbook.with.jre.product" 
    application       ="net.tourbook.application" 
    
    useFeatures       ="true" 
@@ -107,6 +107,8 @@
       <feature id="feature.net.tourbook.app"                installMode="root"/>
       <feature id="feature.net.tourbook.app.nl"             installMode="root"/>
       <feature id="feature.net.tourbook.app.version"/>
+      
+      <feature id="feature.net.tourbook.jre"                installMode="root"/>      
    </features>
 
    <configurations>
