@@ -6,8 +6,8 @@
    name              ="MyTourbook Product - With Java Runtime" 
    version           ="22.1.0.qualifier" 
 
-   id                ="net.tourbook.prodWithJRE" 
-   uid               ="net.tourbook.prodWithJRE" 
+   id                ="net.tourbook.productWithJRE" 
+   uid               ="net.tourbook.productWithJRE" 
 
    application       ="net.tourbook.appWithJRE" 
    

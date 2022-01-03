@@ -164,8 +164,8 @@ task mt_50_CreateExeFiles {
       
       def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
       
-      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-core-64-create-setup_exe.iss').absolutePath
-      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-core-64-jre-create-setup_exe.iss').absolutePath
+      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
       exec {
       

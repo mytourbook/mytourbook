@@ -6,10 +6,10 @@
    name              ="MyTourbook Product" 
    version           ="22.1.0.qualifier" 
 
-   id                ="net.tourbook.prodNoJRE" 
-   uid               ="net.tourbook.prodNoJRE" 
+   id                ="net.tourbook.productWithoutJRE" 
+   uid               ="net.tourbook.productWithoutJRE" 
 
-   application       ="net.tourbook.appNoJRE" 
+   application       ="net.tourbook.appWithoutJRE" 
    
    useFeatures       ="true" 
    includeLaunchers  ="true"

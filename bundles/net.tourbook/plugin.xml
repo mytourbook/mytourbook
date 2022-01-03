@@ -13,7 +13,7 @@
    <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
    <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
 
-   <extension        point="org.eclipse.core.runtime.applications"   id="appNoJRE">
+   <extension        point="org.eclipse.core.runtime.applications"   id="appWithoutJRE">
       <application>
          <run class="net.tourbook.application.Application"/>
       </application>
@@ -25,9 +25,9 @@
       </application>
    </extension>
 
-   <extension        point="org.eclipse.core.runtime.products"       id="prodNoJRE">
+   <extension        point="org.eclipse.core.runtime.products"       id="productWithoutJRE">
 
-      <product       name="MyTourbook"                application="appNoJRE">
+      <product       name="MyTourbook"                application="appWithoutJRE">
 
          <property   name="appName"                   value="MyTourbook"/>
          <property   name="aboutText"                 value="%Product_about"/>
@@ -40,9 +40,7 @@
       </product>
    </extension>
 
-<!--
--->
-   <extension        point="org.eclipse.core.runtime.products"    id="prodWithJRE">
+   <extension        point="org.eclipse.core.runtime.products"    id="productWithJRE">
 
       <product       name="MyTourbook"                application="appWithJRE">
 
