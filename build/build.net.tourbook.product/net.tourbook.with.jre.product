@@ -3,12 +3,13 @@
 
 <product 
 
+   name              ="MyTourbook Product - With Java Runtime" 
    version           ="22.1.0.qualifier" 
 
-   name              ="MyTourbook Product - With Java Runtime" 
-   id                ="net.tourbook.with.jre.product" 
-   uid               ="net.tourbook.with.jre.product" 
-   application       ="net.tourbook.application" 
+   id                ="net.tourbook.prodWithJRE" 
+   uid               ="net.tourbook.prodWithJRE" 
+
+   application       ="net.tourbook.appWithJRE" 
    
    useFeatures       ="true" 
    includeLaunchers  ="true"

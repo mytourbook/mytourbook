@@ -47,7 +47,7 @@
                   <product>
 
                      <!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
-                     <id>net.tourbook.product</id>
+                     <id>net.tourbook.prodNoJRE</id>
 
                      <!-- optional parameters -->
                      <rootFolder>mytourbook</rootFolder>
@@ -72,9 +72,9 @@
                   <product>
 
                      <!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
-                     <id>net.tourbook.with.jre.product</id>
+                     <id>net.tourbook.prodWithJRE</id>
 
-                     <!-- Is needed for the 2nd product !!! -->
+                     <!-- This is needed for the 2nd product !!! -->
                      <attachId>net.tourbook.with.jre.product</attachId>
         
                      <!-- optional parameters -->
