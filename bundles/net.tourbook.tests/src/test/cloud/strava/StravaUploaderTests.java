@@ -16,6 +16,7 @@
 package cloud.strava;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
@@ -28,6 +29,9 @@ import net.tourbook.cloud.strava.StravaUploader;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -48,10 +52,26 @@ public class StravaUploaderTests {
 
       httpClientMock = new HttpClientMock();
       stravaUploader = new StravaUploader();
+
+      Display.getDefault().addFilter(SWT.Activate, event -> {
+         // Is this a Shell being activated?
+
+         if (event.widget instanceof Shell) {
+            final Shell shell = (Shell) event.widget;
+
+            // Look at the shell title to see if it is the one we want
+
+            if ("Strava Tour Upload Summary".equals(shell.getText())) {
+               // Close the shell after it has finished initializing
+
+               Display.getDefault().asyncExec(shell::close);
+            }
+         }
+      });
    }
 
    @Test
-   void testManualTourUpload() throws IllegalAccessException, NoSuchFieldException {
+   void testTourUpload() throws IllegalAccessException, NoSuchFieldException {
 
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
             + "PasseurResponse.json"); //$NON-NLS-1$
@@ -63,7 +83,8 @@ public class StravaUploaderTests {
             + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
             "https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
-            .doReturn(stravaResponse);
+            .doReturn(stravaResponse)
+            .withStatus(201);
       final Field field = StravaUploader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
@@ -76,6 +97,10 @@ public class StravaUploaderTests {
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());
-      assertEquals("", logs.get(0).toString());
+      assertTrue(logs.get(1).toString().contains(
+            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n"));
    }
+
+   // @Test
+   //void testManualTourUpload() throws IllegalAccessException, NoSuchFieldException {
 }

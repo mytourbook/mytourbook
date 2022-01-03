@@ -30,5 +30,7 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.device.suunto,
  net.tourbook.export,
  org.eclipse.jface.preference,
+ org.eclipse.swt,
+ org.eclipse.swt.widgets,
  org.json
 Automatic-Module-Name: net.tourbook.tests
