@@ -32,6 +32,7 @@ import net.tourbook.tour.TourLogManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -70,8 +71,13 @@ public class StravaUploaderTests {
       });
    }
 
+   @AfterEach
+   public void cleanUpEach() {
+      TourLogManager.clear();
+   }
+
    @Test
-   void testTourUpload() throws IllegalAccessException, NoSuchFieldException {
+   void testManualTourUpload() throws IllegalAccessException, NoSuchFieldException {
 
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
             + "PasseurResponse.json"); //$NON-NLS-1$
@@ -101,6 +107,34 @@ public class StravaUploaderTests {
             "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n"));
    }
 
-   // @Test
-   //void testManualTourUpload() throws IllegalAccessException, NoSuchFieldException {
+   @Test
+   void testTourUpload() throws IllegalAccessException, NoSuchFieldException {
+
+      final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
+            + "PasseurResponse.json"); //$NON-NLS-1$
+      httpClientMock.onPost(
+            OAuth2Constants.HEROKU_APP_URL + "/strava/token") //$NON-NLS-1$
+            .doReturn(passeurResponse)
+            .withStatus(201);
+      final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
+            + "ManualTour-StravaResponse.json"); //$NON-NLS-1$
+      httpClientMock.onPost(
+            "https://www.strava.com/api/v3/activities") //$NON-NLS-1$
+            .doReturn(stravaResponse)
+            .withStatus(201);
+      final Field field = StravaUploader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
+
+      final TourData tour = Initializer.createManualTour();
+
+      final List<TourData> selectedTours = new ArrayList<>();
+      selectedTours.add(tour);
+      stravaUploader.uploadTours(selectedTours);
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertEquals(3, logs.size());
+      assertTrue(logs.get(1).toString().contains(
+            "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"));
+   }
 }

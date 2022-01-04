@@ -132,7 +132,6 @@ public class StravaUploader extends TourbookCloudUploader {
 
          final ObjectMapper mapper = new ObjectMapper();
          try {
-            final String toto = response.body();
             activityUpload = mapper.readValue(response.body(), ActivityUpload.class);
          } catch (final JsonProcessingException e) {
             StatusUtil.log(e);
@@ -338,7 +337,7 @@ public class StravaUploader extends TourbookCloudUploader {
       return StravaManualActivityTypes.stream().filter(
             stravaActivityType -> tourTypeName.toLowerCase().startsWith(stravaActivityType.toLowerCase()))
             .findFirst()
-            .orElse(StravaManualActivityTypes.get(0));
+            .orElse(StravaManualActivityTypes.get(4));
    }
 
    /**
