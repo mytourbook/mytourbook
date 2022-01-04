@@ -42,16 +42,31 @@ import utils.Initializer;
 
 public class StravaUploaderTests {
 
-   private static final String STRAVA_FILE_PATH =
-         FilesUtils.rootPath + "cloud/strava/files/"; //$NON-NLS-1$
+   private static final String HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token";
+
+   private static final String STRAVA_FILE_PATH     =
+         FilesUtils.rootPath + "cloud/strava/files/";
 
    static HttpClientMock       httpClientMock;
    static StravaUploader       stravaUploader;
 
+   private List<TourData>      selectedTours        = new ArrayList<>();
+
    @BeforeAll
-   static void initAll() {
+   static void initAll() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
       httpClientMock = new HttpClientMock();
+      final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
+            + "PasseurResponse.json");
+      httpClientMock.onPost(
+            HEROKU_APP_URL_TOKEN)
+            .doReturn(passeurResponse)
+            .withStatus(201);
+
+      final Field field = StravaUploader.class.getDeclaredField("_httpClient");
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
+
       stravaUploader = new StravaUploader();
 
       Display.getDefault().addFilter(SWT.Activate, event -> {
@@ -74,32 +89,26 @@ public class StravaUploaderTests {
    @AfterEach
    public void cleanUpEach() {
       TourLogManager.clear();
+      selectedTours.clear();
    }
 
    @Test
-   void testManualTourUpload() throws IllegalAccessException, NoSuchFieldException {
+   void testManualTourUpload() {
 
-      final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "PasseurResponse.json"); //$NON-NLS-1$
-      httpClientMock.onPost(
-            OAuth2Constants.HEROKU_APP_URL + "/strava/token") //$NON-NLS-1$
-            .doReturn(passeurResponse)
-            .withStatus(201);
       final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
+            + "LongsPeak-StravaResponse.json");
       httpClientMock.onPost(
-            "https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
+            "https://www.strava.com/api/v3/uploads")
             .doReturn(stravaResponse)
             .withStatus(201);
-      final Field field = StravaUploader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
 
-      final List<TourData> selectedTours = new ArrayList<>();
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
+
+      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().post("https://www.strava.com/api/v3/uploads").called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());
@@ -108,29 +117,22 @@ public class StravaUploaderTests {
    }
 
    @Test
-   void testTourUpload() throws IllegalAccessException, NoSuchFieldException {
+   void testTourUpload() {
 
-      final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "PasseurResponse.json"); //$NON-NLS-1$
-      httpClientMock.onPost(
-            OAuth2Constants.HEROKU_APP_URL + "/strava/token") //$NON-NLS-1$
-            .doReturn(passeurResponse)
-            .withStatus(201);
       final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "ManualTour-StravaResponse.json"); //$NON-NLS-1$
+            + "ManualTour-StravaResponse.json");
       httpClientMock.onPost(
-            "https://www.strava.com/api/v3/activities") //$NON-NLS-1$
+            "https://www.strava.com/api/v3/activities")
             .doReturn(stravaResponse)
             .withStatus(201);
-      final Field field = StravaUploader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
 
       final TourData tour = Initializer.createManualTour();
 
-      final List<TourData> selectedTours = new ArrayList<>();
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
+
+      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().post("https://www.strava.com/api/v3/activities").called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());
