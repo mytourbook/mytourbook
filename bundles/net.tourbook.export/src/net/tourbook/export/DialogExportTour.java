@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -105,14 +105,12 @@ public class DialogExportTour extends TitleAreaDialog {
 
    //$NON-NLS-1$
 
-   private static final int           VERTICAL_SECTION_MARGIN = 10;
-   private static final int           SIZING_TEXT_FIELD_WIDTH = 250;
-   private static final int           COMBO_HISTORY_LENGTH    = 20;
+   private static final int VERTICAL_SECTION_MARGIN = 10;
+   private static final int SIZING_TEXT_FIELD_WIDTH = 250;
+   private static final int COMBO_HISTORY_LENGTH    = 20;
 
-   private static String              _dlgDefaultMessage;
    //
-   private static final DecimalFormat _nf3                    = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-
+   private static final DecimalFormat _nf3 = (DecimalFormat) NumberFormat.getInstance(Locale.US);
    static {
 
       _nf3.setMinimumFractionDigits(1);
@@ -124,6 +122,8 @@ public class DialogExportTour extends TitleAreaDialog {
    public static final String[]      StravaActivityTypes = new String[] {
          "Biking", "Running", "Hiking", "Walking", "Swimming", "Other"                                                                                    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
    };
+
+   private String                    _dlgDefaultMessage;
 
    private final IDialogSettings     _state              = TourbookPlugin
          .getState("DialogExportTour");                                                                                                                   //$NON-NLS-1$
@@ -1340,9 +1340,7 @@ public class DialogExportTour extends TitleAreaDialog {
             /*
              * Fill-up the default activity types
              */
-            for (final String activitType : StravaActivityTypes) {
-               _comboTcxActivityTypes.add(activitType);
-            }
+            Arrays.asList(StravaActivityTypes).forEach(activityType -> _comboTcxActivityTypes.add(activityType));
          } else {
             UI.restoreCombo(_comboTcxActivityTypes, activityTypes);
          }
@@ -1360,7 +1358,9 @@ public class DialogExportTour extends TitleAreaDialog {
       }
 
       // merge all tours
-      if (_isSetup_MultipleTours) {
+      if (_isSetup_MultipleTours)
+
+      {
          _chkMergeAllTours.setSelection(_state.getBoolean(STATE_IS_MERGE_ALL_TOURS));
       }
 

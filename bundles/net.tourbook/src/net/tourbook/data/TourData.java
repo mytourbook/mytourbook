@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -9908,7 +9908,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (serieData.latitude != null) {
 
-         // use exising lat/lon double serie data from older versions
+         // use existing lat/lon double serie data from older versions
          // -> saving the tour will convert them into E6 format
 
          latitudeSerie        = serieData.latitude;
