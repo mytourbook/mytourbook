@@ -59,8 +59,9 @@ Changes
 Bugfix
 ======
 
-* 
-
+* Strava Integration: (Frederic)       
+  - Manually created activities use different activity types than uploaded activities
+    Official activity types list: https://developers.strava.com/docs/reference/#api-models-ActivityType
 
 
 Translation    

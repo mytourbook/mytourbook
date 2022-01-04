@@ -19,6 +19,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
  net.tourbook.cloud.oauth2,
+ net.tourbook.cloud.strava,
  net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,
@@ -29,5 +30,7 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.device.suunto,
  net.tourbook.export,
  org.eclipse.jface.preference,
+ org.eclipse.swt,
+ org.eclipse.swt.widgets,
  org.json
 Automatic-Module-Name: net.tourbook.tests
