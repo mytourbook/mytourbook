@@ -1358,9 +1358,7 @@ public class DialogExportTour extends TitleAreaDialog {
       }
 
       // merge all tours
-      if (_isSetup_MultipleTours)
-
-      {
+      if (_isSetup_MultipleTours) {
          _chkMergeAllTours.setSelection(_state.getBoolean(STATE_IS_MERGE_ALL_TOURS));
       }
 
