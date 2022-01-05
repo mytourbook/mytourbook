@@ -195,7 +195,7 @@ task mt_60_CleanupFiles {
       /*
          Deleting extracted files
       */
-      println 'Deleting extracted files from ' + _dirProductArchive
+      println 'Deleting extracted files'
       
       def hiddenDir = file(_pathProductArchive + '/hidden')
       
@@ -215,7 +215,8 @@ task mt_60_CleanupFiles {
       /*
          Delete JRE files      
       */
-      println 'Deleting JRE files from ' + _dirProductArchive
+      println '' 
+      println 'Deleting JRE files'
       
       file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.zip/) { jreFile->
          
