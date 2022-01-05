@@ -33,7 +33,7 @@ public class DefaultWaypointRenderer implements WaypointRenderer {
 	 * @param waypoint
 	 * @return
 	 */
-	public void paintWaypoint(final GC gc, final Map map, final Waypoint waypoint, final int devPartOffset) {
+	public void paintWaypoint(final GC gc, final Map2 map, final Waypoint waypoint, final int devPartOffset) {
 
 		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 

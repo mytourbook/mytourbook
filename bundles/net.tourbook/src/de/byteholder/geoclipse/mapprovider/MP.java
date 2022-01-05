@@ -18,7 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.ITilePainter;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Mercator;
 import de.byteholder.geoclipse.map.OverlayTourState;
 import de.byteholder.geoclipse.map.Projection;
@@ -147,7 +147,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    // map min/max zoom level
    private int         _minZoomLevel       = 0;
-   private int         _maxZoomLevel       = Map.UI_MAX_ZOOM_LEVEL - Map.UI_MIN_ZOOM_LEVEL;
+   private int         _maxZoomLevel       = Map2.UI_MAX_ZOOM_LEVEL - Map2.UI_MIN_ZOOM_LEVEL;
 
    private int         _defaultZoomLevel   = 0;
 
@@ -427,7 +427,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          _errorImage = new Image(display, tileSize, tileSize);
 
-         final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
+         final Color bgColor = new Color(display, Map2.OSM_BACKGROUND_RGB);
          final GC gc = new GC(getErrorImage());
          {
             gc.setBackground(bgColor);
@@ -451,7 +451,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          _loadingImage = new Image(display, tileSize, tileSize);
 
-         final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
+         final Color bgColor = new Color(display, Map2.OSM_BACKGROUND_RGB);
          final GC gc = new GC(getLoadingImage());
          {
             gc.setBackground(bgColor);

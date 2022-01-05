@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,17 +74,48 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     LOG_CLOUDACTION_END             = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS   = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static final String     StravaBaseUrl                   = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
+   private static final String     StravaBaseUrl                 = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
 
-   private static HttpClient       _httpClient                     = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   private static IPreferenceStore _prefStore                      = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter                   = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+   private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
+   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
-   private static String           CLOUD_UPLOADER_ID               = "Strava";                                                             //$NON-NLS-1$
-   private String                  STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
+   private static String           CLOUD_UPLOADER_ID             = "Strava";                                                             //$NON-NLS-1$
+
+   // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
+   private static final List<String> StravaManualActivityTypes       = List.of(
+         "InlineSkate",                                                                                    //$NON-NLS-1$
+         "Kayaking",                                                                                       //$NON-NLS-1$
+         "Kitesurf",                                                                                       //$NON-NLS-1$
+         "NordicSki",                                                                                      //$NON-NLS-1$
+         "Ride",                                                                                           //$NON-NLS-1$
+         "RockClimbing",                                                                                   //$NON-NLS-1$
+         "RollerSki",                                                                                      //$NON-NLS-1$
+         "Rowing",                                                                                         //$NON-NLS-1$
+         "Run",                                                                                            //$NON-NLS-1$
+         "Sail",                                                                                           //$NON-NLS-1$
+         "Skateboard",                                                                                     //$NON-NLS-1$
+         "Snowboard",                                                                                      //$NON-NLS-1$
+         "Snowshoe",                                                                                       //$NON-NLS-1$
+         "Soccer",                                                                                         //$NON-NLS-1$
+         "StairStepper",                                                                                   //$NON-NLS-1$
+         "StandUpPaddling",                                                                                //$NON-NLS-1$
+         "Surfing",                                                                                        //$NON-NLS-1$
+         "Swim",                                                                                           //$NON-NLS-1$
+         "Velomobile",                                                                                     //$NON-NLS-1$
+         "VirtualRide",                                                                                    //$NON-NLS-1$
+         "VirtualRun",                                                                                     //$NON-NLS-1$
+         "Walk",                                                                                           //$NON-NLS-1$
+         "WeightTraining",                                                                                 //$NON-NLS-1$
+         "Wheelchair",                                                                                     //$NON-NLS-1$
+         "Windsurf",                                                                                       //$NON-NLS-1$
+         "Workout",                                                                                        //$NON-NLS-1$
+         "Yoga");                                                                                          //$NON-NLS-1$
+
+   private String                    STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
 
    public StravaUploader() {
 
@@ -297,6 +328,18 @@ public class StravaUploader extends TourbookCloudUploader {
       return isTourUploaded;
    }
 
+   private String mapTourType(final TourData manualTour) {
+
+      final String tourTypeName = manualTour.getTourType() != null
+            ? manualTour.getTourType().getName().trim()
+            : UI.EMPTY_STRING;
+
+      return StravaManualActivityTypes.stream().filter(
+            stravaActivityType -> tourTypeName.toLowerCase().startsWith(stravaActivityType.toLowerCase()))
+            .findFirst()
+            .orElse(StravaManualActivityTypes.get(4));
+   }
+
    /**
     * Returns the Strava activity name from a given tour type
     *
@@ -341,7 +384,6 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private void processManualTour(final IProgressMonitor monitor,
                                   final TourData tourData,
-                                  final String stravaActivityName,
                                   final Map<TourData, String> manualTours) {
 
       if (StringUtils.isNullOrEmpty(tourData.getTourTitle())) {
@@ -352,6 +394,8 @@ public class StravaUploader extends TourbookCloudUploader {
          monitor.worked(2);
 
       } else {
+
+         final String stravaActivityName = mapTourType(tourData);
 
          manualTours.put(tourData, stravaActivityName);
          monitor.worked(1);
@@ -369,7 +413,6 @@ public class StravaUploader extends TourbookCloudUploader {
             return;
          }
 
-         final String stravaActivityName = DialogExportTour.StravaActivityTypes[0];
          if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
 
             final TourType tourType = tourData.getTourType();
@@ -398,8 +441,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 
-            //TODO FB
-            processManualTour(monitor, tourData, "Rock Climb", manualTours);
+            processManualTour(monitor, tourData, manualTours);
          } else {
 
             createCompressedTcxTourFile(monitor, toursWithTimeSeries, tourData);
@@ -475,7 +517,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final TourData tourData = manualTourToUpload.getKey();
 
       final boolean isTrainerActivity = tourData.getTourType() != null &&
-            tourData.getTourType().getName().equalsIgnoreCase("trainer"); //$NON-NLS-1$
+            tourData.getTourType().getName().trim().equalsIgnoreCase("trainer"); //$NON-NLS-1$
 
       final JSONObject body = new JSONObject();
       body.put("name", tourData.getTourTitle()); //$NON-NLS-1$
@@ -543,7 +585,6 @@ public class StravaUploader extends TourbookCloudUploader {
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
          }
-
       };
 
       try {

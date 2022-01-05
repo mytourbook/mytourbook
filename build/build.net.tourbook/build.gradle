@@ -42,7 +42,7 @@ mt_0_Build.dependsOn(
    'mt_30_CopyProduct',
    'mt_40_ExtractWinFiles',
    'mt_50_CreateExeFiles',
-   'mt_60_CleanupWinFiles',
+   'mt_60_CleanupFiles',
    'mt_70_CopyReleaseNotes',
 )
 
@@ -79,7 +79,7 @@ task mt_20_BuildProduct {
 
    doLast {
 
-      //run: mvn verify -P build-release
+      // run: mvn verify -P build-release
 
       def buildDir = file('../..')
 
@@ -137,10 +137,10 @@ task mt_40_ExtractWinFiles {
 
       file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
 
-         def winZipFileName = winZipFile.name
-         def winZipName = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+         def winZipFileName   = winZipFile.name
+         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
 
-         def outputDir = file(_pathProductArchive + '/' + winZipName)
+         def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
          println '\t' + outputDir
          
@@ -164,14 +164,23 @@ task mt_50_CreateExeFiles {
       
       def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
       
-      def win64SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-64-create-setup_exe.iss').absolutePath
+      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
       exec {
       
-         println '\twin 64'
+         println '\tWin 64'
       
          commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-         args      win64SetupConfigFilename
+         args        configFilename_Win64Setup
+      }
+
+      exec {
+      
+         println '\tWin 64 with Java runtime'
+      
+         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+         args        configFilename_Win64SetupWithJRE
       }
    }
 }
@@ -179,35 +188,41 @@ task mt_50_CreateExeFiles {
 /*
  Cleanup win zip files
 */
-task mt_60_CleanupWinFiles {
+task mt_60_CleanupFiles {
         
    doLast {
        
-      println 'Deleting extracted files from ' + _dirProductArchive
+      /*
+         Deleting extracted files
+      */
+      println 'Deleting extracted files'
       
       def hiddenDir = file(_pathProductArchive + '/hidden')
       
       file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
          
-         def winZipFileName = winZipFile.name
-         def winZipName = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+         def winZipFileName   = winZipFile.name
+         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
          
-         def outputDir = file(_pathProductArchive + '/' + winZipName)
+         def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
-         println '\tdelete\t\t' + outputDir
+         println '\tdelete folder\t\t' + outputDir
          
          // delete extracted files
          outputDir.deleteDir()
+      }
+      
+      /*
+         Delete JRE files      
+      */
+      println '' 
+      println 'Deleting JRE files'
+      
+      file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.zip/) { jreFile->
          
-//         // move zip into hidden folder
-//         hiddenDir.mkdirs()
-//         def hiddenFile = file(hiddenDir.absolutePath + '/' + winZipFileName)
-//         println '\tmove into\t' + hiddenFile 
-//         
-//         // delete old file when available
-//         hiddenFile.delete()
-//         
-//         winZipFile.renameTo(hiddenFile)
+         println '\tdelete file\t\t' + jreFile
+         
+         jreFile.delete()
       }
    }
 }

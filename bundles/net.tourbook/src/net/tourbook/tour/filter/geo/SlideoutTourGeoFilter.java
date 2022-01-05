@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter.geo;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -102,7 +102,7 @@ import org.eclipse.ui.IViewPart;
 /**
  * Slideout with the tour geo filters.
  */
-public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener, IActionResetToDefault {
+public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourViewer, IColorSelectorListener, IActionResetToDefault {
 
    private static final String            COLUMN_CREATED_DATE_TIME   = "createdDateTime";                      //$NON-NLS-1$
    private static final String            COLUMN_FILTER_NAME         = "filterName";                           //$NON-NLS-1$
@@ -332,7 +332,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public Slideout_TourGeoFilter(final ToolItem toolItem) {
+   public SlideoutTourGeoFilter(final ToolItem toolItem) {
 
       super(toolItem.getParent(), _state, new int[] { 700, 200, 700, 200 });
 
@@ -1045,7 +1045,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
          final Map2View map2View = (Map2View) view;
 
-         final Map map = map2View.getMap();
+         final Map2 map = map2View.getMap();
 
          map.disposeTiles();
          map.disposeOverlayImageCache();

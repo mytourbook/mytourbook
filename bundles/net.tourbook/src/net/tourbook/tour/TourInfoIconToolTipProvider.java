@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,8 +79,12 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
     * Is <code>true</code> when the mouse is hovering a hovered location
     */
    private boolean            _isHovered  = false;
-   private int                _xPos;
-   private int                _yPos;
+
+   /**
+    * Icon image position
+    */
+   private int                _xPosIconImage;
+   private int                _yPosIconImage;
 
    public TourInfoIconToolTipProvider() {
 
@@ -89,18 +93,12 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
    public TourInfoIconToolTipProvider(final int xPos, final int yPos) {
 
-      _xPos = xPos;
-      _yPos = yPos;
+      _xPosIconImage = xPos;
+      _yPosIconImage = yPos;
 
       createInfoIcon();
 
-      _tourInfoHoveredAreaContext = new HoveredAreaContext(
-            this,
-            this,
-            xPos,
-            yPos,
-            _tourInfoImageSize.width,
-            _tourInfoImageSize.height);
+      setHoveredAreaContext();
    }
 
    @Override
@@ -162,10 +160,10 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
        */
       final int margin = 5;
 
-      if (devMouseX >= _xPos - margin
-            && devMouseX <= _xPos + _tourInfoImageSize.width + margin
-            && devMouseY >= _yPos - margin
-            && devMouseY <= _yPos + _tourInfoImageSize.height + margin) {
+      if (devMouseX >= _xPosIconImage - margin
+            && devMouseX <= _xPosIconImage + _tourInfoImageSize.width + margin
+            && devMouseY >= _yPosIconImage - margin
+            && devMouseY <= _yPosIconImage + _tourInfoImageSize.height + margin) {
 
          _isHovered = true;
 
@@ -219,7 +217,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
                   : _tourInfoImage_Disabled;
 
       // paint static image
-      gc.drawImage(tourInfoImage, _xPos, _yPos);
+      gc.drawImage(tourInfoImage, _xPosIconImage, _yPosIconImage);
    }
 
    private void resetToolTip() {
@@ -236,6 +234,17 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
     */
    public void setActionsEnabled(final boolean isEnabled) {
       _tourInfoUI.setActionsEnabled(isEnabled);
+   }
+
+   private void setHoveredAreaContext() {
+
+      _tourInfoHoveredAreaContext = new HoveredAreaContext(
+            this,
+            this,
+            _xPosIconImage,
+            _yPosIconImage,
+            _tourInfoImageSize.width,
+            _tourInfoImageSize.height);
    }
 
    @Override
@@ -255,6 +264,14 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
       _isHovered = hoveredContext != null;
 
       return _isHovered;
+   }
+
+   public void setIconPosition(final int tooltipDevX, final int tooltipDevY) {
+
+      _xPosIconImage = tooltipDevX;
+      _yPosIconImage = tooltipDevY;
+
+      setHoveredAreaContext();
    }
 
    /**

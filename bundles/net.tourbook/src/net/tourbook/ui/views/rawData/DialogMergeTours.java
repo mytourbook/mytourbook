@@ -78,20 +78,20 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private static final int       MAX_ADJUST_ALTITUDE_1  = 20;
    private static final int       MAX_ADJUST_ALTITUDE_10 = 40;                                              // x 10
 
-   private static final int       VH_SPACING             = 2;
+   private static final int              VH_SPACING             = 2;
 
-   private final IPreferenceStore _prefStore             = TourbookPlugin.getDefault().getPreferenceStore();
-   private final IDialogSettings  _dialogSettings;
+   private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
 
-   private TourData               _sourceTour;
-   private TourData               _targetTour;
+   private TourData                      _sourceTour;
+   private TourData                      _targetTour;
 
-   private Composite              _dlgContainer;
+   private Composite                     _dlgContainer;
 
-   private TourChart              _tourChart;
-   private TourChartConfiguration _tourChartConfig;
+   private TourChart                     _tourChart;
+   private TourChartConfiguration        _tourChartConfig;
 
-   private PixelConverter         _pc;
+   private PixelConverter                _pc;
 
    /*
     * vertical adjustment options
@@ -222,8 +222,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       _nf.setMinimumFractionDigits(3);
       _nf.setMaximumFractionDigits(3);
-
-      _dialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
    }
 
    private void addPrefListener() {
@@ -1303,14 +1301,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    private void createUITourChart(final Composite dlgContainer) {
 
-      _tourChart = new TourChart(dlgContainer, SWT.BORDER, null, _dialogSettings);
+      _tourChart = new TourChart(dlgContainer, SWT.BORDER, null, _state);
       GridDataFactory.fillDefaults().grab(true, true).minSize(300, 200).applyTo(_tourChart);
 
       _tourChart.setShowZoomActions(true);
       _tourChart.setShowSlider(true);
 
       // set altitude visible
-      _tourChartConfig = new TourChartConfiguration(true);
+      _tourChartConfig = new TourChartConfiguration(true, _state);
 
       // set one visible graph
       int visibleGraph = -1;
@@ -1464,7 +1462,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       // keep window size and position
 //		return null;
-      return _dialogSettings;
+      return _state;
    }
 
    private int getFromUIAltitudeOffset() {

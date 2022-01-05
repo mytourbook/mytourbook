@@ -177,6 +177,11 @@ public class PostSelectionProvider implements IPostSelectionProvider {
       }
    }
 
+   /**
+    * Set selection into the selection provider but do not fire an event.
+    *
+    * @param selection
+    */
    public void setSelectionNoFireEvent(final ISelection selection) {
 
       if (selection == null) {

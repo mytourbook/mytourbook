@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id       ="feature.net.tourbook.jre"
+      label    ="Eclipse Temurin by Adoptium - OpenJDK 11"
+      version  ="11.0.13.qualifier"
+      plugin   ="net.tourbook.branding">
+
+   <description url="https://adoptium.net/">
+      https://adoptium.net/
+   </description>
+
+   <copyright url="https://adoptium.net/">
+      https://adoptium.net/
+   </copyright>
+
+   <license url="https://adoptium.net/">
+      https://adoptium.net/
+   </license>
+
+   <url>
+      <update label="MyTourbook Update Site" url="https://mytourbook.sourceforge.io/updates/"/>
+   </url>
+
+</feature>

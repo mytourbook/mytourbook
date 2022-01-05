@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour data editor options.
  */
-public class Slideout_TourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
@@ -64,7 +64,7 @@ public class Slideout_TourEditor_Options extends ToolbarSlideout implements ICol
 
    private int       _hintValueFieldWidth;
 
-   public Slideout_TourEditor_Options(final Control ownerControl,
+   public SlideoutTourEditor_Options(final Control ownerControl,
                                       final ToolBar toolBar,
                                       final IDialogSettings state,
                                       final TourDataEditorView tourEditorView) {

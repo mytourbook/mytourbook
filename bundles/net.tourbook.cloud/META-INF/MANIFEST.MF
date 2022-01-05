@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Connectivity to cloud applications
 Bundle-SymbolicName: net.tourbook.cloud;singleton:=true
-Bundle-Version: 21.12.1.qualifier
+Bundle-Version: 22.1.0.qualifier
 Bundle-Activator: net.tourbook.cloud.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
@@ -44,4 +44,5 @@ Import-Package: com.fasterxml.jackson.core,
  org.apache.http.util,
  org.json
 Automatic-Module-Name: net.tourbook.cloud
-Export-Package: net.tourbook.cloud.oauth2
+Export-Package: net.tourbook.cloud.oauth2,
+ net.tourbook.cloud.strava

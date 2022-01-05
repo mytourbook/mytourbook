@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.application;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.PrefPageGeneral;
 import net.tourbook.tour.TourManager;
@@ -32,26 +33,27 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-   private static final String SYS_PROP__SET_ALL_VIEWS_CLOSABLE = "setAllViewsClosable";                                       //$NON-NLS-1$
+   private static final String SYS_PROP__SET_ALL_VIEWS_CLOSABLE = "setAllViewsClosable";                               //$NON-NLS-1$
 
    /**
-    * When <code>true</code> then all views will be set closable in workbench.xmi
+    * When <code>false</code> then all views will not be set closable in workbench.xmi
     * <p>
     * Sometimes the attribute "closeable=true" for views do disappear and a view cannot be closed
     * anymore with the mouse.
     * <p>
-    * Commandline parameter: <code>-DsetAllViewsClosable</code>
+    * Commandline parameter: <code>-DsetAllViewsClosable=false</code>
     */
-   private static boolean      IS_SET_ALL_VIEWS_CLOSABLE        = System.getProperty(SYS_PROP__SET_ALL_VIEWS_CLOSABLE) != null;
+   private static String       SET_ALL_VIEWS_CLOSABLE           = System.getProperty(SYS_PROP__SET_ALL_VIEWS_CLOSABLE);
+   private static boolean      IS_SET_ALL_VIEWS_CLOSABLE        = UI.FALSE.equals(SET_ALL_VIEWS_CLOSABLE) == false;
 
    static {
 
-      if (IS_SET_ALL_VIEWS_CLOSABLE) {
-
-         Util.logSystemProperty_IsEnabled(ApplicationWorkbenchAdvisor.class,
-               SYS_PROP__SET_ALL_VIEWS_CLOSABLE,
-               "All views will be set closeable=\"true\" in workbench.xmi when the app closes"); //$NON-NLS-1$
-      }
+      Util.logSystemProperty_Value(ApplicationWorkbenchAdvisor.class,
+            SYS_PROP__SET_ALL_VIEWS_CLOSABLE,
+            SET_ALL_VIEWS_CLOSABLE,
+            String.format(
+                  "When \"false\" then all views will not be set closeable=\"true\" in workbench.xmi when the app closes, recognized value: \"%s\"", //$NON-NLS-1$
+                  Boolean.toString(IS_SET_ALL_VIEWS_CLOSABLE)));
    }
 
    @Override

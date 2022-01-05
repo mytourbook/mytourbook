@@ -13,33 +13,46 @@
    <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
    <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
 
-   <extension
-         id="application"
-         point="org.eclipse.core.runtime.applications">
-
+   <extension        point="org.eclipse.core.runtime.applications"   id="net.tourbook.appWithoutJRE">
       <application>
-         <run
-               class="net.tourbook.application.Application">
-         </run>
+         <run class="net.tourbook.application.Application"/>
       </application>
-
    </extension>
 
+   <extension        point="org.eclipse.core.runtime.applications"   id="net.tourbook.appWithJRE">
+      <application>
+         <run class="net.tourbook.application.Application"/>
+      </application>
+   </extension>
 
-   <extension        point="org.eclipse.core.runtime.products"    id="product">
+   <extension        point="org.eclipse.core.runtime.products"       id="productWithoutJRE">
 
-      <product       name="MyTourbook"                application="net.tourbook.application">
+      <product       name="MyTourbook"                application="net.tourbook.appWithoutJRE">
 
-         <property   name="windowImages"              value="icons/application/tourbook16.png,icons/application/tourbook32.png,icons/application/tourbook48.png,icons/application/tourbook64.png,icons/application/tourbook128.png"/>
+         <property   name="appName"                   value="MyTourbook"/>
          <property   name="aboutText"                 value="%Product_about"/>
          <property   name="aboutImage"                value="icons/application/tourbook-about.png"/>
-         <property   name="appName"                   value="MyTourbook"/>
+         <property   name="windowImages"              value="icons/application/tourbook16.png,icons/application/tourbook32.png,icons/application/tourbook48.png,icons/application/tourbook64.png,icons/application/tourbook128.png"/>
          
          <property   name="preferenceCustomization"   value="plugin_customization.ini"/>
          <property   name="lifeCycleURI"              value="bundleclass://net.tourbook/net.tourbook.application.LifeCycleManager"/>
          
       </product>
+   </extension>
 
+   <extension        point="org.eclipse.core.runtime.products"    id="productWithJRE">
+
+      <product       name="MyTourbook"                application="net.tourbook.appWithJRE">
+
+         <property   name="appName"                   value="MyTourbook"/>
+         <property   name="aboutText"                 value="%Product_about"/>
+         <property   name="aboutImage"                value="icons/application/tourbook-about.png"/>
+         <property   name="windowImages"              value="icons/application/tourbook16.png,icons/application/tourbook32.png,icons/application/tourbook48.png,icons/application/tourbook64.png,icons/application/tourbook128.png"/>
+         
+         <property   name="preferenceCustomization"   value="plugin_customization.ini"/>
+         <property   name="lifeCycleURI"              value="bundleclass://net.tourbook/net.tourbook.application.LifeCycleManager"/>
+         
+      </product>
    </extension>
 
 

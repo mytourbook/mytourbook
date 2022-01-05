@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,30 +40,32 @@ import org.eclipse.swt.graphics.Point;
  */
 public class TourGeoFilter {
 
-   String             id         = Long.toString(System.nanoTime());
+   private static final char NL         = UI.NEW_LINE;
 
-   public GeoPosition geoLocation_TopLeft;
-   public GeoPosition geoLocation_BottomRight;
-   public GeoPosition geoParts_TopLeft;
-   public GeoPosition geoParts_BottomRight;
+   String                    id         = Long.toString(System.nanoTime());
 
-   public Point       geoLocation_TopLeft_E2;
-   public Point       geoLocation_BottomRight_E2;
-   public Point       geoParts_TopLeft_E2;
-   public Point       geoParts_BottomRight_E2;
+   public GeoPosition        geoLocation_TopLeft;
+   public GeoPosition        geoLocation_BottomRight;
+   public GeoPosition        geoParts_TopLeft;
+   public GeoPosition        geoParts_BottomRight;
 
-   public int         mapZoomLevel;
-   public GeoPosition mapGeoCenter;
+   public Point              geoLocation_TopLeft_E2;
+   public Point              geoLocation_BottomRight_E2;
+   public Point              geoParts_TopLeft_E2;
+   public Point              geoParts_BottomRight_E2;
 
-   String             filterName = UI.EMPTY_STRING;
-   ZonedDateTime      created;
-   long               createdMS;
+   public int                mapZoomLevel;
+   public GeoPosition        mapGeoCenter;
 
-   int                geoParts_Width;
-   int                geoParts_Height;
-   int                numGeoParts;
+   String                    filterName = UI.EMPTY_STRING;
+   ZonedDateTime             created;
+   long                      createdMS;
 
-   public MapGridData mapGridData;
+   int                       geoParts_Width;
+   int                       geoParts_Height;
+   int                       numGeoParts;
+
+   public MapGridData        mapGridData;
 
    public TourGeoFilter() {}
 
@@ -138,28 +140,28 @@ public class TourGeoFilter {
 
             + "[\n" //$NON-NLS-1$
 
-            + "geoLocation_TopLeft           =" + geoLocation_TopLeft + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoLocation_BottomRight       =" + geoLocation_BottomRight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoParts_TopLeft              =" + geoParts_TopLeft + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoParts_BottomRight          =" + geoParts_BottomRight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoLocation_TopLeft           =" + geoLocation_TopLeft + NL //$NON-NLS-1$
+            + "geoLocation_BottomRight       =" + geoLocation_BottomRight + NL //$NON-NLS-1$
+            + "geoParts_TopLeft              =" + geoParts_TopLeft + NL //$NON-NLS-1$
+            + "geoParts_BottomRight          =" + geoParts_BottomRight + NL //$NON-NLS-1$
 
-            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoLocation_TopLeft_E2        =" + geoLocation_TopLeft_E2 + NL //$NON-NLS-1$
+            + "geoLocation_BottomRight_E2    =" + geoLocation_BottomRight_E2 + NL //$NON-NLS-1$
+            + "geoParts_TopLeft_E2           =" + geoParts_TopLeft_E2 + NL //$NON-NLS-1$
+            + "geoParts_BottomRight_E2       =" + geoParts_BottomRight_E2 + NL //$NON-NLS-1$
 
-            + "geoParts_Width       =" + geoParts_Width + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoParts_Height      =" + geoParts_Height + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "numGeoParts          =" + numGeoParts + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoParts_Width       =" + geoParts_Width + NL //$NON-NLS-1$
+            + "geoParts_Height      =" + geoParts_Height + NL //$NON-NLS-1$
+            + "numGeoParts          =" + numGeoParts + NL //$NON-NLS-1$
 
-//            + "mapZoomLevel         =" + mapZoomLevel + "\n"
-//            + "mapGeoCenter         =" + mapGeoCenter + "\n"
+            + "mapZoomLevel         =" + mapZoomLevel + NL //$NON-NLS-1$
+            + "mapGeoCenter         =" + mapGeoCenter + NL //$NON-NLS-1$
 //
-//            + "id                   =" + id + "\n"
-//            + "created              =" + created + "\n"
-//            + "createdMS            =" + createdMS + "\n"
+//            + "id                   =" + id + NL
+//            + "created              =" + created + NL
+//            + "createdMS            =" + createdMS + NL
 
-            + "mapGridData          =" + mapGridData + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "mapGridData          =" + mapGridData + NL //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }
