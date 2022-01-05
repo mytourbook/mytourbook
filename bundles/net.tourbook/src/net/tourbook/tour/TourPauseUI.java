@@ -231,19 +231,20 @@ public class TourPauseUI implements IColorSelectorListener {
          }
          {
             /*
-             * Pauses Filter: Auto pause
+             * Pauses Filter: Show auto pause
              */
             _chkIsShow_AutoPauses = new Button(container, SWT.CHECK);
-            _chkIsShow_AutoPauses.setText(Messages.Tour_Pauses_Checkbox_AutoPauses);
+            _chkIsShow_AutoPauses.setText(Messages.Tour_Pauses_Checkbox_ShowAutoPauses);
             _chkIsShow_AutoPauses.addSelectionListener(_defaultSelectionListener);
             _firstColoumLayoutData.span(2, 1).applyTo(_chkIsShow_AutoPauses);
          }
          {
             /*
-             * Pauses Filter: User started/stopped
+             * Pauses Filter: Show pauses started/stopped by the user
              */
             _chkIsShow_UserPauses = new Button(container, SWT.CHECK);
-            _chkIsShow_UserPauses.setText(Messages.Tour_Pauses_Checkbox_UserPauses);
+            _chkIsShow_UserPauses.setText(Messages.Tour_Pauses_Checkbox_ShowUserPauses);
+            _chkIsShow_UserPauses.setToolTipText(Messages.Tour_Pauses_Checkbox_ShowUserPauses_Tooltip);
             _chkIsShow_UserPauses.addSelectionListener(_defaultSelectionListener);
             _firstColoumLayoutData.span(2, 1).applyTo(_chkIsShow_UserPauses);
          }

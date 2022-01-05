@@ -2827,12 +2827,13 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
 
-   public static String        Tour_Pauses_Checkbox_AutoPauses;
    public static String        Tour_Pauses_Checkbox_Duration_Hours;
    public static String        Tour_Pauses_Checkbox_Duration_Minutes;
    public static String        Tour_Pauses_Checkbox_Duration_Seconds;
    public static String        Tour_Pauses_Checkbox_PauseDurationFilter;
-   public static String        Tour_Pauses_Checkbox_UserPauses;
+   public static String        Tour_Pauses_Checkbox_ShowAutoPauses;
+   public static String        Tour_Pauses_Checkbox_ShowUserPauses;
+   public static String        Tour_Pauses_Checkbox_ShowUserPauses_Tooltip;
    public static String        Tour_Pauses_Checkbox_TourPauseFilter;
 
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
