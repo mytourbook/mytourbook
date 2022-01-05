@@ -137,6 +137,13 @@ public class MapTourBreadcrumb {
       final int numNewTours = allTourData.size();
       final int numTourCrumbs = _allCrumbsWithAllTours.size();
 
+      if (numTourCrumbs == 0 && numNewTours <= 1) {
+
+         // do not add one single tour to an empty crumb bar
+
+         return;
+      }
+
       int numPreviousTours = -1;
 
       if (numTourCrumbs > 0) {
