@@ -71,7 +71,7 @@ public class MapTourBreadcrumb {
 
    private Font                       _boldFont                      = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-   private Map2                        _map;
+   private Map2                       _map;
 
    public MapTourBreadcrumb(final Map2 map) {
 
@@ -85,25 +85,33 @@ public class MapTourBreadcrumb {
     */
    public void addBreadcrumTour(final Long tourId) {
 
-      Long lastCrumbTour = null;
-      ArrayList<Long> allLastCrumbTours = null;
-
       final int numTourCrumbs = _allCrumbsWithAllTours.size();
+
+      if (numTourCrumbs == 0) {
+
+         // do not add one single tour to an empty crumb bar
+
+         return;
+      }
+
+      Long tourIdInLastCrumb = null;
+      ArrayList<Long> allToursInLastCrumb = null;
+
       if (numTourCrumbs > 0) {
 
-         allLastCrumbTours = _allCrumbsWithAllTours.get(numTourCrumbs - 1);
+         allToursInLastCrumb = _allCrumbsWithAllTours.get(numTourCrumbs - 1);
 
-         if (allLastCrumbTours.size() == 1) {
-            lastCrumbTour = allLastCrumbTours.get(0);
+         if (allToursInLastCrumb.size() == 1) {
+            tourIdInLastCrumb = allToursInLastCrumb.get(0);
          }
       }
 
-      if (lastCrumbTour != null) {
+      if (tourIdInLastCrumb != null) {
 
          // replace last tour with current tour
 
-         allLastCrumbTours.clear();
-         allLastCrumbTours.add(tourId);
+         allToursInLastCrumb.clear();
+         allToursInLastCrumb.add(tourId);
 
       } else {
 
