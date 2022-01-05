@@ -90,33 +90,6 @@
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
       <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
-      <!-- 
-
-      Eclipse local repositories downloaded from https://download.eclipse.org/eclipse/downloads/
-      do not work anymore
-
-      <repository>
-         <id>eclipse.platform.4.10</id>                                  <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.platform-4.10.zip!/</url>
-      </repository>
-
-      <repository>
-         <id>eclipse.rcp.4.10</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.rcp-4.10.zip!/</url>
-      </repository>
-
-      <repository>
-         <id>eclipse.jdt.4.10</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.jdt-4.10.zip!/</url>
-      </repository>
-
-      <repository>
-         <id>eclipse.pde.4.10</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.pde-4.10.zip!/</url>
-      </repository>
-
-      -->
-
    </repositories>
 
    <build>
