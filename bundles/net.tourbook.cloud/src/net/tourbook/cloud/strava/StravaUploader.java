@@ -521,7 +521,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final JSONObject body = new JSONObject();
       body.put("name", tourData.getTourTitle()); //$NON-NLS-1$
-      body.put("type", "Run"); //$NON-NLS-1$
+      body.put("type", manualTourToUpload.getValue()); //$NON-NLS-1$
       body.put("start_date_local", tourData.getTourStartTime().format(DateTimeFormatter.ISO_DATE_TIME)); //$NON-NLS-1$
       body.put("elapsed_time", tourData.getTourDeviceTime_Elapsed()); //$NON-NLS-1$
       body.put("distance", tourData.getTourDistance()); //$NON-NLS-1$
