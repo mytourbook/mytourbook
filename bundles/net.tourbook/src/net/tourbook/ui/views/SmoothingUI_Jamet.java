@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -399,7 +399,7 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             WEB.openUrl(
                   //
-                  // the url MUST be split otherwise the messages editor will truncate the url
+                  // the URL MUST be split otherwise the messages editor will truncate it
                   //
                   Messages.External_Link_MyTourbook + Messages.External_Link_MyTourbook_TourChartSmoothing);
          }));
