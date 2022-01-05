@@ -51,6 +51,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -73,10 +74,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    //TODO FB shouldn't the elapsed time of the target tour be equal to the target
    // time of the source tour is the speed is merged ?
 
-   private static final int       MAX_ADJUST_SECONDS     = 120;
-   private static final int       MAX_ADJUST_MINUTES     = 120;                                             // x 60
-   private static final int       MAX_ADJUST_ALTITUDE_1  = 20;
-   private static final int       MAX_ADJUST_ALTITUDE_10 = 40;                                              // x 10
+   private static final int              MAX_ADJUST_SECONDS     = 120;
+   private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
+   private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
+   private static final int              MAX_ADJUST_ALTITUDE_10 = 40;                                                                       // x 10
 
    private static final int              VH_SPACING             = 2;
 
@@ -159,35 +160,35 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    /*
     * backup data
     */
-   private int[]                                          _backupSourceTimeSerie;
-   private float[]                                        _backupSourceDistanceSerie;
-   private float[]                                        _backupSourceAltitudeSerie;
-   private float[]                                        _backupSourceSpeedSerie;
+   private int[]                         _backupSourceTimeSerie;
+   private float[]                       _backupSourceDistanceSerie;
+   private float[]                       _backupSourceAltitudeSerie;
+   private float[]                       _backupSourceSpeedSerie;
 
-   private TourType                                       _backupSourceTourType;
+   private TourType                      _backupSourceTourType;
 
-   private float[]                                        _backupTargetPulseSerie;
-   private float[]                                        _backupTargetTemperatureSerie;
-   private int[]                                          _backupTargetTimeSerie;
-   private float[]                                        _backupTargetCadenceSerie;
+   private float[]                       _backupTargetPulseSerie;
+   private float[]                       _backupTargetTemperatureSerie;
+   private int[]                         _backupTargetTimeSerie;
+   private float[]                       _backupTargetCadenceSerie;
 
-   private int                                            _backupTargetTimeOffset;
-   private int                                            _backupTargetAltitudeOffset;
+   private int                           _backupTargetTimeOffset;
+   private int                           _backupTargetAltitudeOffset;
 
-   private ActionOpenPrefDialog                           _actionOpenTourTypePrefs;
+   private ActionOpenPrefDialog          _actionOpenTourTypePrefs;
 
-   private final NumberFormat                             _nf          = NumberFormat.getNumberInstance();
+   private final NumberFormat            _nf          = NumberFormat.getNumberInstance();
 
-   private final Image                                    _iconPlaceholder;
-   private final HashMap<Integer, Image>                  _graphImages = new HashMap<>();
+   private final Image                   _iconPlaceholder;
+   private final HashMap<Integer, Image> _graphImages = new HashMap<>();
 
-   private final int                                      _tourStartTimeSynchOffset;
-   private int                                            _tourTimeOffsetBackup;
+   private final int                     _tourStartTimeSynchOffset;
+   private int                           _tourTimeOffsetBackup;
 
-   private boolean                                        _isAdjustAltiFromSourceBackup;
-   private boolean                                        _isAdjustAltiFromStartBackup;
+   private boolean                       _isAdjustAltiFromSourceBackup;
+   private boolean                       _isAdjustAltiFromStartBackup;
 
-   private org.eclipse.jface.util.IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener;
 
    /**
     * @param parentShell
@@ -1503,6 +1504,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    }
 
    private boolean isLinearInterpolation() {
+
       return _chkAdjustAltiFromSource.getSelection()
             && _chkAdjustAltiSmoothly.getSelection();
    }
@@ -1517,6 +1519,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
                                    final float x3,
                                    final float y1,
                                    final float y3) {
+
       final float xDiff = x3 - x1;
 
       final float interpolatedValue = xDiff == 0 ? y1 : (x2 - x1) * (y3 - y1) / xDiff + y1;
