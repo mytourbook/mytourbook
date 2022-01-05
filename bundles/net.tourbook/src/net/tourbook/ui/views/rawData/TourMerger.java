@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
+import java.util.Arrays;
+
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 
 public class TourMerger {
@@ -27,6 +30,17 @@ public class TourMerger {
    private boolean  mergePulse;
    private boolean  mergeSpeed;
    private boolean  mergeTemperature;
+   private boolean  adjustAltiFromStart;
+   private boolean  adjustAltiFromSource;
+   private boolean  adjustAltiSmoothly;
+   private float[]  _backupTargetPulseSerie;
+   private int[]    _backupTargetTimeSerie;
+   private float[]  _backupSourceSpeedSerie;
+   private float[]  _backupTargetTemperatureSerie;
+   private float[]  _backupTargetCadenceSerie;
+   private int      _tourChart_LeftSliderValueIndex;
+   private boolean  _synchStartTime;
+   private int      _tourStartTimeSynchOffset;
 
    public TourMerger(final TourData sourceTour, final TourData targetTour) {
 
@@ -35,59 +49,57 @@ public class TourMerger {
 
    }
 
+   private void assignMergedSeries(final float[] newSourceAltitudeSerie,
+                                   final float[] newSourceAltiDiffSerie,
+                                   final float[] newTargetPulseSerie,
+                                   final float[] newTargetTemperatureSerie,
+                                   final float[] newTargetCadenceSerie,
+                                   final int[] targetTimeSerie) {
 
+      // check if the data series are available
+      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
+      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
 
-//   private void assignMergedSeries(final float[] newSourceAltitudeSerie,
-//                                   final float[] newSourceAltiDiffSerie,
-//                                   final float[] newTargetPulseSerie,
-//                                   final float[] newTargetTemperatureSerie,
-//                                   final float[] newTargetCadenceSerie,
-//                                   final int[] targetTimeSerie) {
-//
-//      // check if the data series are available
-//      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
-//      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
-//
-//      _sourceTour.dataSerieAdjustedAlti = null;
-//
-//      if (isSourceAltitude) {
-//         _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
-//      } else {
-//         _sourceTour.dataSerie2ndAlti = null;
-//      }
-//
-//      if (isSourceAltitude && isTargetAltitude) {
-//         _sourceTour.dataSerieDiffTo2ndAlti = newSourceAltiDiffSerie;
-//      } else {
-//         _sourceTour.dataSerieDiffTo2ndAlti = null;
-//      }
-//
-//      if (mergePulse) {
-//         _targetTour.pulseSerie = newTargetPulseSerie;
-//      } else {
-//         _targetTour.pulseSerie = _backupTargetPulseSerie;
-//      }
-//
-//      if (mergeSpeed) {
-//         _targetTour.timeSerie = targetTimeSerie;
-//         _targetTour.setSpeedSerie(null);
-//      } else {
-//         _targetTour.timeSerie = _backupTargetTimeSerie;
-//         _targetTour.setSpeedSerie(_backupSourceSpeedSerie);
-//      }
-//
-//      if (_chkMergeTemperature.getSelection()) {
-//         _targetTour.temperatureSerie = newTargetTemperatureSerie;
-//      } else {
-//         _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
-//      }
-//
-//      if (_chkMergeCadence.getSelection()) {
-//         _targetTour.setCadenceSerie(newTargetCadenceSerie);
-//      } else {
-//         _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
-//      }
-//   }
+      _sourceTour.dataSerieAdjustedAlti = null;
+
+      if (isSourceAltitude) {
+         _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
+      } else {
+         _sourceTour.dataSerie2ndAlti = null;
+      }
+
+      if (isSourceAltitude && isTargetAltitude) {
+         _sourceTour.dataSerieDiffTo2ndAlti = newSourceAltiDiffSerie;
+      } else {
+         _sourceTour.dataSerieDiffTo2ndAlti = null;
+      }
+
+      if (mergePulse) {
+         _targetTour.pulseSerie = newTargetPulseSerie;
+      } else {
+         _targetTour.pulseSerie = _backupTargetPulseSerie;
+      }
+
+      if (mergeSpeed) {
+         _targetTour.timeSerie = targetTimeSerie;
+         _targetTour.setSpeedSerie(null);
+      } else {
+         _targetTour.timeSerie = _backupTargetTimeSerie;
+         _targetTour.setSpeedSerie(_backupSourceSpeedSerie);
+      }
+
+      if (mergeTemperature) {
+         _targetTour.temperatureSerie = newTargetTemperatureSerie;
+      } else {
+         _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
+      }
+
+      if (mergeCadence) {
+         _targetTour.setCadenceSerie(newTargetCadenceSerie);
+      } else {
+         _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
+      }
+   }
 
    private void assignTargetSeriesValue(final float[] newTargetPulseSerie,
                                         final float[] newTargetTemperatureSerie,
@@ -120,247 +132,246 @@ public class TourMerger {
       return sourceIndex;
    }
 
+   private float[] computeAdjustedAltitude(final int[] targetTimeSerie,
+                                           final float[] newSourceAltitudeSerie,
+                                           final float[] newSourceAltiDiffSerie) {
 
+      final float[] targetDistanceSerie = _targetTour.distanceSerie;
 
-//   private float[] computeAdjustedAltitude(final int[] targetTimeSerie,
-//                                           final float[] newSourceAltitudeSerie,
-//                                           final float[] newSourceAltiDiffSerie) {
-//
-//      final float[] targetDistanceSerie = _targetTour.distanceSerie;
-//
-//      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
-//      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
-//      final boolean isTargetDistance = targetDistanceSerie != null;
-//
-//      final float[] altitudeDifferences = new float[2];
-//      if (!isSourceAltitude || !isTargetAltitude || !isTargetDistance) {
-//         return altitudeDifferences;
-//      }
-//
-//      final int serieLength = targetTimeSerie.length;
-//
-//      if (_chkAdjustAltiFromStart.getSelection()) {
-//
-//         /*
-//          * adjust start altitude until left slider
-//          */
-//
-//         final float[] adjustedTargetAltitudeSerie = new float[serieLength];
-//
-//         float startAltiDiff = newSourceAltiDiffSerie[0];
-//         final int endIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
-//         final float distanceDiff = targetDistanceSerie[endIndex];
-//
-//         final float[] altitudeSerie = _targetTour.altitudeSerie;
-//
-//         for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-//
-//            if (serieIndex < endIndex) {
-//
-//               // add adjusted altitude
-//
-//               final float targetDistance = targetDistanceSerie[serieIndex];
-//               final float distanceScale = 1 - targetDistance / distanceDiff;
-//
-//               final float adjustedAltiDiff = startAltiDiff * distanceScale;
-//               final float newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
-//
-//               adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
-//               newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
-//
-//            } else {
-//
-//               // add altitude which are not adjusted
-//
-//               adjustedTargetAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
-//            }
-//         }
-//
-//         _sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
-//
-//         startAltiDiff /= UI.UNIT_VALUE_ELEVATION;
-//
-//         final int targetEndTime = targetTimeSerie[endIndex];
-//         final float targetEndDistance = targetDistanceSerie[endIndex];
-//
-//         // meter/min
-//         altitudeDifferences[0] = targetEndTime == 0 ? //
-//               0f
-//               : startAltiDiff / targetEndTime * 60;
-//
-//         // meter/meter
-//         altitudeDifferences[1] = targetEndDistance == 0 ? //
-//               0f
-//               : ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
-//
-//      } else if (_chkAdjustAltiFromSource.getSelection()) {
-//
-//         /*
-//          * adjust target altitude from source altitude
-//          */
-//         _sourceTour.dataSerieAdjustedAlti = Arrays.copyOf(newSourceAltitudeSerie, serieLength);
-//      }
-//
-//      return altitudeDifferences;
-//   }
+      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
+      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
+      final boolean isTargetDistance = targetDistanceSerie != null;
 
-//   private void computeMergedData() {
-//
-//      final int serieLength = _targetTour.timeSerie.length;
-//      final float[] newSourceAltitudeSerie = new float[serieLength];
-//      final float[] newSourceAltiDiffSerie = new float[serieLength];
-//
-//      final float[] newTargetPulseSerie = new float[serieLength];
-//      final float[] newTargetTemperatureSerie = new float[serieLength];
-//      final float[] newTargetCadenceSerie = new float[serieLength];
-//
-//      final int[] targetTimeSerie = mergeSpeed();
-//
-//      int xMergeOffset = _targetTour.getMergedTourTimeOffset();
-//      if (_chkSynchStartTime.getSelection()) {
-//
-//         // synchronize start time
-//         xMergeOffset = _tourStartTimeSynchOffset;
-//      }
-//
-//      createNewTimeAndDistanceSerie(xMergeOffset,
-//            newSourceAltitudeSerie,
-//            newSourceAltiDiffSerie,
-//            newTargetPulseSerie,
-//            newTargetTemperatureSerie,
-//            newTargetCadenceSerie,
-//            targetTimeSerie);
-//
-//      assignMergedSeries(newSourceAltitudeSerie,
-//            newSourceAltiDiffSerie,
-//            newTargetPulseSerie,
-//            newTargetTemperatureSerie,
-//            newTargetCadenceSerie,
-//            targetTimeSerie);
-//
-//      final float[] altitudeDifferences = computeAdjustedAltitude(targetTimeSerie,
-//            newSourceAltitudeSerie,
-//            newSourceAltiDiffSerie);
-//
-//      updateUI(altitudeDifferences[0], altitudeDifferences[1]);
-//   }
-//
-//   private float computeNewSourceAltitude(final float sourceAlti,
-//                                          final float previousSourceAltitude,
-//                                          final int previousSourceTime,
-//                                          final int sourceTime,
-//                                          final int targetTime) {
-//
-//      float newSourceAltitude;
-//
-//      if (isLinearInterpolation()) {
-//
-//         newSourceAltitude = linearInterpolate(
-//               previousSourceTime,
-//               targetTime,
-//               sourceTime,
-//               previousSourceAltitude,
-//               sourceAlti);
-//
-//      } else {
-//
-//         /*
-//          * the interpolated altitude is not exact above the none interpolate altitude, it is
-//          * in the middle of the previous and current altitude
-//          */
-//         // newSourceAltitude = sourceAlti;
-//         newSourceAltitude = previousSourceAltitude;
-//      }
-//
-//      return newSourceAltitude;
-//   }
+      final float[] altitudeDifferences = new float[2];
+      if (!isSourceAltitude || !isTargetAltitude || !isTargetDistance) {
+         return altitudeDifferences;
+      }
 
+      final int serieLength = targetTimeSerie.length;
+
+      if (adjustAltiFromStart) {
+
+         /*
+          * adjust start altitude until left slider
+          */
+
+         final float[] adjustedTargetAltitudeSerie = new float[serieLength];
+
+         float startAltiDiff = newSourceAltiDiffSerie[0];
+         final int endIndex = _tourChart_LeftSliderValueIndex;
+         final float distanceDiff = targetDistanceSerie[endIndex];
+
+         final float[] altitudeSerie = _targetTour.altitudeSerie;
+
+         for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+            if (serieIndex < endIndex) {
+
+               // add adjusted altitude
+
+               final float targetDistance = targetDistanceSerie[serieIndex];
+               final float distanceScale = 1 - targetDistance / distanceDiff;
+
+               final float adjustedAltiDiff = startAltiDiff * distanceScale;
+               final float newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
+
+               adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
+               newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
+
+            } else {
+
+               // add altitude which are not adjusted
+
+               adjustedTargetAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
+            }
+         }
+
+         _sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
+
+         startAltiDiff /= UI.UNIT_VALUE_ELEVATION;
+
+         final int targetEndTime = targetTimeSerie[endIndex];
+         final float targetEndDistance = targetDistanceSerie[endIndex];
+
+         // meter/min
+         altitudeDifferences[0] = targetEndTime == 0 ? //
+               0f
+               : startAltiDiff / targetEndTime * 60;
+
+         // meter/meter
+         altitudeDifferences[1] = targetEndDistance == 0 ? //
+               0f
+               : ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
+
+      } else if (adjustAltiFromSource) {
+
+         /*
+          * adjust target altitude from source altitude
+          */
+         _sourceTour.dataSerieAdjustedAlti = Arrays.copyOf(newSourceAltitudeSerie, serieLength);
+      }
+
+      return altitudeDifferences;
+   }
+
+   private void computeMergedData() {
+
+      final int serieLength = _targetTour.timeSerie.length;
+      final float[] newSourceAltitudeSerie = new float[serieLength];
+      final float[] newSourceAltiDiffSerie = new float[serieLength];
+
+      final float[] newTargetPulseSerie = new float[serieLength];
+      final float[] newTargetTemperatureSerie = new float[serieLength];
+      final float[] newTargetCadenceSerie = new float[serieLength];
+
+      final int[] targetTimeSerie = mergeSpeed();
+
+      int xMergeOffset = _targetTour.getMergedTourTimeOffset();
+      if (_synchStartTime) {
+
+         // synchronize start time
+         xMergeOffset = _tourStartTimeSynchOffset;
+      }
+
+      createNewTimeAndDistanceSerie(xMergeOffset,
+            newSourceAltitudeSerie,
+            newSourceAltiDiffSerie,
+            newTargetPulseSerie,
+            newTargetTemperatureSerie,
+            newTargetCadenceSerie,
+            targetTimeSerie);
+
+      assignMergedSeries(newSourceAltitudeSerie,
+            newSourceAltiDiffSerie,
+            newTargetPulseSerie,
+            newTargetTemperatureSerie,
+            newTargetCadenceSerie,
+            targetTimeSerie);
+
+      final float[] altitudeDifferences = computeAdjustedAltitude(targetTimeSerie,
+            newSourceAltitudeSerie,
+            newSourceAltiDiffSerie);
+
+      //updateUI(altitudeDifferences[0], altitudeDifferences[1]);
+   }
+
+   private float computeNewSourceAltitude(final float sourceAlti,
+                                          final float previousSourceAltitude,
+                                          final int previousSourceTime,
+                                          final int sourceTime,
+                                          final int targetTime) {
+
+      float newSourceAltitude;
+
+      if (isLinearInterpolation()) {
+
+         newSourceAltitude = linearInterpolate(
+               previousSourceTime,
+               targetTime,
+               sourceTime,
+               previousSourceAltitude,
+               sourceAlti);
+
+      } else {
+
+         /*
+          * the interpolated altitude is not exact above the none interpolate altitude, it is
+          * in the middle of the previous and current altitude
+          */
+         // newSourceAltitude = sourceAlti;
+         newSourceAltitude = previousSourceAltitude;
+      }
+
+      return newSourceAltitude;
+   }
 
    /**
     * create new time/distance serie for the source tour according to the time of the target tour
     */
-//   private void createNewTimeAndDistanceSerie(final int xMergeOffset,
-//                                              final float[] newSourceAltitudeSerie,
-//                                              final float[] newSourceAltiDiffSerie,
-//                                              final float[] newTargetPulseSerie,
-//                                              final float[] newTargetTemperatureSerie,
-//                                              final float[] newTargetCadenceSerie,
-//                                              final int[] targetTimeSerie) {
-//
-//      final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
-//      final int[] sourceTimeSerie = _sourceTour.timeSerie;
-//      final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
-//      // check if the data series are available
-//      final boolean isSourceAltitude = sourceAltitudeSerie != null;
-//      final boolean isTargetAltitude = targetAltitudeSerie != null;
-//
-//      final int yMergeOffset = _targetTour.getMergedAltitudeOffset();
-//
-//      float sourceAlti = 0;
-//      float previousSourceAltitude = 0;
-//      if (isSourceAltitude) {
-//         sourceAlti = _sourceTour.altitudeSerie[0] + yMergeOffset;
-//         previousSourceAltitude = sourceAlti;
-//      }
-//
-//      int sourceIndex = 0;
-//      final int lastSourceIndex = sourceTimeSerie.length - 1;
-//      int previousSourceTime = 0;
-//      int sourceTime = sourceTimeSerie[0] + xMergeOffset;
-//      for (int targetIndex = 0; targetIndex < _targetTour.timeSerie.length; targetIndex++) {
-//
-//         final int targetTime = targetTimeSerie[targetIndex];
-//
-//         /*
-//          * target tour is the leading time data serie, move source time forward to reach target
-//          * time
-//          */
-//         while (sourceTime < targetTime) {
-//
-//            sourceIndex++;
-//
-//            sourceIndex = checkArrayBounds(sourceIndex, lastSourceIndex);
-//
-//            if (sourceIndex == lastSourceIndex) {
-//               //prevent endless loops
-//               break;
-//            }
-//
-//            previousSourceTime = sourceTime;
-//            sourceTime = sourceTimeSerie[sourceIndex] + xMergeOffset;
-//
-//            if (isSourceAltitude) {
-//               previousSourceAltitude = sourceAlti;
-//               sourceAlti = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
-//            }
-//         }
-//
-//         if (isSourceAltitude) {
-//
-//            final float newSourceAltitude = computeNewSourceAltitude(
-//                  sourceAlti,
-//                  previousSourceAltitude,
-//                  previousSourceTime,
-//                  sourceTime,
-//                  targetTime);
-//
-//            newSourceAltitudeSerie[targetIndex] = newSourceAltitude;
-//
-//            if (isTargetAltitude) {
-//               newSourceAltiDiffSerie[targetIndex] = newSourceAltitude - targetAltitudeSerie[targetIndex];
-//            }
-//         }
-//
-//         assignTargetSeriesValue(newTargetPulseSerie,
-//               newTargetTemperatureSerie,
-//               newTargetCadenceSerie,
-//               sourceIndex,
-//               targetIndex);
-//      }
-//   }
+   private void createNewTimeAndDistanceSerie(final int xMergeOffset,
+                                              final float[] newSourceAltitudeSerie,
+                                              final float[] newSourceAltiDiffSerie,
+                                              final float[] newTargetPulseSerie,
+                                              final float[] newTargetTemperatureSerie,
+                                              final float[] newTargetCadenceSerie,
+                                              final int[] targetTimeSerie) {
 
+      final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
+      final int[] sourceTimeSerie = _sourceTour.timeSerie;
+      final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
+      // check if the data series are available
+      final boolean isSourceAltitude = sourceAltitudeSerie != null;
+      final boolean isTargetAltitude = targetAltitudeSerie != null;
 
+      final int yMergeOffset = _targetTour.getMergedAltitudeOffset();
 
+      float sourceAlti = 0;
+      float previousSourceAltitude = 0;
+      if (isSourceAltitude) {
+         sourceAlti = _sourceTour.altitudeSerie[0] + yMergeOffset;
+         previousSourceAltitude = sourceAlti;
+      }
+
+      int sourceIndex = 0;
+      final int lastSourceIndex = sourceTimeSerie.length - 1;
+      int previousSourceTime = 0;
+      int sourceTime = sourceTimeSerie[0] + xMergeOffset;
+      for (int targetIndex = 0; targetIndex < _targetTour.timeSerie.length; targetIndex++) {
+
+         final int targetTime = targetTimeSerie[targetIndex];
+
+         /*
+          * target tour is the leading time data serie, move source time forward to reach target
+          * time
+          */
+         while (sourceTime < targetTime) {
+
+            sourceIndex++;
+
+            sourceIndex = checkArrayBounds(sourceIndex, lastSourceIndex);
+
+            if (sourceIndex == lastSourceIndex) {
+               //prevent endless loops
+               break;
+            }
+
+            previousSourceTime = sourceTime;
+            sourceTime = sourceTimeSerie[sourceIndex] + xMergeOffset;
+
+            if (isSourceAltitude) {
+               previousSourceAltitude = sourceAlti;
+               sourceAlti = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
+            }
+         }
+
+         if (isSourceAltitude) {
+
+            final float newSourceAltitude = computeNewSourceAltitude(
+                  sourceAlti,
+                  previousSourceAltitude,
+                  previousSourceTime,
+                  sourceTime,
+                  targetTime);
+
+            newSourceAltitudeSerie[targetIndex] = newSourceAltitude;
+
+            if (isTargetAltitude) {
+               newSourceAltiDiffSerie[targetIndex] = newSourceAltitude - targetAltitudeSerie[targetIndex];
+            }
+         }
+
+         assignTargetSeriesValue(newTargetPulseSerie,
+               newTargetTemperatureSerie,
+               newTargetCadenceSerie,
+               sourceIndex,
+               targetIndex);
+      }
+   }
+
+   private boolean isLinearInterpolation() {
+
+      return adjustAltiFromSource && adjustAltiSmoothly;
+   }
 
    /**
     * Compute a linear interpolation based on the below formula
