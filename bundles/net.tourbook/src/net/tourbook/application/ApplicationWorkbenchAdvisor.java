@@ -18,6 +18,7 @@ package net.tourbook.application;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.PrefPageGeneral;
 import net.tourbook.tour.TourManager;
@@ -43,7 +44,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     * Commandline parameter: <code>-DsetAllViewsClosable=false</code>
     */
    private static String       SET_ALL_VIEWS_CLOSABLE           = System.getProperty(SYS_PROP__SET_ALL_VIEWS_CLOSABLE);
-   private static boolean      IS_SET_ALL_VIEWS_CLOSABLE        = "false".equals(SET_ALL_VIEWS_CLOSABLE) == false;
+   private static boolean      IS_SET_ALL_VIEWS_CLOSABLE        = UI.FALSE.equals(SET_ALL_VIEWS_CLOSABLE) == false;
 
    static {
 

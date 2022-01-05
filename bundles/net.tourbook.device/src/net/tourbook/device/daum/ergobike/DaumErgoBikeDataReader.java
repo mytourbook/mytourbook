@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -176,7 +176,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          fileNameToken.nextToken();
          fileNameToken.nextToken();
          final String token4 = fileNameToken.nextToken();
-         final boolean is_D_M_Y_Format = token4.contains("min");
+         final boolean is_D_M_Y_Format = token4.contains("min"); //$NON-NLS-1$
 
          // tokenize again
          fileNameToken = new StringTokenizer(fileName);

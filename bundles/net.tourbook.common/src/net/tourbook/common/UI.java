@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -250,6 +250,9 @@ public class UI {
    public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_ON
+
+   public static final String  TRUE                           = Boolean.toString(true);
+   public static final String  FALSE                          = Boolean.toString(false);
 
    /**
     * Is <code>true</code> when the dark theme in the UI is selected

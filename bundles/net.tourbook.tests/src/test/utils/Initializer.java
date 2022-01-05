@@ -44,10 +44,10 @@ public class Initializer {
       manualTour.setTourStartTime(2022, 1, 3, 17, 16, 0);
       manualTour.setTourDistance(10);
       manualTour.setTourDeviceTime_Elapsed(3600);
-      manualTour.setTourTitle("Manual Tour");
+      manualTour.setTourTitle("Manual Tour"); //$NON-NLS-1$
 
       final TourType tourType = new TourType();
-      tourType.setName("Running");
+      tourType.setName("Running"); //$NON-NLS-1$
       manualTour.setTourType(tourType);
 
       return manualTour;

@@ -42,10 +42,10 @@ import utils.Initializer;
 
 public class StravaUploaderTests {
 
-   private static final String HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token";
+   private static final String HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
 
    private static final String STRAVA_FILE_PATH     =
-         FilesUtils.rootPath + "cloud/strava/files/";
+         FilesUtils.rootPath + "cloud/strava/files/"; //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
    static StravaUploader       stravaUploader;
@@ -57,13 +57,13 @@ public class StravaUploaderTests {
 
       httpClientMock = new HttpClientMock();
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "PasseurResponse.json");
+            + "PasseurResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
             HEROKU_APP_URL_TOKEN)
             .doReturn(passeurResponse)
             .withStatus(201);
 
-      final Field field = StravaUploader.class.getDeclaredField("_httpClient");
+      final Field field = StravaUploader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
@@ -77,7 +77,7 @@ public class StravaUploaderTests {
 
             // Look at the shell title to see if it is the one we want
 
-            if ("Strava Tour Upload Summary".equals(shell.getText())) {
+            if ("Strava Tour Upload Summary".equals(shell.getText())) { //$NON-NLS-1$
                // Close the shell after it has finished initializing
 
                Display.getDefault().asyncExec(shell::close);
@@ -96,9 +96,9 @@ public class StravaUploaderTests {
    void testManualTourUpload() {
 
       final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "LongsPeak-StravaResponse.json");
+            + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
-            "https://www.strava.com/api/v3/uploads")
+            "https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
             .doReturn(stravaResponse)
             .withStatus(201);
 
@@ -108,21 +108,21 @@ public class StravaUploaderTests {
       stravaUploader.uploadTours(selectedTours);
 
       httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
-      httpClientMock.verify().post("https://www.strava.com/api/v3/uploads").called();
+      httpClientMock.verify().post("https://www.strava.com/api/v3/uploads").called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());
       assertTrue(logs.get(1).toString().contains(
-            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n"));
+            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")); //$NON-NLS-1$
    }
 
    @Test
    void testTourUpload() {
 
       final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "ManualTour-StravaResponse.json");
+            + "ManualTour-StravaResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
-            "https://www.strava.com/api/v3/activities")
+            "https://www.strava.com/api/v3/activities") //$NON-NLS-1$
             .doReturn(stravaResponse)
             .withStatus(201);
 
@@ -132,11 +132,11 @@ public class StravaUploaderTests {
       stravaUploader.uploadTours(selectedTours);
 
       httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
-      httpClientMock.verify().post("https://www.strava.com/api/v3/activities").called();
+      httpClientMock.verify().post("https://www.strava.com/api/v3/activities").called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());
       assertTrue(logs.get(1).toString().contains(
-            "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"));
+            "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n")); //$NON-NLS-1$
    }
 }
