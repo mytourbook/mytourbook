@@ -2137,6 +2137,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // pauses layer is visible
 
+      final int[] timeSerie = _tourData.timeSerie;
+      if (timeSerie == null) {
+         // this happened when a manual tour is selected which has no time data
+         // https://github.com/mytourbook/mytourbook/commit/3c61e93b02c07798af31686a1123c108e053f7e7#r62975304-permalink
+         return;
+      }
+
       final ChartPauseConfig chartPauseConfig = new ChartPauseConfig();
 
       chartPauseConfig.isShowPauseLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
@@ -2160,7 +2167,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // get the x-axis data serie
       final double[] xAxisSerie = getXAxisDataSerie();
 
-      final int[] timeSerie = _tourData.timeSerie;
       final float[] altitudeSerie = _tourData.altitudeSerie;
       final int numTimeSlices = timeSerie.length;
       final boolean canAlignPauseLabel = altitudeSerie != null;
