@@ -50,7 +50,8 @@
    </configIni>
 
    <launcherArgs>
-      <vmArgs>-Xmx1024m</vmArgs>
+      <!-- VERY IMPORTANT: vmArgs MUST BE IN ONE LINE otherwise they are wrongly formatted and DO NOT WORK !!! -->
+      <vmArgs>--add-exports=java.base/java.lang=ALL-UNNAMED --add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.desktop/sun.java2d=ALL-UNNAMED</vmArgs>
       <vmArgsMac>-XstartOnFirstThread</vmArgsMac>
    </launcherArgs>
 
