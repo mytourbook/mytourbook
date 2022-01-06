@@ -46,7 +46,6 @@ public class TourMerger {
 
       _sourceTour = sourceTour;
       _targetTour = targetTour;
-
    }
 
    private void assignMergedSeries(final float[] newSourceAltitudeSerie,
@@ -214,7 +213,7 @@ public class TourMerger {
       return altitudeDifferences;
    }
 
-   private void computeMergedData() {
+   public float[] computeMergedData() {
 
       final int serieLength = _targetTour.timeSerie.length;
       final float[] newSourceAltitudeSerie = new float[serieLength];
@@ -252,7 +251,7 @@ public class TourMerger {
             newSourceAltitudeSerie,
             newSourceAltiDiffSerie);
 
-      //updateUI(altitudeDifferences[0], altitudeDifferences[1]);
+      return altitudeDifferences;
    }
 
    private float computeNewSourceAltitude(final float sourceAlti,

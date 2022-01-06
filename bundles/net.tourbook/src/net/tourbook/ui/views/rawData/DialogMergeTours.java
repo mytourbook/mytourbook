@@ -473,47 +473,47 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       return altitudeDifferences;
    }
-
-   private void computeMergedData() {
-
-      final int serieLength = _targetTour.timeSerie.length;
-      final float[] newSourceAltitudeSerie = new float[serieLength];
-      final float[] newSourceAltiDiffSerie = new float[serieLength];
-
-      final float[] newTargetPulseSerie = new float[serieLength];
-      final float[] newTargetTemperatureSerie = new float[serieLength];
-      final float[] newTargetCadenceSerie = new float[serieLength];
-
-      final int[] targetTimeSerie = mergeSpeed();
-
-      int xMergeOffset = _targetTour.getMergedTourTimeOffset();
-      if (_chkSynchStartTime.getSelection()) {
-
-         // synchronize start time
-         xMergeOffset = _tourStartTimeSynchOffset;
-      }
-
-      createNewTimeAndDistanceSerie(xMergeOffset,
-            newSourceAltitudeSerie,
-            newSourceAltiDiffSerie,
-            newTargetPulseSerie,
-            newTargetTemperatureSerie,
-            newTargetCadenceSerie,
-            targetTimeSerie);
-
-      assignMergedSeries(newSourceAltitudeSerie,
-            newSourceAltiDiffSerie,
-            newTargetPulseSerie,
-            newTargetTemperatureSerie,
-            newTargetCadenceSerie,
-            targetTimeSerie);
-
-      final float[] altitudeDifferences = computeAdjustedAltitude(targetTimeSerie,
-            newSourceAltitudeSerie,
-            newSourceAltiDiffSerie);
-
-      updateUI(altitudeDifferences[0], altitudeDifferences[1]);
-   }
+//
+//   private float[] computeMergedData() {
+//
+//      final int serieLength = _targetTour.timeSerie.length;
+//      final float[] newSourceAltitudeSerie = new float[serieLength];
+//      final float[] newSourceAltiDiffSerie = new float[serieLength];
+//
+//      final float[] newTargetPulseSerie = new float[serieLength];
+//      final float[] newTargetTemperatureSerie = new float[serieLength];
+//      final float[] newTargetCadenceSerie = new float[serieLength];
+//
+//      final int[] targetTimeSerie = mergeSpeed();
+//
+//      int xMergeOffset = _targetTour.getMergedTourTimeOffset();
+//      if (_chkSynchStartTime.getSelection()) {
+//
+//         // synchronize start time
+//         xMergeOffset = _tourStartTimeSynchOffset;
+//      }
+//
+//      createNewTimeAndDistanceSerie(xMergeOffset,
+//            newSourceAltitudeSerie,
+//            newSourceAltiDiffSerie,
+//            newTargetPulseSerie,
+//            newTargetTemperatureSerie,
+//            newTargetCadenceSerie,
+//            targetTimeSerie);
+//
+//      assignMergedSeries(newSourceAltitudeSerie,
+//            newSourceAltiDiffSerie,
+//            newTargetPulseSerie,
+//            newTargetTemperatureSerie,
+//            newTargetCadenceSerie,
+//            targetTimeSerie);
+//
+//      final float[] altitudeDifferences = computeAdjustedAltitude(targetTimeSerie,
+//            newSourceAltitudeSerie,
+//            newSourceAltiDiffSerie);
+//
+//      return altitudeDifferences;
+//   }
 
    private float computeNewSourceAltitude(final float sourceAlti,
                                           final float previousSourceAltitude,
@@ -1613,7 +1613,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _targetTour.setMergedTourTimeOffset(getFromUITourTimeOffset());
 
       // calculate merged data
-      computeMergedData();
+      final TourMerger tourMerger = new TourMerger(_sourceTour, _targetTour);
+
+      final float[] altitudeDifferences = tourMerger.computeMergedData();
+
+      updateUI(altitudeDifferences[0], altitudeDifferences[1]);
 
       _tourChartConfig.isRelativeValueDiffScaling = _chkValueDiffScaling.getSelection();
 
