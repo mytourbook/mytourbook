@@ -30,41 +30,25 @@ Experimental
 New
 ===
 
-* MyTourbook for Windows is bundled with a JRE       
-                              https://github.com/mytourbook/mytourbook/issues/381
+* 
 
 
 Improvements
 ============
 
-* Tour Chart
-  - Filter tour pauses
-  - Stack tour pauses that they don't overlap
-  
-                              https://github.com/mytourbook/mytourbook/issues/428
-
-* 2D Map
-  - Filter tour pauses        https://github.com/mytourbook/mytourbook/issues/428
-  - Tour breadcrumbs          https://github.com/mytourbook/mytourbook/issues/431
-  - Update tour geo filter default location and zoom level 
-                              https://github.com/mytourbook/mytourbook/issues/433
+* 
 
 
 Changes
 =======
 
-* Reverted feature: Repair close button in all views
-
-  The command line parameter "-DsetAllViewsClosable=false" will now disable the experimental feature which was introduced in version 21.9. 
-  When this value is not set in the command line, then the close button will be repaired in all views when the application is closing.
+* 
 
 
 Bugfix
 ======
 
-* Strava Integration: (Frederic)       
-  - Manually created activities use different activity types than uploaded activities
-    Official activity types list: https://developers.strava.com/docs/reference/#api-models-ActivityType
+* 
 
 
 Translation    
