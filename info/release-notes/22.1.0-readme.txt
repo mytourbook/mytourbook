@@ -39,6 +39,9 @@ Bugfix
 * Strava Integration: (Frederic)       
   - Manually created activities use different activity types than uploaded activities
     Official activity types list: https://developers.strava.com/docs/reference/#api-models-ActivityType
+    
+* 3D Map
+  - Is now working with Java 17    
 
 
 Translation    
