@@ -75,15 +75,15 @@ public class SuuntoJsonProcessor {
    private static final String TAG_TEMPERATURE    = "Temperature";      //$NON-NLS-1$
 
    // Swimming
-   private static final String Swimming             = "Swimming";                                 //$NON-NLS-1$
-   private static final String Breaststroke         = "Breaststroke";                             //$NON-NLS-1$
-   private static final String Freestyle            = "Freestyle";                                //$NON-NLS-1$
-   private static final String Other                = "Other";                                    //$NON-NLS-1$
-   private static final String PoolLengthStyle      = "PrevPoolLengthStyle";                      //$NON-NLS-1$
-   private static final String TotalLengths         = "TotalLengths";                             //$NON-NLS-1$
-   private static final String Stroke               = "Stroke";                                   //$NON-NLS-1$
-   private static final String Turn                 = "Turn";                                     //$NON-NLS-1$
-   private static int          previousTotalLengths = 0;
+   private static final String Swimming                    = "Swimming";                                 //$NON-NLS-1$
+   private static final String Breaststroke                = "Breaststroke";                             //$NON-NLS-1$
+   private static final String Freestyle                   = "Freestyle";                                //$NON-NLS-1$
+   private static final String Other                       = "Other";                                    //$NON-NLS-1$
+   private static final String PoolLengthStyle             = "PrevPoolLengthStyle";                      //$NON-NLS-1$
+   private static final String TotalLengths                = "TotalLengths";                             //$NON-NLS-1$
+   private static final String Stroke                      = "Stroke";                                   //$NON-NLS-1$
+   private static final String Turn                        = "Turn";                                     //$NON-NLS-1$
+   private static int          previousTotalLengths        = 0;
 
    private List<TimeData>      _sampleList;
    private int                 _numLaps;
@@ -91,7 +91,7 @@ public class SuuntoJsonProcessor {
    private short               _tourBatteryPercentageStart = -1;
    private short               _tourBatteryPercentageEnd   = -1;
 
-   private IPreferenceStore    _prefStore           = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore    _prefStore                  = Activator.getDefault().getPreferenceStore();
 
    /**
     * Parses and stores all the R-R interval for a given data sample.
@@ -398,7 +398,7 @@ public class SuuntoJsonProcessor {
 
       tourData.createTimeSeries(_sampleList, true);
 
-      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End, null);
       tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
       tourData.setBattery_Percentage_Start(_tourBatteryPercentageStart);

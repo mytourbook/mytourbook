@@ -982,7 +982,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       // set title
       _tourChart.addDataModelListener(chartDataModel -> chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData)));
 
-      final TourChartConfiguration chartConfig = TourManager.createDefaultTourChartConfig();
+      final TourChartConfiguration chartConfig = TourManager.createDefaultTourChartConfig(_state);
       _tourChart.updateTourChart(_tourData, chartConfig, false);
    }
 

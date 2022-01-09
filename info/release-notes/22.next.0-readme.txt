@@ -1,10 +1,8 @@
-21.next.0                                                 ?.Month 2021
+22.next.0                                                 ?.Month 2022
 
 
 TODO's
 ======
-
-https://adoptium.net/ Temurin
 
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
@@ -15,7 +13,7 @@ https://adoptium.net/ Temurin
 
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-                 
+
 
 Issues
 ======
@@ -28,11 +26,12 @@ Experimental
 
 * 
 
-  
+
 New
 ===
 
 * 
+
 
 Improvements
 ============
@@ -40,7 +39,7 @@ Improvements
 * 
 
 
-Changes  
+Changes
 =======
 
 * 
@@ -50,7 +49,6 @@ Bugfix
 ======
 
 * 
-
 
 
 Translation    

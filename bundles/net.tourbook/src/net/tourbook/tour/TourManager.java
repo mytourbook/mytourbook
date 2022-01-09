@@ -92,6 +92,7 @@ import net.tourbook.weather.WeatherData;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -714,11 +715,12 @@ public class TourManager {
    /**
     * Create a tour chart configuration by reading the settings from the pref store.
     *
+    * @param state
     * @return Returns a new tour chart configuration.
     */
-   public static TourChartConfiguration createDefaultTourChartConfig() {
+   public static TourChartConfiguration createDefaultTourChartConfig(final IDialogSettings state) {
 
-      final TourChartConfiguration tcc = new TourChartConfiguration(true);
+      final TourChartConfiguration tcc = new TourChartConfiguration(true, state);
 
       /*
        * convert graph ids from the preferences into visible graphs in the chart panel configuration
@@ -1076,13 +1078,24 @@ public class TourManager {
          final long[] pausedTime_Start = fromTourData.getPausedTime_Start();
 
          if (pausedTime_Start != null) {
+
             final long[] pausedTime_End = fromTourData.getPausedTime_End();
+            final long[] pausedTime_Data = fromTourData.getPausedTime_Data();
+
             for (int index = 0; index < pausedTime_Start.length; ++index) {
 
                final List<Long> fromTourPausesList = new ArrayList<>();
 
+               final long pauseData = pausedTime_Data == null
+
+                     // pause data are not available -> it will be displayed as an auto-pause
+                     ? -1
+
+                     : pausedTime_Data[index];
+
                fromTourPausesList.add(pausedTime_Start[index]);
                fromTourPausesList.add(pausedTime_End[index]);
+               fromTourPausesList.add(pauseData);
 
                allTourPauses.add(fromTourPausesList);
             }
@@ -1932,7 +1945,7 @@ public class TourManager {
 
          try {
 
-            final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+            final IRunnableWithProgress runnable = new IRunnableWithProgress() {
                @Override
                public void run(final IProgressMonitor monitor)
                      throws InvocationTargetException, InterruptedException {
@@ -1963,7 +1976,7 @@ public class TourManager {
              * Ensure to run in the app shell that a slideoutshell can get hidden without hiding the
              * progress dialog, complicated !
              */
-            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
+            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
@@ -3979,10 +3992,24 @@ public class TourManager {
       return new ChartDataYSerie(chartType, dataSerie);
    }
 
+   /**
+    * 0 values will be ignored when computing min/maxvalues.
+    *
+    * @param dataSerie
+    * @param chartType
+    * @return
+    */
    private ChartDataYSerie createChartDataSerieNoZero(final float[] dataSerie, final ChartType chartType) {
       return new ChartDataYSerie(chartType, dataSerie, true);
    }
 
+   /**
+    * 0 values will be ignored when computing min/maxvalues.
+    *
+    * @param dataSerie
+    * @param chartType
+    * @return
+    */
    private ChartDataYSerie createChartDataSerieNoZero(final float[][] dataSerie, final ChartType chartType) {
       return new ChartDataYSerie(chartType, dataSerie, true);
    }
@@ -4151,7 +4178,7 @@ public class TourManager {
          }
 
          if (yDataElevation == null) {
-            yDataElevation = createChartDataSerie(altitudeSerie, chartType);
+            yDataElevation = createChartDataSerieNoZero(altitudeSerie, chartType);
          }
 
          yDataElevation.setYTitle(GRAPH_LABEL_ALTITUDE);

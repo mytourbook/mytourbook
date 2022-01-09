@@ -26,7 +26,7 @@ import de.byteholder.geoclipse.preferences.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.map2.view.Slideout_Map2_MapProvider;
+import net.tourbook.map2.view.SlideoutMap2_MapProvider;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -60,7 +60,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
    private static final int          SHELL_MARGIN = 5;
 
-   private Slideout_Map2_MapProvider _slideout_Map2_MapProvider;
+   private SlideoutMap2_MapProvider _slideout_Map2_MapProvider;
 
    private MP                        _mp;
 
@@ -91,7 +91,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
    private Link      _linkOnlineMap;
 
-   public MapProvider_InfoToolTip(final Slideout_Map2_MapProvider slideout_Map2_MapProvider, final TableViewer tableViewer) {
+   public MapProvider_InfoToolTip(final SlideoutMap2_MapProvider slideout_Map2_MapProvider, final TableViewer tableViewer) {
 
       super(tableViewer.getTable(), NO_RECREATE, false);
 
@@ -461,7 +461,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
          final CellLabelProvider labelProvider = _tableViewer.getLabelProvider(_viewerCell.getColumnIndex());
 
-         if (labelProvider instanceof Slideout_Map2_MapProvider.TooltipLabelProvider) {
+         if (labelProvider instanceof SlideoutMap2_MapProvider.TooltipLabelProvider) {
 
             // show tooltip for this cell
 

@@ -163,9 +163,9 @@ public class Suunto2_SAXHandler extends DefaultHandler {
    private String              _tourSW;
 
    public Suunto2_SAXHandler(final TourbookDevice deviceDataReader,
-                            final String importFileName,
-                            final Map<Long, TourData> alreadyImportedTours,
-                            final Map<Long, TourData> newlyImportedTours) {
+                             final String importFileName,
+                             final Map<Long, TourData> alreadyImportedTours,
+                             final Map<Long, TourData> newlyImportedTours) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -539,7 +539,7 @@ public class Suunto2_SAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End, null);
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
          tourData.computeAltitudeUpDown();

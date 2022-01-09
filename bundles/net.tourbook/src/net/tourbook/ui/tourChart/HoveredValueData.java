@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.data.TourData;
+
 public class HoveredValueData {
 
-   public int hoveredValuePointIndex;
+   public TourData tourData;
+   public int      hoveredValuePointIndex;
 
-   public HoveredValueData(final int hoveredValuePointIndex) {
+   public HoveredValueData(final TourData tourData, final int hoveredValuePointIndex) {
 
+      this.tourData = tourData;
       this.hoveredValuePointIndex = hoveredValuePointIndex;
    }
 
@@ -29,7 +33,10 @@ public class HoveredValueData {
 
       return "HoveredValueData\n" //$NON-NLS-1$
             + "[\n" //$NON-NLS-1$
-            + "hoveredValuePointIndex=" + hoveredValuePointIndex //$NON-NLS-1$
+
+            + "hoveredValuePointIndex  =" + hoveredValuePointIndex //$NON-NLS-1$
+            + "tourData                =" + tourData //$NON-NLS-1$
+
             + "\n]"; //$NON-NLS-1$
    }
 

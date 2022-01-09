@@ -23,6 +23,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.ui.tourChart.SlideoutTourChartPauses;
 import net.tourbook.ui.tourChart.TourChart;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -30,8 +31,9 @@ public class ActionTourChartPauses extends ActionToolbarSlideout {
 
    private TourChart _tourChart;
    private Control   _ownerControl;
+   private IDialogSettings _state;
 
-   public ActionTourChartPauses(final TourChart tourChart, final Control ownerControl) {
+   public ActionTourChartPauses(final TourChart tourChart, final Control ownerControl, final IDialogSettings state) {
 
       super(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses),
             TourbookPlugin.getThemedImageDescriptor(Images.TourPauses_Disabled));
@@ -39,14 +41,16 @@ public class ActionTourChartPauses extends ActionToolbarSlideout {
       notSelectedTooltip = Messages.Tour_Action_ShowTourPauses_Tooltip;
 
       isToggleAction = true;
+
       _tourChart = tourChart;
       _ownerControl = ownerControl;
+      _state = state;
    }
 
    @Override
    protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-      return new SlideoutTourChartPauses(_ownerControl, toolbar, _tourChart);
+      return new SlideoutTourChartPauses(_ownerControl, toolbar, _tourChart, _state);
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -473,12 +473,12 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
             + ("wayPointId=" + wayPointId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("latitude=" + latitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ ("category=" + category) //$NON-NLS-1$
+            //          + ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //          + ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //          + ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //          + ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //          + ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            //          + ("category=" + category) //$NON-NLS-1$
 
             + "]\n"; //$NON-NLS-1$
    }

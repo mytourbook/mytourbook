@@ -2,23 +2,37 @@
 
 <project name="Rename Product Archives" default="rename-product-archives">
 
-	<target name="rename-product-archives">
-		
-		<echo message="tycho-path:     '${tycho-path}'"/>
-		<echo message="tycho-version:  '${tycho-version}'"/>
+   <target name="rename-product-archives">
+      
+      <echo message="tycho-path:     '${tycho-path}'"/>
+      <echo message="tycho-version:  '${tycho-version}'"/>
 
-		<move 
-			file	="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"
-			tofile	="${tycho-path}\products\mytourbook-${tycho-version}-linux-64.zip"/>
+   	<!-- 
+   	
+   	   Without Java runtime
+   	
+   	-->
+      <move 
+         file     ="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-linux.zip"/>
 
-		<move 
-			file	="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"
-			tofile	="${tycho-path}\products\mytourbook-${tycho-version}-macos-64_THIS_IS_NOT_SUPPORTED.zip"/>
+      <move 
+         file     ="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-macos_THIS_IS_NOT_SUPPORTED.zip"/>
 
-		<move 
-			file	="${tycho-path}\products\mytourbook-${tycho-version}-win32.win32.x86_64.zip"
-			tofile	="${tycho-path}\products\mytourbook-${tycho-version}-win-64.zip"/>
-	
-	</target>
-	
+      <move 
+         file     ="${tycho-path}\products\mytourbook-${tycho-version}-win32.win32.x86_64.zip"
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-win.zip"/>
+
+   	<!-- 
+   	
+   	   With Java runtime
+   	
+   	-->
+      <move 
+         file     ="${tycho-path}\products\mytourbook-jre-${tycho-version}-win32.win32.x86_64.zip"
+         tofile   ="${tycho-path}\products\mytourbook-jre-${tycho-version}-win.zip"/>
+   
+   </target>
+   
 </project>

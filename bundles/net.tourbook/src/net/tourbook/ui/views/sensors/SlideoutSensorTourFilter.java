@@ -63,8 +63,6 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
    static final String            STATE_TOUR_FILTER_YEARS              = "STATE_TOUR_FILTER_YEARS";      //$NON-NLS-1$
    static final int               STATE_TOUR_FILTER_YEARS_DEFAULT      = 1;
 
-   private static final String    RESET_VALUE                          = " X ";                          //$NON-NLS-1$
-
    private static IDialogSettings _state;
 
    private SelectionListener      _defaultSelectionListener;
@@ -99,7 +97,7 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
 
       public Action_ResetValue(final Spinner spinner) {
 
-         super(RESET_VALUE, AS_PUSH_BUTTON);
+         super(UI.RESET_LABEL, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Slideout_SensorTourFilter_Action_ResetValue_Tooltip);
 
@@ -230,12 +228,12 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
 
    private void createUI_22_DurationFilter(final Composite parent) {
 
-      final Composite durationContainer = new Composite(parent, SWT.NONE);
+      final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .indent(16, 0)
-            .applyTo(durationContainer);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(durationContainer);
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
             /*
@@ -243,20 +241,20 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // radio
-            _checkboxUseTourFilter_Year = new Button(durationContainer, SWT.CHECK);
+            _checkboxUseTourFilter_Year = new Button(container, SWT.CHECK);
             _checkboxUseTourFilter_Year.setText(Messages.Slideout_SensorTourFilter_Radio_Year);
             _checkboxUseTourFilter_Year.setToolTipText(Messages.Slideout_SensorTourFilter_Radio_Year_Tooltip);
             _checkboxUseTourFilter_Year.addSelectionListener(_defaultSelectionListener);
 
             // spinner
-            _spinnerYear = new Spinner(durationContainer, SWT.BORDER);
+            _spinnerYear = new Spinner(container, SWT.BORDER);
             _spinnerYear.setMinimum(0);
             _spinnerYear.setMaximum(999);
             _spinnerYear.addSelectionListener(_defaultSelectionListener);
             _spinnerYear.addMouseWheelListener(_defaultMouseWheelListener);
 
             // action: Reset value
-            _actionResetValue_Year = createUI_Action_ResetValue(durationContainer, _spinnerYear);
+            _actionResetValue_Year = createUI_Action_ResetValue(container, _spinnerYear);
          }
          {
             /*
@@ -264,20 +262,20 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // radio
-            _checkboxUseTourFilter_Month = new Button(durationContainer, SWT.CHECK);
+            _checkboxUseTourFilter_Month = new Button(container, SWT.CHECK);
             _checkboxUseTourFilter_Month.setText(Messages.Slideout_SensorTourFilter_Radio_Month);
             _checkboxUseTourFilter_Month.setToolTipText(Messages.Slideout_SensorTourFilter_Radio_Month_Tooltip);
             _checkboxUseTourFilter_Month.addSelectionListener(_defaultSelectionListener);
 
             // spinner
-            _spinnerMonth = new Spinner(durationContainer, SWT.BORDER);
+            _spinnerMonth = new Spinner(container, SWT.BORDER);
             _spinnerMonth.setMinimum(0);
             _spinnerMonth.setMaximum(999);
             _spinnerMonth.addSelectionListener(_defaultSelectionListener);
             _spinnerMonth.addMouseWheelListener(_defaultMouseWheelListener);
 
             // action: Reset value
-            _actionResetValue_Month = createUI_Action_ResetValue(durationContainer, _spinnerMonth);
+            _actionResetValue_Month = createUI_Action_ResetValue(container, _spinnerMonth);
          }
          {
             /*
@@ -285,20 +283,20 @@ public class SlideoutSensorTourFilter extends ToolbarSlideout implements IAction
              */
 
             // radio
-            _checkboxUseTourFilter_Day = new Button(durationContainer, SWT.CHECK);
+            _checkboxUseTourFilter_Day = new Button(container, SWT.CHECK);
             _checkboxUseTourFilter_Day.setText(Messages.Slideout_SensorTourFilter_Radio_Day);
             _checkboxUseTourFilter_Day.setToolTipText(Messages.Slideout_SensorTourFilter_Radio_Day_Tooltip);
             _checkboxUseTourFilter_Day.addSelectionListener(_defaultSelectionListener);
 
             // spinner
-            _spinnerDay = new Spinner(durationContainer, SWT.BORDER);
+            _spinnerDay = new Spinner(container, SWT.BORDER);
             _spinnerDay.setMinimum(0);
             _spinnerDay.setMaximum(999);
             _spinnerDay.addSelectionListener(_defaultSelectionListener);
             _spinnerDay.addMouseWheelListener(_defaultMouseWheelListener);
 
             // action: Reset value
-            _actionResetValue_Day = createUI_Action_ResetValue(durationContainer, _spinnerDay);
+            _actionResetValue_Day = createUI_Action_ResetValue(container, _spinnerDay);
          }
       }
    }

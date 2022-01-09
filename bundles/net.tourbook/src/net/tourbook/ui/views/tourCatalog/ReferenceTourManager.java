@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -30,11 +31,16 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
+
 /**
  *
  */
 public class ReferenceTourManager {
 
+   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tourCatalog.ReferenceTourManager");//$NON-NLS-1$
+
+   //
    private static final HashMap<Long, TourCompareConfig> _compareConfigCache = new HashMap<>();
 
    /**
@@ -80,8 +86,8 @@ public class ReferenceTourManager {
 
       final TourData refTourData = refTour.getTourData();
 
-      final TourChartConfiguration refTourChartConfig = TourManager.createDefaultTourChartConfig();
-      final TourChartConfiguration compTourchartConfig = TourManager.createDefaultTourChartConfig();
+      final TourChartConfiguration refTourChartConfig = TourManager.createDefaultTourChartConfig(_state);
+      final TourChartConfiguration compTourchartConfig = TourManager.createDefaultTourChartConfig(_state);
 
       final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
             refTourData,

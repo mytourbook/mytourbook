@@ -198,7 +198,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
             //
             //
             ) {
-               _tourChartConfig = TourManager.createDefaultTourChartConfig();
+               _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
 
                if (_tourChart != null) {
                   _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -438,7 +438,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       _tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
       _tourChart.setContextProvider(new TourChartContextProvider(this), true);
 
-      _tourChartConfig = TourManager.createDefaultTourChartConfig();
+      _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
 
       _tourChartConfig.canUseGeoCompareTool = true;
 
@@ -492,7 +492,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    private void fireHoveredValue(final int hoveredValuePointIndex) {
 
-      final HoveredValueData hoveredValueData = new HoveredValueData(hoveredValuePointIndex);
+      final HoveredValueData hoveredValueData = new HoveredValueData(_tourData, hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
             TourEventId.HOVERED_VALUE_POSITION,
@@ -537,7 +537,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    @Override
    public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
-      // TODO Auto-generated method stub
 
       if (part == TourChartView.this) {
          return;
@@ -591,10 +590,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       if (_isInSaving) {
          return;
       }
-
-//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//            + ("\t\t\tonSelectionChanged:\t" + selection));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       _isInSelectionChanged = true;
       {
@@ -887,7 +882,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       _tourChart.setFocus();
 
       /*
-       * fire tour selection
+       * Fire tour selection
        */
       if (_tourData == null) {
 
@@ -899,7 +894,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
          _postSelectionProvider.setSelectionNoFireEvent(selection);
 
-         fireSliderPosition();
+//         fireSliderPosition();
       }
    }
 
