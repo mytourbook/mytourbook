@@ -2137,6 +2137,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // pauses layer is visible
 
+      final int[] timeSerie = _tourData.timeSerie;
+      if (timeSerie == null) {
+         // this happened when a manual tour is selected which has no time data
+         // https://github.com/mytourbook/mytourbook/commit/3c61e93b02c07798af31686a1123c108e053f7e7#r62975304-permalink
+         return;
+      }
+
       final ChartPauseConfig chartPauseConfig = new ChartPauseConfig();
 
       chartPauseConfig.isShowPauseLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
@@ -2160,7 +2167,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // get the x-axis data serie
       final double[] xAxisSerie = getXAxisDataSerie();
 
-      final int[] timeSerie = _tourData.timeSerie;
       final float[] altitudeSerie = _tourData.altitudeSerie;
       final int numTimeSlices = timeSerie.length;
       final boolean canAlignPauseLabel = altitudeSerie != null;
@@ -2479,7 +2485,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT);
       final int lineOpacity = Util.getStateInt(
-            _tourSegmenterState, //
+            _tourSegmenterState,
             TourSegmenterView.STATE_LINE_OPACITY,
             TourSegmenterView.STATE_LINE_OPACITY_DEFAULT);
 
@@ -2504,7 +2510,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
       final int graphOpacity = Util.getStateInt(
-            _tourSegmenterState, //
+            _tourSegmenterState,
             TourSegmenterView.STATE_GRAPH_OPACITY,
             TourSegmenterView.STATE_GRAPH_OPACITY_DEFAULT);
 
@@ -2523,14 +2529,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          addChartOverlay(_layerTourSegmenterAltitude);
       }
 
-      _layerTourSegmenterAltitude.setTourData(_tourData);
-      _layerTourSegmenterAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
-      _layerTourSegmenterAltitude.setIsShowSegmenterMarker(isShowSegmenterMarker);
-      _layerTourSegmenterAltitude.setIsShowSegmenterValue(isShowSegmenterValue);
-      _layerTourSegmenterAltitude.setLineProperties(isShowSegmenterLine, lineOpacity);
-      _layerTourSegmenterAltitude.setSmallHiddenValuesProperties(isHideSmallValues, smallValueSize);
-      _layerTourSegmenterAltitude.setStackedValues(stackedValues);
-      _layerTourSegmenterAltitude.setXDataSerie(xDataSerie);
+      _layerTourSegmenterAltitude
+            .setTourData(_tourData)
+            .setIsShowDecimalPlaces(isShowDecimalPlaces)
+            .setIsShowSegmenterMarker(isShowSegmenterMarker)
+            .setIsShowSegmenterValue(isShowSegmenterValue)
+            .setLineProperties(isShowSegmenterLine, lineOpacity)
+            .setSmallHiddenValuesProperties(isHideSmallValues, smallValueSize)
+            .setStackedValues(stackedValues)
+            .setXDataSerie(xDataSerie);
 
       /*
        * Create/update value layer
@@ -2539,13 +2546,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          _layerTourSegmenterOther = new ChartLayerSegmentValue(this);
       }
 
-      _layerTourSegmenterOther.setTourData(_tourData);
-      _layerTourSegmenterOther.setIsShowDecimalPlaces(isShowDecimalPlaces);
-      _layerTourSegmenterOther.setIsShowSegmenterValues(isShowSegmenterValue);
-      _layerTourSegmenterOther.setLineProperties(isShowSegmenterLine, lineOpacity);
-      _layerTourSegmenterOther.setSmallHiddenValuesProperties(isHideSmallValues, smallValueSize);
-      _layerTourSegmenterOther.setStackedValues(stackedValues);
-      _layerTourSegmenterOther.setXDataSerie(xDataSerie);
+      _layerTourSegmenterOther
+            .setTourData(_tourData)
+            .setIsShowDecimalPlaces(isShowDecimalPlaces)
+            .setIsShowSegmenterValues(isShowSegmenterValue)
+            .setLineProperties(isShowSegmenterLine, lineOpacity)
+            .setSmallHiddenValuesProperties(isHideSmallValues, smallValueSize)
+            .setStackedValues(stackedValues)
+            .setXDataSerie(xDataSerie);
 
       // draw the graph lighter that the segments are more visible
       setGraphAlpha(graphOpacity / 100.0);

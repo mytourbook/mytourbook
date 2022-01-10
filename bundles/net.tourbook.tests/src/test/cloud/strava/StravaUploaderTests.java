@@ -15,6 +15,7 @@
  *******************************************************************************/
 package cloud.strava;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,7 +46,7 @@ public class StravaUploaderTests {
    private static final String HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
 
    private static final String STRAVA_FILE_PATH     =
-         FilesUtils.rootPath + "cloud/strava/files/"; //$NON-NLS-1$
+         FilesUtils.rootPath + "cloud/strava/files/";                                                   //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
    static StravaUploader       stravaUploader;
@@ -53,7 +54,7 @@ public class StravaUploaderTests {
    private List<TourData>      selectedTours        = new ArrayList<>();
 
    @BeforeAll
-   static void initAll() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+   static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
       httpClientMock = new HttpClientMock();
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
@@ -108,7 +109,11 @@ public class StravaUploaderTests {
       stravaUploader.uploadTours(selectedTours);
 
       httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
-      httpClientMock.verify().post("https://www.strava.com/api/v3/uploads").called(); //$NON-NLS-1$
+      httpClientMock
+            .verify()
+            .post("https://www.strava.com/api/v3/uploads")
+            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888")
+            .called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());
@@ -132,7 +137,13 @@ public class StravaUploaderTests {
       stravaUploader.uploadTours(selectedTours);
 
       httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
-      httpClientMock.verify().post("https://www.strava.com/api/v3/activities").called(); //$NON-NLS-1$
+      httpClientMock
+            .verify()
+            .post("https://www.strava.com/api/v3/activities")
+            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888")
+            .withBody(equalTo(
+                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour\",\"elapsed_time\":3600,\"description\":\"\",\"type\":\"Run\"}"))
+            .called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertEquals(3, logs.size());

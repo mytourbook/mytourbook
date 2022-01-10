@@ -853,6 +853,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   onSelect_SegmenterType(false);
                }
 
+            } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)) {
+
+               // recompute segments
+
+               onSelect_CreateSegments();
+
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
                _segmentViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
