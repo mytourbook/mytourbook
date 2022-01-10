@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -263,13 +263,13 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
 
-         Color paintedColor;
+         Color textAndLineColor;
          RGB paintedRGB;
          if (altiDiff < 0) {
-            paintedColor = segmentColor;
+            textAndLineColor = segmentColor;
             paintedRGB = segmentRGB;
          } else {
-            paintedColor = upColor;
+            textAndLineColor = upColor;
             paintedRGB = upRGB;
          }
 
@@ -290,7 +290,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
             if (_isShowSegmenterLine /* && isShowValueText */) {
 
                gc.setAlpha(_lineOpacity);
-               gc.setForeground(paintedColor);
+               gc.setForeground(textAndLineColor);
                gc.setLineAttributes(defaultLineAttributes);
 
                gc.drawLine(
@@ -328,7 +328,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                }
 
                gc.setAlpha(0xff);
-               gc.setForeground(paintedColor);
+               gc.setForeground(textAndLineColor);
                gc.setLineAttributes(markerLineAttribute);
 
                gc.drawLine(
@@ -383,7 +383,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                      overlapChecker.setupNext(validRect);
 
                      gc.setAlpha(0xff);
-                     gc.setForeground(paintedColor);
+                     gc.setForeground(textAndLineColor);
                      gc.drawText(
                            valueText,
                            devXText - borderWidth,
@@ -632,32 +632,48 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
       return _paintedSegments;
    }
 
-   void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+   ChartLayerSegmentAltitude setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+
       _isShowDecimalPlaces = isShowDecimalPlaces;
+
+      return this;
    }
 
-   void setIsShowSegmenterMarker(final boolean isShowSegmenterMarker) {
+   ChartLayerSegmentAltitude setIsShowSegmenterMarker(final boolean isShowSegmenterMarker) {
+
       _isShowSegmenterMarker = isShowSegmenterMarker;
+
+      return this;
    }
 
-   void setIsShowSegmenterValue(final boolean isShowSegmenterValue) {
+   ChartLayerSegmentAltitude setIsShowSegmenterValue(final boolean isShowSegmenterValue) {
+
       _isShowSegmenterValue = isShowSegmenterValue;
+
+      return this;
    }
 
-   void setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
+   ChartLayerSegmentAltitude setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
 
       _isShowSegmenterLine = isShowSegmenterLine;
       _lineOpacity = (int) (lineOpacity / 100.0 * 255);
+
+      return this;
    }
 
-   void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
+   ChartLayerSegmentAltitude setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
 
       _isHideSmallValues = isHideSmallValues;
       _smallValue = smallValue / 100.0;
+
+      return this;
    }
 
-   void setStackedValues(final int stackedValues) {
+   ChartLayerSegmentAltitude setStackedValues(final int stackedValues) {
+
       _stackedValues = stackedValues;
+
+      return this;
    }
 
    /**
@@ -665,15 +681,20 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
     *
     * @param tourData
     */
-   void setTourData(final TourData tourData) {
+   ChartLayerSegmentAltitude setTourData(final TourData tourData) {
 
       _tourData = tourData;
 
       _paintedSegments.clear();
+
+      return this;
    }
 
-   void setXDataSerie(final double[] dataSerie) {
+   ChartLayerSegmentAltitude setXDataSerie(final double[] dataSerie) {
+
       _xDataSerie = dataSerie;
+
+      return this;
    }
 
 }

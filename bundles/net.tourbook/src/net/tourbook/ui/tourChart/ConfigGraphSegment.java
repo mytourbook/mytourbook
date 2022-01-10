@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,7 +49,11 @@ public class ConfigGraphSegment {
     */
    public ConfigGraphSegment(final String graphColorName) {
 
-      segmentLineRGB = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT_LIGHT);
+      final String prefColorText = net.tourbook.common.UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
+
+      segmentLineRGB = TourManager.getGraphColor(graphColorName, prefColorText);
    }
 
 }
