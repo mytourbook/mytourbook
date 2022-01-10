@@ -5683,6 +5683,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
       final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
 
       final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
@@ -5776,20 +5778,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          /*
-          * time
+          * Time
           */
          final int segmentEndTime = timeSerie[segmentEndIndex];
          final int segmentElapsedTime = segmentEndTime - segmentStartTime;
+
          final int segmentPausedTime = getPausedTime(segmentStartIndex, segmentEndIndex);
-         final int segmentRecordedTime = segmentElapsedTime - segmentPausedTime;
          final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
-         final float segmentMovingTime = segmentElapsedTime - segmentBreakTime;
+         final int segmentRecordedTime = segmentElapsedTime - segmentPausedTime;
+         final int segmentMovingTime = segmentElapsedTime - segmentBreakTime;
+
+         final float segmentTime = isPaceAndSpeedFromRecordedTime
+               ? segmentRecordedTime
+               : segmentMovingTime;
 
          segmentSerie_Time_Elapsed[segmentIndex] = segment.deviceTime_Elapsed = segmentElapsedTime;
          segmentSerie_Time_Recorded[segmentIndex] = segment.deviceTime_Recorded = segmentRecordedTime;
          segmentSerie_Time_Paused[segmentIndex] = segment.deviceTime_Paused = segmentPausedTime;
-         segmentSerie_Time_Moving[segmentIndex] = segment.computedTime_Moving = (int) segmentMovingTime;
+         segmentSerie_Time_Moving[segmentIndex] = segment.computedTime_Moving = segmentMovingTime;
          segmentSerie_Time_Break[segmentIndex] = segment.computedTime_Break = segmentBreakTime;
          segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentElapsedTime;
 
@@ -5802,7 +5809,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          float segmentDistance = 0.0f;
 
          /*
-          * distance
+          * Distance
           */
          if (isDistanceSerie) {
 
@@ -5819,12 +5826,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (segmentDistance != 0.0) {
 
                // speed
-               segmentSerie_Speed[segmentIndex] = segment.speed = segmentMovingTime == 0.0f //
+               segmentSerie_Speed[segmentIndex] = segment.speed = segmentTime == 0.0f
                      ? 0.0f
-                     : segmentDistance / segmentMovingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
+                     : segmentDistance / segmentTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
                // pace
-               final float segmentPace = segmentMovingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
+               final float segmentPace = segmentTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
                segment.pace = segmentPace;
                segment.pace_Diff = segment.pace - tourPace;
                segmentSerie_Pace[segmentIndex] = segmentPace;
@@ -5834,7 +5841,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          /*
-          * altitude
+          * Elevation
           */
          if (isAltitudeSerie) {
 
@@ -8133,28 +8140,62 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Calculates the total amount of paused time between a start and an end indices
     *
-    * @param startIndex
-    * @param endIndex
+    * @param tourStartIndex
+    * @param tourEndIndex
     * @return Returns the paused time in seconds
     */
-   public int getPausedTime(final int startIndex, final int endIndex) {
+   public int getPausedTime(final int tourStartIndex, final int tourEndIndex) {
+
+      if (timeSerie == null
+            || pausedTime_Start == null
+            || tourStartIndex < 0
+            || tourEndIndex < 0
+            || tourStartIndex == tourEndIndex
+            || tourStartIndex > timeSerie.length
+            || tourEndIndex > timeSerie.length) {
+
+         return 0;
+      }
+
+      final int tour_RelativeStartTime = timeSerie[tourStartIndex];
+      final int tour_RelativeEndTime = timeSerie[tourEndIndex];
 
       int totalPausedTime = 0;
 
-      if (timeSerie == null || pausedTime_Start == null ||
-            startIndex < 0 || endIndex < 0 || startIndex == endIndex ||
-            startIndex > timeSerie.length || endIndex > timeSerie.length) {
-         return totalPausedTime;
-      }
-
+      // loop: all tour pauses
       for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-         final long currentPausedTime_Start = pausedTime_Start[index] / 1000;
-         final long currentRelativePausedTime_Start = (pausedTime_Start[index] - tourStartTime) / 1000;
+         final long paused_AbsoluteStartTime_MS = pausedTime_Start[index];
+         final long paused_RelativeStartTime = (paused_AbsoluteStartTime_MS - tourStartTime) / 1000;
 
-         if (currentRelativePausedTime_Start >= timeSerie[startIndex] &&
-               currentRelativePausedTime_Start <= timeSerie[endIndex]) {
-            totalPausedTime += (pausedTime_End[index] / 1000) - currentPausedTime_Start;
+         // check if tour segment is within pauses
+         if (paused_RelativeStartTime > tour_RelativeEndTime) {
+
+            // pause is starting after tour segment -> all is done
+
+            break;
+         }
+
+         if (paused_RelativeStartTime >= tour_RelativeStartTime
+               && paused_RelativeStartTime <= tour_RelativeEndTime) {
+
+            final long paused_AbsoluteEndTime_MS = pausedTime_End[index];
+            final long paused_RelativeEndTime = (paused_AbsoluteEndTime_MS - tourStartTime) / 1000;
+
+            long pausedTimeDiff = 0;
+
+            if (paused_RelativeEndTime > tour_RelativeEndTime) {
+
+               // pause continues after tour segment -> clip paused time
+
+               pausedTimeDiff = tour_RelativeEndTime - paused_RelativeStartTime;
+
+            } else {
+
+               pausedTimeDiff = paused_RelativeEndTime - paused_RelativeStartTime;
+            }
+
+            totalPausedTime += pausedTimeDiff;
          }
       }
 

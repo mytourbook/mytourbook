@@ -12,17 +12,19 @@ Improvements
 ============
 
 * Tour Chart
-  - Filter tour pauses
-  - Stack tour pauses that they don't overlap
+  - Filter tour pauses                             https://github.com/mytourbook/mytourbook/issues/428
+  - Stack tour pauses that they don't overlap      https://github.com/mytourbook/mytourbook/issues/428
   
-                              https://github.com/mytourbook/mytourbook/issues/428
+                              
 
 * 2D Map
-  - Filter tour pauses        https://github.com/mytourbook/mytourbook/issues/428
-  - Tour breadcrumbs          https://github.com/mytourbook/mytourbook/issues/431
+  - Filter tour pauses                             https://github.com/mytourbook/mytourbook/issues/428
+  - Tour breadcrumbs                               https://github.com/mytourbook/mytourbook/issues/431
   - Update tour geo filter default location and zoom level 
-                              https://github.com/mytourbook/mytourbook/issues/433
+                                                   https://github.com/mytourbook/mytourbook/issues/433
 
+* Tour Segmenter
+  - Recompute segments when time in preferences to compute speed/pace is modified
 
 Changes
 =======
@@ -39,10 +41,15 @@ Bugfix
 * Strava Integration: (Frederic)       
   - Manually created activities use different activity types than uploaded activities
     Official activity types list: https://developers.strava.com/docs/reference/#api-models-ActivityType
+
+* Tour Chart    
+  - Show tour segment values with the correct dark color when dark theme is used
     
 * 3D Map
   - Is now working with Java 17    
 
+* Tour Segmenter
+  - Use selected time in preferences to compute speed and pace, until now only the moving time was used
 
 Translation    
 ===========
