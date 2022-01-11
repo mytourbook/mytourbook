@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import net.tourbook.common.util.FilesUtils;
+
 public final class FileZip {
 
    public final static String gunzip(final String gzipName) throws Exception {
@@ -42,9 +44,7 @@ public final class FileZip {
          if (gzipEntryName.indexOf(File.separator) != -1) {
             gzipEntryName = gzipEntryName.substring(gzipEntryName.lastIndexOf(File.separator) + 1);
          }
-         if (gzipEntryName.indexOf('.') != -1) {
-            gzipEntryName = gzipEntryName.substring(0, gzipEntryName.lastIndexOf('.'));
-         }
+         gzipEntryName = FilesUtils.removeExtensions(gzipEntryName);
 
          outFileName = gzipName.substring(0, gzipName.lastIndexOf(File.separator)) + File.separator + gzipEntryName;
 
