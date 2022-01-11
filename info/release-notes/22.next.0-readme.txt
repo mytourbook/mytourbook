@@ -30,7 +30,8 @@ Experimental
 New
 ===
 
-* 
+* Tour Pauses
+  - Show all tour pauses in a list
 
 
 Improvements
