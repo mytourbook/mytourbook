@@ -123,6 +123,7 @@ public class TourMerger {
       final float[] sourceCadenceSerie = _sourceTour.getCadenceSerie();
       final float[] sourcePulseSerie = _sourceTour.pulseSerie;
       final float[] sourceTemperatureSerie = _sourceTour.temperatureSerie;
+
       // check if the data series are available
       final boolean isSourceCadence = sourceCadenceSerie != null;
       final boolean isSourcePulse = sourcePulseSerie != null;
