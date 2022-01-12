@@ -32,11 +32,6 @@ public class TourMerger {
    private boolean  _adjustAltiFromStart;
    private boolean  _adjustAltiFromSource;
    private boolean  _adjustAltiSmoothly;
-   private float[]  _backupTargetPulseSerie;
-   private int[]    _backupTargetTimeSerie;
-   private float[]  _backupSourceSpeedSerie;
-   private float[]  _backupTargetTemperatureSerie;
-   private float[]  _backupTargetCadenceSerie;
    private int      _tourChart_LeftSliderValueIndex;
    private boolean  _synchStartTime;
    private int      _tourStartTimeSynchOffset;
@@ -44,6 +39,7 @@ public class TourMerger {
    public TourMerger(final TourData sourceTour,
                      final TourData targetTour,
                      final boolean synchStartTime,
+                     final int tourStartTimeSynchOffset,
                      final boolean mergeCadence,
                      final boolean mergePulse,
                      final boolean mergeSpeed,
@@ -62,7 +58,9 @@ public class TourMerger {
       _adjustAltiFromStart = adjustAltiFromStart;
       _adjustAltiFromSource = adjustAltiFromSource;
       _adjustAltiSmoothly = adjustAltiSmoothly;
+      _tourStartTimeSynchOffset = tourStartTimeSynchOffset;
    }
+
 
    private void assignMergedSeries(final float[] newSourceAltitudeSerie,
                                    final float[] newSourceAltiDiffSerie,
@@ -92,27 +90,27 @@ public class TourMerger {
       if (_mergePulse) {
          _targetTour.pulseSerie = newTargetPulseSerie;
       } else {
-         _targetTour.pulseSerie = _backupTargetPulseSerie;
+         _targetTour.pulseSerie = _sourceTour.pulseSerie;
       }
 
       if (_mergeSpeed) {
          _targetTour.timeSerie = targetTimeSerie;
          _targetTour.setSpeedSerie(null);
       } else {
-         _targetTour.timeSerie = _backupTargetTimeSerie;
-         _targetTour.setSpeedSerie(_backupSourceSpeedSerie);
+         _targetTour.timeSerie = _sourceTour.timeSerie;
+         _targetTour.setSpeedSerie(_sourceTour.getSpeedSerie());
       }
 
       if (_mergeTemperature) {
          _targetTour.temperatureSerie = newTargetTemperatureSerie;
       } else {
-         _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
+         _targetTour.temperatureSerie = _sourceTour.temperatureSerie;
       }
 
       if (_mergeCadence) {
          _targetTour.setCadenceSerie(newTargetCadenceSerie);
       } else {
-         _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
+         _targetTour.setCadenceSerie(_sourceTour.getCadenceSerie());
       }
    }
 
@@ -332,7 +330,7 @@ public class TourMerger {
       final int lastSourceIndex = sourceTimeSerie.length - 1;
       int previousSourceTime = 0;
       int sourceTime = sourceTimeSerie[0] + xMergeOffset;
-      for (int targetIndex = 0; targetIndex < _targetTour.timeSerie.length; targetIndex++) {
+      for (int targetIndex = 0; targetIndex < targetTimeSerie.length; targetIndex++) {
 
          final int targetTime = targetTimeSerie[targetIndex];
 
@@ -421,7 +419,7 @@ public class TourMerger {
       }
 
       final float[] targetDistanceSerie = _targetTour.distanceSerie;
-      final int serieLength = targetTimeSerie.length;
+      final int serieLength = targetDistanceSerie.length;
 
       int sourceTime = sourceTimeSerie[0];
       int previousSourceTime = 0;
