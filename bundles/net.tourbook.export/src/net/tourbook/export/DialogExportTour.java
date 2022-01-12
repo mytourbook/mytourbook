@@ -1470,7 +1470,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
       // search for the first tour
       TourData minTourData = _tourDataList.get(0);
-      final long minTourMillis = 0;
+      long minTourMillis = minTourData.getTourStartTime().toInstant().toEpochMilli();
 
       for (final TourData tourData : _tourDataList) {
 
@@ -1478,6 +1478,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          if (tourMillis < minTourMillis) {
             minTourData = tourData;
+            minTourMillis = minTourData.getTourStartTime().toInstant().toEpochMilli();
          }
       }
 
