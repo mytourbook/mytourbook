@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,16 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -292,39 +301,58 @@ public class TourManager {
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
     * not opened
     */
-   private static TourDataEditorView      _tourDataEditorInstance;
+   private static TourDataEditorView       _tourDataEditorInstance;
    //
-   private static LabelProviderMMSS       _labelProviderMMSS = new LabelProviderMMSS();
-   private static LabelProviderInt        _labelProviderInt  = new LabelProviderInt();
+   private static LabelProviderMMSS        _labelProviderMMSS = new LabelProviderMMSS();
+   private static LabelProviderInt         _labelProviderInt  = new LabelProviderInt();
    //
-   private static volatile TourData       _joined_TourData;
-   private static int                     _joined_TourIds_Hash;
-   private static volatile List<TourData> _allLoaded_TourData;
-   private static int                     _allLoaded_TourData_Hash;
-   private static long                    _allLoaded_TourData_Key;
-   private static int                     _allLoaded_TourIds_Hash;
+   private static volatile TourData        _joined_TourData;
+   private static int                      _joined_TourIds_Hash;
+   private static volatile List<TourData>  _allLoaded_TourData;
+   private static int                      _allLoaded_TourData_Hash;
+   private static long                     _allLoaded_TourData_Key;
+   private static int                      _allLoaded_TourIds_Hash;
    //
-   private ComputeChartValue              _computeAvg_Altimeter;
-   private ComputeChartValue              _computeAvg_Altitude;
-   private ComputeChartValue              _computeAvg_Cadence;
-   private ComputeChartValue              _computeAvg_Gradient;
-   private ComputeChartValue              _computeAvg_Pace;
-   private ComputeChartValue              _computeAvg_Power;
-   private ComputeChartValue              _computeAvg_Pulse;
-   private ComputeChartValue              _computeAvg_Speed;
+   private static ThreadPoolExecutor       _loadingTour_Executor;
+   private static ArrayBlockingQueue<Long> _loadingTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch           _loadingTour_CountDownLatch;
    //
-   private ComputeChartValue              _computeAvg_RunDyn_StanceTime;
-   private ComputeChartValue              _computeAvg_RunDyn_StanceTimeBalance;
-   private ComputeChartValue              _computeAvg_RunDyn_StepLength;
-   private ComputeChartValue              _computeAvg_RunDyn_VerticalOscillation;
-   private ComputeChartValue              _computeAvg_RunDyn_VerticalRatio;
+   static {
+
+      final ThreadFactory loadingThreadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Loading tours from DB");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _loadingTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, loadingThreadFactory);
+   }
    //
-   private final TourDataCache            _tourDataCache;
+   private ComputeChartValue   _computeAvg_Altimeter;
+   private ComputeChartValue   _computeAvg_Altitude;
+   private ComputeChartValue   _computeAvg_Cadence;
+   private ComputeChartValue   _computeAvg_Gradient;
+   private ComputeChartValue   _computeAvg_Pace;
+   private ComputeChartValue   _computeAvg_Power;
+   private ComputeChartValue   _computeAvg_Pulse;
+   private ComputeChartValue   _computeAvg_Speed;
+   //
+   private ComputeChartValue   _computeAvg_RunDyn_StanceTime;
+   private ComputeChartValue   _computeAvg_RunDyn_StanceTimeBalance;
+   private ComputeChartValue   _computeAvg_RunDyn_StepLength;
+   private ComputeChartValue   _computeAvg_RunDyn_VerticalOscillation;
+   private ComputeChartValue   _computeAvg_RunDyn_VerticalRatio;
+   //
+   private final TourDataCache _tourDataCache;
 
    /**
     * tour chart which shows the selected tour
     */
-   private TourChart                      _activeTourChart;
+   private TourChart           _activeTourChart;
 
    public static class LabelProviderInt implements IValueLabelProvider {
 
@@ -1367,7 +1395,6 @@ public class TourManager {
 //                  + ("\tcustomData: " + customData)
 ////            + ("\t: " + )
 //      );
-//// TODO remove SYSTEM.OUT.PRINTLN
 
       final Object[] allListeners = _tourEventListeners.getListeners();
       for (final Object listener : allListeners) {
@@ -1792,8 +1819,6 @@ public class TourManager {
       }
 
       return true;
-
-//      return tourData.hasGeoData();
    }
 
    /**
@@ -1918,9 +1943,8 @@ public class TourManager {
       boolean isLongDuration = false;
 
       // create a unique key for all tours
-      final long[] newOverlayKey = { 0 };
+      final AtomicLong newOverlayKey = new AtomicLong();
       final int[] tourIndex = { 0 };
-      final int[] loadCounter = { 0 };
       final int numTourIds = allTourIds.size();
 
       while (tourIndex[0] < numTourIds) {
@@ -1929,7 +1953,7 @@ public class TourManager {
          loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
 
          /*
-          * Check if this is a long duration -> run with progress monitor
+          * Check if this is a long duration -> run with progress monitor and concurrent
           */
          final long runDuration = System.currentTimeMillis() - start;
          if (runDuration > 500) {
@@ -1950,24 +1974,74 @@ public class TourManager {
                public void run(final IProgressMonitor monitor)
                      throws InvocationTargetException, InterruptedException {
 
+                  /*
+                   * Setup concurrency
+                   */
+                  _loadingTour_CountDownLatch = new CountDownLatch(numTourIds - tourIndex[0]);
+                  _loadingTour_Queue.clear();
+
+                  final ConcurrentHashMap<Long, TourData> allTourData_Concurrent = new ConcurrentHashMap<>();
+
+                  /*
+                   * Setup monitor
+                   */
+                  final long startTime = System.currentTimeMillis();
+                  long lastUpdateTime = startTime;
+
+                  final AtomicInteger numWorkedTours = new AtomicInteger(tourIndex[0]);
+                  int numLastWorked = 0;
+
                   monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, numTourIds);
 
                   while (tourIndex[0] < numTourIds) {
-
-                     monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
-                           ++loadCounter[0],
-                           numTourIds));
 
                      if (monitor.isCanceled()) {
                         break;
                      }
 
-                     final Long tourId = allTourIds.get(tourIndex[0]);
-                     loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
+                     /*
+                      * Update monitor
+                      */
+                     final long currentTime = System.currentTimeMillis();
+                     final long timeDiff = currentTime - lastUpdateTime;
 
-                     monitor.worked(1);
+                     // reduce logging
+                     if (timeDiff > 500) {
+
+                        lastUpdateTime = currentTime;
+
+                        final int numWorked = numWorkedTours.get();
+
+                        // "{0} / {1} - {2} % - {3} Δ"
+                        UI.showWorkedInProgressMonitor(monitor, numWorked, numTourIds, numLastWorked);
+
+                        numLastWorked = numWorked;
+                     }
+
+//                     monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
+//                           ++loadCounter[0],
+//                           numTourIds));
+
+                     final Long tourId = allTourIds.get(tourIndex[0]);
+
+                     loadTourData_Concurrent(
+
+                           tourId,
+                           allTourData_Concurrent,
+                           numWorkedTours,
+                           isCheckLatLon,
+                           newOverlayKey,
+                           monitor);
 
                      ++tourIndex[0];
+                  }
+
+                  // wait until all loadings are performed
+                  _loadingTour_CountDownLatch.await();
+
+                  // add new loaded tours
+                  for (final Entry<Long, TourData> entry : allTourData_Concurrent.entrySet()) {
+                     allTourData.add(entry.getValue());
                   }
                }
             };
@@ -1986,15 +2060,64 @@ public class TourManager {
       _allLoaded_TourIds_Hash = allTourIds.hashCode();
       _allLoaded_TourData = allTourData;
       _allLoaded_TourData_Hash = allTourData.hashCode();
-      _allLoaded_TourData_Key = newOverlayKey[0];
+      _allLoaded_TourData_Key = newOverlayKey.get();
 
       return _allLoaded_TourData_Key;
+   }
+
+   private static void loadTourData_Concurrent(final Long tourId,
+                                               final ConcurrentHashMap<Long, TourData> allTourData_Concurrent,
+                                               final AtomicInteger numWorkedTours,
+                                               final boolean isCheckLatLon,
+                                               final AtomicLong newOverlayKey,
+                                               final IProgressMonitor monitor) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _loadingTour_Queue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _loadingTour_Executor.submit(() -> {
+
+         try {
+
+            // get last added item
+            final Long queueItem_TourId = _loadingTour_Queue.poll();
+
+            if (queueItem_TourId != null) {
+
+               loadTourData_OneTour_Concurrent(
+
+                     queueItem_TourId,
+                     allTourData_Concurrent,
+                     isCheckLatLon,
+                     newOverlayKey);
+            }
+
+         } finally {
+
+            if (monitor != null) {
+               monitor.worked(1);
+            }
+
+            numWorkedTours.incrementAndGet();
+
+            _loadingTour_CountDownLatch.countDown();
+         }
+      });
    }
 
    private static void loadTourData_OneTour(final Long tourId,
                                             final List<TourData> allTourData,
                                             final boolean isCheckLatLon,
-                                            final long[] newOverlayKey) {
+                                            final AtomicLong newOverlayKey) {
 
       final TourData tourData = getInstance().getTourData(tourId);
 
@@ -2011,7 +2134,31 @@ public class TourManager {
          allTourData.add(tourData);
 
          // update key for all tours
-         newOverlayKey[0] += tourData.getTourId();
+         newOverlayKey.getAndAdd(tourData.getTourId());
+      }
+   }
+
+   private static void loadTourData_OneTour_Concurrent(final Long tourId,
+                                                       final ConcurrentHashMap<Long, TourData> allTourData,
+                                                       final boolean isCheckLatLon,
+                                                       final AtomicLong newOverlayKey) {
+
+      final TourData tourData = getInstance().getTourData(tourId);
+
+      if (tourData == null) {
+
+         // this happened when switching tour type during normal startup but all was not yet loaded
+
+         return;
+      }
+
+      if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
+
+         // keep tour data for each tour id
+         allTourData.put(tourData.getTourId(), tourData);
+
+         // update key for all tours
+         newOverlayKey.getAndAdd(tourData.getTourId());
       }
    }
 
