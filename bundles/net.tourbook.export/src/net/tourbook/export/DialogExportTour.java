@@ -1088,7 +1088,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
             // get markers when this option is checked
             if (!_exportState_GPX_IsExportMarkers) {
-               //todo fb
                return;
             }
 

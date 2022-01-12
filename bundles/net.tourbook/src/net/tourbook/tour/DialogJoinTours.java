@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,8 +57,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -361,24 +362,19 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    private void createUI(final Composite parent) {
 
-      final SelectionAdapter defaultSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableControls();
-         }
-      };
+      final SelectionListener defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
 
       _dlgInnerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
       GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
 //      _dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
-         createUI10JoinMethod(_dlgInnerContainer, defaultSelectionAdapter);
+         createUI10JoinMethod(_dlgInnerContainer, defaultSelectionListener);
          createUI20Title(_dlgInnerContainer);
-         createUI22TourTime(_dlgInnerContainer, defaultSelectionAdapter);
+         createUI22TourTime(_dlgInnerContainer, defaultSelectionListener);
          createUI30TypeTags(_dlgInnerContainer);
          createUI40Person(_dlgInnerContainer);
-         createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
+         createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionListener);
          createUI60InsertPauses(_dlgInnerContainer);
       }
    }
@@ -386,7 +382,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    /**
     * tour time
     */
-   private void createUI10JoinMethod(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+   private void createUI10JoinMethod(final Composite parent, final SelectionListener defaultSelectionListener) {
 
       /*
        * join method
@@ -402,7 +398,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // combo
       _cboJoinMethod = new Combo(parent, SWT.READ_ONLY);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboJoinMethod);
-      _cboJoinMethod.addSelectionListener(defaultSelectionAdapter);
+      _cboJoinMethod.addSelectionListener(defaultSelectionListener);
 
       // fill combo
       for (final String timeText : STATE_TEXT_JOIN_METHOD) {
@@ -440,12 +436,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             .grab(true, false)
             .span(2, 1)
             .applyTo(_cboTourTitleSource);
-      _cboTourTitleSource.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectTourTitleSource();
-         }
-      });
+      _cboTourTitleSource.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTourTitleSource()));
 
       // fill combo
       for (final String comboText : STATE_COMBO_TEXT_TOUR_TITLE_SOURCE) {
@@ -468,14 +459,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    /**
     * tour time
     */
-   private void createUI22TourTime(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+   private void createUI22TourTime(final Composite parent, final SelectionListener defaultSelectionListener) {
 
-      final SelectionAdapter dateTimeUpdateListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableControls();
-         }
-      };
+      final SelectionListener dateTimeUpdateListener = widgetSelectedAdapter(selectionEvent -> enableControls());
 
       /*
        * tour time
@@ -489,7 +475,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _chkKeepOriginalDateTime = new Button(parent, SWT.CHECK);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkKeepOriginalDateTime);
       _chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_Checkbox_KeepTime);
-      _chkKeepOriginalDateTime.addSelectionListener(defaultSelectionAdapter);
+      _chkKeepOriginalDateTime.addSelectionListener(defaultSelectionListener);
 
       /*
        * tour start date/time
@@ -545,12 +531,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       _cboTourType = new Combo(parent, SWT.READ_ONLY);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboTourType);
-      _cboTourType.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectTourTypeSource();
-         }
-      });
+      _cboTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTourTypeSource()));
 
       // fill combo
       for (final String tourTypeText : STATE_TEXT_TOUR_TYPE_SOURCE) {
@@ -570,12 +551,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       {
          _linkTourType = new Link(tourTypeContainer, SWT.NONE);
          _linkTourType.setText(Messages.Dialog_JoinTours_Link_TourType);
-         _linkTourType.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               net.tourbook.common.UI.openControlMenu(_linkTourType);
-            }
-         });
+         _linkTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTourType)));
 
          _lblTourType = new CLabel(tourTypeContainer, SWT.NONE);
          GridDataFactory.swtDefaults().grab(true, false).applyTo(_lblTourType);
@@ -589,12 +565,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       GridDataFactory.fillDefaults()//
             .align(SWT.BEGINNING, SWT.FILL)
             .applyTo(_linkTag);
-      _linkTag.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            net.tourbook.common.UI.openControlMenu(_linkTag);
-         }
-      });
+      _linkTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTag)));
 
       _lblTourTags = new Label(parent, SWT.WRAP);
       GridDataFactory.fillDefaults()//
@@ -628,7 +599,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    /**
     * checkbox: set marker for each tour
     */
-   private void createUI50DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+   private void createUI50DescriptionMarker(final Composite parent, final SelectionListener defaultSelectionListener) {
 
       /*
        * description
@@ -672,7 +643,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          _chkCreateTourMarker = new Button(container, SWT.CHECK);
          GridDataFactory.fillDefaults().applyTo(_chkCreateTourMarker);
          _chkCreateTourMarker.setText(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker);
-         _chkCreateTourMarker.addSelectionListener(defaultSelectionAdapter);
+         _chkCreateTourMarker.addSelectionListener(defaultSelectionListener);
 
          final Composite markerContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(markerContainer);
@@ -691,7 +662,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             GridDataFactory.fillDefaults()//
                   .grab(true, false)
                   .applyTo(_cboTourMarker);
-            _cboTourMarker.addSelectionListener(defaultSelectionAdapter);
+            _cboTourMarker.addSelectionListener(defaultSelectionListener);
 
             // !!! combo box is filled in updateUIMarker() !!!
          }
