@@ -25,14 +25,13 @@ public class TourMerger {
    private TourData _sourceTour;
    private TourData _targetTour;
 
-   private boolean  mergeAltitude;
-   private boolean  mergeCadence;
-   private boolean  mergePulse;
-   private boolean  mergeSpeed;
-   private boolean  mergeTemperature;
-   private boolean  adjustAltiFromStart;
-   private boolean  adjustAltiFromSource;
-   private boolean  adjustAltiSmoothly;
+   private boolean  _mergeCadence;
+   private boolean  _mergePulse;
+   private boolean  _mergeSpeed;
+   private boolean  _mergeTemperature;
+   private boolean  _adjustAltiFromStart;
+   private boolean  _adjustAltiFromSource;
+   private boolean  _adjustAltiSmoothly;
    private float[]  _backupTargetPulseSerie;
    private int[]    _backupTargetTimeSerie;
    private float[]  _backupSourceSpeedSerie;
@@ -42,10 +41,27 @@ public class TourMerger {
    private boolean  _synchStartTime;
    private int      _tourStartTimeSynchOffset;
 
-   public TourMerger(final TourData sourceTour, final TourData targetTour) {
+   public TourMerger(final TourData sourceTour,
+                     final TourData targetTour,
+                     final boolean synchStartTime,
+                     final boolean mergeCadence,
+                     final boolean mergePulse,
+                     final boolean mergeSpeed,
+                     final boolean mergeTemperature,
+                     final boolean adjustAltiFromStart,
+                     final boolean adjustAltiFromSource,
+                     final boolean adjustAltiSmoothly) {
 
       _sourceTour = sourceTour;
       _targetTour = targetTour;
+      _synchStartTime = synchStartTime;
+      _mergeCadence = mergeCadence;
+      _mergePulse = mergePulse;
+      _mergeSpeed = mergeSpeed;
+      _mergeTemperature = mergeTemperature;
+      _adjustAltiFromStart = adjustAltiFromStart;
+      _adjustAltiFromSource = adjustAltiFromSource;
+      _adjustAltiSmoothly = adjustAltiSmoothly;
    }
 
    private void assignMergedSeries(final float[] newSourceAltitudeSerie,
@@ -73,13 +89,13 @@ public class TourMerger {
          _sourceTour.dataSerieDiffTo2ndAlti = null;
       }
 
-      if (mergePulse) {
+      if (_mergePulse) {
          _targetTour.pulseSerie = newTargetPulseSerie;
       } else {
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
-      if (mergeSpeed) {
+      if (_mergeSpeed) {
          _targetTour.timeSerie = targetTimeSerie;
          _targetTour.setSpeedSerie(null);
       } else {
@@ -87,13 +103,13 @@ public class TourMerger {
          _targetTour.setSpeedSerie(_backupSourceSpeedSerie);
       }
 
-      if (mergeTemperature) {
+      if (_mergeTemperature) {
          _targetTour.temperatureSerie = newTargetTemperatureSerie;
       } else {
          _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       }
 
-      if (mergeCadence) {
+      if (_mergeCadence) {
          _targetTour.setCadenceSerie(newTargetCadenceSerie);
       } else {
          _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
@@ -148,7 +164,7 @@ public class TourMerger {
 
       final int serieLength = targetTimeSerie.length;
 
-      if (adjustAltiFromStart) {
+      if (_adjustAltiFromStart) {
 
          /*
           * adjust start altitude until left slider
@@ -202,7 +218,7 @@ public class TourMerger {
                0f
                : ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
 
-      } else if (adjustAltiFromSource) {
+      } else if (_adjustAltiFromSource) {
 
          /*
           * adjust target altitude from source altitude
@@ -223,11 +239,12 @@ public class TourMerger {
       final float[] newTargetTemperatureSerie = new float[serieLength];
       final float[] newTargetCadenceSerie = new float[serieLength];
 
-      final int[] targetTimeSerie = mergeSpeed();
+      final int[] targetTimeSerie = _mergeSpeed
+            ? mergeSpeed()
+            : _targetTour.timeSerie;
 
       int xMergeOffset = _targetTour.getMergedTourTimeOffset();
       if (_synchStartTime) {
-
          // synchronize start time
          xMergeOffset = _tourStartTimeSynchOffset;
       }
@@ -369,7 +386,7 @@ public class TourMerger {
 
    private boolean isLinearInterpolation() {
 
-      return adjustAltiFromSource && adjustAltiSmoothly;
+      return _adjustAltiFromSource && _adjustAltiSmoothly;
    }
 
    /**
