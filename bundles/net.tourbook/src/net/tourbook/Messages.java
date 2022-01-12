@@ -2835,6 +2835,13 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Checkbox_ShowUserPauses;
    public static String        Tour_Pauses_Checkbox_ShowUserPauses_Tooltip;
    public static String        Tour_Pauses_Checkbox_TourPauseFilter;
+   public static String        Tour_Pauses_Column_Duration_Label;
+   public static String        Tour_Pauses_Column_Duration_Tooltip;
+   public static String        Tour_Pauses_Column_EndTime_Header;
+   public static String        Tour_Pauses_Column_EndTime_Label;
+   public static String        Tour_Pauses_Column_StartTime_Header;
+   public static String        Tour_Pauses_Column_StartTime_Label;
+   public static String        Tour_Pauses_Column_StartTime_Tooltip;
 
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;
