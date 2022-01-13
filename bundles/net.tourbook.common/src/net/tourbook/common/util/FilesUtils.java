@@ -64,7 +64,7 @@ public final class FilesUtils {
 
    public static String removeExtensions(String fileName) {
 
-      final int extensionPosition = fileName.indexOf('.');
+      final int extensionPosition = fileName.lastIndexOf('.');
       if (extensionPosition != -1) {
          fileName = fileName.substring(0, extensionPosition);
       }
