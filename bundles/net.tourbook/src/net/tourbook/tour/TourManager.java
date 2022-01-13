@@ -1995,6 +1995,15 @@ public class TourManager {
                   while (tourIndex[0] < numTourIds) {
 
                      if (monitor.isCanceled()) {
+
+                        /*
+                         * Count down all, that the loading task can finish but process loaded tours
+                         */
+                        long numCounts = _loadingTour_CountDownLatch.getCount();
+                        while (numCounts-- > 0) {
+                           _loadingTour_CountDownLatch.countDown();
+                        }
+
                         break;
                      }
 
