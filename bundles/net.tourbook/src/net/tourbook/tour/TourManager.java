@@ -1939,7 +1939,7 @@ public class TourManager {
 
       allTourData.clear();
 
-      final long start = System.currentTimeMillis();
+      final long startTime = System.currentTimeMillis();
       boolean isLongDuration = false;
 
       // create a unique key for all tours
@@ -1955,8 +1955,8 @@ public class TourManager {
          /*
           * Check if this is a long duration -> run with progress monitor and concurrent
           */
-         final long runDuration = System.currentTimeMillis() - start;
-         if (runDuration > 500) {
+         final long runDuration = System.currentTimeMillis() - startTime;
+         if (runDuration > 1000) {
             isLongDuration = true;
             ++tourIndex[0];
             break;
@@ -1985,7 +1985,6 @@ public class TourManager {
                   /*
                    * Setup monitor
                    */
-                  final long startTime = System.currentTimeMillis();
                   long lastUpdateTime = startTime;
 
                   final AtomicInteger numWorkedTours = new AtomicInteger(tourIndex[0]);
@@ -2006,7 +2005,7 @@ public class TourManager {
                      final long timeDiff = currentTime - lastUpdateTime;
 
                      // reduce logging
-                     if (timeDiff > 500) {
+                     if (timeDiff > 200) {
 
                         lastUpdateTime = currentTime;
 
