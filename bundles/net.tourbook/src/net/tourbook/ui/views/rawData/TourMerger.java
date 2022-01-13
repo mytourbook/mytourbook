@@ -230,7 +230,7 @@ public class TourMerger {
 //      return altitudeDifferences;
 //   }
 
-   public void computeMergedData_NEWWIP() {
+   public TourData computeMergedData_NEWWIP() {
 
       final int serieLength = _targetTour.timeSerie.length;
       _newSourceAltitudeSerie = new float[serieLength];
@@ -251,6 +251,8 @@ public class TourMerger {
       }
 
       createNewTimeAndDistanceSerie(xMergeOffset, targetTimeSerie);
+
+      return _targetTour;
    }
 
 //   public float[] computeMergedData_Original() {
