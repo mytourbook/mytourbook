@@ -37,7 +37,8 @@ New
 Improvements
 ============
 
-* 
+* Tours
+  - Loading multiple tours is now much faster because they are loaded concurrently
 
 
 Changes

@@ -2105,10 +2105,11 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartGraph_Label_ShowGraph;
    public static String        Slideout_TourChartGraph_Label_Title;
 
-   public static String        Slideout_TourChartOptions_Check_InvertPaceGraph;
-   public static String        Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip;
-   public static String        Slideout_TourChartOptions_Check_NightSectionsOpacity;
-   public static String        Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip;
+   public static String        Slideout_TourChartOptions_Checkbox_InvertPaceGraph;
+   public static String        Slideout_TourChartOptions_Checkbox_InvertPaceGraph_Tooltip;
+   public static String        Slideout_TourChartOptions_Checkbox_ShowNightSections;
+   public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity;
+   public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
    public static String        Slideout_TourChartOptions_Label_Title;
 

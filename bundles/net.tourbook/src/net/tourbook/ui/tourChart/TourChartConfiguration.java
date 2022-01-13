@@ -263,11 +263,18 @@ public class TourChartConfiguration {
     * available .
     */
    public boolean               canShowBackground_SwimStyle = false;
+
+   /**
+    * When <code>true</code> then night sections are displayed when tour time is between sunset and
+    * sunrise
+    */
+   public boolean               isShowNightSections;
+
    /*
     * Tour photos
     */
-   public boolean               isShowTourPhotos            = true;
-   public boolean               isShowTourPhotoTooltip      = true;
+   public boolean isShowTourPhotos       = true;
+   public boolean isShowTourPhotoTooltip = true;
 
    /*
     * Tour info
