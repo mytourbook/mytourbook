@@ -51,6 +51,9 @@ Bugfix
 * Tour Segmenter
   - Use selected time in preferences to compute speed and pace, until now only the moving time was used
 
+* Tour Exporter (Frederic)
+  - Multiple tours are now successfully exported (GPX & TCX formats)
+
 Translation    
 ===========
 
