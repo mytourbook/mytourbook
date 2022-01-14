@@ -3814,11 +3814,15 @@ public class RawDataManager {
          }
 
          if (importedTourData.isTourDeleted) {
+
             _loadingTour_CountDownLatch.countDown();
+
             continue;
          }
 
-         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(importedTourData,
+         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(
+
+               importedTourData,
                monitor,
                numWorkedTours,
                allSavedTourIds);

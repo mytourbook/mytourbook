@@ -30,13 +30,15 @@ Experimental
 New
 ===
 
-* 
+* Tour Pauses
+  - Show all tour pauses in a list
 
 
 Improvements
 ============
 
-* 
+* Tours
+  - Loading multiple tours is now much faster because they are loaded concurrently
 
 
 Changes

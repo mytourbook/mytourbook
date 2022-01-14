@@ -21,6 +21,7 @@ import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -156,7 +157,7 @@ public class TourMapPainter extends Map2Painter {
 
    private class LoadCallbackImage implements ILoadCallBack {
 
-      private Map2  __map;
+      private Map2 __map;
       private Tile __tile;
 
       public LoadCallbackImage(final Map2 map, final Tile tile) {
@@ -1529,7 +1530,6 @@ public class TourMapPainter extends Map2Painter {
             ? allMultipleTourIds[0]
             : tourData.getTourId();
 
-
       boolean isFirstVisibleDataPoint = false;
       boolean isPrevVisibleDataPoint = false;
 
@@ -1825,7 +1825,7 @@ public class TourMapPainter extends Map2Painter {
                         if (_prefIsDrawSquare == false || _isFastPainting) {
                            drawTour_40_Dot(gcTile, devX, devY, color, tile, tourId);
                         } else {
-                           drawTour_30_Square(gcTile, devX, devY, color);
+                           drawTour_30_Square(gcTile, devX, devY, color, tile);
                         }
 
                         // set previous pixel
@@ -1856,24 +1856,67 @@ public class TourMapPainter extends Map2Painter {
                                  final Tile tile,
                                  final Long tourId) {
 
+      int paintingHash = 17;
+
       if (color != null) {
-         gc.setForeground(color);
+         paintingHash = 31 * paintingHash + color.hashCode();
       }
+
+      // create painting hash code
+      paintingHash = 31 * paintingHash + devXFrom;
+      paintingHash = 31 * paintingHash + devXTo;
+      paintingHash = 31 * paintingHash + devYFrom;
+      paintingHash = 31 * paintingHash + devYTo;
+
+      final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
+      if (allPainted_DotsHash.contains(paintingHash)) {
+
+         // dot is already painted
+         return;
+      }
+      allPainted_DotsHash.add(paintingHash);
 
       drawTour_40_Dot(gc, devXTo, devYTo, color, tile, tourId);
 
       // draw line with the color from the legend provider
+      if (color != null) {
+         gc.setForeground(color);
+      }
       gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 
    }
 
-   private void drawTour_30_Square(final GC gc, final int devX, final int devY, final Color color) {
+   private void drawTour_30_Square(final GC gc,
+                                   final int devX,
+                                   final int devY,
+                                   final Color color,
+                                   final Tile tile) {
+
+      int paintingHash = 17;
+
+      if (color != null) {
+         paintingHash = 31 * paintingHash + color.hashCode();
+      }
+
+      final int paintedDevX = devX - _lineWidth2;
+      final int paintedDevY = devY - _lineWidth2;
+
+      // create painting hash code
+      paintingHash = 31 * paintingHash + paintedDevX;
+      paintingHash = 31 * paintingHash + paintedDevY;
+
+      final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
+      if (allPainted_DotsHash.contains(paintingHash)) {
+
+         // dot is already painted
+         return;
+      }
+      allPainted_DotsHash.add(paintingHash);
 
       if (color != null) {
          gc.setBackground(color);
       }
-
-      gc.fillRectangle(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
+      gc.fillRectangle(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
    }
 
    private void drawTour_40_Dot(final GC gc,
@@ -1883,8 +1926,10 @@ public class TourMapPainter extends Map2Painter {
                                 final Tile tile,
                                 final Long tourId) {
 
+      int paintingHash = 17;
+
       if (color != null) {
-         gc.setBackground(color);
+         paintingHash = 31 * paintingHash + color.hashCode();
       }
 
       int paintedDevX;
@@ -1897,13 +1942,31 @@ public class TourMapPainter extends Map2Painter {
          paintedDevX = devX;
          paintedDevY = devY;
 
-         gc.fillRectangle(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
-
       } else {
 
          paintedDevX = devX - _lineWidth2;
          paintedDevY = devY - _lineWidth2;
+      }
 
+      // create painting hash code
+      paintingHash = 31 * paintingHash + paintedDevX;
+      paintingHash = 31 * paintingHash + paintedDevY;
+
+      final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
+      if (allPainted_DotsHash.contains(paintingHash)) {
+
+         // dot is already painted
+         return;
+      }
+      allPainted_DotsHash.add(paintingHash);
+
+      if (color != null) {
+         gc.setBackground(color);
+      }
+
+      if (_lineWidth == 2) {
+         gc.fillRectangle(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
+      } else {
          gc.fillOval(paintedDevX, paintedDevY, _lineWidth, _lineWidth);
       }
 
@@ -2509,6 +2572,7 @@ public class TourMapPainter extends Map2Painter {
       }
 
       tourData.setWorldPixelForTour(tourWorldPixelPosAll, mapZoomLevel, projectionId);
+
       return tourWorldPixelPosAll;
    }
 
@@ -2691,7 +2755,7 @@ public class TourMapPainter extends Map2Painter {
          if (latitudeSerie != null && longitudeSerie != null) {
 
             /*
-             * world positions are cached to optimize performance when multiple tours are selected
+             * World positions are cached to optimize performance when multiple tours are selected
              */
             Point[] tourWorldPixelPosAll = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
             if ((tourWorldPixelPosAll == null)) {

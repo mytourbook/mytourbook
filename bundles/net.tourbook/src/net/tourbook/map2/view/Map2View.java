@@ -505,7 +505,7 @@ public class Map2View extends ViewPart implements
     * UI controls
     */
    private Composite _parent;
-   private Map2       _map;
+   private Map2      _map;
 
    private class ActionMap2_Graphs extends ActionToolbarSlideout {
 
@@ -2399,7 +2399,7 @@ public class Map2View extends ViewPart implements
          final double tourMaxLongitude = geoPosition[1].longitude;
 
          if (tourMinLatitude == 0 && tourMaxLatitude == 0
-               && tourMinLongitude == 0 && tourMaxLatitude == 0) {
+               && tourMinLongitude == 0 && tourMaxLongitude == 0) {
             continue;
          }
 
@@ -3307,8 +3307,8 @@ public class Map2View extends ViewPart implements
 
       // check if this is a new tour
       boolean isNewTour = true;
-      if ((_previousTourData != null)
-            && (_previousTourData.getTourId().longValue() == tourData.getTourId().longValue())) {
+      if (_previousTourData != null
+            && _previousTourData.getTourId().longValue() == tourData.getTourId().longValue()) {
 
          isNewTour = false;
       }
@@ -3359,9 +3359,9 @@ public class Map2View extends ViewPart implements
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
       /*
-       * set position and zoom level for the tour
+       * Set position and zoom level for the tour
        */
-      if (_isMapSyncWith_Tour && !_map.isSearchTourByLocation()) {
+      if (_isMapSyncWith_Tour && _map.isSearchTourByLocation() == false) {
 
          if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 
@@ -3385,6 +3385,18 @@ public class Map2View extends ViewPart implements
                         tourData.mapCenterPositionLatitude,
                         tourData.mapCenterPositionLongitude));
          }
+
+      } else if (isNewTour) {
+
+         /**
+          * !! Disabled !!
+          * <p>
+          * Because map is moved when any sync is disabled but there should be a
+          * possibility that the map is NOT moved when a new tour is selected
+          */
+
+         // ensure that a new tour is visible
+//       positionMapTo_MapPosition(tourBoundsSet, true);
       }
 
       // keep tour data
@@ -4183,13 +4195,13 @@ public class Map2View extends ViewPart implements
       final int devYTooltip =
 
             _tourPainterConfig.isShowBreadcrumbs
-            && _map.tourBreadcrumb().getUsedCrumbs() > 0
+                  && _map.tourBreadcrumb().getUsedCrumbs() > 0
 
-                  // show tooltip icon below the crumbs
-                  ? TOUR_INFO_TOOLTIP_Y
+                        // show tooltip icon below the crumbs
+                        ? TOUR_INFO_TOOLTIP_Y
 
-                  // breadcrumb is not visible -> "center" icon in the top left corner
-                  : TOUR_INFO_TOOLTIP_X;
+                        // breadcrumb is not visible -> "center" icon in the top left corner
+                        : TOUR_INFO_TOOLTIP_X;
 
       _tourInfoToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
    }
