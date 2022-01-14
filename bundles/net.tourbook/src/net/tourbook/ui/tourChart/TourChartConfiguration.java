@@ -27,7 +27,10 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourPauseUI;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
@@ -145,11 +148,6 @@ public class TourChartConfiguration {
    public boolean                 isShowTourMarker        = true;
 
    /**
-    * Is <code>true</code> when tour pauses are displayed.
-    */
-   public boolean                 isShowTourPauses        = true;
-
-   /**
     * When <code>true</code>, hidden markers are also visible.
     */
    public boolean                 isShowHiddenMarker;
@@ -178,7 +176,17 @@ public class TourChartConfiguration {
    public boolean                 isShowTooltipData_DistanceDifference;
    public boolean                 isShowTooltipData_DurationDifference;
 
+   /**
+    * Is <code>true</code> when tour pauses are displayed.
+    */
+   public boolean                 isShowTourPauses        = true;
    public boolean                 isShowPauseTooltip;
+   public boolean                 isFilterTourPauses;
+   public boolean                 isFilterPauseDuration;
+   public boolean                 isShowAutoPauses;
+   public boolean                 isShowUserPauses;
+   public long                    pauseDuration;
+   public TourFilterFieldOperator pauseDurationOperator;
 
    public boolean                 isShowAbsoluteValues;
 
@@ -255,11 +263,18 @@ public class TourChartConfiguration {
     * available .
     */
    public boolean               canShowBackground_SwimStyle = false;
+
+   /**
+    * When <code>true</code> then night sections are displayed when tour time is between sunset and
+    * sunrise
+    */
+   public boolean               isShowNightSections;
+
    /*
     * Tour photos
     */
-   public boolean               isShowTourPhotos            = true;
-   public boolean               isShowTourPhotoTooltip      = true;
+   public boolean isShowTourPhotos       = true;
+   public boolean isShowTourPhotoTooltip = true;
 
    /*
     * Tour info
@@ -300,7 +315,7 @@ public class TourChartConfiguration {
     * @param keepMinMaxValues
     *           set <code>true</code> to keep min/max values when tour data will change
     */
-   public TourChartConfiguration(final boolean keepMinMaxValues) {
+   public TourChartConfiguration(final boolean keepMinMaxValues, final IDialogSettings state) {
 
       if (keepMinMaxValues) {
          setMinMaxKeeper(true);
@@ -358,17 +373,16 @@ public class TourChartConfiguration {
       isShowInfoTitle               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE);
       isShowInfoTooltip             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE);
       isShowInfoTourSeparator       = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE);
-      tourInfoTooltipDelay          = _prefStore.getInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
+      tourInfoTooltipDelay          = _prefStore.getInt(    ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
 
       /*
        * Pulse values
        */
-      pulseGraph = (PulseGraph) Util.getEnumValue(
-            _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
-            TourChart.PULSE_GRAPH_DEFAULT
-      );
+      pulseGraph                    = (PulseGraph) Util.getEnumValue(_prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES), TourChart.PULSE_GRAPH_DEFAULT);
 
 // SET_FORMATTING_ON
+
+      updateStateValues(state);
    }
 
    public void addVisibleGraph(final int visibleGraph) {
@@ -435,6 +449,20 @@ public class TourChartConfiguration {
       } else {
          _minMaxKeeper = null;
       }
+   }
+
+   public void updateStateValues(final IDialogSettings state) {
+
+// SET_FORMATTING_OFF
+
+      isFilterTourPauses    = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES,       TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
+      isFilterPauseDuration = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION,    TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
+      isShowAutoPauses      = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES,         TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
+      isShowUserPauses      = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_SHOW_USER_PAUSES,         TourPauseUI.STATE_IS_SHOW_USER_PAUSES_DEFAULT);
+      pauseDuration         = Util.getStateLong(      state, TourPauseUI.STATE_DURATION_FILTER_SUMMARIZED,  0);
+      pauseDurationOperator = (TourFilterFieldOperator) Util.getStateEnum(state, TourPauseUI.STATE_DURATION_OPERATOR, TourPauseUI.STATE_DURATION_OPERATOR_DEFAULT);
+
+// SET_FORMATTING_ON
    }
 
    /**

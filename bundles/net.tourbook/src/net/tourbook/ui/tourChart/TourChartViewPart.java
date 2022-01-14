@@ -34,6 +34,7 @@ import net.tourbook.ui.views.geoCompare.GeoPartItem;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -50,21 +51,22 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TourChartViewPart extends ViewPart implements IGeoCompareListener {
 
-   private static final String      ID         = "net.tourbook.ui.tourChart.TourChartViewPart";   //$NON-NLS-1$
+   private static final String           ID         = "net.tourbook.ui.tourChart.TourChartViewPart";   //$NON-NLS-1$
 
-   private final IPreferenceStore   _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IDialogSettings  _state     = TourbookPlugin.getState(ID);
 
-   public TourData                  _tourData;
+   public TourData                       _tourData;
 
-   protected TourChart              _tourChart;
-   protected TourChartConfiguration _tourChartConfig;
+   protected TourChart                   _tourChart;
+   protected TourChartConfiguration      _tourChartConfig;
 
-   public PostSelectionProvider     _postSelectionProvider;
+   public PostSelectionProvider          _postSelectionProvider;
 
-   private ITourEventListener       _abstractTourEventListener;
-   private IPropertyChangeListener  _prefChangeListener;
-   private ISelectionListener       _postSelectionListener;
-   private IPartListener2           _partListener;
+   private ITourEventListener            _abstractTourEventListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPartListener2                _partListener;
 
    /**
     * set the part listener to save the view settings, the listeners are called before the controls
@@ -125,7 +127,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
                   || property.equals(ITourbookPreferences.GRAPH_X_AXIS)
                   || property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-               _tourChartConfig = TourManager.createDefaultTourChartConfig();
+               _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
 
                if (_tourChart != null) {
                   _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -262,7 +264,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
             _tourData = TourManager.getInstance().getTourData(tourId);
 
             if (_tourChartConfig == null) {
-               _tourChartConfig = TourManager.createDefaultTourChartConfig();
+               _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
             }
 
 //            TourManager.fireEventWithCustomData(

@@ -372,6 +372,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       final int devYBelow = devYParent + itemHeight;
 
       final Rectangle displayBounds = Display.getCurrent().getBounds();
+      final int displayWidth = displayBounds.width;
+      final int displayHeight = displayBounds.height;
 
       int devX;
       int devY;
@@ -408,8 +410,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       if (isCheckAbove && (devY < 0)) {
          devY = devYBelow;
       }
-      if (isCheckBelow & (devY + slideoutHeight > displayBounds.height)) {
+      if (isCheckBelow & (devY + slideoutHeight > displayHeight)) {
          devY = devYAbove;
+      }
+
+      // do not hide on the right side
+      if (devX > displayWidth - slideoutWidth) {
+         devX = displayWidth - slideoutWidth;
       }
 
       return new Point(devX, devY);

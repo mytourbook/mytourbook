@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
-public class Slideout_YearStatisticOptions extends ToolbarSlideout implements IActionResetToDefault {
+public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
@@ -46,7 +46,7 @@ public class Slideout_YearStatisticOptions extends ToolbarSlideout implements IA
     * UI controls
     */
 
-   public Slideout_YearStatisticOptions(final Control ownerControl,
+   public SlideoutYearStatisticOptions(final Control ownerControl,
                                         final ToolBar toolBar,
                                         final String prefStoreGridPrefix) {
 

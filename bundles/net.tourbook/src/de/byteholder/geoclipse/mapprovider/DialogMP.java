@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -58,7 +58,7 @@ public class DialogMP extends TitleAreaDialog {
    private MP _mp;
 
    // map is shared
-   protected Map _map;
+   protected Map2 _map;
 
    private Font  _fontMono;
 

@@ -695,7 +695,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_TourEditor_Options(_pageBook, toolbar, _state, TourDataEditorView.this);
+         return new SlideoutTourEditor_Options(_pageBook, toolbar, _state, TourDataEditorView.this);
       }
    }
 

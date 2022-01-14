@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String           MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -90,6 +90,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
    private Composite             _parent;
 
    private Button                _chkPaintWithBorder;
+   private Button                _chkShowBreadcrumbs;
    private Button                _chkShowEnhancedWarning;
    private Button                _chkShowHoveredSelectedTour;
    private Button                _chkShowSlider_Location;
@@ -107,6 +108,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
    private Label                 _lblBorder_Color;
    private Label                 _lblBorder_Width;
+   private Label                 _lblBreadcrumbItems;
    private Label                 _lblHoveredSelected_HoveredColor;
    private Label                 _lblHoveredSelected_HoveredAndSelectedColor;
    private Label                 _lblHoveredSelected_SelectedColor;
@@ -120,6 +122,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
    private Spinner               _spinnerBorder_ColorDarker;
    private Spinner               _spinnerBorder_Width;
+   private Spinner               _spinnerBreadcrumbItems;
    private Spinner               _spinnerHoveredSelected_HoveredOpacity;
    private Spinner               _spinnerHoveredSelected_HoveredAndSelectedOpacity;
    private Spinner               _spinnerHoveredSelected_SelectedOpacity;
@@ -145,10 +148,10 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
     * @param map2View
     * @param map2State
     */
-   public Slideout_Map2_TrackOptions(final Control ownerControl,
-                                     final ToolBar toolBar,
-                                     final Map2View map2View,
-                                     final IDialogSettings map2State) {
+   public SlideoutMap2TrackOptions(final Control ownerControl,
+                                   final ToolBar toolBar,
+                                   final Map2View map2View,
+                                   final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
@@ -460,12 +463,6 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
          GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
          {
-            // color
-            _colorHoveredSelected_Hovered = new ColorSelectorExtended(colorContainer);
-            _colorHoveredSelected_Hovered.setToolTipText(Messages.Slideout_Map_Options_Label_HoveredColor_Tooltip);
-            _colorHoveredSelected_Hovered.addListener(_defaultMapOptions_ChangePropertyListener);
-            _colorHoveredSelected_Hovered.addOpenListener(this);
-
             // opacity
             _spinnerHoveredSelected_HoveredOpacity = new Spinner(colorContainer, SWT.BORDER);
             _spinnerHoveredSelected_HoveredOpacity.setMaximum(UI.MAX_OPACITY);
@@ -473,6 +470,12 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
             _spinnerHoveredSelected_HoveredOpacity.addSelectionListener(_defaultMapOptions_SelectionListener);
             _spinnerHoveredSelected_HoveredOpacity.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
             _spinnerLayoutData.applyTo(_spinnerHoveredSelected_HoveredOpacity);
+
+            // color
+            _colorHoveredSelected_Hovered = new ColorSelectorExtended(colorContainer);
+            _colorHoveredSelected_Hovered.setToolTipText(Messages.Slideout_Map_Options_Label_HoveredColor_Tooltip);
+            _colorHoveredSelected_Hovered.addListener(_defaultMapOptions_ChangePropertyListener);
+            _colorHoveredSelected_Hovered.addOpenListener(this);
          }
       }
       {
@@ -490,12 +493,6 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
          GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
          {
-            // color
-            _colorHoveredSelected_Selected = new ColorSelectorExtended(colorContainer);
-            _colorHoveredSelected_Selected.setToolTipText(Messages.Slideout_Map_Options_Label_SelectedColor_Tooltip);
-            _colorHoveredSelected_Selected.addListener(_defaultMapOptions_ChangePropertyListener);
-            _colorHoveredSelected_Selected.addOpenListener(this);
-
             // opacity
             _spinnerHoveredSelected_SelectedOpacity = new Spinner(colorContainer, SWT.BORDER);
             _spinnerHoveredSelected_SelectedOpacity.setMaximum(UI.MAX_OPACITY);
@@ -503,6 +500,12 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
             _spinnerHoveredSelected_SelectedOpacity.addSelectionListener(_defaultMapOptions_SelectionListener);
             _spinnerHoveredSelected_SelectedOpacity.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
             _spinnerLayoutData.applyTo(_spinnerHoveredSelected_SelectedOpacity);
+
+            // color
+            _colorHoveredSelected_Selected = new ColorSelectorExtended(colorContainer);
+            _colorHoveredSelected_Selected.setToolTipText(Messages.Slideout_Map_Options_Label_SelectedColor_Tooltip);
+            _colorHoveredSelected_Selected.addListener(_defaultMapOptions_ChangePropertyListener);
+            _colorHoveredSelected_Selected.addOpenListener(this);
          }
       }
       {
@@ -520,12 +523,6 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
          GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(colorContainer);
          {
-            // color
-            _colorHoveredSelected_HoveredAndSelected = new ColorSelectorExtended(colorContainer);
-            _colorHoveredSelected_HoveredAndSelected.setToolTipText(Messages.Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip);
-            _colorHoveredSelected_HoveredAndSelected.addListener(_defaultMapOptions_ChangePropertyListener);
-            _colorHoveredSelected_HoveredAndSelected.addOpenListener(this);
-
             // opacity
             _spinnerHoveredSelected_HoveredAndSelectedOpacity = new Spinner(colorContainer, SWT.BORDER);
             _spinnerHoveredSelected_HoveredAndSelectedOpacity.setMaximum(UI.MAX_OPACITY);
@@ -533,13 +530,59 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
             _spinnerHoveredSelected_HoveredAndSelectedOpacity.addSelectionListener(_defaultMapOptions_SelectionListener);
             _spinnerHoveredSelected_HoveredAndSelectedOpacity.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
             _spinnerLayoutData.applyTo(_spinnerHoveredSelected_HoveredAndSelectedOpacity);
+
+            // color
+            _colorHoveredSelected_HoveredAndSelected = new ColorSelectorExtended(colorContainer);
+            _colorHoveredSelected_HoveredAndSelected.setToolTipText(Messages.Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip);
+            _colorHoveredSelected_HoveredAndSelected.addListener(_defaultMapOptions_ChangePropertyListener);
+            _colorHoveredSelected_HoveredAndSelected.addOpenListener(this);
          }
       }
 
-      createUI_42_TourDirection(parent);
+      createUI_42_Breadcrumb(parent);
+      createUI_44_TourDirection(parent);
    }
 
-   private void createUI_42_TourDirection(final Composite parent) {
+   /**
+    * Breadcrumb history
+    *
+    * @param parent
+    */
+   private void createUI_42_Breadcrumb(final Composite parent) {
+
+      {
+         /*
+          * Show breadcrumbs
+          */
+         _chkShowBreadcrumbs = new Button(parent, SWT.CHECK);
+         _chkShowBreadcrumbs.setText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs);
+         _chkShowBreadcrumbs.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip);
+         _chkShowBreadcrumbs.addSelectionListener(_defaultMapOptions_SelectionListener);
+         _firstColoumLayoutData.span(2, 1).applyTo(_chkShowBreadcrumbs);
+      }
+      {
+         /*
+          * Number of crumbs
+          */
+
+         // label
+         _lblBreadcrumbItems = new Label(parent, SWT.NONE);
+         _lblBreadcrumbItems.setText(Messages.Slideout_Map_Options_Label_BreadcrumbItems);
+         _lblBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
+         _secondColoumLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
+
+         // number of crumbs
+         _spinnerBreadcrumbItems = new Spinner(parent, SWT.BORDER);
+         _spinnerBreadcrumbItems.setMinimum(0); // 0 will hide the bread crumb
+         _spinnerBreadcrumbItems.setMaximum(99);
+         _spinnerBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
+         _spinnerBreadcrumbItems.addSelectionListener(_defaultMapOptions_SelectionListener);
+         _spinnerBreadcrumbItems.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
+         _spinnerLayoutData.applyTo(_spinnerBreadcrumbItems);
+      }
+   }
+
+   private void createUI_44_TourDirection(final Composite parent) {
 
       {
          /*
@@ -724,6 +767,8 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
    private void enableControls() {
 
+// SET_FORMATTING_OFF
+
       final boolean isUseTrackOpacity = _chkTrackOpacity.getSelection();
       final boolean isShowSliderPath = _chkShowSlider_Path.getSelection();
       final boolean isPaintWithBorder = _chkPaintWithBorder.getSelection();
@@ -731,51 +776,59 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
       final boolean isHoveredSelected = _chkShowHoveredSelectedTour.getSelection();
       final boolean isShowTourDirection = _chkShowTourDirections.getSelection() && isHoveredSelected;
+      final boolean isShowBreadcrumbs = _chkShowBreadcrumbs.getSelection() && isHoveredSelected;
 
       _spinnerTrackOpacity.setEnabled(isUseTrackOpacity);
 
       // border
-      _lblBorder_Color.setEnabled(isPaintWithBorder);
-      _lblBorder_Width.setEnabled(isPaintWithBorder);
-      _colorBorderColor.setEnabled(isPaintWithBorder);
-      _rdoBorderColorColor.setEnabled(isPaintWithBorder);
-      _rdoBorderColorDarker.setEnabled(isPaintWithBorder);
-      _spinnerBorder_ColorDarker.setEnabled(isPaintWithBorder);
-      _spinnerBorder_Width.setEnabled(isPaintWithBorder);
+      _lblBorder_Color              .setEnabled(isPaintWithBorder);
+      _lblBorder_Width              .setEnabled(isPaintWithBorder);
+      _colorBorderColor             .setEnabled(isPaintWithBorder);
+      _rdoBorderColorColor          .setEnabled(isPaintWithBorder);
+      _rdoBorderColorDarker         .setEnabled(isPaintWithBorder);
+      _spinnerBorder_ColorDarker    .setEnabled(isPaintWithBorder);
+      _spinnerBorder_Width          .setEnabled(isPaintWithBorder);
 
       // slider path
-      _colorSliderPathColor.setEnabled(isShowSliderPath);
-      _lblSliderPath_Color.setEnabled(isShowSliderPath);
-      _lblSliderPath_Width.setEnabled(isShowSliderPath);
-      _lblSliderPath_Segments.setEnabled(isShowSliderPath);
-      _spinnerSliderPath_Opacity.setEnabled(isShowSliderPath);
-      _spinnerSliderPath_Segments.setEnabled(isShowSliderPath);
-      _spinnerSliderPath_LineWidth.setEnabled(isShowSliderPath);
+      _colorSliderPathColor         .setEnabled(isShowSliderPath);
+      _lblSliderPath_Color          .setEnabled(isShowSliderPath);
+      _lblSliderPath_Width          .setEnabled(isShowSliderPath);
+      _lblSliderPath_Segments       .setEnabled(isShowSliderPath);
+      _spinnerSliderPath_Opacity    .setEnabled(isShowSliderPath);
+      _spinnerSliderPath_Segments   .setEnabled(isShowSliderPath);
+      _spinnerSliderPath_LineWidth  .setEnabled(isShowSliderPath);
 
       // painting method
-      _chkShowEnhancedWarning.setEnabled(isEnhancedPaintingMode);
+      _chkShowEnhancedWarning       .setEnabled(isEnhancedPaintingMode);
 
       // hovered + selected
-      _lblHoveredSelected_HoveredColor.setEnabled(isHoveredSelected);
-      _lblHoveredSelected_HoveredAndSelectedColor.setEnabled(isHoveredSelected);
-      _lblHoveredSelected_SelectedColor.setEnabled(isHoveredSelected);
-      _colorHoveredSelected_Hovered.setEnabled(isHoveredSelected);
-      _colorHoveredSelected_HoveredAndSelected.setEnabled(isHoveredSelected);
-      _colorHoveredSelected_Selected.setEnabled(isHoveredSelected);
-      _spinnerHoveredSelected_HoveredOpacity.setEnabled(isHoveredSelected);
-      _spinnerHoveredSelected_HoveredAndSelectedOpacity.setEnabled(isHoveredSelected);
-      _spinnerHoveredSelected_SelectedOpacity.setEnabled(isHoveredSelected);
+      _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelected);
+      _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelected);
+      _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelected);
+      _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelected);
+      _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelected);
+      _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelected);
+      _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelected);
+      _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelected);
+      _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelected);
+
+      // breadcrumbs
+      _chkShowBreadcrumbs                       .setEnabled(isHoveredSelected);
+      _lblBreadcrumbItems                       .setEnabled(isShowBreadcrumbs);
+      _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs);
 
       // tour direction
-      _chkShowTourDirections.setEnabled(isHoveredSelected);
-      _colorTourDirection_SymbolColor.setEnabled(isShowTourDirection);
-      _lblTourDirection_DistanceBetweenMarkers.setEnabled(isShowTourDirection);
-      _lblTourDirection_LineWidth.setEnabled(isShowTourDirection);
-      _lblTourDirection_SymbolColor.setEnabled(isShowTourDirection);
-      _lblTourDirection_SymbolSize.setEnabled(isShowTourDirection);
-      _spinnerTourDirection_MarkerGap.setEnabled(isShowTourDirection);
-      _spinnerTourDirection_LineWidth.setEnabled(isShowTourDirection);
-      _spinnerTourDirection_SymbolSize.setEnabled(isShowTourDirection);
+      _chkShowTourDirections                    .setEnabled(isHoveredSelected);
+      _colorTourDirection_SymbolColor           .setEnabled(isShowTourDirection);
+      _lblTourDirection_DistanceBetweenMarkers  .setEnabled(isShowTourDirection);
+      _lblTourDirection_LineWidth               .setEnabled(isShowTourDirection);
+      _lblTourDirection_SymbolColor             .setEnabled(isShowTourDirection);
+      _lblTourDirection_SymbolSize              .setEnabled(isShowTourDirection);
+      _spinnerTourDirection_MarkerGap           .setEnabled(isShowTourDirection);
+      _spinnerTourDirection_LineWidth           .setEnabled(isShowTourDirection);
+      _spinnerTourDirection_SymbolSize          .setEnabled(isShowTourDirection);
+
+// SET_FORMATTING_ON
    }
 
    private int getBorderType() {
@@ -953,6 +1006,10 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _colorHoveredSelected_HoveredAndSelected.setColorValue(           Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT);
       _colorHoveredSelected_Selected.setColorValue(                     Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
 
+      // breadcrumbs
+      _chkShowBreadcrumbs.setSelection(                                 Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
+      _spinnerBreadcrumbItems.setSelection(                             Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
+
       // tour direction
       _chkShowTourDirections.setSelection(            Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
       _spinnerTourDirection_LineWidth.setSelection(   Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
@@ -1009,6 +1066,10 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _colorHoveredSelected_HoveredAndSelected.setColorValue(           Util.getStateRGB(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,        Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT));
       _colorHoveredSelected_Selected.setColorValue(                     Util.getStateRGB(_state,      Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB,                    Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT));
 
+      // breadcrumbs
+      _chkShowBreadcrumbs.setSelection(                                 Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT));
+      _spinnerBreadcrumbItems.setSelection(                             Util.getStateInt(_state,      Map2View.STATE_VISIBLE_BREADCRUMBS,                               Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT));
+
       // tour direction
       _chkShowTourDirections.setSelection(            Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_TOUR_DIRECTION,       Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT));
       _spinnerTourDirection_LineWidth.setSelection(   Util.getStateInt(_state,      Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,    Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT));
@@ -1061,6 +1122,10 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB,                 _colorHoveredSelected_Hovered.getColorValue());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,    _colorHoveredSelected_HoveredAndSelected.getColorValue());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB,                _colorHoveredSelected_Selected.getColorValue());
+
+      // breadcrumbs
+      _state.put(Map2View.STATE_IS_SHOW_BREADCRUMBS,                                      _chkShowBreadcrumbs.getSelection());
+      _state.put(Map2View.STATE_VISIBLE_BREADCRUMBS,                                      _spinnerBreadcrumbItems.getSelection());
 
       // tour direction
       _state.put(Map2View.STATE_IS_SHOW_TOUR_DIRECTION,           _chkShowTourDirections.getSelection());

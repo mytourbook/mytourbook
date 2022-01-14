@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -105,14 +106,12 @@ public class DialogExportTour extends TitleAreaDialog {
 
    //$NON-NLS-1$
 
-   private static final int           VERTICAL_SECTION_MARGIN = 10;
-   private static final int           SIZING_TEXT_FIELD_WIDTH = 250;
-   private static final int           COMBO_HISTORY_LENGTH    = 20;
+   private static final int VERTICAL_SECTION_MARGIN = 10;
+   private static final int SIZING_TEXT_FIELD_WIDTH = 250;
+   private static final int COMBO_HISTORY_LENGTH    = 20;
 
-   private static String              _dlgDefaultMessage;
    //
-   private static final DecimalFormat _nf3                    = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-
+   private static final DecimalFormat _nf3 = (DecimalFormat) NumberFormat.getInstance(Locale.US);
    static {
 
       _nf3.setMinimumFractionDigits(1);
@@ -124,6 +123,8 @@ public class DialogExportTour extends TitleAreaDialog {
    public static final String[]      StravaActivityTypes = new String[] {
          "Biking", "Running", "Hiking", "Walking", "Swimming", "Other"                                                                                    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
    };
+
+   private String                    _dlgDefaultMessage;
 
    private final IDialogSettings     _state              = TourbookPlugin
          .getState("DialogExportTour");                                                                                                                   //$NON-NLS-1$
@@ -998,148 +999,23 @@ public class DialogExportTour extends TitleAreaDialog {
 
       } else {
 
-         /*
-          * export multiple tours
-          */
-
-         final String exportPathName;
-
-         if (_exportState_IsMergeTours) {
-            exportPathName = exportFileName;
-         } else {
-            exportPathName = getExportPathName();
-         }
-
-         try {
-
-            final IRunnableWithProgress exportRunnable = new IRunnableWithProgress() {
-               @Override
-               public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                     InterruptedException {
-
-                  try {
-
-                     doExport_05_Runnable(monitor, exportPathName);
-
-                  } catch (final IOException e) {
-                     StatusUtil.log(e);
-                  }
-               }
-            };
-
-            new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, exportRunnable);
-
-         } catch (final InvocationTargetException | InterruptedException e) {
-            StatusUtil.showStatus(e);
-            Thread.currentThread().interrupt();
-         }
+         exportMultipleTours(exportFileName);
       }
    }
 
    private void doExport_05_Runnable(final IProgressMonitor monitor, final String exportFileName) throws IOException {
 
-      int exported = 0;
       final int tourSize = _tourDataList.size();
 
       monitor.beginTask(UI.EMPTY_STRING, tourSize);
 
       if (_exportState_IsMergeTours) {
 
-         /*
-          * merge all tours into one
-          */
-
-         _mergedTime[0] = _tourDataList.get(0).getTourStartTime();
-         _mergedDistance[0] = 0;
-
-         final ArrayList<GarminTrack> tracks = new ArrayList<>();
-         final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
-         final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
-
-         final GarminLap tourLap = new GarminLap();
-
-         // create tracklist and lap
-         for (final TourData tourData : _tourDataList) {
-
-            if (monitor.isCanceled()) {
-               return;
-            }
-
-            monitor.worked(1);
-            monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export,
-                  new Object[] {
-                        ++exported,
-                        tourSize,
-                        TourManager.getTourTitle(tourData) }));
-
-            doExport_52_Laps(tourData, tourLap);
-
-            ZonedDateTime trackStartTime;
-            if (_exportState_IsCamouflageSpeed) {
-               trackStartTime = _mergedTime[0];
-            } else {
-               trackStartTime = tourData.getTourStartTime();
-            }
-
-            final GarminTrack track = _tourExporter.useTourData(tourData).doExport_60_TrackPoints(trackStartTime, _mergedTime, _mergedDistance);
-            if (track != null) {
-               tracks.add(track);
-            }
-
-            // get markers when this option is checked
-            if (!_exportState_GPX_IsExportMarkers) {
-               return;
-            }
-
-            _tourExporter.doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
-         }
-
-         /*
-          * There is currently no listener to stop the velocity evaluate method
-          */
-         monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
-
-         _tourExporter.doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+         mergeAllTours(monitor, exportFileName, tourSize);
 
       } else {
 
-         /*
-          * export each tour separately
-          */
-
-         final IPath exportFilePath = new Path(exportFileName).addTrailingSeparator();
-         final String fileExtension = _exportExtensionPoint.getFileExtension();
-
-         for (int index = 0; index < _tourDataList.size() && !monitor.isCanceled(); ++index) {
-
-            final TourData tourData = _tourDataList.get(index);
-
-            // merge distance is also used as total distance for not merged tours
-            _mergedDistance[0] = 0;
-
-            // create file path name
-            final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
-
-            final String exportFilePathName = exportFilePath
-                  .append(tourFileName)
-                  .addFileExtension(fileExtension)
-                  .toOSString();
-
-            monitor.worked(1);
-            monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export,
-                  new Object[] {
-                        ++exported,
-                        tourSize,
-                        exportFilePathName }));
-
-            _tourExporter.useTourData(tourData);
-            _tourExporter.export(exportFilePathName);
-
-            // check if overwrite dialog was canceled
-            if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
-               break;
-            }
-         }
+         exportEachTour(monitor, exportFileName, tourSize);
       }
    }
 
@@ -1230,6 +1106,92 @@ public class DialogExportTour extends TitleAreaDialog {
       setFileName();
    }
 
+   /**
+    * Export each tour separately
+    *
+    * @param monitor
+    * @param exportFileName
+    * @param exported
+    * @param tourSize
+    */
+   private void exportEachTour(final IProgressMonitor monitor, final String exportFileName, final int tourSize) {
+
+      int exported = 0;
+      final IPath exportFilePath = new Path(exportFileName).addTrailingSeparator();
+      final String fileExtension = _exportExtensionPoint.getFileExtension();
+
+      for (int index = 0; index < _tourDataList.size() && !monitor.isCanceled(); ++index) {
+
+         final TourData tourData = _tourDataList.get(index);
+
+         // merge distance is also used as total distance for not merged tours
+         _mergedDistance[0] = 0;
+
+         // create file path name
+         final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
+
+         final String exportFilePathName = exportFilePath
+               .append(tourFileName)
+               .addFileExtension(fileExtension)
+               .toOSString();
+
+         monitor.worked(1);
+         monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export,
+               new Object[] {
+                     ++exported,
+                     tourSize,
+                     exportFilePathName }));
+
+         _tourExporter.useTourData(tourData);
+         _tourExporter.export(exportFilePathName);
+
+         // check if overwrite dialog was canceled
+         if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
+            break;
+         }
+      }
+   }
+
+   /**
+    * Export multiple tours
+    *
+    * @param exportFileName
+    */
+   private void exportMultipleTours(final String exportFileName) {
+
+      final String exportPathName;
+
+      if (_exportState_IsMergeTours) {
+         exportPathName = exportFileName;
+      } else {
+         exportPathName = getExportPathName();
+      }
+
+      try {
+
+         final IRunnableWithProgress exportRunnable = new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                  InterruptedException {
+
+               try {
+
+                  doExport_05_Runnable(monitor, exportPathName);
+
+               } catch (final IOException e) {
+                  StatusUtil.log(e);
+               }
+            }
+         };
+
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, exportRunnable);
+
+      } catch (final InvocationTargetException | InterruptedException e) {
+         StatusUtil.showStatus(e);
+         Thread.currentThread().interrupt();
+      }
+   }
+
    private String getActivityType() {
       return _comboTcxActivityTypes.getText().trim();
    }
@@ -1255,6 +1217,70 @@ public class DialogExportTour extends TitleAreaDialog {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+   }
+
+   /**
+    * Merge all tours into one
+    *
+    * @param monitor
+    * @param exportFileName
+    * @param exported
+    * @param tourSize
+    * @throws IOException
+    */
+   private void mergeAllTours(final IProgressMonitor monitor, final String exportFileName, final int tourSize) throws IOException {
+
+      int exported = 0;
+      _mergedTime[0] = _tourDataList.get(0).getTourStartTime();
+      _mergedDistance[0] = 0;
+
+      final ArrayList<GarminTrack> tracks = new ArrayList<>();
+      final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
+      final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
+
+      final GarminLap tourLap = new GarminLap();
+
+      // create tracklist and lap
+      for (final TourData tourData : _tourDataList) {
+
+         if (monitor.isCanceled()) {
+            return;
+         }
+
+         monitor.worked(1);
+         monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_Export,
+               new Object[] {
+                     ++exported,
+                     tourSize,
+                     TourManager.getTourTitle(tourData) }));
+
+         doExport_52_Laps(tourData, tourLap);
+
+         ZonedDateTime trackStartTime;
+         if (_exportState_IsCamouflageSpeed) {
+            trackStartTime = _mergedTime[0];
+         } else {
+            trackStartTime = tourData.getTourStartTime();
+         }
+
+         final GarminTrack track = _tourExporter.useTourData(tourData).doExport_60_TrackPoints(trackStartTime, _mergedTime, _mergedDistance);
+         if (track != null) {
+            tracks.add(track);
+         }
+
+         // get markers when this option is checked
+         if (_exportState_GPX_IsExportMarkers) {
+
+            _tourExporter.doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
+         }
+      }
+
+      /*
+       * There is currently no listener to stop the velocity evaluate method
+       */
+      monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
+
+      _tourExporter.doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
    }
 
    @Override
@@ -1340,9 +1366,7 @@ public class DialogExportTour extends TitleAreaDialog {
             /*
              * Fill-up the default activity types
              */
-            for (final String activitType : StravaActivityTypes) {
-               _comboTcxActivityTypes.add(activitType);
-            }
+            Arrays.asList(StravaActivityTypes).forEach(activityType -> _comboTcxActivityTypes.add(activityType));
          } else {
             UI.restoreCombo(_comboTcxActivityTypes, activityTypes);
          }
@@ -1445,20 +1469,16 @@ public class DialogExportTour extends TitleAreaDialog {
    private void setFileName() {
 
       // search for the first tour
-      TourData minTourData = null;
-      final long minTourMillis = 0;
+      TourData minTourData = _tourDataList.get(0);
+      long minTourMillis = minTourData.getTourStartTime().toInstant().toEpochMilli();
 
       for (final TourData tourData : _tourDataList) {
 
-         if (minTourData == null) {
+         final long tourMillis = tourData.getTourStartTime().toInstant().toEpochMilli();
+
+         if (tourMillis < minTourMillis) {
             minTourData = tourData;
-         } else {
-
-            final long tourMillis = tourData.getTourStartTime().toInstant().toEpochMilli();
-
-            if (tourMillis < minTourMillis) {
-               minTourData = tourData;
-            }
+            minTourMillis = minTourData.getTourStartTime().toInstant().toEpochMilli();
          }
       }
 
@@ -1575,11 +1595,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          String fileName = getExportFileName();
 
-         // remove extensions
-         final int extPos = fileName.indexOf('.');
-         if (extPos != -1) {
-            fileName = fileName.substring(0, extPos);
-         }
+         fileName = FilesUtils.removeExtensions(fileName);
 
          // build file path with extension
          filePath = filePath

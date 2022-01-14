@@ -939,6 +939,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       int joinedPausedTime = 0;
       final ArrayList<Long> joinedPausedTime_Start = new ArrayList<>();
       final ArrayList<Long> joinedPausedTime_End = new ArrayList<>();
+      final ArrayList<Long> joinedPausedTime_Data = new ArrayList<>();
       int joinedMovingTime = 0;
       float joinedDistance = 0;
       int joinedCalories = 0;
@@ -1328,14 +1329,21 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                final long currentTourStartTime = tourData.getTourStartTimeMS();
 
                if (previousTourEndTime < currentTourStartTime) {
+
                   joinedPausedTime_Start.add(previousTourEndTime);
                   joinedPausedTime_End.add(currentTourStartTime);
+
+                  // set this pause as a manual pause, it's not an auto-pause
+                  joinedPausedTime_Data.add(0L);
 
                   joinedPausedTime += (currentTourStartTime - previousTourEndTime) / 1000;
                }
             }
          }
 
+         /*
+          * Pauses
+          */
          final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
          if (pausedTime_Start != null) {
             joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
@@ -1343,6 +1351,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
          if (pausedTime_End != null) {
             joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
+         }
+         final Long[] pausedTime_Data = ArrayUtils.toObject(tourData.getPausedTime_Data());
+         if (pausedTime_Data != null) {
+            joinedPausedTime_Data.addAll(Arrays.asList(pausedTime_Data));
          }
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
 
@@ -1402,6 +1414,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setTourDeviceTime_Paused(joinedPausedTime);
       _joinedTourData.setPausedTime_Start(joinedPausedTime_Start.stream().mapToLong(l -> l).toArray());
       _joinedTourData.setPausedTime_End(joinedPausedTime_End.stream().mapToLong(l -> l).toArray());
+      _joinedTourData.setPausedTime_Data(joinedPausedTime_Data.stream().mapToLong(l -> l).toArray());
       _joinedTourData.setTourComputedTime_Moving(joinedMovingTime);
       _joinedTourData.setTourDistance(joinedDistance);
 

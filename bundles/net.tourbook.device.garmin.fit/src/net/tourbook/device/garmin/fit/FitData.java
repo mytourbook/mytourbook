@@ -84,6 +84,7 @@ public class FitData {
    private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
    private final List<Long>              _pausedTime_Start      = new ArrayList<>();
    private final List<Long>              _pausedTime_End        = new ArrayList<>();
+   private final List<Long>              _pausedTime_Data       = new ArrayList<>();
 
    private final List<Long>              _allBatteryTime        = new ArrayList<>();
    private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
@@ -212,7 +213,8 @@ public class FitData {
 
       _tourData.createTimeSeries(_allTimeData, false);
 
-      _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End, _pausedTime_Data);
+
       //We set the recorded time again as the elapsed time might have changed (+- few seconds)
       //after the time series were created.
       _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - _tourData.getTourDeviceTime_Paused());
@@ -631,6 +633,10 @@ public class FitData {
 
    public TimeData getLastAdded_TimeData() {
       return _lastAdded_TimeData;
+   }
+
+   public List<Long> getPausedTime_Data() {
+      return _pausedTime_Data;
    }
 
    public List<Long> getPausedTime_End() {

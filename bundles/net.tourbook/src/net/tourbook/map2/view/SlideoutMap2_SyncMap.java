@@ -31,14 +31,14 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout to sync map with...
  */
-public class Slideout_Map2_SyncMap extends ToolbarSlideout {
+public class SlideoutMap2_SyncMap extends ToolbarSlideout {
 
    /*
     * UI controls
     */
    private Map2View _map2View;
 
-   public Slideout_Map2_SyncMap(final Control ownerControl,
+   public SlideoutMap2_SyncMap(final Control ownerControl,
                                 final ToolBar toolBar,
                                 final Map2View map2View) {
 

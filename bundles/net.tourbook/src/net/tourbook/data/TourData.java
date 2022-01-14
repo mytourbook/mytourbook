@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1223,7 +1223,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 2nd item contains lat/lon maximum values<br>
     */
    @Transient
-   private GeoPosition[]         _gpsBounds;
+   private GeoPosition[]         _geoBounds;
+
+   /**
+    * Is <code>true</code> when geo bounds are checked
+    */
+   @Transient
+   private boolean               _isGeoBoundsChecked;
 
    /**
     * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
@@ -1499,8 +1505,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private double[]           timeSerieWithTimeZoneAdjustment;
 
    /**
-    * {@link TourData} contains multiple tours or a virtual tour. It is created when multiple tours
-    * are selected to be displayed in the {@link TourChart}.
+    * {@link TourData} contains multiple tours or a virtual tour or sub tours. It is created when
+    * multiple tours are selected to be displayed in the {@link TourChart}.
     */
    @Transient
    private boolean            isMultipleTours;
@@ -1553,7 +1559,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * List containing all the tour pauses used only for multiple tours.
     */
    @Transient
-   public List<List<Long>>   multiTourPauses;
+   public List<List<Long>>    multiTourPauses;
 
 
    @Transient
@@ -1753,6 +1759,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    private long[]       pausedTime_End;
+
+   /**
+    * An auto-pause happened when a value is 1, otherwise it was triggered by the user.
+    * This field could also be <code>null</code> when pause data are not available.
+    */
+   @Transient
+   private long[]       pausedTime_Data;
 
    /**
     * Containing the battery time in seconds, relative to the tour start time
@@ -2160,7 +2173,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       srtmSerie = null;
       srtmSerieImperial = null;
 
-      _gpsBounds = null;
+      _geoBounds = null;
+      _isGeoBoundsChecked = false;
+
       _rasterizedLatLon = null;
       geoGrid = null;
 //      latitudeMinE6 = 0;
@@ -2177,7 +2192,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * clears the cached world positions, this is necessary when the data serie have been modified
+    * Clears the cached world positions, this is necessary when the data serie have been modified
     */
    public void clearWorldPositions() {
 
@@ -4069,23 +4084,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void computeGeo_Bounds() {
 
-      if (latitudeSerie == null || longitudeSerie == null || latitudeSerie.length == 0 || longitudeSerie.length == 0) {
+      if (latitudeSerie == null || longitudeSerie == null
+            || latitudeSerie.length == 0 || longitudeSerie.length == 0
+            || _isGeoBoundsChecked) {
+
          return;
       }
 
-      /*
-       * get min/max longitude/latitude
-       */
+      double minLatitude = Double.MIN_VALUE;
+      double maxLatitude = Double.MIN_VALUE;
+      double minLongitude = Double.MIN_VALUE;
+      double maxLongitude = Double.MIN_VALUE;
 
-      double minLatitude = latitudeSerie[0];
-      double maxLatitude = latitudeSerie[0];
-      double minLongitude = longitudeSerie[0];
-      double maxLongitude = longitudeSerie[0];
+      int serieIndex = 0;
 
-      for (int serieIndex = 1; serieIndex < latitudeSerie.length; serieIndex++) {
+      // find first value where lat/long != 0
+      for (; serieIndex < latitudeSerie.length; serieIndex++) {
 
          final double latitude = latitudeSerie[serieIndex];
          final double longitude = longitudeSerie[serieIndex];
+
+         if (latitude != 0 || longitude != 0) {
+
+            minLatitude = latitudeSerie[serieIndex];
+            maxLatitude = latitudeSerie[serieIndex];
+            minLongitude = longitudeSerie[serieIndex];
+            maxLongitude = longitudeSerie[serieIndex];
+
+            break;
+         }
+      }
+
+      for (; serieIndex < latitudeSerie.length; serieIndex++) {
+
+         final double latitude = latitudeSerie[serieIndex];
+         final double longitude = longitudeSerie[serieIndex];
+
+         // ignore lat/long == 0
+         if (latitude == 0 && longitude == 0) {
+            continue;
+         }
 
          minLatitude = latitude < minLatitude ? latitude : minLatitude;
          maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
@@ -4098,15 +4136,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-//      latitudeMinE6 = (int) (minLatitude * 1_000_000);
-//      longitudeMinE6 = (int) (minLongitude * 1_000_000);
-//
-//      latitudeMaxE6 = (int) (maxLatitude * 1_000_000);
-//      longitudeMaxE6 = (int) (maxLongitude * 1_000_000);
+      _isGeoBoundsChecked = true;
 
-      _gpsBounds = new GeoPosition[] {
-            new GeoPosition(minLatitude, minLongitude),
-            new GeoPosition(maxLatitude, maxLongitude) };
+      _geoBounds = minLatitude == Double.MIN_VALUE
+
+            ? null
+
+            // geo data are available
+            : new GeoPosition[] {
+                  new GeoPosition(minLatitude, minLongitude),
+                  new GeoPosition(maxLatitude, maxLongitude) };
    }
 
    /**
@@ -5644,6 +5683,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
       final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
 
       final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
@@ -5737,20 +5778,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          /*
-          * time
+          * Time
           */
          final int segmentEndTime = timeSerie[segmentEndIndex];
          final int segmentElapsedTime = segmentEndTime - segmentStartTime;
+
          final int segmentPausedTime = getPausedTime(segmentStartIndex, segmentEndIndex);
-         final int segmentRecordedTime = segmentElapsedTime - segmentPausedTime;
          final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
-         final float segmentMovingTime = segmentElapsedTime - segmentBreakTime;
+         final int segmentRecordedTime = segmentElapsedTime - segmentPausedTime;
+         final int segmentMovingTime = segmentElapsedTime - segmentBreakTime;
+
+         final float segmentTime = isPaceAndSpeedFromRecordedTime
+               ? segmentRecordedTime
+               : segmentMovingTime;
 
          segmentSerie_Time_Elapsed[segmentIndex] = segment.deviceTime_Elapsed = segmentElapsedTime;
          segmentSerie_Time_Recorded[segmentIndex] = segment.deviceTime_Recorded = segmentRecordedTime;
          segmentSerie_Time_Paused[segmentIndex] = segment.deviceTime_Paused = segmentPausedTime;
-         segmentSerie_Time_Moving[segmentIndex] = segment.computedTime_Moving = (int) segmentMovingTime;
+         segmentSerie_Time_Moving[segmentIndex] = segment.computedTime_Moving = segmentMovingTime;
          segmentSerie_Time_Break[segmentIndex] = segment.computedTime_Break = segmentBreakTime;
          segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentElapsedTime;
 
@@ -5763,7 +5809,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          float segmentDistance = 0.0f;
 
          /*
-          * distance
+          * Distance
           */
          if (isDistanceSerie) {
 
@@ -5780,12 +5826,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (segmentDistance != 0.0) {
 
                // speed
-               segmentSerie_Speed[segmentIndex] = segment.speed = segmentMovingTime == 0.0f //
+               segmentSerie_Speed[segmentIndex] = segment.speed = segmentTime == 0.0f
                      ? 0.0f
-                     : segmentDistance / segmentMovingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
+                     : segmentDistance / segmentTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
                // pace
-               final float segmentPace = segmentMovingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
+               final float segmentPace = segmentTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
                segment.pace = segmentPace;
                segment.pace_Diff = segment.pace - tourPace;
                segmentSerie_Pace[segmentIndex] = segmentPace;
@@ -5795,7 +5841,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          /*
-          * altitude
+          * Elevation
           */
          if (isAltitudeSerie) {
 
@@ -7139,21 +7185,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *           A given array of paused time start times
     * @param pausedTime_End
     *           A given array of paused time end times
+    * @param pausedTime_Data
+    *           A value of 1 indicate that it is an auto-pause
     */
    public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
-                                        final List<Long> pausedTime_End) {
+                                        final List<Long> pausedTime_End,
+                                        List<Long> pausedTime_Data) {
 
       if (pausedTime_Start == null || pausedTime_Start.isEmpty() ||
             pausedTime_End == null || pausedTime_End.isEmpty()) {
+
          return;
       }
 
-      if (pausedTime_Start.size() > pausedTime_End.size()) {
-         pausedTime_Start = pausedTime_Start.subList(0, pausedTime_End.size());
+      final int numPauses = pausedTime_End.size();
+
+      /*
+       * Ensure bounds
+       */
+      if (pausedTime_Start.size() > numPauses) {
+         pausedTime_Start = pausedTime_Start.subList(0, numPauses);
+      }
+      if (pausedTime_Data != null && pausedTime_Data.size() > numPauses) {
+         pausedTime_Data = pausedTime_Data.subList(0, numPauses);
       }
 
       setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
       setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
+
+      if (pausedTime_Data != null) {
+         setPausedTime_Data(pausedTime_Data.stream().mapToLong(l -> l).toArray());
+      }
 
       setTourDeviceTime_Paused(getTotalTourTimerPauses());
    }
@@ -7794,11 +7856,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public GeoPosition[] getGeoBounds() {
 
-      if (_gpsBounds == null) {
+      if (_geoBounds == null) {
          computeGeo_Bounds();
       }
 
-      return _gpsBounds;
+      return _geoBounds;
    }
 
    /**
@@ -8078,32 +8140,70 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Calculates the total amount of paused time between a start and an end indices
     *
-    * @param startIndex
-    * @param endIndex
+    * @param tourStartIndex
+    * @param tourEndIndex
     * @return Returns the paused time in seconds
     */
-   public int getPausedTime(final int startIndex, final int endIndex) {
+   public int getPausedTime(final int tourStartIndex, final int tourEndIndex) {
+
+      if (timeSerie == null
+            || pausedTime_Start == null
+            || tourStartIndex < 0
+            || tourEndIndex < 0
+            || tourStartIndex == tourEndIndex
+            || tourStartIndex > timeSerie.length
+            || tourEndIndex > timeSerie.length) {
+
+         return 0;
+      }
+
+      final int tour_RelativeStartTime = timeSerie[tourStartIndex];
+      final int tour_RelativeEndTime = timeSerie[tourEndIndex];
 
       int totalPausedTime = 0;
 
-      if (timeSerie == null || pausedTime_Start == null ||
-            startIndex < 0 || endIndex < 0 || startIndex == endIndex ||
-            startIndex > timeSerie.length || endIndex > timeSerie.length) {
-         return totalPausedTime;
-      }
-
+      // loop: all tour pauses
       for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-         final long currentPausedTime_Start = pausedTime_Start[index] / 1000;
-         final long currentRelativePausedTime_Start = (pausedTime_Start[index] - tourStartTime) / 1000;
+         final long paused_AbsoluteStartTime_MS = pausedTime_Start[index];
+         final long paused_RelativeStartTime = (paused_AbsoluteStartTime_MS - tourStartTime) / 1000;
 
-         if (currentRelativePausedTime_Start >= timeSerie[startIndex] &&
-               currentRelativePausedTime_Start <= timeSerie[endIndex]) {
-            totalPausedTime += (pausedTime_End[index] / 1000) - currentPausedTime_Start;
+         // check if tour segment is within pauses
+         if (paused_RelativeStartTime > tour_RelativeEndTime) {
+
+            // pause is starting after tour segment -> all is done
+
+            break;
+         }
+
+         if (paused_RelativeStartTime >= tour_RelativeStartTime
+               && paused_RelativeStartTime <= tour_RelativeEndTime) {
+
+            final long paused_AbsoluteEndTime_MS = pausedTime_End[index];
+            final long paused_RelativeEndTime = (paused_AbsoluteEndTime_MS - tourStartTime) / 1000;
+
+            long pausedTimeDiff = 0;
+
+            if (paused_RelativeEndTime > tour_RelativeEndTime) {
+
+               // pause continues after tour segment -> clip paused time
+
+               pausedTimeDiff = tour_RelativeEndTime - paused_RelativeStartTime;
+
+            } else {
+
+               pausedTimeDiff = paused_RelativeEndTime - paused_RelativeStartTime;
+            }
+
+            totalPausedTime += pausedTimeDiff;
          }
       }
 
       return totalPausedTime;
+   }
+
+   public long[] getPausedTime_Data() {
+      return pausedTime_Data;
    }
 
    public long[] getPausedTime_End() {
@@ -9462,6 +9562,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the world position for the supplied zoom level and projection id
     */
    public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
+
       return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
    }
 
@@ -9845,10 +9946,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       speedSerie           = serieData.speedSerie20;
       pausedTime_Start     = serieData.pausedTime_Start;
       pausedTime_End       = serieData.pausedTime_End;
+      pausedTime_Data      = serieData.pausedTime_Data;
 
       if (serieData.latitude != null) {
 
-         // use exising lat/lon double serie data from older versions
+         // use existing lat/lon double serie data from older versions
          // -> saving the tour will convert them into E6 format
 
          latitudeSerie        = serieData.latitude;
@@ -9929,6 +10031,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       serieData.temperatureSerie20  = temperatureSerie;
       serieData.pausedTime_Start    = pausedTime_Start;
       serieData.pausedTime_End      = pausedTime_End;
+      serieData.pausedTime_Data     = pausedTime_Data;
 
       /*
        * don't save computed data series
@@ -10433,6 +10536,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setMergeTargetTourId(final Long mergeTargetTourId) {
       this.mergeTargetTourId = mergeTargetTourId;
+   }
+
+   public void setPausedTime_Data(final long[] pausedTime_Data) {
+      this.pausedTime_Data = pausedTime_Data;
    }
 
    public void setPausedTime_End(final long[] pausedTime_End) {
@@ -11549,6 +11656,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param projectionId
     */
    public void setWorldPixelForTour(final Point[] worldPositions, final int zoomLevel, final String projectionId) {
+
       _tourWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
    }
 
@@ -11587,10 +11695,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       return "TourData [" + NL //                                                                     //$NON-NLS-1$
 
-            + "start    = " + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //     //$NON-NLS-1$
+            + "start          = " + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //$NON-NLS-1$
             + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + "tourId   = " + tourId + NL //                                                          //$NON-NLS-1$
+            + "tourId         = " + tourId + NL //                                                    //$NON-NLS-1$
+            + "isMultipleTours= " + isMultipleTours + NL //                                           //$NON-NLS-1$
 
 //            + "object   = " + super.toString() + NL //                                              //$NON-NLS-1$
 //            + "identityHashCode=" + System.identityHashCode(this) + NL //                           //$NON-NLS-1$

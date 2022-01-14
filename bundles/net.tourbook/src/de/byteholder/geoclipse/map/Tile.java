@@ -12,6 +12,7 @@ import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -49,7 +50,7 @@ public class Tile extends Observable {
     */
 
    private static final ReentrantLock      TILE_LOCK                 = new ReentrantLock();
-   private static final int                MAX_BOUNDS                = Map.MAP_MAX_ZOOM_LEVEL + 1;
+   private static final int                MAX_BOUNDS                = Map2.MAP_MAX_ZOOM_LEVEL + 1;
 
    private OverlayTourState                _overlayTourState         = OverlayTourState.TILE_IS_NOT_CHECKED;
 
@@ -198,6 +199,12 @@ public class Tile extends Observable {
     */
    public ArrayList<Rectangle>             allPainted_HoverRectangle = new ArrayList<>();
    public TLongArrayList                   allPainted_HoverTourID    = new TLongArrayList();
+
+   /**
+    * Hash for all paintings, this is used to optimize performance by reducing number of paintings
+    * because there can be millions
+    */
+   public TIntHashSet                      allPainted_Hash           = new TIntHashSet();
 
    /**
     * Create a new Tile at the specified tile point and zoom level

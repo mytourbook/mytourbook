@@ -36,6 +36,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/features/pom.xml</locationURI>
 		</link>
 		<link>
+			<name>pom-JRE.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/features/feature.net.tourbook.jre/pom.xml</locationURI>
+		</link>
+		<link>
 			<name>pom-product.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/build/build.net.tourbook.product/pom.xml</locationURI>

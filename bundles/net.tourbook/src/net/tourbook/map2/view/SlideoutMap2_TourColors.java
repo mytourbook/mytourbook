@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the map2 tour colors
  */
-public class Slideout_Map2_TourColors extends ToolbarSlideout implements IActionResetToDefault {
+public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionResetToDefault {
 
    private IDialogSettings  _state;
 
@@ -60,7 +60,7 @@ public class Slideout_Map2_TourColors extends ToolbarSlideout implements IAction
    private Button   _chkShowInChartToolbar_RunDyn_StepLength;
    private Button   _chkShowInChartToolbar_HrZone;
 
-   public Slideout_Map2_TourColors(final Control ownerControl,
+   public SlideoutMap2_TourColors(final Control ownerControl,
                                    final ToolBar toolBar,
                                    final Map2View map2View,
                                    final IDialogSettings state) {

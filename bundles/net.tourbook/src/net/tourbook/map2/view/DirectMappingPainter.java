@@ -17,9 +17,9 @@ package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.MapPainter;
+import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.List;
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-   private Map                    _map;
+   private Map2                    _map;
    private TourData               _tourData;
 
    private int                    _leftSliderValueIndex;
@@ -408,14 +408,14 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      final List<MapPainter> allMapPainter = _map.getMapPainter();
+      final List<Map2Painter> allMapPainter = _map.getMapPainter();
       if (allMapPainter == null || allMapPainter.isEmpty()) {
          return;
       }
 
       // get first tour painter
       TourMapPainter tourPainter = null;
-      for (final MapPainter mapPainter : allMapPainter) {
+      for (final Map2Painter mapPainter : allMapPainter) {
          if (mapPainter instanceof TourMapPainter) {
             tourPainter = (TourMapPainter) mapPainter;
             break;
@@ -504,7 +504,7 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param isShowSliderInMap
     * @param sliderRelationPaintingData
     */
-   public void setPaintContext(final Map map,
+   public void setPaintContext(final Map2 map,
                                final boolean isTourVisible,
                                final TourData tourData,
 

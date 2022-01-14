@@ -240,7 +240,7 @@ public class UI {
                getPaletteData());
       }
 
-      final RGB transparentRGB = Map.getTransparentRGB();
+      final RGB transparentRGB = Map2.getTransparentRGB();
 
       transparentImageData.transparentPixel = transparentImageData.palette.getPixel(transparentRGB);
 

@@ -694,7 +694,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End, null);
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
          tourData.computeAltitudeUpDown();

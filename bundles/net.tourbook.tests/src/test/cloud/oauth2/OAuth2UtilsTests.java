@@ -28,12 +28,12 @@ public class OAuth2UtilsTests {
 
       assertEquals(
             OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 0),
-            "2000-11-22T23:26:27Z[UTC]");
+            "2000-11-22T23:26:27Z[UTC]"); //$NON-NLS-1$
 
       assertEquals(
             OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 300000),
-            "2000-11-22T23:31:27Z[UTC]");
+            "2000-11-22T23:31:27Z[UTC]"); //$NON-NLS-1$
 
-      assertEquals(OAuth2Utils.computeAccessTokenExpirationDate(0, 0), "");
+      assertEquals(OAuth2Utils.computeAccessTokenExpirationDate(0, 0), ""); //$NON-NLS-1$
    }
 }

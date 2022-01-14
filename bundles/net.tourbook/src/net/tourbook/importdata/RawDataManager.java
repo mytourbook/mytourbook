@@ -1772,6 +1772,7 @@ public class RawDataManager {
                tourData.setTourDeviceTime_Elapsed(0);
                tourData.setPausedTime_Start(null);
                tourData.setPausedTime_End(null);
+               tourData.setPausedTime_Data(null);
                tourData.setTourDeviceTime_Paused(0);
                tourData.setTourDeviceTime_Recorded(0);
                tourData.setTourComputedTime_Moving(0);
@@ -1784,6 +1785,7 @@ public class RawDataManager {
 
                tourData.setPausedTime_Start(null);
                tourData.setPausedTime_End(null);
+               tourData.setPausedTime_Data(null);
                tourData.setTourDeviceTime_Paused(0);
                tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
                break;
@@ -3494,12 +3496,25 @@ public class RawDataManager {
          long totalTourTimerPauses = 0;
          final long[] pausedTime_Start = reimportedTourData.getPausedTime_Start();
          if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+
             final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
             final List<Long> listPausedTime_End = Arrays.stream(reimportedTourData.getPausedTime_End()).boxed().collect(Collectors.toList());
-            oldTourData.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End);
+
+            final long[] pausedTime_Data = reimportedTourData.getPausedTime_Data();
+            final List<Long> listPausedTime_Data = pausedTime_Data == null
+                  ? null
+                  : Arrays.stream(pausedTime_Data).boxed().collect(Collectors.toList());
+
+            oldTourData.finalizeTour_TimerPauses(
+                  listPausedTime_Start,
+                  listPausedTime_End,
+                  listPausedTime_Data);
+
          } else {
+
             oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
             oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
+            oldTourData.setPausedTime_Data(reimportedTourData.getPausedTime_Data());
          }
 
          totalTourTimerPauses = reimportedTourData.getTourDeviceTime_Paused();
@@ -3799,11 +3814,15 @@ public class RawDataManager {
          }
 
          if (importedTourData.isTourDeleted) {
+
             _loadingTour_CountDownLatch.countDown();
+
             continue;
          }
 
-         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(importedTourData,
+         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(
+
+               importedTourData,
                monitor,
                numWorkedTours,
                allSavedTourIds);

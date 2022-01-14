@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product 
+
+   name              ="MyTourbook Product - With Java Runtime" 
+   version           ="22.1.0.qualifier" 
+
+   id                ="net.tourbook.productWithJRE" 
+   uid               ="net.tourbook.productWithJRE" 
+
+   application       ="net.tourbook.appWithJRE" 
+   
+   useFeatures       ="true" 
+   includeLaunchers  ="true"
+>
+
+   <aboutInfo>
+      <image path="../../bundles/net.tourbook/icons/application/tourbook-about.png"/>
+      <text>%Product_about</text>
+   </aboutInfo>
+
+   <configIni use="default">
+      <linux>config-linux.ini</linux>
+      <macosx>config-osx.ini</macosx>
+      <solaris>config-linux.ini</solaris>
+
+<!--   
+      PRODUCTION   
+
+      osgi.instance.area.default=@user.home/mytourbook
+
+      <win32>config-win.ini</win32>
+-->
+      
+      <win32>config-win.ini</win32>
+
+
+<!--   
+      DEBUG      
+
+      osgi.instance.area.default=@user.home/mytourbook-DEBUG
+
+      When the location contains 'DEBUG' then the location is displayed in the splashscreen
+      (MyTourbookSplashHandler), otherwise the qualifier is displayed
+
+      <win32>config-win-DEBUG.ini</win32>
+-->
+
+   </configIni>
+
+   <launcherArgs>
+      <!-- VERY IMPORTANT: vmArgs MUST BE IN ONE LINE otherwise they are wrongly formatted and DO NOT WORK !!! -->
+      <vmArgs>-Xmx8g --add-exports=java.base/java.lang=ALL-UNNAMED --add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.desktop/sun.java2d=ALL-UNNAMED</vmArgs>
+      <vmArgsMac>-XstartOnFirstThread</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages 
+         i16   ="../../bundles/net.tourbook/icons/application/tourbook16.png" 
+         i32   ="../../bundles/net.tourbook/icons/application/tourbook32.png" 
+         i48   ="../../bundles/net.tourbook/icons/application/tourbook48.png" 
+         i64   ="../../bundles/net.tourbook/icons/application/tourbook64.png" 
+         i128  ="../../bundles/net.tourbook/icons/application/tourbook128.png"
+      />
+
+   <splash
+      location                ="net.tourbook"
+      startupProgressRect     ="5,131,390,10"
+      startupMessageRect      ="5,116,390,15"
+      startupForegroundColor  ="FFFFFF" 
+   />
+   
+   <launcher name="mytourbook">
+      <linux icon                ="../../bundles/net.tourbook/icons/application/linux/tourbook48-32.xpm"/>
+      <macosx icon               ="../../bundles/net.tourbook/icons/application/mac/tourbook128.icns"/>
+      <win useIco="false">
+         <bmp
+            winSmallHigh         ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-16px-32bit.bmp"
+            winSmallLow          ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-16px-8bit.bmp"
+            winMediumHigh        ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-32px-32bit.bmp"
+            winMediumLow         ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-32px-8bit.bmp"
+            winLargeHigh         ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-48px-32bit.bmp"
+            winLargeLow          ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-48px-8bit.bmp"
+            winExtraLargeHigh    ="../../bundles/net.tourbook/icons/application/win/mytourbook-launcher-256px-32bit.bmp"
+         />
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.e4.rcp"/>
+      <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.emf.common"/>
+
+      <feature id="feature.net.tourbook.ext.eclipse"        installMode="root"/>
+      <feature id="feature.net.tourbook.ext.eclipse.nl"     installMode="root"/>
+      <feature id="feature.net.tourbook.ext.derby"          installMode="root"/>
+      <feature id="feature.net.tourbook.ext.ejb3"           installMode="root"/>
+      <feature id="feature.net.tourbook.ext.jars"           installMode="root"/>
+      <feature id="feature.net.tourbook.ext.rxtx"           installMode="root"/>
+      <feature id="feature.net.tourbook.ext.vtm"            installMode="root"/>
+      <feature id="feature.net.tourbook.ext.worldwind"      installMode="root"/>
+
+      <feature id="feature.net.tourbook.app"                installMode="root"/>
+      <feature id="feature.net.tourbook.app.nl"             installMode="root"/>
+      <feature id="feature.net.tourbook.app.version"/>
+      
+      <feature id="feature.net.tourbook.jre"                installMode="root"/>      
+   </features>
+
+   <configurations>
+      <plugin id="org.eclipse.core.runtime"                 autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.equinox.common"               autoStart="true" startLevel="2" />
+      <plugin id="org.apache.felix.scr"                     autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator"   autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.update.configurator"          autoStart="true" startLevel="4" />
+   </configurations>
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
+
+</product>

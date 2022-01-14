@@ -29,26 +29,26 @@ public class StringUtilsTests {
    @Test
    void testHasContent() {
 
-      assertTrue(StringUtils.hasContent("string"));
-      assertFalse(StringUtils.hasContent(" "));
-      assertFalse(StringUtils.hasContent(""));
+      assertTrue(StringUtils.hasContent("string")); //$NON-NLS-1$
+      assertFalse(StringUtils.hasContent(" ")); //$NON-NLS-1$
+      assertFalse(StringUtils.hasContent("")); //$NON-NLS-1$
       assertFalse(StringUtils.hasContent(null));
    }
 
    @Test
    void testJoin() {
 
-      final String[] stringArray = { "1", "2", "3" };
-      assertEquals(StringUtils.join(stringArray, ","), "1,2,3");
-      assertEquals(StringUtils.join(new String[] { "1" }, ","), "1");
+      final String[] stringArray = { "1", "2", "3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      assertEquals(StringUtils.join(stringArray, ","), "1,2,3"); //$NON-NLS-1$ //$NON-NLS-2$
+      assertEquals(StringUtils.join(new String[] { "1" }, ","), "1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
    @Test
    void testSanitizeFileName() {
 
-      final String fileName = "\\$%#filename.txt";
-      assertEquals(StringUtils.sanitizeFileName(fileName), "----filename.txt");
+      final String fileName = "\\$%#filename.txt"; //$NON-NLS-1$
+      assertEquals(StringUtils.sanitizeFileName(fileName), "----filename.txt"); //$NON-NLS-1$
       assertNull(StringUtils.sanitizeFileName(null));
-      assertEquals(StringUtils.sanitizeFileName(""), UI.EMPTY_STRING);
+      assertEquals(StringUtils.sanitizeFileName(""), UI.EMPTY_STRING); //$NON-NLS-1$
    }
 }

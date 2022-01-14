@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -177,8 +177,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * Contains the marker label visual position which is defined in {@link ChartLabel} like
     * {@link ChartLabel#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
     */
-   private int      visualPosition  =
-         TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
+   private int      visualPosition  = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
 
    private int      labelXOffset;
 

@@ -25,7 +25,9 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
+import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -43,19 +45,25 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Map 2D properties slideout
+ * Slideout for 2D Map properties
  */
-public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutMap2Options extends ToolbarSlideout implements
 
-   private static IDialogSettings        _state;
+      IColorSelectorListener,
+      IActionResetToDefault,
+      IChangeUIListener {
 
-   private IPropertyChangeListener       _defaultChangePropertyListener;
-   private SelectionListener             _defaultSelectionListener;
-   private MouseWheelListener            _defaultMouseWheelListener;
+   private static IDialogSettings         _state;
 
-   private ActionResetToDefaults         _actionRestoreDefaults;
+   private IPropertyChangeListener        _defaultChangePropertyListener;
+   private SelectionListener              _defaultSelectionListener;
+   private MouseWheelListener             _defaultMouseWheelListener;
 
-   private Map2View                      _map2View;
+   private ActionResetToDefaults          _actionRestoreDefaults;
+
+   private Map2View                       _map2View;
+
+   private final TourPainterConfiguration _tourPainterConfig = TourPainterConfiguration.getInstance();
 
    /*
     * UI controls
@@ -67,6 +75,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
    private Spinner               _spinnerDimValue;
 
    private ColorSelectorExtended _colorMapDimmColor;
+   private TourPauseUI           _tourPausesUI;
 
    /**
     * @param ownerControl
@@ -74,15 +83,17 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
     * @param map2View
     * @param map2State
     */
-   public Slideout_Map2_Options(final Control ownerControl,
-                                final ToolBar toolBar,
-                                final Map2View map2View,
-                                final IDialogSettings map2State) {
+   public SlideoutMap2Options(final Control ownerControl,
+                              final ToolBar toolBar,
+                              final Map2View map2View,
+                              final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
       _map2View = map2View;
       _state = map2State;
+
+      _tourPausesUI = new TourPauseUI(map2State, this, this);
    }
 
    @Override
@@ -117,6 +128,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       {
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
+
+         _tourPausesUI.createContent(shellContainer, _tourPainterConfig.isShowTourPauses);
       }
 
       return shellContainer;
@@ -225,6 +238,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
       _colorMapDimmColor.setEnabled(isDimMap);
       _spinnerDimValue.setEnabled(isDimMap);
+
+      _tourPausesUI.enableControls();
    }
 
    private void initUI(final Composite parent) {
@@ -240,7 +255,11 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       };
    }
 
+   @Override
+   public void onChangeUI_External() {
 
+      _map2View.restoreState_Map2_Options();
+   }
 
    private void onChangeUI_UpdateMap() {
 
@@ -268,6 +287,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_ON
 
+      _tourPausesUI.resetToDefaults();
+
       onChangeUI_UpdateMap();
    }
 
@@ -286,6 +307,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
 
 // SET_FORMATTING_ON
+
+      _tourPausesUI.restoreState();
    }
 
    private void saveState() {
@@ -303,6 +326,8 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
       Util.setState(_state,Map2View.STATE_DIM_MAP_COLOR,       _colorMapDimmColor.getColorValue());
 
 // SET_FORMATTING_ON
+
+      _tourPausesUI.saveState();
    }
 
 }
