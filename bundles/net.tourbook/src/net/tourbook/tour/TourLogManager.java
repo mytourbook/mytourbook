@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -113,12 +113,7 @@ public class TourLogManager {
 
       addLog(tourLog);
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            showLogView();
-         }
-      });
+      Display.getDefault().syncExec(TourLogManager::showLogView);
 
       // ensure it is logged when crashing
       StatusUtil.log(e);
