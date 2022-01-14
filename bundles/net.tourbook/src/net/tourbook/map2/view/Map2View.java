@@ -34,7 +34,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +96,7 @@ import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
 import net.tourbook.map2.action.ActionShowTourPauses;
+import net.tourbook.map2.action.ActionShowTourWeatherInMap;
 import net.tourbook.map2.action.ActionShowValuePoint;
 import net.tourbook.map2.action.ActionShowWayPoints;
 import net.tourbook.map2.action.ActionSyncMapWith_OtherMap;
@@ -217,9 +218,10 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT                   = true;
    private static final String   STATE_IS_SHOW_SLIDER_IN_LEGEND                        = "STATE_IS_SHOW_SLIDER_IN_LEGEND";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_START_END_IN_MAP                        = "STATE_IS_SHOW_START_END_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                        = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
    private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
 
@@ -447,7 +449,7 @@ public class Map2View extends ViewPart implements
    private boolean                           _isMapSyncWith_Tour;
    private boolean                           _isMapSyncWith_ValuePoint;
    //
-   private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
+   private EnumMap<MapGraphId, Action>       _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
    private ActionTourColor                   _actionTourColor_Elevation;
    private ActionTourColor                   _actionTourColor_Gradient;
    private ActionTourColor                   _actionTourColor_Pulse;
@@ -482,12 +484,13 @@ public class Map2View extends ViewPart implements
    private ActionShowTourInfoInMap           _actionShowTourInfoInMap;
    private ActionShowTourMarker              _actionShowTourMarker;
    private ActionShowTourPauses              _actionShowTourPauses;
+   private ActionShowTourWeatherInMap        _actionShowTourWeatherInMap;
    private ActionShowValuePoint              _actionShowValuePoint;
    private ActionShowWayPoints               _actionShowWayPoints;
    private ActionZoomLevelAdjustment         _actionZoomLevelAdjustment;
    //
    private ActionSyncMap                     _actionMap2_SyncMap;
-   private HashMap<MapSyncId, Action>        _allSyncMap_Actions   = new HashMap<>();
+   private EnumMap<MapSyncId, Action>        _allSyncMap_Actions   = new EnumMap<>(MapSyncId.class);
    private ActionSyncMapWith_Photo           _actionSyncMapWith_Photo;
    private ActionSyncMapWith_Slider_One      _actionSyncMapWith_Slider_One;
    private ActionSyncMapWith_Slider_Centered _actionSyncMapWith_Slider_Centered;
@@ -968,6 +971,19 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.isShowTourPauses = _actionShowTourPauses.isChecked();
 
       _map.disposeOverlayImageCache();
+      _map.paint();
+   }
+
+   public void actionSetShowTourWeatherInMap() {
+
+      final boolean isVisible = _actionShowTourWeatherInMap.isChecked();
+
+      if (isVisible) {
+         _tourToolTip.addToolTipProvider(_tourWeatherToolTipProvider);
+      } else {
+         _tourToolTip.removeToolTipProvider(_tourWeatherToolTipProvider);
+      }
+
       _map.paint();
    }
 
@@ -1598,6 +1614,7 @@ public class Map2View extends ViewPart implements
       _actionShowTourInfoInMap            = new ActionShowTourInfoInMap(this);
       _actionShowTourMarker               = new ActionShowTourMarker(this);
       _actionShowTourPauses               = new ActionShowTourPauses(this);
+      _actionShowTourWeatherInMap = new ActionShowTourWeatherInMap(this) ;
       _actionShowWayPoints                = new ActionShowWayPoints(this);
       _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
 
@@ -1920,6 +1937,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour.setEnabled(_isTourOrWayPoint);
       _actionShowTourMarker.setEnabled(_isTourOrWayPoint);
       _actionShowTourPauses.setEnabled(_isTourOrWayPoint);
+      _actionShowTourWeatherInMap.setEnabled(isOneTour);
       _actionShowWayPoints.setEnabled(_isTourOrWayPoint);
       _actionZoom_Centered.setEnabled(isTourAvailable);
       _actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
@@ -2044,6 +2062,7 @@ public class Map2View extends ViewPart implements
        */
       menuMgr.add(new Separator());
       menuMgr.add(_actionShowTourInfoInMap);
+      menuMgr.add(_actionShowTourWeatherInMap);
       menuMgr.add(_actionShowLegendInMap);
       menuMgr.add(_actionShowScaleInMap);
       menuMgr.add(_actionShowValuePoint);
@@ -2403,7 +2422,8 @@ public class Map2View extends ViewPart implements
          final double tourMaxLatitude = geoPosition[1].latitude;
          final double tourMaxLongitude = geoPosition[1].longitude;
 
-         if (tourMinLatitude == 0 && tourMaxLatitude == 0 && tourMinLongitude == 0) {
+         if (tourMinLatitude == 0 && tourMaxLatitude == 0
+               && tourMinLongitude == 0 && tourMaxLongitude == 0) {
             continue;
          }
 
@@ -3733,7 +3753,13 @@ public class Map2View extends ViewPart implements
       if (isShowTourInfo) {
          _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
       }
-      _tourToolTip.addToolTipProvider(_tourWeatherToolTipProvider);
+
+      // show tour weather in map
+      final boolean isShowTourWeather = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_WEATHER_IN_MAP, true);
+      _actionShowTourWeatherInMap.setChecked(isShowTourWeather);
+      if (isShowTourWeather) {
+         _tourToolTip.addToolTipProvider(_tourWeatherToolTipProvider);
+      }
 
       // show scale
       final boolean isScaleVisible = Util.getStateBoolean(_state, STATE_IS_SHOW_SCALE_IN_MAP, true);
@@ -4039,9 +4065,10 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_SCALE_IN_MAP,                      _actionShowScaleInMap.isChecked());
       _state.put(STATE_IS_SHOW_SLIDER_IN_MAP,                     _actionShowSliderInMap.isChecked());
       _state.put(STATE_IS_SHOW_SLIDER_IN_LEGEND,                  _actionShowSliderInLegend.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_MARKER,                       _actionShowTourMarker.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_PAUSES,                       _actionShowTourPauses.isChecked());
-      _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,                  _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
       _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
