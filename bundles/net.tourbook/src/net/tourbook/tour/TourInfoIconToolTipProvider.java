@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -299,7 +300,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
     *
     * @param tourData
     */
-   public void setTourDataList(final ArrayList<TourData> tourDataList) {
+   public void setTourDataList(final List<TourData> tourDataList) {
 
       if (tourDataList == null || tourDataList.isEmpty()) {
          _tourData = null;
