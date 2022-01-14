@@ -30,7 +30,8 @@ Experimental
 New
 ===
 
-* 
+* 2D Map (Frederic)
+  - Added the possibility to show/hide the tour weather icon on the map
 
 
 Improvements
@@ -65,4 +66,4 @@ System
 ======
 
 * Eclipse 2021-06
-* FIT SDK 21.60
+* FIT SDK 21.67
