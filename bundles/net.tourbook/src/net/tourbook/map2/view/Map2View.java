@@ -1614,7 +1614,7 @@ public class Map2View extends ViewPart implements
       _actionShowTourInfoInMap            = new ActionShowTourInfoInMap(this);
       _actionShowTourMarker               = new ActionShowTourMarker(this);
       _actionShowTourPauses               = new ActionShowTourPauses(this);
-      _actionShowTourWeatherInMap = new ActionShowTourWeatherInMap(this) ;
+      _actionShowTourWeatherInMap         = new ActionShowTourWeatherInMap(this);
       _actionShowWayPoints                = new ActionShowWayPoints(this);
       _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
 
@@ -1937,7 +1937,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour.setEnabled(_isTourOrWayPoint);
       _actionShowTourMarker.setEnabled(_isTourOrWayPoint);
       _actionShowTourPauses.setEnabled(_isTourOrWayPoint);
-      _actionShowTourWeatherInMap.setEnabled(isOneTour);
+      _actionShowTourWeatherInMap.setEnabled(isTourAvailable);
       _actionShowWayPoints.setEnabled(_isTourOrWayPoint);
       _actionZoom_Centered.setEnabled(isTourAvailable);
       _actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
@@ -4080,7 +4080,7 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_MARKER,                       _actionShowTourMarker.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_PAUSES,                       _actionShowTourPauses.isChecked());
-      _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,                  _actionShowTourWeatherInMap.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
       _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
