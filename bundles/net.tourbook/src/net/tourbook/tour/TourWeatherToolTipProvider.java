@@ -36,7 +36,7 @@ public class TourWeatherToolTipProvider implements ITourToolTipProvider {
    private static final int HOVER_AREA_POSITION_Y = 2;
 
    /**
-    * Tour which is displayed in the tool tip
+    * Tour for which the weather icon is displayed
     */
    private TourData         _tourData;
 
