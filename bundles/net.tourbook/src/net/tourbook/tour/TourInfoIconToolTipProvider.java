@@ -28,8 +28,6 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -108,9 +106,9 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
    private void createInfoIcon() {
 
-      if (_tourInfoImage != null) {
-         return;
-      }
+//      if (_tourInfoImage != null) {
+//         return;
+//      }
    }
 
    @Override
@@ -142,12 +140,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
          }
       }
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _tourInfoUI.dispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> _tourInfoUI.dispose());
 
       return ui;
    }
@@ -156,7 +149,7 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
    public HoveredAreaContext getHoveredContext(final int devMouseX, final int devMouseY) {
 
       /*
-       * hovered area which is hit by the mouse is extendet in the width
+       * hovered area which is hit by the mouse is extended in the width
        */
       final int margin = 5;
 
