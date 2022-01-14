@@ -2192,7 +2192,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * clears the cached world positions, this is necessary when the data serie have been modified
+    * Clears the cached world positions, this is necessary when the data serie have been modified
     */
    public void clearWorldPositions() {
 
@@ -9562,6 +9562,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the world position for the supplied zoom level and projection id
     */
    public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
+
       return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
    }
 
@@ -11655,6 +11656,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param projectionId
     */
    public void setWorldPixelForTour(final Point[] worldPositions, final int zoomLevel, final String projectionId) {
+
       _tourWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
    }
 

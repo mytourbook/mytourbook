@@ -247,9 +247,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // the low speeds/high paces at the bottom of the graph
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
 
-      // night section
+      // night sections
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
-      store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 50);
+      store.setDefault(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY, 50);
 
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
