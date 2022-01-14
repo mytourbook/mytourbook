@@ -461,11 +461,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _tourChart.getXSliderPosition().getLeftSliderValueIndex());
 
       tourMerger.computeMergedData_NEWWIP();
-      //   _targetTour = tourMerger.getTargetTour();
+      final TourData mergedTour = tourMerger.getMergedTour();
 
       _sourceTour.dataSerieAdjustedAlti = null;
 
-      newSourceAltitudeSerie = tourMerger.getNewSourceAltitudeSerie();
+      newSourceAltitudeSerie = mergedTour.altitudeSerie;
       if (isSourceAltitude) {
          _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
       } else {
@@ -480,19 +480,19 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       if (_chkMergePulse.getSelection()) {
-         _targetTour.pulseSerie = tourMerger.getNewTargetPulseSerie();
+         _targetTour.pulseSerie = mergedTour.pulseSerie;
       } else {
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
       if (_chkMergeTemperature.getSelection()) {
-         _targetTour.temperatureSerie = tourMerger.getNewTargetTemperatureSerie();
+         _targetTour.temperatureSerie = mergedTour.temperatureSerie;
       } else {
          _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       }
 
       if (_chkMergeCadence.getSelection()) {
-         _targetTour.setCadenceSerie(tourMerger.getNewTargetCadenceSerie());
+         _targetTour.setCadenceSerie(mergedTour.getCadenceSerie());
       } else {
          _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
       }
@@ -1468,7 +1468,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       _targetTour.setMergedAltitudeOffset(getFromUIAltitudeOffset());
       _targetTour.setMergedTourTimeOffset(getFromUITourTimeOffset());
-
 
       // calculate merged data
       final float[] altitudeDifferences = computeMergedData();

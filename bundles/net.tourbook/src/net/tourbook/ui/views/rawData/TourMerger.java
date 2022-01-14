@@ -65,7 +65,6 @@ public class TourMerger {
       _tourChart_LeftSliderValueIndex = tourChart_LeftSliderValueIndex;
    }
 
-
 //   private void assignMergedSeries(final float[] newSourceAltitudeSerie,
 //                                   final float[] newSourceAltiDiffSerie,
 //                                   final float[] newTargetPulseSerie,
@@ -251,6 +250,11 @@ public class TourMerger {
       }
 
       createNewTimeAndDistanceSerie(xMergeOffset, targetTimeSerie);
+
+      _targetTour.altitudeSerie = _newSourceAltitudeSerie;
+      _targetTour.setCadenceSerie(_newTargetCadenceSerie);
+      _targetTour.pulseSerie = _newTargetPulseSerie;
+      _targetTour.temperatureSerie = _newTargetTemperatureSerie;
 
       return _targetTour;
    }
@@ -600,31 +604,13 @@ public class TourMerger {
       }
    }
 
+   public TourData getMergedTour() {
+      return _targetTour;
+   }
+
    public float[] getNewSourceAltiDiffSerie() {
-      // TODO Auto-generated method stub
       return _newSourceAltiDiffSerie;
    }
-
-   public float[] getNewSourceAltitudeSerie() {
-      return _newSourceAltitudeSerie;
-   }
-
-   public float[] getNewTargetCadenceSerie() {
-      // TODO Auto-generated method stub
-      return _newTargetCadenceSerie;
-   }
-
-   public float[] getNewTargetPulseSerie() {
-      return _newTargetPulseSerie;
-   }
-
-   public float[] getNewTargetTemperatureSerie() {
-      return _newTargetTemperatureSerie;
-   }
-
-//   public TourData getTargetTour() {
-//      return _targetTour;
-//   }
 
    private boolean isLinearInterpolation() {
 
