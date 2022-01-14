@@ -4590,6 +4590,7 @@ public class Map2 extends Canvas {
                // cleanup previous positions
                tile.allPainted_HoverRectangle.clear();
                tile.allPainted_HoverTourID.clear();
+               tile.allPainted_Hash.clear();
 
                /*
                 * check if a tour, marker or photo is within the current tile
