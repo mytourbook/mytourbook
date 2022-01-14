@@ -3388,8 +3388,15 @@ public class Map2View extends ViewPart implements
 
       } else if (isNewTour) {
 
+         /**
+          * !! Disabled !!
+          * <p>
+          * Because map is moved when any sync is disabled but there should be a
+          * possibility that the map is NOT moved when a new tour is selected
+          */
+
          // ensure that a new tour is visible
-         positionMapTo_MapPosition(tourBoundsSet, true);
+//       positionMapTo_MapPosition(tourBoundsSet, true);
       }
 
       // keep tour data
