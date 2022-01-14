@@ -2399,7 +2399,7 @@ public class Map2View extends ViewPart implements
          final double tourMaxLongitude = geoPosition[1].longitude;
 
          if (tourMinLatitude == 0 && tourMaxLatitude == 0
-               && tourMinLongitude == 0 && tourMaxLatitude == 0) {
+               && tourMinLongitude == 0 && tourMaxLongitude == 0) {
             continue;
          }
 
