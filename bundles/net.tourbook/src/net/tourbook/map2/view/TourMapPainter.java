@@ -2642,10 +2642,10 @@ public class TourMapPainter extends Map2Painter {
    @Override
    protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
-      final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
-      final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
+      final ArrayList<TourData> allTourData = _tourPaintConfig.getTourData();
+      final ArrayList<Photo> allPhotos = _tourPaintConfig.getPhotos();
 
-      if (tourDataList.isEmpty() && photoList.isEmpty()) {
+      if (allTourData.isEmpty() && allPhotos.isEmpty()) {
          return false;
       }
 
@@ -2665,22 +2665,31 @@ public class TourMapPainter extends Map2Painter {
       final int tileWorldPixelTop = tile.getY() * tileSize;
       final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
-      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0 && isPaintingNeeded_Tours(
-            tourDataList,
-            mp,
-            mapZoomLevel,
-            projectionId,
-            tileWorldPixelLeft,
-            tileWorldPixelRight,
-            tileWorldPixelTop,
-            tileWorldPixelBottom)) {
+      if (_tourPaintConfig.isTourVisible
+
+            && allTourData.size() > 0
+
+            && isPaintingNeeded_Tours(
+
+                  allTourData,
+                  mp,
+                  mapZoomLevel,
+                  projectionId,
+                  tileWorldPixelLeft,
+                  tileWorldPixelRight,
+                  tileWorldPixelTop,
+                  tileWorldPixelBottom)) {
 
          return true;
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0 &&
-            isPaintingNeeded_Photos(
-                  photoList,
+      if (_tourPaintConfig.isPhotoVisible
+
+            && allPhotos.size() > 0
+
+            && isPaintingNeeded_Photos(
+
+                  allPhotos,
                   mp,
                   mapZoomLevel,
                   projectionId,
@@ -2757,12 +2766,13 @@ public class TourMapPainter extends Map2Painter {
             /*
              * World positions are cached to optimize performance when multiple tours are selected
              */
-            Point[] tourWorldPixelPosAll = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
-            if ((tourWorldPixelPosAll == null)) {
+            Point[] allTourWorldPixelPos = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
+
+            if ((allTourWorldPixelPos == null)) {
 
                // world pixels are not yet cached, create them now
 
-               tourWorldPixelPosAll = initWorldPixelTour(
+               allTourWorldPixelPos = initWorldPixelTour(
                      tourData,
                      mp,
                      mapZoomLevel,
@@ -2773,7 +2783,7 @@ public class TourMapPainter extends Map2Painter {
 
             for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
-               final Point tourWorldPixel = tourWorldPixelPosAll[serieIndex];
+               final Point tourWorldPixel = allTourWorldPixelPos[serieIndex];
 
                // this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
                final int tourWorldPixelX = tourWorldPixel.x;
