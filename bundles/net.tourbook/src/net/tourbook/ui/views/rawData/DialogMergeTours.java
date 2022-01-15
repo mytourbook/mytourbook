@@ -355,18 +355,89 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       return super.close();
    }
 
-   private float[] computeMergedData() {
+   private float[] computeAdjustedAltitude(final float[] newSourceAltiDiffSerie,
+                                           final float[] newSourceAltitudeSerie) {
+
+      final float[] targetDistanceSerie = _targetTour.distanceSerie;
+
+      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
+      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
+      final boolean isTargetDistance = targetDistanceSerie != null;
+
+      final float[] altitudeDifferences = new float[2];
+
+      if (!isSourceAltitude || !isTargetAltitude || !isTargetDistance) {
+         return altitudeDifferences;
+      }
 
       final int[] targetTimeSerie = _targetTour.timeSerie;
-      final float[] targetDistanceSerie = _targetTour.distanceSerie;
-      final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
-      final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
-
-      final boolean isSourceAltitude = sourceAltitudeSerie != null;
-      final boolean isTargetDistance = targetDistanceSerie != null;
-      final boolean isTargetAltitude = targetAltitudeSerie != null;
-
       final int serieLength = targetTimeSerie.length;
+      if (_chkAdjustAltiFromStart.getSelection()) {
+
+         /*
+          * adjust start altitude until left slider
+          */
+
+         final float[] adjustedTargetAltitudeSerie = new float[serieLength];
+
+         float startAltiDiff = newSourceAltiDiffSerie[0];
+         final int endIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
+         final float distanceDiff = targetDistanceSerie[endIndex];
+
+         final float[] altitudeSerie = _targetTour.altitudeSerie;
+
+         for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+            if (serieIndex < endIndex) {
+
+               // add adjusted altitude
+
+               final float targetDistance = targetDistanceSerie[serieIndex];
+               final float distanceScale = 1 - targetDistance / distanceDiff;
+
+               final float adjustedAltiDiff = startAltiDiff * distanceScale;
+               final float newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
+
+               adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
+               newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
+
+            } else {
+
+               // add altitude which are not adjusted
+
+               adjustedTargetAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
+            }
+         }
+
+         _sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
+
+         startAltiDiff /= UI.UNIT_VALUE_ELEVATION;
+
+         final int targetEndTime = targetTimeSerie[endIndex];
+         final float targetEndDistance = targetDistanceSerie[endIndex];
+
+         // meter/min
+         altitudeDifferences[0] = targetEndTime == 0 ? //
+               0f
+               : startAltiDiff / targetEndTime * 60;
+
+         // meter/meter
+         altitudeDifferences[1] = targetEndDistance == 0 ? //
+               0f
+               : ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
+
+      } else if (_chkAdjustAltiFromSource.getSelection()) {
+
+         /*
+          * adjust target altitude from source altitude
+          */
+         _sourceTour.dataSerieAdjustedAlti = Arrays.copyOf(newSourceAltitudeSerie, serieLength);
+      }
+
+      return altitudeDifferences;
+   }
+
+   private float[] computeMergedData() {
 
       final TourMerger tourMerger = new TourMerger(
             _sourceTour,
@@ -382,78 +453,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       final float[] newSourceAltiDiffSerie = tourMerger.getNewSourceAltiDiffSerie();
       assignMergedSeries(mergedTour, newSourceAltiDiffSerie);
 
-      final float[] altitudeDifferences = new float[2];
-
       final float[] newSourceAltitudeSerie = mergedTour.altitudeSerie;
 
-      if (isSourceAltitude && isTargetAltitude && isTargetDistance) {
-
-         /*
-          * compute adjusted altitude
-          */
-
-         if (_chkAdjustAltiFromStart.getSelection()) {
-
-            /*
-             * adjust start altitude until left slider
-             */
-
-            final float[] adjustedTargetAltitudeSerie = new float[serieLength];
-
-            float startAltiDiff = newSourceAltiDiffSerie[0];
-            final int endIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
-            final float distanceDiff = targetDistanceSerie[endIndex];
-
-            final float[] altitudeSerie = _targetTour.altitudeSerie;
-
-            for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-               if (serieIndex < endIndex) {
-
-                  // add adjusted altitude
-
-                  final float targetDistance = targetDistanceSerie[serieIndex];
-                  final float distanceScale = 1 - targetDistance / distanceDiff;
-
-                  final float adjustedAltiDiff = startAltiDiff * distanceScale;
-                  final float newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
-
-                  adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
-                  newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
-
-               } else {
-
-                  // add altitude which are not adjusted
-
-                  adjustedTargetAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
-               }
-            }
-
-            _sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
-
-            startAltiDiff /= UI.UNIT_VALUE_ELEVATION;
-
-            final int targetEndTime = targetTimeSerie[endIndex];
-            final float targetEndDistance = targetDistanceSerie[endIndex];
-
-            // meter/min
-            altitudeDifferences[0] = targetEndTime == 0 ? //
-                  0f
-                  : startAltiDiff / targetEndTime * 60;
-
-            // meter/meter
-            altitudeDifferences[1] = targetEndDistance == 0 ? //
-                  0f
-                  : ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
-
-         } else if (_chkAdjustAltiFromSource.getSelection()) {
-
-            /*
-             * adjust target altitude from source altitude
-             */
-            _sourceTour.dataSerieAdjustedAlti = Arrays.copyOf(newSourceAltitudeSerie, serieLength);
-         }
-      }
+      final float[] altitudeDifferences = computeAdjustedAltitude(newSourceAltiDiffSerie,
+            newSourceAltitudeSerie);
 
       return altitudeDifferences;
    }
