@@ -34,7 +34,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +96,7 @@ import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
 import net.tourbook.map2.action.ActionShowTourPauses;
+import net.tourbook.map2.action.ActionShowTourWeatherInMap;
 import net.tourbook.map2.action.ActionShowValuePoint;
 import net.tourbook.map2.action.ActionShowWayPoints;
 import net.tourbook.map2.action.ActionSyncMapWith_OtherMap;
@@ -133,6 +134,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourPauseUI;
+import net.tourbook.tour.TourWeatherToolTipProvider;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
@@ -216,9 +218,10 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT                   = true;
    private static final String   STATE_IS_SHOW_SLIDER_IN_LEGEND                        = "STATE_IS_SHOW_SLIDER_IN_LEGEND";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_START_END_IN_MAP                        = "STATE_IS_SHOW_START_END_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                        = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
    private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
 
@@ -325,23 +328,27 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
    //
-   private static final IPreferenceStore _prefStore          = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common   = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state              = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _state_MapProvider  = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
-   private static final IDialogSettings  _state_PhotoFilter  = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common      = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_MapProvider     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
+   private static final IDialogSettings  _state_PhotoFilter     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
 
-   public static final int               TOUR_INFO_TOOLTIP_X = 3;
-   public static final int               TOUR_INFO_TOOLTIP_Y = 23;
+   public static final int               TOUR_INFO_TOOLTIP_X    = 3;
+   public static final int               TOUR_INFO_TOOLTIP_Y    = 23;
+   public static final int               TOUR_WEATHER_TOOLTIP_X = 28;
+   public static final int               TOUR_WEATHER_TOOLTIP_Y = 23;
 
    //
    //
-   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
-   private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
-   private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
+   private final TourInfoIconToolTipProvider _tourInfoToolTipProvider    = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
+   private final TourWeatherToolTipProvider  _tourWeatherToolTipProvider = new TourWeatherToolTipProvider(TOUR_WEATHER_TOOLTIP_X,
+         TOUR_WEATHER_TOOLTIP_Y);
+   private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
+   private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter();
    //
-   private final MapInfoManager              _mapInfoManager          = MapInfoManager.getInstance();
-   private final TourPainterConfiguration    _tourPainterConfig       = TourPainterConfiguration.getInstance();
+   private final MapInfoManager              _mapInfoManager             = MapInfoManager.getInstance();
+   private final TourPainterConfiguration    _tourPainterConfig          = TourPainterConfiguration.getInstance();
    //
    private boolean                           _isPartVisible;
    //
@@ -358,15 +365,15 @@ public class Map2View extends ViewPart implements
    /**
     * Contains all tours which are displayed in the map.
     */
-   private final ArrayList<TourData>         _allTourData             = new ArrayList<>();
+   private final ArrayList<TourData>         _allTourData                = new ArrayList<>();
    private TourData                          _previousTourData;
    private Long                              _lastSelectedTourInsideMap;
    //
    /**
     * contains photos which are displayed in the map
     */
-   private final ArrayList<Photo>            _allPhotos               = new ArrayList<>();
-   private final ArrayList<Photo>            _filteredPhotos          = new ArrayList<>();
+   private final ArrayList<Photo>            _allPhotos                  = new ArrayList<>();
+   private final ArrayList<Photo>            _filteredPhotos             = new ArrayList<>();
    //
    private boolean                           _isPhotoFilterActive;
    private int                               _photoFilter_RatingStars;
@@ -442,7 +449,7 @@ public class Map2View extends ViewPart implements
    private boolean                           _isMapSyncWith_Tour;
    private boolean                           _isMapSyncWith_ValuePoint;
    //
-   private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
+   private EnumMap<MapGraphId, Action>       _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
    private ActionTourColor                   _actionTourColor_Elevation;
    private ActionTourColor                   _actionTourColor_Gradient;
    private ActionTourColor                   _actionTourColor_Pulse;
@@ -477,12 +484,13 @@ public class Map2View extends ViewPart implements
    private ActionShowTourInfoInMap           _actionShowTourInfoInMap;
    private ActionShowTourMarker              _actionShowTourMarker;
    private ActionShowTourPauses              _actionShowTourPauses;
+   private ActionShowTourWeatherInMap        _actionShowTourWeatherInMap;
    private ActionShowValuePoint              _actionShowValuePoint;
    private ActionShowWayPoints               _actionShowWayPoints;
    private ActionZoomLevelAdjustment         _actionZoomLevelAdjustment;
    //
    private ActionSyncMap                     _actionMap2_SyncMap;
-   private HashMap<MapSyncId, Action>        _allSyncMap_Actions   = new HashMap<>();
+   private EnumMap<MapSyncId, Action>        _allSyncMap_Actions   = new EnumMap<>(MapSyncId.class);
    private ActionSyncMapWith_Photo           _actionSyncMapWith_Photo;
    private ActionSyncMapWith_Slider_One      _actionSyncMapWith_Slider_One;
    private ActionSyncMapWith_Slider_Centered _actionSyncMapWith_Slider_Centered;
@@ -963,6 +971,19 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.isShowTourPauses = _actionShowTourPauses.isChecked();
 
       _map.disposeOverlayImageCache();
+      _map.paint();
+   }
+
+   public void actionSetShowTourWeatherInMap() {
+
+      final boolean isVisible = _actionShowTourWeatherInMap.isChecked();
+
+      if (isVisible) {
+         _tourToolTip.addToolTipProvider(_tourWeatherToolTipProvider);
+      } else {
+         _tourToolTip.removeToolTipProvider(_tourWeatherToolTipProvider);
+      }
+
       _map.paint();
    }
 
@@ -1593,6 +1614,7 @@ public class Map2View extends ViewPart implements
       _actionShowTourInfoInMap            = new ActionShowTourInfoInMap(this);
       _actionShowTourMarker               = new ActionShowTourMarker(this);
       _actionShowTourPauses               = new ActionShowTourPauses(this);
+      _actionShowTourWeatherInMap         = new ActionShowTourWeatherInMap(this);
       _actionShowWayPoints                = new ActionShowWayPoints(this);
       _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
 
@@ -1915,6 +1937,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour.setEnabled(_isTourOrWayPoint);
       _actionShowTourMarker.setEnabled(_isTourOrWayPoint);
       _actionShowTourPauses.setEnabled(_isTourOrWayPoint);
+      _actionShowTourWeatherInMap.setEnabled(isTourAvailable);
       _actionShowWayPoints.setEnabled(_isTourOrWayPoint);
       _actionZoom_Centered.setEnabled(isTourAvailable);
       _actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
@@ -2039,6 +2062,7 @@ public class Map2View extends ViewPart implements
        */
       menuMgr.add(new Separator());
       menuMgr.add(_actionShowTourInfoInMap);
+      menuMgr.add(_actionShowTourWeatherInMap);
       menuMgr.add(_actionShowLegendInMap);
       menuMgr.add(_actionShowScaleInMap);
       menuMgr.add(_actionShowValuePoint);
@@ -2609,6 +2633,7 @@ public class Map2View extends ViewPart implements
          final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
          _tourInfoToolTipProvider.setTourData(tourData);
+         _tourWeatherToolTipProvider.setTourData(tourData);
 
          /*
           * Show single tour only when it's selected the 2nd time
@@ -2672,6 +2697,7 @@ public class Map2View extends ViewPart implements
 
             _map.tourBreadcrumb().addBreadcrumTour(tourIdSelection.getTourId());
             setTourInfoIconPosition();
+            setTourWeatherIconPosition();
 
          } else {
 
@@ -3069,6 +3095,7 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
+      _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
       final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
 
@@ -3184,6 +3211,7 @@ public class Map2View extends ViewPart implements
           */
          _map.tourBreadcrumb().setBreadcrumbTours(_allTourData);
          setTourInfoIconPosition();
+         setTourWeatherIconPosition();
 
          return;
       }
@@ -3225,6 +3253,7 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
+      _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
       _map.resetHoveredSelectedTours();
 
@@ -3257,6 +3286,7 @@ public class Map2View extends ViewPart implements
 
       if (_allTourData.isEmpty()) {
          _tourInfoToolTipProvider.setTourData(null);
+         _tourWeatherToolTipProvider.setTourData(null);
          return;
       }
 
@@ -3327,6 +3357,7 @@ public class Map2View extends ViewPart implements
       _hash_AllTourIds = tourData.getTourId().hashCode();
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
+      _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
       // set the paint context (slider position) for the direct mapping painter
       _directMappingPainter.setPaintContext(
@@ -3429,6 +3460,7 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
+      _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
       _directMappingPainter.disablePaintContext();
 
@@ -3734,6 +3766,13 @@ public class Map2View extends ViewPart implements
          _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
       }
 
+      // show tour weather in map
+      final boolean isShowTourWeather = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_WEATHER_IN_MAP, true);
+      _actionShowTourWeatherInMap.setChecked(isShowTourWeather);
+      if (isShowTourWeather) {
+         _tourToolTip.addToolTipProvider(_tourWeatherToolTipProvider);
+      }
+
       // show scale
       final boolean isScaleVisible = Util.getStateBoolean(_state, STATE_IS_SHOW_SCALE_IN_MAP, true);
       _actionShowScaleInMap.setChecked(isScaleVisible);
@@ -3925,6 +3964,7 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       setTourInfoIconPosition();
+      setTourWeatherIconPosition();
 
       // create legend image after the dim level is modified
       createLegendImage(_tourPainterConfig.getMapColorProvider());
@@ -4037,9 +4077,10 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_SCALE_IN_MAP,                      _actionShowScaleInMap.isChecked());
       _state.put(STATE_IS_SHOW_SLIDER_IN_MAP,                     _actionShowSliderInMap.isChecked());
       _state.put(STATE_IS_SHOW_SLIDER_IN_LEGEND,                  _actionShowSliderInLegend.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_MARKER,                       _actionShowTourMarker.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_PAUSES,                       _actionShowTourPauses.isChecked());
-      _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
       _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
@@ -4170,6 +4211,7 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().addBreadcrumTours(allTourData);
       setTourInfoIconPosition();
+      setTourWeatherIconPosition();
    }
 
    /**
@@ -4184,6 +4226,7 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().addBreadcrumTour(tourData.getTourId());
       setTourInfoIconPosition();
+      setTourWeatherIconPosition();
    }
 
    /**
@@ -4216,6 +4259,26 @@ public class Map2View extends ViewPart implements
    }
 
    /**
+    * Adjust tour weather icon according to the breadcrumb toolbar visibility
+    */
+   private void setTourWeatherIconPosition() {
+
+      final int devXTooltip = TOUR_WEATHER_TOOLTIP_X;
+      final int devYTooltip =
+
+            _tourPainterConfig.isShowBreadcrumbs
+                  && _map.tourBreadcrumb().getUsedCrumbs() > 0
+
+                        // show tooltip icon below the crumbs
+                        ? TOUR_WEATHER_TOOLTIP_Y
+
+                        // breadcrumb is not visible -> "center" icon in the top left corner
+                        : TOUR_INFO_TOOLTIP_X;
+
+      _tourWeatherToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
+   }
+
+   /**
     * Show map by removing/resetting all previously displayed tours
     *
     * @param isShowOverlays
@@ -4223,6 +4286,7 @@ public class Map2View extends ViewPart implements
    private void showDefaultMap(final boolean isShowOverlays) {
 
       _tourInfoToolTipProvider.setTourData(null);
+      _tourWeatherToolTipProvider.setTourData(null);
 
       // disable tour actions in this view
       _isTourOrWayPoint = false;
@@ -4253,6 +4317,7 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().removeAllCrumbs();
       setTourInfoIconPosition();
+      setTourWeatherIconPosition();
 
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);
@@ -4476,6 +4541,7 @@ public class Map2View extends ViewPart implements
 
       // update the tour info icon depending if breadcrumbs are visible
       setTourInfoIconPosition();
+      setTourWeatherIconPosition();
    }
 
    private void updateFilteredPhotos() {
