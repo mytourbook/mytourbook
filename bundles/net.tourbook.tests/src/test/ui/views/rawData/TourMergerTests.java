@@ -23,17 +23,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
-import utils.FilesUtils;
 import utils.Initializer;
 
 public class TourMergerTests {
 
-   private static final String IMPORT_PATH          = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
-   private static final String _testTourFilePathTcx = IMPORT_PATH + "TCXExport.tcx";         //$NON-NLS-1$
-   private static final String _testTourFilePathGpx = IMPORT_PATH + "GPXExport.gpx";         //$NON-NLS-1$
+   //private static final String IMPORT_PATH          = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
 
-   private static TourData     _targetTour;
-   private TourMerger          _tourMerger;
+   private static TourData _targetTour;
+   private TourMerger      _tourMerger;
 
    @BeforeAll
    static void initAll() {
@@ -52,16 +49,11 @@ public class TourMergerTests {
       _tourMerger = new TourMerger(
             new TourData(), // _sourceTour,
             _targetTour,
-            false, //_chkSynchStartTime.getSelection(),
-            0, //_tourStartTimeSynchOffset,
-            true, //_chkMergeCadence.getSelection(),
-            true, //_chkMergePulse.getSelection(),
             true, //_chkMergeSpeed.getSelection(),
-            true, //_chkMergeTemperature.getSelection(),
-            false, //_chkAdjustAltiFromStart.getSelection(),
+            0, //_tourStartTimeSynchOffset,
+            false, //_chkSynchStartTime.getSelection(),
             false, //_chkAdjustAltiFromSource.getSelection(),
-            false, //_chkAdjustAltiSmoothly.getSelection(),
-            0);// _tourChart.getXSliderPosition().getLeftSliderValueIndex());
+            false);//_chkAdjustAltiSmoothly.getSelection(),
 
       final TourData mergedTour = _tourMerger.computeMergedData_NEWWIP();
 

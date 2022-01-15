@@ -22,16 +22,12 @@ public class TourMerger {
    private TourData _sourceTour;
    private TourData _targetTour;
 
-   private boolean  _mergeCadence;
-   private boolean  _mergePulse;
    private boolean  _mergeSpeed;
-   private boolean  _mergeTemperature;
-   private boolean  _adjustAltiFromStart;
    private boolean  _adjustAltiFromSource;
    private boolean  _adjustAltiSmoothly;
-   private int      _tourChart_LeftSliderValueIndex;
    private boolean  _synchStartTime;
    private int      _tourStartTimeSynchOffset;
+
    private float[]  _newSourceAltitudeSerie;
    private float[]  _newTargetPulseSerie;
    private float[]  _newTargetCadenceSerie;
@@ -40,82 +36,20 @@ public class TourMerger {
 
    public TourMerger(final TourData sourceTour,
                      final TourData targetTour,
-                     final boolean synchStartTime,
-                     final int tourStartTimeSynchOffset,
-                     final boolean mergeCadence,
-                     final boolean mergePulse,
                      final boolean mergeSpeed,
-                     final boolean mergeTemperature,
-                     final boolean adjustAltiFromStart,
+                     final int tourStartTimeSynchOffset,
+                     final boolean synchStartTime,
                      final boolean adjustAltiFromSource,
-                     final boolean adjustAltiSmoothly,
-                     final int tourChart_LeftSliderValueIndex) {
+                     final boolean adjustAltiSmoothly) {
 
       _sourceTour = sourceTour;
       _targetTour = targetTour;
       _synchStartTime = synchStartTime;
-      _mergeCadence = mergeCadence;
-      _mergePulse = mergePulse;
       _mergeSpeed = mergeSpeed;
-      _mergeTemperature = mergeTemperature;
-      _adjustAltiFromStart = adjustAltiFromStart;
       _adjustAltiFromSource = adjustAltiFromSource;
       _adjustAltiSmoothly = adjustAltiSmoothly;
       _tourStartTimeSynchOffset = tourStartTimeSynchOffset;
-      _tourChart_LeftSliderValueIndex = tourChart_LeftSliderValueIndex;
    }
-
-//   private void assignMergedSeries(final float[] newSourceAltitudeSerie,
-//                                   final float[] newSourceAltiDiffSerie,
-//                                   final float[] newTargetPulseSerie,
-//                                   final float[] newTargetTemperatureSerie,
-//                                   final float[] newTargetCadenceSerie,
-//                                   final int[] targetTimeSerie) {
-//
-//      // check if the data series are available
-//      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
-//      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
-//
-//      _sourceTour.dataSerieAdjustedAlti = null;
-//
-//      if (isSourceAltitude) {
-//         _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
-//      } else {
-//         _sourceTour.dataSerie2ndAlti = null;
-//      }
-//
-//      if (isSourceAltitude && isTargetAltitude) {
-//         _sourceTour.dataSerieDiffTo2ndAlti = newSourceAltiDiffSerie;
-//      } else {
-//         _sourceTour.dataSerieDiffTo2ndAlti = null;
-//      }
-//
-//      if (_mergePulse) {
-//         _targetTour.pulseSerie = newTargetPulseSerie;
-//      } else {
-//         _targetTour.pulseSerie = _sourceTour.pulseSerie;
-//      }
-//
-//      if (_mergeSpeed) {
-//         _targetTour.timeSerie = targetTimeSerie;
-//         _targetTour.setSpeedSerie(null);
-//      } else {
-//         _targetTour.timeSerie = _sourceTour.timeSerie;
-//         _targetTour.setSpeedSerie(_sourceTour.getSpeedSerie());
-//      }
-//
-//      if (_mergeTemperature) {
-//         _targetTour.temperatureSerie = newTargetTemperatureSerie;
-//      } else {
-//         _targetTour.temperatureSerie = _sourceTour.temperatureSerie;
-//      }
-//
-//      if (_mergeCadence) {
-//         _targetTour.setCadenceSerie(newTargetCadenceSerie);
-//      } else {
-//         _targetTour.setCadenceSerie(_sourceTour.getCadenceSerie());
-//      }
-//   }
 
    private void assignTargetSeriesValue(
                                         final int sourceIndex,
@@ -602,10 +536,6 @@ public class TourMerger {
 
          assignTargetSeriesValue(sourceIndex, targetIndex);
       }
-   }
-
-   public TourData getMergedTour() {
-      return _targetTour;
    }
 
    public float[] getNewSourceAltiDiffSerie() {
