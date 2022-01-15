@@ -306,14 +306,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       } else {
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
-
-      if (_chkMergeSpeed.getSelection()) {
-         _targetTour.timeSerie = mergedTour.timeSerie;
-         _targetTour.setSpeedSerie(null);
-      } else {
-         _targetTour.timeSerie = _sourceTour.timeSerie;
-         _targetTour.setSpeedSerie(_sourceTour.getSpeedSerie());
-      }
+//
+//      if (_chkMergeSpeed.getSelection()) {
+//         _targetTour.timeSerie = mergedTour.timeSerie;
+//         _targetTour.setSpeedSerie(null);
+//      } else {
+//         _targetTour.timeSerie = _sourceTour.timeSerie;
+//         _targetTour.setSpeedSerie(_sourceTour.getSpeedSerie());
+//      }
 
       if (_chkMergeTemperature.getSelection()) {
          _targetTour.temperatureSerie = mergedTour.temperatureSerie;
