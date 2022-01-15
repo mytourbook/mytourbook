@@ -355,7 +355,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       return super.close();
    }
 
-   private float[] computeAdjustedAltitude(final float[] newSourceAltiDiffSerie,
+   private float[] computeAdjustedAltitude(//final int[] targetTimeSerie,
+                                           final float[] newSourceAltiDiffSerie,
                                            final float[] newSourceAltitudeSerie) {
 
       final float[] targetDistanceSerie = _targetTour.distanceSerie;
@@ -370,6 +371,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          return altitudeDifferences;
       }
 
+      // final int serieLength = targetTimeSerie.length;
       final int[] targetTimeSerie = _targetTour.timeSerie;
       final int serieLength = targetTimeSerie.length;
       if (_chkAdjustAltiFromStart.getSelection()) {
@@ -437,7 +439,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       return altitudeDifferences;
    }
 
-   private float[] computeMergedData() {
+   private void computeMergedData() {
 
       final TourMerger tourMerger = new TourMerger(
             _sourceTour,
@@ -455,10 +457,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final float[] newSourceAltitudeSerie = mergedTour.altitudeSerie;
 
-      final float[] altitudeDifferences = computeAdjustedAltitude(newSourceAltiDiffSerie,
+      final float[] altitudeDifferences = computeAdjustedAltitude(//mergedTour.timeSerie,
+            newSourceAltiDiffSerie,
             newSourceAltitudeSerie);
 
-      return altitudeDifferences;
+      updateUI(altitudeDifferences);
    }
 
    @Override
@@ -1347,9 +1350,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       _iconPlaceholder.dispose();
 
-      for (final Image image : _graphImages.values()) {
-         image.dispose();
-      }
+      _graphImages.values().forEach(Image::dispose);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
    }
@@ -1360,9 +1361,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _targetTour.setMergedTourTimeOffset(getFromUITourTimeOffset());
 
       // calculate merged data
-      final float[] altitudeDifferences = computeMergedData();
-
-      updateUI(altitudeDifferences);
+      computeMergedData();
 
       _tourChartConfig.isRelativeValueDiffScaling = _chkValueDiffScaling.getSelection();
 
