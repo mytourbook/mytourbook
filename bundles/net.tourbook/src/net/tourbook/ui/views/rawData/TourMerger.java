@@ -51,8 +51,7 @@ public class TourMerger {
       _tourStartTimeSynchOffset = tourStartTimeSynchOffset;
    }
 
-   private void assignTargetSeriesValue(
-                                        final int sourceIndex,
+   private void assignTargetSeriesValue(final int sourceIndex,
                                         final int targetIndex) {
 
       final float[] sourceCadenceSerie = _sourceTour.getCadenceSerie();
