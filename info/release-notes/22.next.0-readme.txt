@@ -45,6 +45,9 @@ Improvements
   - Loading multiple tours is now much faster because they are loaded concurrently
 
 
+* Tour Import
+  - Sort imported tours by number of markers/waypoints
+
 Changes
 =======
 
