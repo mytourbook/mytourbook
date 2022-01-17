@@ -94,6 +94,7 @@ import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.srtm.ElevationSRTM1;
 import net.tourbook.srtm.ElevationSRTM3;
 import net.tourbook.srtm.GeoLat;
 import net.tourbook.srtm.GeoLon;
@@ -218,6 +219,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Transient
    private static final ElevationSRTM3 _elevationSRTM3                   = new ElevationSRTM3();
+   private static final ElevationSRTM1 _elevationSRTM1                   = new ElevationSRTM1();
 
    @Transient
    private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
@@ -6014,11 +6016,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             final double longitude = longitudeSerie[serieIndex];
 
+            final float srtm1Value, srtm3Value;
             float srtmValue = 0;
-
+            //System.out.println(" min float:" + Float.MIN_VALUE);
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
-               srtmValue = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               System.out.println("******************* TourData srtm3: " + srtm3Value + " vs. ,srtm1: " + srtm1Value);
+               if (srtm1Value != Float.MIN_VALUE) { //check if valid srtm1 value found
+                  srtmValue = srtm1Value;
+                  System.out.println("******************* TourData using srtm1: " + srtmValue);
+               } else { //else use srtm3
+                  srtmValue = srtm3Value;
+                  System.out.println("******************* TourData using srtm3: " + srtmValue);
+               }
+               //srtmValue = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               //System.out.println("******************* TourData srtm3: " + srtmValue);
             }
 
             /*
