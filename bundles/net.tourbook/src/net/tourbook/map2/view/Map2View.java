@@ -3492,6 +3492,10 @@ public class Map2View extends ViewPart implements
 
    private void paintToursAndPhotos(final TourData tourData, final ISelection selection) {
 
+      if (tourData == null) {
+         return;
+      }
+
       if (tourData.isMultipleTours()) {
 
          /*
