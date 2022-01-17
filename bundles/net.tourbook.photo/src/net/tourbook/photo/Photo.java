@@ -1039,18 +1039,18 @@ public class Photo {
 
    /**
     * @param mapProvider
-    * @param projectionId
+    * @param projectionHash
     * @param zoomLevel
     * @param isLinkPhotoDisplayed
     * @return Returns the world position for this photo or <code>null</code> when geo position is
     *         not set.
     */
    public Point getWorldPosition(final CommonMapProvider mapProvider,
-                                 final String projectionId,
+                                 final int projectionHash,
                                  final int zoomLevel,
                                  final boolean isLinkPhotoDisplayed) {
 
-      final double latitude = isLinkPhotoDisplayed //
+      final double latitude = isLinkPhotoDisplayed
             ? getLinkLatitude()
             : getTourLatitude();
 
@@ -1058,9 +1058,9 @@ public class Photo {
          return null;
       }
 
-      final Integer hashKey = projectionId.hashCode() + zoomLevel;
+      final Integer hashKey = projectionHash + zoomLevel;
 
-      final Point worldPosition = isLinkPhotoDisplayed //
+      final Point worldPosition = isLinkPhotoDisplayed
             ? _linkWorldPosition.get(hashKey)
             : _tourWorldPosition.get(hashKey);
 

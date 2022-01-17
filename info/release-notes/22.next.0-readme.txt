@@ -41,12 +41,14 @@ New
 Improvements
 ============
 
-* Tours
-  - Loading multiple tours is now much faster because they are loaded concurrently
+* Multiple Tours
+  - Loading multiple tours is much faster because they are loaded concurrently
+  - Painting multiple tours in tour chart and 2D map are further optimized 
 
 
 * Tour Import
   - Sort imported tours by number of markers/waypoints
+  
 
 Changes
 =======
