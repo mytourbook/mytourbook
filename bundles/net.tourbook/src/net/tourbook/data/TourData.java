@@ -6018,7 +6018,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             final float srtm1Value, srtm3Value;
             float srtmValue = 0;
-            //System.out.println(" min float:" + Float.MIN_VALUE);
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
                srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
@@ -6031,8 +6030,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                   srtmValue = srtm3Value;
                   System.out.println("******************* TourData using srtm3: " + srtmValue);
                }
-               //srtmValue = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-               //System.out.println("******************* TourData srtm3: " + srtmValue);
             }
 
             /*
