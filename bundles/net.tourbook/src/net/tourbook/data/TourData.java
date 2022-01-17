@@ -6022,13 +6022,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (latitude != 0 || longitude != 0) {
                srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
                srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-               System.out.println("******************* TourData srtm3: " + srtm3Value + " vs. ,srtm1: " + srtm1Value);
+               //System.out.println("******************* TourData srtm3: " + srtm3Value + " vs. ,srtm1: " + srtm1Value);
                if (srtm1Value != Float.MIN_VALUE) { //check if valid srtm1 value found
                   srtmValue = srtm1Value;
-                  System.out.println("******************* TourData using srtm1: " + srtmValue);
+                  //System.out.println("******************* TourData using srtm1: " + srtmValue);
                } else { //else use srtm3
                   srtmValue = srtm3Value;
-                  System.out.println("******************* TourData using srtm3: " + srtmValue);
+                  //System.out.println("******************* TourData using srtm3: " + srtmValue);
                }
             }
 
