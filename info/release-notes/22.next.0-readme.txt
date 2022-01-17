@@ -49,6 +49,9 @@ Improvements
 * Tour Import
   - Sort imported tours by number of markers/waypoints
   
+* Tour Segmenter
+  - Show power value for each segment
+                        https://sourceforge.net/p/mytourbook/feature-requests/204/
 
 Changes
 =======

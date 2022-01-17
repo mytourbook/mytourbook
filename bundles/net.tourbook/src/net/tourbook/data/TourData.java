@@ -5701,13 +5701,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
 
-      final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
+      final boolean isElevationSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
       final boolean isCadenceSerie = (cadenceSerie != null) && (cadenceSerie.length > 0);
       final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
       final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
 
       final float[] localPowerSerie = getPowerSerie();
-      final boolean isPowerSerie = (localPowerSerie != null) && (localPowerSerie.length > 0);
+      final boolean isPowerDataAvailable = (localPowerSerie != null) && (localPowerSerie.length > 0);
 
       final int segmentSerieLength = segmentSerieIndex.length;
 
@@ -5715,13 +5715,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final int firstSerieIndex = segmentSerieIndex[0];
 
       /*
-       * get start values
+       * Set start values
        */
       int segmentStartTime = timeSerie[firstSerieIndex];
 
-      float altitudeStart = 0;
-      if (isAltitudeSerie) {
-         altitudeStart = segmenterAltitudeSerie[firstSerieIndex];
+      float elevationStart = 0;
+      if (isElevationSerie) {
+         elevationStart = segmenterAltitudeSerie[firstSerieIndex];
       }
 
       float distanceStart = 0;
@@ -5857,10 +5857,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          /*
           * Elevation
           */
-         if (isAltitudeSerie) {
+         if (isElevationSerie) {
 
             final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
-            final float altitudeDiff = altitudeEnd - altitudeStart;
+            final float altitudeDiff = altitudeEnd - elevationStart;
 
             final float altiUpDownHour = segmentMovingTime == 0 //
                   ? 0
@@ -5932,27 +5932,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                totalAltitude_Down += sumSegmentAltitude_Down;
             }
 
-            // get computed values: power for a segment
-            float sumPower = 0;
-            for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
-
-               if (isPowerSerie) {
-                  sumPower += localPowerSerie[serieIndex];
-               }
-            }
-            final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
-            segmentSerie_Power[segmentIndex] = segment.power = segmentIndexDiff == 0 //
-                  ? 0
-                  : sumPower / segmentIndexDiff;
-
             // end point of the current segment is the start of the next segment
-            altitudeStart = altitudeEnd;
+            elevationStart = altitudeEnd;
          }
 
-         if (isDistanceSerie && isAltitudeSerie && (segmentDistance != 0.0)) {
+         /*
+          * Power
+          */
+         if (isPowerDataAvailable) {
 
-            // gradient
-            segmentSerie_Gradient[segmentIndex] = segment.gradient = //
+            float sumPower = 0;
+            for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
+               sumPower += localPowerSerie[serieIndex];
+            }
+
+            final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
+
+            segmentSerie_Power[segmentIndex] = segment.power =
+                  segmentIndexDiff == 0
+                        ? 0
+                        : sumPower / segmentIndexDiff;
+         }
+
+         /*
+          * Gradient
+          */
+         if (isDistanceSerie && isElevationSerie && (segmentDistance != 0.0)) {
+
+            segmentSerie_Gradient[segmentIndex] = segment.gradient =
                   segment.altitude_Segment_Border_Diff * 100 / segmentDistance;
          }
 
@@ -5982,11 +5989,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /*
        * Add total segment
        */
-      final float totalSpeed = totalTime_Moving == 0 //
+      final float totalSpeed = totalTime_Moving == 0
             ? 0
             : totalDistance / totalTime_Moving * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
-      final float totalPace = totalDistance == 0 //
+      final float totalPace = totalDistance == 0
             ? 0
             : totalTime_Moving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
 
@@ -10730,7 +10737,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public void setTileHashes_ForTours(final TIntHashSet tileHashes, final int mapZoomLevel, final int projectionHash) {
- 
+
       _tileHashes_Tours.put(projectionHash + mapZoomLevel, tileHashes);
    }
 
