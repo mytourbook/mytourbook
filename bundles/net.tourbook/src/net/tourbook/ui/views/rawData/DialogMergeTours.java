@@ -74,6 +74,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    //TODO FB shouldn't the elapsed time of the target tour be equal to the target
    // time of the source tour is the speed is merged ?
 
+   //should it be called merge distance (and consequently speed/pace) ???
+
    private static final int              MAX_ADJUST_SECONDS     = 120;
    private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
    private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
@@ -306,7 +308,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       } else {
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
-//
+
 //      if (_chkMergeSpeed.getSelection()) {
 //         _targetTour.timeSerie = mergedTour.timeSerie;
 //         _targetTour.setSpeedSerie(null);
@@ -445,10 +447,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _sourceTour,
             _targetTour,
             _chkMergeSpeed.getSelection(),
-            _tourStartTimeSynchOffset,
-            _chkSynchStartTime.getSelection(),
             _chkAdjustAltiFromSource.getSelection(),
-            _chkAdjustAltiSmoothly.getSelection());
+            _chkAdjustAltiSmoothly.getSelection(),
+            _chkSynchStartTime.getSelection(),
+            _tourStartTimeSynchOffset);
 
       final TourData mergedTour = tourMerger.computeMergedData_NEWWIP();
 
@@ -1129,10 +1131,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _chkKeepHVAdjustments.setText(Messages.tour_merger_chk_keep_horiz_vert_adjustments);
       _chkKeepHVAdjustments.setToolTipText(Messages.tour_merger_chk_keep_horiz_vert_adjustments_tooltip);
       _chkKeepHVAdjustments.setSelection(true);
-      _chkKeepHVAdjustments.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-         // this option cannot be deselected
-         _chkKeepHVAdjustments.setSelection(true);
-      }));
+      // this option cannot be deselected
+      _chkKeepHVAdjustments.addSelectionListener(widgetSelectedAdapter(
+            selectionEvent -> _chkKeepHVAdjustments.setSelection(true)));
    }
 
    private void createUITourChart(final Composite dlgContainer) {

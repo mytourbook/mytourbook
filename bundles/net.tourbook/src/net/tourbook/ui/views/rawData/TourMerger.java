@@ -37,17 +37,17 @@ public class TourMerger {
    public TourMerger(final TourData sourceTour,
                      final TourData targetTour,
                      final boolean mergeSpeed,
-                     final int tourStartTimeSynchOffset,
-                     final boolean synchStartTime,
                      final boolean adjustAltiFromSource,
-                     final boolean adjustAltiSmoothly) {
+                     final boolean adjustAltiSmoothly,
+                     final boolean synchStartTime,
+                     final int tourStartTimeSynchOffset) {
 
       _sourceTour = sourceTour;
       _targetTour = targetTour;
-      _synchStartTime = synchStartTime;
       _mergeSpeed = mergeSpeed;
       _adjustAltiFromSource = adjustAltiFromSource;
       _adjustAltiSmoothly = adjustAltiSmoothly;
+      _synchStartTime = synchStartTime;
       _tourStartTimeSynchOffset = tourStartTimeSynchOffset;
    }
 
@@ -90,9 +90,7 @@ public class TourMerger {
       _newTargetTemperatureSerie = new float[serieLength];
       _newTargetCadenceSerie = new float[serieLength];
 
-      final int[] targetTimeSerie = _mergeSpeed
-            ? mergeSpeed()
-            : _targetTour.timeSerie;
+      final int[] targetTimeSerie = _mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
 
       int xMergeOffset = _targetTour.getMergedTourTimeOffset();
       if (_synchStartTime) {

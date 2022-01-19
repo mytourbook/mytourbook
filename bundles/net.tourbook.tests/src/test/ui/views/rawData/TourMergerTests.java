@@ -50,10 +50,10 @@ public class TourMergerTests {
             new TourData(), // _sourceTour,
             _targetTour,
             true, //_chkMergeSpeed.getSelection(),
-            0, //_tourStartTimeSynchOffset,
-            false, //_chkSynchStartTime.getSelection(),
             false, //_chkAdjustAltiFromSource.getSelection(),
-            false);//_chkAdjustAltiSmoothly.getSelection(),
+            false, //_chkAdjustAltiSmoothly.getSelection(),
+            false, //_chkSynchStartTime.getSelection(),
+            0); //_tourStartTimeSynchOffset,
 
       final TourData mergedTour = _tourMerger.computeMergedData_NEWWIP();
 
