@@ -47,21 +47,21 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
 
-   private static final int       MAX_TAU    = 5000;
+   private static final int              MAX_TAU    = 5000;
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final boolean          _isOSX     = net.tourbook.common.UI.IS_OSX;
 
-   private final boolean          _isOSX     = net.tourbook.common.UI.IS_OSX;
-   private final boolean          _isLinux   = net.tourbook.common.UI.IS_LINUX;
+   private static final boolean          _isLinux   = net.tourbook.common.UI.IS_LINUX;
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-   private int                    _hintDefaultSpinnerWidth;
+   private int                           _hintDefaultSpinnerWidth;
 
-   private SmoothingUI            _smoothingUI;
+   private SmoothingUI                   _smoothingUI;
 
-   private SelectionListener      _selectionListener;
-   private MouseWheelListener     _spinnerMouseWheelListener;
+   private SelectionListener             _selectionListener;
+   private MouseWheelListener            _spinnerMouseWheelListener;
 
-   private boolean                _isUpdateUI;
+   private boolean                       _isUpdateUI;
 
    /*
     * UI resources
