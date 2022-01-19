@@ -52,6 +52,13 @@ Improvements
 * Tour Segmenter
   - Show power value for each segment
                         https://sourceforge.net/p/mytourbook/feature-requests/204/
+                        
+* Photos + Tours
+  - Show tours with these photo times: 
+    - Exif time
+    - Selected adjustment time
+    - Saved time
+  - Show photo location in view                         
 
 Changes
 =======

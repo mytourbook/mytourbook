@@ -123,22 +123,22 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
     */
    private static final int       MAX_GALLERY_POSITIONS        = 100;
 
-   private static final String    MENU_ID_PHOTO_GALLERY        = "menu.net.tourbook.photo.PhotoGallery";     //$NON-NLS-1$
+   private static final String    MENU_ID_PHOTO_GALLERY        = "menu.net.tourbook.photo.PhotoGallery"; //$NON-NLS-1$
 
-   private static final int       DELAY_JOB_SUBSEQUENT_FILTER  = 500;                                        // ms
-   private static final long      DELAY_JOB_UI_FILTER          = 200;                                        // ms
-   private static final long      DELAY_JOB_UI_LOADING         = 200;                                        // ms
+   private static final int       DELAY_JOB_SUBSEQUENT_FILTER  = 500;                                    // ms
+   private static final long      DELAY_JOB_UI_FILTER          = 200;                                    // ms
+   private static final long      DELAY_JOB_UI_LOADING         = 200;                                    // ms
 
-   public static final int        MIN_GALLERY_ITEM_WIDTH       = 10;                                         // pixel
-   public static final int        MAX_GALLERY_ITEM_WIDTH       = 2000;                                       // pixel
+   public static final int        MIN_GALLERY_ITEM_WIDTH       = 10;                                     // pixel
+   public static final int        MAX_GALLERY_ITEM_WIDTH       = 2000;                                   // pixel
 
-   public static final String     STATE_THUMB_IMAGE_SIZE       = "STATE_THUMB_IMAGE_SIZE";                   //$NON-NLS-1$
-   private static final String    STATE_GALLERY_POSITION_KEY   = "STATE_GALLERY_POSITION_KEY";               //$NON-NLS-1$
-   private static final String    STATE_GALLERY_POSITION_VALUE = "STATE_GALLERY_POSITION_VALUE";             //$NON-NLS-1$
-   private static final String    STATE_IMAGE_SORTING          = "STATE_IMAGE_SORTING";                      //$NON-NLS-1$
-   private static final String    STATE_SELECTED_ITEMS         = "STATE_SELECTED_ITEMS";                     //$NON-NLS-1$
+   public static final String     STATE_THUMB_IMAGE_SIZE       = "STATE_THUMB_IMAGE_SIZE";               //$NON-NLS-1$
+   private static final String    STATE_GALLERY_POSITION_KEY   = "STATE_GALLERY_POSITION_KEY";           //$NON-NLS-1$
+   private static final String    STATE_GALLERY_POSITION_VALUE = "STATE_GALLERY_POSITION_VALUE";         //$NON-NLS-1$
+   private static final String    STATE_IMAGE_SORTING          = "STATE_IMAGE_SORTING";                  //$NON-NLS-1$
+   private static final String    STATE_SELECTED_ITEMS         = "STATE_SELECTED_ITEMS";                 //$NON-NLS-1$
 
-   private static final String    DEFAULT_GALLERY_FONT         = "arial,sans-serif";                         //$NON-NLS-1$
+   private static final String    DEFAULT_GALLERY_FONT         = "arial,sans-serif";                     //$NON-NLS-1$
 
    private IDialogSettings        _state;
    private final IPreferenceStore _prefStore                   = PhotoActivator.getPrefStore();
@@ -746,6 +746,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
          @Override
          public void handleEvent(final Event event) {
+
             onSelectPhoto();
          }
       });

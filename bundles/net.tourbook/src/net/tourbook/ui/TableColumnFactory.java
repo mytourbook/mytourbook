@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,6 +127,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MOTION_SPEED;
    public static final TableColumnFactory MOTION_SPEED_DIFF;
 
+   public static final TableColumnFactory PHOTO_FILE_PATH;
    public static final TableColumnFactory PHOTO_NUMBER_OF_GPS_PHOTOS;
    public static final TableColumnFactory PHOTO_NUMBER_OF_NO_GPS_PHOTOS;
    public static final TableColumnFactory PHOTO_NUMBER_OF_PHOTOS;
@@ -1713,6 +1714,26 @@ public abstract class TableColumnFactory {
       /*
        * Photo
        */
+
+      PHOTO_FILE_PATH = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "PHOTO_FILE_PATH", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_FilePath_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_FilePath_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_FilePath_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
 
       PHOTO_NUMBER_OF_GPS_PHOTOS = new TableColumnFactory() {
 

@@ -3090,7 +3090,7 @@ public class TourManager {
             final TourPhoto tourPhoto = new TourPhoto(tourData, selectedPhoto);
 
             // set adjusted time / geo location
-            tourPhoto.setAdjustedTime(selectedPhoto.adjustedTimeLink);
+            tourPhoto.setAdjustedTime(selectedPhoto.adjustedTime_Camera);
             tourPhoto.setGeoLocation(
                   selectedPhoto.getLinkLatitude(),
                   selectedPhoto.getLinkLongitude());
