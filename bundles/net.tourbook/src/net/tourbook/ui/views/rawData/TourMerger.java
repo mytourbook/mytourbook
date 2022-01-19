@@ -51,8 +51,7 @@ public class TourMerger {
       _tourStartTimeSynchOffset = tourStartTimeSynchOffset;
    }
 
-   private void assignTargetSeriesValue(final int sourceIndex,
-                                        final int targetIndex) {
+   private void assignTargetSeriesValue(final int sourceIndex, final int targetIndex) {
 
       final float[] sourceCadenceSerie = _sourceTour.getCadenceSerie();
       final float[] sourcePulseSerie = _sourceTour.pulseSerie;
@@ -80,7 +79,7 @@ public class TourMerger {
       return sourceIndex;
    }
 
-   public TourData computeMergedData_NEWWIP() {
+   public TourData computeMergedData() {
 
       final int[] targetTimeSerie = _mergeTime ? mergeTime() : _targetTour.timeSerie;
 
@@ -88,9 +87,18 @@ public class TourMerger {
       _newSourceAltitudeSerie = new float[serieLength];
       _newSourceAltiDiffSerie = new float[serieLength];
 
-      _newTargetPulseSerie = new float[serieLength];
-      _newTargetTemperatureSerie = new float[serieLength];
-      _newTargetCadenceSerie = new float[serieLength];
+      final boolean isSourceCadence = _sourceTour.getCadenceSerie() != null;
+      if (isSourceCadence) {
+         _newTargetCadenceSerie = new float[serieLength];
+      }
+      final boolean isSourcePulse = _sourceTour.pulseSerie != null;
+      if (isSourcePulse) {
+         _newTargetPulseSerie = new float[serieLength];
+      }
+      final boolean isSourceTemperature = _sourceTour.temperatureSerie != null;
+      if (isSourceTemperature) {
+         _newTargetTemperatureSerie = new float[serieLength];
+      }
 
       int xMergeOffset = _targetTour.getMergedTourTimeOffset();
       if (_synchStartTime) {
@@ -102,9 +110,15 @@ public class TourMerger {
       createNewTimeAndDistanceSerie(targetTimeSerie, xMergeOffset, yMergeOffset);
 
       _targetTour.altitudeSerie = _newSourceAltitudeSerie;
-      _targetTour.setCadenceSerie(_newTargetCadenceSerie);
-      _targetTour.pulseSerie = _newTargetPulseSerie;
-      _targetTour.temperatureSerie = _newTargetTemperatureSerie;
+      if (isSourceCadence) {
+         _targetTour.setCadenceSerie(_newTargetCadenceSerie);
+      }
+      if (isSourcePulse) {
+         _targetTour.pulseSerie = _newTargetPulseSerie;
+      }
+      if (isSourceTemperature) {
+         _targetTour.temperatureSerie = _newTargetTemperatureSerie;
+      }
 
       return _targetTour;
    }

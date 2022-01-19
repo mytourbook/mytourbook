@@ -18,45 +18,48 @@ package ui.views.rawData;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.views.rawData.TourMerger;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
+import utils.FilesUtils;
 import utils.Initializer;
 
 public class TourMergerTests {
 
-   //private static final String IMPORT_PATH          = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
+   private static final String FILES_PATH = FilesUtils.rootPath + "ui/views/rawData/files/"; //$NON-NLS-1$
 
-   private static TourData _targetTour;
-   private TourMerger      _tourMerger;
-
-   @BeforeAll
-   static void initAll() {
-
-      _targetTour = Initializer.importTour();
-   }
-
-   @AfterEach
-   void afterEach() {
-
-   }
+   private TourData            _sourceTour;
+   private TourData            _targetTour;
+   private TourMerger          _tourMerger;
 
    @Test
-   void testMergeTours() {
+   void testMergeTours_Basic() {
+
+      final String sourceFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "Move_2011_07_03_08_01_04_Trail+running.fit");
+      _sourceTour = Initializer.importTour_FIT(sourceFilePath);
+
+      final String targetFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "2011-07-03_KiliansClassik.gpx");
+      _targetTour = Initializer.importTour_GPX(targetFilePath);
 
       _tourMerger = new TourMerger(
-            new TourData(), // _sourceTour,
+            _sourceTour,
             _targetTour,
-            true, //_chkMergeSpeed.getSelection(),
+            false, // Merge time
             false, //_chkAdjustAltiFromSource.getSelection(),
             false, //_chkAdjustAltiSmoothly.getSelection(),
             false, //_chkSynchStartTime.getSelection(),
             0); //_tourStartTimeSynchOffset,
 
-      final TourData mergedTour = _tourMerger.computeMergedData_NEWWIP();
+      //Comparing the original tour before the merge
+      String controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik"; //$NON-NLS-1$
 
-      Comparison.compareTourDataAgainstControl(mergedTour, "filePath");
+      Comparison.compareTourDataAgainstControl(_targetTour, controlFilePath);
+
+      final TourData mergedTour = _tourMerger.computeMergedData();
+
+      //Comparing the merged tour
+      controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik-MergedWith-Move_2011_07_03_08_01_04_Trail+running"; //$NON-NLS-1$
+
+      Comparison.compareTourDataAgainstControl(mergedTour, controlFilePath);
    }
 }

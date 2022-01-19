@@ -451,7 +451,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _chkSynchStartTime.getSelection(),
             _tourStartTimeSynchOffset);
 
-      final TourData mergedTour = tourMerger.computeMergedData_NEWWIP();
+      final TourData mergedTour = tourMerger.computeMergedData();
 
       final float[] newSourceAltiDiffSerie = tourMerger.getNewSourceAltiDiffSerie();
       assignMergedSeries(mergedTour, newSourceAltiDiffSerie);
