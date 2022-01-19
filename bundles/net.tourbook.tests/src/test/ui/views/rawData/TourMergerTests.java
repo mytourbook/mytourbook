@@ -33,7 +33,7 @@ public class TourMergerTests {
    private TourMerger          _tourMerger;
 
    @Test
-   void testMergeTours_Basic() {
+   void testMergeTours() {
 
       final String sourceFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "Move_2011_07_03_08_01_04_Trail+running.fit");
       _sourceTour = Initializer.importTour_FIT(sourceFilePath);
@@ -44,7 +44,6 @@ public class TourMergerTests {
       _tourMerger = new TourMerger(
             _sourceTour,
             _targetTour,
-            false, // Merge time
             false, //_chkAdjustAltiFromSource.getSelection(),
             false, //_chkAdjustAltiSmoothly.getSelection(),
             false, //_chkSynchStartTime.getSelection(),
@@ -55,10 +54,19 @@ public class TourMergerTests {
 
       Comparison.compareTourDataAgainstControl(_targetTour, controlFilePath);
 
-      final TourData mergedTour = _tourMerger.computeMergedData();
+      //Merge the pulse and temperature
+      TourData mergedTour = _tourMerger.computeMergedData(false);
 
       //Comparing the merged tour
       controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik-PulseAndAltitudeMergeWith-Move_2011_07_03_08_01_04_Trail+running"; //$NON-NLS-1$
+
+      Comparison.compareTourDataAgainstControl(mergedTour, controlFilePath);
+
+      //Merge the pulse, temperature and time
+      mergedTour = _tourMerger.computeMergedData(true);
+
+      //Comparing the merged tour
+      controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik-PulseAndAltitudeAndTimeMergeWith-Move_2011_07_03_08_01_04_Trail+running"; //$NON-NLS-1$
 
       Comparison.compareTourDataAgainstControl(mergedTour, controlFilePath);
    }
