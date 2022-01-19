@@ -65,8 +65,8 @@ Changes
 Bugfix
 ======
 
-* 
-
+* Suunto App Integration: (Frederic)   
+  - When determining if a Suunto activity already exists in the database, only the tours for the selected user are compared with the activities available on the Suunto App
 
 Translation    
 ===========
