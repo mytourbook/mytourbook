@@ -22,7 +22,7 @@ public class TourMerger {
    private TourData _sourceTour;
    private TourData _targetTour;
 
-   private boolean  _mergeSpeed;
+   private boolean  _mergeTime;
    private boolean  _adjustAltiFromSource;
    private boolean  _adjustAltiSmoothly;
    private boolean  _synchStartTime;
@@ -36,7 +36,7 @@ public class TourMerger {
 
    public TourMerger(final TourData sourceTour,
                      final TourData targetTour,
-                     final boolean mergeSpeed,
+                     final boolean mergeTime,
                      final boolean adjustAltiFromSource,
                      final boolean adjustAltiSmoothly,
                      final boolean synchStartTime,
@@ -44,7 +44,7 @@ public class TourMerger {
 
       _sourceTour = sourceTour;
       _targetTour = targetTour;
-      _mergeSpeed = mergeSpeed;
+      _mergeTime = mergeTime;
       _adjustAltiFromSource = adjustAltiFromSource;
       _adjustAltiSmoothly = adjustAltiSmoothly;
       _synchStartTime = synchStartTime;
@@ -82,7 +82,7 @@ public class TourMerger {
 
    public TourData computeMergedData_NEWWIP() {
 
-      final int[] targetTimeSerie = _mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
+      final int[] targetTimeSerie = _mergeTime ? mergeTime() : _targetTour.timeSerie;
 
       final int serieLength = targetTimeSerie.length;
       _newSourceAltitudeSerie = new float[serieLength];
@@ -241,7 +241,7 @@ public class TourMerger {
    /**
     * Creates new time serie for the target tour according to the distance of the target tour
     */
-   private int[] mergeSpeed() {
+   private int[] mergeTime() {
 
       final int[] sourceTimeSerie = _sourceTour.timeSerie;
       final boolean isSourceTime = sourceTimeSerie != null && sourceTimeSerie.length > 0;

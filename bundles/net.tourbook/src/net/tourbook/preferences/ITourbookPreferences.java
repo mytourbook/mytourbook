@@ -497,7 +497,7 @@ public interface ITourbookPreferences {
 
    public static final String MERGE_TOUR_MERGE_GRAPH_ALTITUDE    = "merge.tour.merge-graph-altitude";              //$NON-NLS-1$
    public static final String MERGE_TOUR_MERGE_GRAPH_PULSE       = "merge.tour.merge-graph-pulse";                 //$NON-NLS-1$
-   public static final String MERGE_TOUR_MERGE_GRAPH_SPEED       = "merge.tour.merge-graph-speed";                 //$NON-NLS-1$
+   public static final String MERGE_TOUR_MERGE_GRAPH_TIME        = "merge.tour.merge-graph-time";                  //$NON-NLS-1$
    public static final String MERGE_TOUR_MERGE_GRAPH_TEMPERATURE = "merge.tour.merge-graph-temperature";           //$NON-NLS-1$
    public static final String MERGE_TOUR_MERGE_GRAPH_CADENCE     = "merge.tour.merge-graph-cadence";               //$NON-NLS-1$
 

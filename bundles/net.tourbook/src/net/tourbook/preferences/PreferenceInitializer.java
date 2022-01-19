@@ -435,7 +435,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // save actions
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE, false);
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, false);
-      store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_SPEED, false);
+      store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME, false);
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, false);
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, false);
 
