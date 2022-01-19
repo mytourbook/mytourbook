@@ -82,15 +82,15 @@ public class TourMerger {
 
    public TourData computeMergedData_NEWWIP() {
 
-      final int serieLength = _targetTour.timeSerie.length;
+      final int[] targetTimeSerie = _mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
+
+      final int serieLength = targetTimeSerie.length;
       _newSourceAltitudeSerie = new float[serieLength];
       _newSourceAltiDiffSerie = new float[serieLength];
 
       _newTargetPulseSerie = new float[serieLength];
       _newTargetTemperatureSerie = new float[serieLength];
       _newTargetCadenceSerie = new float[serieLength];
-
-      final int[] targetTimeSerie = _mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
 
       int xMergeOffset = _targetTour.getMergedTourTimeOffset();
       if (_synchStartTime) {
