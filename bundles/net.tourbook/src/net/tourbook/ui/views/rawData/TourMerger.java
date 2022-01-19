@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import net.tourbook.data.TourData;
 
 public class TourMerger {
@@ -115,6 +119,21 @@ public class TourMerger {
       }
       if (isSourceTemperature) {
          _targetTour.temperatureSerie = _newTargetTemperatureSerie;
+      }
+
+      if (mergeTime) {
+
+         final long[] pausedTime_Start = _sourceTour.getPausedTime_Start();
+         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
+            final List<Long> listPausedTime_End = Arrays.stream(_sourceTour.getPausedTime_End()).boxed().collect(Collectors.toList());
+
+            _targetTour.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, null);
+         }
+
+         _targetTour.setTourDeviceTime_Elapsed(targetTimeSerie[targetTimeSerie.length - 1] - targetTimeSerie[0] * 1L);
+         _targetTour.setTourDeviceTime_Recorded(_targetTour.getTourDeviceTime_Elapsed() - _targetTour.getTourDeviceTime_Paused());
+         _targetTour.computeTourMovingTime();
       }
 
       return _targetTour;
