@@ -99,8 +99,9 @@ public class TourMerger {
          // synchronize start time
          xMergeOffset = _tourStartTimeSynchOffset;
       }
+      final int yMergeOffset = _targetTour.getMergedAltitudeOffset();
 
-      createNewTimeAndDistanceSerie(xMergeOffset, targetTimeSerie);
+      createNewTimeAndDistanceSerie(targetTimeSerie, xMergeOffset, yMergeOffset);
 
       _targetTour.altitudeSerie = _newSourceAltitudeSerie;
       _targetTour.setCadenceSerie(_newTargetCadenceSerie);
@@ -143,8 +144,9 @@ public class TourMerger {
    /**
     * create new time/distance serie for the source tour according to the time of the target tour
     */
-   private void createNewTimeAndDistanceSerie(final int xMergeOffset,
-                                              final int[] targetTimeSerie) {
+   private void createNewTimeAndDistanceSerie(final int[] targetTimeSerie,
+                                              final int xMergeOffset,
+                                              final int yMergeOffset) {
 
       final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
       final int[] sourceTimeSerie = _sourceTour.timeSerie;
@@ -152,8 +154,6 @@ public class TourMerger {
       // check if the data series are available
       final boolean isSourceAltitude = sourceAltitudeSerie != null;
       final boolean isTargetAltitude = targetAltitudeSerie != null;
-
-      final int yMergeOffset = _targetTour.getMergedAltitudeOffset();
 
       float sourceAlti = 0;
       float previousSourceAltitude = 0;
