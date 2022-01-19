@@ -58,7 +58,7 @@ public class TourMergerTests {
       final TourData mergedTour = _tourMerger.computeMergedData();
 
       //Comparing the merged tour
-      controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik-MergedWith-Move_2011_07_03_08_01_04_Trail+running"; //$NON-NLS-1$
+      controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik-PulseAndAltitudeMergeWith-Move_2011_07_03_08_01_04_Trail+running"; //$NON-NLS-1$
 
       Comparison.compareTourDataAgainstControl(mergedTour, controlFilePath);
    }
