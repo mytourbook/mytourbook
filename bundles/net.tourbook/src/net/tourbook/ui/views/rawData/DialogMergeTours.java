@@ -313,7 +313,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.timeSerie = mergedTour.timeSerie;
          _targetTour.setSpeedSerie(null);
       } else {
-         _targetTour.timeSerie = _sourceTour.timeSerie;
+         _targetTour.timeSerie = _backupTargetTimeSerie;
          _targetTour.setSpeedSerie(_sourceTour.getSpeedSerie());
       }
 
