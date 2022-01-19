@@ -248,12 +248,10 @@ public class TourMerger {
       final float[] sourceDistanceSerie = _sourceTour.distanceSerie;
       final boolean isSourceDistance = sourceDistanceSerie != null;
       final int[] targetTimeSerie = _targetTour.timeSerie;
+
       if (!isSourceTime || !isSourceDistance) {
          return targetTimeSerie;
       }
-
-      final float[] targetDistanceSerie = _targetTour.distanceSerie;
-      final int serieLength = targetDistanceSerie.length;
 
       int sourceTime = sourceTimeSerie[0];
       int previousSourceTime = 0;
@@ -261,8 +259,9 @@ public class TourMerger {
       float sourceDistance = 0;
       int sourceIndex = 0;
       final int lastSourceIndex = sourceDistanceSerie.length - 1;
+      final float[] targetDistanceSerie = _targetTour.distanceSerie;
 
-      for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
+      for (int targetIndex = 0; targetIndex < targetDistanceSerie.length; targetIndex++) {
 
          final float targetDistance = targetDistanceSerie[targetIndex];
 
