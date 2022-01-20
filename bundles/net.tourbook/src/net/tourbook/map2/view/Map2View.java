@@ -2958,7 +2958,33 @@ public class Map2View extends ViewPart implements
 
       } else if (selection instanceof PhotoSelection) {
 
-         paintPhotos(((PhotoSelection) selection).galleryPhotos);
+         final PhotoSelection photoSelection = (PhotoSelection) selection;
+
+         final ArrayList<Photo> allGalleryPhotos = photoSelection.galleryPhotos;
+
+         TourData tourData = null;
+
+         allPhotoLoop:
+
+         // get first tour id
+         for (final Photo photo : allGalleryPhotos) {
+
+            for (final Long photoTourId : photo.getTourPhotoReferences().keySet()) {
+
+               tourData = TourManager.getInstance().getTourData(photoTourId);
+
+               break allPhotoLoop;
+            }
+         }
+
+         if (tourData != null) {
+
+            paintToursAndPhotos(tourData, selection);
+
+         } else {
+
+            paintPhotos(((PhotoSelection) selection).galleryPhotos);
+         }
 
          enableActions();
 

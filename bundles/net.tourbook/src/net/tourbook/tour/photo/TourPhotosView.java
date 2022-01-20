@@ -350,8 +350,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       final int gallerySize = galleryPhotos.size();
       if (gallerySize > 0) {
 
-         final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
-         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
+         final long tourStartTime = galleryPhotos.get(0).adjustedTime_Tour;
+         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTime_Tour;
 
          if (tourStartTime < _photoStartTime) {
             _photoStartTime = tourStartTime;

@@ -1640,8 +1640,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          while (true) {
 
             final long imageAdjustedTime = isPhotoSavedInTour //
-                  ? photo.adjustedTimeTour
-                  : photo.adjustedTimeLink;
+                  ? photo.adjustedTime_Tour
+                  : photo.adjustedTime_Camera;
 
             long imageTime = 0;
 

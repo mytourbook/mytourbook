@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -121,13 +121,19 @@ public class TourPhoto {
    // constructor is required for hibernate
    public TourPhoto() {}
 
-   public TourPhoto(final TourData tourData, final Photo photo) {
+   /**
+    * Create a tour photo from a gallery photo
+    *
+    * @param tourData
+    * @param galleryPhoto
+    */
+   public TourPhoto(final TourData tourData, final Photo galleryPhoto) {
 
       _createId = ++_createCounter;
 
       this.tourData = tourData;
 
-      final File imageFile = photo.imageFile;
+      final File imageFile = galleryPhoto.imageFile;
 
       final String filePathName = imageFile.getAbsolutePath();
       final IPath filePath = new Path(filePathName);
@@ -140,9 +146,9 @@ public class TourPhoto {
       imageFilePathName = filePathName;
 
       imageFileLastModified = imageFile.lastModified();
-      imageExifTime = photo.imageExifTime;
+      imageExifTime = galleryPhoto.imageExifTime;
 
-      if (photo.isGeoFromExif) {
+      if (galleryPhoto.isGeoFromExif) {
          setIsGeoFromPhoto();
       } else {
          setIsGeoFromTour();

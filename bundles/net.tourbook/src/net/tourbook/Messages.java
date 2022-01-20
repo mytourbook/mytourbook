@@ -1267,6 +1267,10 @@ public class Messages extends NLS {
 
    public static String        NT001_DialogExtractTour_InvalidTourData;
 
+   public static String        Photos_AndTours_Action_SetToSavedAdjustment_Tooltip;
+   public static String        Photos_AndTours_AdjustmentType_NoAdjustment;
+   public static String        Photos_AndTours_AdjustmentType_SavedAdjustment;
+   public static String        Photos_AndTours_AdjustmentType_SelectedAdjustment;
    public static String        Photos_AndTours_Combo_Camera_Tooltip;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;

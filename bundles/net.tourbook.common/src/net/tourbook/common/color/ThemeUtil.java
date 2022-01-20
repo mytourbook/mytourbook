@@ -238,8 +238,7 @@ public class ThemeUtil {
    /**
     * @param imageName
     * @return Returns the themed image name. The postfix {@value #DARK_THEME_POSTFIX} is
-    *         appended to
-    *         the image name when the dark theme image name is returned.
+    *         appended to the image name when the dark theme image name is returned.
     */
    public static String getThemedImageName(final String imageName) {
 

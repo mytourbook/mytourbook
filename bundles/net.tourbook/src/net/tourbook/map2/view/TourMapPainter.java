@@ -1870,17 +1870,18 @@ public class TourMapPainter extends Map2Painter {
                                  final Tile tile,
                                  final Long tourId) {
 
-      int paintingHash = 17;
+      final int prime = 31;
+      int paintingHash = 1;
 
       if (color != null) {
-         paintingHash = 31 * paintingHash + color.hashCode();
+         paintingHash = prime * paintingHash + color.hashCode();
       }
 
       // create painting hash code
-      paintingHash = 31 * paintingHash + devXFrom;
-      paintingHash = 31 * paintingHash + devXTo;
-      paintingHash = 31 * paintingHash + devYFrom;
-      paintingHash = 31 * paintingHash + devYTo;
+      paintingHash = prime * paintingHash + devXFrom;
+      paintingHash = prime * paintingHash + devXTo;
+      paintingHash = prime * paintingHash + devYFrom;
+      paintingHash = prime * paintingHash + devYTo;
 
       final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
       if (allPainted_DotsHash.contains(paintingHash)) {
@@ -1906,18 +1907,19 @@ public class TourMapPainter extends Map2Painter {
                                    final Color color,
                                    final Tile tile) {
 
-      int paintingHash = 17;
+      final int prime = 31;
+      int paintingHash = 1;
 
       if (color != null) {
-         paintingHash = 31 * paintingHash + color.hashCode();
+         paintingHash = prime * paintingHash + color.hashCode();
       }
 
       final int paintedDevX = devX - _lineWidth2;
       final int paintedDevY = devY - _lineWidth2;
 
       // create painting hash code
-      paintingHash = 31 * paintingHash + paintedDevX;
-      paintingHash = 31 * paintingHash + paintedDevY;
+      paintingHash = prime * paintingHash + paintedDevX;
+      paintingHash = prime * paintingHash + paintedDevY;
 
       final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
       if (allPainted_DotsHash.contains(paintingHash)) {
@@ -1940,10 +1942,11 @@ public class TourMapPainter extends Map2Painter {
                                 final Tile tile,
                                 final Long tourId) {
 
-      int paintingHash = 17;
+      final int prime = 31;
+      int paintingHash = 1;
 
       if (color != null) {
-         paintingHash = 31 * paintingHash + color.hashCode();
+         paintingHash = prime * paintingHash + color.hashCode();
       }
 
       int paintedDevX;
@@ -1963,8 +1966,8 @@ public class TourMapPainter extends Map2Painter {
       }
 
       // create painting hash code
-      paintingHash = 31 * paintingHash + paintedDevX;
-      paintingHash = 31 * paintingHash + paintedDevY;
+      paintingHash = prime * paintingHash + paintedDevX;
+      paintingHash = prime * paintingHash + paintedDevY;
 
       final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
       if (allPainted_DotsHash.contains(paintingHash)) {
