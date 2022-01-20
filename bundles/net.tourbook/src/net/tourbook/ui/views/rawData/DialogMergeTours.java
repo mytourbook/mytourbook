@@ -78,6 +78,16 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    // But when JUST clicking (and even unchecking right before merging) the merge time, the altitude merge gets cropped for KC 2011
 // and even the tour recorded, elapsed, moving gets modified
 
+   //I even tried to uncheck merge altitude and not checked anything else and the altitude still gets merged (I broke something
+   //because it was not doing that in 21.12
+
+   //todo fb
+   //another bug: when unclicking on merge cadence, pulse.... the graph disappears
+   //it does NOT disappear when uncheckng merge time
+
+   //todo fb
+   //when all the options ar eunchecked, the ok button should not be enabled
+
    private static final int              MAX_ADJUST_SECONDS     = 120;
    private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
    private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
@@ -573,6 +583,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       super.createButtonsForButtonBar(parent);
 
       // rename OK button
+
+      //TODO FB ok button
       final Button buttonOK = getButton(IDialogConstants.OK_ID);
       buttonOK.setText(Messages.tour_merger_save_target_tour);
 
