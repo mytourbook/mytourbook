@@ -74,7 +74,7 @@ public class TourPhotoLink {
    int                             numTourPhotos;
 
    /**
-    * Adjusted time in seconds.
+    * Adjusted time in seconds which is saved in the tour
     */
    int                             photoTimeAdjustment;
 

@@ -737,11 +737,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   numberOfPhotos;
 
    /**
-    * Number of time slices in {@link #timeSerie}
-    */
-   private int                   numberOfTimeSlices;
-
-   /**
     * Time adjustment in seconds, this is an average value for all photos.
     */
    private int                   photoTimeAdjustment;
@@ -839,6 +834,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                      deviceWeight;
 
    // ############################################# UNUSED FIELDS - END #############################################
+
+   /**
+    * Number of time slices in {@link #timeSerie}
+    */
+   private int                         numberOfTimeSlices;
 
    /**
     * All data series for time, altitude,... A BLOB CANNOT BE MULTIPLE !

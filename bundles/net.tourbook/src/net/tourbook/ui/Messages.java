@@ -262,34 +262,32 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Motion_Altimeter;
    public static String        ColumnFactory_Motion_Altimeter_Tooltip;
 
-   public static String        ColumnFactory_NumberOfGPSPhotos_Header;
-   public static String        ColumnFactory_NumberOfGPSPhotos_Label;
-   public static String        ColumnFactory_NumberOfGPSPhotos_Tooltip;
-   public static String        ColumnFactory_NumberOfNoGPSPhotos_Header;
-   public static String        ColumnFactory_NumberOfNoGPSPhotos_Label;
-   public static String        ColumnFactory_NumberOfNoGPSPhotos_Tooltip;
    public static String        ColumnFactory_NumberOfPhotos_Header;
    public static String        ColumnFactory_NumberOfPhotos_Label;
    public static String        ColumnFactory_NumberOfPhotos_Tooltip;
    public static String        ColumnFactory_NumberOfTimeSlices_Header;
    public static String        ColumnFactory_NumberOfTimeSlices_Label;
    public static String        ColumnFactory_NumberOfTimeSlices_Tooltip;
-   public static String        ColumnFactory_NumberOfTourPhotos_Header;
-   public static String        ColumnFactory_NumberOfTourPhotos_Label;
-   public static String        ColumnFactory_NumberOfTourPhotos_Tooltip;
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
 
-   public static String ColumnFactory_Photo_FilePath_Header;
-
-   public static String ColumnFactory_Photo_FilePath_Label;
-
-   public static String ColumnFactory_Photo_FilePath_Tooltip;
-
-   public static String        ColumnFactory_PhotoTimeAdjustment_Header;
-   public static String        ColumnFactory_PhotoTimeAdjustment_Label;
-   public static String        ColumnFactory_PhotoTimeAdjustment_Tooltip;
+   public static String        ColumnFactory_Photo_FilePath_Label;
+   public static String        ColumnFactory_Photo_FilePath_Tooltip;
+   public static String        ColumnFactory_Photo_TimeAdjustment_Header;
+   public static String        ColumnFactory_Photo_TimeAdjustment_Label;
+   public static String        ColumnFactory_Photo_TimeAdjustment_Tooltip;
+   public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Header;
+   public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Label;
+   public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Tooltip;
+   public static String        ColumnFactory_Photo_NumberOfNoGPSPhotos_Header;
+   public static String        ColumnFactory_Photo_NumberOfNoGPSPhotos_Label;
+   public static String        ColumnFactory_Photo_NumberOfNoGPSPhotos_Tooltip;
+   public static String        ColumnFactory_Photo_NumberOfTourPhotos_Header;
+   public static String        ColumnFactory_Photo_NumberOfTourPhotos_Label;
+   public static String        ColumnFactory_Photo_NumberOfTourPhotos_Tooltip;
+   public static String        ColumnFactory_Photo_TourCamera_Label;
+   public static String        ColumnFactory_Photo_TourCamera_Label_Tooltip;
 
    public static String        ColumnFactory_Power_Avg_Header;
    public static String        ColumnFactory_Power_Avg_Label;
@@ -453,8 +451,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Tour_WeekDay_Header;
    public static String        ColumnFactory_Tour_WeekDay_Label;
    public static String        ColumnFactory_Tour_WeekDay_Tooltip;
-   public static String        ColumnFactory_TourCamera_Label;
-   public static String        ColumnFactory_TourCamera_Label_Tooltip;
    public static String        ColumnFactory_TourDistanceDiff_Label;
    public static String        ColumnFactory_TourDistanceDiff_Tooltip;
    public static String        ColumnFactory_TourDurationTime_Header;

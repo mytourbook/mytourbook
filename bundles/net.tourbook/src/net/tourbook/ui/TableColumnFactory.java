@@ -1726,7 +1726,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Photo_FilePath_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_FilePath_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_FilePath_Label);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_FilePath_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
@@ -1745,9 +1745,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfGPSPhotos_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfGPSPhotos_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfGPSPhotos_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_NumberOfGPSPhotos_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_NumberOfGPSPhotos_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_NumberOfGPSPhotos_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1765,9 +1765,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfNoGPSPhotos_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfNoGPSPhotos_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfNoGPSPhotos_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_NumberOfNoGPSPhotos_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_NumberOfNoGPSPhotos_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_NumberOfNoGPSPhotos_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1785,9 +1785,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfTourPhotos_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfTourPhotos_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfTourPhotos_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_NumberOfTourPhotos_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_NumberOfTourPhotos_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_NumberOfTourPhotos_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1805,9 +1805,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_PhotoTimeAdjustment_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_PhotoTimeAdjustment_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_PhotoTimeAdjustment_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_TimeAdjustment_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_TimeAdjustment_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_TimeAdjustment_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11)); // 9 ... 54
 
@@ -1825,9 +1825,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_TourCamera_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourCamera_Label);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourCamera_Label_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_TourCamera_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_TourCamera_Label);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_TourCamera_Label_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
