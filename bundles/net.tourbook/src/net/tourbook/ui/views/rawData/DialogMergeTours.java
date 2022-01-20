@@ -81,10 +81,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    //I even tried to uncheck merge altitude and not checked anything else and the altitude still gets merged (I broke something
    //because it was not doing that in 21.12
 
-   //todo fb
-   //another bug: when unclicking on merge cadence, pulse.... the graph disappears
-   //it does NOT disappear when uncheckng merge time
-
    private static final int              MAX_ADJUST_SECONDS     = 120;
    private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
    private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
@@ -320,6 +316,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
+      if (_chkMergeTemperature.getSelection()) {
+         _targetTour.temperatureSerie = mergedTour.temperatureSerie;
+      } else {
+         _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
+      }
+
       //In both cases, we update the speed to trigger the recalculation of it
       if (_chkMergeTime.getSelection()) {
          _targetTour.timeSerie = mergedTour.timeSerie;
@@ -329,12 +331,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          //need to restore the elapsed time, recorded time...
          _targetTour.timeSerie = _backupTargetTimeSerie;
          _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
-      }
-
-      if (_chkMergeTemperature.getSelection()) {
-         _targetTour.temperatureSerie = mergedTour.temperatureSerie;
-      } else {
-         _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       }
    }
 
@@ -1548,10 +1544,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       // restore merge graph state
       _chkMergeAltitude.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE));
-      _chkMergePulse.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE));
-      _chkMergeTime.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME));
-      _chkMergeTemperature.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE));
       _chkMergeCadence.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE));
+      _chkMergePulse.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE));
+      _chkMergeTemperature.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE));
+      _chkMergeTime.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME));
    }
 
    private void saveState() {
@@ -1578,10 +1574,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       // save merged tour graphs
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE, _chkMergeAltitude.getSelection());
-      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, _chkMergePulse.getSelection());
-      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME, _chkMergeTime.getSelection());
-      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, _chkMergeTemperature.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, _chkMergeCadence.getSelection());
+      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, _chkMergePulse.getSelection());
+      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, _chkMergeTemperature.getSelection());
+      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME, _chkMergeTime.getSelection());
    }
 
    private void saveTour() {
@@ -1670,20 +1666,19 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          addVisibleGraph(TourManager.GRAPH_ALTITUDE);
       }
 
+      if (_chkMergeCadence.getSelection()) {
+         addVisibleGraph(TourManager.GRAPH_CADENCE);
+      }
       if (_chkMergePulse.getSelection()) {
          addVisibleGraph(TourManager.GRAPH_PULSE);
-      }
-
-      if (_chkMergeTime.getSelection()) {
-         addVisibleGraph(TourManager.GRAPH_SPEED);
       }
 
       if (_chkMergeTemperature.getSelection()) {
          addVisibleGraph(TourManager.GRAPH_TEMPERATURE);
       }
 
-      if (_chkMergeCadence.getSelection()) {
-         addVisibleGraph(TourManager.GRAPH_CADENCE);
+      if (_chkMergeTime.getSelection()) {
+         addVisibleGraph(TourManager.GRAPH_SPEED);
       }
    }
 
