@@ -85,9 +85,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    //another bug: when unclicking on merge cadence, pulse.... the graph disappears
    //it does NOT disappear when uncheckng merge time
 
-   //todo fb
-   //when all the options ar eunchecked, the ok button should not be enabled
-
    private static final int              MAX_ADJUST_SECONDS     = 120;
    private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
    private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
@@ -107,6 +104,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private TourChartConfiguration        _tourChartConfig;
 
    private PixelConverter                _pc;
+   private boolean                       _isInUIInit;
 
    /*
     * vertical adjustment options
@@ -504,7 +502,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _dlgContainer.layout(true, true);
 
       createActions();
-      restoreState();
+      _isInUIInit = true;
+      {
+         restoreState();
+      }
+      _isInUIInit = false;
 
       setTitle(NLS.bind(
             Messages.tour_merger_dialog_header_title,
@@ -536,6 +538,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       enableActions();
 
+      validateFields();
    }
 
    @Override
@@ -823,7 +826,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       mergeButton.setText(btnText);
       mergeButton.setToolTipText(btnTooltip);
 
-      mergeButton.addSelectionListener(widgetSelectedAdapter(this::onSelectMergeGraph));
+      mergeButton.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         validateFields();
+         onSelectMergeGraph(selectionEvent);
+      }));
 
       if (isEnabled) {
          final Image image = TourbookPlugin.getImageDescriptor(imageEnabled).createImage();
@@ -1312,6 +1318,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
    }
 
+   private void enableMergeButton(final boolean isEnabled) {
+
+      final Button okButton = getButton(IDialogConstants.OK_ID);
+      if (okButton != null) {
+         okButton.setEnabled(isEnabled);
+      }
+   }
+
    @Override
    protected IDialogSettings getDialogBoundsSettings() {
 
@@ -1568,7 +1582,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME, _chkMergeTime.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, _chkMergeTemperature.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, _chkMergeCadence.getSelection());
-
    }
 
    private void saveTour() {
@@ -1745,5 +1758,27 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       _scaleAdjustSeconds.setSelection(seconds + MAX_ADJUST_SECONDS);
       _scaleAdjustMinutes.setSelection(minutes + MAX_ADJUST_MINUTES);
+   }
+
+   private void validateFields() {
+
+      if (_isInUIInit) {
+         return;
+      }
+
+      /*
+       * validate fields
+       */
+      boolean enableMergeButton = false;
+
+      if (_chkMergeAltitude.getSelection() ||
+            _chkMergeCadence.getSelection() ||
+            _chkMergePulse.getSelection() ||
+            _chkMergeTemperature.getSelection() ||
+            _chkMergeTime.getSelection()) {
+         enableMergeButton = true;
+      }
+
+      enableMergeButton(enableMergeButton);
    }
 }
