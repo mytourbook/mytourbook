@@ -28,28 +28,29 @@ public class TourMerger {
 
    private boolean  _adjustAltiFromSource;
    private boolean  _adjustAltiSmoothly;
-   private boolean  _synchStartTime;
-   private int      _tourStartTimeSynchOffset;
+   private boolean  _synchronizeStartTime;
+   private int      _tourStartTimeSynchronizeOffset;
 
+   private float[]  _newSourceAltitudeDifferencesSerie;
    private float[]  _newSourceAltitudeSerie;
+
    private float[]  _newTargetPulseSerie;
    private float[]  _newTargetCadenceSerie;
    private float[]  _newTargetTemperatureSerie;
-   private float[]  _newSourceAltiDiffSerie;
 
    public TourMerger(final TourData sourceTour,
                      final TourData targetTour,
                      final boolean adjustAltiFromSource,
                      final boolean adjustAltiSmoothly,
-                     final boolean synchStartTime,
-                     final int tourStartTimeSynchOffset) {
+                     final boolean synchronizeStartTime,
+                     final int tourStartTimeSynchronizeOffset) {
 
       _sourceTour = sourceTour;
       _targetTour = targetTour;
       _adjustAltiFromSource = adjustAltiFromSource;
       _adjustAltiSmoothly = adjustAltiSmoothly;
-      _synchStartTime = synchStartTime;
-      _tourStartTimeSynchOffset = tourStartTimeSynchOffset;
+      _synchronizeStartTime = synchronizeStartTime;
+      _tourStartTimeSynchronizeOffset = tourStartTimeSynchronizeOffset;
    }
 
    private void assignTargetSeriesValue(final int sourceIndex, final int targetIndex) {
@@ -86,7 +87,7 @@ public class TourMerger {
 
       final int serieLength = targetTimeSerie.length;
       _newSourceAltitudeSerie = new float[serieLength];
-      _newSourceAltiDiffSerie = new float[serieLength];
+      _newSourceAltitudeDifferencesSerie = new float[serieLength];
 
       final boolean isSourceCadence = _sourceTour.getCadenceSerie() != null;
       if (isSourceCadence) {
@@ -102,9 +103,9 @@ public class TourMerger {
       }
 
       int xMergeOffset = _targetTour.getMergedTourTimeOffset();
-      if (_synchStartTime) {
+      if (_synchronizeStartTime) {
          // synchronize start time
-         xMergeOffset = _tourStartTimeSynchOffset;
+         xMergeOffset = _tourStartTimeSynchronizeOffset;
       }
       final int yMergeOffset = _targetTour.getMergedAltitudeOffset();
 
@@ -139,7 +140,7 @@ public class TourMerger {
       return _targetTour;
    }
 
-   private float computeNewSourceAltitude(final float sourceAlti,
+   private float computeNewSourceAltitude(final float sourceAltitude,
                                           final float previousSourceAltitude,
                                           final int previousSourceTime,
                                           final int sourceTime,
@@ -154,7 +155,7 @@ public class TourMerger {
                targetTime,
                sourceTime,
                previousSourceAltitude,
-               sourceAlti);
+               sourceAltitude);
 
       } else {
 
@@ -183,11 +184,11 @@ public class TourMerger {
       final boolean isSourceAltitude = sourceAltitudeSerie != null;
       final boolean isTargetAltitude = targetAltitudeSerie != null;
 
-      float sourceAlti = 0;
+      float sourceAltitude = 0;
       float previousSourceAltitude = 0;
       if (isSourceAltitude) {
-         sourceAlti = _sourceTour.altitudeSerie[0] + yMergeOffset;
-         previousSourceAltitude = sourceAlti;
+         sourceAltitude = _sourceTour.altitudeSerie[0] + yMergeOffset;
+         previousSourceAltitude = sourceAltitude;
       }
 
       int sourceIndex = 0;
@@ -217,15 +218,15 @@ public class TourMerger {
             sourceTime = sourceTimeSerie[sourceIndex] + xMergeOffset;
 
             if (isSourceAltitude) {
-               previousSourceAltitude = sourceAlti;
-               sourceAlti = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
+               previousSourceAltitude = sourceAltitude;
+               sourceAltitude = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
             }
          }
 
          if (isSourceAltitude) {
 
             final float newSourceAltitude = computeNewSourceAltitude(
-                  sourceAlti,
+                  sourceAltitude,
                   previousSourceAltitude,
                   previousSourceTime,
                   sourceTime,
@@ -234,7 +235,7 @@ public class TourMerger {
             _newSourceAltitudeSerie[targetIndex] = newSourceAltitude;
 
             if (isTargetAltitude) {
-               _newSourceAltiDiffSerie[targetIndex] = newSourceAltitude - targetAltitudeSerie[targetIndex];
+               _newSourceAltitudeDifferencesSerie[targetIndex] = newSourceAltitude - targetAltitudeSerie[targetIndex];
             }
          }
 
@@ -242,8 +243,8 @@ public class TourMerger {
       }
    }
 
-   public float[] getNewSourceAltiDiffSerie() {
-      return _newSourceAltiDiffSerie;
+   public float[] getNewSourceAltitudeDifferencesSerie() {
+      return _newSourceAltitudeDifferencesSerie;
    }
 
    private boolean isLinearInterpolation() {
