@@ -41,6 +41,6 @@ class ActionDeleteTimeSlices_AdjustTourStartTime extends Action {
 
    @Override
    public void run() {
-      _tourDataEditorView.actionDeleteTimeSlices(true, true);
+      _tourDataEditorView.actionDelete_TimeSlices(true, true);
    }
 }
