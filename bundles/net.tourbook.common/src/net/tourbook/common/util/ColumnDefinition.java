@@ -804,7 +804,7 @@ public class ColumnDefinition implements Cloneable {
       _defaultValueFormat_Detail = defaultDetailFormat;
    }
 
-   void setValueFormatter_Category(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
+   public void setValueFormatter_Category(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
 
       _valueFormat_Category = valueFormat;
       _valueFormatter_Category = valueFormatter;

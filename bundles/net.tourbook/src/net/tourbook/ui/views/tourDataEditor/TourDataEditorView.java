@@ -824,9 +824,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   __dataSerie[serieIndex] = enteredValue;
 
                   /*
-                   * world position has changed, this is an absolute overkill, when only one
-                   * position
-                   * has changed
+                   * World position has changed, this is an absolute overkill, when only one
+                   * position has changed
                    */
                   _tourData.clearWorldPositions();
 

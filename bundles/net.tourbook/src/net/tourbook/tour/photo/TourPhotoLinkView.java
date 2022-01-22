@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.photo;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -36,6 +39,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.Camera;
@@ -57,11 +61,13 @@ import net.tourbook.ui.TableColumnFactory;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -85,10 +91,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -98,6 +102,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -114,23 +119,44 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourViewer {
 
-   public static final String                 ID                              = "net.tourbook.photo.PhotosAndToursView.ID"; //$NON-NLS-1$
+   public static final String               ID                                  = "net.tourbook.photo.PhotosAndToursView.ID"; //$NON-NLS-1$
 
-   private static final String                STATE_FILTER_NOT_SAVED_PHOTOS   = "STATE_FILTER_NOT_SAVED_PHOTOS";            //$NON-NLS-1$
-   private static final String                STATE_FILTER_TOUR_WITH_PHOTOS   = "STATE_FILTER_TOUR_WITH_PHOTOS";            //$NON-NLS-1$
-   private static final String                STATE_SELECTED_CAMERA_NAME      = "STATE_SELECTED_CAMERA_NAME";               //$NON-NLS-1$
+   private static final String              STATE_FILTER_NOT_SAVED_PHOTOS       = "STATE_FILTER_NOT_SAVED_PHOTOS";            //$NON-NLS-1$
+   private static final String              STATE_FILTER_TOUR_WITH_PHOTOS       = "STATE_FILTER_TOUR_WITH_PHOTOS";            //$NON-NLS-1$
+   private static final String              STATE_SELECTED_CAMERA_NAME          = "STATE_SELECTED_CAMERA_NAME";               //$NON-NLS-1$
+   private static final String              STATE_SELECTED_TIME_ADJUSTMENT_TYPE = "STATE_SELECTED_TIME_ADJUSTMENT_TYPE";      //$NON-NLS-1$
 
-   public static final String                 IMAGE_PIC_DIR_VIEW              = "IMAGE_PIC_DIR_VIEW";                       //$NON-NLS-1$
-   public static final String                 IMAGE_PHOTO_PHOTO               = "IMAGE_PHOTO_PHOTO";                        //$NON-NLS-1$
+   public static final String               IMAGE_PIC_DIR_VIEW                  = "IMAGE_PIC_DIR_VIEW";                       //$NON-NLS-1$
+   public static final String               IMAGE_PHOTO_PHOTO                   = "IMAGE_PHOTO_PHOTO";                        //$NON-NLS-1$
 
+   private static final ComboEnumEntry<?>[] ALL_TIME_ADJUSTMENT_TYPES;
+
+// SET_FORMATTING_OFF
+
+   static {
+
+      ALL_TIME_ADJUSTMENT_TYPES = new ComboEnumEntry<?>[] {
+
+         new ComboEnumEntry<>(Messages.Photos_AndTours_AdjustmentType_SelectedAdjustment, TimeAdjustmentType.SELECT_AJUSTMENT),
+         new ComboEnumEntry<>(Messages.Photos_AndTours_AdjustmentType_SavedAdjustment,    TimeAdjustmentType.SAVED_AJUSTMENT),
+         new ComboEnumEntry<>(Messages.Photos_AndTours_AdjustmentType_NoAdjustment,       TimeAdjustmentType.NO_AJUSTMENT),
+      };
+   }
+
+// SET_FORMATTING_ON
+
+   private static final IPreferenceStore      _prefStore                      = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore      _prefStore_Common               = CommonActivator.getPrefStore();
+   private static final IDialogSettings       _state                          = TourbookPlugin.getState(ID);
+   //
    private static final TourPhotoManager      _photoMgr                       = TourPhotoManager.getInstance();
-
-   private final IPreferenceStore             _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore             _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings              _state                          = TourbookPlugin.getState(ID);
-
-   private ArrayList<TourPhotoLink>           _visibleTourPhotoLinks          = new ArrayList<>();
-
+   //
+   private TableViewer                        _tourViewer;
+   private ColumnManager                      _columnManager;
+   private MenuManager                        _viewerMenuManager;
+   private IContextMenuProvider               _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   //
+   private ArrayList<TourPhotoLink>           _allVisibleTourPhotoLinks       = new ArrayList<>();
    private ArrayList<Photo>                   _allPhotos                      = new ArrayList<>();
 
    /**
@@ -146,7 +172,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    /**
     * Tour photo link which is currently selected in the tour viewer.
     */
-   private ArrayList<TourPhotoLink>           _selectedLinks                  = new ArrayList<>();
+   private ArrayList<TourPhotoLink>           _selectedPhotoLinks             = new ArrayList<>();
 
    /**
     * Contains only tour photo links with real tours and which contain geo positions.
@@ -155,22 +181,20 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private TourPhotoLinkSelection             _tourPhotoLinkSelection;
 
+   private SelectionListener                  _defaultSelectionListener;
+   private MouseWheelListener                 _defaultMouseWheelListener;
    private IPartListener2                     _partListener;
    private IPropertyChangeListener            _prefChangeListener;
    private IPropertyChangeListener            _prefChangeListener_Common;
    private ISelectionListener                 _postSelectionListener;
    private ITourEventListener                 _tourEventListener;
-
-   private PixelConverter                     _pc;
-   private ColumnManager                      _columnManager;
-   private MenuManager                        _viewerMenuManager;
-   private IContextMenuProvider               _tableViewerContextMenuProvider = new TableContextMenuProvider();
-
+   //
    private ActionFilterTourWithoutSavedPhotos _actionFilterTourWithoutSavedPhotos;
    private ActionFilterTourWithPhotos         _actionFilterTourWithPhotos;
    private ActionFilterOneHistoryTour         _actionFilterOneHistory;
    private ActionSavePhotosInTour             _actionSavePhotoInTour;
-
+   private ActionSetToSavedAdjustment         _actionSetToSavedAdjustment;
+   //
    private final PeriodFormatter              _durationFormatter;
    private final NumberFormat                 _nf_1_1;
    {
@@ -210,23 +234,51 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private ICommandService          _commandService;
 
+   private PixelConverter           _pc;
+
    /*
     * UI controls
     */
-   private PageBook    _pageBook;
-   private Composite   _pageNoImage;
-   private Composite   _pageViewer;
+   private PageBook  _pageBook;
+   private Composite _pageNoImage;
+   private Composite _pageViewer;
 
-   private Composite   _viewerContainer;
-   private TableViewer _tourViewer;
+   private Composite _viewerContainer;
 
-   private Label       _lblAdjustTime;
-   private Spinner     _spinnerHours;
-   private Spinner     _spinnerMinutes;
-   private Spinner     _spinnerSeconds;
-   private Combo       _comboCamera;
+   private Combo     _comboAdjustTime;
+   private Combo     _comboCamera;
 
-   private Menu        _tableContextMenu;
+   private Spinner   _spinnerHours;
+   private Spinner   _spinnerMinutes;
+   private Spinner   _spinnerSeconds;
+
+   private Menu      _tableContextMenu;
+
+   private Label     _lblAdjustTime;
+
+   private class ActionSetToSavedAdjustment extends Action {
+
+      /**
+       * Common action to reset values to it's defaults
+       *
+       * @param restoreAction
+       */
+      public ActionSetToSavedAdjustment() {
+
+         super();
+
+         setToolTipText(Messages.Photos_AndTours_Action_SetToSavedAdjustment_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoTimeAdjustment));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoTimeAdjustment_Disabled));
+      }
+
+      @Override
+      public void run() {
+         action_SetToSavedAdjustment();
+      }
+
+   }
 
    private static class ContentComparator extends ViewerComparator {
 
@@ -257,7 +309,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       @Override
       public Object[] getElements(final Object inputElement) {
-         return _visibleTourPhotoLinks.toArray();
+         return _allVisibleTourPhotoLinks.toArray();
       }
 
       @Override
@@ -291,8 +343,32 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    }
 
+   public static enum TimeAdjustmentType {
+
+      NO_AJUSTMENT, //
+      SAVED_AJUSTMENT, //
+      SELECT_AJUSTMENT, //
+   }
+
    public TourPhotoLinkView() {
       super();
+   }
+
+   private void action_SetToSavedAdjustment() {
+
+      final TourPhotoLink photoLink = _selectedPhotoLinks.get(0);
+
+      /*
+       * Set time adjustment into the selected camera
+       */
+      final Camera camera = getSelectedCamera();
+      if (camera == null) {
+         return;
+      }
+
+      camera.setTimeAdjustment(photoLink.photoTimeAdjustment * 1000);
+
+      updateUI();
    }
 
    void actionFilterNotSavedPhotos() {
@@ -356,8 +432,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       final TourManager tourManager = TourManager.getInstance();
 
-      // contains all photos which are modified (it also contains not modified photos)
-      final HashSet<Photo> modifiedPhotos = new HashSet<>();
+      // contains all photos, modified and not modified
+      final HashSet<Photo> allPhotos = new HashSet<>();
 
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
       final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<>();
@@ -366,59 +442,62 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       int historyTours = 0;
 
-      for (final Object linkElement : allSelectedPhotoLinks) {
+      for (final Object selectedItem : allSelectedPhotoLinks) {
 
-         if (linkElement instanceof TourPhotoLink) {
+         if (selectedItem instanceof TourPhotoLink) {
 
-            final TourPhotoLink photoLink = (TourPhotoLink) linkElement;
+            final TourPhotoLink photoLink = (TourPhotoLink) selectedItem;
             final boolean isRealTour = photoLink.tourId != Long.MIN_VALUE;
 
             if (isRealTour) {
 
-               final ArrayList<Photo> linkPhotos = photoLink.linkPhotos;
+               final ArrayList<Photo> allLinkPhotos = photoLink.linkPhotos;
 
-               if (linkPhotos.size() > 0) {
+               if (allLinkPhotos.size() > 0) {
 
                   final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
                   if (tourData != null) {
 
-                     final HashMap<String, TourPhoto> oldTourPhotos = new HashMap<>();
+                     final HashMap<String, TourPhoto> allOldTourPhotos = new HashMap<>();
                      final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
                      for (final TourPhoto tourPhoto : tourPhotosSet) {
-                        oldTourPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
+                        allOldTourPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
                      }
 
                      // keep existing photos
-                     final ArrayList<Photo> oldGalleryPhotos = tourData.getGalleryPhotos();
-                     if (oldGalleryPhotos != null) {
-                        modifiedPhotos.addAll(oldGalleryPhotos);
+                     final ArrayList<Photo> allOldGalleryPhotos = tourData.getGalleryPhotos();
+                     if (allOldGalleryPhotos != null) {
+                        allPhotos.addAll(allOldGalleryPhotos);
                      }
 
-                     final HashSet<TourPhoto> tourPhotos = new HashSet<>();
+                     final HashSet<TourPhoto> allNewTourPhotos = new HashSet<>();
 
-                     for (final Photo galleryPhoto : linkPhotos) {
+                     for (final Photo galleryPhoto : allLinkPhotos) {
 
                         // get existing tour photo
-                        TourPhoto tourPhoto = oldTourPhotos.get(galleryPhoto.imageFilePathName);
+                        TourPhoto tourPhoto = allOldTourPhotos.get(galleryPhoto.imageFilePathName);
 
                         if (tourPhoto == null) {
+
+                           // gallery photo is not in tour -> create new tour photo
+
                            tourPhoto = new TourPhoto(tourData, galleryPhoto);
                         }
 
                         // set adjusted time / geo location
-                        tourPhoto.setAdjustedTime(galleryPhoto.adjustedTimeLink);
+                        tourPhoto.setAdjustedTime(galleryPhoto.adjustedTime_Camera);
                         tourPhoto.setGeoLocation(
                               galleryPhoto.getLinkLatitude(),
                               galleryPhoto.getLinkLongitude());
 
-                        tourPhotos.add(tourPhoto);
+                        allNewTourPhotos.add(tourPhoto);
 
                         // add new/old photos
-                        modifiedPhotos.add(galleryPhoto);
+                        allPhotos.add(galleryPhoto);
                      }
 
-                     tourData.setTourPhotos(tourPhotos, linkPhotos);
+                     tourData.setTourPhotos(allNewTourPhotos, allLinkPhotos);
 
                      modifiedTours.add(tourData);
                      modifiedLinks.add(photoLink);
@@ -469,7 +548,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
          if (tourData != null) {
-            photoLink.numberOfTourPhotos = tourData.getTourPhotos().size();
+            photoLink.numTourPhotos = tourData.getTourPhotos().size();
             photoLink.photoTimeAdjustment = tourData.getPhotoTimeAdjustment();
          }
       }
@@ -479,7 +558,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       PhotoManager.firePhotoEvent(this,
             PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED,
-            new ArrayList<>(modifiedPhotos));
+            new ArrayList<>(allPhotos));
    }
 
    private void addPartListener() {
@@ -633,9 +712,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          return;
       }
 
-      _visibleTourPhotoLinks.clear();
+      _allVisibleTourPhotoLinks.clear();
       _allPhotos.clear();
-      _selectedLinks.clear();
+      _selectedPhotoLinks.clear();
       _selectedTourPhotoLinksWithGps.clear();
       _tourPhotoLinkSelection = null;
 
@@ -652,6 +731,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _actionFilterTourWithoutSavedPhotos = new ActionFilterTourWithoutSavedPhotos(this);
       _actionFilterTourWithPhotos = new ActionFilterTourWithPhotos(this);
       _actionSavePhotoInTour = new ActionSavePhotosInTour(this);
+      _actionSetToSavedAdjustment = new ActionSetToSavedAdjustment();
    }
 
    private void createMenuManager() {
@@ -669,16 +749,17 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    @Override
    public void createPartControl(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
+      initUI(parent);
 
       createMenuManager();
 
       _columnManager = new ColumnManager(this, _state);
       defineAllColumns(parent);
 
+      createActions();
+
       createUI(parent);
 
-      createActions();
       fillToolbar();
 
       addSelectionListener();
@@ -705,14 +786,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          GridLayoutFactory.fillDefaults().applyTo(_pageViewer);
 //			_pageViewer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
-            createUI_20_Tours(_pageViewer);
+            createUI_10_Container(_pageViewer);
          }
 
          _pageNoImage = createUI_90_PageNoImage(_pageBook);
       }
    }
 
-   private void createUI_20_Tours(final Composite parent) {
+   private void createUI_10_Container(final Composite parent) {
 
       _viewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
@@ -728,138 +809,105 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
+            .numColumns(7)
             .margins(2, 2)
             .applyTo(container);
       {
-         /*
-          * label: adjust time
-          */
-         _lblAdjustTime = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblAdjustTime);
-         _lblAdjustTime.setText(Messages.Photos_AndTours_Label_AdjustTime);
-         _lblAdjustTime.setToolTipText(Messages.Photos_AndTours_Label_AdjustTime_Tooltip);
+         {
+            /*
+             * Label: Adjust time
+             */
+            _lblAdjustTime = new Label(container, SWT.NONE);
+            _lblAdjustTime.setText(Messages.Photos_AndTours_Label_AdjustTime);
+            _lblAdjustTime.setToolTipText(Messages.Photos_AndTours_Label_AdjustTime_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblAdjustTime);
+         }
+         {
+            /*
+             * Combo: Adjust time by
+             */
+            _comboAdjustTime = new Combo(container, SWT.READ_ONLY);
+            _comboAdjustTime.setVisibleItemCount(33);
+            _comboAdjustTime.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+//                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_comboAdjustTime);
 
-//			/*
-//			 * radio: all/selected tours
-//			 */
-//			final Composite containerTours = new Composite(container, SWT.NONE);
-//			GridDataFactory.fillDefaults().grab(false, false).applyTo(containerTours);
-//			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTours);
-//			{
-//				_rdoAdjustAllTours = new Button(containerTours, SWT.RADIO);
-//				_rdoAdjustAllTours.setText(Messages.Photos_AndTours_Radio_AdjustTime_AllTours);
-//				_rdoAdjustAllTours.setToolTipText(Messages.Photos_AndTours_Radio_AdjustTime_AllTours_Tooltip);
-//
-//				_rdoAdjustSelectedTours = new Button(containerTours, SWT.RADIO);
-//				_rdoAdjustSelectedTours.setText(Messages.Photos_AndTours_Radio_AdjustTime_SelectedTours);
-//				_rdoAdjustSelectedTours.setToolTipText(Messages.Photos_AndTours_Radio_AdjustTime_SelectedTours_Tooltip);
-//			}
-
-         createUI_44_AdjustTime(container);
-
-         /*
-          * combo: camera
-          */
-         _comboCamera = new Combo(container, SWT.READ_ONLY);
-         GridDataFactory.fillDefaults()
-               .align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
-               .applyTo(_comboCamera);
-         _comboCamera.setVisibleItemCount(33);
-         _comboCamera.setToolTipText(Messages.Photos_AndTours_Combo_Camera_Tooltip);
-         _comboCamera.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectCamera();
+            // fill static combo
+            for (final ComboEnumEntry<?> option : ALL_TIME_ADJUSTMENT_TYPES) {
+               _comboAdjustTime.add(option.label);
             }
-         });
-      }
-   }
+         }
+         {
+            /*
+             * Spinner: Adjust hours
+             */
+            _spinnerHours = new Spinner(container, SWT.BORDER);
+            _spinnerHours.setMinimum(-100);
+            _spinnerHours.setMaximum(100);
+            _spinnerHours.setIncrement(1);
+            _spinnerHours.setPageIncrement(24);
+            _spinnerHours.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustHours_Tooltip);
+            _spinnerHours.addSelectionListener(_defaultSelectionListener);
+            _spinnerHours.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerHours);
+         }
+         {
+            /*
+             * Spinner: Adjust minutes
+             */
+            _spinnerMinutes = new Spinner(container, SWT.BORDER);
+            _spinnerMinutes.setMinimum(-100);
+            _spinnerMinutes.setMaximum(100);
+            _spinnerMinutes.setIncrement(1);
+            _spinnerMinutes.setPageIncrement(10);
+            _spinnerMinutes.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustMinutes_Tooltip);
+            _spinnerMinutes.addSelectionListener(_defaultSelectionListener);
+            _spinnerMinutes.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerMinutes);
+         }
+         {
+            /*
+             * Spinner: adjust seconds
+             */
+            _spinnerSeconds = new Spinner(container, SWT.BORDER);
+            _spinnerSeconds.setMinimum(-100);
+            _spinnerSeconds.setMaximum(100);
+            _spinnerSeconds.setIncrement(1);
+            _spinnerSeconds.setPageIncrement(10);
+            _spinnerSeconds.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustSeconds_Tooltip);
+            _spinnerSeconds.addSelectionListener(_defaultSelectionListener);
+            _spinnerSeconds.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerSeconds);
+         }
+         {
+            /*
+             * Action: Set to saved adjustment
+             */
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+//            GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+//                  .align(SWT.END, SWT.BEGINNING)
+//                  .applyTo(toolbar);
 
-   private void createUI_44_AdjustTime(final Composite parent) {
+            final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).spacing(0, 0).applyTo(container);
-      {
-         /*
-          * spinner: adjust hours
-          */
-         _spinnerHours = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .applyTo(_spinnerHours);
-         _spinnerHours.setMinimum(-100);
-         _spinnerHours.setMaximum(100);
-         _spinnerHours.setIncrement(1);
-         _spinnerHours.setPageIncrement(24);
-         _spinnerHours.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustHours_Tooltip);
-         _spinnerHours.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectTimeAdjustment();
-            }
+            tbm.add(_actionSetToSavedAdjustment);
 
-         });
-         _spinnerHours.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onSelectTimeAdjustment();
-            }
-         });
-
-         /*
-          * spinner: adjust minutes
-          */
-         _spinnerMinutes = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .applyTo(_spinnerMinutes);
-         _spinnerMinutes.setMinimum(-100);
-         _spinnerMinutes.setMaximum(100);
-         _spinnerMinutes.setIncrement(1);
-         _spinnerMinutes.setPageIncrement(10);
-         _spinnerMinutes.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustMinutes_Tooltip);
-         _spinnerMinutes.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectTimeAdjustment();
-            }
-
-         });
-         _spinnerMinutes.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onSelectTimeAdjustment();
-            }
-         });
-
-         /*
-          * spinner: adjust seconds
-          */
-         _spinnerSeconds = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .applyTo(_spinnerSeconds);
-         _spinnerSeconds.setMinimum(-100);
-         _spinnerSeconds.setMaximum(100);
-         _spinnerSeconds.setIncrement(1);
-         _spinnerSeconds.setPageIncrement(10);
-         _spinnerSeconds.setToolTipText(Messages.Photos_AndTours_Spinner_AdjustSeconds_Tooltip);
-         _spinnerSeconds.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectTimeAdjustment();
-            }
-
-         });
-         _spinnerSeconds.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onSelectTimeAdjustment();
-            }
-         });
+            tbm.update(true);
+         }
+         {
+            /*
+             * Combo: Camera
+             */
+            _comboCamera = new Combo(container, SWT.READ_ONLY);
+            _comboCamera.setVisibleItemCount(33);
+            _comboCamera.setToolTipText(Messages.Photos_AndTours_Combo_Camera_Tooltip);
+            _comboCamera.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectCamera()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_comboCamera);
+         }
       }
    }
 
@@ -935,7 +983,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(label);
 
             /*
-             * link: import
+             * Link: import
              */
             final Image picDirIcon = net.tourbook.ui.UI.IMAGE_REGISTRY.get(IMAGE_PIC_DIR_VIEW);
 
@@ -945,19 +993,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             iconPicDirView.setText(UI.EMPTY_STRING);
 
             final Link linkImport = new Link(container, SWT.NONE);
+            linkImport.setText(Messages.Photos_AndTours_Link_PhotoDirectory);
+            linkImport.addSelectionListener(widgetSelectedAdapter(selectionEvent -> Util.showView(PicDirView.ID, true)));
             GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
                   .indent(0, 10)
                   .applyTo(linkImport);
-            linkImport.setText(Messages.Photos_AndTours_Link_PhotoDirectory);
-            linkImport.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  Util.showView(PicDirView.ID, true);
-               }
-            });
          }
       }
 
@@ -976,12 +1019,34 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Time_TourDurationTime();
 
       defineColumn_Photo_TourCameras();
+      defineColumn_Photo_FilePath();
 
       defineColumn_Time_TourStartTime();
       defineColumn_Time_TourEndDate();
       defineColumn_Time_TourEndTime();
 
       defineColumn_Tour_TypeText();
+   }
+
+   /**
+    * column: number of photos which are saved in the tour
+    */
+   private void defineColumn_Photo_FilePath() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_PATH.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final String photoFilePath = photoLink.photoFilePath;
+
+            cell.setText(photoFilePath == null ? UI.EMPTY_STRING : photoFilePath);
+
+            setBgColor(cell, photoLink);
+         }
+      });
    }
 
    /**
@@ -995,12 +1060,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final int numberOfGPSPhotos = link.numberOfGPSPhotos;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final int numberOfGPSPhotos = photoLink.numGPSPhotos;
 
             cell.setText(numberOfGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfGPSPhotos));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1018,12 +1083,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final int numberOfNoGPSPhotos = link.numberOfNoGPSPhotos;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final int numberOfNoGPSPhotos = photoLink.numbNoGPSPhotos;
 
             cell.setText(numberOfNoGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfNoGPSPhotos));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1039,12 +1104,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final int numberOfPhotos = link.numberOfTourPhotos;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final int numberOfPhotos = photoLink.numTourPhotos;
 
             cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Integer.toString(numberOfPhotos));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1060,15 +1125,15 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final int numberOfTourPhotos = link.numberOfTourPhotos;
-            final int timeAdjustment = link.photoTimeAdjustment;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final int numTourPhotos = photoLink.numTourPhotos;
+            final int timeAdjustment = photoLink.photoTimeAdjustment;
 
-            cell.setText(numberOfTourPhotos == 0 //
+            cell.setText(numTourPhotos == 0
                   ? UI.EMPTY_STRING
                   : UI.formatHhMmSs(timeAdjustment));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1083,15 +1148,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            final Object element = cell.getElement();
-            if (element instanceof TourPhotoLink) {
 
-               final TourPhotoLink link = (TourPhotoLink) element;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
 
-               cell.setText(link.tourCameras);
+            cell.setText(photoLink.tourCameras);
 
-               setBgColor(cell, link);
-            }
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1108,9 +1170,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
 
-            final Period period = link.tourPeriod;
+            final Period period = photoLink.tourPeriod;
 
             int periodSum = 0;
             for (final int value : period.getValues()) {
@@ -1125,7 +1187,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                cell.setText(period.toString(_durationFormatter));
             }
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1142,14 +1204,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final long historyTime = link.historyEndTime;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final long historyTime = photoLink.historyEndTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE //
-                  ? TimeTools.getZonedDateTime(link.tourEndTime).format(TimeTools.Formatter_Date_S)
+            cell.setText(historyTime == Long.MIN_VALUE
+                  ? TimeTools.getZonedDateTime(photoLink.tourEndTime).format(TimeTools.Formatter_Date_S)
                   : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Date_S));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1164,14 +1226,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final long historyTime = link.historyEndTime;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final long historyTime = photoLink.historyEndTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE //
-                  ? TimeTools.getZonedDateTime(link.tourEndTime).format(TimeTools.Formatter_Time_M)
+            cell.setText(historyTime == Long.MIN_VALUE
+                  ? TimeTools.getZonedDateTime(photoLink.tourEndTime).format(TimeTools.Formatter_Time_M)
                   : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Time_M));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1188,14 +1250,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final long historyTime = link.historyStartTime;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final long historyTime = photoLink.historyStartTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE //
-                  ? TimeTools.getZonedDateTime(link.tourStartTime).format(TimeTools.Formatter_Date_S)
+            cell.setText(historyTime == Long.MIN_VALUE
+                  ? TimeTools.getZonedDateTime(photoLink.tourStartTime).format(TimeTools.Formatter_Date_S)
                   : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Date_S));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1210,14 +1272,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-            final long historyTime = link.historyStartTime;
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final long historyTime = photoLink.historyStartTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE //
-                  ? TimeTools.getZonedDateTime(link.tourStartTime).format(TimeTools.Formatter_Time_M)
+            cell.setText(historyTime == Long.MIN_VALUE
+                  ? TimeTools.getZonedDateTime(photoLink.tourStartTime).format(TimeTools.Formatter_Time_M)
                   : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Time_M));
 
-            setBgColor(cell, link);
+            setBgColor(cell, photoLink);
          }
       });
    }
@@ -1235,15 +1297,15 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             if (element instanceof TourPhotoLink) {
 
-               final TourPhotoLink link = (TourPhotoLink) element;
+               final TourPhotoLink photoLink = (TourPhotoLink) element;
 
-               if (link.isHistoryTour) {
+               if (photoLink.isHistoryTour) {
 
                   cell.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(IMAGE_PHOTO_PHOTO));
 
                } else {
 
-                  final long tourTypeId = link.tourTypeId;
+                  final long tourTypeId = photoLink.tourTypeId;
                   if (tourTypeId == -1) {
 
                      cell.setImage(null);
@@ -1278,14 +1340,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             if (element instanceof TourPhotoLink) {
 
-               final TourPhotoLink link = (TourPhotoLink) element;
-               if (link.isHistoryTour) {
+               final TourPhotoLink photoLink = (TourPhotoLink) element;
+               if (photoLink.isHistoryTour) {
 
                   cell.setText(Messages.Photos_AndTours_Label_HistoryTour);
 
                } else {
 
-                  final long tourTypeId = link.tourTypeId;
+                  final long tourTypeId = photoLink.tourTypeId;
                   if (tourTypeId == -1) {
                      cell.setText(UI.EMPTY_STRING);
                   } else {
@@ -1293,7 +1355,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                   }
                }
 
-               setBgColor(cell, link);
+               setBgColor(cell, photoLink);
             }
          }
       });
@@ -1318,18 +1380,25 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       final boolean isPhotoAvailable = _allPhotos.size() > 0;
       final boolean isOneHistory = _actionFilterOneHistory.isChecked();
       final boolean isNoHistory = !isOneHistory;
-      final boolean isPhotoFilter = isPhotoAvailable && isNoHistory;
+      final boolean isPhotoWithRealTour = isPhotoAvailable && isNoHistory;
+      final boolean isSelectedOneRealTour = _selectedPhotoLinks.size() == 1 && _selectedPhotoLinks.get(0).isHistoryTour() == false;
 
-      _lblAdjustTime.setEnabled(isPhotoFilter);
-      _spinnerHours.setEnabled(isPhotoFilter);
-      _spinnerMinutes.setEnabled(isPhotoFilter);
-      _spinnerSeconds.setEnabled(isPhotoFilter);
-      _comboCamera.setEnabled(isPhotoFilter);
+      final boolean canSelectTime = getSelectedTimeAdjustmentType().equals(TimeAdjustmentType.SELECT_AJUSTMENT);
 
-      _actionFilterTourWithPhotos.setEnabled(isPhotoFilter && _isShowToursWithoutSavedPhotos == false);
-      _actionFilterTourWithoutSavedPhotos.setEnabled(isPhotoFilter);
+      _comboAdjustTime.setEnabled(isPhotoWithRealTour);
+      _comboCamera.setEnabled(isPhotoWithRealTour && canSelectTime);
+
+      _lblAdjustTime.setEnabled(isPhotoWithRealTour);
+
+      _spinnerHours.setEnabled(isPhotoWithRealTour && canSelectTime);
+      _spinnerMinutes.setEnabled(isPhotoWithRealTour && canSelectTime);
+      _spinnerSeconds.setEnabled(isPhotoWithRealTour && canSelectTime);
+
+      _actionFilterTourWithPhotos.setEnabled(isPhotoWithRealTour && _isShowToursWithoutSavedPhotos == false);
+      _actionFilterTourWithoutSavedPhotos.setEnabled(isPhotoWithRealTour);
       _actionFilterOneHistory.setEnabled(isPhotoAvailable);
       _actionSavePhotoInTour.setEnabled(isPhotoAvailable);
+      _actionSetToSavedAdjustment.setEnabled(isPhotoWithRealTour && isSelectedOneRealTour && canSelectTime);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1355,14 +1424,38 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       return _columnManager;
    }
 
-   private Camera getSelectedCamera() {
+   private String getPhotoFilePath(final TourData tourData) {
 
-      final int cameraIndex = _comboCamera.getSelectionIndex();
-      if (cameraIndex == -1) {
+      final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+
+      if (allTourPhotos.size() == 0) {
          return null;
       }
 
-      return _allTourCamerasSorted[cameraIndex];
+      final TourPhoto[] allPhotos = allTourPhotos.toArray(new TourPhoto[allTourPhotos.size()]);
+
+      return allPhotos[0].getImageFilePath();
+   }
+
+   private Camera getSelectedCamera() {
+
+      final int selectedIndex = _comboCamera.getSelectionIndex();
+      if (selectedIndex == -1) {
+         return null;
+      }
+
+      return _allTourCamerasSorted[selectedIndex];
+   }
+
+   private TimeAdjustmentType getSelectedTimeAdjustmentType() {
+
+      int selectedIndex = _comboAdjustTime.getSelectionIndex();
+
+      if (selectedIndex == -1) {
+         selectedIndex = 0;
+      }
+
+      return (TimeAdjustmentType) ALL_TIME_ADJUSTMENT_TYPES[selectedIndex].value;
    }
 
    @Override
@@ -1370,9 +1463,42 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       return new ArrayList<>();
    }
 
+   private int getTimeAdjustmentTypeIndex(final Enum<TimeAdjustmentType> timeAdjustmentType) {
+
+      if (timeAdjustmentType == null) {
+
+         // this case should not happen
+         return -1;
+      }
+
+      for (int itemIndex = 0; itemIndex < ALL_TIME_ADJUSTMENT_TYPES.length; itemIndex++) {
+
+         final ComboEnumEntry<?> enumItem = ALL_TIME_ADJUSTMENT_TYPES[itemIndex];
+
+         if (enumItem.value.equals(timeAdjustmentType)) {
+            return itemIndex;
+         }
+      }
+
+      return -1;
+   }
+
    @Override
    public ColumnViewer getViewer() {
       return _tourViewer;
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onSelectTimeAdjustment());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onSelectTimeAdjustment();
+      };
    }
 
    private void onPartActivate() {
@@ -1391,16 +1517,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       }
 
       // update UI
-
-      final long timeAdjustment = camera.timeAdjustment / 1000;
-
-      final int hours = (int) (timeAdjustment / 3600);
-      final int minutes = (int) ((timeAdjustment % 3600) / 60);
-      final int seconds = (int) ((timeAdjustment % 3600) % 60);
-
-      _spinnerHours.setSelection(hours);
-      _spinnerMinutes.setSelection(minutes);
-      _spinnerSeconds.setSelection(seconds);
+      updateUI_TimeAdjustment(camera.getTimeAdjustment() / 1000);
    }
 
    private void onSelectionChanged(final ISelection selection, final IWorkbenchPart part) {
@@ -1440,11 +1557,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void onSelectTimeAdjustment() {
 
-      if (_selectedLinks.isEmpty()) {
+      if (_selectedPhotoLinks.isEmpty()) {
          // a tour is not selected
          return;
       }
 
+      /*
+       * Set time adjustment into the selected camera
+       */
       final Camera camera = getSelectedCamera();
       if (camera == null) {
          return;
@@ -1518,7 +1638,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          }
       }
 
-      if (_selectedLinks.equals(selectedLinks)) {
+      if (_selectedPhotoLinks.equals(selectedLinks)) {
          // currently selected tour is already selected and selection is fired
          return;
       }
@@ -1542,13 +1662,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          }
       }
 
-      _selectedLinks.clear();
-      _selectedLinks.addAll(selectedLinks);
+      _selectedPhotoLinks.clear();
+      _selectedPhotoLinks.addAll(selectedLinks);
 
       enableControls();
 
       // create tour selection
-      _tourPhotoLinkSelection = new TourPhotoLinkSelection(_selectedLinks, selectedTourIds);
+      _tourPhotoLinkSelection = new TourPhotoLinkSelection(_selectedPhotoLinks, selectedTourIds);
 
       PhotoManager.firePhotoEvent(this, PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
    }
@@ -1560,7 +1680,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<>();
 
       // update viewer data
-      for (final TourPhotoLink photoLink : _visibleTourPhotoLinks) {
+      for (final TourPhotoLink photoLink : _allVisibleTourPhotoLinks) {
 
          final long photoLink_TourId = photoLink.tourId;
 
@@ -1572,8 +1692,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
                if (tourData != null) {
 
-                  photoLink.numberOfTourPhotos = tourData.getTourPhotos().size();
+                  photoLink.numTourPhotos = tourData.getTourPhotos().size();
                   photoLink.photoTimeAdjustment = tourData.getPhotoTimeAdjustment();
+                  photoLink.photoFilePath = getPhotoFilePath(tourData);
 
                   modifiedLinks.add(photoLink);
 
@@ -1623,6 +1744,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _actionFilterTourWithoutSavedPhotos.setChecked(_isShowToursWithoutSavedPhotos);
       _actionFilterTourWithPhotos.setChecked(_isShowToursWithPhotos);
 
+      // time adjustment type
+      final Enum<TimeAdjustmentType> timeAdjustmentType = Util.getStateEnum(_state,
+            STATE_SELECTED_TIME_ADJUSTMENT_TYPE,
+            TimeAdjustmentType.SAVED_AJUSTMENT);
+      _comboAdjustTime.select(getTimeAdjustmentTypeIndex(timeAdjustmentType));
+
+      // camera
       final String prevCameraName = Util.getStateString(_state, STATE_SELECTED_CAMERA_NAME, null);
       updateUI_Cameras(prevCameraName);
    }
@@ -1636,9 +1764,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          return;
       }
 
-      /*
-       * selected camera
-       */
+      // camera
       final Camera selectedCamera = getSelectedCamera();
       if (selectedCamera != null) {
 
@@ -1653,6 +1779,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _state.put(STATE_FILTER_NOT_SAVED_PHOTOS, _actionFilterTourWithoutSavedPhotos.isChecked());
       _state.put(STATE_FILTER_TOUR_WITH_PHOTOS, _actionFilterTourWithPhotos.isChecked());
 
+      // time adjustment type
+      Util.setStateEnum(_state, STATE_SELECTED_TIME_ADJUSTMENT_TYPE, getSelectedTimeAdjustmentType());
+
       _columnManager.saveState(_state);
    }
 
@@ -1662,7 +1791,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void selectTour(final TourPhotoLink prevTourPhotoLink) {
 
-      if (_visibleTourPhotoLinks.isEmpty()) {
+      if (_allVisibleTourPhotoLinks.isEmpty()) {
          return;
       }
 
@@ -1674,7 +1803,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       if (prevTourPhotoLink == null) {
 
          // select first tour
-         selectedTour = _visibleTourPhotoLinks.get(0);
+         selectedTour = _allVisibleTourPhotoLinks.get(0);
 
       } else if (prevTourPhotoLink.isHistoryTour == false) {
 
@@ -1706,15 +1835,15 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
             // get tour for the first photo
 
-            final long tourPhotoTime = tourPhotos.get(0).adjustedTimeLink;
+            final long tourPhotoTime = tourPhotos.get(0).adjustedTime_Camera;
 
-            for (final TourPhotoLink link : _visibleTourPhotoLinks) {
+            for (final TourPhotoLink link : _allVisibleTourPhotoLinks) {
 
-               final long linkStartTime = link.isHistoryTour //
+               final long linkStartTime = link.isHistoryTour
                      ? link.historyStartTime
                      : link.tourStartTime;
 
-               final long linkEndTime = link.isHistoryTour //
+               final long linkEndTime = link.isHistoryTour
                      ? link.historyEndTime
                      : link.tourEndTime;
 
@@ -1731,16 +1860,20 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final long requestedStartTime = prevTourPhotoLink.isHistoryTour
                   ? prevTourPhotoLink.historyStartTime
                   : prevTourPhotoLink.tourStartTime;
-            final long requestedEndTime = prevTourPhotoLink.isHistoryTour //
+
+            final long requestedEndTime = prevTourPhotoLink.isHistoryTour
                   ? prevTourPhotoLink.historyEndTime
                   : prevTourPhotoLink.tourEndTime;
 
             final long requestedTime = requestedStartTime + ((requestedEndTime - requestedStartTime) / 2);
 
-            for (final TourPhotoLink link : _visibleTourPhotoLinks) {
+            for (final TourPhotoLink link : _allVisibleTourPhotoLinks) {
 
-               final long linkStartTime = link.isHistoryTour ? link.historyStartTime : link.tourStartTime;
-               final long linkEndTime = link.isHistoryTour //
+               final long linkStartTime = link.isHistoryTour
+                     ? link.historyStartTime
+                     : link.tourStartTime;
+
+               final long linkEndTime = link.isHistoryTour
                      ? link.historyEndTime
                      : link.tourEndTime;
 
@@ -1766,7 +1899,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       if (newSelection == null || newSelection.isEmpty()) {
 
          // previous selections failed, select first tour
-         final TourPhotoLink firstTour = _visibleTourPhotoLinks.get(0);
+         final TourPhotoLink firstTour = _allVisibleTourPhotoLinks.get(0);
 
          _tourViewer.setSelection(new StructuredSelection(firstTour), true);
       }
@@ -1795,9 +1928,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       for (final Photo photo : _allPhotos) {
 
          final long exifTime = photo.imageExifTime;
-         final long cameraTimeAdjustment = photo.camera.timeAdjustment;
+         final long cameraTimeAdjustment = photo.camera.getTimeAdjustment();
 
-         photo.adjustedTimeLink = exifTime + cameraTimeAdjustment;
+         photo.adjustedTime_Camera = exifTime + cameraTimeAdjustment;
 
          // force that the position are updated
          photo.resetLinkWorldPosition();
@@ -1813,9 +1946,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    void showPhotosAndTours(final ArrayList<Photo> tourPhotos) {
 
-      final int numberOfPhotos = tourPhotos.size();
+      final int numPhotos = tourPhotos.size();
 
-      if (numberOfPhotos == 0) {
+      if (numPhotos == 0) {
          clearView();
          return;
       }
@@ -1832,18 +1965,18 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          }
       }
 
-      if (numberOfPhotos > 100) {
+      if (numPhotos > 100) {
 
          BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
             @Override
             public void run() {
-               updateUI(null, _visibleTourPhotoLinks);
+               updateUI(null, _allVisibleTourPhotoLinks);
             }
          });
 
       } else {
 
-         updateUI(null, _visibleTourPhotoLinks);
+         updateUI(null, _allVisibleTourPhotoLinks);
       }
    }
 
@@ -1855,13 +1988,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void updateUI() {
 
-      updateUI(_selectedLinks, null);
+      updateUI(_selectedPhotoLinks, null);
    }
 
    private void updateUI(final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,
                          final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected) {
 
       if (_allPhotos.isEmpty()) {
+
          // view is not fully initialized, this happend in the pref listener
          return;
       }
@@ -1875,24 +2009,27 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       // this must be called BEFORE start/end date are set
       setPhotoTimeAdjustment();
 
-      _visibleTourPhotoLinks.clear();
-      _selectedLinks.clear();
+      _allVisibleTourPhotoLinks.clear();
+      _selectedPhotoLinks.clear();
       _selectedTourPhotoLinksWithGps.clear();
 
       if (_isFilterOneHistoryTour) {
 
-         _photoMgr.createTourPhotoLinks_01_OneHistoryTour(
+         _photoMgr.createTourPhotoLinks_OneHistoryTour(
+
                _allPhotos,
-               _visibleTourPhotoLinks,
+               _allVisibleTourPhotoLinks,
                _allTourCameras);
       } else {
 
          _photoMgr.createTourPhotoLinks(
+
                _allPhotos,
-               _visibleTourPhotoLinks,
+               _allVisibleTourPhotoLinks,
                _allTourCameras,
                _isShowToursWithPhotos,
-               _isShowToursWithoutSavedPhotos);
+               _isShowToursWithoutSavedPhotos,
+               getSelectedTimeAdjustmentType());
       }
 
       updateUI_Cameras(null);
@@ -1900,28 +2037,25 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       enableControls();
 
       // tour viewer update can be a longer task, update other UI element before
-      _pageBook.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _pageBook.getDisplay().asyncExec(() -> {
 
-            if (_tourViewer.getTable().isDisposed()) {
-               return;
-            }
+         if (_tourViewer.getTable().isDisposed()) {
+            return;
+         }
 
-            _tourViewer.setInput(new Object[0]);
-            _pageBook.showPage(_pageViewer);
+         _tourViewer.setInput(new Object[0]);
+         _pageBook.showPage(_pageViewer);
 
-            // update annotations in PicDirView
-            PhotoManager.updatePicDirGallery();
+         // update annotations in PicDirView
+         PhotoManager.updatePicDirGallery();
 
-            if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
+         if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
 
-               _tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), true);
+            _tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), true);
 
-            } else {
+         } else {
 
-               selectTour(prevTourPhotoLink[0]);
-            }
+            selectTour(prevTourPhotoLink[0]);
          }
       });
    }
@@ -1975,5 +2109,20 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       // update spinners for camera time adjustment
       onSelectCamera();
+   }
+
+   /**
+    * @param timeAdjustment
+    *           Time adjustment in seconds
+    */
+   private void updateUI_TimeAdjustment(final long timeAdjustment) {
+
+      final int hours = (int) (timeAdjustment / 3600);
+      final int minutes = (int) ((timeAdjustment % 3600) / 60);
+      final int seconds = (int) ((timeAdjustment % 3600) % 60);
+
+      _spinnerHours.setSelection(hours);
+      _spinnerMinutes.setSelection(minutes);
+      _spinnerSeconds.setSelection(seconds);
    }
 }

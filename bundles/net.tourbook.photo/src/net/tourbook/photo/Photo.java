@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -111,10 +111,14 @@ public class Photo {
 
    /**
     * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
-    * e.g. wrong time zone, wrong time is set in the camera.
+    * e.g. wrong time zone, wrong time is set in the camera. This time is saved in the tour photo.
     */
-   public long                                     adjustedTimeTour        = Long.MIN_VALUE;
-   public long                                     adjustedTimeLink        = Long.MIN_VALUE;
+   public long                                     adjustedTime_Tour       = Long.MIN_VALUE;
+
+   /**
+    * Time in ms which is set in the link view with the adjusted camera time
+    */
+   public long                                     adjustedTime_Camera     = Long.MIN_VALUE;
 
    public long                                     imageFileSize;
 
@@ -939,9 +943,9 @@ public class Photo {
 
    public long getPhotoTime() {
 
-      if (adjustedTimeTour != Long.MIN_VALUE) {
+      if (adjustedTime_Tour != Long.MIN_VALUE) {
 
-         return adjustedTimeTour;
+         return adjustedTime_Tour;
 
       } else {
 
@@ -1039,18 +1043,18 @@ public class Photo {
 
    /**
     * @param mapProvider
-    * @param projectionId
+    * @param projectionHash
     * @param zoomLevel
     * @param isLinkPhotoDisplayed
     * @return Returns the world position for this photo or <code>null</code> when geo position is
     *         not set.
     */
    public Point getWorldPosition(final CommonMapProvider mapProvider,
-                                 final String projectionId,
+                                 final int projectionHash,
                                  final int zoomLevel,
                                  final boolean isLinkPhotoDisplayed) {
 
-      final double latitude = isLinkPhotoDisplayed //
+      final double latitude = isLinkPhotoDisplayed
             ? getLinkLatitude()
             : getTourLatitude();
 
@@ -1058,9 +1062,9 @@ public class Photo {
          return null;
       }
 
-      final Integer hashKey = projectionId.hashCode() + zoomLevel;
+      final Integer hashKey = projectionHash + zoomLevel;
 
-      final Point worldPosition = isLinkPhotoDisplayed //
+      final Point worldPosition = isLinkPhotoDisplayed
             ? _linkWorldPosition.get(hashKey)
             : _tourWorldPosition.get(hashKey);
 

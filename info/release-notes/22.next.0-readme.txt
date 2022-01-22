@@ -30,15 +30,37 @@ Experimental
 New
 ===
 
-* 
+
+* Tour Pauses
+  - Show all tour pauses in a list
+
+* 2D Map (Frederic)
+  - Added the possibility to show/hide the tour weather icon on the map
 
 
 Improvements
 ============
 
-* 
+* Multiple Tours
+  - Loading multiple tours is much faster because they are loaded concurrently
+  - Painting multiple tours in tour chart and 2D map are further optimized 
 
 
+* Tour Import
+  - Sort imported tours by number of markers/waypoints
+  
+* Tour Segmenter
+  - Show power value for each segment
+                                          https://sourceforge.net/p/mytourbook/feature-requests/204/
+                        
+* Photos + Tours        
+  - Show tours with these photo times: 
+    - Exif time
+    - Selected adjustment time
+    - Saved time
+  - Show photo location in view                         
+                                          https://github.com/mytourbook/mytourbook/issues/449
+                                          
 Changes
 =======
 
@@ -48,8 +70,8 @@ Changes
 Bugfix
 ======
 
-* 
-
+* Suunto App Integration: (Frederic)   
+  - When determining if a Suunto activity already exists in the database, only the tours for the selected user are compared with the activities available on the Suunto App
 
 Translation    
 ===========
@@ -65,4 +87,4 @@ System
 ======
 
 * Eclipse 2021-06
-* FIT SDK 21.60
+* FIT SDK 21.67

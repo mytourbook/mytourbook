@@ -897,7 +897,8 @@ public class ColumnManager {
     *           Can be <code>null</code> when a default context menu is not available
     */
    public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider) {
-      this.createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
+
+      createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
    }
 
    /**

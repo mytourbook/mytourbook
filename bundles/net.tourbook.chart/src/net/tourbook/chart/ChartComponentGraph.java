@@ -2893,11 +2893,16 @@ public class ChartComponentGraph extends Canvas {
           * Draw line to current point
           */
          final long devXPrev_long = (long) devXPrev;
+         final long devY1_long = (long) devY1;
+         final long devY1Prev_long = (long) devY1Prev;
 
          if (devX_long != devXPrev_long
 
                // draw line when is has the same x position but y is larger/smaller than previous value
-               || (devX_long == devXPrev_long && (devY1 >= 0 ? devY1 > devY1Prev : devY1 < devY1Prev))
+               || (devX_long == devXPrev_long
+                     && (devY1_long >= 0
+                           ? devY1_long > devY1Prev_long
+                           : devY1_long < devY1Prev_long))
 
                || graphY1 == 0
                || (isPath2 && graphY2 == 0)) {

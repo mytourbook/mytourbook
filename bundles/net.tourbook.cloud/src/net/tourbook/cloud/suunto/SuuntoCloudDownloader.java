@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
@@ -50,6 +51,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.tour.TourLogManager;
@@ -287,15 +289,25 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return isTourDownloaded;
    }
 
+   /**
+    * Retrieves a list of all the tour start times currently in the database the current person
+    * (if not "All People" is selected).
+    */
    private List<Long> retrieveAllTourStartTimes() {
 
       final List<Long> tourStartTimes = new ArrayList<>();
       try (Connection conn = TourDatabase.getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final String sqlQuery = "SELECT tourStartTime FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
+         final StringBuilder sqlQuery = new StringBuilder("SELECT tourStartTime FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-         final ResultSet result = stmt.executeQuery(sqlQuery);
+         final TourPerson activePerson = TourbookPlugin.getActivePerson();
+
+         if (activePerson != null) {
+            sqlQuery.append(" WHERE TOURPERSON_PERSONID = " + activePerson.getPersonId()); //$NON-NLS-1$
+         }
+
+         final ResultSet result = stmt.executeQuery(sqlQuery.toString());
 
          while (result.next()) {
 

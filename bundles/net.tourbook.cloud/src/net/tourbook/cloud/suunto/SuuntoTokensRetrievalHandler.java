@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -137,7 +137,6 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       }
 
       //if active person has no tokens and all people has, take the tokens from all people
-
       if (OAuth2Utils.isAccessTokenValid(
             _prefStore.getLong(suuntoAccessTokenIssueDateTime) +
                   _prefStore.getLong(suuntoAccessTokenExpiresIn) * 1000)) {

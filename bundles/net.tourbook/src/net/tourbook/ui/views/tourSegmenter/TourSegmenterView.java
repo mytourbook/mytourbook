@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,6 +43,7 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.AltitudeUpDownSegment;
 import net.tourbook.data.TourData;
@@ -355,6 +356,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private TableViewer                  _segmentViewer;
    private SegmenterComparator          _segmentComparator        = new SegmenterComparator();
    private ColumnManager                _columnManager;
+   private TableColumnDefinition        _colDef_Power;
    //
    private TourData                     _tourData;
    private int                          _tourStartDayTime;
@@ -852,6 +854,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                   onSelect_SegmenterType(false);
                }
+
+            } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)) {
+
+               // recompute segments
+
+               onSelect_CreateSegments();
 
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -2866,6 +2874,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _segmentViewer = new TableViewer(table);
       _columnManager.createColumns(_segmentViewer);
 
+      // disable category formatter that it is hidden in the context menu, this formatter is used with a tree viewer (with categories)
+      _colDef_Power.setValueFormatter_Category(null, null);
+
       _segmentViewer.setContentProvider(new SegmenterContentProvider());
       _segmentViewer.setComparator(_segmentComparator);
       _segmentViewer.setFilters(new SegmenterFilter());
@@ -3035,7 +3046,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_AvgPace();
       defineColumn_Motion_AvgPace_Difference();
-
       defineColumn_Altitude_Gradient();
       defineColumn_Altitude_Hour_Up();
       defineColumn_Altitude_Hour_Down();
@@ -3054,6 +3064,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       defineColumn_Powertrain_AvgCadence();
       defineColumn_Powertrain_StrideLength();
+
+      defineColumn_Power_Avg();
 
       defineColumn_Data_Sequence();
       defineColumn_Data_SerieStartEndIndex();
@@ -3645,7 +3657,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: Average cadence
+    * Column: Power - Avg power
+    */
+   private void defineColumn_Power_Avg() {
+
+      _colDef_Power = TableColumnFactory.POWER_AVG.createColumn(_columnManager, _pc);
+      _colDef_Power.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final double value = ((TourSegment) cell.getElement()).power;
+
+            _colDef_Power.printDetailValue(cell, value);
+         }
+      });
+   }
+
+   /**
+    * Column: Average cadence
     */
    private void defineColumn_Powertrain_AvgCadence() {
 
@@ -3673,7 +3702,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: Stride length (meters/stride)
+    * Column: Stride length (meters/stride)
     */
    private void defineColumn_Powertrain_StrideLength() {
 
@@ -3702,7 +3731,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: elapsed time
+    * Column: elapsed time
     */
    private void defineColumn_Time_Elapsed() {
 
@@ -3732,7 +3761,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: TOTAL elapsed time
+    * Column: TOTAL elapsed time
     */
    private void defineColumn_Time_ElapsedTimeTotal() {
 
@@ -3760,7 +3789,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: moving time
+    * Column: moving time
     */
    private void defineColumn_Time_Moving() {
 
@@ -3788,7 +3817,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: paused time
+    * Column: paused time
     */
    private void defineColumn_Time_Paused() {
 

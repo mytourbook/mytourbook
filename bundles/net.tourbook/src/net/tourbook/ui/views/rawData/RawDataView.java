@@ -304,14 +304,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           LOG_TOUR_DETAILS                           = "%s · %.0f s · %5.1f Δ %s";               //$NON-NLS-1$
    //
    static {
+      //
+// SET_FORMATTING_OFF
 
-      HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
-      HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
-      HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
-      HREF_ACTION_OLD_UI = HREF_TOKEN + ACTION_OLD_UI;
-      HREF_ACTION_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
-      HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
-      HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
+      HREF_ACTION_DEVICE_IMPORT           = HREF_TOKEN + ACTION_DEVICE_IMPORT;
+      HREF_ACTION_DEVICE_WATCHING_ON_OFF  = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
+      HREF_ACTION_IMPORT_FROM_FILES       = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
+      HREF_ACTION_OLD_UI                  = HREF_TOKEN + ACTION_OLD_UI;
+      HREF_ACTION_SERIAL_PORT_CONFIGURED  = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
+      HREF_ACTION_SERIAL_PORT_DIRECTLY    = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
+      HREF_ACTION_SETUP_EASY_IMPORT       = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
+
+// SET_FORMATTING_ON
    }
    //
    private static boolean                      _isStopWatchingStoresThread;
@@ -351,6 +355,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    //
    private String                         _columnId_DeviceName;
    private String                         _columnId_ImportFileName;
+   private String                         _columnId_Marker;
    private String                         _columnId_TimeZone;
    private String                         _columnId_Title;
    private String                         _columnId_TourStartDate;
@@ -526,6 +531,36 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // title
 
             result = tourData1.getTourTitle().compareTo(tourData2.getTourTitle());
+
+         } else if (__sortColumnId.equals(_columnId_Marker)) {
+
+            // marker
+
+            final int numMarker1 = tourData1.getTourMarkers().size();
+            final int numMarker2 = tourData2.getTourMarkers().size();
+            final int numWayPoints1 = tourData1.getTourWayPoints().size();
+            final int numWayPoints2 = tourData2.getTourWayPoints().size();
+
+            final int num1 = numMarker1 + numWayPoints1;
+            final int num2 = numMarker2 + numWayPoints2;
+
+            if (num1 > 0 && num2 > 0) {
+
+               result = num1 > num2 ? 1 : -1;
+
+            } else {
+
+               // prevent java.lang.IllegalArgumentException: Comparison method violates its general contract!
+
+               if (num1 > 0) {
+
+                  result = 1;
+
+               } else if (num2 > 0) {
+
+                  result = -1;
+               }
+            }
 
          } else if (__sortColumnId.equals(_columnId_ImportFileName)) {
 
@@ -2684,7 +2719,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _importComparator.__sortDirection = ImportComparator.ASCENDING;
 
       // show the sorting indicator in the viewer
-      updateUI_ShowSortDirection(//
+      updateUI_ShowSortDirection(
             _importComparator.__sortColumnId,
             _importComparator.__sortDirection);
 
@@ -3235,6 +3270,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3259,6 +3295,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             }
          }
       });
+
+      _columnId_Marker = colDef.getColumnId();
    }
 
    /**

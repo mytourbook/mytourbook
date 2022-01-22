@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -559,40 +559,58 @@ public class ChartLayerSegmentValue implements IChartLayer {
       return _allPaintedSegments;
    }
 
-   void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+   ChartLayerSegmentValue setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+
       _isShowDecimalPlaces = isShowDecimalPlaces;
+
+      return this;
    }
 
-   void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
+   ChartLayerSegmentValue setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
+
       _isShowSegmenterValues = isShowSegmenterValues;
+
+      return this;
    }
 
-   void setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
+   ChartLayerSegmentValue setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
 
       _isShowSegmenterLine = isShowSegmenterLine;
       _lineOpacity = (int) (lineOpacity / 100.0 * 255);
+
+      return this;
    }
 
-   void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
+   ChartLayerSegmentValue setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
 
       _isHideSmallValues = isHideSmallValues;
       _smallValue = smallValue / 100.0;
+
+      return this;
    }
 
-   void setStackedValues(final int stackedValues) {
+   ChartLayerSegmentValue setStackedValues(final int stackedValues) {
+
       _stackedValues = stackedValues;
+
+      return this;
    }
 
-   void setTourData(final TourData tourData) {
+   ChartLayerSegmentValue setTourData(final TourData tourData) {
 
       _tourData = tourData;
 
       // initialize painted labels
       _allPaintedSegments.clear();
       _allGraphAreas.clear();
+
+      return this;
    }
 
-   void setXDataSerie(final double[] dataSerie) {
+   ChartLayerSegmentValue setXDataSerie(final double[] dataSerie) {
+
       _xDataSerie = dataSerie;
+
+      return this;
    }
 }
