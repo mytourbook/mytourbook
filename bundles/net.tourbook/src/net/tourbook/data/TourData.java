@@ -6042,37 +6042,56 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float[] newSRTMSerie = new float[serieLength];
          final float[] newSRTMSerieImperial = new float[serieLength];
 
+         int usedSrtm1Values = 0;
+         int usedSrtm3Values = 0;
+         int usedSrtmLastValues = 0;
+
          for (final double latitude : latitudeSerie) {
 
             final double longitude = longitudeSerie[serieIndex];
 
             final float srtm1Value, srtm3Value;
+
             float srtmValue = 0;
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
                srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-               srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               //srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
                //System.out.println("******************* TourData srtm3: " + srtm3Value + " vs. ,srtm1: " + srtm1Value);
-               if (srtm1Value != Float.MIN_VALUE) { //check if valid srtm1 value found
+               if (srtm1Value != Float.MIN_VALUE && srtm1Value > -32767.0) { //valid srtm1Value. sometimes illegal value is -32767.0
                   srtmValue = srtm1Value;
-                  System.out.println("******************* TourData using srtm1: " + srtmValue);
-               } else { //else use srtm3
-                  srtmValue = srtm3Value;
-                  System.out.println("******************* TourData using srtm3: " + srtmValue);
+                  isSRTMValid = true;
+                  lastValidSRTM = srtmValue;
+                  usedSrtm1Values++;
+                  //System.out.println("******************* TourData using srtm1: " + srtmValue + "min short" + Short.MIN_VALUE);
+               } else {
+                  srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+
+                  if (srtm3Value == Float.MIN_VALUE) { //else when srtm3 is also not availible, used the last good one
+                     srtmValue = lastValidSRTM;
+                     usedSrtmLastValues++;
+                     //System.out.println("******************* TourData using srtm3: " + srtmValue);
+                  } else {
+                     srtmValue = srtm3Value;
+                     isSRTMValid = true;
+                     lastValidSRTM = srtm3Value;
+                     usedSrtm3Values++;
+                  }
+
                }
             }
 
             /*
              * set invalid values to the previous valid value
              */
-            if (srtmValue == Float.MIN_VALUE) {
-               // invalid data
-               srtmValue = lastValidSRTM;
-            } else {
-               // valid data are available
-               isSRTMValid = true;
-               lastValidSRTM = srtmValue;
-            }
+//            if (srtmValue == Float.MIN_VALUE) {
+//               // invalid data
+//               srtmValue = lastValidSRTM;
+//            } else {
+//               // valid data are available
+//               isSRTMValid = true;
+//               lastValidSRTM = srtmValue;
+//            }
 
             // adjust wrong values
             if (srtmValue < -1000) {
@@ -6086,6 +6105,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             serieIndex++;
          }
+
+         System.out.println(this.getClass().getCanonicalName() + " - used srtm1 Values: " + usedSrtm1Values
+               + ", used srtm3 Values: " + usedSrtm3Values
+               + ", used last Values: " + usedSrtmLastValues);
 
          if (isSRTMValid) {
             srtmSerie = newSRTMSerie;
