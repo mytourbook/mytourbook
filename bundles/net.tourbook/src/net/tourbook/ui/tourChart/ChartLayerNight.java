@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.application.TourbookPlugin;
@@ -51,12 +50,7 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
    @Override
    public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart, final PixelConverter pc) {
 
-      if (!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS)) {
-         return;
-      }
-
-      final int opacity = ColorUtil.getTransparencyFromPercentage(
-            _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
+      final int opacity = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY));
 
       final int devYTop = graphDrawingData.getDevYTop();
       final int devGraphHeight = graphDrawingData.devGraphHeight;

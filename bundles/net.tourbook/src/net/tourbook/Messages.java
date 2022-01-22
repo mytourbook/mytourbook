@@ -1265,6 +1265,10 @@ public class Messages extends NLS {
 
    public static String        NT001_DialogExtractTour_InvalidTourData;
 
+   public static String        Photos_AndTours_Action_SetToSavedAdjustment_Tooltip;
+   public static String        Photos_AndTours_AdjustmentType_NoAdjustment;
+   public static String        Photos_AndTours_AdjustmentType_SavedAdjustment;
+   public static String        Photos_AndTours_AdjustmentType_SelectedAdjustment;
    public static String        Photos_AndTours_Combo_Camera_Tooltip;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
@@ -2105,10 +2109,11 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartGraph_Label_ShowGraph;
    public static String        Slideout_TourChartGraph_Label_Title;
 
-   public static String        Slideout_TourChartOptions_Check_InvertPaceGraph;
-   public static String        Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip;
-   public static String        Slideout_TourChartOptions_Check_NightSectionsOpacity;
-   public static String        Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip;
+   public static String        Slideout_TourChartOptions_Checkbox_InvertPaceGraph;
+   public static String        Slideout_TourChartOptions_Checkbox_InvertPaceGraph_Tooltip;
+   public static String        Slideout_TourChartOptions_Checkbox_ShowNightSections;
+   public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity;
+   public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
    public static String        Slideout_TourChartOptions_Label_Title;
 
@@ -2835,6 +2840,13 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Checkbox_ShowUserPauses;
    public static String        Tour_Pauses_Checkbox_ShowUserPauses_Tooltip;
    public static String        Tour_Pauses_Checkbox_TourPauseFilter;
+   public static String        Tour_Pauses_Column_Duration_Label;
+   public static String        Tour_Pauses_Column_Duration_Tooltip;
+   public static String        Tour_Pauses_Column_EndTime_Header;
+   public static String        Tour_Pauses_Column_EndTime_Label;
+   public static String        Tour_Pauses_Column_StartTime_Header;
+   public static String        Tour_Pauses_Column_StartTime_Label;
+   public static String        Tour_Pauses_Column_StartTime_Tooltip;
 
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;

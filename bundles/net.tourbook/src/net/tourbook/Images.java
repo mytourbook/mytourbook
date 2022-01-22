@@ -186,6 +186,8 @@ public class Images {
    public static final String PhotoLinkWithTour                          = "photo-link-photo-with-tour.png";                      //$NON-NLS-1$
    public static final String PhotoSyncTour                              = "photo-sync-tour.png";                                 //$NON-NLS-1$
    public static final String PhotoTourPhotos                            = "photo-tour-photos.png";                               //$NON-NLS-1$
+   public static final String PhotoTimeAdjustment                        = "photo-time-adjustment.png";                           //$NON-NLS-1$
+   public static final String PhotoTimeAdjustment_Disabled               = "photo-time-adjustment-disabled.png";                  //$NON-NLS-1$
    public static final String PulseZones                                 = "pulse-zones.png";                                     //$NON-NLS-1$
    public static final String PulseZones_Disabled                        = "pulse-zones-disabled.png";                            //$NON-NLS-1$
    public static final String RawData_DashboardUI                        = "import-dashboard.png";                                //$NON-NLS-1$

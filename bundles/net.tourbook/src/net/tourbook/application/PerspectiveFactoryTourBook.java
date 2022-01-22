@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import net.tourbook.photo.PicDirView;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.ui.tourChart.TourChartView;
+import net.tourbook.ui.views.TourPausesView;
 import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
@@ -54,7 +55,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout mapFolder = layout.createFolder(FOLDER_ID_MAP, //
+      final IFolderLayout mapFolder = layout.createFolder(FOLDER_ID_MAP,
             IPageLayout.RIGHT,
             0.4f,
             IPageLayout.ID_EDITOR_AREA);
@@ -66,7 +67,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout chartFolder = layout.createFolder(FOLDER_ID_CHART, //
+      final IFolderLayout chartFolder = layout.createFolder(FOLDER_ID_CHART,
             IPageLayout.BOTTOM,
             0.5f,
             FOLDER_ID_MAP);
@@ -75,7 +76,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST, //
+      final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,
             IPageLayout.TOP,
             0.6f,
             IPageLayout.ID_EDITOR_AREA);
@@ -89,7 +90,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout markerFolder = layout.createFolder(FOLDER_ID_MARKER, //
+      final IFolderLayout markerFolder = layout.createFolder(FOLDER_ID_MARKER,
             IPageLayout.BOTTOM,
             0.6f,
             FOLDER_ID_LIST);
@@ -97,6 +98,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
       markerFolder.addView(TourMarkerView.ID);
       markerFolder.addView(TourTags_View.ID);
       markerFolder.addView(TourWaypointView.ID);
+      markerFolder.addView(TourPausesView.ID);
       markerFolder.addPlaceholder(GeoCompareView.ID);
    }
 }

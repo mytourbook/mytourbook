@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2021,37 +2021,7 @@ public class RawDataManager {
          /*
           * Resort files by extension priority
           */
-         Collections.sort(allImportFilePaths, (importFilePath1, importFilePath2) -> {
-
-            final String file1Extension = importFilePath1.filePath.getFileExtension();
-            final String file2Extension = importFilePath2.filePath.getFileExtension();
-
-            int rc = 0;
-
-            if (file1Extension != null
-                  && file1Extension.length() > 0
-                  && file2Extension != null
-                  && file2Extension.length() > 0) {
-
-               final TourbookDevice file1Device = _allDevices_ByExtension.get(file1Extension.toLowerCase());
-               final TourbookDevice file2Device = _allDevices_ByExtension.get(file2Extension.toLowerCase());
-
-               if (file1Device != null && file2Device != null) {
-                  rc = file1Device.extensionSortPriority - file2Device.extensionSortPriority;
-               }
-
-            } else {
-
-               // sort invalid files to the end
-               rc = Integer.MAX_VALUE;
-            }
-
-            return rc > 0
-                  ? 1
-                  : rc < 0
-                        ? -1
-                        : 0;
-         });
+         Collections.sort(allImportFilePaths, this::onSortFileExtensions);
 
          importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);
 
@@ -2715,6 +2685,55 @@ public class RawDataManager {
       fileIn.delete();
 
       return newFile.getAbsolutePath();
+   }
+
+   private int onSortFileExtensions(final ImportFile importFilePath1, final ImportFile importFilePath2) {
+
+      final String file1Extension = importFilePath1.filePath.getFileExtension();
+      final String file2Extension = importFilePath2.filePath.getFileExtension();
+
+      final boolean isFile1_Ext = file1Extension != null && file1Extension.length() > 0;
+      final boolean isFile2_Ext = file2Extension != null && file2Extension.length() > 0;
+
+      int rc = 0;
+
+      if (isFile1_Ext && isFile2_Ext) {
+
+         final TourbookDevice file1Device = _allDevices_ByExtension.get(file1Extension.toLowerCase());
+         final TourbookDevice file2Device = _allDevices_ByExtension.get(file2Extension.toLowerCase());
+
+         final boolean isFile1_Device = file1Device != null;
+         final boolean isFile2_Device = file2Device != null;
+
+         if (isFile1_Device && isFile2_Device) {
+
+            rc = file1Device.extensionSortPriority - file2Device.extensionSortPriority;
+
+         } else {
+
+            // prevent java.lang.IllegalArgumentException: Comparison method violates its general contract!
+
+            if (isFile1_Device) {
+
+               rc = Integer.MAX_VALUE;
+
+            } else if (isFile2_Device) {
+
+               rc = -Integer.MAX_VALUE;
+            }
+         }
+
+      } else {
+
+         // sort invalid files to the end
+         rc = Integer.MAX_VALUE;
+      }
+
+      return rc > 0
+            ? 1
+            : rc < 0
+                  ? -1
+                  : 0;
    }
 
    /**
@@ -3814,11 +3833,15 @@ public class RawDataManager {
          }
 
          if (importedTourData.isTourDeleted) {
+
             _loadingTour_CountDownLatch.countDown();
+
             continue;
          }
 
-         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(importedTourData,
+         updateTourData_InImportView_FromDb_Runnable_10_Concurrent(
+
+               importedTourData,
                monitor,
                numWorkedTours,
                allSavedTourIds);

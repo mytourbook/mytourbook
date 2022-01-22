@@ -1,5 +1,5 @@
 /* *****************************************************************************
- *  Copyright (C) 2008 Joshua Marinacci, Michael Kanis and others
+ *  Copyright (C) 2008, 2022 Joshua Marinacci, Michael Kanis and others
  *
  *  This file is part of Geoclipse.
  *
@@ -35,7 +35,10 @@ import net.tourbook.common.map.GeoPosition;
  */
 public final class Mercator extends Projection {
 
-   private static final String PROJECTION_ID = "merca"; //$NON-NLS-1$
+   private static final double PI_DIV_2      = Math.PI / 2;
+   private static final double PI_DIV_180    = Math.PI / 180.0;
+
+   private static final String PROJECTION_ID = "merca";        //$NON-NLS-1$
 
 //	// WGS-84 Ellipsoid
 //	private static final double	HALBACHSE_A		= 6378.137;
@@ -84,7 +87,7 @@ public final class Mercator extends Projection {
    }
 
    public static double yToLat(final int y, final double radius) {
-      final double latitude = (Math.PI / 2) - (2 * Math.atan(Math.exp(-1.0 * y / radius)));
+      final double latitude = PI_DIV_2 - (2 * Math.atan(Math.exp(-1.0 * y / radius)));
       return Math.toDegrees(latitude);
    }
 
@@ -176,7 +179,7 @@ public final class Mercator extends Projection {
 
       final double x = devMapCenter.getX() + (longitude * mp.getLongitudeDegreeWidthInPixels(zoomLevel));
 
-      double e = Math.sin(latitude * (Math.PI / 180.0));
+      double e = Math.sin(latitude * PI_DIV_180);
 
       if (e > 0.9999) {
          e = 0.9999;
@@ -220,7 +223,7 @@ public final class Mercator extends Projection {
 
       final double x = mapCenterInPixels.getX() + (longitude * mp.getLongitudeDegreeWidthInPixels(zoomLevel));
 
-      double e = Math.sin(latitude * (Math.PI / 180.0));
+      double e = Math.sin(latitude * PI_DIV_180);
       if (e > 0.9999) {
          e = 0.9999;
       }
@@ -304,7 +307,7 @@ public final class Mercator extends Projection {
       final double lon = (pixelX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
 
       final double e1 = (pixelY - devMapCenter.getY()) / (-1 * mp.getLongitudeRadianWidthInPixels(zoom));
-      final double e2 = (2 * Math.atan(Math.exp(e1)) - Math.PI / 2) / (Math.PI / 180.0);
+      final double e2 = (2 * Math.atan(Math.exp(e1)) - PI_DIV_2) / PI_DIV_180;
       final double lat = e2;
 
       final GeoPosition wc = new GeoPosition(lat, lon);
@@ -329,7 +332,7 @@ public final class Mercator extends Projection {
 
       final double e1 = (devY - devMapCenter.getY()) / (-1 * mp.getLongitudeRadianWidthInPixels(zoom));
 
-      final double latitude = (2 * Math.atan(Math.exp(e1)) - Math.PI / 2) / (Math.PI / 180.0);
+      final double latitude = (2 * Math.atan(Math.exp(e1)) - PI_DIV_2) / PI_DIV_180;
 
       final GeoPosition wc = new GeoPosition(latitude, longitude);
 

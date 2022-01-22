@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,16 +13,32 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.widgets;
+package net.tourbook.map2.action;
 
-public class ComboEnumEntry<E extends Enum<E>> {
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
+import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
 
-   public String  label;
-   public Enum<E> value;
+import org.eclipse.jface.action.Action;
 
-   public ComboEnumEntry(final String label, final Enum<E> value) {
+public class ActionShowTourWeatherInMap extends Action {
 
-      this.label = label;
-      this.value = value;
+   private final Map2View _mapView;
+
+   public ActionShowTourWeatherInMap(final Map2View mapView) {
+
+      super(null, AS_CHECK_BOX);
+
+      _mapView = mapView;
+
+      setText(Messages.Map_Action_ShowTourWeatherInMap);
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Cloudy));
    }
+
+   @Override
+   public void run() {
+      _mapView.actionSetShowTourWeatherInMap();
+   }
+
 }

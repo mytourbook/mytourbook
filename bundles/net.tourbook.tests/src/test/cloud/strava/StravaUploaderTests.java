@@ -16,7 +16,6 @@
 package cloud.strava;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
@@ -116,9 +115,8 @@ public class StravaUploaderTests {
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
-      assertEquals(3, logs.size());
-      assertTrue(logs.get(1).toString().contains(
-            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")); //$NON-NLS-1$
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
    }
 
    @Test
@@ -146,8 +144,7 @@ public class StravaUploaderTests {
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
-      assertEquals(3, logs.size());
-      assertTrue(logs.get(1).toString().contains(
-            "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n")); //$NON-NLS-1$
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
    }
 }

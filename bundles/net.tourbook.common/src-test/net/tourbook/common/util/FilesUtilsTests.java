@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,16 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.widgets;
+package net.tourbook.common.util;
 
-public class ComboEnumEntry<E extends Enum<E>> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-   public String  label;
-   public Enum<E> value;
+import org.junit.jupiter.api.Test;
 
-   public ComboEnumEntry(final String label, final Enum<E> value) {
+public class FilesUtilsTests {
 
-      this.label = label;
-      this.value = value;
+   @Test
+   void testRemoveExtensions() {
+
+      assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")); //$NON-NLS-1$
+      assertEquals("file", FilesUtils.removeExtensions("file")); //$NON-NLS-1$
    }
+
 }
