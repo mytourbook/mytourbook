@@ -6036,6 +6036,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          int serieIndex = 0;
          float lastValidSRTM = 0;
          boolean isSRTMValid = false;
+         final float lowerLimit = -1000;
+         final float upperLimit = 10000;
 
          final int serieLength = timeSerie.length;
 
@@ -6054,7 +6056,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
                srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-               if (srtm1Value != Float.MIN_VALUE && srtm1Value > -32767.0) { //check if valid srtm1Value. sometimes illegal value is also -32767.0
+               if (srtm1Value != Float.MIN_VALUE && srtm1Value > lowerLimit && srtm1Value < upperLimit) { //check if valid srtm1Value. sometimes illegal value is also -32767.0
                   srtmValue = srtm1Value;
                   isSRTMValid = true;
                   lastValidSRTM = srtmValue;
@@ -6065,7 +6067,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                   if (srtm3Value == Float.MIN_VALUE) { // when srtm3 is also not availible, used the last good one
                      srtmValue = lastValidSRTM;
                      usedSrtmLastValues++;
-                     //System.out.println("******************* TourData using srtm3: " + srtmValue);
+                     //System.out.println("******************* TourData using LAST srtm3: " + srtmValue);
                   } else { //if srtm3 is good, use it
                      srtmValue = srtm3Value;
                      isSRTMValid = true;
@@ -6075,23 +6077,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                }
             }
 
-            /*
-             * set invalid values to the previous valid value
-             */
-//            if (srtmValue == Float.MIN_VALUE) {
-//               // invalid data
-//               srtmValue = lastValidSRTM;
-//            } else {
-//               // valid data are available
-//               isSRTMValid = true;
-//               lastValidSRTM = srtmValue;
-//            }
-
             // adjust wrong values
-            if (srtmValue < -1000) {
+            if (srtmValue < lowerLimit) {
                srtmValue = 0;
             } else {
-               srtmValue = Math.min(srtmValue, 10000);
+               srtmValue = Math.min(srtmValue, upperLimit);
             }
 
             newSRTMSerie[serieIndex] = srtmValue;
