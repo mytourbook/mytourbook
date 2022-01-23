@@ -2285,7 +2285,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          table.showSelection();
 
          // fire selection position
-//         _timeSlice_Viewer.setSelection(_timeSlice_Viewer.getSelection());
+         _timeSlice_Viewer.setSelection(_timeSlice_Viewer.getSelection());
       }
    }
 
