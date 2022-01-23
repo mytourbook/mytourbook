@@ -6077,6 +6077,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                }
             }
 
+
             // adjust wrong values
             if (srtmValue < lowerLimit) {
                srtmValue = 0;
