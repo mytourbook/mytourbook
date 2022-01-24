@@ -6126,6 +6126,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
                srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+
                if (srtm1Value != Float.MIN_VALUE && srtm1Value > lowerLimit && srtm1Value < upperLimit) { //check if valid srtm1Value. sometimes illegal value is also -32767.0
                   srtmValue = srtm1Value;
                   isSRTMValid = true;
@@ -6137,7 +6138,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                   if (srtm3Value == Float.MIN_VALUE) { // when srtm3 is also not availible, used the last good one
                      srtmValue = lastValidSRTM;
                      usedSrtmLastValues++;
-                     //System.out.println("******************* TourData using LAST srtm3: " + srtmValue);
                   } else { //if srtm3 is good, use it
                      srtmValue = srtm3Value;
                      isSRTMValid = true;
