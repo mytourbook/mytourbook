@@ -37,6 +37,6 @@ class ActionDeleteTimeSlices_KeepTime extends Action {
 
    @Override
    public void run() {
-      fTourPropertiesView.actionDeleteTimeSlices(false, false);
+      fTourPropertiesView.actionDelete_TimeSlices(false, false);
    }
 }
