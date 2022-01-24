@@ -125,28 +125,28 @@ import org.hibernate.annotations.Cascade;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
-   private static final char           NL                                = UI.NEW_LINE;
-   private static final String         INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
+   private static final char             NL                                = UI.NEW_LINE;
+   private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
 
-   public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
-   public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
-   public static final int             DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
-   public static final int             DB_LENGTH_DEVICE_MODE_NAME        = 255;
-   public static final int             DB_LENGTH_DEVICE_FIRMWARE_VERSION = 255;
+   public static final int               DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
+   public static final int               DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
+   public static final int               DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
+   public static final int               DB_LENGTH_DEVICE_MODE_NAME        = 255;
+   public static final int               DB_LENGTH_DEVICE_FIRMWARE_VERSION = 255;
 
-   public static final int             DB_LENGTH_TOUR_TITLE              = 255;
-   public static final int             DB_LENGTH_TOUR_DESCRIPTION        = 4096;
-   public static final int             DB_LENGTH_TOUR_DESCRIPTION_V10    = 32000;
-   public static final int             DB_LENGTH_TOUR_START_PLACE        = 255;
-   public static final int             DB_LENGTH_TOUR_END_PLACE          = 255;
-   public static final int             DB_LENGTH_TOUR_IMPORT_FILE_PATH   = 255;
-   public static final int             DB_LENGTH_TOUR_IMPORT_FILE_NAME   = 255;
-   public static final int             DB_LENGTH_TIME_ZONE_ID            = 255;
+   public static final int               DB_LENGTH_TOUR_TITLE              = 255;
+   public static final int               DB_LENGTH_TOUR_DESCRIPTION        = 4096;
+   public static final int               DB_LENGTH_TOUR_DESCRIPTION_V10    = 32000;
+   public static final int               DB_LENGTH_TOUR_START_PLACE        = 255;
+   public static final int               DB_LENGTH_TOUR_END_PLACE          = 255;
+   public static final int               DB_LENGTH_TOUR_IMPORT_FILE_PATH   = 255;
+   public static final int               DB_LENGTH_TOUR_IMPORT_FILE_NAME   = 255;
+   public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
-   public static final int             DB_LENGTH_WEATHER                 = 1000;
-   public static final int             DB_LENGTH_WEATHER_CLOUDS          = 255;
+   public static final int               DB_LENGTH_WEATHER                 = 1000;
+   public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
-   public static final int             DB_LENGTH_POWER_DATA_SOURCE       = 255;
+   public static final int               DB_LENGTH_POWER_DATA_SOURCE       = 255;
 
    /**
     * <pre>
@@ -175,54 +175,53 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Deg * 100000    1.6 m
     * </pre>
     */
-   public static final double          MAX_GEO_DIFF                      = 0.0001;
+   public static final double            MAX_GEO_DIFF                      = 0.0001;
 
-   public static final double          NORMALIZED_LATITUDE_OFFSET        = 90.0;
-   public static final int             NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
-   public static final double          NORMALIZED_LONGITUDE_OFFSET       = 180.0;
-   public static final int             NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
+   public static final double            NORMALIZED_LATITUDE_OFFSET        = 90.0;
+   public static final int               NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
+   public static final double            NORMALIZED_LONGITUDE_OFFSET       = 180.0;
+   public static final int               NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
 
-   private static final String         TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
+   private static final String           TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
 
-   public static final int             MIN_TIMEINTERVAL_FOR_MAX_SPEED    = 20;
+   public static final int               MIN_TIMEINTERVAL_FOR_MAX_SPEED    = 20;
 
-   public static final float           MAX_BIKE_SPEED                    = 120f;
+   public static final float             MAX_BIKE_SPEED                    = 120f;
 
    /**
     * Number of defined hr zone fields which is currently {@link #hrZone0} ... {@link #hrZone9} = 10
     */
-   public static final int             MAX_HR_ZONES                      = 10;
+   public static final int               MAX_HR_ZONES                      = 10;
 
-   public static final Float           RUN_DYN_DATA_MULTIPLIER           = 100f;
+   public static final Float             RUN_DYN_DATA_MULTIPLIER           = 100f;
 
-   public static final short           SURFING_VALUE_IS_NOT_SET          = -1;
+   public static final short             SURFING_VALUE_IS_NOT_SET          = -1;
 
    /**
     * Device Id for manually created tours
     */
-   public static final String          DEVICE_ID_FOR_MANUAL_TOUR         = "manual";                                //$NON-NLS-1$
+   public static final String            DEVICE_ID_FOR_MANUAL_TOUR         = "manual";                                //$NON-NLS-1$
 
    /**
     * Device id for csv files which behave like manually created tours, marker and timeslices are
     * disabled because they are not available, tour duration can be edited<br>
     * this is the id of the deviceDataReader
     */
-   public static final String          DEVICE_ID_CSV_TOUR_DATA_READER    = "net.tourbook.device.CSVTourDataReader"; //$NON-NLS-1$
+   public static final String            DEVICE_ID_CSV_TOUR_DATA_READER    = "net.tourbook.device.CSVTourDataReader"; //$NON-NLS-1$
 
    /**
     * THIS IS NOT UNUSED !!!<br>
     * <br>
     * it initializes SRTM
     */
-   @Transient
-   private static final NumberForm     srtmNumberForm                    = new NumberForm();
+   @SuppressWarnings("unused")
+   private static final NumberForm       srtmNumberForm                    = new NumberForm();
 
    @Transient
    private static final ElevationSRTM3 _elevationSRTM3                   = new ElevationSRTM3();
    private static final ElevationSRTM1 _elevationSRTM1                   = new ElevationSRTM1();
 
-   @Transient
-   private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
 
 // SET_FORMATTING_OFF
 
@@ -1060,6 +1059,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean[]             breakTimeSerie;
 
    /**
+    * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
+    * <code>true</code> is set when a time slice is a pause.
+    */
+   @Transient
+   private boolean[]             pausedTimeSerie;
+
+   /**
     * Contains the temperature in the metric measurement system.
     */
    @Transient
@@ -1762,21 +1768,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * An array containing the start time of each pause (in milliseconds)
-    * A timer pause is a device event triggered by the user.
+    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
     */
    @Transient
    private long[]       pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
-    * A timer pause is a device event triggered by the user.
+    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
     */
    @Transient
    private long[]       pausedTime_End;
 
    /**
     * An auto-pause happened when a value is 1, otherwise it was triggered by the user.
-    * This field could also be <code>null</code> when pause data are not available.
+    * This field can be <code>null</code> when pause data are not available.
     */
    @Transient
    private long[]       pausedTime_Data;
@@ -2139,6 +2145,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       distanceSerieDouble_NauticalMile = null;
 
       breakTimeSerie = null;
+      pausedTimeSerie = null;
 
       _pulseSerie_Smoothed = null;
       pulseSerie_FromTime = null;
@@ -5680,6 +5687,69 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       setTourEndTimeMS();
    }
 
+   private void createPausedTimeSerie() {
+
+      if (timeSerie == null
+            || timeSerie.length == 0
+            || pausedTime_Start == null
+            || pausedTime_Start.length == 0) {
+
+         return;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+      final int numPauses = pausedTime_Start.length;
+
+      pausedTimeSerie = new boolean[numTimeSlices];
+
+      int pauseIndex = 0;
+      long pausedStartTime = pausedTime_Start[pauseIndex];
+      long pausedEndTime = pausedTime_End[pauseIndex];
+
+      // loop: all time slices
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int relativeTime = timeSerie[serieIndex];
+         final long absoluteTime = tourStartTime + relativeTime * 1000;
+
+         boolean isInValidPauses = true;
+
+         if (absoluteTime < pausedStartTime) {
+
+            // time is before the next pause -> nothing to do
+
+         } else if (absoluteTime < pausedEndTime && isInValidPauses) {
+
+            // time is within a pause -> mark this pause
+
+            // set pause time marker into the next slice otherwise it looks not good in the tour editor
+            final int pauseTimeIndex = serieIndex + 1;
+            if (pauseTimeIndex < numTimeSlices) {
+               pausedTimeSerie[pauseTimeIndex] = true;
+            }
+
+         } else if (absoluteTime >= pausedEndTime) {
+
+            // advance to the next pause
+
+            pauseIndex++;
+
+            if (pauseIndex >= numPauses) {
+
+               // there are no other pauses
+
+               isInValidPauses = false;
+
+            } else {
+
+               // get next pause times
+               pausedStartTime = pausedTime_Start[pauseIndex];
+               pausedEndTime = pausedTime_End[pauseIndex];
+            }
+         }
+      }
+   }
+
    /**
     * Create the tour segment list from the segment index array
     *
@@ -8253,6 +8323,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public long[] getPausedTime_Start() {
       return pausedTime_Start;
+   }
+
+   public boolean[] getPausedTimeSerie() {
+
+      if (pausedTimeSerie == null) {
+         createPausedTimeSerie();
+      }
+
+      return pausedTimeSerie;
    }
 
    /**

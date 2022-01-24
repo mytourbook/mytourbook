@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -112,6 +112,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
    private boolean                 _isInSaving;
    private boolean                 _isInSelectionChanged;
    private boolean                 _isInSliderPositionFired;
+   private boolean                 _isInTourModified;
 
    private FormToolkit             _tk;
 
@@ -300,39 +301,48 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                   return;
                }
 
-               // get modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+               try {
+                  
+                  _isInTourModified = true;
 
-                  final long chartTourId = _tourData.getTourId();
+                  // get modified tours
+                  final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+                  if (modifiedTours != null) {
 
-                  // update chart with the modified tour
-                  for (final TourData tourData : modifiedTours) {
+                     final long chartTourId = _tourData.getTourId();
 
-                     if (tourData == null) {
+                     // update chart with the modified tour
+                     for (final TourData tourData : modifiedTours) {
 
-                        /*
-                         * tour is not set, this can be the case when a manual tour is discarded
-                         */
+                        if (tourData == null) {
 
-                        clearView();
+                           /*
+                            * tour is not set, this can be the case when a manual tour is discarded
+                            */
 
-                        return;
+                           clearView();
+
+                           return;
+                        }
+
+                        if (tourData.getTourId() == chartTourId) {
+
+                           updateChart(tourData);
+
+                           // removed old tour data from the selection provider
+                           _postSelectionProvider.clearSelection();
+
+                           return;
+                        }
                      }
 
-                     if (tourData.getTourId() == chartTourId) {
-
-                        updateChart(tourData);
-
-                        // removed old tour data from the selection provider
-                        _postSelectionProvider.clearSelection();
-
-                        return;
-                     }
+                     // ensure that wrong data are not displayed
+                     clearView();
                   }
 
-                  // ensure that wrong data are not displayed
-                  clearView();
+               } finally {
+                  
+                  _isInTourModified = false;
                }
 
             } else if (eventId == TourEventId.TOUR_CHANGED) {
@@ -456,6 +466,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       _tourChart.addSliderMoveListener(new ISliderMoveListener() {
          @Override
          public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+
+            // don't refire when in an event
+            if (_isInSelectionChanged || _isInTourModified) {
+               return;
+            }
+
             fireSliderPosition();
          }
       });

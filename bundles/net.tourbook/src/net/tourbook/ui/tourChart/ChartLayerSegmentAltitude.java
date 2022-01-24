@@ -116,6 +116,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
          return;
       }
 
+      final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
+      if (segmentSerieIndex == null) {
+         // this happened after deleting a time slice in the tour editor
+         return;
+      }
+
       _tourChart.setLineSelectionDirty();
 
       final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
@@ -133,7 +139,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
       final double maxValue = yData.getOriginalMaxValue();
       final double hideThreshold = maxValue * _smallValue * minValueAdjustment;
 
-      final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
       final int numSegments = segmentSerieIndex.length;
 
       final Long[] multipleTourIds = _tourData.multipleTourIds;
