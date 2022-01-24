@@ -124,28 +124,28 @@ import org.hibernate.annotations.Cascade;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
-   private static final char           NL                                = UI.NEW_LINE;
-   private static final String         INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
+   private static final char             NL                                = UI.NEW_LINE;
+   private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
 
-   public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
-   public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
-   public static final int             DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
-   public static final int             DB_LENGTH_DEVICE_MODE_NAME        = 255;
-   public static final int             DB_LENGTH_DEVICE_FIRMWARE_VERSION = 255;
+   public static final int               DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
+   public static final int               DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
+   public static final int               DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
+   public static final int               DB_LENGTH_DEVICE_MODE_NAME        = 255;
+   public static final int               DB_LENGTH_DEVICE_FIRMWARE_VERSION = 255;
 
-   public static final int             DB_LENGTH_TOUR_TITLE              = 255;
-   public static final int             DB_LENGTH_TOUR_DESCRIPTION        = 4096;
-   public static final int             DB_LENGTH_TOUR_DESCRIPTION_V10    = 32000;
-   public static final int             DB_LENGTH_TOUR_START_PLACE        = 255;
-   public static final int             DB_LENGTH_TOUR_END_PLACE          = 255;
-   public static final int             DB_LENGTH_TOUR_IMPORT_FILE_PATH   = 255;
-   public static final int             DB_LENGTH_TOUR_IMPORT_FILE_NAME   = 255;
-   public static final int             DB_LENGTH_TIME_ZONE_ID            = 255;
+   public static final int               DB_LENGTH_TOUR_TITLE              = 255;
+   public static final int               DB_LENGTH_TOUR_DESCRIPTION        = 4096;
+   public static final int               DB_LENGTH_TOUR_DESCRIPTION_V10    = 32000;
+   public static final int               DB_LENGTH_TOUR_START_PLACE        = 255;
+   public static final int               DB_LENGTH_TOUR_END_PLACE          = 255;
+   public static final int               DB_LENGTH_TOUR_IMPORT_FILE_PATH   = 255;
+   public static final int               DB_LENGTH_TOUR_IMPORT_FILE_NAME   = 255;
+   public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
-   public static final int             DB_LENGTH_WEATHER                 = 1000;
-   public static final int             DB_LENGTH_WEATHER_CLOUDS          = 255;
+   public static final int               DB_LENGTH_WEATHER                 = 1000;
+   public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
-   public static final int             DB_LENGTH_POWER_DATA_SOURCE       = 255;
+   public static final int               DB_LENGTH_POWER_DATA_SOURCE       = 255;
 
    /**
     * <pre>
@@ -174,53 +174,51 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Deg * 100000    1.6 m
     * </pre>
     */
-   public static final double          MAX_GEO_DIFF                      = 0.0001;
+   public static final double            MAX_GEO_DIFF                      = 0.0001;
 
-   public static final double          NORMALIZED_LATITUDE_OFFSET        = 90.0;
-   public static final int             NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
-   public static final double          NORMALIZED_LONGITUDE_OFFSET       = 180.0;
-   public static final int             NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
+   public static final double            NORMALIZED_LATITUDE_OFFSET        = 90.0;
+   public static final int               NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
+   public static final double            NORMALIZED_LONGITUDE_OFFSET       = 180.0;
+   public static final int               NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
 
-   private static final String         TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
+   private static final String           TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
 
-   public static final int             MIN_TIMEINTERVAL_FOR_MAX_SPEED    = 20;
+   public static final int               MIN_TIMEINTERVAL_FOR_MAX_SPEED    = 20;
 
-   public static final float           MAX_BIKE_SPEED                    = 120f;
+   public static final float             MAX_BIKE_SPEED                    = 120f;
 
    /**
     * Number of defined hr zone fields which is currently {@link #hrZone0} ... {@link #hrZone9} = 10
     */
-   public static final int             MAX_HR_ZONES                      = 10;
+   public static final int               MAX_HR_ZONES                      = 10;
 
-   public static final Float           RUN_DYN_DATA_MULTIPLIER           = 100f;
+   public static final Float             RUN_DYN_DATA_MULTIPLIER           = 100f;
 
-   public static final short           SURFING_VALUE_IS_NOT_SET          = -1;
+   public static final short             SURFING_VALUE_IS_NOT_SET          = -1;
 
    /**
     * Device Id for manually created tours
     */
-   public static final String          DEVICE_ID_FOR_MANUAL_TOUR         = "manual";                                //$NON-NLS-1$
+   public static final String            DEVICE_ID_FOR_MANUAL_TOUR         = "manual";                                //$NON-NLS-1$
 
    /**
     * Device id for csv files which behave like manually created tours, marker and timeslices are
     * disabled because they are not available, tour duration can be edited<br>
     * this is the id of the deviceDataReader
     */
-   public static final String          DEVICE_ID_CSV_TOUR_DATA_READER    = "net.tourbook.device.CSVTourDataReader"; //$NON-NLS-1$
+   public static final String            DEVICE_ID_CSV_TOUR_DATA_READER    = "net.tourbook.device.CSVTourDataReader"; //$NON-NLS-1$
 
    /**
     * THIS IS NOT UNUSED !!!<br>
     * <br>
     * it initializes SRTM
     */
-   @Transient
-   private static final NumberForm     srtmNumberForm                    = new NumberForm();
+   @SuppressWarnings("unused")
+   private static final NumberForm       srtmNumberForm                    = new NumberForm();
 
-   @Transient
-   private static final ElevationSRTM3 _elevationSRTM3                   = new ElevationSRTM3();
+   private static final ElevationSRTM3   _elevationSRTM3                   = new ElevationSRTM3();
 
-   @Transient
-   private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
 
 // SET_FORMATTING_OFF
 
