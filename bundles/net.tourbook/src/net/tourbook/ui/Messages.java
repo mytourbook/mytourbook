@@ -151,6 +151,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_tag_tooltip;
    public static String        ColumnFactory_temperature_label;
    public static String        ColumnFactory_temperature_tooltip;
+   public static String        ColumnFactory_Time_PausedTime_Header;
+   public static String        ColumnFactory_Time_PausedTime_Label;
+   public static String        ColumnFactory_Time_PausedTime_Tooltip;
    public static String        ColumnFactory_time;
    public static String        ColumnFactory_time_interval;
    public static String        ColumnFactory_time_interval_label;

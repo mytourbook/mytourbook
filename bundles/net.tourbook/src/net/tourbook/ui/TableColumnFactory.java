@@ -270,6 +270,7 @@ public abstract class TableColumnFactory {
    public static final String             TIME__COMPUTED_BREAK_TIME_RELATIVE_ID              = "TIME__COMPUTED_BREAK_TIME_RELATIVE";              //$NON-NLS-1$
 
    public static final TableColumnFactory TIME_IS_BREAK_TIME;
+   public static final TableColumnFactory TIME_IS_PAUSED_TIME;
    public static final TableColumnFactory TIME_DATE;
    public static final String             TIME_DATE_ID                                       = "TIME_DATE";                                       //$NON-NLS-1$
    public static final TableColumnFactory TIME_TIME_ZONE;
@@ -3310,13 +3311,33 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_BREAK_TIME", SWT.CENTER); //$NON-NLS-1$
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_BreakTime_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_BreakTime_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_BreakTime_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(3));
+
+            return colDef;
+         }
+      };
+
+      TIME_IS_PAUSED_TIME = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_PAUSED_TIME", SWT.CENTER); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Time_PausedTime_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Time_PausedTime_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Time_PausedTime_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(3));
 

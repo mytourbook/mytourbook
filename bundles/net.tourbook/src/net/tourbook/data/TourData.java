@@ -1056,6 +1056,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean[]             breakTimeSerie;
 
    /**
+    * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
+    * <code>true</code> is set when a time slice is a pause.
+    */
+   @Transient
+   private boolean[]             pausedTimeSerie;
+
+   /**
     * Contains the temperature in the metric measurement system.
     */
    @Transient
@@ -1758,21 +1765,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * An array containing the start time of each pause (in milliseconds)
-    * A timer pause is a device event triggered by the user.
+    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
     */
    @Transient
    private long[]       pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
-    * A timer pause is a device event triggered by the user.
+    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
     */
    @Transient
    private long[]       pausedTime_End;
 
    /**
     * An auto-pause happened when a value is 1, otherwise it was triggered by the user.
-    * This field could also be <code>null</code> when pause data are not available.
+    * This field can be <code>null</code> when pause data are not available.
     */
    @Transient
    private long[]       pausedTime_Data;
@@ -2135,6 +2142,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       distanceSerieDouble_NauticalMile = null;
 
       breakTimeSerie = null;
+      pausedTimeSerie = null;
 
       _pulseSerie_Smoothed = null;
       pulseSerie_FromTime = null;
@@ -5676,6 +5684,69 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       setTourEndTimeMS();
    }
 
+   private void createPausedTimeSerie() {
+
+      if (timeSerie == null
+            || timeSerie.length == 0
+            || pausedTime_Start == null
+            || pausedTime_Start.length == 0) {
+
+         return;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+      final int numPauses = pausedTime_Start.length;
+
+      pausedTimeSerie = new boolean[numTimeSlices];
+
+      int pauseIndex = 0;
+      long pausedStartTime = pausedTime_Start[pauseIndex];
+      long pausedEndTime = pausedTime_End[pauseIndex];
+
+      // loop: all time slices
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int relativeTime = timeSerie[serieIndex];
+         final long absoluteTime = tourStartTime + relativeTime * 1000;
+
+         boolean isInValidPauses = true;
+
+         if (absoluteTime < pausedStartTime) {
+
+            // time is before the next pause -> nothing to do
+
+         } else if (absoluteTime < pausedEndTime && isInValidPauses) {
+
+            // time is within a pause -> mark this pause
+
+            // set pause time marker into the next slice otherwise it looks not good in the tour editor
+            final int pauseTimeIndex = serieIndex + 1;
+            if (pauseTimeIndex < numTimeSlices) {
+               pausedTimeSerie[pauseTimeIndex] = true;
+            }
+
+         } else if (absoluteTime >= pausedEndTime) {
+
+            // advance to the next pause
+
+            pauseIndex++;
+
+            if (pauseIndex >= numPauses) {
+
+               // there are no other pauses
+
+               isInValidPauses = false;
+
+            } else {
+
+               // get next pause times
+               pausedStartTime = pausedTime_Start[pauseIndex];
+               pausedEndTime = pausedTime_End[pauseIndex];
+            }
+         }
+      }
+   }
+
    /**
     * Create the tour segment list from the segment index array
     *
@@ -8233,6 +8304,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public long[] getPausedTime_Start() {
       return pausedTime_Start;
+   }
+
+   public boolean[] getPausedTimeSerie() {
+
+      if (pausedTimeSerie == null) {
+         createPausedTimeSerie();
+      }
+
+      return pausedTimeSerie;
    }
 
    /**

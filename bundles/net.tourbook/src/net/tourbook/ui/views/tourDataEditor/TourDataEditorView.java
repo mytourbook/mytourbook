@@ -293,6 +293,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private double[]                _serieLongitude;
    private float[][]               _serieGears;
    private boolean[]               _serieBreakTime;
+   private boolean[]               _seriePausedTime;
    //
    private short[]                 _swimSerie_StrokeRate;
 // private short[]                 _swimSerie_LengthType;
@@ -4837,6 +4838,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_TimeSlice_Time_TimeInSeconds();
       defineColumn_TimeSlice_Time_TimeDiff();
       defineColumn_TimeSlice_Time_BreakTime();
+      defineColumn_TimeSlice_Time_PausedTime();
 
       defineColumn_TimeSlice_Motion_Distance();
       defineColumn_TimeSlice_Motion_Speed();
@@ -5643,10 +5645,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          public void update(final ViewerCell cell) {
             if (_serieBreakTime != null) {
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               cell.setText(
-                     _serieBreakTime[timeSlice.serieIndex]
-                           ? UI.SYMBOL_BOX
-                           : UI.EMPTY_STRING);
+               cell.setText(_serieBreakTime[timeSlice.serieIndex]
+                     ? UI.SYMBOL_BOX
+                     : UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Paused time
+    */
+   private void defineColumn_TimeSlice_Time_PausedTime() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_IS_PAUSED_TIME.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePausedTime != null) {
+
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               cell.setText(_seriePausedTime[timeSlice.serieIndex]
+                     ? UI.SYMBOL_BOX
+                     : UI.EMPTY_STRING);
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -6657,6 +6682,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieLongitude = _tourData.longitudeSerie;
 
       _serieBreakTime = _tourData.getBreakTimeSerie();
+      _seriePausedTime = _tourData.getPausedTimeSerie();
 
       _serieGradient = _tourData.getGradientSerie();
       _serieSpeed = _tourData.getSpeedSerie();
