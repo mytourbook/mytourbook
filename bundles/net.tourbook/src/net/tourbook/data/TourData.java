@@ -6116,7 +6116,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          int usedSrtm1Values = 0;
          int usedSrtm3Values = 0;
-         int usedSrtmLastValues = 0;
+         int usedCorrectedSrtmValues = 0;
 
          for (final double latitude : latitudeSerie) {
 
@@ -6137,7 +6137,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                   srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
                   if (srtm3Value == Float.MIN_VALUE) { // when srtm3 is also not availible, used the last good one
                      srtmValue = lastValidSRTM;
-                     usedSrtmLastValues++;
+                     usedCorrectedSrtmValues++;
                   } else { //if srtm3 is good, use it
                      srtmValue = srtm3Value;
                      isSRTMValid = true;
@@ -6150,8 +6150,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             // adjust wrong values
             if (srtmValue < lowerLimit) {
                srtmValue = 0;
-            } else {
-               srtmValue = Math.min(srtmValue, upperLimit);
+               usedCorrectedSrtmValues++;
+            } else if (srtmValue > upperLimit) {
+               srtmValue = upperLimit;
+               usedCorrectedSrtmValues++;
             }
 
             newSRTMSerie[serieIndex] = srtmValue;
@@ -6162,7 +6164,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          System.out.println(this.getClass().getCanonicalName() + " - used srtm1 Values: " + usedSrtm1Values
                + ", used srtm3 Values: " + usedSrtm3Values
-               + ", replaced \"wrong\" Values: " + usedSrtmLastValues);
+               + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues);
 
          if (isSRTMValid) {
             srtmSerie = newSRTMSerie;
