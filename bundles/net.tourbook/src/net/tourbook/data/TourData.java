@@ -5739,7 +5739,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             } else {
 
-               // get next pause times
+               // get next paused time
+
                pausedStartTime = pausedTime_Start[pauseIndex];
                pausedEndTime = pausedTime_End[pauseIndex];
             }

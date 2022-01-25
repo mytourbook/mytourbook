@@ -2111,12 +2111,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                                         final String timeZoneId,
                                                         final double[] xAxisSerie,
                                                         final int xAxisSerieIndex,
+                                                        final int pauseIndex,
                                                         final LabelAlignment labelAlignment) {
 
       final ChartLabelPause chartLabelPause = new ChartLabelPause();
 
       chartLabelPause.graphX = xAxisSerie[xAxisSerieIndex];
       chartLabelPause.serieIndex = xAxisSerieIndex;
+      chartLabelPause.setPauseIndex(pauseIndex);
       chartLabelPause.setPausedTime_Start(pausedTime_Start);
       chartLabelPause.setPausedTime_End(pausedTime_End);
       chartLabelPause.setIsAutoPause(isAutoPause);
@@ -2270,6 +2272,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                            tourTimeZoneId,
                            xAxisSerie,
                            tourSerieIndex,
+                           currentTourPauseIndex,
                            labelAlignment);
 
                      chartPauseConfig.chartLabelPauses.add(chartLabelPause);
@@ -2357,6 +2360,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                      _tourData.getTimeZoneId(),
                      xAxisSerie,
                      serieIndex,
+                     pausesIndex,
                      labelAlignment);
 
                chartPauseConfig.chartLabelPauses.add(chartLabelPause);
@@ -3206,7 +3210,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void fireTourPauseSelection(final ChartLabelPause tourPause) {
 
       // update selection locally (e.g. in a dialog)
-      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.serieIndex);
+      final SelectionTourPause tourPauseSelection = new SelectionTourPause(
+            _tourData,
+            tourPause.serieIndex,
+            tourPause.getPauseIndex());
 
       Arrays.asList(_tourPauseSelectionListener.getListeners()).forEach(listener -> ((ITourPauseSelectionListener) listener).selectionChanged(
             tourPauseSelection));
