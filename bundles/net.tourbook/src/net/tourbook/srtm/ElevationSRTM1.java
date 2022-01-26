@@ -34,7 +34,6 @@ public class ElevationSRTM1 extends ElevationBase {
 
          final String srtm1DataPath = getElevationData_FilePath("srtm1"); //$NON-NLS-1$
          final String srtm1Suffix = ".hgt"; //$NON-NLS-1$
-
          final String fileName = new String(srtm1DataPath
                + File.separator
                + lat.direction
