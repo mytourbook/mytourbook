@@ -36,7 +36,7 @@ public class ElevationLayer {
       _allElevations[1] = _elevationGlobe;
       _allElevations[2] = _elevationSrtm3;
 //      _allElevations[3] = _elevationSrtm1;
-
+//      System.out.println("******************* ElevationLayer *********************");
       zoom = 0;
    }
 
