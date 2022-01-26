@@ -60,8 +60,11 @@ Improvements
     - Saved time
   - Show photo location in view                         
                                           https://github.com/mytourbook/mytourbook/issues/449
-* SRTM
-  - Additionally to the already usable SRTM3 Altitudes, SRTM1 is now also usable. The Data Files must be manually copied to the new SRTM1 folder. SRTM1 size is 25.9 MB per file. SRTM3 file size is 2.9 MB per file
+
+* SRTM (Thomas)
+  - Additionally to the already usable SRTM3 Altitudes, SRTM1 is now also usable. 
+    The Data Files must be manually copied to the new SRTM1 folder. 
+    SRTM1 size is 25.9 MB per file. SRTM3 file size is 2.9 MB per file
                                           https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
                                           https://sourceforge.net/p/mytourbook/feature-requests/122/
 

@@ -217,9 +217,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @SuppressWarnings("unused")
    private static final NumberForm       srtmNumberForm                    = new NumberForm();
 
-   @Transient
-   private static final ElevationSRTM3 _elevationSRTM3                   = new ElevationSRTM3();
-   private static final ElevationSRTM1 _elevationSRTM1                   = new ElevationSRTM1();
+   private static final ElevationSRTM3   _elevationSRTM3                   = new ElevationSRTM3();
+   private static final ElevationSRTM1   _elevationSRTM1                   = new ElevationSRTM1();
 
    private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
 
