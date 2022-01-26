@@ -8319,10 +8319,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pausedTime_Data;
    }
 
+   /**
+    * @return An array containing the end time of each pause (in milliseconds)A timer pause is a
+    *         device event, triggered by the user or automatically triggerd by the device.
+    */
    public long[] getPausedTime_End() {
       return pausedTime_End;
    }
 
+   /**
+    * @return An array containing the start time of each pause (in milliseconds)A timer pause is a
+    *         device event, triggered by the user or automatically triggerd by the device.
+    */
    public long[] getPausedTime_Start() {
       return pausedTime_Start;
    }

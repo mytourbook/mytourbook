@@ -2234,6 +2234,9 @@ public class TourManager {
                                        final boolean isRemoveTime,
                                        final boolean isAdjustTourStartTime) {
 
+      // this must be done with the original timeSerie
+      removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
+
       if (isRemoveTime || (isRemoveTime && isAdjustTourStartTime)) {
 
          // this must be done before the time series are modified
@@ -2276,9 +2279,6 @@ public class TourManager {
       if (floatSerie != null) {
          tourData.temperatureSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
       }
-
-      // this must be done with the original timeSerie
-      removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
 
       intSerie = tourData.timeSerie;
       if (intSerie != null) {
@@ -2643,225 +2643,69 @@ public class TourManager {
       // TODO Auto-generated method stub
 
       final int[] timeSerie = tourData.timeSerie;
-      final long[] pausedTime_Start = tourData.getPausedTime_Start();
+      final long[] allPausedTime_Start = tourData.getPausedTime_Start();
 
       if (timeSerie == null
             || timeSerie.length == 0
-            || pausedTime_Start == null
-            || pausedTime_Start.length == 0) {
+            || allPausedTime_Start == null
+            || allPausedTime_Start.length == 0) {
 
          // there are no time slices or tour pauses -> nothing to do
 
          return;
       }
 
-      final int numPauses = pausedTime_Start.length;
-
+      final int numPauses = allPausedTime_Start.length;
       final int numTimeSlices = timeSerie.length;
 
-      final long[] pausedTime_End = tourData.getPausedTime_End();
+      final long[] allPausedTime_End = tourData.getPausedTime_End();
       final long tourStartTime = tourData.getTourStartTimeMS();
 
-      final TLongArrayList pausedTimeAdjusted_Start = new TLongArrayList();
-      final TLongArrayList pausedTimeAdjusted_End = new TLongArrayList();
+      final int lastRemovedIndexForDiff = Math.min(lastRemovedIndex + 1, numTimeSlices - 1);
 
-      int pauseIndex = 0;
-      int validPauseIndex = 0;
-      int serieIndex = 0;
+      final long sliceTime_RemoveStart = timeSerie[firstRemovedIndex];
+      final long sliceTime_RemoveEnd = timeSerie[lastRemovedIndex];
+      final long sliceTime_RemoveEndDiff = timeSerie[lastRemovedIndexForDiff];
 
-      long pausedStartTime = pausedTime_Start[pauseIndex];
-      long pausedEndTime = pausedTime_End[pauseIndex];
+      final long removedTimeDiff = sliceTime_RemoveEndDiff - sliceTime_RemoveStart;
 
-      int sliceRelativeTimeSec = timeSerie[0];
-      long sliceTime = tourStartTime + sliceRelativeTimeSec * 1000;
+      final TLongArrayList allPausedTimeAdjusted_Start = new TLongArrayList();
+      final TLongArrayList allPausedTimeAdjusted_End = new TLongArrayList();
 
-      if (pausedStartTime < sliceTime) {
+      // loop: all pauses
+      for (int pauseIndex = 0; pauseIndex < numPauses; pauseIndex++) {
 
-         // the first pause can start before the tour start -> keep this pause
+         final long pauseTime_StartMS = allPausedTime_Start[pauseIndex];
+         final long pauseTime_EndMS = allPausedTime_End[pauseIndex];
 
-         pausedTimeAdjusted_Start.add(pausedStartTime);
-         pausedTimeAdjusted_End.add(pausedEndTime);
-      }
+         long pauseTime_Start = (pauseTime_StartMS - tourStartTime) / 1000;
+         long pauseTime_End = (pauseTime_EndMS - tourStartTime) / 1000;
 
-      /*
-       * Keep pauses which are before the removed slices
-       */
-      for (; serieIndex < numTimeSlices; serieIndex++) {
+         if (pauseTime_Start < sliceTime_RemoveStart) {
 
-         if (serieIndex >= firstRemovedIndex) {
+            // pauses are before the removed slices -> they will be unmodified
 
-            // time is at or after the removed slices
+            allPausedTimeAdjusted_Start.add(pauseTime_StartMS);
+            allPausedTimeAdjusted_End.add(pauseTime_EndMS);
 
-            break;
-         }
+         } else if (pauseTime_Start > sliceTime_RemoveEnd) {
 
-         // time is before removed slices
+            // pauses are after the removed slices -> adjust time when requested
 
-         sliceRelativeTimeSec = timeSerie[serieIndex];
-         sliceTime = tourStartTime + sliceRelativeTimeSec * 1000;
+            if (isRemoveTime) {
 
-         final String sliceTime__Text = TimeTools.toLocalDateTime(sliceTime).format(TimeTools.Formatter_Time_M);
-         final String pauseStart_Text = TimeTools.toLocalDateTime(pausedStartTime).format(TimeTools.Formatter_Time_M);
-         final String pauseEnd__Text = TimeTools.toLocalDateTime(pausedEndTime).format(TimeTools.Formatter_Time_M);
-
-         if (sliceTime < pausedStartTime) {
-
-            // time is before the next pause -> nothing to do
-
-         } else if (sliceTime < pausedEndTime && validPauseIndex == pauseIndex) {
-
-            // time is within a pause -> keep this pause
-
-            pausedTimeAdjusted_Start.add(pausedStartTime);
-            pausedTimeAdjusted_End.add(pausedEndTime);
-
-            // ensure that current pause is added only once
-            validPauseIndex = -1;
-
-         } else if (sliceTime >= pausedEndTime) {
-
-            // advance to the next pause
-
-            pauseIndex++;
-
-            if (pauseIndex < numPauses) {
-
-               // get next paused time
-
-               validPauseIndex = pauseIndex;
-
-               pausedStartTime = pausedTime_Start[pauseIndex];
-               pausedEndTime = pausedTime_End[pauseIndex];
-
-               // one time slice can contain multiple pauses !!!
-               while (sliceTime < pausedEndTime && pauseIndex < numPauses) {
-
-                  pausedTimeAdjusted_Start.add(pausedStartTime);
-                  pausedTimeAdjusted_End.add(pausedEndTime);
-
-                  // ensure that current pause is added only once
-                  validPauseIndex = -1;
-
-                  pauseIndex++;
-
-                  if (pauseIndex < numPauses) {
-
-                     // get next paused time
-
-                     validPauseIndex = pauseIndex;
-
-                     pausedStartTime = pausedTime_Start[pauseIndex];
-                     pausedEndTime = pausedTime_End[pauseIndex];
-                  }
-               }
-            }
-         }
-      }
-
-      /*
-       * Skip pauses which are within the removed time slices
-       */
-      if (pauseIndex < numPauses) {
-
-         for (; serieIndex < numTimeSlices; serieIndex++) {
-
-            if (serieIndex >= lastRemovedIndex) {
-
-               // time is after the last removed slices
-
-               break;
+               pauseTime_Start -= removedTimeDiff;
+               pauseTime_End -= removedTimeDiff;
             }
 
-            // time is within removed time slices
-
-            sliceRelativeTimeSec = timeSerie[serieIndex];
-            sliceTime = tourStartTime + sliceRelativeTimeSec * 1000;
-
-            if (sliceTime < pausedStartTime) {
-
-               // time is before the next pause -> nothing to do
-
-            } else if (sliceTime < pausedEndTime && validPauseIndex == pauseIndex) {
-
-               // time is within a pause -> ignore this pause
-
-            } else if (sliceTime >= pausedEndTime) {
-
-               // advance to the next pause
-
-               pauseIndex++;
-
-               if (pauseIndex < numPauses) {
-
-                  // get next paused time
-
-                  validPauseIndex = pauseIndex;
-
-                  pausedStartTime = pausedTime_Start[pauseIndex];
-                  pausedEndTime = pausedTime_End[pauseIndex];
-               }
-            }
-         }
-      }
-
-      /*
-       * Keep pauses which are after the removed slices
-       */
-      if (pauseIndex < numPauses) {
-
-         final int lastRemovedIndexForDiff = Math.min(lastRemovedIndex + 1, numTimeSlices - 1);
-         final int removedTimeDiff = timeSerie[lastRemovedIndexForDiff] - timeSerie[firstRemovedIndex];
-         final long removedTimeDiffMS = removedTimeDiff * 1000;
-
-         for (; serieIndex < numTimeSlices; serieIndex++) {
-
-            sliceRelativeTimeSec = timeSerie[serieIndex];
-            sliceTime = tourStartTime + sliceRelativeTimeSec * 1000;
-
-            if (sliceTime < pausedStartTime) {
-
-               // time is before the next pause -> nothing to do
-
-            } else if (sliceTime < pausedEndTime && validPauseIndex == pauseIndex) {
-
-               // time is within a pause -> keep this pause
-
-               if (isRemoveTime) {
-
-                  // adjust paused times
-
-                  pausedStartTime -= removedTimeDiffMS;
-                  pausedEndTime -= removedTimeDiffMS;
-               }
-
-               pausedTimeAdjusted_Start.add(pausedStartTime);
-               pausedTimeAdjusted_End.add(pausedEndTime);
-
-               // ensure that current pause is added only once
-               validPauseIndex = -1;
-
-            } else if (sliceTime >= pausedEndTime) {
-
-               // advance to the next pause
-
-               pauseIndex++;
-
-               if (pauseIndex < numPauses) {
-
-                  // get next paused time
-
-                  validPauseIndex = pauseIndex;
-
-                  pausedStartTime = pausedTime_Start[pauseIndex];
-                  pausedEndTime = pausedTime_End[pauseIndex];
-               }
-            }
+            allPausedTimeAdjusted_Start.add(tourStartTime + pauseTime_Start * 1000);
+            allPausedTimeAdjusted_End.add(tourStartTime + pauseTime_End * 1000);
          }
       }
 
       // update model
-      tourData.setPausedTime_Start(pausedTimeAdjusted_Start.toArray());
-      tourData.setPausedTime_End(pausedTimeAdjusted_End.toArray());
+      tourData.setPausedTime_Start(allPausedTimeAdjusted_Start.toArray());
+      tourData.setPausedTime_End(allPausedTimeAdjusted_End.toArray());
    }
 
    /**
