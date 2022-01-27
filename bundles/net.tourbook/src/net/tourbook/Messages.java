@@ -2569,7 +2569,6 @@ public class Messages extends NLS {
    public static String        tour_data_label_feature_since_version_9_01;
    public static String        tour_data_label_manually_created_tour;
    public static String        Tour_Data_LoadTourData_Monitor;
-   public static String        Tour_Data_LoadTourData_Monitor_SubTask;
    public static String        Tour_Data_SaveTour_Monitor;
    public static String        Tour_Data_SaveTour_MonitorSubtask;
    public static String        Tour_Data_Text_AltitudeValues;
@@ -2844,11 +2843,15 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Checkbox_TourPauseFilter;
    public static String        Tour_Pauses_Column_Duration_Label;
    public static String        Tour_Pauses_Column_Duration_Tooltip;
-   public static String        Tour_Pauses_Column_EndTime_Header;
-   public static String        Tour_Pauses_Column_EndTime_Label;
-   public static String        Tour_Pauses_Column_StartTime_Header;
-   public static String        Tour_Pauses_Column_StartTime_Label;
-   public static String        Tour_Pauses_Column_StartTime_Tooltip;
+   public static String        Tour_Pauses_Column_EndTime_Daytime_Label;
+   public static String        Tour_Pauses_Column_EndTime_Daytime_Tooltip;
+   public static String        Tour_Pauses_Column_EndTime_Relative_Header;
+   public static String        Tour_Pauses_Column_EndTime_Relative_Label;
+   public static String        Tour_Pauses_Column_StartTime_Daytime_Label;
+   public static String        Tour_Pauses_Column_StartTime_Daytime_Tooltip;
+   public static String        Tour_Pauses_Column_StartTime_Relative_Header;
+   public static String        Tour_Pauses_Column_StartTime_Relative_Label;
+   public static String        Tour_Pauses_Column_StartTime_Relative_Tooltip;
 
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;

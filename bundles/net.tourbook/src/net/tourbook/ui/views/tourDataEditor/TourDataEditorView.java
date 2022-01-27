@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -144,6 +144,7 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -292,6 +293,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private double[]                _serieLongitude;
    private float[][]               _serieGears;
    private boolean[]               _serieBreakTime;
+   private boolean[]               _seriePausedTime;
    //
    private short[]                 _swimSerie_StrokeRate;
 // private short[]                 _swimSerie_LengthType;
@@ -2122,7 +2124,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   void actionDeleteDistanceValues() {
+   void actionDelete_DistanceValues() {
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
@@ -2151,7 +2153,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * @param isRemoveTime
     * @param isAdjustTourStartTime
     */
-   void actionDeleteTimeSlices(final boolean isRemoveTime, final boolean isAdjustTourStartTime) {
+   void actionDelete_TimeSlices(final boolean isRemoveTime, final boolean isAdjustTourStartTime) {
 
       // a tour with reference tours is currently not supported
       if (_isReferenceTourAvailable) {
@@ -2234,7 +2236,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int[] indices = table.getSelectionIndices();
       Arrays.sort(indices);
-      int lastSelectionIndex = indices[0];
+      final int lastTopIndex = indices[0];
 
       TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime, isAdjustTourStartTime);
 
@@ -2269,18 +2271,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       setTourDirty();
 
       // notify other viewers
-      fireModifyNotification();
+      fireTourIsModified();
 
       /*
-       * Select next available time slice
+       * Keep position by selecting the next available time slice
        */
-      final int itemCount = table.getItemCount();
-      if (itemCount > 0) {
+      final int numItems = table.getItemCount();
+      if (numItems > 0) {
 
          // adjust to array bounds
-         lastSelectionIndex = Math.max(0, Math.min(lastSelectionIndex, itemCount - 1));
+         final int topIndex = Math.max(0, Math.min(lastTopIndex, numItems - 1));
 
-         table.setSelection(lastSelectionIndex);
+         table.setSelection(topIndex);
          table.showSelection();
 
          // fire selection position
@@ -3214,7 +3216,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
 
-      _tabFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTab()));
+      _tabFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Tab()));
 
       {
          _tab_10_Tour = new CTabItem(_tabFolder, SWT.FLAT);
@@ -4022,7 +4024,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindSpeedValue();
+               onSelect_WindSpeedValue();
                setTourDirty();
             });
             _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
@@ -4030,7 +4032,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindSpeedValue();
+               onSelect_WindSpeedValue();
                setTourDirty();
             }));
             _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
@@ -4038,7 +4040,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindSpeedValue();
+               onSelect_WindSpeedValue();
                setTourDirty();
             });
 
@@ -4070,7 +4072,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindDirectionText();
+               onSelect_WindDirectionText();
                setTourDirty();
             }));
 
@@ -4111,7 +4113,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindSpeedText();
+               onSelect_WindSpeedText();
                setTourDirty();
             }));
 
@@ -4140,7 +4142,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindDirectionValue();
+               onSelect_WindDirectionValue();
                setTourDirty();
             });
             _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
@@ -4148,7 +4150,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindDirectionValue();
+               onSelect_WindDirectionValue();
                setTourDirty();
             }));
 
@@ -4157,7 +4159,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelectWindDirectionValue();
+               onSelect_WindDirectionValue();
                setTourDirty();
             });
 
@@ -4643,16 +4645,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //       }
 //    });
 
-      table.addKeyListener(KeyListener.keyPressedAdapter(
-            keyEvent -> {
-               if ((_isEditMode == false) || (isTourInDb() == false)) {
-                  return;
-               }
+      table.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
-               if (keyEvent.keyCode == SWT.DEL) {
-                  actionDeleteTimeSlices(true, false);
-               }
-            }));
+         if ((_isEditMode == false) || (isTourInDb() == false)) {
+            return;
+         }
+
+         if (keyEvent.keyCode == SWT.DEL) {
+            actionDelete_TimeSlices(true, false);
+         }
+      }));
 
       _timeSlice_Viewer = new TableViewer(table);
 
@@ -4684,13 +4686,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeSlice_Viewer.setContentProvider(new TimeSlice_ViewerContentProvider());
       _timeSlice_Viewer.setComparator(_timeSlice_Comparator);
       _timeSlice_Viewer.setUseHashlookup(true);
-
-      _timeSlice_Viewer.addSelectionChangedListener(selectionChangedEvent -> {
-         final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
-         if (selection != null) {
-            fireSliderPosition(selection);
-         }
-      });
+      _timeSlice_Viewer.addSelectionChangedListener(this::onSelect_Slice);
 
       // hide first column, this is a hack to align the "first" visible column to right
       table.getColumn(0).setWidth(0);
@@ -4791,13 +4787,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _swimSlice_Viewer.setContentProvider(new SwimSlice_ViewerContentProvider());
       _swimSlice_Viewer.setUseHashlookup(true);
-
-      _swimSlice_Viewer.addSelectionChangedListener(selectionChangedEvent -> {
-         final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
-         if (selection != null) {
-            fireSliderPosition(selection);
-         }
-      });
+      _swimSlice_Viewer.addSelectionChangedListener(this::onSelect_Slice);
 
       createUI_Tab_34_SwimSliceViewerContextMenu();
 
@@ -4848,6 +4838,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_TimeSlice_Time_TimeInSeconds();
       defineColumn_TimeSlice_Time_TimeDiff();
       defineColumn_TimeSlice_Time_BreakTime();
+      defineColumn_TimeSlice_Time_PausedTime();
 
       defineColumn_TimeSlice_Motion_Distance();
       defineColumn_TimeSlice_Motion_Speed();
@@ -5654,10 +5645,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          public void update(final ViewerCell cell) {
             if (_serieBreakTime != null) {
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               cell.setText(
-                     _serieBreakTime[timeSlice.serieIndex]
-                           ? UI.SYMBOL_BOX
-                           : UI.EMPTY_STRING);
+               cell.setText(_serieBreakTime[timeSlice.serieIndex]
+                     ? UI.SYMBOL_BOX
+                     : UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Paused time
+    */
+   private void defineColumn_TimeSlice_Time_PausedTime() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_IS_PAUSED_TIME.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePausedTime != null) {
+
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               cell.setText(_seriePausedTime[timeSlice.serieIndex]
+                     ? UI.SYMBOL_BOX
+                     : UI.EMPTY_STRING);
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -5830,7 +5844,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       updateUI_FromModel(_tourData, true, true);
 
-      fireRevertNotification();
+      fireTourIsReverted();
 
       // a manually created tour can not be reloaded, find a tour in the workbench
       if (_tourData == null) {
@@ -6130,7 +6144,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             setTourDirty();
 
             // notify other viewers
-            fireModifyNotification();
+            fireTourIsModified();
 
             /*
              * Select back the previously selected indices
@@ -6469,32 +6483,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * fire notification for changed tour data
-    */
-   private void fireModifyNotification() {
-
-      final ArrayList<TourData> modifiedTour = new ArrayList<>();
-      modifiedTour.add(_tourData);
-
-      final TourEvent tourEvent = new TourEvent(modifiedTour);
-      tourEvent.isTourModified = true;
-
-      TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
-   }
-
-   /**
-    * fire notification for the reverted tour data
-    */
-   private void fireRevertNotification() {
-
-      final TourEvent tourEvent = new TourEvent(_tourData);
-      tourEvent.isReverted = true;
-
-      TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
-   }
-
-   /**
-    * Select the chart/map slider(s) according to the selected slices
+    * Select the chart/map slider(s) according to the selected tour/swim slices
     *
     * @return
     */
@@ -6647,6 +6636,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
+   /**
+    * Fire notification for changed tour data
+    */
+   private void fireTourIsModified() {
+
+      final ArrayList<TourData> modifiedTour = new ArrayList<>();
+      modifiedTour.add(_tourData);
+
+      final TourEvent tourEvent = new TourEvent(modifiedTour);
+      tourEvent.isTourModified = true;
+
+      TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
+   }
+
+   /**
+    * Fire notification for the reverted tour data
+    */
+   private void fireTourIsReverted() {
+
+      final TourEvent tourEvent = new TourEvent(_tourData);
+      tourEvent.isReverted = true;
+
+      TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
+   }
+
    private void getDataSeriesFromTourData() {
 
       _serieTime = _tourData.timeSerie;
@@ -6668,6 +6682,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieLongitude = _tourData.longitudeSerie;
 
       _serieBreakTime = _tourData.getBreakTimeSerie();
+      _seriePausedTime = _tourData.getPausedTimeSerie();
 
       _serieGradient = _tourData.getGradientSerie();
       _serieSpeed = _tourData.getSpeedSerie();
@@ -7145,11 +7160,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       enableActions();
 
-      fireModifyNotification();
+      fireTourIsModified();
    }
 
    private void onResizeTab1() {
       _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+   }
+
+   private void onSelect_Slice(final SelectionChangedEvent selectionChangedEvent) {
+
+      final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
+
+      if (selection != null && selection.isEmpty() == false) {
+         fireSliderPosition(selection);
+      }
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -7170,7 +7194,60 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeSlice_Viewer.getTable().setRedraw(true);
    }
 
+   private void onSelect_Tab() {
+
+      final CTabItem selectedTab = _tabFolder.getSelection();
+
+      if (selectedTab == _tab_20_TimeSlices) {
+
+         if (_timeSlice_ViewerTourId == -1L) {
+
+            // load viewer when this was not yet done
+            _timeSlice_ViewerTourId = _tourData.getTourId();
+
+            _timeSlice_TourViewer.reloadViewer();
+            updateStatusLine();
+
+            // run async because reloadViewer is also running async
+            Display.getCurrent().asyncExec(() -> {
+
+               if (_timeSlice_Viewer.getTable().isDisposed()) {
+                  return;
+               }
+
+               _timeSlice_Viewer.getTable().setFocus();
+            });
+         }
+
+      } else if (selectedTab == _tab_30_SwimSlices) {
+
+         if (_swimSlice_ViewerTourId == -1L) {
+
+            // load viewer when this was not yet done
+            _swimSlice_ViewerTourId = _tourData.getTourId();
+
+            _swimSlice_TourViewer.reloadViewer();
+//          updateStatusLine();
+
+            // run async because relaodViewer is also running async
+            Display.getCurrent().asyncExec(() -> {
+
+               if (_swimSlice_Viewer.getTable().isDisposed()) {
+                  return;
+               }
+
+               _swimSlice_Viewer.getTable().setFocus();
+            });
+         }
+
+      }
+
+      enableActions();
+
+   }
+
    private void onSelect_Weather_Text() {
+
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
          final boolean isDataRetrieved = TourManager.retrieveWeatherData(_tourData);
 
@@ -7186,6 +7263,70 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       });
 
+   }
+
+   private void onSelect_WindDirectionText() {
+
+      // N=348.75=11.25   NNE=11.25=33.75    NE=33.75=56.25    ENE=56.25=78.75
+      // E=78.75=101.25   ESE=101.25=123.75  SE=123.75=146.25  SSE=146.25=168.75
+      // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
+      // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
+
+      final int selectedIndex = _comboWeather_WindDirectionText.getSelectionIndex();
+
+      // get degree from selected direction
+
+      final int degree = (int) (selectedIndex * 22.5f * 10f);
+
+      _spinWeather_Wind_DirectionValue.setSelection(degree);
+   }
+
+   private void onSelect_WindDirectionValue() {
+
+      int degree = _spinWeather_Wind_DirectionValue.getSelection();
+
+      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
+      if (degree == -1) {
+         degree = 3599;
+         _spinWeather_Wind_DirectionValue.setSelection(degree);
+      }
+
+      if (degree == 3600) {
+         degree = 0;
+         _spinWeather_Wind_DirectionValue.setSelection(degree);
+      }
+
+      _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(degree));
+
+   }
+
+   private void onSelect_WindSpeedText() {
+
+      _isWindSpeedManuallyModified = true;
+
+      final int selectedIndex = _comboWeather_WindSpeedText.getSelectionIndex();
+      final int speed = _unitValueWindSpeed[selectedIndex];
+
+      final boolean isBackup = _isSetField;
+      _isSetField = true;
+      {
+         _spinWeather_Wind_SpeedValue.setSelection(speed);
+      }
+      _isSetField = isBackup;
+   }
+
+   private void onSelect_WindSpeedValue() {
+
+      _isWindSpeedManuallyModified = true;
+
+      final int windSpeed = _spinWeather_Wind_SpeedValue.getSelection();
+
+      final boolean isBackup = _isSetField;
+      _isSetField = true;
+      {
+         _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(windSpeed));
+      }
+      _isSetField = isBackup;
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -7210,7 +7351,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
 
-      if (onSelectionChanged_isTourInSelection(selection)) {
+      if (onSelectionChanged_IsTourInSelection(selection)) {
 
          /*
           * tour in the selection is already displayed or a tour is not in the selection
@@ -7347,7 +7488,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * @param selection
     * @return Returns <code>true</code> when the current tour is within the selection
     */
-   private boolean onSelectionChanged_isTourInSelection(final ISelection selection) {
+   private boolean onSelectionChanged_IsTourInSelection(final ISelection selection) {
 
       boolean isCurrentTourSelected = false;
 
@@ -7539,122 +7680,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final int leftSliderValueIndex = pauseSelection.getSerieIndex();
 
       selectTimeSlice_InViewer(leftSliderValueIndex, leftSliderValueIndex);
-   }
-
-   private void onSelectTab() {
-
-      final CTabItem selectedTab = _tabFolder.getSelection();
-
-      if (selectedTab == _tab_20_TimeSlices) {
-
-         if (_timeSlice_ViewerTourId == -1L) {
-
-            // load viewer when this was not yet done
-            _timeSlice_ViewerTourId = _tourData.getTourId();
-
-            _timeSlice_TourViewer.reloadViewer();
-            updateStatusLine();
-
-            // run async because reloadViewer is also running async
-            Display.getCurrent().asyncExec(() -> {
-
-               if (_timeSlice_Viewer.getTable().isDisposed()) {
-                  return;
-               }
-
-               _timeSlice_Viewer.getTable().setFocus();
-            });
-         }
-
-      } else if (selectedTab == _tab_30_SwimSlices) {
-
-         if (_swimSlice_ViewerTourId == -1L) {
-
-            // load viewer when this was not yet done
-            _swimSlice_ViewerTourId = _tourData.getTourId();
-
-            _swimSlice_TourViewer.reloadViewer();
-//          updateStatusLine();
-
-            // run async because relaodViewer is also running async
-            Display.getCurrent().asyncExec(() -> {
-
-               if (_swimSlice_Viewer.getTable().isDisposed()) {
-                  return;
-               }
-
-               _swimSlice_Viewer.getTable().setFocus();
-            });
-         }
-
-      }
-
-      enableActions();
-
-   }
-
-   private void onSelectWindDirectionText() {
-
-      // N=348.75=11.25   NNE=11.25=33.75    NE=33.75=56.25    ENE=56.25=78.75
-      // E=78.75=101.25   ESE=101.25=123.75  SE=123.75=146.25  SSE=146.25=168.75
-      // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
-      // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
-
-      final int selectedIndex = _comboWeather_WindDirectionText.getSelectionIndex();
-
-      // get degree from selected direction
-
-      final int degree = (int) (selectedIndex * 22.5f * 10f);
-
-      _spinWeather_Wind_DirectionValue.setSelection(degree);
-   }
-
-   private void onSelectWindDirectionValue() {
-
-      int degree = _spinWeather_Wind_DirectionValue.getSelection();
-
-      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
-      if (degree == -1) {
-         degree = 3599;
-         _spinWeather_Wind_DirectionValue.setSelection(degree);
-      }
-
-      if (degree == 3600) {
-         degree = 0;
-         _spinWeather_Wind_DirectionValue.setSelection(degree);
-      }
-
-      _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(degree));
-
-   }
-
-   private void onSelectWindSpeedText() {
-
-      _isWindSpeedManuallyModified = true;
-
-      final int selectedIndex = _comboWeather_WindSpeedText.getSelectionIndex();
-      final int speed = _unitValueWindSpeed[selectedIndex];
-
-      final boolean isBackup = _isSetField;
-      _isSetField = true;
-      {
-         _spinWeather_Wind_SpeedValue.setSelection(speed);
-      }
-      _isSetField = isBackup;
-   }
-
-   private void onSelectWindSpeedValue() {
-
-      _isWindSpeedManuallyModified = true;
-
-      final int windSpeed = _spinWeather_Wind_SpeedValue.getSelection();
-
-      final boolean isBackup = _isSetField;
-      _isSetField = true;
-      {
-         _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(windSpeed));
-      }
-      _isSetField = isBackup;
    }
 
    public void recreateViewer() {
@@ -8532,7 +8557,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       // display modified time slices in other views
-      fireModifyNotification();
+      fireTourIsModified();
    }
 
    void updateUI_DescriptionNumLines(final int numLines) {
