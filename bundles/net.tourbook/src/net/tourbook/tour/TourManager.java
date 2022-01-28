@@ -2533,7 +2533,10 @@ public class TourManager {
          return;
       }
 
-      final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
+      final int timeFirstIndex = timeSerie[firstIndex];
+      final int timeNextIndex = timeSerie[lastIndex + 1];
+
+      final int timeDiff = timeNextIndex - timeFirstIndex;
       float distDiff = -1;
 
       if (distSerie != null) {

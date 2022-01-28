@@ -2210,16 +2210,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             if (lastIndex - timeSlice.serieIndex == -1) {
 
-               // successive selection
+               // this is a successive selection which is currently supported
 
                lastIndex = timeSlice.serieIndex;
 
             } else {
 
+               // this is not a successive selection -> show warning
+
                MessageDialog.openInformation(
                      Display.getCurrent().getActiveShell(),
                      Messages.tour_editor_dlg_delete_rows_title,
                      Messages.tour_editor_dlg_delete_rows_not_successive);
+
                return;
             }
          }
@@ -2234,9 +2237,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * Get first selection index to select a time slice after removal
        */
       final Table table = (Table) _timeSlice_Viewer.getControl();
-      final int[] indices = table.getSelectionIndices();
-      Arrays.sort(indices);
-      final int lastTopIndex = indices[0];
+      final int[] selectionIndices = table.getSelectionIndices();
+      Arrays.sort(selectionIndices);
+      final int lastTopIndex = selectionIndices[0];
 
       TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime, isAdjustTourStartTime);
 
@@ -5644,8 +5647,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void update(final ViewerCell cell) {
             if (_serieBreakTime != null) {
+
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               cell.setText(_serieBreakTime[timeSlice.serieIndex]
+
+               // get break time state from the next slice, a break is between the current and the previous slice
+               final int numSlices = _serieBreakTime.length;
+               int serieIndex = timeSlice.serieIndex;
+               serieIndex = serieIndex < numSlices - 2
+                     ? serieIndex + 1
+                     : serieIndex;
+
+               cell.setText(_serieBreakTime[serieIndex]
                      ? UI.SYMBOL_BOX
                      : UI.EMPTY_STRING);
             } else {
@@ -5691,13 +5703,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          public void update(final ViewerCell cell) {
 
             if (_serieTime != null) {
+
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
                final int serieIndex = timeSlice.serieIndex;
-               if (serieIndex == 0) {
+               final int numSlices = _serieTime.length;
+
+               if (serieIndex == numSlices - 1) {
+
+                  // the last time slice is displayed-> there is no difference to the next slice
+
                   cell.setText(Integer.toString(0));
+
                } else {
-                  cell.setText(Integer.toString(_serieTime[serieIndex] - _serieTime[serieIndex - 1]));
+
+                  cell.setText(Integer.toString(_serieTime[serieIndex + 1] - _serieTime[serieIndex]));
                }
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -6503,10 +6524,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
 
-      final int timeSerieSize = _tourData.timeSerie.length;
+      final int numSlices = _tourData.timeSerie.length;
 
       final int numSelectedSlices = selectedSlices.length;
-      final Object slice1 = selectedSlices[0];
+      final Object firstSelectedSlice = selectedSlices[0];
 
       int serieIndex0 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
       int serieIndex1 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
@@ -6516,13 +6537,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // One slice is selected
 
-         if (slice1 instanceof SwimSlice) {
+         if (firstSelectedSlice instanceof SwimSlice) {
 
             /*
              * position slider at the beginning of the slice so that each slice borders has an
              * slider
              */
-            final int swimSerieIndex1 = ((SwimSlice) slice1).serieIndex;
+            final int swimSerieIndex1 = ((SwimSlice) firstSelectedSlice).serieIndex;
             final int timeSerieIndex1 = getSerieIndexFromSwimTime(swimSerieIndex1);
 
             if (timeSerieIndex1 > 1) {
@@ -6533,29 +6554,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                serieIndex0 = timeSerieIndex0;
             }
 
-            serieIndex1 = timeSerieIndex1 == timeSerieSize - 1
+            serieIndex1 = timeSerieIndex1 == numSlices - 1
 
                   // keep slider at the end of the chart
-                  ? timeSerieSize - 1
+                  ? numSlices - 1
 
                   // adjust slider to the same stroke/swolf value as the left slider
                   : timeSerieIndex1 - 1;
 
             serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-         } else if (slice1 instanceof TimeSlice) {
+         } else if (firstSelectedSlice instanceof TimeSlice) {
 
-            final int serieIndexFirst = ((TimeSlice) slice1).serieIndex;
+            final int sliceSerieIndex = ((TimeSlice) firstSelectedSlice).serieIndex;
 
-            /*
-             * position slider at the beginning of the slice so that each slice borders has an
-             * slider
-             */
-            serieIndex0 = serieIndexFirst > 0
-                  ? serieIndexFirst - 1
+            serieIndex0 = sliceSerieIndex;
+            serieIndex1 = sliceSerieIndex < numSlices - 1
+                  ? sliceSerieIndex + 1
                   : SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-            serieIndex1 = serieIndexFirst;
             serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
          }
 
@@ -6563,9 +6580,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // Two or more slices are selected, set the 2 sliders to the first and last selected slices
 
-         if (slice1 instanceof SwimSlice) {
+         if (firstSelectedSlice instanceof SwimSlice) {
 
-            final int swimSerieIndex1 = ((SwimSlice) slice1).serieIndex;
+            final int swimSerieIndex1 = ((SwimSlice) firstSelectedSlice).serieIndex;
             final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
 
             final int timeSerieIndex2 = getSerieIndexFromSwimTime(swimSerieIndex2);
@@ -6582,17 +6599,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                serieIndex1 = timeSerieIndex1;
             }
 
-            serieIndex2 = timeSerieIndex2 == timeSerieSize - 1
+            serieIndex2 = timeSerieIndex2 == numSlices - 1
 
                   // keep slider at the end of the chart
-                  ? timeSerieSize - 1
+                  ? numSlices - 1
 
                   // adjust slider to the same stroke/swolf value as the left slider
                   : timeSerieIndex2 - 1;
 
-         } else if (slice1 instanceof TimeSlice) {
+         } else if (firstSelectedSlice instanceof TimeSlice) {
 
-            final int serieIndexFirst = ((TimeSlice) slice1).serieIndex;
+            final int serieIndexFirst = ((TimeSlice) firstSelectedSlice).serieIndex;
 
             /*
              * Position slider at the beginning of the first slice
@@ -8049,16 +8066,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          return;
       }
 
-      int valueIndexStart = sliderPosition.getLeftSliderValueIndex();
-      final int valueIndexEnd = sliderPosition.getRightSliderValueIndex();
+      final int valueIndex_Before = sliderPosition.getBeforeLeftSliderIndex();
+      int valueIndex_Start;
+      int valueIndex_End;
 
-      final boolean isAdjustStartIndex = sliderPosition.isAdjustStartIndex();
+      if (valueIndex_Before != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-      if (isAdjustStartIndex && (valueIndexStart < valueIndexEnd && valueIndexStart != 0)) {
-         valueIndexStart++;
+         valueIndex_Start = valueIndex_Before;
+         valueIndex_End = sliderPosition.getLeftSliderValueIndex();
+
+      } else {
+
+         valueIndex_Start = sliderPosition.getLeftSliderValueIndex();
+         valueIndex_End = sliderPosition.getRightSliderValueIndex();
       }
 
-      selectTimeSlice_InViewer(valueIndexStart, valueIndexEnd);
+      selectTimeSlice_InViewer(valueIndex_Start, valueIndex_End);
    }
 
    /**

@@ -477,7 +477,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TourStartTime_Tooltip;
    public static String        ColumnFactory_TourTimeDiff_Header;
    public static String        ColumnFactory_TourTimeDiff_Label;
-   public static String        ColumnFactory_TourTimeDiff_Tooltip;
+   public static String        ColumnFactory_TourTimeDiff_Tooltip_2;
    public static String        ColumnFactory_TourTypeText_Header;
    public static String        ColumnFactory_TourTypeText_Label;
    public static String        ColumnFactory_TourWeekYear_Header;

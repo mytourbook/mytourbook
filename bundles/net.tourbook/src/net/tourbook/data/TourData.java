@@ -5721,10 +5721,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // time is within a pause -> mark this pause
 
-            // set pause time marker into the next slice otherwise it looks not good in the tour editor
-            final int pauseTimeIndex = serieIndex + 1;
-            if (pauseTimeIndex < numTimeSlices) {
-               pausedTimeSerie[pauseTimeIndex] = true;
+            if (serieIndex < numTimeSlices) {
+               pausedTimeSerie[serieIndex] = true;
             }
 
          } else if (absoluteTime >= pausedEndTime) {
@@ -5811,7 +5809,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       float altitudeDownSummarizedBorder = 0;
       float altitudeDownSummarizedComputed = 0;
 
-      final float tourPace = tourDistance == 0 //
+      final float tourPace = tourDistance == 0
             ? 0
             : tourComputedTime_Moving * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
@@ -5936,7 +5934,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
             final float altitudeDiff = altitudeEnd - elevationStart;
 
-            final float altiUpDownHour = segmentMovingTime == 0 //
+            final float altiUpDownHour = segmentMovingTime == 0
                   ? 0
                   : (altitudeDiff / UI.UNIT_VALUE_ELEVATION) / segmentMovingTime * 3600;
 
@@ -6123,22 +6121,41 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final double longitude = longitudeSerie[serieIndex];
             final float srtm1Value, srtm3Value;
             float srtmValue = 0;
+
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
+
                srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
 
-               if (srtm1Value != Float.MIN_VALUE && srtm1Value > lowerLimit && srtm1Value < upperLimit) { //check if valid srtm1Value. sometimes illegal value is also -32767.0
+               if (srtm1Value != Float.MIN_VALUE
+
+                     // check if valid srtm1Value. sometimes illegal value is also -32767.0
+                     && srtm1Value > lowerLimit && srtm1Value < upperLimit) {
+
                   srtmValue = srtm1Value;
                   isSRTMValid = true;
                   lastValidSRTM = srtmValue;
                   usedSrtm1Values++;
+
                   //System.out.println("******************* TourData using srtm1: " + srtmValue + "min short" + Short.MIN_VALUE);
-               } else { //no srtm1 found, try srtm3
+
+               } else {
+
+                  //no srtm1 found, try srtm3
+
                   srtm3Value = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-                  if (srtm3Value == Float.MIN_VALUE) { // when srtm3 is also not availible, used the last good one
+
+                  if (srtm3Value == Float.MIN_VALUE) {
+
+                     // when srtm3 is also not availible, used the last good one
+
                      srtmValue = lastValidSRTM;
                      usedCorrectedSrtmValues++;
-                  } else { //if srtm3 is good, use it
+
+                  } else {
+
+                     //if srtm3 is good, use it
+
                      srtmValue = srtm3Value;
                      isSRTMValid = true;
                      lastValidSRTM = srtmValue;
@@ -6149,9 +6166,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // adjust wrong values
             if (srtmValue < lowerLimit) {
+
                srtmValue = 0;
                usedCorrectedSrtmValues++;
+
             } else if (srtmValue > upperLimit) {
+
                srtmValue = upperLimit;
                usedCorrectedSrtmValues++;
             }
