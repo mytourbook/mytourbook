@@ -78,6 +78,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    // But when JUST clicking (and even unchecking right before merging) the merge time, the altitude merge gets cropped for KC 2011
 // and even the tour recorded, elapsed, moving gets modified
 
+   //when merging time, the start time should be the same ?? not if i rename it again to merge speed
+
    private static final int              MAX_ADJUST_SECONDS     = 120;
    private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
    private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
