@@ -7696,7 +7696,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final int leftSliderValueIndex = pauseSelection.getSerieIndex();
 
-      selectTimeSlice_InViewer(leftSliderValueIndex, leftSliderValueIndex);
+      // the serie index is the end of the pause but the start of the pause should be selected
+      final int startPauseIndex = Math.max(0, leftSliderValueIndex - 1);
+
+      selectTimeSlice_InViewer(startPauseIndex, startPauseIndex);
    }
 
    public void recreateViewer() {
