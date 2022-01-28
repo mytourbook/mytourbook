@@ -1379,17 +1379,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final Layers layers = mMap.layers();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      _hillshadingSource = DefaultSources.HIKEBIKE_HILLSHADE
-            .httpFactory(_httpFactory)
-            .zoomMin(1)
-            .zoomMax(16)
-            .build();
+//      _hillshadingSource = DefaultSources.HIKEBIKE_HILLSHADE
+//            .httpFactory(_httpFactory)
+//            .zoomMin(1)
+//            .zoomMax(16)
+//            .build();
 
       /* needs long copyright hint... */
-//	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
-//	         .httpFactory(_httpFactory)
-//	         .apiKey(_mp_key)
-//	         .build();
+      _hillshadingSource = DefaultSources.MAPILION_HILLSHADE_2
+            .httpFactory(_httpFactory)
+            .apiKey(_mp_key)
+            .build();
 
       // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
       _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
