@@ -75,8 +75,10 @@ Improvements
 Changes
 =======
 
-* 
-
+* Tour Editor
+  - Time difference column shows now the time difference to the next time slice, until now the time difference to the previous time slice was displayed
+  - A "wrong" time slice is deleted
+                                          https://github.com/mytourbook/mytourbook/issues/456
 
 Bugfix
 ======

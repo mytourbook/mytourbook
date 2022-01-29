@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TLongArrayList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -2233,6 +2234,9 @@ public class TourManager {
                                        final boolean isRemoveTime,
                                        final boolean isAdjustTourStartTime) {
 
+      // this must be done with the original timeSerie
+      removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
+
       if (isRemoveTime || (isRemoveTime && isAdjustTourStartTime)) {
 
          // this must be done before the time series are modified
@@ -2523,13 +2527,16 @@ public class TourManager {
       }
 
       /*
-       * check if lastIndex is the last time slice, this will already remove time and distance
+       * Check if lastIndex is the last time slice, this will already remove time and distance
        */
       if (lastIndex == timeSerie.length - 1) {
          return;
       }
 
-      final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
+      final int timeFirstIndex = timeSerie[firstIndex];
+      final int timeNextIndex = timeSerie[lastIndex + 1];
+
+      final int timeDiff = timeNextIndex - timeFirstIndex;
       float distDiff = -1;
 
       if (distSerie != null) {
@@ -2576,7 +2583,7 @@ public class TourManager {
       }
 
       /*
-       * remove deleted markers
+       * Remove deleted markers
        */
       final TourMarker[] markerCloneList = allTourMarkers.toArray(new TourMarker[allTourMarkers.size()]);
       for (final TourMarker tourMarker : markerCloneList) {
@@ -2589,7 +2596,7 @@ public class TourManager {
       }
 
       /*
-       * update marker index in the remaining markers
+       * Update marker index in the remaining markers
        */
       final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
       final long tourStartTimeMS = tourData.getTourStartTimeMS();
@@ -2620,6 +2627,88 @@ public class TourManager {
             }
          }
       }
+   }
+
+   /**
+    * Remove tour pauses and adjust the paused times when <code>isRemoveTime == true</code>
+    *
+    * @param tourData
+    * @param firstRemovedIndex
+    *           First index which is removed
+    * @param lastRemovedIndex
+    *           Last index which is removed
+    * @param isRemoveTime
+    */
+   private static void removeTourPauses(final TourData tourData,
+                                        final int firstRemovedIndex,
+                                        final int lastRemovedIndex,
+                                        final boolean isRemoveTime) {
+      // TODO Auto-generated method stub
+
+      final int[] timeSerie = tourData.timeSerie;
+      final long[] allPausedTime_Start = tourData.getPausedTime_Start();
+
+      if (timeSerie == null
+            || timeSerie.length == 0
+            || allPausedTime_Start == null
+            || allPausedTime_Start.length == 0) {
+
+         // there are no time slices or tour pauses -> nothing to do
+
+         return;
+      }
+
+      final int numPauses = allPausedTime_Start.length;
+      final int numTimeSlices = timeSerie.length;
+
+      final long[] allPausedTime_End = tourData.getPausedTime_End();
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int lastRemovedIndexForDiff = Math.min(lastRemovedIndex + 1, numTimeSlices - 1);
+
+      final long sliceTime_RemoveStart = timeSerie[firstRemovedIndex];
+      final long sliceTime_RemoveEnd = timeSerie[lastRemovedIndex];
+      final long sliceTime_RemoveEndDiff = timeSerie[lastRemovedIndexForDiff];
+
+      final long removedTimeDiff = sliceTime_RemoveEndDiff - sliceTime_RemoveStart;
+
+      final TLongArrayList allPausedTimeAdjusted_Start = new TLongArrayList();
+      final TLongArrayList allPausedTimeAdjusted_End = new TLongArrayList();
+
+      // loop: all pauses
+      for (int pauseIndex = 0; pauseIndex < numPauses; pauseIndex++) {
+
+         final long pauseTime_StartMS = allPausedTime_Start[pauseIndex];
+         final long pauseTime_EndMS = allPausedTime_End[pauseIndex];
+
+         long pauseTime_Start = (pauseTime_StartMS - tourStartTime) / 1000;
+         long pauseTime_End = (pauseTime_EndMS - tourStartTime) / 1000;
+
+         if (pauseTime_Start < sliceTime_RemoveStart) {
+
+            // pauses are before the removed slices -> they will be unmodified
+
+            allPausedTimeAdjusted_Start.add(pauseTime_StartMS);
+            allPausedTimeAdjusted_End.add(pauseTime_EndMS);
+
+         } else if (pauseTime_Start > sliceTime_RemoveEnd) {
+
+            // pauses are after the removed slices -> adjust time when requested
+
+            if (isRemoveTime) {
+
+               pauseTime_Start -= removedTimeDiff;
+               pauseTime_End -= removedTimeDiff;
+            }
+
+            allPausedTimeAdjusted_Start.add(tourStartTime + pauseTime_Start * 1000);
+            allPausedTimeAdjusted_End.add(tourStartTime + pauseTime_End * 1000);
+         }
+      }
+
+      // update model
+      tourData.setPausedTime_Start(allPausedTimeAdjusted_Start.toArray());
+      tourData.setPausedTime_End(allPausedTimeAdjusted_End.toArray());
    }
 
    /**

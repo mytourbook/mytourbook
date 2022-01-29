@@ -3224,7 +3224,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_TourTimeDiff_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_TourTimeDiff_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip_2);
             colDef.setColumnUnit(               Messages.ColumnFactory_tour_time);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -3417,7 +3417,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_TourTimeDiff_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_TourTimeDiff_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip_2);
             colDef.setColumnUnit(               Messages.ColumnFactory_tour_time);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));

@@ -1277,20 +1277,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _openDlgMgr.closeOpenedDialogs(openingDialog);
    }
 
-   private void create_NightSection_ChartLabel(final ChartNightConfig chartNightConfig,
-                                               final double[] xAxisSerie,
-                                               final int xAxisSerieIndex,
-                                               final int xAxisEndSerieIndex) {
-
-      final ChartLabelNightSection chartLabelNight = new ChartLabelNightSection();
-
-      chartLabelNight.graphX = xAxisSerie[xAxisSerieIndex];
-      chartLabelNight.graphXEnd = xAxisSerie[xAxisEndSerieIndex];
-      chartLabelNight.serieIndex = xAxisSerieIndex;
-
-      chartNightConfig.chartLabelNightSections.add(chartLabelNight);
-   }
-
    /**
     * Create all tour chart actions.
     */
@@ -2083,7 +2069,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                //The last time slice is in the night,
                //we need to create the night section it before exiting the for loop
 
-               create_NightSection_ChartLabel(
+               createLayer_NightSections_ChartLabel(
                      chartNightConfig,
                      xAxisSerie,
                      nightStartSerieIndex,
@@ -2094,7 +2080,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             //The current time slice is in daylight and
             //the previous time slice was in the night
 
-            create_NightSection_ChartLabel(
+            createLayer_NightSections_ChartLabel(
                   chartNightConfig,
                   xAxisSerie,
                   nightStartSerieIndex,
@@ -2105,25 +2091,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private ChartLabelPause createLayer_Pause_ChartLabel(final long pausedTime_Start,
-                                                        final long pausedTime_End,
-                                                        final boolean isAutoPause,
-                                                        final String timeZoneId,
-                                                        final double[] xAxisSerie,
-                                                        final int xAxisSerieIndex,
-                                                        final LabelAlignment labelAlignment) {
+   private void createLayer_NightSections_ChartLabel(final ChartNightConfig chartNightConfig,
+                                               final double[] xAxisSerie,
+                                               final int xAxisSerieIndex,
+                                               final int xAxisEndSerieIndex) {
 
-      final ChartLabelPause chartLabelPause = new ChartLabelPause();
+      final ChartLabelNightSection chartLabelNight = new ChartLabelNightSection();
 
-      chartLabelPause.graphX = xAxisSerie[xAxisSerieIndex];
-      chartLabelPause.serieIndex = xAxisSerieIndex;
-      chartLabelPause.setPausedTime_Start(pausedTime_Start);
-      chartLabelPause.setPausedTime_End(pausedTime_End);
-      chartLabelPause.setIsAutoPause(isAutoPause);
-      chartLabelPause.setTimeZoneId(timeZoneId);
-      chartLabelPause.setLabelAlignment(labelAlignment);
+      chartLabelNight.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabelNight.graphXEnd = xAxisSerie[xAxisEndSerieIndex];
+      chartLabelNight.serieIndex = xAxisSerieIndex;
 
-      return chartLabelPause;
+      chartNightConfig.chartLabelNightSections.add(chartLabelNight);
    }
 
    /**
@@ -2263,13 +2242,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                         // check right align -> is used when descending
                      }
 
-                     final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
+                     final ChartLabelPause chartLabelPause = createLayer_Pauses_ChartLabel(
                            pausedTime_Start,
                            pausedTime_End,
                            isPauseAnAutoPause,
                            tourTimeZoneId,
                            xAxisSerie,
                            tourSerieIndex,
+                           currentTourPauseIndex,
                            labelAlignment);
 
                      chartPauseConfig.chartLabelPauses.add(chartLabelPause);
@@ -2350,19 +2330,43 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                }
 
-               final ChartLabelPause chartLabelPause = createLayer_Pause_ChartLabel(
+               final ChartLabelPause chartLabelPause = createLayer_Pauses_ChartLabel(
                      pausedTime_Start,
                      pausedTime_End,
                      isPauseAnAutoPause,
                      _tourData.getTimeZoneId(),
                      xAxisSerie,
                      serieIndex,
+                     pausesIndex,
                      labelAlignment);
 
                chartPauseConfig.chartLabelPauses.add(chartLabelPause);
             }
          }
       }
+   }
+
+   private ChartLabelPause createLayer_Pauses_ChartLabel(final long pausedTime_Start,
+                                                        final long pausedTime_End,
+                                                        final boolean isAutoPause,
+                                                        final String timeZoneId,
+                                                        final double[] xAxisSerie,
+                                                        final int xAxisSerieIndex,
+                                                        final int pauseIndex,
+                                                        final LabelAlignment labelAlignment) {
+
+      final ChartLabelPause chartLabelPause = new ChartLabelPause();
+
+      chartLabelPause.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabelPause.serieIndex = xAxisSerieIndex;
+      chartLabelPause.setPauseIndex(pauseIndex);
+      chartLabelPause.setPausedTime_Start(pausedTime_Start);
+      chartLabelPause.setPausedTime_End(pausedTime_End);
+      chartLabelPause.setIsAutoPause(isAutoPause);
+      chartLabelPause.setTimeZoneId(timeZoneId);
+      chartLabelPause.setLabelAlignment(labelAlignment);
+
+      return chartLabelPause;
    }
 
    private void createLayer_Photo() {
@@ -3206,7 +3210,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void fireTourPauseSelection(final ChartLabelPause tourPause) {
 
       // update selection locally (e.g. in a dialog)
-      final SelectionTourPause tourPauseSelection = new SelectionTourPause(_tourData, tourPause.serieIndex);
+      final SelectionTourPause tourPauseSelection = new SelectionTourPause(
+            _tourData,
+            tourPause.serieIndex,
+            tourPause.getPauseIndex());
 
       Arrays.asList(_tourPauseSelectionListener.getListeners()).forEach(listener -> ((ITourPauseSelectionListener) listener).selectionChanged(
             tourPauseSelection));
