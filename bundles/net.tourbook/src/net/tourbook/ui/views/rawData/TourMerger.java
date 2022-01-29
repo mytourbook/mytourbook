@@ -81,9 +81,9 @@ public class TourMerger {
       return sourceIndex;
    }
 
-   public TourData computeMergedData(final boolean mergeTime) {
+   public TourData computeMergedData(final boolean mergeSpeed) {
 
-      final int[] targetTimeSerie = mergeTime ? mergeTime() : _targetTour.timeSerie;
+      final int[] targetTimeSerie = mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
 
       final int serieLength = targetTimeSerie.length;
       _newSourceAltitudeSerie = new float[serieLength];
@@ -122,7 +122,7 @@ public class TourMerger {
          _targetTour.temperatureSerie = _newTargetTemperatureSerie;
       }
 
-      if (mergeTime) {
+      if (mergeSpeed) {
 
          final long[] pausedTime_Start = _sourceTour.getPausedTime_Start();
          if (pausedTime_Start != null && pausedTime_Start.length > 0) {
@@ -272,7 +272,7 @@ public class TourMerger {
    /**
     * Creates new time serie for the target tour according to the distance of the target tour
     */
-   private int[] mergeTime() {
+   private int[] mergeSpeed() {
 
       final int[] sourceTimeSerie = _sourceTour.timeSerie;
       final boolean isSourceTime = sourceTimeSerie != null && sourceTimeSerie.length > 0;

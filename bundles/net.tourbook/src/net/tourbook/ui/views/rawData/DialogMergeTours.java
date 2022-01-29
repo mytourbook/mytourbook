@@ -71,15 +71,6 @@ import org.eclipse.swt.widgets.Widget;
 
 public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2, I2ndAltiLayer {
 
-   //TODO FB shouldn't the elapsed time of the target tour be equal to the target
-   // time of the source tour is the speed is merged ?
-
-   //Issue: When only merging the altitude and not even clickoing once on merge time, the altitude gets merged correctly.
-   // But when JUST clicking (and even unchecking right before merging) the merge time, the altitude merge gets cropped for KC 2011
-// and even the tour recorded, elapsed, moving gets modified
-
-   //when merging time, the start time should be the same ?? not if i rename it again to merge speed
-
    private static final int              MAX_ADJUST_SECONDS     = 120;
    private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
    private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
@@ -135,7 +126,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private Button _chkMergeAltitude;
    private Button _chkMergeCadence;
    private Button _chkMergePulse;
-   private Button _chkMergeTime;
+   private Button _chkMergeSpeed;
    private Button _chkMergeTemperature;
 
    private Button _chkAdjustAltiFromSource;
@@ -323,12 +314,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       //In both cases, we update the speed to trigger the recalculation of it
-      if (_chkMergeTime.getSelection()) {
+      if (_chkMergeSpeed.getSelection()) {
          _targetTour.timeSerie = mergedTour.timeSerie;
          _targetTour.setSpeedSerie(null);
       } else {
-         //todo fb need to restore the altitude serie ?
-         //need to restore the elapsed time, recorded time...
          _targetTour.timeSerie = _backupTargetTimeSerie;
          _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
       }
@@ -461,7 +450,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _chkSynchStartTime.getSelection(),
             _tourStartTimeSynchOffset);
 
-      final TourData mergedTour = tourMerger.computeMergedData(_chkMergeTime.getSelection());
+      final TourData mergedTour = tourMerger.computeMergedData(_chkMergeSpeed.getSelection());
 
       final float[] newSourceAltitudeDifferencesSerie = tourMerger.getNewSourceAltitudeDifferencesSerie();
       assignMergedSeries(mergedTour, newSourceAltitudeDifferencesSerie);
@@ -581,9 +570,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       super.createButtonsForButtonBar(parent);
 
-      // rename OK button
-
-      //TODO FB ok button
       final Button buttonOK = getButton(IDialogConstants.OK_ID);
       buttonOK.setText(Messages.tour_merger_save_target_tour);
 
@@ -948,13 +934,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _sourceTour.pulseSerie != null);
 
       /*
-       * checkbox: merge time
+       * checkbox: merge speed
        */
-      _chkMergeTime = createUIMergeAction(
+      _chkMergeSpeed = createUIMergeAction(
             group,
             TourManager.GRAPH_SPEED,
-            Messages.merge_tour_source_graph_time,
-            Messages.merge_tour_source_graph_time_tooltip,
+            Messages.merge_tour_source_graph_speed,
+            Messages.merge_tour_source_graph_speed_tooltip,
             Images.Graph_Speed,
             _sourceTour.timeSerie != null && _sourceTour.distanceSerie != null);
 
@@ -1283,7 +1269,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       _chkMergeAltitude.setEnabled(isAltitude);
       _chkMergePulse.setEnabled(isSourcePulse);
-      _chkMergeTime.setEnabled(isSourceTime);
+      _chkMergeSpeed.setEnabled(isSourceTime);
       _chkMergeTemperature.setEnabled(isSourceTemperature);
       _chkMergeCadence.setEnabled(isSourceCadence);
 
@@ -1297,7 +1283,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _chkMergePulse.setSelection(false);
       }
       if (isSourceTime == false || isSourceDistance == false) {
-         _chkMergeTime.setSelection(false);
+         _chkMergeSpeed.setSelection(false);
       }
       if (isSourceTemperature == false) {
          _chkMergeTemperature.setSelection(false);
@@ -1550,7 +1536,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _chkMergeCadence.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE));
       _chkMergePulse.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE));
       _chkMergeTemperature.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE));
-      _chkMergeTime.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME));
+      _chkMergeSpeed.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_SPEED));
    }
 
    private void saveState() {
@@ -1580,7 +1566,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, _chkMergeCadence.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, _chkMergePulse.getSelection());
       prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, _chkMergeTemperature.getSelection());
-      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TIME, _chkMergeTime.getSelection());
+      prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_SPEED, _chkMergeSpeed.getSelection());
    }
 
    private void saveTour() {
@@ -1630,11 +1616,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       }
 
-      if (_chkMergeTime.getSelection()) {
-         // time is already merged
+      if (_chkMergeSpeed.getSelection()) {
+         // speed is already merged
          isMerged = true;
       } else {
-         // restore original time values because these values should not be saved
+         // restore original speed and time values because these values should not be saved
          _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
          _targetTour.timeSerie = _backupTargetTimeSerie;
       }
@@ -1682,7 +1668,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          addVisibleGraph(TourManager.GRAPH_TEMPERATURE);
       }
 
-      if (_chkMergeTime.getSelection()) {
+      if (_chkMergeSpeed.getSelection()) {
          addVisibleGraph(TourManager.GRAPH_SPEED);
       }
    }
@@ -1775,7 +1761,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _chkMergeCadence.getSelection() ||
             _chkMergePulse.getSelection() ||
             _chkMergeTemperature.getSelection() ||
-            _chkMergeTime.getSelection()) {
+            _chkMergeSpeed.getSelection()) {
          enableMergeButton = true;
       }
 

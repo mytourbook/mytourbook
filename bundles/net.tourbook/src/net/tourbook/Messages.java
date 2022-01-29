@@ -1260,8 +1260,8 @@ public class Messages extends NLS {
    public static String        merge_tour_source_graph_cadence_tooltip;
    public static String        merge_tour_source_graph_heartbeat;
    public static String        merge_tour_source_graph_heartbeat_tooltip;
-   public static String        merge_tour_source_graph_time;
-   public static String        merge_tour_source_graph_time_tooltip;
+   public static String        merge_tour_source_graph_speed;
+   public static String        merge_tour_source_graph_speed_tooltip;
    public static String        merge_tour_source_graph_temperature;
    public static String        merge_tour_source_graph_temperature_tooltip;
 
