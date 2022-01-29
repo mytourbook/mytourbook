@@ -93,15 +93,12 @@ class GPX_SAX_HandlerTests {
       final InputStream in = new FileInputStream(file);
 
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-
             IMPORT_FILE_PATH,
             deviceData,
             alreadyImportedTours,
             newlyImportedTours,
-
             new ImportState_File(),
             new ImportState_Process(),
-
             deviceDataReader);
 
       parser.parse(in, handler);

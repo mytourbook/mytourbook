@@ -45,6 +45,9 @@ Improvements
   - Loading multiple tours is much faster because they are loaded concurrently
   - Painting multiple tours in tour chart and 2D map are further optimized 
 
+* Tour Merging (Frederic)
+ - Added the possibility to merge speed
+
 
 * Tour Import
   - Sort imported tours by number of markers/waypoints

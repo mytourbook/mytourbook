@@ -9,7 +9,7 @@
 	<classpathentry exported="true" kind="lib" path="batik-all-1.14.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all -->
 	<classpathentry exported="true" kind="lib" path="fop-2.6.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop -->
 	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-2.6.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/xmlgraphics-commons -->
-	<classpathentry exported="true" kind="lib" path="commons-io-2.8.0.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+	<classpathentry exported="true" kind="lib" path="commons-io-2.11.0.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<classpathentry exported="true" kind="lib" path="commons-logging-1.2.jar"/> <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
 	<classpathentry exported="true" kind="lib" path="jaxb-api-2.4.0-b180830.0359.jar"/> <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
 	<classpathentry exported="true" kind="lib" path="jaxb-runtime-2.4.0-b180830.0438.jar"/> <!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
