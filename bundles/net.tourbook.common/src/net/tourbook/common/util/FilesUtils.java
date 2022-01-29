@@ -57,11 +57,7 @@ public final class FilesUtils {
       try {
          fileContent = Files.readString(Paths.get(filePath), StandardCharsets.US_ASCII);
       } catch (final IOException e) {
-         try {
-            fileContent = Files.readString(Paths.get(filePath), StandardCharsets.ISO_8859_1);
-         } catch (final IOException e1) {
             StatusUtil.log(e);
-         }
       }
       return fileContent;
    }
