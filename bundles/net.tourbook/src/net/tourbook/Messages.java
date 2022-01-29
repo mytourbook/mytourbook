@@ -627,6 +627,11 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_SaveTour_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_CoudApps;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_Files;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_FossilUI;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_SerialPort;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_SerialPortWithConfig;
    public static String        Dialog_ImportConfig_Checkbox_TourType;
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
    public static String        Dialog_ImportConfig_Column_AdjustElevation_Header;
@@ -667,6 +672,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Group_Dashboard;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
+   public static String        Dialog_ImportConfig_Group_SimpleImport;
    public static String        Dialog_ImportConfig_Group_StateTooltip;
    public static String        Dialog_ImportConfig_Group_Tiles;
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
@@ -696,6 +702,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
+   public static String        Dialog_ImportConfig_Label_ShowTheseTiles;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;

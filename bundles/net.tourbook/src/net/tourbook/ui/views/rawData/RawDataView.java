@@ -1269,6 +1269,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private String createHTML_20_Body() {
 
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final boolean isShowSimpleImport = easyConfig.isShowTile_CloudApps
+            || easyConfig.isShowTile_Files
+            || easyConfig.isShowTile_FossilUI
+            || easyConfig.isShowTile_SerialPort
+            || easyConfig.isShowTile_SerialPortWithConfig;
+
       final StringBuilder sb = new StringBuilder();
 
       sb.append("<div class='import-container'>" + NL); //$NON-NLS-1$
@@ -1283,19 +1291,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append("<div class='import-content'>" + NL); //$NON-NLS-1$
          {
             /*
-             * Device Import
+             * Easy Import
              */
             createHTML_50_Easy_Header(sb);
             createHTML_80_Easy_Tiles(sb);
 
             /*
-             * Get Tours
+             * Simple Import
              */
-            sb.append("<div class='get-tours-title title'>" + NL); //$NON-NLS-1$
-            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + NL);
-            sb.append("</div>" + NL); //$NON-NLS-1$
+            if (isShowSimpleImport) {
 
-            createHTML_90_SimpleImport(sb);
+               sb.append("<div class='get-tours-title title'>" + NL); //$NON-NLS-1$
+               sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + NL);
+               sb.append("</div>" + NL); //$NON-NLS-1$
+
+               createHTML_90_SimpleImport(sb, easyConfig);
+            }
          }
          sb.append("</div>" + NL); //$NON-NLS-1$
       }
@@ -1798,7 +1809,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       for (final ImportConfig importConfig : easyConfig.importConfigs) {
 
-         final String isSelected = importConfig.equals(selectedConfig)//
+         final String isSelected = importConfig.equals(selectedConfig)
                ? "selected" //$NON-NLS-1$
                : UI.EMPTY_STRING;
 
@@ -1842,7 +1853,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          numHorizontalTiles = availableLauncher;
       }
 
-      final String watchClass = isWatchingOn() //
+      final String watchClass = isWatchingOn()
             ? DOM_CLASS_DEVICE_ON
             : DOM_CLASS_DEVICE_OFF;
 
@@ -2144,48 +2155,63 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return sb.toString();
    }
 
-   private void createHTML_90_SimpleImport(final StringBuilder sb) {
+   private void createHTML_90_SimpleImport(final StringBuilder sb, final EasyConfig easyConfig) {
 
       sb.append("<div class='get-tours-items'>" + NL); //$NON-NLS-1$
       sb.append("   <table><tbody><tr>" + NL); //$NON-NLS-1$
       {
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_ImportFromFiles_Action,
-               Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
-               (HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES),
-               _imageUrl_ImportFromFile);
-
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
-               (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
-               _imageUrl_SerialPort_Configured);
-
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
-               (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
-               _imageUrl_SerialPort_Directly);
-
-         for (final var cloudDownloader : _cloudDownloadersList) {
+         if (easyConfig.isShowTile_Files) {
 
             createHTML_92_TileAction(
                   sb,
-                  cloudDownloader.getName(),
-                  cloudDownloader.getTooltip(),
-                  (HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId()),
-                  cloudDownloader.getIconUrl());
+                  Messages.Import_Data_HTML_ImportFromFiles_Action,
+                  Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
+                  HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES,
+                  _imageUrl_ImportFromFile);
          }
 
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_Action_OldUI,
-               Messages.Import_Data_HTML_Action_OldUI_Tooltip,
-               (HTTP_DUMMY + HREF_ACTION_OLD_UI),
-               null);
+         if (easyConfig.isShowTile_CloudApps) {
+
+            for (final var cloudDownloader : _cloudDownloadersList) {
+
+               createHTML_92_TileAction(
+                     sb,
+                     cloudDownloader.getName(),
+                     cloudDownloader.getTooltip(),
+                     HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId(),
+                     cloudDownloader.getIconUrl());
+            }
+         }
+
+         if (easyConfig.isShowTile_SerialPort) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
+                  HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED,
+                  _imageUrl_SerialPort_Configured);
+         }
+
+         if (easyConfig.isShowTile_SerialPortWithConfig) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
+                  HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY,
+                  _imageUrl_SerialPort_Directly);
+         }
+
+         if (easyConfig.isShowTile_FossilUI) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_Action_OldUI,
+                  Messages.Import_Data_HTML_Action_OldUI_Tooltip,
+                  HTTP_DUMMY + HREF_ACTION_OLD_UI,
+                  null);
+         }
       }
       sb.append("   </tr></tbody></table>" + NL); // //$NON-NLS-1$
       sb.append("</div>" + NL); //$NON-NLS-1$
@@ -2424,7 +2450,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              */
             final Label label = new Label(container, SWT.WRAP);
             label.setText(Messages.Import_Data_OldUI_Label_Info);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .grab(true, false)
                   .span(2, 1)
@@ -2438,7 +2464,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // icon
             final CLabel iconImport = new CLabel(container, SWT.NONE);
             iconImport.setImage(_images.get(IMAGE_IMPORT_FROM_FILES));
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .indent(0, 10)
                   .align(SWT.CENTER, SWT.BEGINNING)
 //                  .grab(true, false)
@@ -2449,7 +2475,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             _linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
             _linkImport.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> _rawDataMgr.actionImportFromFile()));
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -2464,7 +2490,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // icon
             final CLabel iconTransfer = new CLabel(container, SWT.NONE);
             iconTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER));
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.CENTER, SWT.BEGINNING)
 //                  .grab(true, false)
                   .indent(0, 10)
@@ -2475,7 +2501,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
             linkTransfer.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> _rawDataMgr.actionImportFromDevice()));
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
 //                  .grab(true, false)
@@ -2490,7 +2516,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // icon
             final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
             iconDirectTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER_DIRECT));
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.CENTER, SWT.BEGINNING)
 //                  .grab(true, false)
                   .indent(0, 10)
@@ -2501,7 +2527,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
             linkTransferDirect.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> _rawDataMgr.actionImportFromDeviceDirect()));
-            GridDataFactory.fillDefaults() //
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -2523,7 +2549,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
             link.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onSelectUI_New()));
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -2537,7 +2563,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              */
             final Label label = new Label(container, SWT.WRAP);
             label.setText(Messages.Import_Data_OldUI_Label_Hint);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .grab(true, false)
                   .indent(0, 20)
@@ -2584,7 +2610,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _txtNoBrowser = new Text(_dashboardPage_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
          _txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
          _txtNoBrowser.setBackground(bgColor);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.BEGINNING)
                .applyTo(_txtNoBrowser);
@@ -3612,7 +3638,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // action: merge tour ... into ...
       if (isOneSelectedNotDeleteTour) {
 
-         final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
+         final StringBuilder sb = new StringBuilder()
+               .append(UI.EMPTY_STRING)
                .append(TourManager.getTourDateShort(firstValidTour))
                .append(UI.DASH_WITH_SPACE)
                .append(TourManager.getTourTimeShort(firstValidTour))
@@ -4187,7 +4214,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // make the import tiles visible otherwise they are 'hidden' after the startup
          _isShowWatcherAnimation = true;
-         updateUI_WatcherAnimation(isWatchingOn() //
+         updateUI_WatcherAnimation(isWatchingOn()
                ? DOM_CLASS_DEVICE_ON_ANIMATED
                : DOM_CLASS_DEVICE_OFF_ANIMATED);
       }
@@ -5983,16 +6010,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _isRunDashboardAnimation = true;
       }
 
-      easyConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
-      easyConfig.animationDuration = modifiedConfig.animationDuration;
+// SET_FORMATTING_OFF
 
-      easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
-      easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
-      easyConfig.isLogDetails = modifiedConfig.isLogDetails;
-      easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
-      easyConfig.stateToolTipDisplayAbsoluteFilePath = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
-      easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;
-      easyConfig.tileSize = modifiedConfig.tileSize;
+      easyConfig.animationCrazinessFactor             = modifiedConfig.animationCrazinessFactor;
+      easyConfig.animationDuration                    = modifiedConfig.animationDuration;
+      easyConfig.backgroundOpacity                    = modifiedConfig.backgroundOpacity;
+      easyConfig.isLiveUpdate                         = modifiedConfig.isLiveUpdate;
+      easyConfig.isLogDetails                         = modifiedConfig.isLogDetails;
+      easyConfig.isShowTile_CloudApps                 = modifiedConfig.isShowTile_CloudApps;
+      easyConfig.isShowTile_Files                     = modifiedConfig.isShowTile_Files;
+      easyConfig.isShowTile_FossilUI                  = modifiedConfig.isShowTile_FossilUI;
+      easyConfig.isShowTile_SerialPort                = modifiedConfig.isShowTile_SerialPort;
+      easyConfig.isShowTile_SerialPortWithConfig      = modifiedConfig.isShowTile_SerialPortWithConfig;
+      easyConfig.numHorizontalTiles                   = modifiedConfig.numHorizontalTiles;
+      easyConfig.stateToolTipDisplayAbsoluteFilePath  = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
+      easyConfig.stateToolTipWidth                    = modifiedConfig.stateToolTipWidth;
+      easyConfig.tileSize                             = modifiedConfig.tileSize;
+
+// SET_FORMATTING_ON
 
       EasyImportManager.getInstance().saveEasyConfig(easyConfig);
    }
@@ -6118,7 +6153,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
       jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
 
-      final String js = UI.EMPTY_STRING + NL //
+      final String js = NL
 
             + "var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";" + NL //                                         //$NON-NLS-1$ //$NON-NLS-2$
             + "document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
