@@ -135,6 +135,7 @@ import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -384,13 +385,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
    private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private ActionReimportTours            _actionReimport_Tours;
+   private ActionReimportTours            _actionReimportTours;
    private ActionRemoveTour               _actionRemoveTour;
    private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
    private ActionSaveTourInDatabase       _actionSaveTour;
    private ActionSaveTourInDatabase       _actionSaveTourWithPerson;
    private ActionSetupImport              _actionSetupImport;
    private ActionSetTourTypeMenu          _actionSetTourType;
+   private ActionToggleFossilOrEasyImport _actionToggleFossilOrEasyImportUI;
    private ActionUpload                   _actionUploadTour;
    //
    protected TourPerson                   _activePerson;
@@ -503,6 +505,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Browser   _browser;
 
    private Menu      _tableContextMenu;
+
+   private class ActionToggleFossilOrEasyImport extends Action {
+
+      public ActionToggleFossilOrEasyImport() {
+
+         setToolTipText(Messages.Import_Data_Action_ImportUI_Easy_Tooltip);
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy));
+      }
+
+      @Override
+      public void run() {
+         actionToggle_SimpleOrEasy_ImportUI();
+      }
+   }
 
    private class ImportComparator extends ViewerComparator {
 
@@ -885,6 +901,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       saveImportedTours(getAnySelectedTours(), person);
    }
 
+   private void actionToggle_SimpleOrEasy_ImportUI() {
+
+      if (_isEasyImportUI) {
+
+         // show fossil UI
+
+         onSelectUI_Fossil();
+
+      } else {
+
+         // show easy UI
+
+         onSelectUI_EasyImport();
+      }
+   }
+
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
@@ -1084,28 +1116,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 // SET_FORMATTING_OFF
 
-      _actionEditImportPreferences     = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+      _actionEditImportPreferences        = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
 
-      _actionClearView                 = new ActionClearView(this);
-      _actionDeleteTourFile            = new ActionDeleteTourFiles(this);
-      _actionEditTour                  = new ActionEditTour(this);
-      _actionEditQuick                 = new ActionEditQuick(this);
-      _actionExportTour                = new ActionExport(this);
-      _actionJoinTours                 = new ActionJoinTours(this);
-      _actionMergeIntoTour             = new ActionMergeIntoMenu(this);
-      _actionMergeTour                 = new ActionMergeTour(this);
-      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this);
-      _actionOpenTourLogView           = new ActionOpenTourLogView();
-      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, true);
-      _actionOpenTour                  = new ActionOpenTour(this);
-      _actionReimport_Tours            = new ActionReimportTours(this);
-      _actionRemoveTour                = new ActionRemoveTour(this);
-      _actionRemoveToursWhenClosed     = new ActionRemoveToursWhenClosed();
-      _actionSaveTour                  = new ActionSaveTourInDatabase(this, false);
-      _actionSaveTourWithPerson        = new ActionSaveTourInDatabase(this, true);
-      _actionSetupImport               = new ActionSetupImport(this);
-      _actionSetTourType               = new ActionSetTourTypeMenu(this);
-      _actionUploadTour                = new ActionUpload(this);
+      _actionToggleFossilOrEasyImportUI   = new ActionToggleFossilOrEasyImport();
+      _actionClearView                    = new ActionClearView(this);
+      _actionDeleteTourFile               = new ActionDeleteTourFiles(this);
+      _actionEditTour                     = new ActionEditTour(this);
+      _actionEditQuick                    = new ActionEditQuick(this);
+      _actionExportTour                   = new ActionExport(this);
+      _actionJoinTours                    = new ActionJoinTours(this);
+      _actionMergeIntoTour                = new ActionMergeIntoMenu(this);
+      _actionMergeTour                    = new ActionMergeTour(this);
+      _actionOpenAdjustAltitudeDialog     = new ActionOpenAdjustAltitudeDialog(this);
+      _actionOpenTourLogView              = new ActionOpenTourLogView();
+      _actionOpenMarkerDialog             = new ActionOpenMarkerDialog(this, true);
+      _actionOpenTour                     = new ActionOpenTour(this);
+      _actionReimportTours                = new ActionReimportTours(this);
+      _actionRemoveTour                   = new ActionRemoveTour(this);
+      _actionRemoveToursWhenClosed        = new ActionRemoveToursWhenClosed();
+      _actionSaveTour                     = new ActionSaveTourInDatabase(this, false);
+      _actionSaveTourWithPerson           = new ActionSaveTourInDatabase(this, true);
+      _actionSetupImport                  = new ActionSetupImport(this);
+      _actionSetTourType                  = new ActionSetTourTypeMenu(this);
+      _actionUploadTour                   = new ActionUpload(this);
 
 // SET_FORMATTING_ON
    }
@@ -2339,8 +2372,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        */
       _images.put(IMAGE_DATA_TRANSFER,          TourbookPlugin.getImageDescriptor(Images.RawData_Transfer));
       _images.put(IMAGE_DATA_TRANSFER_DIRECT,   TourbookPlugin.getImageDescriptor(Images.RawData_TransferDirect));
-      _images.put(IMAGE_IMPORT_FROM_FILES,      TourbookPlugin.getImageDescriptor(Images.RawData_Import));
-      _images.put(IMAGE_NEW_UI,                 TourbookPlugin.getImageDescriptor(Images.RawData_DashboardUI));
+      _images.put(IMAGE_IMPORT_FROM_FILES,      TourbookPlugin.getImageDescriptor(Images.Import_Files));
+      _images.put(IMAGE_NEW_UI,                 TourbookPlugin.getImageDescriptor(Images.Import_DashboardUI));
 
 // SET_FORMATTING_ON
    }
@@ -2398,7 +2431,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          /*
           * Image urls
           */
-         _imageUrl_ImportFromFile = getIconUrl(Images.RawData_Import);
+         _imageUrl_ImportFromFile = getIconUrl(Images.Import_Files);
          _imageUrl_SerialPort_Configured = getIconUrl(Images.RawData_Transfer);
          _imageUrl_SerialPort_Directly = getIconUrl(Images.RawData_TransferDirect);
 
@@ -2548,7 +2581,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final Link link = new Link(container, SWT.NONE);
             link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
             link.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onSelectUI_New()));
+                  selectionEvent -> onSelectUI_EasyImport()));
             GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
@@ -3563,17 +3596,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void enableActions() {
 
-      final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
-      final boolean isTourAvailable = rawData.length > 0;
+      final boolean isTourImported = _rawDataMgr.getImportedTours().values().size() > 0;
 
       final StructuredSelection selection = (StructuredSelection) _tourViewer.getSelection();
 
-      int savedTours = 0;
-      int unsavedTours = 0;
-      int selectedTours = 0;
+      int numSavedTours = 0;
+      int numUnsavedTours = 0;
+      int numSelectedTours = 0;
 
       // contains all tours which are selected and not deleted
-      int selectedNotDeletedTours = 0;
+      int numSelectedNotDeletedTours = 0;
 
       TourData firstSavedTour = null;
       TourData firstValidTour = null;
@@ -3581,7 +3613,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       for (final Object treeItem : selection) {
          if (treeItem instanceof TourData) {
 
-            selectedTours++;
+            numSelectedTours++;
 
             final TourData tourData = (TourData) treeItem;
             if (tourData.getTourPerson() == null) {
@@ -3592,30 +3624,60 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   // tour is not deleted, deleted tours are ignored
 
-                  unsavedTours++;
-                  selectedNotDeletedTours++;
+                  numUnsavedTours++;
+                  numSelectedNotDeletedTours++;
                }
 
             } else {
 
-               if (savedTours == 0) {
+               if (numSavedTours == 0) {
                   firstSavedTour = tourData;
                }
 
-               savedTours++;
-               selectedNotDeletedTours++;
+               numSavedTours++;
+               numSelectedNotDeletedTours++;
             }
 
-            if (selectedNotDeletedTours == 1) {
+            if (numSelectedNotDeletedTours == 1) {
                firstValidTour = tourData;
             }
          }
       }
 
-      final boolean isSavedTourSelected = savedTours > 0;
-      final boolean isOneSavedAndNotDeleteTour = (selectedNotDeletedTours == 1) && (savedTours == 1);
+      final boolean isSavedTourSelected = numSavedTours > 0;
+      final boolean isOneSavedAndNotDeleteTour = numSelectedNotDeletedTours == 1 && numSavedTours == 1;
+      final boolean isOneSelectedNotDeleteTour = numSelectedNotDeletedTours == 1;
 
-      final boolean isOneSelectedNotDeleteTour = selectedNotDeletedTours == 1;
+      final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
+      final ArrayList<Long> allUsedTagIds = new ArrayList<>();
+
+      long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      boolean isOneTourSelected;
+
+      if (firstSavedTour != null && numSavedTours == 1) {
+
+         // one tour is selected
+
+         isOneTourSelected = true;
+
+         final TourType tourType = firstSavedTour.getTourType();
+         existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+
+         final Set<TourTag> allUsedTags = firstSavedTour.getTourTags();
+         if (allUsedTags != null && allUsedTags.size() > 0) {
+
+            // tour contains at least one tag
+            for (final TourTag tourTag : allUsedTags) {
+               allUsedTagIds.add(tourTag.getTagId());
+            }
+         }
+
+      } else {
+
+         // multiple tours are selected
+
+         isOneTourSelected = false;
+      }
 
       // action: save tour with person
       final TourPerson person = TourbookPlugin.getActivePerson();
@@ -3625,7 +3687,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                person.getName()));
          _actionSaveTourWithPerson.setPerson(person);
       }
-      _actionSaveTourWithPerson.setEnabled((person != null) && (unsavedTours > 0));
+      _actionSaveTourWithPerson.setEnabled((person != null) && (numUnsavedTours > 0));
 
       // action: save tour...
       if (selection.size() == 1) {
@@ -3633,7 +3695,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else {
          _actionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
       }
-      _actionSaveTour.setEnabled(unsavedTours > 0);
+      _actionSaveTour.setEnabled(numUnsavedTours > 0);
 
       // action: merge tour ... into ...
       if (isOneSelectedNotDeleteTour) {
@@ -3655,67 +3717,39 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionMergeIntoTour.setEnabled(isOneSelectedNotDeleteTour);
 
       _actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
-      _actionReimport_Tours.setEnabled(selectedTours > 0);
-      _actionRemoveTour.setEnabled(selectedTours > 0);
-      _actionExportTour.setEnabled(selectedNotDeletedTours > 0);
-      _actionJoinTours.setEnabled(selectedNotDeletedTours > 1);
-      _actionUploadTour.setEnabled(selectedNotDeletedTours > 0);
 
-      _actionEditTour.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionEditQuick.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionOpenTour.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionOpenMarkerDialog.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndNotDeleteTour);
+// SET_FORMATTING_OFF
 
-      _actionDeleteTourFile.setEnabled(isTourAvailable);
+      _actionDeleteTourFile               .setEnabled(isTourImported);
+      _actionEditTour                     .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionEditQuick                    .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionExportTour                   .setEnabled(numSelectedNotDeletedTours > 0);
+      _actionJoinTours                    .setEnabled(numSelectedNotDeletedTours > 1);
+      _actionOpenTour                     .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionOpenMarkerDialog             .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionOpenAdjustAltitudeDialog     .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionReimportTours                .setEnabled(numSelectedTours > 0);
+      _actionRemoveTour                   .setEnabled(numSelectedTours > 0);
+      _actionUploadTour                   .setEnabled(numSelectedNotDeletedTours > 0);
 
-      // set double click state
-      _tourDoubleClickState.canEditTour = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canQuickEditTour = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canEditMarker = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canAdjustAltitude = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canOpenTour = isOneSelectedNotDeleteTour;
+      // import setup
+      _actionClearView                    .setEnabled(isTourImported);
+      _actionSetupImport                  .setEnabled(!isTourImported);
+      _actionToggleFossilOrEasyImportUI   .setEnabled(!isTourImported);
 
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
-
-      final ArrayList<Long> existingTagIds = new ArrayList<>();
-      long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-      boolean isOneTour;
-
-      if ((firstSavedTour != null) && (savedTours == 1)) {
-
-         // one tour is selected
-
-         isOneTour = true;
-
-         final TourType tourType = firstSavedTour.getTourType();
-         existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-
-         final Set<TourTag> existingTags = firstSavedTour.getTourTags();
-         if ((existingTags != null) && (existingTags.size() > 0)) {
-
-            // tour contains at least one tag
-            for (final TourTag tourTag : existingTags) {
-               existingTagIds.add(tourTag.getTagId());
-            }
-         }
-      } else {
-
-         // multiple tours are selected
-
-         isOneTour = false;
-      }
-
-      // enable/disable actions for tags/tour types
-      _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTour, existingTagIds);
+      // actions for tags/tour types
+      _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
+      _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTourSelected, allUsedTagIds);
       TourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
 
-      /*
-       * Action: Setup import
-       */
-      _actionSetupImport.setEnabled(!isTourAvailable);
-      _actionClearView.setEnabled(isTourAvailable);
+      // set double click state
+      _tourDoubleClickState.canEditTour         = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canQuickEditTour    = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canEditMarker       = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canAdjustAltitude   = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canOpenTour         = isOneSelectedNotDeleteTour;
+
+// SET_FORMATTING_ON
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -3733,7 +3767,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       menuMgr.add(new Separator());
       menuMgr.add(_actionUploadTour);
       menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimport_Tours);
+      menuMgr.add(_actionReimportTours);
       menuMgr.add(_actionEditImportPreferences);
       menuMgr.add(_actionRemoveTour);
       menuMgr.add(_actionDeleteTourFile);
@@ -3775,6 +3809,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tbm.add(new GroupMarker("import")); //$NON-NLS-1$
       tbm.add(new Separator());
 
+      tbm.add(_actionToggleFossilOrEasyImportUI);
       tbm.add(_actionClearView);
       tbm.add(_actionOpenTourLogView);
       tbm.add(_actionSetupImport);
@@ -3790,6 +3825,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void fireSelectedTour() {
+
+      if (_parent != null && _parent.isDisposed()) {
+
+         // this happens when import view is closed from setFocus() method
+
+         return;
+      }
 
       final IStructuredSelection selection = (IStructuredSelection) _tourViewer.getSelection();
       final TourData tourData = (TourData) selection.getFirstElement();
@@ -4277,7 +4319,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
-         onSelectUI_Old();
+         onSelectUI_Fossil();
 
       } else {
 
@@ -4365,7 +4407,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void onSelectUI_New() {
+   private void onSelectUI_EasyImport() {
 
       _isEasyImportUI = true;
       _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
@@ -4373,9 +4415,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       updateUI_1_TopPage(true);
 
       showFailbackUI();
+
+      updateUI_EasyFossilAction();
    }
 
-   private void onSelectUI_Old() {
+   private void onSelectUI_Fossil() {
 
       resetEasyImport();
 
@@ -4383,6 +4427,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
 
       updateUI_1_TopPage(true);
+
+      updateUI_EasyFossilAction();
    }
 
    private void recreateViewer() {
@@ -4681,6 +4727,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _rawDataMgr.setIsHAC4_5_ChecksumValidation(isValidation);
 
       updateToolTipState();
+      updateUI_EasyFossilAction();
 
       Display.getCurrent().asyncExec(() -> reimportAllImportFiles(true));
    }
@@ -5639,7 +5686,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // check again because the browser could be set
             if (_browser == null || _browser.isDisposed()) {
-               onSelectUI_Old();
+               onSelectUI_Fossil();
             }
          });
       }
@@ -6167,6 +6214,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (!isSuccess) {
          System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
                + ("\tupdateDOM_DeviceState: " + isSuccess + js)); //$NON-NLS-1$
+      }
+   }
+
+   private void updateUI_EasyFossilAction() {
+
+      if (_isEasyImportUI) {
+
+         // show fossil UI
+
+         _actionToggleFossilOrEasyImportUI.setToolTipText(Messages.Import_Data_Action_ImportUI_Fossil_Tooltip);
+
+         _actionToggleFossilOrEasyImportUI.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil));
+         _actionToggleFossilOrEasyImportUI.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil_Disabled));
+
+      } else {
+
+         // show easy UI
+
+         _actionToggleFossilOrEasyImportUI.setToolTipText(Messages.Import_Data_Action_ImportUI_Easy_Tooltip);
+
+         _actionToggleFossilOrEasyImportUI.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy));
+         _actionToggleFossilOrEasyImportUI.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Disabled));
       }
    }
 
