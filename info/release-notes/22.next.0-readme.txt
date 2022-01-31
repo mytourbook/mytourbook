@@ -86,7 +86,7 @@ Bugfix
   - When determining if a Suunto activity already exists in the database, only the tours for the selected user are compared with the activities available on the Suunto App
 
 * Map25 (Thomas)
-  - The old hillshading provider(wmflabs.org) is not avaible anymore, the new provider for hillshading is now "Mapilion"
+  - The old hillshading provider(wmflabs.org) is not available anymore, the new provider for hillshading is now "Mapilion"
   
 * Tour Editor
   - Using DELETE in the Tour Editor is not consecutive        https://sourceforge.net/p/mytourbook/bugs/127/
