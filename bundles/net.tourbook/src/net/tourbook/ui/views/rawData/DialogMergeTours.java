@@ -570,6 +570,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       super.createButtonsForButtonBar(parent);
 
+      // rename OK button
       final Button buttonOK = getButton(IDialogConstants.OK_ID);
       buttonOK.setText(Messages.tour_merger_save_target_tour);
 
@@ -1382,6 +1383,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _tourChartConfig.isRelativeValueDiffScaling = _chkValueDiffScaling.getSelection();
 
       if (_chkPreviewChart.getSelection()) {
+         // update chart
          updateTourChart();
       } else {
          // update only the merge layer, this is much faster
