@@ -157,6 +157,7 @@ public class Map2 extends Canvas {
    private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
    private static final IDialogSettings _geoFilterState                                = TourGeoFilter_Manager.getState();
+
    /**
     * Min zoomlevels which the maps supports
     */
@@ -168,7 +169,7 @@ public class Map2 extends Canvas {
    public static final int              MAP_MAX_ZOOM_LEVEL                             = 22;
 
    /**
-    * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
+    * These zoom levels are displayed in the UI therefore they start with 1 instead of 0
     */
    public static final int              UI_MIN_ZOOM_LEVEL                              = MAP_MIN_ZOOM_LEVEL + 1;
    public static final int              UI_MAX_ZOOM_LEVEL                              = MAP_MAX_ZOOM_LEVEL + 1;
@@ -3913,11 +3914,12 @@ public class Map2 extends Canvas {
          paint_HoveredTour_10(gc, _hovered_SelectedTourId);
       }
 
-      if (isPaintBreadcrumbs) {
+      final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
+      final boolean isShowTourPaintMethodEnhancedWarning = isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning;
 
-         final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
+      if (isPaintBreadcrumbs || isShowTourPaintMethodEnhancedWarning) {
 
-         _tourBreadcrumb.paint(gc, isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning);
+         _tourBreadcrumb.paint(gc, isPaintBreadcrumbs, isShowTourPaintMethodEnhancedWarning);
       }
 
       return isPaintTourInfo;
