@@ -1727,7 +1727,8 @@ public class TourMapPainter extends Map2Painter {
                                  devFrom_WithOffsetY,
                                  color,
                                  tile,
-                                 tourId);
+                                 tourId,
+                                 serieIndex);
 
                         }
 
@@ -1739,7 +1740,8 @@ public class TourMapPainter extends Map2Painter {
                               devTo_WithOffsetY,
                               color,
                               tile,
-                              tourId);
+                              tourId,
+                              serieIndex);
                      }
                   }
 
@@ -1763,7 +1765,8 @@ public class TourMapPainter extends Map2Painter {
                         devTo_WithOffsetY,
                         color,
                         tile,
-                        tourId);
+                        tourId,
+                        serieIndex);
                }
 
                // keep positions
@@ -1837,7 +1840,7 @@ public class TourMapPainter extends Map2Painter {
                               isInRefTourPart);
 
                         if (_prefIsDrawSquare == false || _isFastPainting) {
-                           drawTour_40_Dot(gcTile, devX, devY, color, tile, tourId);
+                           drawTour_40_Dot(gcTile, devX, devY, color, tile, tourId, serieIndex);
                         } else {
                            drawTour_30_Square(gcTile, devX, devY, color, tile);
                         }
@@ -1868,7 +1871,8 @@ public class TourMapPainter extends Map2Painter {
                                  final int devYTo,
                                  final Color color,
                                  final Tile tile,
-                                 final Long tourId) {
+                                 final Long tourId,
+                                 final int serieIndex) {
 
       final int prime = 31;
       int paintingHash = 1;
@@ -1891,7 +1895,7 @@ public class TourMapPainter extends Map2Painter {
       }
       allPainted_DotsHash.add(paintingHash);
 
-      drawTour_40_Dot(gc, devXTo, devYTo, color, tile, tourId);
+      drawTour_40_Dot(gc, devXTo, devYTo, color, tile, tourId, serieIndex);
 
       // draw line with the color from the legend provider
       if (color != null) {
@@ -1940,7 +1944,8 @@ public class TourMapPainter extends Map2Painter {
                                 final int devY,
                                 final Color color,
                                 final Tile tile,
-                                final Long tourId) {
+                                final Long tourId,
+                                final int serieIndex) {
 
       final int prime = 31;
       int paintingHash = 1;
@@ -1998,6 +2003,7 @@ public class TourMapPainter extends Map2Painter {
 
       tile.allPainted_HoverRectangle.add(hoveredRect);
       tile.allPainted_HoverTourID.add(tourId);
+      tile.allPainted_HoverSerieIndices.add(serieIndex);
    }
 
    /**

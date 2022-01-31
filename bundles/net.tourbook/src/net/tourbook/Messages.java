@@ -2032,6 +2032,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_HoveredColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SelectedColor;
    public static String        Slideout_Map_Options_Label_SelectedColor_Tooltip;
+   public static String        Slideout_Map_Options_Label_SelectTourTrackpoint;
+   public static String        Slideout_Map_Options_Label_SelectTourTrackpoint_Tooltip;
    public static String        Slideout_Map_Options_Label_SliderLocation_Color;
    public static String        Slideout_Map_Options_Label_SliderLocation_Color_Tooltip;
    public static String        Slideout_Map_Options_Label_SliderLocation_Size;
@@ -2044,6 +2046,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_TourDirection_LineWidth;
    public static String        Slideout_Map_Options_Label_TourDirection_SymbolColor;
    public static String        Slideout_Map_Options_Label_TourDirection_SymbolSize;
+   public static String        Slideout_Map_Options_Radio_SelectTour;
+   public static String        Slideout_Map_Options_Radio_SelectTrackpoint;
    public static String        Slideout_Map_Options_Spinner_DimValue_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Label_Title;
    public static String        Slideout_Map_SyncMap_Label_Title;

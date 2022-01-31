@@ -59,6 +59,8 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
@@ -493,8 +495,10 @@ public class Map2 extends Canvas {
    private long             _hovered_SelectedTourId    = Long.MIN_VALUE;
 
    private ArrayList<Long>  _allHoveredTourIds         = new ArrayList<>();
-   private ArrayList<Point> _allDevHoveredPoints       = new ArrayList<>();
+   private TIntArrayList    _allHoveredSerieIndices    = new TIntArrayList();
+   private ArrayList<Point> _allHoveredDevPoints       = new ArrayList<>();
 
+   private boolean          _hoveredSelectedTour_IsSelectTour;
    private int              _hoveredSelectedTour_Hovered_Opacity;
    private Color            _hoveredSelectedTour_Hovered_Color;
    private int              _hoveredSelectedTour_HoveredAndSelected_Opacity;
@@ -2261,7 +2265,8 @@ public class Map2 extends Canvas {
 
       // reset hovered data
       _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
+      _allHoveredDevPoints.clear();
+      _allHoveredSerieIndices.clear();
 
       if (hoveredTile == null) {
 
@@ -2282,6 +2287,7 @@ public class Map2 extends Canvas {
 
       // optimize performance by removing object references
       final long[] allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
+      final int[] allPainted_HoveredSerieIndices = hoveredTile.allPainted_HoverSerieIndices.toArray();
 
       final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangle_List.toArray(
             new Rectangle[allPainted_HoveredRectangle_List.size()]);
@@ -2293,9 +2299,9 @@ public class Map2 extends Canvas {
 
          final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
 
-         // optimized: hoveredRectangle.contains(devMouseTileX, devMouseTileY)
-         if ((devMouseTileX >= painted_HoveredRectangle.x)
-               && (devMouseTileY >= painted_HoveredRectangle.y)
+         // optimized: painted_HoveredRectangle.contains(devMouseTileX, devMouseTileY)
+         if (devMouseTileX >= painted_HoveredRectangle.x
+               && devMouseTileY >= painted_HoveredRectangle.y
                && devMouseTileX < (painted_HoveredRectangle.x + painted_HoveredRectangle.width)
                && devMouseTileY < (painted_HoveredRectangle.y + painted_HoveredRectangle.height)) {
 
@@ -2309,7 +2315,8 @@ public class Map2 extends Canvas {
             devHoveredRect_Center_Y += devHoveredTileY;
 
             _allHoveredTourIds.add(painted_HoveredTourId);
-            _allDevHoveredPoints.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
+            _allHoveredSerieIndices.add(allPainted_HoveredSerieIndices[hoverIndex]);
+            _allHoveredDevPoints.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
 
             // advance to the next tour id
             int hoverTourIdIndex;
@@ -2826,7 +2833,8 @@ public class Map2 extends Canvas {
 
          // reset hovered data to hide hovered tour background
          _allHoveredTourIds.clear();
-         _allDevHoveredPoints.clear();
+         _allHoveredDevPoints.clear();
+         _allHoveredSerieIndices.clear();
 
          redraw();
       }
@@ -3020,7 +3028,8 @@ public class Map2 extends Canvas {
 
             // do not show hovered tour info -> reset hovered data
             _allHoveredTourIds.clear();
-            _allDevHoveredPoints.clear();
+            _allHoveredDevPoints.clear();
+            _allHoveredSerieIndices.clear();
 
             if (_tourBreadcrumb.isCrumbHovered()) {
                setCursor(_cursorHand);
@@ -3213,7 +3222,7 @@ public class Map2 extends Canvas {
             paint_OfflineArea(gc);
          }
 
-         final boolean isPaintTourInfo = paint_HoveredTour(gc);
+         final boolean isPaintHoveredTourInfo = paint_HoveredTour(gc);
 
          _geoGrid_Label_Outline = null;
          _geoGrid_Action_Outline = null;
@@ -3229,8 +3238,8 @@ public class Map2 extends Canvas {
             _tour_ToolTip.paint(gc, _clientArea);
          }
 
-         // paint AFTER hovered/selected tour
-         if (isPaintTourInfo) {
+         // paint info AFTER hovered/selected tour
+         if (isPaintHoveredTourInfo) {
             paint_HoveredTour_50_TourInfo(gc);
          }
       }
@@ -3854,13 +3863,13 @@ public class Map2 extends Canvas {
       boolean isPaintBreadcrumbs = false;
 
       /*
-       * Paint hovered tour
+       * Paint tour when hovered
        */
       if (_isShowHoveredSelectedTour) {
 
          isPaintBreadcrumbs = _isShowBreadcrumbs;
 
-         final int numTours = _allDevHoveredPoints.size();
+         final int numTours = _allHoveredDevPoints.size();
 
          if (numTours > 0) {
 
@@ -3877,20 +3886,31 @@ public class Map2 extends Canvas {
                // paint hovered only when not selected
                if (isHoveredAndSelectedTour == false) {
 
-                  gc.setAlpha(0x80);
-                  gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
                   gc.setAlpha(_hoveredSelectedTour_Hovered_Opacity);
-                  gc.setForeground(_hoveredSelectedTour_Hovered_Color);
 
-                  paint_HoveredTour_10(gc, hoveredTourId);
+                  if (_hoveredSelectedTour_IsSelectTour) {
+
+                     // a tour can be selected
+
+                     gc.setForeground(_hoveredSelectedTour_Hovered_Color);
+
+                     paint_HoveredTour_10(gc, hoveredTourId);
+
+                  } else {
+
+                     // a trackpoint can be selected
+
+                     gc.setBackground(_hoveredSelectedTour_Hovered_Color);
+
+                     paint_HoveredTrackpoint_10(gc, hoveredTourId);
+                  }
                }
             }
          }
       }
 
       /*
-       * Paint Selected tour
+       * Paint tour when selected
        */
       if (_hovered_SelectedTourId != Long.MIN_VALUE) {
 
@@ -3914,6 +3934,9 @@ public class Map2 extends Canvas {
          paint_HoveredTour_10(gc, _hovered_SelectedTourId);
       }
 
+      /*
+       * Paint breadcrumb bar
+       */
       final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
       final boolean isShowTourPaintMethodEnhancedWarning = isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning;
 
@@ -3968,7 +3991,7 @@ public class Map2 extends Canvas {
       final double[] longitudeSerie = tourData.longitudeSerie;
 
       // paint with much less points to speed it up
-      final int numMaxSegments = 200;
+      final int numMaxSegments = 1000;
       final float numSlices = latitudeSerie.length;
       final int numSegments = (int) Math.min(numMaxSegments, numSlices);
 
@@ -4257,7 +4280,7 @@ public class Map2 extends Canvas {
       final int detailWidth = contentWidth + marginHorizontal * 2;
       final int detailHeight = contentHeight + marginVertical * 2;
 
-      final int marginAboveMouse = 10;
+      final int marginAboveMouse = 20;
       final int marginBelowMouse = 25;
 
       int devXDetail = devXMouse + 10;
@@ -4302,6 +4325,54 @@ public class Map2 extends Canvas {
 
       gc.setFont(normalFont);
       gc.drawText(valueText, devX, devY);
+   }
+
+   private void paint_HoveredTrackpoint_10(final GC gc, final long tourId) {
+      // TODO Auto-generated method stub
+
+      final TourData tourData = TourManager.getTour(tourId);
+
+      if (tourData == null) {
+
+         // this occurred, it can be that previously a history/multiple tour was displayed
+         return;
+      }
+
+      final MP mp = getMapProvider();
+      final int zoomLevel = getZoom();
+
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+
+      final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
+
+      final int numHoveredPoints = _allHoveredSerieIndices.size();
+
+      final int dotWidth = 30;
+      final int dotWidth2 = dotWidth / 2;
+
+      for (int hoverIndex = 0; hoverIndex < numHoveredPoints; hoverIndex++) {
+
+         final int serieIndex = _allHoveredSerieIndices.get(hoverIndex);
+
+         // get world position for the current lat/lon
+         final java.awt.Point worldPosAWT = mp.geoToPixel(
+               new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
+               zoomLevel);
+
+         // convert world position into device position
+         final int devPosX = worldPosAWT.x - worldPosition_Viewport.x;
+         final int devPosY = worldPosAWT.y - worldPosition_Viewport.y;
+
+         gc.fillOval(
+               devPosX - dotWidth2,
+               devPosY - dotWidth2,
+               dotWidth,
+               dotWidth);
+      }
+
+      gc.setAntialias(SWT.OFF);
+      gc.setAlpha(0xff);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -5918,7 +5989,8 @@ public class Map2 extends Canvas {
       _hovered_SelectedTourId = Long.MIN_VALUE;
 
       _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
+      _allHoveredDevPoints.clear();
+      _allHoveredSerieIndices.clear();
 
       if (_allPaintedTiles != null) {
 
@@ -5938,6 +6010,7 @@ public class Map2 extends Canvas {
 
    public void setConfig_HoveredSelectedTour(final boolean isVisible,
                                              final boolean isShowBreadcrumbs,
+                                             final boolean isSelectTour,
 
                                              final int breadcrumbItems,
                                              final RGB hoveredRGB,
@@ -5951,6 +6024,8 @@ public class Map2 extends Canvas {
 
       _isShowHoveredSelectedTour                      = isVisible;
       _isShowBreadcrumbs                              = isShowBreadcrumbs;
+
+      _hoveredSelectedTour_IsSelectTour               = isSelectTour;
 
       _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
       _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
@@ -5972,7 +6047,8 @@ public class Map2 extends Canvas {
       }
 
       _allHoveredTourIds.clear();
-      _allDevHoveredPoints.clear();
+      _allHoveredDevPoints.clear();
+      _allHoveredSerieIndices.clear();
 
       disposeOverlayImageCache();
 

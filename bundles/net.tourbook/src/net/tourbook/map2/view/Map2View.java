@@ -235,14 +235,16 @@ public class Map2View extends ViewPart implements
    static final int              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT   = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB               = "STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB";    //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT       = new RGB(0, 255, 255);
+   static final String           STATE_HOVERED_SELECTED__IS_SELECT_TOUR                         = "STATE_HOVERED_SELECTED__IS_SELECT_TOUR";              //$NON-NLS-1$
+   static final boolean          STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT                 = true;
    static final String           STATE_HOVERED_SELECTED__SELECTED_OPACITY                       = "STATE_HOVERED_SELECTED__SELECTED_OPACITY";            //$NON-NLS-1$
    static final int              STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT               = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__SELECTED_RGB                           = "STATE_HOVERED_SELECTED__SELECTED_RGB";                //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT                   = new RGB(0, 255, 0);
 
-   static final String           STATE_IS_SHOW_BREADCRUMBS                                      = "STATE_IS_SHOW_BREADCRUMBS";//$NON-NLS-1$
+   static final String           STATE_IS_SHOW_BREADCRUMBS                                      = "STATE_IS_SHOW_BREADCRUMBS";                  //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_BREADCRUMBS_DEFAULT                              = true;
-   static final String           STATE_VISIBLE_BREADCRUMBS                                      = "STATE_VISIBLE_BREADCRUMBS";                              //$NON-NLS-1$
+   static final String           STATE_VISIBLE_BREADCRUMBS                                      = "STATE_VISIBLE_BREADCRUMBS";                  //$NON-NLS-1$
    static final int              STATE_VISIBLE_BREADCRUMBS_DEFAULT                              = 5;
 
    static final String           STATE_IS_SHOW_TOUR_DIRECTION                          = "STATE_IS_SHOW_TOUR_DIRECTION";                        //$NON-NLS-1$
@@ -333,12 +335,11 @@ public class Map2View extends ViewPart implements
    private static final IDialogSettings  _state                 = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_MapProvider     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
    private static final IDialogSettings  _state_PhotoFilter     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
-
+   //
    public static final int               TOUR_INFO_TOOLTIP_X    = 3;
    public static final int               TOUR_INFO_TOOLTIP_Y    = 23;
    public static final int               TOUR_WEATHER_TOOLTIP_X = 28;
    public static final int               TOUR_WEATHER_TOOLTIP_Y = 23;
-
    //
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider    = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
@@ -563,6 +564,7 @@ public class Map2View extends ViewPart implements
 
          setText(Messages.Map_Action_SearchTourByLocation);
          setToolTipText(Messages.Map_Action_SearchTourByLocation_Tooltip);
+
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
       }
 
@@ -3914,8 +3916,9 @@ public class Map2View extends ViewPart implements
        */
       final boolean isShowHoveredSelectedTour   = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
       final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
+      final boolean isSelectTour                = Util.getStateBoolean(_state,   Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR,                  Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT);
 
-      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                                  Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
+      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                               Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
       final int hoveredOpacity                  = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
       final int hoveredAndSelectedOpacity       = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
       final int selectedOpacity                 = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
@@ -3924,8 +3927,11 @@ public class Map2View extends ViewPart implements
       final RGB selectedRGB                     = Util.getStateRGB(_state,       Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB,                    Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
 
       _map.setConfig_HoveredSelectedTour(
+
             isShowHoveredSelectedTour,
             isShowBreadcrumbs,
+            isSelectTour,
+
             numVisibleBreadcrumbs,
             hoveredRGB,
             hoveredOpacity,
