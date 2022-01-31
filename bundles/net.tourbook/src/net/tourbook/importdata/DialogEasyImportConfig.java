@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -261,6 +261,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIL_ShowInDashboard;
    private Button               _chkIL_SetLastMarker;
    private Button               _chkIL_SetTourType;
+   //
+   private Button               _chkOptions_ShowTile_CloudApps;
+   private Button               _chkOptions_ShowTile_Files;
+   private Button               _chkOptions_ShowTile_FossilUI;
+   private Button               _chkOptions_ShowTile_SerialPort;
+   private Button               _chkOptions_ShowTile_SerialPortWithConfig;
    //
    private Button               _btnIC_Duplicate;
    private Button               _btnIC_New;
@@ -652,6 +658,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _dialogEasyConfig.backgroundOpacity                      = easyConfig.backgroundOpacity;
       _dialogEasyConfig.isLiveUpdate                           = easyConfig.isLiveUpdate;
       _dialogEasyConfig.isLogDetails                           = easyConfig.isLogDetails;
+      _dialogEasyConfig.isShowTile_CloudApps                   = easyConfig.isShowTile_CloudApps;
+      _dialogEasyConfig.isShowTile_Files                       = easyConfig.isShowTile_Files;
+      _dialogEasyConfig.isShowTile_FossilUI                    = easyConfig.isShowTile_FossilUI;
+      _dialogEasyConfig.isShowTile_SerialPort                  = easyConfig.isShowTile_SerialPort;
+      _dialogEasyConfig.isShowTile_SerialPortWithConfig        = easyConfig.isShowTile_SerialPortWithConfig;
       _dialogEasyConfig.numHorizontalTiles                     = easyConfig.numHorizontalTiles;
       _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath    = easyConfig.stateToolTipDisplayAbsoluteFilePath;
       _dialogEasyConfig.stateToolTipWidth                      = easyConfig.stateToolTipWidth;
@@ -2473,14 +2484,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         createUI_910_Tiles(container);
-         createUI_920_StateTooltip(container);
-         createUI_930_Dashboard(container);
-         createUI_940_TourLog(container);
+         createUI_910_Option_Tiles(container);
+         createUI_920_Option_StateTooltip(container);
+         createUI_930_Option_Dashboard(container);
+         createUI_940_Option_SimpleImport(container);
+
+         createUI_980_TourLog(container);
       }
    }
 
-   private void createUI_910_Tiles(final Composite parent) {
+   private void createUI_910_Option_Tiles(final Composite parent) {
 
       /*
        * Group: Tiles
@@ -2542,7 +2555,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_920_StateTooltip(final Composite parent) {
+   private void createUI_920_Option_StateTooltip(final Composite parent) {
 
       /*
        * Group: State Tooltip
@@ -2592,7 +2605,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_930_Dashboard(final Composite parent) {
+   private void createUI_930_Option_Dashboard(final Composite parent) {
 
       /*
        * Group: State Tooltip
@@ -2684,7 +2697,69 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_940_TourLog(final Composite parent) {
+   private void createUI_940_Option_SimpleImport(final Composite parent) {
+
+      /*
+       * Group: Simple Import
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ImportConfig_Group_SimpleImport);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
+         {
+            /*
+             * Label: Show these tiles
+             */
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Dialog_ImportConfig_Label_ShowTheseTiles);
+         }
+         {
+            /*
+             * Checkbox: Files
+             */
+            _chkOptions_ShowTile_Files = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_Files.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_Files);
+            _chkOptions_ShowTile_Files.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Cloud apps
+             */
+            _chkOptions_ShowTile_CloudApps = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_CloudApps.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_CoudApps);
+            _chkOptions_ShowTile_CloudApps.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Serial port
+             */
+            _chkOptions_ShowTile_SerialPort = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_SerialPort.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_SerialPort);
+            _chkOptions_ShowTile_SerialPort.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Serial port with configuration
+             */
+            _chkOptions_ShowTile_SerialPortWithConfig = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_SerialPortWithConfig.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_SerialPortWithConfig);
+            _chkOptions_ShowTile_SerialPortWithConfig.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Fossil UI
+             */
+            _chkOptions_ShowTile_FossilUI = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_FossilUI.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_FossilUI);
+            _chkOptions_ShowTile_FossilUI.addSelectionListener(_liveUpdateListener);
+         }
+      }
+   }
+
+   private void createUI_980_TourLog(final Composite parent) {
 
       {
          /*
@@ -4284,15 +4359,25 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    @Override
    public void resetToDefaults() {
 
-      _chkOptions_LiveUpdate.setSelection(EasyConfig.IS_LIVE_UPDATE_DEFAULT);
-      _chkOptions_LogDetails.setSelection(EasyConfig.IS_LOG_DETAILS_DEFAULT);
+// SET_FORMATTING_OFF
 
-      _spinnerDash_AnimationCrazinessFactor.setSelection(EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT);
-      _spinnerDash_AnimationDuration.setSelection(EasyConfig.ANIMATION_DURATION_DEFAULT);
-      _spinnerDash_BgOpacity.setSelection(EasyConfig.BACKGROUND_OPACITY_DEFAULT);
-      _spinnerDash_NumHTiles.setSelection(EasyConfig.HORIZONTAL_TILES_DEFAULT);
-      _spinnerDash_StateTooltipWidth.setSelection(EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT);
-      _spinnerDash_TileSize.setSelection(EasyConfig.TILE_SIZE_DEFAULT);
+      _chkOptions_LiveUpdate                    .setSelection(EasyConfig.IS_LIVE_UPDATE_DEFAULT);
+      _chkOptions_LogDetails                    .setSelection(EasyConfig.IS_LOG_DETAILS_DEFAULT);
+
+      _chkOptions_ShowTile_CloudApps            .setSelection(EasyConfig.IS_SHOW_TILE_CLOUD_APPS_DEFAULT);
+      _chkOptions_ShowTile_Files                .setSelection(EasyConfig.IS_SHOW_TILE_FILES_DEFAULT);
+      _chkOptions_ShowTile_FossilUI             .setSelection(EasyConfig.IS_SHOW_TILE_FOSSIL_UI_DEFAULT);
+      _chkOptions_ShowTile_SerialPort           .setSelection(EasyConfig.IS_SHOW_TILE_SERIAL_PORT_DEFAULT);
+      _chkOptions_ShowTile_SerialPortWithConfig .setSelection(EasyConfig.IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG_DEFAULT);
+
+      _spinnerDash_AnimationCrazinessFactor     .setSelection(EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT);
+      _spinnerDash_AnimationDuration            .setSelection(EasyConfig.ANIMATION_DURATION_DEFAULT);
+      _spinnerDash_BgOpacity                    .setSelection(EasyConfig.BACKGROUND_OPACITY_DEFAULT);
+      _spinnerDash_NumHTiles                    .setSelection(EasyConfig.HORIZONTAL_TILES_DEFAULT);
+      _spinnerDash_StateTooltipWidth            .setSelection(EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT);
+      _spinnerDash_TileSize                     .setSelection(EasyConfig.TILE_SIZE_DEFAULT);
+
+// SET_FORMATTING_ON
 
       doLiveUpdate();
    }
@@ -4302,7 +4387,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Tab folder
        */
-      final int selectedTab = _initialTab == -1 //
+      final int selectedTab = _initialTab == -1
             ? Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0)
             : _initialTab;
 
@@ -4377,16 +4462,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Dashboard
        */
-      _chkOptions_DisplayAbsoluteFilePath    .setSelection(_dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath);
-      _chkOptions_LiveUpdate                 .setSelection(_dialogEasyConfig.isLiveUpdate);
-      _chkOptions_LogDetails                 .setSelection(_dialogEasyConfig.isLogDetails);
+      _chkOptions_DisplayAbsoluteFilePath       .setSelection(_dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath);
+      _chkOptions_LiveUpdate                    .setSelection(_dialogEasyConfig.isLiveUpdate);
+      _chkOptions_LogDetails                    .setSelection(_dialogEasyConfig.isLogDetails);
 
-      _spinnerDash_AnimationCrazinessFactor  .setSelection(_dialogEasyConfig.animationCrazinessFactor);
-      _spinnerDash_AnimationDuration         .setSelection(_dialogEasyConfig.animationDuration);
-      _spinnerDash_BgOpacity                 .setSelection(_dialogEasyConfig.backgroundOpacity);
-      _spinnerDash_NumHTiles                 .setSelection(_dialogEasyConfig.numHorizontalTiles);
-      _spinnerDash_StateTooltipWidth         .setSelection(_dialogEasyConfig.stateToolTipWidth);
-      _spinnerDash_TileSize                  .setSelection(_dialogEasyConfig.tileSize);
+      _chkOptions_ShowTile_CloudApps            .setSelection(_dialogEasyConfig.isShowTile_CloudApps);
+      _chkOptions_ShowTile_Files                .setSelection(_dialogEasyConfig.isShowTile_Files);
+      _chkOptions_ShowTile_FossilUI             .setSelection(_dialogEasyConfig.isShowTile_FossilUI);
+      _chkOptions_ShowTile_SerialPort           .setSelection(_dialogEasyConfig.isShowTile_SerialPort);
+      _chkOptions_ShowTile_SerialPortWithConfig .setSelection(_dialogEasyConfig.isShowTile_SerialPortWithConfig);
+
+      _spinnerDash_AnimationCrazinessFactor     .setSelection(_dialogEasyConfig.animationCrazinessFactor);
+      _spinnerDash_AnimationDuration            .setSelection(_dialogEasyConfig.animationDuration);
+      _spinnerDash_BgOpacity                    .setSelection(_dialogEasyConfig.backgroundOpacity);
+      _spinnerDash_NumHTiles                    .setSelection(_dialogEasyConfig.numHorizontalTiles);
+      _spinnerDash_StateTooltipWidth            .setSelection(_dialogEasyConfig.stateToolTipWidth);
+      _spinnerDash_TileSize                     .setSelection(_dialogEasyConfig.tileSize);
 
 // SET_FORMATTING_ON
    }
@@ -4521,16 +4612,26 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void update_Model_From_UI_LiveUpdateValues() {
 
-      _dialogEasyConfig.isLiveUpdate = _chkOptions_LiveUpdate.getSelection();
-      _dialogEasyConfig.isLogDetails = _chkOptions_LogDetails.getSelection();
+// SET_FORMATTING_OFF
 
-      _dialogEasyConfig.animationCrazinessFactor = _spinnerDash_AnimationCrazinessFactor.getSelection();
-      _dialogEasyConfig.animationDuration = _spinnerDash_AnimationDuration.getSelection();
-      _dialogEasyConfig.backgroundOpacity = _spinnerDash_BgOpacity.getSelection();
-      _dialogEasyConfig.numHorizontalTiles = _spinnerDash_NumHTiles.getSelection();
-      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = _chkOptions_DisplayAbsoluteFilePath.getSelection();
-      _dialogEasyConfig.stateToolTipWidth = _spinnerDash_StateTooltipWidth.getSelection();
-      _dialogEasyConfig.tileSize = _spinnerDash_TileSize.getSelection();
+      _dialogEasyConfig.isLiveUpdate                           = _chkOptions_LiveUpdate.getSelection();
+      _dialogEasyConfig.isLogDetails                           = _chkOptions_LogDetails.getSelection();
+
+      _dialogEasyConfig.isShowTile_CloudApps                   = _chkOptions_ShowTile_CloudApps.getSelection();
+      _dialogEasyConfig.isShowTile_Files                       = _chkOptions_ShowTile_Files.getSelection();
+      _dialogEasyConfig.isShowTile_FossilUI                    = _chkOptions_ShowTile_FossilUI.getSelection();
+      _dialogEasyConfig.isShowTile_SerialPort                  = _chkOptions_ShowTile_SerialPort.getSelection();
+      _dialogEasyConfig.isShowTile_SerialPortWithConfig        = _chkOptions_ShowTile_SerialPortWithConfig.getSelection();
+
+      _dialogEasyConfig.animationCrazinessFactor               = _spinnerDash_AnimationCrazinessFactor.getSelection();
+      _dialogEasyConfig.animationDuration                      = _spinnerDash_AnimationDuration.getSelection();
+      _dialogEasyConfig.backgroundOpacity                      = _spinnerDash_BgOpacity.getSelection();
+      _dialogEasyConfig.numHorizontalTiles                     = _spinnerDash_NumHTiles.getSelection();
+      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath    = _chkOptions_DisplayAbsoluteFilePath.getSelection();
+      _dialogEasyConfig.stateToolTipWidth                      = _spinnerDash_StateTooltipWidth.getSelection();
+      _dialogEasyConfig.tileSize                               = _spinnerDash_TileSize.getSelection();
+
+// SET_FORMATTING_ON
    }
 
    private void update_Model_From_UI_OneTourType() {
