@@ -92,6 +92,9 @@ Bugfix
   - Using DELETE in the Tour Editor is not consecutive        https://sourceforge.net/p/mytourbook/bugs/127/
   - Canceling the tour editor still saves the changes         https://sourceforge.net/p/mytourbook/bugs/128/
 
+* TCX Tour Export (Frederic)
+  - Removing the lat/lon tags when those values are invalid/not provided as it creates an invalid TCX file
+
 
 Translation    
 ===========
