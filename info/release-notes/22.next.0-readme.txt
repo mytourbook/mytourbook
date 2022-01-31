@@ -48,11 +48,10 @@ Improvements
 * Tour Import
   - Sort imported tours by number of markers/waypoints
   - Customize simple import tiles in the easy import page 
-                                          https://github.com/mytourbook/mytourbook/issues/460
+                                        https://github.com/mytourbook/mytourbook/issues/460
   
 * Tour Segmenter
-  - Show power value for each segment
-                                          https://sourceforge.net/p/mytourbook/feature-requests/204/
+  - Show power value for each segment	https://sourceforge.net/p/mytourbook/feature-requests/204/
 
 * Photos + Tours        
   - Show tours with these photo times: 
@@ -60,14 +59,14 @@ Improvements
     - Selected adjustment time
     - Saved time
   - Show photo location in view                         
-                                          https://github.com/mytourbook/mytourbook/issues/449
+                                        https://github.com/mytourbook/mytourbook/issues/449
 
 * SRTM (Thomas)
   - Additionally to the already usable SRTM3 Altitudes, SRTM1 is now also usable. 
     The Data Files must be manually copied to the new SRTM1 folder. 
     SRTM1 size is 25.9 MB per file. SRTM3 file size is 2.9 MB per file
-                                          https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
-                                          https://sourceforge.net/p/mytourbook/feature-requests/122/
+                                        https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
+                                      	https://sourceforge.net/p/mytourbook/feature-requests/122/
 
                                         
 Changes
@@ -75,8 +74,7 @@ Changes
 
 * Tour Editor
   - Time difference column shows now the time difference to the next time slice, until now the time difference to the previous time slice was displayed
-  - A "wrong" time slice is deleted
-                                          https://github.com/mytourbook/mytourbook/issues/456
+  - A "wrong" time slice is deleted		https://github.com/mytourbook/mytourbook/issues/456
 
 Bugfix
 ======
@@ -88,8 +86,8 @@ Bugfix
   - The old hillshading provider(wmflabs.org) is not avaible anymore, the new provider for hillshading is now "Mapilion"
   
 * Tour Editor
-  - Fixed "Using DELETE in the Tour Editor is not consecutive "      
-                                          https://sourceforge.net/p/mytourbook/bugs/127/
+  - Using DELETE in the Tour Editor is not consecutive        https://sourceforge.net/p/mytourbook/bugs/127/
+  - Canceling the tour editor still saves the changes         https://sourceforge.net/p/mytourbook/bugs/128/
 
 
 Translation    
