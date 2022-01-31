@@ -2407,7 +2407,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          public void partClosed(final IWorkbenchPartReference partRef) {
 
             if (partRef.getPart(false) == TourDataEditorView.this) {
+
                TourManager.setTourDataEditor(null);
+               onPart_Closed();
             }
          }
 
@@ -7180,6 +7182,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       fireTourIsModified();
    }
 
+   private void onPart_Closed() {
+
+      if (_tourData == null) {
+         return;
+      }
+
+      if (_isTourDirty == false) {
+         return;
+      }
+
+      /*
+       * Tour is dirty and part is closed -> discard invalid tour to fix
+       * https://sourceforge.net/p/mytourbook/bugs/128/
+       */
+      discardModifications();
+   }
+
    private void onResizeTab1() {
       _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
    }
@@ -7869,7 +7888,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * saves the tour when it is dirty, valid and confirmation is done
+    * Saves the tour when it is dirty, valid and confirmation is done
     */
    private boolean saveTourIntoDB() {
 
@@ -7882,7 +7901,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tourData.computeComputedValues();
 
          /*
-          * saveTour will check the tour editor dirty state, but when the tour is saved the dirty
+          * saveTour() will check the tour editor dirty state, but when the tour is saved, the dirty
           * flag can be set before to prevent an out of sync error
           */
          _isTourDirty = false;
