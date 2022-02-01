@@ -1301,6 +1301,7 @@ public class Map2View extends ViewPart implements
             createLegendImage(_tourPainterConfig.getMapColorProvider());
 
             _map.updateGraphColors();
+            _map.updateMapOptions();
 
             _map.disposeOverlayImageCache();
             _map.paint();
