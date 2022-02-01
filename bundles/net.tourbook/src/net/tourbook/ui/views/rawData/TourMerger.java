@@ -256,6 +256,9 @@ public class TourMerger {
     * Compute a linear interpolation based on the below formula
     * <p>
     * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
+    * Note: Apache Commons has an interpolate function but given that it is not
+    * used a lot in MyTourbook, it is not worth adding a library for now.
+    * (https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/analysis/interpolation/LinearInterpolator.html#interpolate(double[],%20double[]))
     */
    private float linearInterpolate(final float x1,
                                    final float x2,
