@@ -156,9 +156,10 @@ import org.eclipse.swt.widgets.Event;
 
 public class Map2 extends Canvas {
 
-   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE                    = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
+   private static final String          GRAPH_LABEL_HEARTBEAT_UNIT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME                 = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
-   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
+
+   private static final char            NL                                             = UI.NEW_LINE;
 
    private static final IDialogSettings _geoFilterState                                = TourGeoFilter_Manager.getState();
 
@@ -181,16 +182,16 @@ public class Map2 extends Canvas {
    public static final int              EXPANDED_HOVER_SIZE                            = 20;
    public static final int              EXPANDED_HOVER_SIZE2                           = EXPANDED_HOVER_SIZE / 2;
 
-   private static final String          DIRECTION_E                                    = "E";                                                     //$NON-NLS-1$
-   private static final String          DIRECTION_N                                    = "N";                                                     //$NON-NLS-1$
+   private static final String          DIRECTION_E                                    = "E";                                                    //$NON-NLS-1$
+   private static final String          DIRECTION_N                                    = "N";                                                    //$NON-NLS-1$
 
-   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                                //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_DISTANCE                          = "%s\t\t%s %s";                                           //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_TRACK_POINT                       = "%s\t%s";                                                //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                               //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_DISTANCE                          = "%s\t\t%s %s";                                          //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_TRACK_POINT                       = "%s\t%s";                                               //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
-   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                                //$NON-NLS-1$
+   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                               //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -329,6 +330,7 @@ public class Map2 extends Canvas {
    private final Cursor            _cursorPan;
    private final Cursor            _cursorSearchTour;
    private final Cursor            _cursorSearchTour_Scroll;
+   private final Cursor            _cursorSelect;
 
    private final AtomicInteger     _redrawMapCounter        = new AtomicInteger();
    private final AtomicInteger     _overlayRunnableCounter  = new AtomicInteger();
@@ -346,16 +348,20 @@ public class Map2 extends Canvas {
    private Thread                  _overlayThread;
 
    private long                    _nextOverlayRedrawTime;
-   private final NumberFormat      _nf1;
 
+   private final NumberFormat      _nf0;
+   private final NumberFormat      _nf1;
    private final NumberFormat      _nf2;
    private final NumberFormat      _nf3;
    private final NumberFormat      _nfLatLon;
    {
+      _nf0 = NumberFormat.getNumberInstance();
       _nf1 = NumberFormat.getNumberInstance();
       _nf2 = NumberFormat.getNumberInstance();
       _nf3 = NumberFormat.getNumberInstance();
 
+      _nf0.setMinimumFractionDigits(0);
+      _nf0.setMaximumFractionDigits(0);
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
       _nf2.setMinimumFractionDigits(2);
@@ -488,18 +494,20 @@ public class Map2 extends Canvas {
     * POI tooltip
     */
    private PoiToolTip       _poi_Tooltip;
-   private final int        _poi_Tooltip_OffsetY       = 5;
+   private final int        _poi_Tooltip_OffsetY         = 5;
    private TourToolTip      _tour_ToolTip;
 
    /**
     * Hovered/selected tour
     */
-   private boolean          _isShowHoveredSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
-   private long             _hovered_SelectedTourId    = Long.MIN_VALUE;
+   private boolean          _isShowHoveredSelectedTour   = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
+   private long             _hovered_SelectedTourId      = Long.MIN_VALUE;
+   private int              _hovered_SelectedSerieIndex1 = Integer.MIN_VALUE;
+   private int              _hovered_SelectedSerieIndex2 = Integer.MIN_VALUE;
 
-   private ArrayList<Long>  _allHoveredTourIds         = new ArrayList<>();
-   private TIntArrayList    _allHoveredSerieIndices    = new TIntArrayList();
-   private ArrayList<Point> _allHoveredDevPoints       = new ArrayList<>();
+   private ArrayList<Long>  _allHoveredTourIds           = new ArrayList<>();
+   private TIntArrayList    _allHoveredSerieIndices      = new TIntArrayList();
+   private ArrayList<Point> _allHoveredDevPoints         = new ArrayList<>();
 
    private boolean          _hoveredSelectedTour_IsSelectTour;
    private int              _hoveredSelectedTour_Hovered_Opacity;
@@ -673,6 +681,7 @@ public class Map2 extends Canvas {
 
       _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
       _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
+      _cursorSelect = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.Cursor_Select));
 
       _transparentColor = new Color(MAP_TRANSPARENT_RGB);
 
@@ -2515,6 +2524,7 @@ public class Map2 extends Canvas {
       disposeResource(_cursorPan);
       disposeResource(_cursorSearchTour);
       disposeResource(_cursorSearchTour_Scroll);
+      disposeResource(_cursorSelect);
 
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
@@ -2663,6 +2673,9 @@ public class Map2 extends Canvas {
          return;
       }
 
+      final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
+      final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
+
       hideTourTooltipHoveredArea();
       setPoiVisible(false);
 
@@ -2782,7 +2795,7 @@ public class Map2 extends Canvas {
 
          if (_allHoveredTourIds.size() == 1) {
 
-            // select hovered tour
+            // select hovered tour or trackpoint
 
             final long hoveredTour = _allHoveredTourIds.get(0);
 
@@ -2792,6 +2805,15 @@ public class Map2 extends Canvas {
 
                _hovered_SelectedTourId = hoveredTour;
 
+               if (isCtrl) {
+
+                  _hovered_SelectedSerieIndex2 = _allHoveredSerieIndices.get(0);
+
+               } else {
+
+                  _hovered_SelectedSerieIndex1 = _allHoveredSerieIndices.get(0);
+               }
+
                fireEvent_TourSelection(new SelectionTourId(_hovered_SelectedTourId));
 
             } else {
@@ -2799,12 +2821,18 @@ public class Map2 extends Canvas {
                // toggle selection -> hide tour selection
 
                _hovered_SelectedTourId = Long.MIN_VALUE;
+               _hovered_SelectedSerieIndex1 = Integer.MIN_VALUE;
+               _hovered_SelectedSerieIndex2 = Integer.MIN_VALUE;
             }
 
          } else {
 
+            // multiple tours are selected
+
             // hide single tour selection
             _hovered_SelectedTourId = Long.MIN_VALUE;
+            _hovered_SelectedSerieIndex1 = Integer.MIN_VALUE;
+            _hovered_SelectedSerieIndex2 = Integer.MIN_VALUE;
 
             // clone tour id's becauses they will be removed
             final ArrayList<Long> allClonedTourIds = new ArrayList<>();
@@ -3056,7 +3084,7 @@ public class Map2 extends Canvas {
 
             // tour is hovered
 
-            setCursor(_cursorHand);
+            setCursor(_cursorSelect);
 
             // show hovered tour
             redraw();
@@ -3235,7 +3263,7 @@ public class Map2 extends Canvas {
             paint_OfflineArea(gc);
          }
 
-         final boolean isPaintHoveredTourInfo = paint_HoveredTour(gc);
+         final boolean isPaintTourInfo = paint_HoveredTour(gc);
 
          _geoGrid_Label_Outline = null;
          _geoGrid_Action_Outline = null;
@@ -3252,7 +3280,7 @@ public class Map2 extends Canvas {
          }
 
          // paint info AFTER hovered/selected tour
-         if (isPaintHoveredTourInfo) {
+         if (isPaintTourInfo) {
             paint_HoveredTour_50_TourInfo(gc);
          }
       }
@@ -3876,7 +3904,7 @@ public class Map2 extends Canvas {
       boolean isPaintBreadcrumbs = false;
 
       /*
-       * Paint tour when hovered
+       * Paint hovered tour or trackpoint
        */
       if (_isShowHoveredSelectedTour) {
 
@@ -3899,12 +3927,11 @@ public class Map2 extends Canvas {
                // paint hovered only when not selected
                if (isHoveredAndSelectedTour == false) {
 
-                  gc.setAlpha(_hoveredSelectedTour_Hovered_Opacity);
-
                   if (_hoveredSelectedTour_IsSelectTour) {
 
                      // a tour can be selected
 
+                     gc.setAlpha(_hoveredSelectedTour_Hovered_Opacity);
                      gc.setForeground(_hoveredSelectedTour_Hovered_Color);
 
                      paint_HoveredTour_10(gc, hoveredTourId);
@@ -3913,10 +3940,14 @@ public class Map2 extends Canvas {
 
                      // a trackpoint can be selected
 
-                     gc.setForeground(_hoveredSelectedTour_Hovered_Color);
-                     gc.setBackground(_hoveredSelectedTour_Hovered_Color);
+                     paint_HoveredTrackpoint_10(
+                           gc,
+                           hoveredTourId,
+                           _allHoveredSerieIndices.get(0),
+                           Integer.MIN_VALUE,
 
-                     paint_HoveredTrackpoint_10(gc, hoveredTourId);
+                           false // is hovered
+                     );
                   }
                }
             }
@@ -3924,28 +3955,40 @@ public class Map2 extends Canvas {
       }
 
       /*
-       * Paint tour when selected
+       * Paint selected tour or trackpoint
        */
       if (_hovered_SelectedTourId != Long.MIN_VALUE) {
 
-         if (isHoveredAndSelectedTour) {
+         if (_hoveredSelectedTour_IsSelectTour) {
 
-            gc.setAlpha(0x40);
-            gc.setForeground(UI.SYS_COLOR_GREEN);
+            // a tour is selected
 
-            gc.setAlpha(_hoveredSelectedTour_HoveredAndSelected_Opacity);
-            gc.setForeground(_hoveredSelectedTour_HoveredAndSelected_Color);
+            if (isHoveredAndSelectedTour) {
+
+               gc.setAlpha(_hoveredSelectedTour_HoveredAndSelected_Opacity);
+               gc.setForeground(_hoveredSelectedTour_HoveredAndSelected_Color);
+
+            } else {
+
+               gc.setAlpha(_hoveredSelectedTour_Selected_Opacity);
+               gc.setForeground(_hoveredSelectedTour_Selected_Color);
+            }
+
+            paint_HoveredTour_10(gc, _hovered_SelectedTourId);
 
          } else {
 
-            gc.setAlpha(0x40);
-            gc.setForeground(UI.SYS_COLOR_BLACK);
+            // a trackpoint is selected
 
-            gc.setAlpha(_hoveredSelectedTour_Selected_Opacity);
-            gc.setForeground(_hoveredSelectedTour_Selected_Color);
+            paint_HoveredTrackpoint_10(
+                  gc,
+                  _hovered_SelectedTourId,
+                  _hovered_SelectedSerieIndex1,
+                  _hovered_SelectedSerieIndex2,
+
+                  true // is selected
+            );
          }
-
-         paint_HoveredTour_10(gc, _hovered_SelectedTourId);
       }
 
       /*
@@ -4247,38 +4290,126 @@ public class Map2 extends Canvas {
       final long recordedTime = tourData.getTourDeviceTime_Recorded();
       final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
 
-      final String text_MovingTime = String.format(VALUE_FORMAT_TIME,
+      /*
+       * Tour values
+       */
+      final String text_TourMovingTime = String.format(VALUE_FORMAT_TIME,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
-      final String text_RecordedTime = String.format(VALUE_FORMAT_TIME,
-            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+      final String text_TourRecordedTime = String.format("Recorded time\t%s",
             FormatManager.formatRecordedTime(recordedTime));
 
-      final String text_Distance = String.format(VALUE_FORMAT_DISTANCE,
-            TOUR_TOOLTIP_LABEL_DISTANCE,
+      final String text_TourDistance = String.format("Distance\t\t%s\t%s",
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
-      final String text_TrackPoint = String.format(VALUE_FORMAT_TRACK_POINT,
-            "Trackpoint",
+      /*
+       * Track values
+       */
+
+      // trackpoint
+      final String text_TrackPoint = String.format("Trackpoint\t%s",
             Integer.toString(hoveredSerieIndex));
 
-      final String valueText = UI.EMPTY_STRING
+      // time
+      String text_Time = null;
+      final int[] timeSerie = tourData.timeSerie;
+      if (timeSerie != null) {
 
-            + UI.NEW_LINE + text_TourDateTime
-            + UI.NEW_LINE
-            + UI.NEW_LINE + text_Distance
-            + UI.NEW_LINE + text_MovingTime
-            + UI.NEW_LINE + text_RecordedTime
+         text_Time = String.format("Time\t\t%s",
+               UI.format_hh_mm_ss(timeSerie[hoveredSerieIndex]));
+      }
 
-            + UI.NEW_LINE
-            + UI.NEW_LINE + text_TrackPoint
+      // distance
+      String text_Distance = null;
+      final float[] distanceSerie = tourData.distanceSerie;
+      if (distanceSerie != null) {
 
-      ;
+         text_Distance = String.format("Distance\t\t%s\t%s",
+               _nf3.format(distanceSerie[hoveredSerieIndex] / 1000 / UI.UNIT_VALUE_DISTANCE),
+               UI.UNIT_LABEL_DISTANCE);
+      }
+
+      // elevation
+      String text_Elevation = UI.EMPTY_STRING;
+      final float[] altitudeSerie = tourData.altitudeSerie;
+      if (altitudeSerie != null) {
+
+         text_Elevation = String.format("Elevation\t%s\t%s",
+               _nf2.format(altitudeSerie[hoveredSerieIndex] / UI.UNIT_VALUE_ELEVATION),
+               UI.UNIT_LABEL_ELEVATION);
+      }
+
+      // pulse
+      String text_Pulse = null;
+      final float[] pulseSerie = tourData.pulseSerie;
+      if (pulseSerie != null) {
+
+         text_Pulse = String.format("Pulse\t\t%s\t%s",
+               _nf0.format(pulseSerie[hoveredSerieIndex]),
+               GRAPH_LABEL_HEARTBEAT_UNIT);
+      }
+
+      // speed
+      String text_Speed = null;
+      final float[] speedSerie = tourData.getSpeedSerie();
+      if (speedSerie != null) {
+
+         text_Speed = String.format("Speed\t\t%s\t%s",
+               _nf1.format(speedSerie[hoveredSerieIndex]),
+               UI.UNIT_LABEL_SPEED);
+      }
+
+      // pace
+      String text_Pace = null;
+      final float[] paceSerie = tourData.getPaceSerieSeconds();
+      if (paceSerie != null) {
+
+         text_Pace = String.format("Pace\t\t%s\t%s",
+               UI.format_mm_ss((long) (paceSerie[hoveredSerieIndex] * UI.UNIT_VALUE_DISTANCE)),
+               UI.UNIT_LABEL_PACE);
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append(NL);
+      sb.append(text_TourDateTime + NL);
+      sb.append(NL);
+      sb.append(text_TourDistance + NL);
+      sb.append(text_TourMovingTime + NL);
+      sb.append(text_TourRecordedTime + NL);
+      sb.append(NL);
+
+      sb.append(text_TrackPoint);
+      sb.append(NL);
+
+      if (text_Time != null) {
+         sb.append(NL + text_Time);
+      }
+
+      if (text_Distance != null) {
+         sb.append(NL + text_Distance);
+      }
+
+      if (text_Elevation != null) {
+         sb.append(NL + text_Elevation);
+      }
+
+      if (text_Speed != null) {
+         sb.append(NL + text_Speed);
+      }
+
+      if (text_Pace != null) {
+         sb.append(NL + text_Pace);
+      }
+
+      if (text_Pulse != null) {
+         sb.append(NL + text_Pulse);
+      }
 
       final Point size_DateTime = gc.textExtent(text_TourDateTime);
-      final Point size_Values = gc.textExtent(valueText);
+      final Point size_Values = gc.textExtent(sb.toString());
 
       Point size_Title = new Point(0, 0);
       String wrappedTitle = null;
@@ -4351,11 +4482,14 @@ public class Map2 extends Canvas {
       }
 
       gc.setFont(normalFont);
-      gc.drawText(valueText, devX, devY);
+      gc.drawText(sb.toString(), devX, devY);
    }
 
-   private void paint_HoveredTrackpoint_10(final GC gc, final long tourId) {
-      // TODO Auto-generated method stub
+   private void paint_HoveredTrackpoint_10(final GC gc,
+                                           final long tourId,
+                                           final int serieIndex1,
+                                           final int serieIndex2,
+                                           final boolean isSelectedMode) {
 
       final TourData tourData = TourManager.getTour(tourId);
 
@@ -4365,6 +4499,8 @@ public class Map2 extends Canvas {
          return;
       }
 
+      gc.setAntialias(SWT.ON);
+
       final MP mp = getMapProvider();
       final int zoomLevel = getZoom();
 
@@ -4373,14 +4509,27 @@ public class Map2 extends Canvas {
 
       final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
 
-      final int numHoveredPoints = _allHoveredSerieIndices.size();
-
       final int dotWidth = 30;
       final int dotWidth2 = dotWidth / 2;
 
-      for (int hoverIndex = 0; hoverIndex < numHoveredPoints; hoverIndex++) {
+      // paint 2 point
+      for (int paintIndex = 0; paintIndex < 2; paintIndex++) {
 
-         final int serieIndex = _allHoveredSerieIndices.get(hoverIndex);
+         final int serieIndex;
+
+         if (paintIndex == 0) {
+            if (serieIndex1 == Integer.MIN_VALUE) {
+               continue;
+            } else {
+               serieIndex = serieIndex1;
+            }
+         } else {
+            if (serieIndex2 == Integer.MIN_VALUE) {
+               continue;
+            } else {
+               serieIndex = serieIndex2;
+            }
+         }
 
          // get world position for the current lat/lon
          final java.awt.Point worldPosAWT = mp.geoToPixel(
@@ -4391,9 +4540,12 @@ public class Map2 extends Canvas {
          final int devX = worldPosAWT.x - worldPosition_Viewport.x;
          final int devY = worldPosAWT.y - worldPosition_Viewport.y;
 
+         /*
+          * Paint colored margin around a point
+          */
+         gc.setAlpha(_hoveredSelectedTour_Hovered_Opacity);
          gc.setBackground(_hoveredSelectedTour_Hovered_Color);
 
-         // draw border
          if (_prefOptions_IsDrawSquare) {
 
             gc.fillRectangle(
@@ -4410,21 +4562,29 @@ public class Map2 extends Canvas {
                   dotWidth);
          }
 
+         // paint original symbol but with a more contrast color
+
          /*
-          * Paint over the original square with a more contrast color
+          * Fill symbol
           */
-
          gc.setAlpha(0xff);
-         gc.setLineWidth(_prefOptions_BorderWidth);
 
-         // paint symbol
          int symbolSize = _prefOptions_LineWidth;
          int symbolSize2 = symbolSize / 2;
 
          int paintedDevX = devX - symbolSize2;
          int paintedDevY = devY - symbolSize2;
 
-         gc.setBackground(UI.SYS_COLOR_WHITE);
+         if (isSelectedMode) {
+
+            // paint selected
+            gc.setBackground(UI.SYS_COLOR_GREEN);
+
+         } else {
+
+            // paint hovered
+            gc.setBackground(UI.SYS_COLOR_WHITE);
+         }
 
          if (_prefOptions_IsDrawSquare) {
             gc.fillRectangle(paintedDevX, paintedDevY, symbolSize, symbolSize);
@@ -4432,7 +4592,11 @@ public class Map2 extends Canvas {
             gc.fillOval(paintedDevX, paintedDevY, symbolSize, symbolSize);
          }
 
-         // draw symbol border
+         /*
+          * Draw symbol border
+          */
+         gc.setLineWidth(_prefOptions_BorderWidth);
+
          symbolSize = _prefOptions_LineWidth + (_prefOptions_BorderWidth * 1);
          symbolSize2 = symbolSize / 2;
 
@@ -4450,6 +4614,8 @@ public class Map2 extends Canvas {
             gc.drawOval(paintedDevX, paintedDevY, symbolSize, symbolSize);
          }
       }
+
+      gc.setAntialias(SWT.OFF);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -5568,8 +5734,8 @@ public class Map2 extends Canvas {
       final String loadingError = tile.getLoadingError();
       if (loadingError != null) {
          sb.append(loadingError);
-         sb.append(UI.NEW_LINE);
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
+         sb.append(NL);
       }
 
       final ConcurrentHashMap<String, Tile> childrenLoadingError = tile.getChildrenWithErrors();
@@ -5577,8 +5743,8 @@ public class Map2 extends Canvas {
 
          for (final Tile childTile : childrenLoadingError.values()) {
             sb.append(childTile.getLoadingError());
-            sb.append(UI.NEW_LINE);
-            sb.append(UI.NEW_LINE);
+            sb.append(NL);
+            sb.append(NL);
          }
       }
 
@@ -5656,15 +5822,15 @@ public class Map2 extends Canvas {
       final String url = tile.getUrl();
       if (url != null) {
          sb.append(url);
-         sb.append(UI.NEW_LINE);
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
+         sb.append(NL);
       }
 
       final String offlinePath = tile.getOfflinePath();
       if (offlinePath != null) {
          sb.append(offlinePath);
-         sb.append(UI.NEW_LINE);
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
+         sb.append(NL);
       }
 
       final ArrayList<Tile> tileChildren = tile.getChildren();
@@ -6065,6 +6231,8 @@ public class Map2 extends Canvas {
    public void resetHoveredSelectedTours() {
 
       _hovered_SelectedTourId = Long.MIN_VALUE;
+      _hovered_SelectedSerieIndex1 = Integer.MIN_VALUE;
+      _hovered_SelectedSerieIndex2 = Integer.MIN_VALUE;
 
       _allHoveredTourIds.clear();
       _allHoveredDevPoints.clear();
@@ -6123,6 +6291,8 @@ public class Map2 extends Canvas {
 
          // hide hovered/selected tour
          _hovered_SelectedTourId = Long.MIN_VALUE;
+         _hovered_SelectedSerieIndex1 = Integer.MIN_VALUE;
+         _hovered_SelectedSerieIndex2 = Integer.MIN_VALUE;
       }
 
       _allHoveredTourIds.clear();
@@ -6913,7 +7083,6 @@ public class Map2 extends Canvas {
    }
 
    public void updateMapOptions() {
-      // TODO Auto-generated method stub
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 

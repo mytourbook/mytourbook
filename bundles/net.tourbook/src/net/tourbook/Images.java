@@ -82,14 +82,15 @@ public class Images {
    public static final String ArrowUp                                    = "arrow-up.png";                                        //$NON-NLS-1$
    public static final String ArrowUp_Blue                               = "arrow-up-blue.png";                                   //$NON-NLS-1$
    public static final String ArrowUp_Blue_Disabled                      = "arrow-up-blue-disabled.png";                          //$NON-NLS-1$
+   public static final String Calendar                                   = "calendar.png";                                        //$NON-NLS-1$
    public static final String Checkbox_Checked                           = "checkbox-checked.png";                                //$NON-NLS-1$
    public static final String Checkbox_Checked_Disabled                  = "checkbox-checked-disabled.png";                       //$NON-NLS-1$
    public static final String Checkbox_Uncheck                           = "checkbox-unchecked.png";                              //$NON-NLS-1$
    public static final String Checkbox_Uncheck_Disabled                  = "checkbox-unchecked-disabled.png";                     //$NON-NLS-1$
+   public static final String ConconiChart                               = "conconi-chart.png";                                   //$NON-NLS-1$
    public static final String CSVFormat                                  = "app-csv-format.png";                                  //$NON-NLS-1$
    public static final String CSVFormat_Disabled                         = "app-csv-format-disabled.png";                         //$NON-NLS-1$
-   public static final String Calendar                                   = "calendar.png";                                        //$NON-NLS-1$
-   public static final String ConconiChart                               = "conconi-chart.png";                                   //$NON-NLS-1$
+   public static final String Cursor_Select                              = "cursor-select.png";                                   //$NON-NLS-1$
    public static final String EasyImport_Harddrive                       = "hard-drive.png";                                      //$NON-NLS-1$
    public static final String EditRow                                    = "edit-row.png";                                        //$NON-NLS-1$
    public static final String EditRow_Disabled                           = "edit-row-disabled.png";                               //$NON-NLS-1$
