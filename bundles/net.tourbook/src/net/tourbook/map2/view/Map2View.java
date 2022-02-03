@@ -1176,10 +1176,23 @@ public class Map2View extends ViewPart implements
 
       _map.addHoveredTourListener(mapHoveredTourEvent -> {
 
-         final long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
+         if (_actionCreateTourMarkerFromMap == null) {
+            return;
+         }
+
+         final Long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
 
          _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId);
-         _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != Integer.MIN_VALUE);
+         _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != null);
+
+         final HoveredValueData hoveredValueData = new HoveredValueData(
+               hoveredTourId,
+               mapHoveredTourEvent.hoveredValuePointIndex);
+
+         TourManager.fireEventWithCustomData(
+               TourEventId.HOVERED_VALUE_POSITION,
+               hoveredValueData,
+               Map2View.this);
       });
 
       _map.addTourSelectionListener(this::onSelection_InsideMap);
@@ -1915,10 +1928,14 @@ public class Map2View extends ViewPart implements
 //      final boolean isPhotoSynced = canShowFilteredPhoto && _isMapSynchedWithPhoto;
 //      final boolean canSyncTour = isPhotoSynced == false;
 
-      _actionMap2_PhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
-      _actionShowAllFilteredPhotos.setEnabled(canShowFilteredPhoto);
-      _actionShowPhotos.setEnabled(isAllPhotoAvailable);
-      _actionSyncMapWith_Photo.setEnabled(canShowFilteredPhoto);
+// SET_FORMATTING_OFF
+
+      _actionMap2_PhotoFilter       .setEnabled(isAllPhotoAvailable && _isShowPhoto);
+      _actionShowAllFilteredPhotos  .setEnabled(canShowFilteredPhoto);
+      _actionShowPhotos             .setEnabled(isAllPhotoAvailable);
+      _actionSyncMapWith_Photo      .setEnabled(canShowFilteredPhoto);
+
+// SET_FORMATTING_ON
 
       /*
        * Tour actions
@@ -1926,31 +1943,34 @@ public class Map2View extends ViewPart implements
       final int numTours = _allTourData.size();
       final boolean isTourAvailable = numTours > 0;
       final boolean isMultipleTours = numTours > 1 && _isShowTour;
-      final boolean isOneTour = _isTourOrWayPoint && isMultipleTours == false && _isShowTour;
-      final boolean isOneTourHovered = _map.getHoveredTourId() != Integer.MIN_VALUE;
+      final boolean isOneTourDisplayed = _isTourOrWayPoint && isMultipleTours == false && _isShowTour;
+      final boolean isOneTourHovered = _map.getHoveredTourId() != null;
 
-      _actionMap2_Color.setEnabled(isTourAvailable);
+// SET_FORMATTING_OFF
 
-      _actionCreateTourMarkerFromMap.setEnabled(isTourAvailable && isOneTourHovered);
-      _actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
-      _actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
-      _actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
-      _actionShowStartEndInMap.setEnabled(isOneTour);
-      _actionShowTourInfoInMap.setEnabled(isOneTour);
-      _actionShowTour.setEnabled(_isTourOrWayPoint);
-      _actionShowTourMarker.setEnabled(_isTourOrWayPoint);
-      _actionShowTourPauses.setEnabled(_isTourOrWayPoint);
-      _actionShowTourWeatherInMap.setEnabled(isTourAvailable);
-      _actionShowWayPoints.setEnabled(_isTourOrWayPoint);
-      _actionZoom_Centered.setEnabled(isTourAvailable);
-      _actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
-      _actionZoomLevelAdjustment.setEnabled(isTourAvailable);
+      _actionCreateTourMarkerFromMap      .setEnabled(isTourAvailable && isOneTourHovered);
+      _actionMap2_Color                   .setEnabled(isTourAvailable);
+      _actionShowLegendInMap              .setEnabled(_isTourOrWayPoint);
+      _actionShowSliderInLegend           .setEnabled(_isTourOrWayPoint && _isShowLegend);
+      _actionShowSliderInMap              .setEnabled(_isTourOrWayPoint);
+      _actionShowStartEndInMap            .setEnabled(isOneTourDisplayed);
+      _actionShowTourInfoInMap            .setEnabled(isOneTourDisplayed);
+      _actionShowTour                     .setEnabled(_isTourOrWayPoint);
+      _actionShowTourMarker               .setEnabled(_isTourOrWayPoint);
+      _actionShowTourPauses               .setEnabled(_isTourOrWayPoint);
+      _actionShowTourWeatherInMap         .setEnabled(isTourAvailable);
+      _actionShowWayPoints                .setEnabled(_isTourOrWayPoint);
+      _actionZoom_Centered                .setEnabled(isTourAvailable);
+      _actionZoom_ShowEntireTour          .setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
+      _actionZoomLevelAdjustment          .setEnabled(isTourAvailable);
 
-      _actionSyncMapWith_Slider_One.setEnabled(isTourAvailable);
-      _actionSyncMapWith_Slider_Centered.setEnabled(isTourAvailable);
-      _actionSyncMapWith_OtherMap.setEnabled(true);
-      _actionSyncMapWith_Tour.setEnabled(isTourAvailable);
-      _actionSyncMapWith_ValuePoint.setEnabled(isTourAvailable);
+      _actionSyncMapWith_Slider_One       .setEnabled(isTourAvailable);
+      _actionSyncMapWith_Slider_Centered  .setEnabled(isTourAvailable);
+      _actionSyncMapWith_OtherMap         .setEnabled(true);
+      _actionSyncMapWith_Tour             .setEnabled(isTourAvailable);
+      _actionSyncMapWith_ValuePoint       .setEnabled(isTourAvailable);
+
+// SET_FORMATTING_ON
 
       syncMap_ShowCurrentSyncModeImage(isMapSynched());
 
@@ -1974,7 +1994,7 @@ public class Map2View extends ViewPart implements
          _actionTourColor_HrZone.setEnabled(true);
          _actionTourColor_RunDyn_StepLength.setEnabled(true);
 
-      } else if (isOneTour) {
+      } else if (isOneTourDisplayed) {
 
          final TourData oneTourData = _allTourData.get(0);
          final boolean isPulse = oneTourData.pulseSerie != null;
@@ -2610,9 +2630,14 @@ public class Map2View extends ViewPart implements
 
    private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
 
-      _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
+      final Long tourId = hoveredValueData.tourId;
+      final TourData tourData = TourManager.getTour(tourId);
 
-      final TourData tourData = hoveredValueData.tourData;
+      if (tourData == null) {
+         return;
+      }
+
+      _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
 
       paintToursAndPhotos(tourData, null);
 

@@ -302,7 +302,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
 
                try {
-                  
+
                   _isInTourModified = true;
 
                   // get modified tours
@@ -341,7 +341,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                   }
 
                } finally {
-                  
+
                   _isInTourModified = false;
                }
 
@@ -356,7 +356,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                   clearView();
                }
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION //
+            } else if ((eventId == TourEventId.TOUR_SELECTION
                   || eventId == TourEventId.SLIDER_POSITION_CHANGED)
 
                   && eventData instanceof ISelection) {
@@ -373,6 +373,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
             } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
                onSelectionChanged_TourMarker((SelectionTourMarker) eventData);
+
+            } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
+
+               onSelectionChanged_HoveredValue((HoveredValueData) eventData);
 
             } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -508,7 +512,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    private void fireHoveredValue(final int hoveredValuePointIndex) {
 
-      final HoveredValueData hoveredValueData = new HoveredValueData(_tourData, hoveredValuePointIndex);
+      if (_tourData == null) {
+         return;
+      }
+
+      final HoveredValueData hoveredValueData = new HoveredValueData(_tourData.getTourId(), hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
             TourEventId.HOVERED_VALUE_POSITION,
@@ -798,6 +806,39 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
             clearView();
          }
+      }
+      _isInSelectionChanged = false;
+   }
+
+   private void onSelectionChanged_HoveredValue(final HoveredValueData eventData) {
+      // TODO Auto-generated method stub
+
+      final Long tourId = eventData.tourId;
+
+      if (tourId == null) {
+         return;
+      }
+
+      _isInSelectionChanged = true;
+      {
+         if (_tourData == null || _tourData.getTourId().equals(tourId) == false) {
+
+            // show tour
+
+            updateChart(tourId);
+         }
+
+//         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+//               _tourChart,
+//               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+//               eventData.hoveredValuePointIndex,
+//               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION);
+//
+//         xSliderPosition.setCenterSliderPosition(true);
+//
+//         _tourChart.selectXSliders(xSliderPosition);
+
+         _tourChart.setHovered_ValuePoint_Index(eventData.hoveredValuePointIndex);
       }
       _isInSelectionChanged = false;
    }

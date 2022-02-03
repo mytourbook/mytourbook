@@ -1299,16 +1299,16 @@ public class Map2 extends Canvas {
    /**
     * Retrieve, if any, the current tour hovered by the user.
     *
-    * @return If found, the current hovered tour, the smallest integer otherwise.
+    * @return If found, the current hovered tour otherwise <code>null</code>
     */
-   public long getHoveredTourId() {
+   public Long getHoveredTourId() {
 
       if (_allHoveredTourIds != null && _allHoveredTourIds.size() == 1) {
 
          return _allHoveredTourIds.get(0);
       }
 
-      return Integer.MIN_VALUE;
+      return null;
    }
 
    /**
@@ -2234,142 +2234,154 @@ public class Map2 extends Canvas {
          return false;
       }
 
-      Tile hoveredTile = null;
+      int numPrevHoveredTours;
 
-      int hoveredTileIndex_X = 0;
-      int hoveredTileIndex_Y = 0;
+      try {
 
-      final int devMouseX = _mouseMove_DevPosition_X;
-      final int devMouseY = _mouseMove_DevPosition_Y;
 
-      final Tile[][] allPaintedTiles = _allPaintedTiles;
+         Tile hoveredTile = null;
 
-      // top/left dev position for the hovered tile
-      int devHoveredTileX = 0;
-      int devHoveredTileY = 0;
+         int hoveredTileIndex_X = 0;
+         int hoveredTileIndex_Y = 0;
 
-      /*
-       * Get tile which is hovered
-       */
-      tileLoop:
+         final int devMouseX = _mouseMove_DevPosition_X;
+         final int devMouseY = _mouseMove_DevPosition_Y;
 
-      for (int tilePosX = _tilePos_MinX; tilePosX <= _tilePos_MaxX; tilePosX++) {
+         final Tile[][] allPaintedTiles = _allPaintedTiles;
 
-         hoveredTileIndex_Y = 0;
+         // top/left dev position for the hovered tile
+         int devHoveredTileX = 0;
+         int devHoveredTileY = 0;
 
-         for (int tilePosY = _tilePos_MinY; tilePosY <= _tilePos_MaxY; tilePosY++) {
+         /*
+          * Get tile which is hovered
+          */
+         tileLoop:
 
-            // convert tile world position into device position
-            devHoveredTileX = tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x;
-            devHoveredTileY = tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y;
+         for (int tilePosX = _tilePos_MinX; tilePosX <= _tilePos_MaxX; tilePosX++) {
 
-            final int devTileXNext = devHoveredTileX + _tilePixelSize;
-            final int devTileYNext = devHoveredTileY + _tilePixelSize;
+            hoveredTileIndex_Y = 0;
 
-            if (devMouseX >= devHoveredTileX && devMouseX < devTileXNext) {
-               if (devMouseY >= devHoveredTileY && devMouseY < devTileYNext) {
+            for (int tilePosY = _tilePos_MinY; tilePosY <= _tilePos_MaxY; tilePosY++) {
 
-                  // this is the tile which is hovered with the mouse
+               // convert tile world position into device position
+               devHoveredTileX = tilePosX * _tilePixelSize - _worldPixel_TopLeft_Viewport.x;
+               devHoveredTileY = tilePosY * _tilePixelSize - _worldPixel_TopLeft_Viewport.y;
 
-                  hoveredTile = allPaintedTiles[hoveredTileIndex_X][hoveredTileIndex_Y];
+               final int devTileXNext = devHoveredTileX + _tilePixelSize;
+               final int devTileYNext = devHoveredTileY + _tilePixelSize;
 
-                  break tileLoop;
+               if (devMouseX >= devHoveredTileX && devMouseX < devTileXNext) {
+                  if (devMouseY >= devHoveredTileY && devMouseY < devTileYNext) {
+
+                     // this is the tile which is hovered with the mouse
+
+                     hoveredTile = allPaintedTiles[hoveredTileIndex_X][hoveredTileIndex_Y];
+
+                     break tileLoop;
+                  }
                }
+
+               hoveredTileIndex_Y++;
             }
 
-            hoveredTileIndex_Y++;
+            hoveredTileIndex_X++;
          }
 
-         hoveredTileIndex_X++;
-      }
+         numPrevHoveredTours = _allHoveredTourIds.size();
 
-      final int numPrevHoveredTours = _allHoveredTourIds.size();
+         // reset hovered data
+         _allHoveredDevPoints.clear();
+         _allHoveredTourIds.clear();
+         _allHoveredSerieIndices.clear();
 
-      // reset hovered data
-      _allHoveredTourIds.clear();
-      _allHoveredDevPoints.clear();
-      _allHoveredSerieIndices.clear();
+         if (hoveredTile == null) {
 
-      if (hoveredTile == null) {
+            // this can occur when map is zoomed
+            return false;
+         }
 
-         // this can occur when map is zoomed
-         return false;
-      }
+         final ArrayList<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
+         if (allPainted_HoveredRectangle_List.isEmpty()) {
 
-      final ArrayList<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
-      if (allPainted_HoveredRectangle_List.isEmpty()) {
+            // nothing is painted in this tile
+            return false;
+         }
 
-         // nothing is painted in this tile
-         return false;
-      }
+         // get mouse relative position in the tile
+         final int devMouseTileX = devMouseX - devHoveredTileX;
+         final int devMouseTileY = devMouseY - devHoveredTileY;
 
-      // get mouse relative position in the tile
-      final int devMouseTileX = devMouseX - devHoveredTileX;
-      final int devMouseTileY = devMouseY - devHoveredTileY;
+         // optimize performance by removing object references
+         final long[] allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
+         final int[] allPainted_HoveredSerieIndices = hoveredTile.allPainted_HoverSerieIndices.toArray();
 
-      // optimize performance by removing object references
-      final long[] allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
-      final int[] allPainted_HoveredSerieIndices = hoveredTile.allPainted_HoverSerieIndices.toArray();
+         final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangle_List.toArray(
+               new Rectangle[allPainted_HoveredRectangle_List.size()]);
 
-      final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangle_List.toArray(
-            new Rectangle[allPainted_HoveredRectangle_List.size()]);
+         long painted_HoveredTourId = -1;
+         final int numPainted_HoveredTourId = allPainted_HoveredTourId.length;
 
-      long painted_HoveredTourId = -1;
-      final int numPainted_HoveredTourId = allPainted_HoveredTourId.length;
+         for (int hoverIndex = 0; hoverIndex < numPainted_HoveredTourId; hoverIndex++) {
 
-      for (int hoverIndex = 0; hoverIndex < numPainted_HoveredTourId; hoverIndex++) {
+            final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
 
-         final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
+            // optimized: painted_HoveredRectangle.contains(devMouseTileX, devMouseTileY)
+            if (devMouseTileX >= painted_HoveredRectangle.x
+                  && devMouseTileY >= painted_HoveredRectangle.y
+                  && devMouseTileX < (painted_HoveredRectangle.x + painted_HoveredRectangle.width)
+                  && devMouseTileY < (painted_HoveredRectangle.y + painted_HoveredRectangle.height)) {
 
-         // optimized: painted_HoveredRectangle.contains(devMouseTileX, devMouseTileY)
-         if (devMouseTileX >= painted_HoveredRectangle.x
-               && devMouseTileY >= painted_HoveredRectangle.y
-               && devMouseTileX < (painted_HoveredRectangle.x + painted_HoveredRectangle.width)
-               && devMouseTileY < (painted_HoveredRectangle.y + painted_HoveredRectangle.height)) {
+               painted_HoveredTourId = allPainted_HoveredTourId[hoverIndex];
 
-            painted_HoveredTourId = allPainted_HoveredTourId[hoverIndex];
+               int devHoveredRect_Center_X = painted_HoveredRectangle.x + painted_HoveredRectangle.width / 2;
+               int devHoveredRect_Center_Y = painted_HoveredRectangle.y + painted_HoveredRectangle.height / 2;
 
-            int devHoveredRect_Center_X = painted_HoveredRectangle.x + painted_HoveredRectangle.width / 2;
-            int devHoveredRect_Center_Y = painted_HoveredRectangle.y + painted_HoveredRectangle.height / 2;
+               // convert from tile position to device position
+               devHoveredRect_Center_X += devHoveredTileX;
+               devHoveredRect_Center_Y += devHoveredTileY;
 
-            // convert from tile position to device position
-            devHoveredRect_Center_X += devHoveredTileX;
-            devHoveredRect_Center_Y += devHoveredTileY;
+               _allHoveredTourIds.add(painted_HoveredTourId);
+               _allHoveredSerieIndices.add(allPainted_HoveredSerieIndices[hoverIndex]);
+               _allHoveredDevPoints.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
 
-            _allHoveredTourIds.add(painted_HoveredTourId);
-            _allHoveredSerieIndices.add(allPainted_HoveredSerieIndices[hoverIndex]);
-            _allHoveredDevPoints.add(new Point(devHoveredRect_Center_X, devHoveredRect_Center_Y));
+               // advance to the next tour id
+               int hoverTourIdIndex;
+               for (hoverTourIdIndex = hoverIndex + 1; hoverTourIdIndex < numPainted_HoveredTourId; hoverTourIdIndex++) {
 
-            // advance to the next tour id
-            int hoverTourIdIndex;
-            for (hoverTourIdIndex = hoverIndex + 1; hoverTourIdIndex < numPainted_HoveredTourId; hoverTourIdIndex++) {
+                  final long nextPainted_HoveredTourId = allPainted_HoveredTourId[hoverTourIdIndex];
 
-               final long nextPainted_HoveredTourId = allPainted_HoveredTourId[hoverTourIdIndex];
+                  if (nextPainted_HoveredTourId != painted_HoveredTourId) {
 
-               if (nextPainted_HoveredTourId != painted_HoveredTourId) {
+                     // the next tour id is discovered
 
-                  // the next tour id is discovered
+                     hoverIndex = hoverTourIdIndex;
 
-                  hoverIndex = hoverTourIdIndex;
+                     break;
+                  }
+               }
 
+               // this must be checked again otherwise the last tour id occurs multiple times
+               if (hoverTourIdIndex >= numPainted_HoveredTourId) {
                   break;
                }
             }
-
-            // this must be checked again otherwise the last tour id occurs multiple times
-            if (hoverTourIdIndex >= numPainted_HoveredTourId) {
-               break;
-            }
          }
-      }
 
-      /*
-       * Fire event, there is a possible issue:
-       * Above there are return statements which do not fire this event !!!
-       */
-      final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId());
-      for (final Object listener : _allHoveredTourListeners.getListeners()) {
-         ((IHoveredTourListener) listener).setHoveredTourId(event);
+      } finally {
+
+         // fire hover event
+
+         int hoveredValuePointIndex = -1;
+         if (_allHoveredSerieIndices.size() > 0) {
+            hoveredValuePointIndex = _allHoveredSerieIndices.get(0);
+         }
+
+         final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId(), hoveredValuePointIndex);
+
+         for (final Object listener : _allHoveredTourListeners.getListeners()) {
+            ((IHoveredTourListener) listener).setHoveredTourId(event);
+         }
       }
 
       if (_allHoveredTourIds.size() > 0) {

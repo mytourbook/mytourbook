@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2021 Frédéric Bard
+ * Copyright (C) 2019, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 public class ActionCreateTourMarkerFromMap extends Action {
 
    private Map2View _mapView;
-   private long     _currentHoverTourId;
+   private Long     _currentHoverTourId;
 
    public ActionCreateTourMarkerFromMap(final Map2View mapView) {
 
@@ -138,7 +138,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
       TourManager.saveModifiedTour(tourData);
    }
 
-   public void setCurrentHoverTourId(final long tourId) {
+   public void setCurrentHoverTourId(final Long tourId) {
       _currentHoverTourId = tourId;
    }
 

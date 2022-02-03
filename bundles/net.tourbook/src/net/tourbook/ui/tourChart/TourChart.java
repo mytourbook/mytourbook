@@ -4822,6 +4822,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
+
+
    /**
     * When a tour chart is opened in a dialog, some actions should not be done.
     *

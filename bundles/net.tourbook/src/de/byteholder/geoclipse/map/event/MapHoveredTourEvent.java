@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,15 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package de.byteholder.geoclipse.map.event;
 
 public class MapHoveredTourEvent {
 
-   public long hoveredTourId;
+   public Long hoveredTourId;
+   public int  hoveredValuePointIndex;
 
-   public MapHoveredTourEvent(final long currentHoveredTourId) {
+   public MapHoveredTourEvent(final Long hoveredTourId, final int hoveredValuePointIndex) {
 
-      hoveredTourId = currentHoveredTourId;
+      this.hoveredTourId = hoveredTourId;
+      this.hoveredValuePointIndex = hoveredValuePointIndex;
    }
 }

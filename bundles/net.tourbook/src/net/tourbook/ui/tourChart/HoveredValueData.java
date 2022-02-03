@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,29 +15,31 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.data.TourData;
+import net.tourbook.common.UI;
 
 public class HoveredValueData {
 
-   public TourData tourData;
-   public int      hoveredValuePointIndex;
+   private static final char NL = UI.NEW_LINE;
+   public Long               tourId;
+   public int                hoveredValuePointIndex;
 
-   public HoveredValueData(final TourData tourData, final int hoveredValuePointIndex) {
+   public HoveredValueData(final Long tourId, final int hoveredValuePointIndex) {
 
-      this.tourData = tourData;
+      this.tourId = tourId;
       this.hoveredValuePointIndex = hoveredValuePointIndex;
    }
 
    @Override
    public String toString() {
 
-      return "HoveredValueData\n" //$NON-NLS-1$
-            + "[\n" //$NON-NLS-1$
+      return "HoveredValueData" + NL //$NON-NLS-1$
 
-            + "hoveredValuePointIndex  =" + hoveredValuePointIndex //$NON-NLS-1$
-            + "tourData                =" + tourData //$NON-NLS-1$
+            + "[" + NL//$NON-NLS-1$
 
-            + "\n]"; //$NON-NLS-1$
+            + "hoveredValuePointIndex  =" + hoveredValuePointIndex + NL //$NON-NLS-1$
+            + "tourId                  =" + tourId + NL//$NON-NLS-1$
+
+            + "]"; //$NON-NLS-1$
    }
 
 }
