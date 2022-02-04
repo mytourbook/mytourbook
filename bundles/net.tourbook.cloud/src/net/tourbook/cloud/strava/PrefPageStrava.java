@@ -436,6 +436,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
       _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
+      _chkAddWeatherIconInTitle.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
 
