@@ -1380,6 +1380,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       // calculate merged data
       computeMergedData();
 
+      //TODO FB
       _tourChartConfig.isRelativeValueDiffScaling = _chkValueDiffScaling.getSelection();
 
       if (_chkPreviewChart.getSelection()) {
