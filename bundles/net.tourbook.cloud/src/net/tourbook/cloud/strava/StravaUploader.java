@@ -203,6 +203,16 @@ public class StravaUploader extends TourbookCloudUploader {
       return compressedFilePath;
    }
 
+   private String buildFormattedTitle(final TourData tourData) {
+
+      String title = tourData.getTourTitle();
+
+      if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
+         title += getWeatherIconInTitle(tourData.getWeatherIndex());
+      }
+      return title;
+   }
+
    private void createCompressedTcxTourFile(final IProgressMonitor monitor,
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
@@ -547,11 +557,7 @@ public class StravaUploader extends TourbookCloudUploader {
     */
    private CompletableFuture<ActivityUpload> uploadFile(final String compressedTourAbsoluteFilePath, final TourData tourData) {
 
-      String title = tourData.getTourTitle();
-
-      if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
-         title += getWeatherIconInTitle(tourData.getWeatherIndex());
-      }
+      final String title = buildFormattedTitle(tourData);
 
       final MultiPartBodyPublisher publisher = new MultiPartBodyPublisher()
             .addPart("data_type", "tcx.gz") //$NON-NLS-1$ //$NON-NLS-2$
@@ -586,11 +592,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final boolean isTrainerActivity = tourData.getTourType() != null &&
             tourData.getTourType().getName().trim().equalsIgnoreCase("trainer"); //$NON-NLS-1$
 
-      String title = tourData.getTourTitle();
-
-      if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
-         title += getWeatherIconInTitle(tourData.getWeatherIndex());
-      }
+      final String title = buildFormattedTitle(tourData);
 
       final JSONObject body = new JSONObject();
       body.put("name", title); //$NON-NLS-1$
