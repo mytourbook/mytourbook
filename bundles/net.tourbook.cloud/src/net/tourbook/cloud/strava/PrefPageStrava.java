@@ -80,7 +80,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Button             _chkAddWeatherIconInTitle;
    private Button             _chkSendDescription;
    private Button             _chkUseTourTypeMapping;
-
    private Label              _labelAccessToken;
    private Label              _labelAccessToken_Value;
    private Label              _labelAthleteName;
@@ -426,12 +425,21 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       return isCancel;
    }
 
-   /**
-    * Nothing to do since the button is deactivated
-    * {@link #noDefaultAndApplyButton()}
-    */
    @Override
    protected void performDefaults() {
+
+      _labelAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.STRAVA_ACCESSTOKEN));
+      _labelRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.STRAVA_REFRESHTOKEN));
+      _labelAthleteName_Value.setText(_prefStore.getDefaultString(Preferences.STRAVA_ATHLETEFULLNAME));
+      _athleteId = _prefStore.getDefaultString(Preferences.STRAVA_ATHLETEID);
+      _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
+      _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
+      _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
+
+      _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
+
+      enableControls();
 
       super.performDefaults();
    }
