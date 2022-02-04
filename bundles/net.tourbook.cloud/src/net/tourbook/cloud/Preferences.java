@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,13 +33,14 @@ public final class Preferences {
    /*
     * Strava preferences
     */
-   public static final String STRAVA_ACCESSTOKEN            = "STRAVA_ACCESSTOKEN";            //$NON-NLS-1$
-   public static final String STRAVA_REFRESHTOKEN           = "STRAVA_REFRESHTOKEN";           //$NON-NLS-1$
-   public static final String STRAVA_ACCESSTOKEN_EXPIRES_AT = "STRAVA_ACCESSTOKEN_EXPIRES_AT"; //$NON-NLS-1$
-   public static final String STRAVA_ATHLETEID              = "STRAVA_ATHLETEID";              //$NON-NLS-1$
-   public static final String STRAVA_ATHLETEFULLNAME        = "STRAVA_ATHLETEFULLNAME";        //$NON-NLS-1$
-   public static final String STRAVA_SENDDESCRIPTION        = "STRAVA_SENDDESCRIPTION";        //$NON-NLS-1$
-   public static final String STRAVA_USETOURTYPEMAPPING     = "STRAVA_USETOURTYPEMAPPING";     //$NON-NLS-1$
+   public static final String STRAVA_ACCESSTOKEN             = "STRAVA_ACCESSTOKEN";             //$NON-NLS-1$
+   public static final String STRAVA_REFRESHTOKEN            = "STRAVA_REFRESHTOKEN";            //$NON-NLS-1$
+   public static final String STRAVA_ACCESSTOKEN_EXPIRES_AT  = "STRAVA_ACCESSTOKEN_EXPIRES_AT";  //$NON-NLS-1$
+   public static final String STRAVA_ATHLETEID               = "STRAVA_ATHLETEID";               //$NON-NLS-1$
+   public static final String STRAVA_ATHLETEFULLNAME         = "STRAVA_ATHLETEFULLNAME";         //$NON-NLS-1$
+   public static final String STRAVA_ADDWEATHERICON_IN_TITLE = "STRAVA_ADDWEATHERICON_IN_TITLE"; //$NON-NLS-1$
+   public static final String STRAVA_SENDDESCRIPTION         = "STRAVA_SENDDESCRIPTION";         //$NON-NLS-1$
+   public static final String STRAVA_USETOURTYPEMAPPING      = "STRAVA_USETOURTYPEMAPPING";      //$NON-NLS-1$
 
    /*
     * Suunto preferences

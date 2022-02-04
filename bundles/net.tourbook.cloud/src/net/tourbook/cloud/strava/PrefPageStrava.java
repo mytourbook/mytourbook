@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,8 +77,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
     * UI controls
     */
    private Button             _btnCleanup;
+   private Button             _chkAddWeatherIconInTitle;
    private Button             _chkSendDescription;
    private Button             _chkUseTourTypeMapping;
+
    private Label              _labelAccessToken;
    private Label              _labelAccessToken_Value;
    private Label              _labelAthleteName;
@@ -276,6 +278,15 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       {
          {
             /*
+             * Checkbox: Add weather icon in tour title
+             */
+            _chkAddWeatherIconInTitle = new Button(group, SWT.CHECK);
+            GridDataFactory.fillDefaults().applyTo(_chkAddWeatherIconInTitle);
+
+            _chkAddWeatherIconInTitle.setText(Messages.PrefPage_UploadConfiguration_Button_AddWeatherIconInTitle);
+         }
+         {
+            /*
              * Checkbox: Send the tour description
              */
             _chkSendDescription = new Button(group, SWT.CHECK);
@@ -332,6 +343,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _labelExpiresAt_Value.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _linkRevokeAccess.setEnabled(isAuthorized);
+      _chkAddWeatherIconInTitle.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
       _chkUseTourTypeMapping.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
@@ -414,21 +426,12 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       return isCancel;
    }
 
+   /**
+    * Nothing to do since the button is deactivated
+    * {@link #noDefaultAndApplyButton()}
+    */
    @Override
    protected void performDefaults() {
-
-      _labelAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.STRAVA_ACCESSTOKEN));
-      _labelRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.STRAVA_REFRESHTOKEN));
-      _labelAthleteName_Value.setText(_prefStore.getDefaultString(Preferences.STRAVA_ATHLETEFULLNAME));
-      _athleteId = _prefStore.getDefaultString(Preferences.STRAVA_ATHLETEID);
-      _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
-      _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-      _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
-
-      _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
-      _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
-
-      enableControls();
 
       super.performDefaults();
    }
@@ -445,6 +448,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          _prefStore.setValue(Preferences.STRAVA_ATHLETEID, _athleteId);
          _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, _accessTokenExpiresAt);
 
+         _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, _chkAddWeatherIconInTitle.getSelection());
          _prefStore.setValue(Preferences.STRAVA_SENDDESCRIPTION, _chkSendDescription.getSelection());
 
          final boolean prefUseTourTypeMapping = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING);
@@ -495,6 +499,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
       _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
+      _chkAddWeatherIconInTitle.setSelection(_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
    }

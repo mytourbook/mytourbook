@@ -71,6 +71,9 @@ Improvements
                                         https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
                                       	https://sourceforge.net/p/mytourbook/feature-requests/122/
 
+* Strava Integration (Frederic)   
+  - Added the possibility to add the tour weather icon in the uploaded Strava activity title
+
                                         
 Changes
 =======
