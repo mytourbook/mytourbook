@@ -821,12 +821,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
       _isInSelectionChanged = true;
       {
-         if (_tourData == null || _tourData.getTourId().equals(tourId) == false) {
+         if (_tourData != null || _tourData.getTourId().equals(tourId)) {
 
-            // show tour
-
-            updateChart(tourId);
-         }
+            // the hovered tour is displayed
 
 //         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
 //               _tourChart,
@@ -838,7 +835,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 //
 //         _tourChart.selectXSliders(xSliderPosition);
 
-         _tourChart.setHovered_ValuePoint_Index(eventData.hoveredValuePointIndex);
+            _tourChart.setHovered_ValuePoint_Index(eventData.hoveredValuePointIndex);
+         }
       }
       _isInSelectionChanged = false;
    }

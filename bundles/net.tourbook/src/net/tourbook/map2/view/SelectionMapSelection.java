@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,42 +15,35 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import net.tourbook.data.TourData;
-
 import org.eclipse.jface.viewers.ISelection;
 
-public class SelectionMapPosition implements ISelection {
+public class SelectionMapSelection implements ISelection {
 
-   private TourData _tourData;
-   private boolean  _isCenterSliderPosition;
-   private int      _valueIndex1;
-   private int      _valueIndex2;
+   private Long _tourId;
 
-   public SelectionMapPosition(final TourData tourData,
-                               final int valueIndex1,
-                               final int valueIndex2,
-                               final boolean centerSliderPosition) {
+   private int  _valueIndex1;
+   private int  _valueIndex2;
 
-      _tourData = tourData;
+   public SelectionMapSelection(final Long tourId,
+                                final int valueIndex1,
+                                final int valueIndex2) {
+
+      _tourId = tourId;
+
       _valueIndex1 = valueIndex1;
       _valueIndex2 = valueIndex2;
-      _isCenterSliderPosition = centerSliderPosition;
    }
 
-   public int getSlider1ValueIndex() {
+   public Long getTourId() {
+      return _tourId;
+   }
+
+   public int getValueIndex1() {
       return _valueIndex1;
    }
 
-   public int getSlider2ValueIndex() {
+   public int getValueIndex2() {
       return _valueIndex2;
-   }
-
-   public TourData getTourData() {
-      return _tourData;
-   }
-
-   public boolean isCenterSliderPosition() {
-      return _isCenterSliderPosition;
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,34 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package de.byteholder.geoclipse.map.event;
 
-import net.tourbook.common.UI;
+import org.eclipse.jface.viewers.ISelection;
 
-public class HoveredValueData {
+public interface IMapSelectionListener {
 
-   private static final char NL = UI.NEW_LINE;
-
-   public Long               tourId;
-   public int                hoveredValuePointIndex;
-
-   public HoveredValueData(final Long tourId, final int hoveredValuePointIndex) {
-
-      this.tourId = tourId;
-      this.hoveredValuePointIndex = hoveredValuePointIndex;
-   }
-
-   @Override
-   public String toString() {
-
-      return "HoveredValueData" + NL //$NON-NLS-1$
-
-            + "[" + NL//$NON-NLS-1$
-
-            + "hoveredValuePointIndex  =" + hoveredValuePointIndex + NL //$NON-NLS-1$
-            + "tourId                  =" + tourId + NL//$NON-NLS-1$
-
-            + "]"; //$NON-NLS-1$
-   }
+   /**
+    * Is called when something is selected in the map
+    *
+    * @param selection
+    */
+   public void onMapSelection(ISelection selection);
 
 }

@@ -9245,7 +9245,14 @@ public class ChartComponentGraph extends Canvas {
 
    void setHovered_ValuePoint_Index(final int newHoveredValuePointIndex) {
 
-      if (_lineDevPositions.size() == 0) {
+      if (_lineDevPositions.size() == 0
+
+            // this can happen when multiple tours are selected in the map
+            // but only one tour is displayed in the chart
+            // -> needs a fix but is not simple
+            || newHoveredValuePointIndex >= _lineDevPositions.get(0).length
+
+      ) {
          return;
       }
 

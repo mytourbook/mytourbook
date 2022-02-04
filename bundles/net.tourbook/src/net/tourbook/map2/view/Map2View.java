@@ -26,6 +26,7 @@ import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
+import de.byteholder.geoclipse.map.event.IMapSelectionListener;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
@@ -187,15 +188,16 @@ import org.oscim.core.MapPosition;
  */
 public class Map2View extends ViewPart implements
 
+      IBreadcrumbListener,
       IMapContextProvider,
-      IPhotoEventListener,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapPositionListener,
+      IMapSelectionListener,
       IMapSyncListener,
       IMapInfoListener,
-      IBreadcrumbListener,
-      IMapWithPhotos {
+      IMapWithPhotos,
+      IPhotoEventListener {
 
 // SET_FORMATTING_OFF
 
@@ -1195,8 +1197,6 @@ public class Map2View extends ViewPart implements
                Map2View.this);
       });
 
-      _map.addTourSelectionListener(this::onSelection_InsideMap);
-
       _map.addMapGridBoxListener((map_ZoomLevel, map_GeoCenter, isGridSelected, mapGridData) -> {
 
          if (isGridSelected) {
@@ -1209,9 +1209,11 @@ public class Map2View extends ViewPart implements
          }
       });
 
+      _map.addBreadcrumbListener(this);
       _map.addMapInfoListener(this);
       _map.addMapPositionListener(this);
-      _map.addBreadcrumbListener(this);
+      _map.addMapSelectionListener(this);
+      _map.addTourSelectionListener(this::onSelection_InsideMap);
 
       _map.setMapContextProvider(this);
    }
@@ -2607,6 +2609,7 @@ public class Map2View extends ViewPart implements
    public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isCenterTour) {
 
       if (_isInSelectBookmark) {
+
          // prevent fire the sync event
          return;
       }
@@ -2626,6 +2629,15 @@ public class Map2View extends ViewPart implements
       final MapPosition mapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
 
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
+   }
+
+   @Override
+   public void onMapSelection(final ISelection selection) {
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.MAP_SELECTION,
+            selection,
+            Map2View.this);
    }
 
    private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
@@ -3940,9 +3952,9 @@ public class Map2View extends ViewPart implements
       /*
        * Hovered/selected tour
        */
-      final boolean isShowHoveredSelectedTour   = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
+      final boolean isShowHoveredOrSelectedTour = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
       final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
-      final boolean isSelectTour                = Util.getStateBoolean(_state,   Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR,                  Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT);
+      final boolean canSelectTour               = Util.getStateBoolean(_state,   Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR,                  Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT);
 
       final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                               Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
       final int hoveredOpacity                  = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
@@ -3954,9 +3966,9 @@ public class Map2View extends ViewPart implements
 
       _map.setConfig_HoveredSelectedTour(
 
-            isShowHoveredSelectedTour,
+            isShowHoveredOrSelectedTour,
             isShowBreadcrumbs,
-            isSelectTour,
+            canSelectTour,
 
             numVisibleBreadcrumbs,
             hoveredRGB,
