@@ -2634,10 +2634,57 @@ public class Map2View extends ViewPart implements
    @Override
    public void onMapSelection(final ISelection selection) {
 
-      TourManager.fireEventWithCustomData(
-            TourEventId.MAP_SELECTION,
-            selection,
-            Map2View.this);
+      if (selection instanceof SelectionMapSelection) {
+
+         final SelectionMapSelection mapSelection = (SelectionMapSelection) selection;
+
+         final boolean isShowSliderInMap = _actionShowSliderInMap.isChecked();
+
+         if (isShowSliderInMap) {
+
+            // set left/right slider position to the selected value points
+
+            int valueIndex1 = mapSelection.getValueIndex1();
+            int valueIndex2 = mapSelection.getValueIndex2();
+
+            // ensure that the first index is set for the left slider
+            if (valueIndex1 > valueIndex2) {
+
+               final int valueIndex1Backup = valueIndex1;
+
+               valueIndex1 = valueIndex2;
+               valueIndex2 = valueIndex1Backup;
+            }
+
+            _currentLeftSliderValueIndex = valueIndex1;
+            _currentRightSliderValueIndex = valueIndex2;
+
+            // repaint map
+            _directMappingPainter.setPaintContext(
+
+                  _map,
+                  _isShowTour,
+                  _allTourData.get(0),
+
+                  _currentLeftSliderValueIndex,
+                  _currentRightSliderValueIndex,
+                  _currentValuePointIndex,
+
+                  isShowSliderInMap,
+                  _actionShowSliderInLegend.isChecked(),
+                  _actionShowValuePoint.isChecked(),
+
+                  _sliderPathPaintingData);
+
+            _map.redraw();
+         }
+
+         TourManager.fireEventWithCustomData(
+               TourEventId.MAP_SELECTION,
+               selection,
+               Map2View.this);
+      }
+
    }
 
    private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
@@ -3169,7 +3216,7 @@ public class Map2View extends ViewPart implements
 
       _directMappingPainter.disablePaintContext();
 
-      _map.resetHoveredSelectedTours();
+      _map.resetTours_HoveredData();
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3321,7 +3368,8 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
       _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
-      _map.resetHoveredSelectedTours();
+      _map.resetTours_HoveredData();
+      _map.resetTours_SelectedData();
 
       if (_previousOverlayKey != newOverlayKey) {
 
@@ -3380,8 +3428,6 @@ public class Map2View extends ViewPart implements
     *
     * @param tourData
     * @param forceRedraw
-    * @param isSynchronized
-    *           when <code>true</code>, map will be synchronized
     */
    private void paintTours_20_One(final TourData tourData, final boolean forceRedraw) {
 
@@ -3451,7 +3497,9 @@ public class Map2View extends ViewPart implements
 
       _tourPainterConfig.setTourBounds(tourBoundsSet);
 
-      _map.resetHoveredSelectedTours();
+      _map.resetTours_HoveredData();
+      _map.resetTours_SelectedData();
+
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -3530,7 +3578,7 @@ public class Map2View extends ViewPart implements
 
       _directMappingPainter.disablePaintContext();
 
-      _map.resetHoveredSelectedTours();
+      _map.resetTours_HoveredData();
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
 
@@ -4387,7 +4435,7 @@ public class Map2View extends ViewPart implements
 
             _sliderPathPaintingData);
 
-      _map.resetHoveredSelectedTours();
+      _map.resetTours_HoveredData();
 
       _map.tourBreadcrumb().removeAllCrumbs();
       setTourInfoIconPosition();

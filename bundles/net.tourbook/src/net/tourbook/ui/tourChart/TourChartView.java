@@ -30,6 +30,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
@@ -377,6 +378,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
             } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
 
                onSelectionChanged_HoveredValue((HoveredValueData) eventData);
+
+            } else if (eventId == TourEventId.MAP_SELECTION && eventData instanceof SelectionMapSelection) {
+
+               onSelectionChanged_MapSelection((SelectionMapSelection) eventData);
 
             } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -811,7 +816,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
    }
 
    private void onSelectionChanged_HoveredValue(final HoveredValueData eventData) {
-      // TODO Auto-generated method stub
 
       final Long tourId = eventData.tourId;
 
@@ -825,18 +829,25 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
             // the hovered tour is displayed
 
-//         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-//               _tourChart,
-//               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-//               eventData.hoveredValuePointIndex,
-//               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION);
-//
-//         xSliderPosition.setCenterSliderPosition(true);
-//
-//         _tourChart.selectXSliders(xSliderPosition);
-
             _tourChart.setHovered_ValuePoint_Index(eventData.hoveredValuePointIndex);
          }
+      }
+      _isInSelectionChanged = false;
+   }
+
+   private void onSelectionChanged_MapSelection(final SelectionMapSelection mapSelection) {
+
+      final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+            _tourChart,
+            SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+            mapSelection.getValueIndex1(),
+            mapSelection.getValueIndex2());
+
+      xSliderPosition.setCenterSliderPosition(true);
+
+      _isInSelectionChanged = true;
+      {
+         _tourChart.selectXSliders(xSliderPosition);
       }
       _isInSelectionChanged = false;
    }

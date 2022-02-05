@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.map2.view;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
@@ -27,12 +28,14 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -53,6 +56,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       IActionResetToDefault,
       IChangeUIListener {
 
+   private static final IPreferenceStore  _prefStore         = TourbookPlugin.getPrefStore();
    private static IDialogSettings         _state;
 
    private IPropertyChangeListener        _defaultChangePropertyListener;
@@ -71,6 +75,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
    private Button                _chkIsDimMap;
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkIsZoomWithMousePosition;
+   private Button                _chkSelectInbetweenTimeSlices;
 
    private Spinner               _spinnerDimValue;
 
@@ -229,6 +234,16 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
                _colorMapDimmColor.addOpenListener(this);
             }
          }
+         {
+            /*
+             * Options to select all the time slices in between the left and right sliders or only
+             * the current slider's one
+             */
+            _chkSelectInbetweenTimeSlices = new Button(container, SWT.CHECK);
+            _chkSelectInbetweenTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
+            _chkSelectInbetweenTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
+            _chkSelectInbetweenTimeSlices.addSelectionListener(_defaultSelectionListener);
+         }
       }
    }
 
@@ -273,10 +288,14 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
    @Override
    public void resetToDefaults() {
 
+
+
 // SET_FORMATTING_OFF
 
       _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
       _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
+
+      _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       /*
        * Map dimming
@@ -284,6 +303,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _chkIsDimMap.setSelection(                   Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
       _spinnerDimValue.setSelection(               Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
       _colorMapDimmColor.setColorValue(            Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
+
 
 // SET_FORMATTING_ON
 
@@ -299,12 +319,15 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _chkIsToggleKeyboardPanning.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
       _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,     Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
+      _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
+
       /*
        * Map dimming
        */
       _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
       _spinnerDimValue.setSelection(      Util.getStateInt(    _state,  Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
       _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
+
 
 // SET_FORMATTING_ON
 
@@ -313,10 +336,13 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 
    private void saveState() {
 
+
 // SET_FORMATTING_OFF
 
       _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
       _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
 
       /*
        * Map dimming

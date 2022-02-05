@@ -111,7 +111,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    private TourChart _tourChart;
 
    private Button    _chkInvertPaceGraph;
-   private Button    _chkSelectAllTimeSlices;
+   private Button    _chkSelectInbetweenTimeSlices;
    private Button    _chkShowBreaktimeValues;
    private Button    _chkShowNightSections;
    private Button    _chkShowSrtmData;
@@ -323,10 +323,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
              * Options to select all the time slices in between the left and right sliders or only
              * the current slider's one
              */
-            _chkSelectAllTimeSlices = new Button(container, SWT.CHECK);
-            _chkSelectAllTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
-            _chkSelectAllTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
-            _chkSelectAllTimeSlices.addSelectionListener(_defaultSelectionListener);
+            _chkSelectInbetweenTimeSlices = new Button(container, SWT.CHECK);
+            _chkSelectInbetweenTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
+            _chkSelectInbetweenTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
+            _chkSelectInbetweenTimeSlices.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
@@ -524,7 +524,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       tcc.xAxisTime = xAxisStartTime;
 
       _chkInvertPaceGraph.setSelection(isShowPaceGraphInverted);
-      _chkSelectAllTimeSlices.setSelection(isSelectInBetweenTimeSlices);
+      _chkSelectInbetweenTimeSlices.setSelection(isSelectInBetweenTimeSlices);
       _chkShowBreaktimeValues.setSelection(isShowBreaktimeValues);
       _chkShowSrtmData.setSelection(isSrtmDataVisible);
       _chkShowStartTimeOnXAxis.setSelection(isTourStartTime);
@@ -574,7 +574,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
       _chkShowValuePointValue.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE));
 
-      _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
+      _chkSelectInbetweenTimeSlices.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       setSelection_PulseGraph(tcc.pulseGraph,
             tcc.canShowPulseSerie,
@@ -588,7 +588,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
-      final boolean isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
+      final boolean isSelectInBetweenTimeSlices = _chkSelectInbetweenTimeSlices.getSelection();
       final boolean isShowBreaktimeValues = _chkShowBreaktimeValues.getSelection();
       final boolean isShowPaceGraphInverted = _chkInvertPaceGraph.getSelection();
       final boolean isShowValuePointValue = _chkShowValuePointValue.getSelection();

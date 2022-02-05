@@ -340,6 +340,7 @@ public class Map2 extends Canvas {
    private boolean                 _isMapPanned;
 
    private Point                   _mouseDownPosition;
+   private boolean                 _mouseMove_IsShiftKeyPressed;
    private int                     _mouseMove_DevPosition_X = Integer.MIN_VALUE;
    private int                     _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
    private int                     _mouseMove_DevPosition_X_Last;
@@ -2714,7 +2715,7 @@ public class Map2 extends Canvas {
          return;
       }
 
-//      final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
+      final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
       final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
 
       hideTourTooltipHoveredArea();
@@ -2834,7 +2835,7 @@ public class Map2 extends Canvas {
 
       } else if (_allHoveredTourIds.size() > 0) {
 
-         onMouse_Down_HoveredTour(isCtrl);
+         onMouse_Down_HoveredTour(isCtrl, isShift);
 
       } else {
 
@@ -2846,7 +2847,7 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void onMouse_Down_HoveredTour(final boolean isCtrl) {
+   private void onMouse_Down_HoveredTour(final boolean isCtrlKeyPressed, final boolean isShiftKeyPressed) {
 
       ISelection tourSelection = null;
 
@@ -2857,7 +2858,13 @@ public class Map2 extends Canvas {
          final long hoveredTourId = _allHoveredTourIds.get(0);
          final boolean isAnotherTourSelected = _hovered_SelectedTourId != hoveredTourId;
 
-         if (_hoveredSelectedTour_CanSelectTour) {
+         // when pressing the shift key then the tour/trackpoint selection is inverted
+         final boolean isInvertAction = isShiftKeyPressed;
+         final boolean canSelectTour = isInvertAction
+               ? !_hoveredSelectedTour_CanSelectTour
+               : _hoveredSelectedTour_CanSelectTour;
+
+         if (canSelectTour) {
 
             // a tour can be/is selected
 
@@ -2897,7 +2904,7 @@ public class Map2 extends Canvas {
 
             final int hoveredSerieIndex = _allHoveredSerieIndices.get(0);
 
-            if (isCtrl) {
+            if (isCtrlKeyPressed) {
 
                _hovered_SelectedSerieIndex2 = hoveredSerieIndex;
 
@@ -2971,6 +2978,9 @@ public class Map2 extends Canvas {
       if (_mp == null) {
          return;
       }
+
+      final boolean isShiftKeyPressed = (mouseEvent.stateMask & SWT.SHIFT) != 0;
+      _mouseMove_IsShiftKeyPressed = isShiftKeyPressed;
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
 
@@ -4004,11 +4014,19 @@ public class Map2 extends Canvas {
       }
 
       /*
+       * When pressing the shift key then the tour/trackpoint selection is inverted
+       */
+      final boolean isInvertAction = _mouseMove_IsShiftKeyPressed;
+      final boolean canSelectTour = isInvertAction
+            ? !_hoveredSelectedTour_CanSelectTour
+            : _hoveredSelectedTour_CanSelectTour;
+
+      /*
        * Paint selected tour or trackpoint
        */
       if (_hovered_SelectedTourId != -1) {
 
-         if (_hoveredSelectedTour_CanSelectTour) {
+         if (canSelectTour) {
 
             // a tour can be selected
 
@@ -4058,11 +4076,11 @@ public class Map2 extends Canvas {
                isTourHoveredAndSelected == false
 
                      // or when a trackpoint is selected
-                     || isTourHoveredAndSelected && _hoveredSelectedTour_CanSelectTour == false
+                     || isTourHoveredAndSelected && canSelectTour == false
 
                ) {
 
-                  if (_hoveredSelectedTour_CanSelectTour) {
+                  if (canSelectTour) {
 
                      // a tour can be selected
 
@@ -4412,7 +4430,10 @@ public class Map2 extends Canvas {
 
       // trackpoint
       final String text_TrackPoint = String.format("Trackpoint\t%s",
-            Integer.toString(hoveredSerieIndex));
+            Integer.toString(hoveredSerieIndex
+
+                  // start with 1 and not with 0
+                  + 1));
 
       // time
       String text_Time = null;
@@ -4614,7 +4635,7 @@ public class Map2 extends Canvas {
       final int dotWidth = 30;
       final int dotWidth2 = dotWidth / 2;
 
-      // paint 2 point
+      // loop: paint 2 points
       for (int paintIndex = 0; paintIndex < 2; paintIndex++) {
 
          final int serieIndex;
@@ -6338,13 +6359,9 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * Reset hovered data
+    * Reset hovered tour data
     */
-   public void resetHoveredSelectedTours() {
-
-      _hovered_SelectedTourId = -1;
-      _hovered_SelectedSerieIndex1 = -1;
-      _hovered_SelectedSerieIndex2 = -1;
+   public void resetTours_HoveredData() {
 
       _allHoveredTourIds.clear();
       _allHoveredDevPoints.clear();
@@ -6365,6 +6382,16 @@ public class Map2 extends Canvas {
             }
          }
       }
+   }
+
+   /**
+    * Reset selected tour data
+    */
+   public void resetTours_SelectedData() {
+
+      _hovered_SelectedTourId = -1;
+      _hovered_SelectedSerieIndex1 = -1;
+      _hovered_SelectedSerieIndex2 = -1;
    }
 
    public void setConfig_HoveredSelectedTour(final boolean isShowHoveredOrSelectedTour,
@@ -6402,14 +6429,10 @@ public class Map2 extends Canvas {
       if (isShowHoveredOrSelectedTour == false) {
 
          // hide hovered/selected tour
-         _hovered_SelectedTourId = -1;
-         _hovered_SelectedSerieIndex1 = -1;
-         _hovered_SelectedSerieIndex2 = -1;
+         resetTours_SelectedData();
       }
 
-      _allHoveredTourIds.clear();
-      _allHoveredDevPoints.clear();
-      _allHoveredSerieIndices.clear();
+      resetTours_HoveredData();
 
       disposeOverlayImageCache();
 
