@@ -30,12 +30,16 @@ Experimental
 New
 ===
 
+* 2D Map - Select trackpoint
+  - A trackpoint can be selected with the mouse when one tour is displayed
+  - With the <Shift> key the 2nd trackpoint can be selected
+  - Select in-between trackpoints can be activated/deactivated in the "2D Map Options" slideout
+
+* 2D Map (Frederic)
+  - Added the possibility to show/hide the tour weather icon on the map  
 
 * Tour Pauses
   - Show all tour pauses in a list
-
-* 2D Map (Frederic)
-  - Added the possibility to show/hide the tour weather icon on the map
 
 
 Improvements

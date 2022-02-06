@@ -340,7 +340,6 @@ public class Map2 extends Canvas {
    private boolean                 _isMapPanned;
 
    private Point                   _mouseDownPosition;
-   private boolean                 _mouseMove_IsShiftKeyPressed;
    private int                     _mouseMove_DevPosition_X = Integer.MIN_VALUE;
    private int                     _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
    private int                     _mouseMove_DevPosition_X_Last;
@@ -497,21 +496,21 @@ public class Map2 extends Canvas {
     * POI tooltip
     */
    private PoiToolTip       _poi_Tooltip;
-   private final int        _poi_Tooltip_OffsetY         = 5;
+   private final int        _poi_Tooltip_OffsetY               = 5;
    private TourToolTip      _tour_ToolTip;
 
    /**
     * Hovered/selected tour
     */
-   private boolean          _isShowHoveredOrSelectedTour = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
+   private boolean          _isShowHoveredOrSelectedTour       = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
 
-   private ArrayList<Point> _allHoveredDevPoints         = new ArrayList<>();
-   private ArrayList<Long>  _allHoveredTourIds           = new ArrayList<>();
-   private TIntArrayList    _allHoveredSerieIndices      = new TIntArrayList();
+   private ArrayList<Point> _allHoveredDevPoints               = new ArrayList<>();
+   private ArrayList<Long>  _allHoveredTourIds                 = new ArrayList<>();
+   private TIntArrayList    _allHoveredSerieIndices            = new TIntArrayList();
 
-   private long             _hovered_SelectedTourId      = -1;
-   private int              _hovered_SelectedSerieIndex1 = -1;
-   private int              _hovered_SelectedSerieIndex2 = -1;
+   private long             _hovered_SelectedTourId            = -1;
+   private int              _hovered_SelectedSerieIndex_Front  = -1;
+   private int              _hovered_SelectedSerieIndex_Behind = -1;
 
    /**
     * When <code>true</code> then a tour can be selected, otherwise a trackpoint (including tour)
@@ -2719,7 +2718,7 @@ public class Map2 extends Canvas {
       }
 
       final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
-      final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
+//      final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
 
       hideTourTooltipHoveredArea();
       setPoiVisible(false);
@@ -2838,7 +2837,7 @@ public class Map2 extends Canvas {
 
       } else if (_allHoveredTourIds.size() > 0) {
 
-         onMouse_Down_HoveredTour(isCtrl, isShift);
+         onMouse_Down_HoveredTour(isShift);
 
       } else {
 
@@ -2850,7 +2849,12 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void onMouse_Down_HoveredTour(final boolean isCtrlKeyPressed, final boolean isShiftKeyPressed) {
+   /**
+    * A tour is hovered, select/deselect tour or trackpoint
+    *
+    * @param isShiftKeyPressed
+    */
+   private void onMouse_Down_HoveredTour(final boolean isShiftKeyPressed) {
 
       ISelection tourSelection = null;
 
@@ -2861,13 +2865,7 @@ public class Map2 extends Canvas {
          final long hoveredTourId = _allHoveredTourIds.get(0);
          final boolean isAnotherTourSelected = _hovered_SelectedTourId != hoveredTourId;
 
-         // when pressing the shift key then the tour/trackpoint selection is inverted
-         final boolean isInvertAction = isShiftKeyPressed;
-         final boolean canSelectTour = isInvertAction
-               ? !_hoveredSelectedTour_CanSelectTour
-               : _hoveredSelectedTour_CanSelectTour;
-
-         if (canSelectTour) {
+         if (_hoveredSelectedTour_CanSelectTour) {
 
             // a tour can be/is selected
 
@@ -2886,8 +2884,8 @@ public class Map2 extends Canvas {
                _hovered_SelectedTourId = -1;
             }
 
-            _hovered_SelectedSerieIndex1 = -1;
-            _hovered_SelectedSerieIndex2 = -1;
+            _hovered_SelectedSerieIndex_Behind = -1;
+            _hovered_SelectedSerieIndex_Front = -1;
 
          } else {
 
@@ -2897,30 +2895,60 @@ public class Map2 extends Canvas {
 
             if (isAnotherTourSelected) {
 
-               // fire a selection for a newtour
+               // fire a selection for a new tour
 
                tourSelection = new SelectionTourId(_hovered_SelectedTourId);
 
-               _hovered_SelectedSerieIndex1 = -1;
-               _hovered_SelectedSerieIndex2 = -1;
+               _hovered_SelectedSerieIndex_Behind = -1;
+               _hovered_SelectedSerieIndex_Front = -1;
             }
 
             final int hoveredSerieIndex = _allHoveredSerieIndices.get(0);
 
-            if (isCtrlKeyPressed) {
+            if (isShiftKeyPressed) {
 
-               _hovered_SelectedSerieIndex2 = hoveredSerieIndex;
+               // select 2nd value point
+
+               _hovered_SelectedSerieIndex_Behind = hoveredSerieIndex;
 
             } else {
 
-               _hovered_SelectedSerieIndex1 = hoveredSerieIndex;
+               // select 1st value point
+
+               _hovered_SelectedSerieIndex_Front = hoveredSerieIndex;
             }
+
+            /*
+             * Ensure that the right index is larger than the left index
+             */
+            int selectedSerieIndex_Behind = _hovered_SelectedSerieIndex_Behind;
+            int selectedSerieIndex_Front = _hovered_SelectedSerieIndex_Front;
+
+            if (_hovered_SelectedSerieIndex_Front == -1) {
+
+               selectedSerieIndex_Behind = -1;
+               selectedSerieIndex_Front = _hovered_SelectedSerieIndex_Behind;
+
+            } else if (_hovered_SelectedSerieIndex_Behind == -1) {
+
+               // serie index in front is larger than the behind -> nothing to do
+
+            } else if (_hovered_SelectedSerieIndex_Behind > _hovered_SelectedSerieIndex_Front) {
+
+               final int hovered_SelectedSerieIndex_LeftBackup = _hovered_SelectedSerieIndex_Behind;
+
+               selectedSerieIndex_Behind = _hovered_SelectedSerieIndex_Front;
+               selectedSerieIndex_Front = hovered_SelectedSerieIndex_LeftBackup;
+            }
+
+            _hovered_SelectedSerieIndex_Front = selectedSerieIndex_Front;
+            _hovered_SelectedSerieIndex_Behind = selectedSerieIndex_Behind;
 
             fireEvent_MapSelection(new SelectionMapSelection(
 
                   _hovered_SelectedTourId,
-                  _hovered_SelectedSerieIndex1,
-                  _hovered_SelectedSerieIndex2));
+                  selectedSerieIndex_Behind,
+                  selectedSerieIndex_Front));
          }
 
       } else {
@@ -2929,8 +2957,8 @@ public class Map2 extends Canvas {
 
          // hide single tour selection
          _hovered_SelectedTourId = -1;
-         _hovered_SelectedSerieIndex1 = -1;
-         _hovered_SelectedSerieIndex2 = -1;
+         _hovered_SelectedSerieIndex_Behind = -1;
+         _hovered_SelectedSerieIndex_Front = -1;
 
          // clone tour id's becauses they will be removed
          final ArrayList<Long> allClonedTourIds = new ArrayList<>();
@@ -2981,9 +3009,6 @@ public class Map2 extends Canvas {
       if (_mp == null) {
          return;
       }
-
-      final boolean isShiftKeyPressed = (mouseEvent.stateMask & SWT.SHIFT) != 0;
-      _mouseMove_IsShiftKeyPressed = isShiftKeyPressed;
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
 
@@ -4017,19 +4042,11 @@ public class Map2 extends Canvas {
       }
 
       /*
-       * When pressing the shift key then the tour/trackpoint selection is inverted
-       */
-      final boolean isInvertAction = _mouseMove_IsShiftKeyPressed;
-      final boolean canSelectTour = isInvertAction
-            ? !_hoveredSelectedTour_CanSelectTour
-            : _hoveredSelectedTour_CanSelectTour;
-
-      /*
        * Paint selected tour or trackpoint
        */
       if (_hovered_SelectedTourId != -1) {
 
-         if (canSelectTour) {
+         if (_hoveredSelectedTour_CanSelectTour) {
 
             // a tour can be selected
 
@@ -4053,8 +4070,8 @@ public class Map2 extends Canvas {
             paint_HoveredTrackpoint_10(
                   gc,
                   _hovered_SelectedTourId,
-                  _hovered_SelectedSerieIndex1,
-                  _hovered_SelectedSerieIndex2,
+                  _hovered_SelectedSerieIndex_Behind,
+                  _hovered_SelectedSerieIndex_Front,
 
                   HoveredPoint_PaintMode.IS_SELECTED);
          }
@@ -4079,11 +4096,11 @@ public class Map2 extends Canvas {
                isTourHoveredAndSelected == false
 
                      // or when a trackpoint is selected
-                     || isTourHoveredAndSelected && canSelectTour == false
+                     || isTourHoveredAndSelected && _hoveredSelectedTour_CanSelectTour == false
 
                ) {
 
-                  if (canSelectTour) {
+                  if (_hoveredSelectedTour_CanSelectTour) {
 
                      // a tour can be selected
 
@@ -4097,8 +4114,8 @@ public class Map2 extends Canvas {
                      // a trackpoint can be selected
 
                      final int hoveredSerieIndex = _allHoveredSerieIndices.get(0);
-                     final boolean isHoveredAndSelected = hoveredSerieIndex == _hovered_SelectedSerieIndex1
-                           || hoveredSerieIndex == _hovered_SelectedSerieIndex2;
+                     final boolean isHoveredAndSelected = hoveredSerieIndex == _hovered_SelectedSerieIndex_Behind
+                           || hoveredSerieIndex == _hovered_SelectedSerieIndex_Front;
 
                      paint_HoveredTrackpoint_10(
                            gc,
@@ -4108,6 +4125,16 @@ public class Map2 extends Canvas {
                            isHoveredAndSelected
                                  ? HoveredPoint_PaintMode.IS_HOVERED_AND_SELECTED
                                  : HoveredPoint_PaintMode.IS_HOVERED);
+
+                     // paint direction arrows
+                     if (_isDrawTourDirection) {
+
+                        final int[] devXYTourPositions = paint_HoveredTour_12_GetTourPositions(hoveredTourId);
+
+                        if (devXYTourPositions != null) {
+                           paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
+                        }
+                     }
                   }
                }
             }
@@ -4130,7 +4157,7 @@ public class Map2 extends Canvas {
 
    private void paint_HoveredTour_10(final GC gc, final long tourId) {
 
-      int[] devXY;
+      int[] devXYTourPositions;
 
       gc.setLineWidth(30);
 
@@ -4139,28 +4166,30 @@ public class Map2 extends Canvas {
 
       gc.setAntialias(SWT.ON);
       {
-         devXY = paint_HoveredTour_12_Tour(gc, tourId);
+         devXYTourPositions = paint_HoveredTour_12_GetTourPositions(tourId);
+         if (devXYTourPositions != null) {
+            gc.drawPolyline(devXYTourPositions);
+         }
       }
       gc.setAntialias(SWT.OFF);
       gc.setAlpha(0xff);
 
-      if (_isDrawTourDirection && devXY != null) {
-         paint_HoveredTour_14_DirectionArrows(gc, devXY);
+      if (_isDrawTourDirection && devXYTourPositions != null) {
+         paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
       }
    }
 
    /**
-    * @param gc
     * @param tourId
-    * @return Return dev X/Y position of the hovered tour
+    * @return Return dev X/Y position of the hovered tour or <code>null</code>
     */
-   private int[] paint_HoveredTour_12_Tour(final GC gc, final long tourId) {
+   private int[] paint_HoveredTour_12_GetTourPositions(final long tourId) {
 
       final TourData tourData = TourManager.getTour(tourId);
 
       if (tourData == null) {
 
-         // this occurred, it can be that previously a history/multiple tour was displayed
+         // this happened, it can be that previously a history/multiple tour was displayed
          return null;
       }
 
@@ -4214,8 +4243,6 @@ public class Map2 extends Canvas {
          devPosX1 = devPosX2;
          devPosY1 = devPosY2;
       }
-
-      gc.drawPolyline(devXY);
 
       return devXY;
    }
@@ -4638,6 +4665,16 @@ public class Map2 extends Canvas {
       final int dotWidth = 30;
       final int dotWidth2 = dotWidth / 2;
 
+      int serieIndexFront;
+      int serieIndexBehind;
+      if (serieIndex1 > serieIndex2) {
+         serieIndexFront = serieIndex1;
+         serieIndexBehind = serieIndex2;
+      } else {
+         serieIndexFront = serieIndex2;
+         serieIndexBehind = serieIndex1;
+      }
+
       // loop: paint 2 points
       for (int paintIndex = 0; paintIndex < 2; paintIndex++) {
 
@@ -4645,17 +4682,17 @@ public class Map2 extends Canvas {
          boolean isFirstIndex = false;
 
          if (paintIndex == 0) {
-            if (serieIndex1 == -1) {
+            if (serieIndexFront == -1) {
                continue;
             } else {
-               serieIndex = serieIndex1;
+               serieIndex = serieIndexFront;
             }
             isFirstIndex = true;
          } else {
-            if (serieIndex2 == -1) {
+            if (serieIndexBehind == -1) {
                continue;
             } else {
-               serieIndex = serieIndex2;
+               serieIndex = serieIndexBehind;
             }
          }
 
@@ -4709,7 +4746,7 @@ public class Map2 extends Canvas {
 
             gc.setBackground(isFirstIndex
                   ? UI.SYS_COLOR_GREEN
-                  : UI.SYS_COLOR_BLUE);
+                  : UI.SYS_COLOR_DARK_GREEN);
 
          } else if (valuePoint_PaintMode.equals(HoveredPoint_PaintMode.IS_HOVERED_AND_SELECTED)) {
 
@@ -6393,8 +6430,9 @@ public class Map2 extends Canvas {
    public void resetTours_SelectedData() {
 
       _hovered_SelectedTourId = -1;
-      _hovered_SelectedSerieIndex1 = -1;
-      _hovered_SelectedSerieIndex2 = -1;
+      _hovered_SelectedSerieIndex_Behind = -1;
+      _hovered_SelectedSerieIndex_Front = -1;
+
    }
 
    public void setConfig_HoveredSelectedTour(final boolean isShowHoveredOrSelectedTour,
