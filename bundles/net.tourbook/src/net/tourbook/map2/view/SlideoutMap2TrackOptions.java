@@ -101,8 +101,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    //
    private Button                _rdoBorderColorDarker;
    private Button                _rdoBorderColorColor;
-   private Button                _rdoHoveredSelected_CanSelectTour;
-   private Button                _rdoHoveredSelected_CanSelectTrackpoint;
    private Button                _rdoPainting_Simple;
    private Button                _rdoPainting_Complex;
    private Button                _rdoSymbolLine;
@@ -115,7 +113,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private Label                 _lblHoveredSelected_HoveredColor;
    private Label                 _lblHoveredSelected_HoveredAndSelectedColor;
    private Label                 _lblHoveredSelected_SelectedColor;
-   private Label                 _lblHoveredSelected_SelectTourOrTrackpoint;
    private Label                 _lblSliderPath_Color;
    private Label                 _lblSliderPath_Segments;
    private Label                 _lblSliderPath_Width;
@@ -451,35 +448,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
          _chkShowHoveredSelectedTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
          _chkShowHoveredSelectedTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHoveredSelectedTour);
-      }
-      {
-         /*
-          * Select tour or trackpoint
-          */
-
-         // label
-         _lblHoveredSelected_SelectTourOrTrackpoint = new Label(parent, SWT.NONE);
-         _lblHoveredSelected_SelectTourOrTrackpoint.setText(Messages.Slideout_Map_Options_Label_SelectTourTrackpoint);
-         _lblHoveredSelected_SelectTourOrTrackpoint.setToolTipText(Messages.Slideout_Map_Options_Label_SelectTourTrackpoint_Tooltip);
-         _firstColoumLayoutData.span(1, 1).applyTo(_lblHoveredSelected_SelectTourOrTrackpoint);
-
-         // radio
-         final Composite radioContainer = new Composite(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(radioContainer);
-         {
-            // Radio: Tour
-            _rdoHoveredSelected_CanSelectTour = new Button(radioContainer, SWT.RADIO);
-            _rdoHoveredSelected_CanSelectTour.setText(Messages.Slideout_Map_Options_Radio_SelectTour);
-            _rdoHoveredSelected_CanSelectTour.setToolTipText(Messages.Slideout_Map_Options_Label_SelectTourTrackpoint_Tooltip);
-            _rdoHoveredSelected_CanSelectTour.addSelectionListener(_defaultMapOptions_SelectionListener);
-
-            // Radio: Trackpoints
-            _rdoHoveredSelected_CanSelectTrackpoint = new Button(radioContainer, SWT.RADIO);
-            _rdoHoveredSelected_CanSelectTrackpoint.setText(Messages.Slideout_Map_Options_Radio_SelectTrackpoint);
-            _rdoHoveredSelected_CanSelectTrackpoint.setToolTipText(Messages.Slideout_Map_Options_Label_SelectTourTrackpoint_Tooltip);
-            _rdoHoveredSelected_CanSelectTrackpoint.addSelectionListener(_defaultMapOptions_SelectionListener);
-         }
       }
       {
          /*
@@ -842,12 +810,9 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelectedAndBasicMode);
       _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelectedAndBasicMode);
       _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelectedAndBasicMode);
-      _lblHoveredSelected_SelectTourOrTrackpoint         .setEnabled(isHoveredSelectedAndBasicMode);
       _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelectedAndBasicMode);
       _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelectedAndBasicMode);
       _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelectedAndBasicMode);
-      _rdoHoveredSelected_CanSelectTour                  .setEnabled(isHoveredSelectedAndBasicMode);
-      _rdoHoveredSelected_CanSelectTrackpoint            .setEnabled(isHoveredSelectedAndBasicMode);
       _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelectedAndBasicMode);
       _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelectedAndBasicMode);
       _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelectedAndBasicMode);
@@ -1039,8 +1004,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // hovered/selected tour
       _chkShowHoveredSelectedTour.setSelection(                         Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
-      _rdoHoveredSelected_CanSelectTour.setSelection(                   Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT);
-      _rdoHoveredSelected_CanSelectTrackpoint.setSelection(             Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT == false);
       _spinnerHoveredSelected_HoveredOpacity.setSelection(              Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
       _spinnerHoveredSelected_HoveredAndSelectedOpacity.setSelection(   Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
       _spinnerHoveredSelected_SelectedOpacity.setSelection(             Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
@@ -1099,12 +1062,9 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
    private void restoreState() {
 
-      final boolean isSelectTour = Util.getStateBoolean(_state,  Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR,                  Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT);
 
       // hovered/selected tour
       _chkShowHoveredSelectedTour.setSelection(                         Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
-      _rdoHoveredSelected_CanSelectTour.setSelection(                   isSelectTour);
-      _rdoHoveredSelected_CanSelectTrackpoint.setSelection(             isSelectTour == false);
       _spinnerHoveredSelected_HoveredOpacity.setSelection(              Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT));
       _spinnerHoveredSelected_HoveredAndSelectedOpacity.setSelection(   Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT));
       _spinnerHoveredSelected_SelectedOpacity.setSelection(             Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT));
@@ -1164,7 +1124,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                            _chkShowHoveredSelectedTour.getSelection());
       _state.put(Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                        _spinnerHoveredSelected_HoveredOpacity.getSelection());
       _state.put(Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,           _spinnerHoveredSelected_HoveredAndSelectedOpacity.getSelection());
-      _state.put(Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR,                         _rdoHoveredSelected_CanSelectTour.getSelection());
       _state.put(Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                       _spinnerHoveredSelected_SelectedOpacity.getSelection());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB,                 _colorHoveredSelected_Hovered.getColorValue());
       Util.setState(_state, Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,    _colorHoveredSelected_HoveredAndSelected.getColorValue());

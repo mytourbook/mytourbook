@@ -2356,16 +2356,19 @@ public class Map2 extends Canvas {
 
             final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
 
+            final int paintedHoveredX = painted_HoveredRectangle.x;
+            final int paintedHoveredY = painted_HoveredRectangle.y;
+
             // optimized: painted_HoveredRectangle.contains(devMouseTileX, devMouseTileY)
-            if (devMouseTileX >= painted_HoveredRectangle.x
-                  && devMouseTileY >= painted_HoveredRectangle.y
-                  && devMouseTileX < (painted_HoveredRectangle.x + painted_HoveredRectangle.width)
-                  && devMouseTileY < (painted_HoveredRectangle.y + painted_HoveredRectangle.height)) {
+            if (devMouseTileX >= paintedHoveredX
+                  && devMouseTileY >= paintedHoveredY
+                  && devMouseTileX < (paintedHoveredX + painted_HoveredRectangle.width)
+                  && devMouseTileY < (paintedHoveredY + painted_HoveredRectangle.height)) {
 
                painted_HoveredTourId = allPainted_HoveredTourId[hoverIndex];
 
-               int devHoveredRect_Center_X = painted_HoveredRectangle.x + painted_HoveredRectangle.width / 2;
-               int devHoveredRect_Center_Y = painted_HoveredRectangle.y + painted_HoveredRectangle.height / 2;
+               int devHoveredRect_Center_X = paintedHoveredX + painted_HoveredRectangle.width / 2;
+               int devHoveredRect_Center_Y = paintedHoveredY + painted_HoveredRectangle.height / 2;
 
                // convert from tile position to device position
                devHoveredRect_Center_X += devHoveredTileX;
@@ -6396,7 +6399,6 @@ public class Map2 extends Canvas {
 
    public void setConfig_HoveredSelectedTour(final boolean isShowHoveredOrSelectedTour,
                                              final boolean isShowBreadcrumbs,
-                                             final boolean canSelectTour,
 
                                              final int breadcrumbItems,
                                              final RGB hoveredRGB,
@@ -6411,7 +6413,6 @@ public class Map2 extends Canvas {
       _isShowHoveredOrSelectedTour                    = isShowHoveredOrSelectedTour;
       _isShowBreadcrumbs                              = isShowBreadcrumbs;
 
-      _hoveredSelectedTour_CanSelectTour              = canSelectTour;
 
       _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
       _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
@@ -6490,6 +6491,10 @@ public class Map2 extends Canvas {
 
    public void setIsInInverseKeyboardPanning(final boolean isInInverseKeyboardPanning) {
       _isInInverseKeyboardPanning = isInInverseKeyboardPanning;
+   }
+
+   public void setIsMultipleTours(final boolean isMultipleTours) {
+      _hoveredSelectedTour_CanSelectTour = isMultipleTours;
    }
 
    public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {

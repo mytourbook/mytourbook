@@ -237,8 +237,6 @@ public class Map2View extends ViewPart implements
    static final int              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT   = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB               = "STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB";    //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT       = new RGB(0, 255, 255);
-   static final String           STATE_HOVERED_SELECTED__IS_SELECT_TOUR                         = "STATE_HOVERED_SELECTED__IS_SELECT_TOUR";              //$NON-NLS-1$
-   static final boolean          STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT                 = true;
    static final String           STATE_HOVERED_SELECTED__SELECTED_OPACITY                       = "STATE_HOVERED_SELECTED__SELECTED_OPACITY";            //$NON-NLS-1$
    static final int              STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT               = UI.MAX_OPACITY / 2;
    static final String           STATE_HOVERED_SELECTED__SELECTED_RGB                           = "STATE_HOVERED_SELECTED__SELECTED_RGB";                //$NON-NLS-1$
@@ -3338,6 +3336,7 @@ public class Map2View extends ViewPart implements
 
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
+      _map.setIsMultipleTours(allTourIds.size() > 1);
 
       long newOverlayKey = _hash_TourOverlayKey;
 
@@ -3399,8 +3398,10 @@ public class Map2View extends ViewPart implements
    private void paintTours_10_All() {
 
       if (_allTourData.isEmpty()) {
+
          _tourInfoToolTipProvider.setTourData(null);
          _tourWeatherToolTipProvider.setTourData(null);
+
          return;
       }
 
@@ -3502,6 +3503,7 @@ public class Map2View extends ViewPart implements
 
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
+      _map.setIsMultipleTours(false);
 
       /*
        * Set position and zoom level for the tour
@@ -3581,6 +3583,7 @@ public class Map2View extends ViewPart implements
       _map.resetTours_HoveredData();
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
+      _map.setIsMultipleTours(_allTourData.size() > 1);
 
       // get overlay key for all tours which have valid tour data
       long newOverlayKey = -1;
@@ -4002,7 +4005,6 @@ public class Map2View extends ViewPart implements
        */
       final boolean isShowHoveredOrSelectedTour = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
       final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
-      final boolean canSelectTour               = Util.getStateBoolean(_state,   Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR,                  Map2View.STATE_HOVERED_SELECTED__IS_SELECT_TOUR_DEFAULT);
 
       final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                               Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
       final int hoveredOpacity                  = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
@@ -4016,7 +4018,6 @@ public class Map2View extends ViewPart implements
 
             isShowHoveredOrSelectedTour,
             isShowBreadcrumbs,
-            canSelectTour,
 
             numVisibleBreadcrumbs,
             hoveredRGB,
