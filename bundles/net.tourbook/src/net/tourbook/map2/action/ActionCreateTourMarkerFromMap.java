@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 public class ActionCreateTourMarkerFromMap extends Action {
 
    private Map2View _mapView;
-   private Long     _currentHoverTourId;
+   private Long     _currentHoveredTourId;
 
    public ActionCreateTourMarkerFromMap(final Map2View mapView) {
 
@@ -50,11 +50,12 @@ public class ActionCreateTourMarkerFromMap extends Action {
    @Override
    public void run() {
 
-      final TourData tourData = TourManager.getTour(_currentHoverTourId);
+      final TourData tourData = TourManager.getTour(_currentHoveredTourId);
+      if (tourData == null
 
-      if (tourData == null ||
-      // make sure the tour editor does not contain a modified tour
-            TourManager.isTourEditorModified()) {
+            // make sure the tour editor does not contain a modified tour
+            || TourManager.isTourEditorModified()) {
+
          return;
       }
 
@@ -138,8 +139,8 @@ public class ActionCreateTourMarkerFromMap extends Action {
       TourManager.saveModifiedTour(tourData);
    }
 
-   public void setCurrentHoverTourId(final Long tourId) {
-      _currentHoverTourId = tourId;
+   public void setCurrentHoveredTourId(final Long hoveredTourId) {
+      _currentHoveredTourId = hoveredTourId;
    }
 
 }

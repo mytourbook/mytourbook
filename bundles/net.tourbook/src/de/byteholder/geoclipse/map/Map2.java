@@ -2402,17 +2402,17 @@ public class Map2 extends Canvas {
 
       } finally {
 
-         // fire hover event, fire it also when a tour is not hit, this is used to disable actions !!!
+         // fire hover event, when a tour is hovered
 
-         int hoveredValuePointIndex = -1;
          if (_allHoveredSerieIndices.size() > 0) {
-            hoveredValuePointIndex = _allHoveredSerieIndices.get(0);
-         }
 
-         final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId(), hoveredValuePointIndex);
+            final int hoveredValuePointIndex = _allHoveredSerieIndices.get(0);
 
-         for (final Object listener : _allHoveredTourListeners.getListeners()) {
-            ((IHoveredTourListener) listener).setHoveredTourId(event);
+            final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId(), hoveredValuePointIndex);
+
+            for (final Object listener : _allHoveredTourListeners.getListeners()) {
+               ((IHoveredTourListener) listener).setHoveredTourId(event);
+            }
          }
       }
 

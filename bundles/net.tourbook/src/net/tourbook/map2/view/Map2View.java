@@ -1858,8 +1858,6 @@ public class Map2View extends ViewPart implements
 
    private void enableActions(final boolean isForceTourColor) {
 
-      _actionShowPOI.setEnabled(_poiPosition != null);
-
       // update legend action
       if (_isTourOrWayPoint) {
 
@@ -1869,6 +1867,11 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.setChecked(false);
          }
       }
+
+      final Long hoveredTourId = _map.getHoveredTourId();
+
+      // update action because after closing the context menu, the hovered values are reset in the map paint event
+      _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
 
       /*
        * Photo actions
@@ -1885,10 +1888,10 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionMap2_PhotoFilter       .setEnabled(isAllPhotoAvailable && _isShowPhoto);
-      _actionShowAllFilteredPhotos  .setEnabled(canShowFilteredPhoto);
-      _actionShowPhotos             .setEnabled(isAllPhotoAvailable);
-      _actionSyncMapWith_Photo      .setEnabled(canShowFilteredPhoto);
+      _actionMap2_PhotoFilter             .setEnabled(isAllPhotoAvailable && _isShowPhoto);
+      _actionShowAllFilteredPhotos        .setEnabled(canShowFilteredPhoto);
+      _actionShowPhotos                   .setEnabled(isAllPhotoAvailable);
+      _actionSyncMapWith_Photo            .setEnabled(canShowFilteredPhoto);
 
 // SET_FORMATTING_ON
 
@@ -1899,13 +1902,14 @@ public class Map2View extends ViewPart implements
       final boolean isTourAvailable = numTours > 0;
       final boolean isMultipleTours = numTours > 1 && _isShowTour;
       final boolean isOneTourDisplayed = _isTourOrWayPoint && isMultipleTours == false && _isShowTour;
-      final boolean isOneTourHovered = _map.getHoveredTourId() != null;
+      final boolean isOneTourHovered = hoveredTourId != null;
 
 // SET_FORMATTING_OFF
 
       _actionCreateTourMarkerFromMap      .setEnabled(isTourAvailable && isOneTourHovered);
       _actionMap2_Color                   .setEnabled(isTourAvailable);
       _actionShowLegendInMap              .setEnabled(_isTourOrWayPoint);
+      _actionShowPOI                      .setEnabled(_poiPosition != null);
       _actionShowSliderInLegend           .setEnabled(_isTourOrWayPoint && _isShowLegend);
       _actionShowSliderInMap              .setEnabled(_isTourOrWayPoint);
       _actionShowStartEndInMap            .setEnabled(isOneTourDisplayed);
@@ -1925,29 +1929,27 @@ public class Map2View extends ViewPart implements
       _actionSyncMapWith_Tour             .setEnabled(isTourAvailable);
       _actionSyncMapWith_ValuePoint       .setEnabled(isTourAvailable);
 
-// SET_FORMATTING_ON
-
       syncMap_ShowCurrentSyncModeImage(isMapSynched());
 
       if (numTours == 0) {
 
-         _actionTourColor_Elevation.setEnabled(false);
-         _actionTourColor_Gradient.setEnabled(false);
-         _actionTourColor_Pulse.setEnabled(false);
-         _actionTourColor_Speed.setEnabled(false);
-         _actionTourColor_Pace.setEnabled(false);
-         _actionTourColor_HrZone.setEnabled(false);
-         _actionTourColor_RunDyn_StepLength.setEnabled(false);
+         _actionTourColor_Elevation          .setEnabled(false);
+         _actionTourColor_Gradient           .setEnabled(false);
+         _actionTourColor_Pulse              .setEnabled(false);
+         _actionTourColor_Speed              .setEnabled(false);
+         _actionTourColor_Pace               .setEnabled(false);
+         _actionTourColor_HrZone             .setEnabled(false);
+         _actionTourColor_RunDyn_StepLength  .setEnabled(false);
 
       } else if (isForceTourColor) {
 
-         _actionTourColor_Elevation.setEnabled(true);
-         _actionTourColor_Gradient.setEnabled(true);
-         _actionTourColor_Pulse.setEnabled(true);
-         _actionTourColor_Speed.setEnabled(true);
-         _actionTourColor_Pace.setEnabled(true);
-         _actionTourColor_HrZone.setEnabled(true);
-         _actionTourColor_RunDyn_StepLength.setEnabled(true);
+         _actionTourColor_Elevation          .setEnabled(true);
+         _actionTourColor_Gradient           .setEnabled(true);
+         _actionTourColor_Pulse              .setEnabled(true);
+         _actionTourColor_Speed              .setEnabled(true);
+         _actionTourColor_Pace               .setEnabled(true);
+         _actionTourColor_HrZone             .setEnabled(true);
+         _actionTourColor_RunDyn_StepLength  .setEnabled(true);
 
       } else if (isOneTourDisplayed) {
 
@@ -1955,24 +1957,26 @@ public class Map2View extends ViewPart implements
          final boolean isPulse = oneTourData.pulseSerie != null;
          final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
 
-         _actionTourColor_Elevation.setEnabled(true);
-         _actionTourColor_Gradient.setEnabled(oneTourData.getGradientSerie() != null);
-         _actionTourColor_Pulse.setEnabled(isPulse);
-         _actionTourColor_Speed.setEnabled(oneTourData.getSpeedSerie() != null);
-         _actionTourColor_Pace.setEnabled(oneTourData.getPaceSerie() != null);
-         _actionTourColor_HrZone.setEnabled(canShowHrZones);
-         _actionTourColor_RunDyn_StepLength.setEnabled(oneTourData.runDyn_StepLength != null);
+         _actionTourColor_Elevation          .setEnabled(true);
+         _actionTourColor_Gradient           .setEnabled(oneTourData.getGradientSerie() != null);
+         _actionTourColor_Pulse              .setEnabled(isPulse);
+         _actionTourColor_Speed              .setEnabled(oneTourData.getSpeedSerie() != null);
+         _actionTourColor_Pace               .setEnabled(oneTourData.getPaceSerie() != null);
+         _actionTourColor_HrZone             .setEnabled(canShowHrZones);
+         _actionTourColor_RunDyn_StepLength  .setEnabled(oneTourData.runDyn_StepLength != null);
 
       } else {
 
-         _actionTourColor_Elevation.setEnabled(false);
-         _actionTourColor_Gradient.setEnabled(false);
-         _actionTourColor_Pulse.setEnabled(false);
-         _actionTourColor_Speed.setEnabled(false);
-         _actionTourColor_Pace.setEnabled(false);
-         _actionTourColor_HrZone.setEnabled(false);
-         _actionTourColor_RunDyn_StepLength.setEnabled(false);
+         _actionTourColor_Elevation          .setEnabled(false);
+         _actionTourColor_Gradient           .setEnabled(false);
+         _actionTourColor_Pulse              .setEnabled(false);
+         _actionTourColor_Speed              .setEnabled(false);
+         _actionTourColor_Pace               .setEnabled(false);
+         _actionTourColor_HrZone             .setEnabled(false);
+         _actionTourColor_RunDyn_StepLength  .setEnabled(false);
       }
+
+// SET_FORMATTING_ON
    }
 
    private void fillActionBars() {
@@ -2018,6 +2022,8 @@ public class Map2View extends ViewPart implements
 
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
+
+      enableActions();
 
       menuMgr.add(_actionSearchTourByLocation);
       menuMgr.add(_actionCreateTourMarkerFromMap);
@@ -2247,6 +2253,11 @@ public class Map2View extends ViewPart implements
    @Override
    public ArrayList<Photo> getFilteredPhotos() {
       return _filteredPhotos;
+   }
+
+   public Long getHoveredTourId() {
+
+      return _map.getHoveredTourId();
    }
 
    private List<Long> getManyToursFromMultipleTours(final TourData tourData) {
@@ -2538,14 +2549,7 @@ public class Map2View extends ViewPart implements
 
    private void mapListener_HoveredTour(final MapHoveredTourEvent mapHoveredTourEvent) {
 
-      if (_actionCreateTourMarkerFromMap == null) {
-         return;
-      }
-
       final Long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
-
-      _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId);
-      _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != null);
 
       final HoveredValueData hoveredValueData = new HoveredValueData(
             hoveredTourId,
