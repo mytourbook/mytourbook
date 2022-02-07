@@ -51,7 +51,6 @@ public class TourMergerTests {
       //Merge the altitude and pulse
       _tourMerger.computeMergedData(false);
       _targetTour.altitudeSerie = _tourMerger.getNewSourceAltitudeSerie();
-      _targetTour.setCadenceSerie(_tourMerger.getNewTargetCadenceSerie());
       _targetTour.pulseSerie = _tourMerger.getNewTargetPulseSerie();
 
       //Comparing the merged tour
@@ -62,7 +61,6 @@ public class TourMergerTests {
       //Merge the pulse, temperature and time
 // _tourMerger.computeMergedData(true);
 //      _targetTour.altitudeSerie = _tourMerger.getNewSourceAltitudeSerie();
-//      _targetTour.setCadenceSerie(_tourMerger.getNewTargetCadenceSerie());
 //      _targetTour.pulseSerie = _tourMerger.getNewTargetPulseSerie();
 //      _targetTour.timeSerie = _tourMerger.getNewTargetTimeSerie();
 //      _targetTour.setSpeedSerie(null);
