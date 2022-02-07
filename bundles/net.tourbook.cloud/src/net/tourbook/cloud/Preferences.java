@@ -15,10 +15,14 @@
  *******************************************************************************/
 package net.tourbook.cloud;
 
+import java.util.List;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
+
+import org.eclipse.swt.widgets.Text;
 
 public final class Preferences {
 
@@ -153,5 +157,17 @@ public final class Preferences {
       final String personId = getActivePersonId();
 
       return getPerson_SuuntoWorkoutFilterSinceDate_String(personId);
+   }
+
+   public static void showOrHidePasswords(final List<Text> texts, final boolean showPasswords) {
+
+      texts.forEach(text -> {
+         if (text == null) {
+            return;
+         }
+
+         final char character = showPasswords ? '\0' : 0x25cf;
+         text.setEchoChar(character);
+      });
    }
 }

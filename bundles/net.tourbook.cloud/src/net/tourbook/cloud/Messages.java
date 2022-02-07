@@ -26,6 +26,8 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_InvalidTokens;
 
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
+   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords;
+   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip;
    public static String        PrefPage_CloudConnectivity_Group_CloudAccount;
    public static String        PrefPage_CloudConnectivity_Group_TourDownload;
    public static String        PrefPage_CloudConnectivity_Group_TourUpload;

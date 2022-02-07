@@ -74,6 +74,9 @@ Improvements
 * Strava Integration (Frederic)   
   - Added the possibility to add the tour weather icon in the uploaded Strava activity title
 
+* Cloud Integration (Frederic)
+  - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
+
                                         
 Changes
 =======
