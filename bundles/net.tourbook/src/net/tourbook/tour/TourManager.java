@@ -4607,7 +4607,7 @@ public class TourManager {
             final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
 
             /**
-             * Syncronize 2 time series which can contain gaps
+             * Synchronize 2 time series which can contain gaps
              *
              * <pre>
              *
