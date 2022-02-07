@@ -23,10 +23,9 @@ import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
-import de.byteholder.geoclipse.map.event.IMapInfoListener;
-import de.byteholder.geoclipse.map.event.IMapPositionListener;
-import de.byteholder.geoclipse.map.event.IMapSelectionListener;
+import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
+import de.byteholder.geoclipse.map.event.MapPOIEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
@@ -188,14 +187,10 @@ import org.oscim.core.MapPosition;
  */
 public class Map2View extends ViewPart implements
 
-      IBreadcrumbListener,
       IMapContextProvider,
       IMapBookmarks,
       IMapBookmarkListener,
-      IMapPositionListener,
-      IMapSelectionListener,
       IMapSyncListener,
-      IMapInfoListener,
       IMapWithPhotos,
       IPhotoEventListener {
 
@@ -1159,59 +1154,19 @@ public class Map2View extends ViewPart implements
 
    private void addMapListener() {
 
-      _map.addMousePositionListener(mapPositionEvent -> _mapInfoManager.setMapPosition(
-            mapPositionEvent.mapGeoPosition.latitude,
-            mapPositionEvent.mapGeoPosition.longitude,
-            mapPositionEvent.mapZoomLevel));
+// SET_FORMATTING_OFF
 
-      _map.addPOIListener(mapPoiEvent -> {
+      _map.addBreadcrumbListener    (this::mapListener_Breadcrumb);
+      _map.addHoveredTourListener   (this::mapListener_HoveredTour);
+      _map.addMapGridBoxListener    (this::mapListener_MapGridBox);
+      _map.addMapInfoListener       (this::mapListener_MapInfo);
+      _map.addMapPositionListener   (this::mapListener_MapPosition);
+      _map.addMapSelectionListener  (this::mapListener_MapSelection);
+      _map.addMousePositionListener (this::mapListener_MousePosition);
+      _map.addPOIListener           (this::mapListener_POI);
+      _map.addTourSelectionListener (this::mapListener_InsideMap);
 
-         _poiPosition = mapPoiEvent.mapGeoPosition;
-         _poiZoomLevel = mapPoiEvent.mapZoomLevel;
-         _poiName = mapPoiEvent.mapPOIText;
-
-         _actionShowPOI.setEnabled(true);
-         _actionShowPOI.setChecked(true);
-      });
-
-      _map.addHoveredTourListener(mapHoveredTourEvent -> {
-
-         if (_actionCreateTourMarkerFromMap == null) {
-            return;
-         }
-
-         final Long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
-
-         _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId);
-         _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != null);
-
-         final HoveredValueData hoveredValueData = new HoveredValueData(
-               hoveredTourId,
-               mapHoveredTourEvent.hoveredValuePointIndex);
-
-         TourManager.fireEventWithCustomData(
-               TourEventId.HOVERED_VALUE_POSITION,
-               hoveredValueData,
-               Map2View.this);
-      });
-
-      _map.addMapGridBoxListener((map_ZoomLevel, map_GeoCenter, isGridSelected, mapGridData) -> {
-
-         if (isGridSelected) {
-
-            TourGeoFilter_Manager.createAndSetGeoFilter(map_ZoomLevel, map_GeoCenter, mapGridData);
-
-         } else {
-
-            geoFilter_10_Loader(mapGridData, null);
-         }
-      });
-
-      _map.addBreadcrumbListener(this);
-      _map.addMapInfoListener(this);
-      _map.addMapPositionListener(this);
-      _map.addMapSelectionListener(this);
-      _map.addTourSelectionListener(this::onSelection_InsideMap);
+// SET_FORMATTING_ON
 
       _map.setMapContextProvider(this);
    }
@@ -2573,38 +2528,99 @@ public class Map2View extends ViewPart implements
       tourData.mapCenterPositionLongitude = centerPosition.longitude;
    }
 
-   @Override
-   public void moveToMapLocation(final MapBookmark mapBookmark) {
+   private void mapListener_Breadcrumb() {
 
-      _lastFiredSyncEventTime = System.currentTimeMillis();
+      // update the tour info icon depending if breadcrumbs are visible
 
-      MapBookmarkManager.setLastSelectedBookmark(mapBookmark);
-
-      final MapPosition mapPosition = mapBookmark.getMapPosition();
-
-      _map.setZoom(mapPosition.zoomLevel + 1);
-      _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
+      setTourInfoIconPosition();
+      setTourWeatherIconPosition();
    }
 
-   @Override
-   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType mapBookmarkEventType) {
-      {
-         if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {
-            _isInSelectBookmark = true;
-            moveToMapLocation(mapBookmark);
-            _isInSelectBookmark = false;
-         }
+   private void mapListener_HoveredTour(final MapHoveredTourEvent mapHoveredTourEvent) {
+
+      if (_actionCreateTourMarkerFromMap == null) {
+         return;
+      }
+
+      final Long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
+
+      _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId);
+      _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId != null);
+
+      final HoveredValueData hoveredValueData = new HoveredValueData(
+            hoveredTourId,
+            mapHoveredTourEvent.hoveredValuePointIndex);
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.HOVERED_VALUE_POSITION,
+            hoveredValueData,
+            Map2View.this);
+   }
+
+   private void mapListener_InsideMap(final ISelection selection) {
+
+      if (selection instanceof SelectionTourIds) {
+
+         _lastSelectedTourInsideMap = null;
+
+      } else if (selection instanceof SelectionTourId) {
+
+         /*
+          * Update tour info tooltip
+          */
+         final SelectionTourId selectionTourId = (SelectionTourId) selection;
+
+         final Long tourId = selectionTourId.getTourId();
+         final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+         _tourInfoToolTipProvider.setTourData(tourData);
+         _tourWeatherToolTipProvider.setTourData(tourData);
+
+         /*
+          * Show single tour only when it's selected the 2nd time
+          */
+         final boolean isSetBreadcrumbOnly =
+
+               _lastSelectedTourInsideMap == null
+                     || tourId.equals(_lastSelectedTourInsideMap) == false;
+
+         selectionTourId.setIsSetBreadcrumbOnly(isSetBreadcrumbOnly);
+
+         _lastSelectedTourInsideMap = tourId;
+      }
+
+      _map.getDisplay().asyncExec(() -> {
+
+         onSelectionChanged(selection);
+      });
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_SELECTION,
+            selection,
+            Map2View.this);
+   }
+
+   private void mapListener_MapGridBox(final int map_ZoomLevel,
+                                       final GeoPosition map_GeoCenter,
+                                       final boolean isGridSelected,
+                                       final MapGridData mapGridData) {
+
+      if (isGridSelected) {
+
+         TourGeoFilter_Manager.createAndSetGeoFilter(map_ZoomLevel, map_GeoCenter, mapGridData);
+
+      } else {
+
+         geoFilter_10_Loader(mapGridData, null);
       }
    }
 
-   @Override
-   public void onMapInfo(final GeoPosition mapCenter, final int mapZoomLevel) {
+   private void mapListener_MapInfo(final GeoPosition mapCenter, final int mapZoomLevel) {
 
       _mapInfoManager.setMapPosition(mapCenter.latitude, mapCenter.longitude, mapZoomLevel);
    }
 
-   @Override
-   public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isCenterTour) {
+   private void mapListener_MapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isCenterTour) {
 
       if (_isInSelectBookmark) {
 
@@ -2629,8 +2645,7 @@ public class Map2View extends ViewPart implements
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }
 
-   @Override
-   public void onMapSelection(final ISelection selection) {
+   private void mapListener_MapSelection(final ISelection selection) {
 
       if (selection instanceof SelectionMapSelection) {
 
@@ -2685,6 +2700,48 @@ public class Map2View extends ViewPart implements
 
    }
 
+   private void mapListener_MousePosition(final MapPositionEvent mapPositionEvent) {
+
+      _mapInfoManager.setMapPosition(
+            mapPositionEvent.mapGeoPosition.latitude,
+            mapPositionEvent.mapGeoPosition.longitude,
+            mapPositionEvent.mapZoomLevel);
+   }
+
+   private void mapListener_POI(final MapPOIEvent mapPoiEvent) {
+
+      _poiPosition = mapPoiEvent.mapGeoPosition;
+      _poiZoomLevel = mapPoiEvent.mapZoomLevel;
+      _poiName = mapPoiEvent.mapPOIText;
+
+      _actionShowPOI.setEnabled(true);
+      _actionShowPOI.setChecked(true);
+   }
+
+   @Override
+   public void moveToMapLocation(final MapBookmark mapBookmark) {
+
+      _lastFiredSyncEventTime = System.currentTimeMillis();
+
+      MapBookmarkManager.setLastSelectedBookmark(mapBookmark);
+
+      final MapPosition mapPosition = mapBookmark.getMapPosition();
+
+      _map.setZoom(mapPosition.zoomLevel + 1);
+      _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
+   }
+
+   @Override
+   public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType mapBookmarkEventType) {
+      {
+         if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {
+            _isInSelectBookmark = true;
+            moveToMapLocation(mapBookmark);
+            _isInSelectBookmark = false;
+         }
+      }
+   }
+
    private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
 
       final Long tourId = hoveredValueData.tourId;
@@ -2699,49 +2756,6 @@ public class Map2View extends ViewPart implements
       paintToursAndPhotos(tourData, null);
 
       updateUI_HoveredValuePoint();
-   }
-
-   private void onSelection_InsideMap(final ISelection selection) {
-
-      if (selection instanceof SelectionTourIds) {
-
-         _lastSelectedTourInsideMap = null;
-
-      } else if (selection instanceof SelectionTourId) {
-
-         /*
-          * Update tour info tooltip
-          */
-         final SelectionTourId selectionTourId = (SelectionTourId) selection;
-
-         final Long tourId = selectionTourId.getTourId();
-         final TourData tourData = TourManager.getInstance().getTourData(tourId);
-
-         _tourInfoToolTipProvider.setTourData(tourData);
-         _tourWeatherToolTipProvider.setTourData(tourData);
-
-         /*
-          * Show single tour only when it's selected the 2nd time
-          */
-         final boolean isSetBreadcrumbOnly =
-
-               _lastSelectedTourInsideMap == null
-                     || tourId.equals(_lastSelectedTourInsideMap) == false;
-
-         selectionTourId.setIsSetBreadcrumbOnly(isSetBreadcrumbOnly);
-
-         _lastSelectedTourInsideMap = tourId;
-      }
-
-      _map.getDisplay().asyncExec(() -> {
-
-         onSelectionChanged(selection);
-      });
-
-      TourManager.fireEventWithCustomData(
-            TourEventId.TOUR_SELECTION,
-            selection,
-            Map2View.this);
    }
 
    /**
@@ -4657,14 +4671,6 @@ public class Map2View extends ViewPart implements
 
       // run in UI thread
       _parent.getDisplay().asyncExec(runnable);
-   }
-
-   @Override
-   public void updateBreadcrumb() {
-
-      // update the tour info icon depending if breadcrumbs are visible
-      setTourInfoIconPosition();
-      setTourWeatherIconPosition();
    }
 
    private void updateFilteredPhotos() {
