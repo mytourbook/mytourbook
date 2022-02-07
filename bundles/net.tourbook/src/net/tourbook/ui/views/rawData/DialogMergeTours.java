@@ -275,14 +275,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       gridData.widthHint = newWidth;
    }
 
-   private void assignMergedSeries(final TourData mergedTour, final float[] newSourceAltitudeDifferencesSerie) {
+   private void assignMergedSeries(final TourMerger tourMerger) {
 
       final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
       final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
 
       _sourceTour.dataSerieAdjustedAlti = null;
 
-      final float[] newSourceAltitudeSerie = mergedTour.altitudeSerie;
+      final float[] newSourceAltitudeSerie = tourMerger.getNewSourceAltitudeSerie();
       if (isSourceAltitude) {
          _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
       } else {
@@ -290,32 +290,32 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       }
 
       if (isSourceAltitude && isTargetAltitude) {
-         _sourceTour.dataSerieDiffTo2ndAlti = newSourceAltitudeDifferencesSerie;
+         _sourceTour.dataSerieDiffTo2ndAlti = tourMerger.getNewSourceAltitudeDifferencesSerie();
       } else {
          _sourceTour.dataSerieDiffTo2ndAlti = null;
       }
 
       if (_chkMergeCadence.getSelection()) {
-         _targetTour.setCadenceSerie(mergedTour.getCadenceSerie());
+         _targetTour.setCadenceSerie(tourMerger.getNewTargetCadenceSerie());
       } else {
          _targetTour.setCadenceSerie(_backupTargetCadenceSerie);
       }
 
       if (_chkMergePulse.getSelection()) {
-         _targetTour.pulseSerie = mergedTour.pulseSerie;
+         _targetTour.pulseSerie = tourMerger.getNewTargetPulseSerie();
       } else {
          _targetTour.pulseSerie = _backupTargetPulseSerie;
       }
 
       if (_chkMergeTemperature.getSelection()) {
-         _targetTour.temperatureSerie = mergedTour.temperatureSerie;
+         _targetTour.temperatureSerie = tourMerger.getNewTargetTemperatureSerie();
       } else {
          _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       }
 
       //In both cases, we update the speed to trigger the recalculation of it
       if (_chkMergeSpeed.getSelection()) {
-         _targetTour.timeSerie = mergedTour.timeSerie;
+         _targetTour.timeSerie = tourMerger.getNewTargetTimeSerie();
          _targetTour.setSpeedSerie(null);
       } else {
          _targetTour.timeSerie = _backupTargetTimeSerie;
@@ -450,12 +450,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _chkSynchStartTime.getSelection(),
             _tourStartTimeSynchOffset);
 
-      final TourData mergedTour = tourMerger.computeMergedData(_chkMergeSpeed.getSelection());
+      tourMerger.computeMergedData(_chkMergeSpeed.getSelection());
 
       final float[] newSourceAltitudeDifferencesSerie = tourMerger.getNewSourceAltitudeDifferencesSerie();
-      assignMergedSeries(mergedTour, newSourceAltitudeDifferencesSerie);
+      assignMergedSeries(tourMerger);
 
-      final float[] newSourceAltitudeSerie = mergedTour.altitudeSerie;
+      final float[] newSourceAltitudeSerie = tourMerger.getNewSourceAltitudeSerie();
 
       final float[] altitudeDifferences = computeAdjustedAltitude(//mergedTour.timeSerie,
             newSourceAltitudeDifferencesSerie,

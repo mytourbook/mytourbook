@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import net.tourbook.data.TourData;
 
 public class TourMerger {
@@ -37,6 +33,7 @@ public class TourMerger {
    private float[]  _newTargetPulseSerie;
    private float[]  _newTargetCadenceSerie;
    private float[]  _newTargetTemperatureSerie;
+   private int[]    _newTargetTimeSerie;
 
    public TourMerger(final TourData sourceTour,
                      final TourData targetTour,
@@ -81,7 +78,7 @@ public class TourMerger {
       return sourceIndex;
    }
 
-   public TourData computeMergedData(final boolean mergeSpeed) {
+   public void computeMergedData(final boolean mergeSpeed) {
 
       final int[] targetTimeSerie = mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
 
@@ -111,33 +108,20 @@ public class TourMerger {
 
       createNewTimeAndDistanceSerie(targetTimeSerie, xMergeOffset, yMergeOffset);
 
-      _targetTour.altitudeSerie = _newSourceAltitudeSerie;
-      if (isSourceCadence) {
-         _targetTour.setCadenceSerie(_newTargetCadenceSerie);
-      }
-      if (isSourcePulse) {
-         _targetTour.pulseSerie = _newTargetPulseSerie;
-      }
-      if (isSourceTemperature) {
-         _targetTour.temperatureSerie = _newTargetTemperatureSerie;
-      }
-
-      if (mergeSpeed) {
-
-         final long[] pausedTime_Start = _sourceTour.getPausedTime_Start();
-         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
-            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
-            final List<Long> listPausedTime_End = Arrays.stream(_sourceTour.getPausedTime_End()).boxed().collect(Collectors.toList());
-
-            _targetTour.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, null);
-         }
-
-         _targetTour.setTourDeviceTime_Elapsed(targetTimeSerie[targetTimeSerie.length - 1] - targetTimeSerie[0] * 1L);
-         _targetTour.setTourDeviceTime_Recorded(_targetTour.getTourDeviceTime_Elapsed() - _targetTour.getTourDeviceTime_Paused());
-         _targetTour.computeTourMovingTime();
-      }
-
-      return _targetTour;
+//      if (mergeSpeed) {
+//
+//         final long[] pausedTime_Start = _sourceTour.getPausedTime_Start();
+//         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+//            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
+//            final List<Long> listPausedTime_End = Arrays.stream(_sourceTour.getPausedTime_End()).boxed().collect(Collectors.toList());
+//
+//            _targetTour.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, null);
+//         }
+//
+//         _targetTour.setTourDeviceTime_Elapsed(targetTimeSerie[targetTimeSerie.length - 1] - targetTimeSerie[0] * 1L);
+//         _targetTour.setTourDeviceTime_Recorded(_targetTour.getTourDeviceTime_Elapsed() - _targetTour.getTourDeviceTime_Paused());
+//         _targetTour.computeTourMovingTime();
+//      }
    }
 
    private float computeNewSourceAltitude(final float sourceAltitude,
@@ -245,6 +229,26 @@ public class TourMerger {
 
    public float[] getNewSourceAltitudeDifferencesSerie() {
       return _newSourceAltitudeDifferencesSerie;
+   }
+
+   public float[] getNewSourceAltitudeSerie() {
+      return _newSourceAltitudeSerie;
+   }
+
+   public float[] getNewTargetCadenceSerie() {
+      return _newTargetCadenceSerie;
+   }
+
+   public float[] getNewTargetPulseSerie() {
+      return _newTargetPulseSerie;
+   }
+
+   public float[] getNewTargetTemperatureSerie() {
+      return _newTargetTemperatureSerie;
+   }
+
+   public int[] getNewTargetTimeSerie() {
+      return _newTargetTimeSerie;
    }
 
    private boolean isLinearInterpolation() {
