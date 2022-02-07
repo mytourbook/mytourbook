@@ -41,25 +41,18 @@ public class TourMergerTests {
       final String targetFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "2011-07-03_KiliansClassik.gpx");
       _targetTour = Initializer.importTour_GPX(targetFilePath);
 
-      _tourMerger = new TourMerger(
-            _sourceTour,
-            _targetTour,
-            false, //_chkAdjustAltiFromSource.getSelection(),
-            false, //_chkAdjustAltiSmoothly.getSelection(),
-            false, //_chkSynchStartTime.getSelection(),
-            0); //_tourStartTimeSynchOffset,
+      _tourMerger = new TourMerger(_sourceTour, _targetTour, false, false, false, 0);
 
       //Comparing the original tour before the merge
       String controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik"; //$NON-NLS-1$
 
       Comparison.compareTourDataAgainstControl(_targetTour, controlFilePath);
 
-      //Merge the pulse and temperature
+      //Merge the altitude and pulse
       _tourMerger.computeMergedData(false);
       _targetTour.altitudeSerie = _tourMerger.getNewSourceAltitudeSerie();
       _targetTour.setCadenceSerie(_tourMerger.getNewTargetCadenceSerie());
       _targetTour.pulseSerie = _tourMerger.getNewTargetPulseSerie();
-      _targetTour.temperatureSerie = _tourMerger.getNewTargetTemperatureSerie();
 
       //Comparing the merged tour
       controlFilePath = FILES_PATH + "2011-07-03_KiliansClassik-PulseAndAltitudeMergeWith-Move_2011_07_03_08_01_04_Trail+running"; //$NON-NLS-1$
@@ -67,7 +60,10 @@ public class TourMergerTests {
       Comparison.compareTourDataAgainstControl(_targetTour, controlFilePath);
 
       //Merge the pulse, temperature and time
-//      _tourMerger.computeMergedData(true);
+// _tourMerger.computeMergedData(true);
+//      _targetTour.altitudeSerie = _tourMerger.getNewSourceAltitudeSerie();
+//      _targetTour.setCadenceSerie(_tourMerger.getNewTargetCadenceSerie());
+//      _targetTour.pulseSerie = _tourMerger.getNewTargetPulseSerie();
 //      _targetTour.timeSerie = _tourMerger.getNewTargetTimeSerie();
 //      _targetTour.setSpeedSerie(null);
 //
