@@ -19,9 +19,9 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IPositionListener;
+import de.byteholder.geoclipse.map.event.IGeoPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
+import de.byteholder.geoclipse.map.event.MapGeoPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
@@ -969,18 +969,18 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
       _map.setShowScale(true);
 
-      _map.addMousePositionListener(new IPositionListener() {
+      _map.addMousePositionListener(new IGeoPositionListener() {
 
          @Override
-         public void setPosition(final MapPositionEvent event) {
+         public void setPosition(final MapGeoPositionEvent event) {
 
             final GeoPosition mousePosition = event.mapGeoPosition;
 
             double lon = mousePosition.longitude % 360;
-            lon = lon > 180 ? //
-            lon - 360
-                  : lon < -180 ? //
-            lon + 360
+            lon = lon > 180
+                  ? lon - 360
+                  : lon < -180
+                        ? lon + 360
                         : lon;
 
             _lblMapInfo.setText(NLS.bind(
@@ -988,7 +988,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
                   new Object[] {
                         _nfLatLon.format(mousePosition.latitude),
                         _nfLatLon.format(lon),
-                        Integer.toString(event.mapZoomLevel + 1) }));
+                        Integer.toString(event.mapZoomLevel + 1)
+                  }));
          }
       });
 

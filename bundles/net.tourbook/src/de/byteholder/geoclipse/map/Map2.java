@@ -43,17 +43,17 @@ import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
+import de.byteholder.geoclipse.map.event.IGeoPositionListener;
 import de.byteholder.geoclipse.map.event.IHoveredTourListener;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IMapSelectionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
-import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITourSelectionListener;
+import de.byteholder.geoclipse.map.event.MapGeoPositionEvent;
 import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
@@ -469,7 +469,7 @@ public class Map2 extends Canvas {
    private final ListenerList<IMapInfoListener>       _allMapInfoListener        = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapPositionListener>   _allMapPositionListener    = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapSelectionListener>  _allMapSelectionListener   = new ListenerList<>(ListenerList.IDENTITY);
-   private final ListenerList<IPositionListener>      _allMousePositionListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IGeoPositionListener>   _allMousePositionListeners = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IPOIListener>           _allPOIListeners           = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<ITourSelectionListener> _allTourSelectionListener  = new ListenerList<>(ListenerList.IDENTITY);
 
@@ -907,7 +907,7 @@ public class Map2 extends Canvas {
       _allMapSelectionListener.add(listener);
    }
 
-   public void addMousePositionListener(final IPositionListener mapListener) {
+   public void addMousePositionListener(final IGeoPositionListener mapListener) {
       _allMousePositionListeners.add(mapListener);
    }
 
@@ -1231,11 +1231,11 @@ public class Map2 extends Canvas {
       final int worldMouseY = topLeftViewPort.y + _mouseMove_DevPosition_Y;
 
       final GeoPosition geoPosition = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
-      final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
+      final MapGeoPositionEvent event = new MapGeoPositionEvent(geoPosition, _mapZoomLevel);
 
       final Object[] listeners = _allMousePositionListeners.getListeners();
       for (final Object listener : listeners) {
-         ((IPositionListener) listener).setPosition(event);
+         ((IGeoPositionListener) listener).setPosition(event);
       }
    }
 
@@ -1339,6 +1339,87 @@ public class Map2 extends Canvas {
       }
 
       return null;
+   }
+
+   /**
+    * Find a more precise hovered position
+    *
+    * @param devMouseTileY
+    * @param devMouseTileX
+    * @param devHoveredTileY
+    * @param devHoveredTileX
+    * @param allPainted_HoveredRectangle
+    * @param allPainted_HoveredTourId
+    * @param allPainted_HoveredSerieIndices
+    * @return
+    */
+   private int getHoveredValuePointIndex(final int devMouseTileX,
+                                         final int devMouseTileY,
+                                         final int devHoveredTileX,
+                                         final int devHoveredTileY,
+                                         final Rectangle[] allPainted_HoveredRectangle,
+                                         final long[] allPainted_HoveredTourId,
+                                         final int[] allPainted_HoveredSerieIndices) {
+
+      final long hoveredTourId = _allHoveredTourIds.get(0);
+
+      /*
+       * Get indices which are containing the hovered tour id
+       */
+      int firstPaintIndex = -1;
+      int lastPaintIndex = -1;
+
+      for (int paintIndex = 0; paintIndex < allPainted_HoveredTourId.length; paintIndex++) {
+
+         final long paintedTourId = allPainted_HoveredTourId[paintIndex];
+
+         if (firstPaintIndex == -1 && paintedTourId == hoveredTourId) {
+
+            firstPaintIndex = lastPaintIndex = paintIndex;
+
+         } else if (paintedTourId == hoveredTourId) {
+
+            lastPaintIndex = paintIndex;
+
+         } else if (lastPaintIndex != -1) {
+
+            // there are no further positions for the hovered tour
+
+            break;
+         }
+      }
+
+      /*
+       * Find index with the smallest x/y diff value
+       */
+      int minDiff = Integer.MAX_VALUE;
+      int minHoverIndex = 0;
+
+      int hoverIndex;
+
+      for (hoverIndex = firstPaintIndex; hoverIndex <= lastPaintIndex; hoverIndex++) {
+
+         final Rectangle painted_HoveredRectangle = allPainted_HoveredRectangle[hoverIndex];
+
+         final int paintedHovered_CenterX = painted_HoveredRectangle.x + painted_HoveredRectangle.width / 2;
+         final int paintedHovered_CenterY = painted_HoveredRectangle.y + painted_HoveredRectangle.height / 2;
+
+         int diffX = devMouseTileX - paintedHovered_CenterX;
+         int diffY = devMouseTileY - paintedHovered_CenterY;
+
+         diffX = diffX < 0 ? -diffX : diffX;
+         diffY = diffY < 0 ? -diffY : diffY;
+
+         final int allDiff = diffX + diffY;
+
+         if (allDiff < minDiff) {
+
+            minDiff = allDiff;
+            minHoverIndex = allPainted_HoveredSerieIndices[hoverIndex];
+         }
+      }
+
+      return minHoverIndex;
    }
 
    /**
@@ -2266,6 +2347,17 @@ public class Map2 extends Canvas {
 
       int numPrevHoveredTours;
 
+      Rectangle[] allPainted_HoveredRectangle = null;
+      long[] allPainted_HoveredTourId = null;
+      int[] allPainted_HoveredSerieIndices = null;
+
+      int devMouseTileX = 0;
+      int devMouseTileY = 0;
+
+      // top/left dev position for the hovered tile
+      int devHoveredTileX = 0;
+      int devHoveredTileY = 0;
+
       try {
 
          Tile hoveredTile = null;
@@ -2277,10 +2369,6 @@ public class Map2 extends Canvas {
          final int devMouseY = _mouseMove_DevPosition_Y;
 
          final Tile[][] allPaintedTiles = _allPaintedTiles;
-
-         // top/left dev position for the hovered tile
-         int devHoveredTileX = 0;
-         int devHoveredTileY = 0;
 
          /*
           * Get tile which is hovered
@@ -2338,15 +2426,14 @@ public class Map2 extends Canvas {
          }
 
          // get mouse relative position in the tile
-         final int devMouseTileX = devMouseX - devHoveredTileX;
-         final int devMouseTileY = devMouseY - devHoveredTileY;
+         devMouseTileX = devMouseX - devHoveredTileX;
+         devMouseTileY = devMouseY - devHoveredTileY;
 
          // optimize performance by removing object references
-         final long[] allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
-         final int[] allPainted_HoveredSerieIndices = hoveredTile.allPainted_HoverSerieIndices.toArray();
+         allPainted_HoveredTourId = hoveredTile.allPainted_HoverTourID.toArray();
+         allPainted_HoveredSerieIndices = hoveredTile.allPainted_HoverSerieIndices.toArray();
 
-         final Rectangle[] allPainted_HoveredRectangle = allPainted_HoveredRectangle_List.toArray(
-               new Rectangle[allPainted_HoveredRectangle_List.size()]);
+         allPainted_HoveredRectangle = allPainted_HoveredRectangle_List.toArray(new Rectangle[allPainted_HoveredRectangle_List.size()]);
 
          long painted_HoveredTourId = -1;
          final int numPainted_HoveredTourId = allPainted_HoveredTourId.length;
@@ -2363,6 +2450,8 @@ public class Map2 extends Canvas {
                   && devMouseTileY >= paintedHoveredY
                   && devMouseTileX < (paintedHoveredX + painted_HoveredRectangle.width)
                   && devMouseTileY < (paintedHoveredY + painted_HoveredRectangle.height)) {
+
+               // a tour is hovered
 
                painted_HoveredTourId = allPainted_HoveredTourId[hoverIndex];
 
@@ -2404,9 +2493,33 @@ public class Map2 extends Canvas {
 
          // fire hover event, when a tour is hovered
 
-         if (_allHoveredSerieIndices.size() > 0) {
+         final int numHoveredSerieIndices = _allHoveredSerieIndices.size();
 
-            final int hoveredValuePointIndex = _allHoveredSerieIndices.get(0);
+         if (numHoveredSerieIndices > 0) {
+
+            int hoveredValuePointIndex;
+
+            if (numHoveredSerieIndices == 1) {
+
+               hoveredValuePointIndex = getHoveredValuePointIndex(
+
+                     devMouseTileX,
+                     devMouseTileY,
+
+                     devHoveredTileX,
+                     devHoveredTileY,
+
+                     allPainted_HoveredRectangle,
+                     allPainted_HoveredTourId,
+                     allPainted_HoveredSerieIndices);
+
+               // overwrite initial value
+               _allHoveredSerieIndices.set(0, hoveredValuePointIndex);
+
+            } else {
+
+               hoveredValuePointIndex = _allHoveredSerieIndices.get(0);
+            }
 
             final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId(), hoveredValuePointIndex);
 
@@ -6372,7 +6485,7 @@ public class Map2 extends Canvas {
       paint();
    }
 
-   public void removeMousePositionListener(final IPositionListener listener) {
+   public void removeMousePositionListener(final IGeoPositionListener listener) {
       _allMousePositionListeners.remove(listener);
    }
 

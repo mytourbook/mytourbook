@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,8 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.Map2Painter;
+import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.List;
@@ -41,12 +41,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-   private Map2                    _map;
+   private Map2                   _map;
    private TourData               _tourData;
 
    private int                    _leftSliderValueIndex;
    private int                    _rightSliderValueIndex;
-   private int                    _valuePointIndex;
+   private int                    _externalValuePointIndex;
 
    private boolean                _isTourVisible;
    private boolean                _isShowSliderInMap;
@@ -484,8 +484,14 @@ public class DirectMappingPainter implements IDirectPainter {
          drawMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
       }
 
-      if (_isShowValuePoint) {
-         drawMarker(painterContext, _valuePointIndex, _imageValuePoint, true);
+      if (_isShowValuePoint
+
+            // check if value point is valid -> do not show invalid point
+            && _externalValuePointIndex != -1
+
+      ) {
+
+         drawMarker(painterContext, _externalValuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {
@@ -500,8 +506,13 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param tourData
     * @param leftSliderValuesIndex
     * @param rightSliderValuesIndex
-    * @param isShowSliderInLegend
+    * @param externalValuePointIndex
+    *           When <code>-1</code> then this value point is not displayed, this happens when a
+    *           trackpoint is hovered because it is irritating when the external value point has
+    *           another position
     * @param isShowSliderInMap
+    * @param isShowSliderInLegend
+    * @param isShowValuePoint
     * @param sliderRelationPaintingData
     */
    public void setPaintContext(final Map2 map,
@@ -510,7 +521,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
                                final int leftSliderValuesIndex,
                                final int rightSliderValuesIndex,
-                               final int valuePointIndex,
+                               final int externalValuePointIndex,
 
                                final boolean isShowSliderInMap,
                                final boolean isShowSliderInLegend,
@@ -524,7 +535,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _leftSliderValueIndex = leftSliderValuesIndex;
       _rightSliderValueIndex = rightSliderValuesIndex;
-      _valuePointIndex = valuePointIndex;
+      _externalValuePointIndex = externalValuePointIndex;
 
       _isShowSliderInMap = isShowSliderInMap;
       _isShowSliderInLegend = isShowSliderInLegend;

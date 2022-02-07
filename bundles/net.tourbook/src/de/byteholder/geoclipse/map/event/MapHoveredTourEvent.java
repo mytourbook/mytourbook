@@ -15,14 +15,33 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
+import net.tourbook.common.UI;
+
 public class MapHoveredTourEvent {
 
-   public Long hoveredTourId;
-   public int  hoveredValuePointIndex;
+   private static final char NL = UI.NEW_LINE;
+
+   public Long               hoveredTourId;
+   public int                hoveredValuePointIndex;
 
    public MapHoveredTourEvent(final Long hoveredTourId, final int hoveredValuePointIndex) {
 
       this.hoveredTourId = hoveredTourId;
       this.hoveredValuePointIndex = hoveredValuePointIndex;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "MapHoveredTourEvent" + NL //                                      //$NON-NLS-1$
+
+            + "[" + NL //                                                        //$NON-NLS-1$
+
+            + "hoveredTourId=" + hoveredTourId + NL //                           //$NON-NLS-1$
+            + "hoveredValuePointIndex=" + hoveredValuePointIndex + NL //         //$NON-NLS-1$
+
+            + "]"; //                                                            //$NON-NLS-1$
    }
 }

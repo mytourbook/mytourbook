@@ -23,9 +23,9 @@ import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.MapGeoPositionEvent;
 import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
@@ -405,7 +405,7 @@ public class Map2View extends ViewPart implements
    private int                               _currentLeftSliderValueIndex;
    private int                               _currentRightSliderValueIndex;
    private int                               _currentSelectedSliderValueIndex;
-   private int                               _currentValuePointIndex;
+   private int                               _externalValuePointIndex;
    //
    private MapLegend                         _mapLegend;
    //
@@ -1081,7 +1081,7 @@ public class Map2View extends ViewPart implements
 
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
-            _currentValuePointIndex,
+            _externalValuePointIndex,
 
             isShowSliderInMap,
             _actionShowSliderInLegend.isChecked(),
@@ -1873,38 +1873,35 @@ public class Map2View extends ViewPart implements
       // update action because after closing the context menu, the hovered values are reset in the map paint event
       _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
 
+// SET_FORMATTING_OFF
+
       /*
        * Photo actions
        */
-      final boolean isAllPhotoAvailable = _allPhotos.size() > 0;
+      final boolean isAllPhotoAvailable      = _allPhotos.size() > 0;
       final boolean isFilteredPhotoAvailable = _filteredPhotos.size() > 0;
-      final boolean canShowFilteredPhoto = isFilteredPhotoAvailable && _isShowPhoto;
+      final boolean canShowFilteredPhoto     = isFilteredPhotoAvailable && _isShowPhoto;
 
       /*
-       * sync photo has a higher priority than sync tour, both cannot be synced at the same time
+       * Sync photo has a higher priority than sync tour, both cannot be synced at the same time
        */
 //      final boolean isPhotoSynced = canShowFilteredPhoto && _isMapSynchedWithPhoto;
 //      final boolean canSyncTour = isPhotoSynced == false;
 
-// SET_FORMATTING_OFF
 
       _actionMap2_PhotoFilter             .setEnabled(isAllPhotoAvailable && _isShowPhoto);
       _actionShowAllFilteredPhotos        .setEnabled(canShowFilteredPhoto);
       _actionShowPhotos                   .setEnabled(isAllPhotoAvailable);
       _actionSyncMapWith_Photo            .setEnabled(canShowFilteredPhoto);
 
-// SET_FORMATTING_ON
-
       /*
        * Tour actions
        */
-      final int numTours = _allTourData.size();
-      final boolean isTourAvailable = numTours > 0;
-      final boolean isMultipleTours = numTours > 1 && _isShowTour;
-      final boolean isOneTourDisplayed = _isTourOrWayPoint && isMultipleTours == false && _isShowTour;
-      final boolean isOneTourHovered = hoveredTourId != null;
-
-// SET_FORMATTING_OFF
+      final int numTours                  = _allTourData.size();
+      final boolean isTourAvailable       = numTours > 0;
+      final boolean isMultipleTours       = numTours > 1 && _isShowTour;
+      final boolean isOneTourDisplayed    = _isTourOrWayPoint && isMultipleTours == false && _isShowTour;
+      final boolean isOneTourHovered      = hoveredTourId != null;
 
       _actionCreateTourMarkerFromMap      .setEnabled(isTourAvailable && isOneTourHovered);
       _actionMap2_Color                   .setEnabled(isTourAvailable);
@@ -1953,9 +1950,9 @@ public class Map2View extends ViewPart implements
 
       } else if (isOneTourDisplayed) {
 
-         final TourData oneTourData = _allTourData.get(0);
-         final boolean isPulse = oneTourData.pulseSerie != null;
-         final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
+         final TourData oneTourData          = _allTourData.get(0);
+         final boolean isPulse               = oneTourData.pulseSerie != null;
+         final boolean canShowHrZones        = oneTourData.getNumberOfHrZones() > 0 && isPulse;
 
          _actionTourColor_Elevation          .setEnabled(true);
          _actionTourColor_Gradient           .setEnabled(oneTourData.getGradientSerie() != null);
@@ -2549,10 +2546,34 @@ public class Map2View extends ViewPart implements
 
    private void mapListener_HoveredTour(final MapHoveredTourEvent mapHoveredTourEvent) {
 
-      final Long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
+      if (_actionShowValuePoint.isChecked()) {
+
+         //  hide external value point
+
+         _externalValuePointIndex = -1;
+
+         // repaint map
+         _directMappingPainter.setPaintContext(
+
+               _map,
+               _isShowTour,
+               _allTourData.get(0),
+
+               _currentLeftSliderValueIndex,
+               _currentRightSliderValueIndex,
+               _externalValuePointIndex,
+
+               _actionShowSliderInMap.isChecked(),
+               _actionShowSliderInLegend.isChecked(),
+               _actionShowValuePoint.isChecked(),
+
+               _sliderPathPaintingData);
+
+         _map.redraw();
+      }
 
       final HoveredValueData hoveredValueData = new HoveredValueData(
-            hoveredTourId,
+            mapHoveredTourEvent.hoveredTourId,
             mapHoveredTourEvent.hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
@@ -2656,10 +2677,14 @@ public class Map2View extends ViewPart implements
          final SelectionMapSelection mapSelection = (SelectionMapSelection) selection;
 
          final boolean isShowSliderInMap = _actionShowSliderInMap.isChecked();
+         final boolean isShowValuePointInMap = _actionShowValuePoint.isChecked();
 
-         if (isShowSliderInMap) {
+         if (isShowSliderInMap || isShowValuePointInMap) {
 
-            // set left/right slider position to the selected value points
+            /*
+             * Set left/right slider position to the selected value points and/or hide external
+             * value point
+             */
 
             int valueIndex1 = mapSelection.getValueIndex1();
             int valueIndex2 = mapSelection.getValueIndex2();
@@ -2676,6 +2701,9 @@ public class Map2View extends ViewPart implements
             _currentLeftSliderValueIndex = valueIndex1;
             _currentRightSliderValueIndex = valueIndex2;
 
+            // hide the external value point
+            _externalValuePointIndex = -1;
+
             // repaint map
             _directMappingPainter.setPaintContext(
 
@@ -2685,7 +2713,7 @@ public class Map2View extends ViewPart implements
 
                   _currentLeftSliderValueIndex,
                   _currentRightSliderValueIndex,
-                  _currentValuePointIndex,
+                  _externalValuePointIndex,
 
                   isShowSliderInMap,
                   _actionShowSliderInLegend.isChecked(),
@@ -2704,7 +2732,7 @@ public class Map2View extends ViewPart implements
 
    }
 
-   private void mapListener_MousePosition(final MapPositionEvent mapPositionEvent) {
+   private void mapListener_MousePosition(final MapGeoPositionEvent mapPositionEvent) {
 
       _mapInfoManager.setMapPosition(
             mapPositionEvent.mapGeoPosition.latitude,
@@ -2739,8 +2767,11 @@ public class Map2View extends ViewPart implements
    public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType mapBookmarkEventType) {
       {
          if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) {
+
             _isInSelectBookmark = true;
-            moveToMapLocation(mapBookmark);
+            {
+               moveToMapLocation(mapBookmark);
+            }
             _isInSelectBookmark = false;
          }
       }
@@ -2755,7 +2786,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
+      _externalValuePointIndex = hoveredValueData.hoveredValuePointIndex;
 
       paintToursAndPhotos(tourData, null);
 
@@ -3499,7 +3530,7 @@ public class Map2View extends ViewPart implements
 
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
-            _currentValuePointIndex,
+            _externalValuePointIndex,
 
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
@@ -3726,7 +3757,7 @@ public class Map2View extends ViewPart implements
 
             leftSliderValuesIndex,
             rightSliderValuesIndex,
-            _currentValuePointIndex,
+            _externalValuePointIndex,
 
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
@@ -4710,7 +4741,7 @@ public class Map2View extends ViewPart implements
 
          // one simple tour or a multiple tour is displayed
 
-         hoveredSerieIndex = _currentValuePointIndex;
+         hoveredSerieIndex = _externalValuePointIndex;
          hoveredTourData = _allTourData.get(0);
 
       } else {
@@ -4723,7 +4754,7 @@ public class Map2View extends ViewPart implements
           * TourData with isMultipleTour is displayed in the map ->complicated
           */
 
-         int adjustedValuePointIndex = _currentValuePointIndex;
+         int adjustedValuePointIndex = _externalValuePointIndex;
 
          for (final TourData tourData : _allTourData) {
 
