@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 
 public class TourMerger {
@@ -75,7 +76,7 @@ public class TourMerger {
 
    public void computeMergedData(final boolean mergeSpeed) {
 
-      _newTargetTimeSerie = mergeSpeed ? mergeSpeed() : _targetTour.timeSerie;
+      _newTargetTimeSerie = mergeSpeed ? mergeSpeed() : Util.createIntegerCopy(_targetTour.timeSerie);
 
       final int serieLength = _newTargetTimeSerie.length;
       _newSourceAltitudeSerie = new float[serieLength];
@@ -156,7 +157,6 @@ public class TourMerger {
                                               final int yMergeOffset) {
 
       final float[] sourceAltitudeSerie = _sourceTour.altitudeSerie;
-      final int[] sourceTimeSerie = _sourceTour.timeSerie;
       final float[] targetAltitudeSerie = _targetTour.altitudeSerie;
       // check if the data series are available
       final boolean isSourceAltitude = sourceAltitudeSerie != null;
@@ -169,10 +169,11 @@ public class TourMerger {
          previousSourceAltitude = sourceAltitude;
       }
 
-      int sourceIndex = 0;
+      final int[] sourceTimeSerie = _sourceTour.timeSerie;
       final int lastSourceIndex = sourceTimeSerie.length - 1;
       int previousSourceTime = 0;
       int sourceTime = sourceTimeSerie[0] + xMergeOffset;
+      int sourceIndex = 0;
       for (int targetIndex = 0; targetIndex < _newTargetTimeSerie.length; targetIndex++) {
 
          final int targetTime = _newTargetTimeSerie[targetIndex];
