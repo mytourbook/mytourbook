@@ -170,6 +170,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private float[]                       _backupTargetTemperatureSerie;
    private float[]                       _backupTargetSpeedSerie;
    private int[]                         _backupTargetTimeSerie;
+   private long                          _backupTargetDeviceTime_Elapsed;
 
    private int                           _backupTargetTimeOffset;
    private int                           _backupTargetAltitudeOffset;
@@ -315,11 +316,18 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       //In both cases, we update the speed to trigger the recalculation of it
       if (_chkMergeSpeed.getSelection()) {
+         final int[] newTargetTimeSerie = tourMerger.getNewTargetTimeSerie();
          _targetTour.timeSerie = tourMerger.getNewTargetTimeSerie();
          _targetTour.setSpeedSerie(null);
+         _targetTour.setTourDeviceTime_Elapsed(newTargetTimeSerie[newTargetTimeSerie.length - 1] - newTargetTimeSerie[0] * 1L);
+         _targetTour.setTourDeviceTime_Recorded(_targetTour.getTourDeviceTime_Elapsed());
+         _targetTour.computeTourMovingTime();
       } else {
          _targetTour.timeSerie = _backupTargetTimeSerie;
          _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
+         _targetTour.setTourDeviceTime_Elapsed(_backupTargetDeviceTime_Elapsed);
+         _targetTour.setTourDeviceTime_Recorded(_targetTour.getTourDeviceTime_Elapsed());
+         _targetTour.computeTourMovingTime();
       }
    }
 
@@ -587,6 +595,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _backupTargetTemperatureSerie = Util.createFloatCopy(_targetTour.temperatureSerie);
       _backupTargetSpeedSerie = Util.createFloatCopy(_targetTour.getSpeedSerie());
       _backupTargetTimeSerie = Util.createIntegerCopy(_targetTour.timeSerie);
+      _backupTargetDeviceTime_Elapsed = _targetTour.getTourDeviceTime_Elapsed();
 
       _backupTargetTimeOffset = _targetTour.getMergedTourTimeOffset();
       _backupTargetAltitudeOffset = _targetTour.getMergedAltitudeOffset();
@@ -1464,6 +1473,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _targetTour.temperatureSerie = Util.createFloatCopy(_backupTargetTemperatureSerie);
       _targetTour.setSpeedSerie(Util.createFloatCopy(_backupTargetSpeedSerie));
       _targetTour.timeSerie = Util.createIntegerCopy(_backupTargetTimeSerie);
+      _targetTour.setTourDeviceTime_Elapsed(_backupTargetDeviceTime_Elapsed);
 
       _targetTour.setMergedTourTimeOffset(_backupTargetTimeOffset);
       _targetTour.setMergedAltitudeOffset(_backupTargetAltitudeOffset);
@@ -1489,6 +1499,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
       _targetTour.temperatureSerie = _backupTargetTemperatureSerie;
       _targetTour.timeSerie = _backupTargetTimeSerie;
+      _targetTour.setTourDeviceTime_Elapsed(_backupTargetDeviceTime_Elapsed);
 
       _targetTour.setMergedTourTimeOffset(_backupTargetTimeOffset);
       _targetTour.setMergedAltitudeOffset(_backupTargetAltitudeOffset);
@@ -1621,6 +1632,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
          // restore original speed and time values because these values should not be saved
          _targetTour.setSpeedSerie(_backupTargetSpeedSerie);
          _targetTour.timeSerie = _backupTargetTimeSerie;
+         _targetTour.setTourDeviceTime_Elapsed(_backupTargetDeviceTime_Elapsed);
+         _targetTour.setTourDeviceTime_Recorded(_targetTour.getTourDeviceTime_Elapsed());
+         _targetTour.computeTourMovingTime();
       }
 
       if (_chkSetTourType.getSelection() == false) {
