@@ -78,6 +78,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
 
+   //TODO FB problem is that they only give the date file
    public SuuntoCloudDownloader() {
 
       super("SUUNTO", //$NON-NLS-1$
