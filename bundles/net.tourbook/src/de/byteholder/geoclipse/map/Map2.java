@@ -325,6 +325,7 @@ public class Map2 extends Canvas {
 
    private final TileLoadObserver  _tileImageLoadObserver   = new TileLoadObserver();
 
+   private Cursor                  _currentCursor;
    private final Cursor            _cursorCross;
    private final Cursor            _cursorDefault;
    private final Cursor            _cursorHand;
@@ -754,7 +755,7 @@ public class Map2 extends Canvas {
       _offline_DevMouse_Start = null;
       _offline_DevMouse_End = null;
 
-      setCursor(_cursorCross);
+      setCursorOptimized(_cursorCross);
 
       redraw();
       paint();
@@ -783,7 +784,7 @@ public class Map2 extends Canvas {
             new Point2D.Double(worldMousePosition.x, worldMousePosition.y),
             _mapZoomLevel);
 
-      setCursor(_cursorSearchTour);
+      setCursorOptimized(_cursorSearchTour);
 
       redraw();
       paint();
@@ -1890,7 +1891,7 @@ public class Map2 extends Canvas {
 
       TourGeoFilter_Manager.setGeoFilter_OpenSlideout(false, false);
 
-      setCursor(_cursorDefault);
+      setCursorOptimized(_cursorDefault);
       redraw();
    }
 
@@ -1904,7 +1905,7 @@ public class Map2 extends Canvas {
 
       _geoGrid_IsGridAutoScroll = true;
       _geoGrid_AutoScrollCounter[0]++;
-      setCursor(_cursorSearchTour_Scroll);
+      setCursorOptimized(_cursorSearchTour_Scroll);
 
       getDisplay().timerExec(AUTO_SCROLL_INTERVAL, new Runnable() {
 
@@ -1951,7 +1952,7 @@ public class Map2 extends Canvas {
                getDisplay().timerExec(AUTO_SCROLL_INTERVAL, this);
             } else {
                _geoGrid_IsGridAutoScroll = false;
-               setCursor(_cursorSearchTour);
+               setCursorOptimized(_cursorSearchTour);
             }
          }
       });
@@ -2555,7 +2556,7 @@ public class Map2 extends Canvas {
 
       _isContextMenuEnabled = true;
 
-      setCursor(_cursorDefault);
+      setCursorOptimized(_cursorDefault);
       redraw();
    }
 
@@ -2917,7 +2918,7 @@ public class Map2 extends Canvas {
          // hide hover color
          _geoGrid_Label_IsHovered = false;
 
-         setCursor(_cursorDefault);
+         setCursorOptimized(_cursorDefault);
 
          /*
           * Zoom to geo filter zoom level
@@ -2943,7 +2944,7 @@ public class Map2 extends Canvas {
          // hide hover color
          _geoGrid_Action_IsHovered = false;
 
-         setCursor(_cursorDefault);
+         setCursorOptimized(_cursorDefault);
 
          _geoGrid_TourGeoFilter.mapGeoCenter = _geoGrid_MapGeoCenter = getMapGeoCenter();
          _geoGrid_TourGeoFilter.mapZoomLevel = _geoGrid_MapZoomLevel = getZoom();
@@ -2958,7 +2959,7 @@ public class Map2 extends Canvas {
          _isLeftMouseButtonPressed = true;
          _mouseDownPosition = devMousePosition;
 
-         setCursor(_cursorPan);
+         setCursorOptimized(_cursorPan);
       }
    }
 
@@ -3114,7 +3115,7 @@ public class Map2 extends Canvas {
          redraw();
       }
 
-      setCursor(_cursorDefault);
+      setCursorOptimized(_cursorDefault);
    }
 
    private void onMouse_Move(final MouseEvent mouseEvent) {
@@ -3248,7 +3249,7 @@ public class Map2 extends Canvas {
 
             _geoGrid_Label_IsHovered = true;
 
-            setCursor(_cursorHand);
+            setCursorOptimized(_cursorHand);
 
             redraw();
 
@@ -3258,7 +3259,7 @@ public class Map2 extends Canvas {
 
             // hide hovered state
 
-            setCursor(_cursorDefault);
+            setCursorOptimized(_cursorDefault);
 
             redraw();
          }
@@ -3277,7 +3278,7 @@ public class Map2 extends Canvas {
 
             _geoGrid_Action_IsHovered = true;
 
-            setCursor(_cursorHand);
+            setCursorOptimized(_cursorHand);
 
             redraw();
 
@@ -3287,7 +3288,7 @@ public class Map2 extends Canvas {
 
             // hide hovered state
 
-            setCursor(_cursorDefault);
+            setCursorOptimized(_cursorDefault);
 
             redraw();
          }
@@ -3307,9 +3308,9 @@ public class Map2 extends Canvas {
             _allHoveredSerieIndices.clear();
 
             if (_tourBreadcrumb.isCrumbHovered()) {
-               setCursor(_cursorHand);
+               setCursorOptimized(_cursorHand);
             } else {
-               setCursor(_cursorDefault);
+               setCursorOptimized(_cursorDefault);
             }
 
             redraw();
@@ -3318,7 +3319,7 @@ public class Map2 extends Canvas {
 
             // tour is hovered
 
-            setCursor(_cursorSelect);
+            setCursorOptimized(_cursorSelect);
 
             // show hovered tour
             redraw();
@@ -3327,7 +3328,7 @@ public class Map2 extends Canvas {
 
             // reset cursor
 
-            setCursor(_cursorDefault);
+            setCursorOptimized(_cursorDefault);
          }
       }
 
@@ -3353,7 +3354,7 @@ public class Map2 extends Canvas {
          offline_UpdateOfflineAreaEndPosition(mouseEvent);
 
          // reset cursor
-         setCursor(_cursorDefault);
+         setCursorOptimized(_cursorDefault);
 
          // hide selection
          _offline_IsSelectingOfflineArea = false;
@@ -3411,7 +3412,7 @@ public class Map2 extends Canvas {
             _mouseDownPosition = null;
             _isLeftMouseButtonPressed = false;
 
-            setCursor(_cursorDefault);
+            setCursorOptimized(_cursorDefault);
 
          } else if (mouseEvent.button == 2) {
             // if the middle mouse button is clicked, recenter the view
@@ -6603,6 +6604,22 @@ public class Map2 extends Canvas {
       _tourDirection_LineWidth = lineWidth;
       _tourDirection_SymbolSize = symbolSize;
       _tourDirection_RGB = tourDirection_RGB;
+   }
+
+   /**
+    * Set cursor only when needed, to optimize performance
+    *
+    * @param cursor
+    */
+   private void setCursorOptimized(final Cursor cursor) {
+
+      if (cursor == _currentCursor) {
+         return;
+      }
+
+      _currentCursor = cursor;
+
+      setCursor(cursor);
    }
 
    /**
