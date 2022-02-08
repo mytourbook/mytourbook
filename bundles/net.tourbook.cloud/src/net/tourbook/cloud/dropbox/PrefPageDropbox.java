@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
@@ -49,6 +51,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -67,14 +70,15 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     * UI controls
     */
    private Button                  _btnCleanup;
+   private Button                  _chkShowHidePasswords;
    private Group                   _group;
    private Label                   _labelAccessToken;
-   private Label                   _labelAccessToken_Value;
    private Label                   _labelExpiresAt;
    private Label                   _labelExpiresAt_Value;
    private Label                   _labelRefreshToken;
-   private Label                   _labelRefreshToken_Value;
    private Link                    _linkRevokeAccess;
+   private Text                    _txtAccessToken_Value;
+   private Text                    _txtRefreshToken_Value;
 
    @Override
    protected void createFieldEditors() {
@@ -93,11 +97,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
                if (!event.getOldValue().equals(event.getNewValue())) {
 
-                  _labelAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
+                  _txtAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
                   _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
                         _prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME),
                         _prefStore.getInt(Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN)));
-                  _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
+                  _txtRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
 
                   _group.redraw();
 
@@ -187,17 +191,17 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             _labelAccessToken.setToolTipText(Messages.PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
-            _labelAccessToken_Value = new Label(_group, SWT.WRAP);
-            _labelAccessToken_Value.setToolTipText(Messages.PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip);
-            GridDataFactory.fillDefaults().hint(textWidth, SWT.DEFAULT).applyTo(_labelAccessToken_Value);
+            _txtAccessToken_Value = new Text(_group, SWT.READ_ONLY | SWT.PASSWORD);
+            _txtAccessToken_Value.setToolTipText(Messages.PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip);
+            GridDataFactory.fillDefaults().hint(textWidth, SWT.DEFAULT).applyTo(_txtAccessToken_Value);
          }
          {
             _labelRefreshToken = new Label(_group, SWT.NONE);
             _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
-            _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
-            GridDataFactory.fillDefaults().hint(textWidth, SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
+            _txtRefreshToken_Value = new Text(_group, SWT.PASSWORD | SWT.READ_ONLY);
+            GridDataFactory.fillDefaults().hint(textWidth, SWT.DEFAULT).applyTo(_txtRefreshToken_Value);
          }
          {
             _labelExpiresAt = new Label(_group, SWT.NONE);
@@ -206,6 +210,14 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
             _labelExpiresAt_Value = new Label(_group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+         }
+         {
+            _chkShowHidePasswords = new Button(_group, SWT.CHECK);
+            _chkShowHidePasswords.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords);
+            _chkShowHidePasswords.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip);
+            _chkShowHidePasswords.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHidePasswords
+                  .getSelection())));
+            GridDataFactory.fillDefaults().applyTo(_chkShowHidePasswords);
          }
          {
             _linkRevokeAccess = new Link(_group, SWT.NONE);
@@ -222,12 +234,13 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void enableControls() {
 
-      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) &&
-            StringUtils.hasContent(_labelRefreshToken_Value.getText());
+      final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText()) &&
+            StringUtils.hasContent(_txtRefreshToken_Value.getText());
 
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
+      _chkShowHidePasswords.setEnabled(isAuthorized);
       _linkRevokeAccess.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
    }
@@ -331,10 +344,10 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    @Override
    protected void performDefaults() {
 
-      _labelAccessToken_Value.setText(
+      _txtAccessToken_Value.setText(
             _prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
-      _labelRefreshToken_Value.setText(
+      _txtRefreshToken_Value.setText(
             _prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
 
       enableControls();
@@ -348,8 +361,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isOK = super.performOk();
 
       if (isOK) {
-         _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN, _labelAccessToken_Value.getText());
-         _prefStore.setValue(Preferences.DROPBOX_REFRESHTOKEN, _labelRefreshToken_Value.getText());
+         _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN, _txtAccessToken_Value.getText());
+         _prefStore.setValue(Preferences.DROPBOX_REFRESHTOKEN, _txtRefreshToken_Value.getText());
 
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
 
@@ -367,13 +380,22 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
 
-      _labelAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
+      _txtAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
             _prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME),
             _prefStore.getInt(Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN)));
-      _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
+      _txtRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
 
       enableControls();
+   }
+
+   private void showOrHideAllPasswords(final boolean showPasswords) {
+
+      final List<Text> texts = new ArrayList<>();
+      texts.add(_txtAccessToken_Value);
+      texts.add(_txtRefreshToken_Value);
+
+      Preferences.showOrHidePasswords(texts, showPasswords);
    }
 
 }

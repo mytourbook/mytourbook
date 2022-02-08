@@ -1269,6 +1269,8 @@ public class Messages extends NLS {
    public static String        merge_tour_source_graph_cadence_tooltip;
    public static String        merge_tour_source_graph_heartbeat;
    public static String        merge_tour_source_graph_heartbeat_tooltip;
+   public static String        merge_tour_source_graph_speed;
+   public static String        merge_tour_source_graph_speed_tooltip;
    public static String        merge_tour_source_graph_temperature;
    public static String        merge_tour_source_graph_temperature_tooltip;
 
@@ -2407,8 +2409,8 @@ public class Messages extends NLS {
    public static String        TourChart_Smoothing_Label_RepeatedTau;
    public static String        TourChart_Smoothing_Label_RepeatedTau_Tooltip;
    public static String        TourChart_Smoothing_Label_SmoothingAlgorithm;
-   public static String        TourChart_Smoothing_Label_SpeedSmoothing;
-   public static String        TourChart_Smoothing_Label_SpeedSmoothing_Tooltip;
+   public static String        TourChart_Smoothing_Label_SpeedAndPaceSmoothing;
+   public static String        TourChart_Smoothing_Label_SpeedAndPaceSmoothing_Tooltip;
    public static String        TourChart_Smoothing_Label_TauParameter;
    public static String        TourChart_Smoothing_Link_PrefBreakTime;
    public static String        TourChart_Smoothing_Link_SmoothingOnlineDocumentation;
@@ -2831,7 +2833,7 @@ public class Messages extends NLS {
    public static String        tour_merger_chk_use_synced_start_time_tooltip;
    public static String        tour_merger_dialog_header_message;
    public static String        tour_merger_dialog_header_title;
-   public static String        tour_merger_dialog_title;
+   public static String        Dialog_MergeTours_Dialog_Title;
    public static String        tour_merger_group_adjust_altitude;
    public static String        tour_merger_group_adjust_time;
    public static String        tour_merger_group_save_actions;

@@ -6623,7 +6623,7 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * Set map dimming level for the current map factory, this will dimm the map images
+    * Set map dimming level for the current map factory, this will dim the map images
     *
     * @param mapDimLevel
     * @param dimColor
@@ -6741,7 +6741,7 @@ public class Map2 extends Canvas {
 
    /**
     * Sets the center of the map {@link #_worldPixel_MapCenter} in world pixel coordinates with the
-    * current zoomlevel
+    * current zoom level
     *
     * @param newWorldPixelCenter
     */
@@ -6784,7 +6784,7 @@ public class Map2 extends Canvas {
       java.awt.Point wpTourCenter;
       java.awt.geom.Point2D.Double wpMapCenter;
 
-      // keep current zoomlevel
+      // keep current zoom level
       final int currentZoomLevel = _mapZoomLevel;
 
       final int minZoomLevel = _mp.getMinimumZoomLevel();
@@ -6840,7 +6840,7 @@ public class Map2 extends Canvas {
 
       if (zoom != currentZoomLevel) {
 
-         // set new zoomlevel ONLY when it was modified -> this will dispose old overlay images !!!
+         // set new zoom level ONLY when it was modified -> this will dispose old overlay images !!!
 
          setZoom(zoom);
       }
@@ -7029,7 +7029,7 @@ public class Map2 extends Canvas {
 
    /**
     * Sets the visibility of the poi tooltip. Poi tooltip is visible when the tooltip is available
-    * and the poi image is withing the map view port
+    * and the poi image is within the map view port
     *
     * @param isVisible
     *           <code>false</code> will hide the tooltip
@@ -7170,14 +7170,14 @@ public class Map2 extends Canvas {
 
       } else {
 
-         // a new zoomlevel is set
+         // a new zoom level is set
 
          isNewZoomLevel = true;
       }
 
       if (oldZoomLevel != adjustedZoomLevel) {
 
-         // zoomlevel has changed -> stop downloading images for the old zoom level
+         // zoom level has changed -> stop downloading images for the old zoom level
          _mp.resetAll(true);
       }
 
@@ -7219,7 +7219,7 @@ public class Map2 extends Canvas {
 
       } else {
 
-         // zoom behaviour until 18.5
+         // zoom behavior until 18.5
       }
 
       wpNewMapCenter = new Point2D.Double(
@@ -7322,12 +7322,12 @@ public class Map2 extends Canvas {
           */
          if (isSyncMapPosition) {
 
-            // chck if grid box is already visible
+            // check if grid box is already visible
 
             if (world_MapViewPort.contains(_geoGrid_Data_Selected.world_Start)
                   && world_MapViewPort.contains(_geoGrid_Data_Selected.world_End)) {
 
-               // grid box is visile -> nothing to do
+               // grid box is visible -> nothing to do
 
             } else {
 

@@ -49,6 +49,9 @@ Improvements
   - Loading multiple tours is much faster because they are loaded concurrently
   - Painting multiple tours in tour chart and 2D map are further optimized 
 
+* Tour Merging (Frederic)
+ - Added the possibility to merge speed
+
 * Tour Import
   - Sort imported tours by number of markers/waypoints
   - Customize simple import tiles in the easy import page 
@@ -72,6 +75,12 @@ Improvements
                                         https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
                                       	https://sourceforge.net/p/mytourbook/feature-requests/122/
 
+* Strava Integration (Frederic)   
+  - Added the possibility to add the tour weather icon in the uploaded Strava activity title
+
+* Cloud Integration (Frederic)
+  - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
+
                                         
 Changes
 =======
@@ -87,11 +96,14 @@ Bugfix
   - When determining if a Suunto activity already exists in the database, only the tours for the selected user are compared with the activities available on the Suunto App
 
 * Map25 (Thomas)
-  - The old hillshading provider(wmflabs.org) is not avaible anymore, the new provider for hillshading is now "Mapilion"
+  - The old hillshading provider(wmflabs.org) is not available anymore, the new provider for hillshading is now "Mapilion"
   
 * Tour Editor
   - Using DELETE in the Tour Editor is not consecutive        https://sourceforge.net/p/mytourbook/bugs/127/
   - Canceling the tour editor still saves the changes         https://sourceforge.net/p/mytourbook/bugs/128/
+
+* TCX Tour Export (Frederic)
+  - Removing the lat/lon tags when those values are invalid/not provided as it creates an invalid TCX file
 
 
 Translation    

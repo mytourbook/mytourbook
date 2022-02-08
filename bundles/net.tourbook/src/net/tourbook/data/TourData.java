@@ -1404,7 +1404,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * When a tour was deleted and is still visible in the raw data view, resaving the tour or
-    * finding the tour in the entity manager causes lots of trouble with hibernate, therefor this
+    * finding the tour in the entity manager causes lots of trouble with hibernate, therefore this
     * tour cannot be saved again, it must be reloaded from the file system
     */
    @Transient
@@ -8626,6 +8626,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pulseSerie_FromTime;
    }
 
+   @JsonIgnore
    public String[] getPulse_RRIntervals() {
 
       if (pulseTime_TimeIndex == null) {
