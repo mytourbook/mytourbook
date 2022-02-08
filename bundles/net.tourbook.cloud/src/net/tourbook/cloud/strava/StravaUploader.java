@@ -49,6 +49,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.DialogExportTour;
@@ -87,33 +88,33 @@ public class StravaUploader extends TourbookCloudUploader {
 
    // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
    private static final List<String> StravaManualActivityTypes       = List.of(
-         "InlineSkate", //$NON-NLS-1$
-         "Kayaking", //$NON-NLS-1$
-         "Kitesurf", //$NON-NLS-1$
-         "NordicSki", //$NON-NLS-1$
-         "Ride", //$NON-NLS-1$
-         "RockClimbing", //$NON-NLS-1$
-         "RollerSki", //$NON-NLS-1$
-         "Rowing", //$NON-NLS-1$
-         "Run", //$NON-NLS-1$
-         "Sail", //$NON-NLS-1$
-         "Skateboard", //$NON-NLS-1$
-         "Snowboard", //$NON-NLS-1$
-         "Snowshoe", //$NON-NLS-1$
-         "Soccer", //$NON-NLS-1$
-         "StairStepper", //$NON-NLS-1$
-         "StandUpPaddling", //$NON-NLS-1$
-         "Surfing", //$NON-NLS-1$
-         "Swim", //$NON-NLS-1$
-         "Velomobile", //$NON-NLS-1$
-         "VirtualRide", //$NON-NLS-1$
-         "VirtualRun", //$NON-NLS-1$
-         "Walk", //$NON-NLS-1$
-         "WeightTraining", //$NON-NLS-1$
-         "Wheelchair", //$NON-NLS-1$
-         "Windsurf", //$NON-NLS-1$
-         "Workout", //$NON-NLS-1$
-         "Yoga"); //$NON-NLS-1$
+         "InlineSkate",                                                                                    //$NON-NLS-1$
+         "Kayaking",                                                                                       //$NON-NLS-1$
+         "Kitesurf",                                                                                       //$NON-NLS-1$
+         "NordicSki",                                                                                      //$NON-NLS-1$
+         "Ride",                                                                                           //$NON-NLS-1$
+         "RockClimbing",                                                                                   //$NON-NLS-1$
+         "RollerSki",                                                                                      //$NON-NLS-1$
+         "Rowing",                                                                                         //$NON-NLS-1$
+         "Run",                                                                                            //$NON-NLS-1$
+         "Sail",                                                                                           //$NON-NLS-1$
+         "Skateboard",                                                                                     //$NON-NLS-1$
+         "Snowboard",                                                                                      //$NON-NLS-1$
+         "Snowshoe",                                                                                       //$NON-NLS-1$
+         "Soccer",                                                                                         //$NON-NLS-1$
+         "StairStepper",                                                                                   //$NON-NLS-1$
+         "StandUpPaddling",                                                                                //$NON-NLS-1$
+         "Surfing",                                                                                        //$NON-NLS-1$
+         "Swim",                                                                                           //$NON-NLS-1$
+         "Velomobile",                                                                                     //$NON-NLS-1$
+         "VirtualRide",                                                                                    //$NON-NLS-1$
+         "VirtualRun",                                                                                     //$NON-NLS-1$
+         "Walk",                                                                                           //$NON-NLS-1$
+         "WeightTraining",                                                                                 //$NON-NLS-1$
+         "Wheelchair",                                                                                     //$NON-NLS-1$
+         "Windsurf",                                                                                       //$NON-NLS-1$
+         "Workout",                                                                                        //$NON-NLS-1$
+         "Yoga");                                                                                          //$NON-NLS-1$
 
    private String                    STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
 
@@ -202,6 +203,16 @@ public class StravaUploader extends TourbookCloudUploader {
       return compressedFilePath;
    }
 
+   private String buildFormattedTitle(final TourData tourData) {
+
+      String title = tourData.getTourTitle();
+
+      if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
+         title += getWeatherIconInTitle(tourData.getWeatherIndex());
+      }
+      return title;
+   }
+
    private void createCompressedTcxTourFile(final IProgressMonitor monitor,
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
@@ -286,6 +297,66 @@ public class StravaUploader extends TourbookCloudUploader {
       }
 
       return isTokenValid;
+   }
+
+   /**
+    * Returns an appropriate weather Emoji based on the tour weather icon.
+    * To obtain the string representation of the icons in Unicode 7.0,
+    * I used the below code:
+    * https://stackoverflow.com/a/68537229/7066681
+    *
+    * @param weatherIndex
+    * @return
+    */
+   private String getWeatherIconInTitle(final int weatherIndex) {
+
+      String weatherIcon;
+
+      switch (IWeather.cloudIcon[weatherIndex]) {
+
+      case IWeather.WEATHER_ID_CLEAR:
+         //https://emojipedia.org/sun/
+         weatherIcon = "\u2600"; //$NON-NLS-1$
+         break;
+      case IWeather.WEATHER_ID_PART_CLOUDS:
+         //https://emojipedia.org/sun-behind-cloud/
+         weatherIcon = "\u26C5"; //$NON-NLS-1$
+         break;
+      case IWeather.WEATHER_ID_OVERCAST:
+         weatherIcon = "\u2601"; //$NON-NLS-1$
+         break;
+      case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
+         //https://emojipedia.org/sun-behind-rain-cloud/
+         weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
+         break;
+      case IWeather.WEATHER_ID_RAIN:
+         //https://emojipedia.org/cloud-with-rain/
+         weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
+         break;
+      case IWeather.WEATHER_ID_LIGHTNING:
+         //https://emojipedia.org/cloud-with-lightning/
+         weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
+         break;
+      case IWeather.WEATHER_ID_SNOW:
+
+         //https://emojipedia.org/snowflake/
+         weatherIcon = "\u2744"; //$NON-NLS-1$
+
+         //Below is the official "Cloud with snow" icon but because it looks too
+         //much like the "Cloud with rain" icon, instead, we choose the "Snowflake"
+         //icon.
+         //https://emojipedia.org/cloud-with-snow/
+         break;
+      case IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT:
+         //https://emojipedia.org/warning/
+         weatherIcon = "\u26A0"; //$NON-NLS-1$
+         break;
+      case UI.IMAGE_EMPTY_16:
+      default:
+         return UI.EMPTY_STRING;
+      }
+
+      return UI.SPACE1 + weatherIcon;
    }
 
    @Override
@@ -486,9 +557,11 @@ public class StravaUploader extends TourbookCloudUploader {
     */
    private CompletableFuture<ActivityUpload> uploadFile(final String compressedTourAbsoluteFilePath, final TourData tourData) {
 
+      final String title = buildFormattedTitle(tourData);
+
       final MultiPartBodyPublisher publisher = new MultiPartBodyPublisher()
             .addPart("data_type", "tcx.gz") //$NON-NLS-1$ //$NON-NLS-2$
-            .addPart("name", tourData.getTourTitle()) //$NON-NLS-1$
+            .addPart("name", title) //$NON-NLS-1$
             .addPart("file", Paths.get(compressedTourAbsoluteFilePath)); //$NON-NLS-1$
 
       if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
@@ -519,8 +592,10 @@ public class StravaUploader extends TourbookCloudUploader {
       final boolean isTrainerActivity = tourData.getTourType() != null &&
             tourData.getTourType().getName().trim().equalsIgnoreCase("trainer"); //$NON-NLS-1$
 
+      final String title = buildFormattedTitle(tourData);
+
       final JSONObject body = new JSONObject();
-      body.put("name", tourData.getTourTitle()); //$NON-NLS-1$
+      body.put("name", title); //$NON-NLS-1$
       body.put("type", manualTourToUpload.getValue()); //$NON-NLS-1$
       body.put("start_date_local", tourData.getTourStartTime().format(DateTimeFormatter.ISO_DATE_TIME)); //$NON-NLS-1$
       body.put("elapsed_time", tourData.getTourDeviceTime_Elapsed()); //$NON-NLS-1$

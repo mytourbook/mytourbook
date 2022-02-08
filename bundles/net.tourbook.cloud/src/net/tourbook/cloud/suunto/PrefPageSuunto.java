@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -87,18 +88,19 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
     */
    private Button   _btnCleanup;
    private Button   _btnSelectFolder;
+   private Button   _chkShowHidePasswords;
    private Button   _chkUseDateFilter;
    private Combo    _comboDownloadFolderPath;
    private Combo    _comboPeopleList;
    private DateTime _dtFilterSince;
    private Group    _groupCloudAccount;
    private Label    _labelAccessToken;
-   private Label    _labelAccessToken_Value;
    private Label    _labelExpiresAt;
    private Label    _labelExpiresAt_Value;
    private Label    _labelRefreshToken;
-   private Label    _labelRefreshToken_Value;
    private Label    _labelDownloadFolder;
+   private Text     _txtAccessToken_Value;
+   private Text     _txtRefreshToken_Value;
 
    @Override
    protected void createFieldEditors() {
@@ -123,11 +125,11 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
             if (!event.getOldValue().equals(event.getNewValue())) {
 
-               _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+               _txtAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
                _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
                      _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
                      _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
-               _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+               _txtRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
                _groupCloudAccount.redraw();
 
@@ -226,16 +228,16 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _labelAccessToken.setText(Messages.PrefPage_CloudConnectivity_Label_AccessToken);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
-            _labelAccessToken_Value = new Label(_groupCloudAccount, SWT.WRAP);
-            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelAccessToken_Value);
+            _txtAccessToken_Value = new Text(_groupCloudAccount, SWT.READ_ONLY | SWT.PASSWORD);
+            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_txtAccessToken_Value);
          }
          {
             _labelRefreshToken = new Label(_groupCloudAccount, SWT.NONE);
             _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
-            _labelRefreshToken_Value = new Label(_groupCloudAccount, SWT.WRAP);
-            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
+            _txtRefreshToken_Value = new Text(_groupCloudAccount, SWT.READ_ONLY | SWT.PASSWORD);
+            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_txtRefreshToken_Value);
          }
          {
             _labelExpiresAt = new Label(_groupCloudAccount, SWT.NONE);
@@ -244,6 +246,14 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
             _labelExpiresAt_Value = new Label(_groupCloudAccount, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+         }
+         {
+            _chkShowHidePasswords = new Button(_groupCloudAccount, SWT.CHECK);
+            _chkShowHidePasswords.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords);
+            _chkShowHidePasswords.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip);
+            _chkShowHidePasswords.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHidePasswords
+                  .getSelection())));
+            GridDataFactory.fillDefaults().applyTo(_chkShowHidePasswords);
          }
       }
    }
@@ -296,12 +306,13 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    private void enableControls() {
 
-      final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText())
-            && StringUtils.hasContent(_labelRefreshToken_Value.getText());
+      final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText())
+            && StringUtils.hasContent(_txtRefreshToken_Value.getText());
 
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
+      _chkShowHidePasswords.setEnabled(isAuthorized);
       _labelDownloadFolder.setEnabled(isAuthorized);
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);
@@ -432,9 +443,9 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final String selectedPersonId = _prefStore.getDefaultString(Preferences.SUUNTO_SELECTED_PERSON_ID);
 
-      _labelAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+      _txtAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
-      _labelRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+      _txtRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
       _comboDownloadFolderPath.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
 
@@ -477,8 +488,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
          final String personId = getSelectedPersonId();
 
-         _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(personId), _labelAccessToken_Value.getText());
-         _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(personId), _labelRefreshToken_Value.getText());
+         _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(personId), _txtAccessToken_Value.getText());
+         _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(personId), _txtRefreshToken_Value.getText());
 
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
             _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), 0L);
@@ -519,11 +530,11 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    private void restoreAccountInformation(final String selectedPersonId) {
 
-      _labelAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+      _txtAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
             _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
             _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
-      _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+      _txtRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
       _comboDownloadFolderPath.setText(_prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
 
@@ -558,6 +569,15 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _dtFilterSince.setDate(suuntoFileDownloadSinceDate.getYear(),
             suuntoFileDownloadSinceDate.getMonthValue() - 1,
             suuntoFileDownloadSinceDate.getDayOfMonth());
+   }
+
+   private void showOrHideAllPasswords(final boolean showPasswords) {
+
+      final List<Text> texts = new ArrayList<>();
+      texts.add(_txtAccessToken_Value);
+      texts.add(_txtRefreshToken_Value);
+
+      Preferences.showOrHidePasswords(texts, showPasswords);
    }
 
 }

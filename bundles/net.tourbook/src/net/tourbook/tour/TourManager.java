@@ -3445,7 +3445,7 @@ public class TourManager {
       if (deviceTimeInterval > 0) {
 
          /*
-          * clipping for constanct time intervals
+          * clipping for constant time intervals
           */
 
          final int slices = Math.max(1, clippingTime / deviceTimeInterval);
@@ -4607,7 +4607,7 @@ public class TourManager {
             final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
 
             /**
-             * Syncronize 2 time series which can contain gaps
+             * Synchronize 2 time series which can contain gaps
              *
              * <pre>
              *

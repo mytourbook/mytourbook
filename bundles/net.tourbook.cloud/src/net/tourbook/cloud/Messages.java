@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,8 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_InvalidTokens;
 
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
+   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords;
+   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip;
    public static String        PrefPage_CloudConnectivity_Group_CloudAccount;
    public static String        PrefPage_CloudConnectivity_Group_TourDownload;
    public static String        PrefPage_CloudConnectivity_Group_TourUpload;
@@ -49,6 +51,30 @@ public class Messages extends NLS {
    public static String Dialog_DropboxBrowser_Title;
    public static String PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip;
    public static String PrefPage_CloudConnectivity_Dropbox_WebPage_Link;
+
+   //STRAVA
+   public static String Dialog_UploadToursToStrava_Message;
+   public static String Dialog_UploadToursToStrava_SubTask;
+   public static String Dialog_UploadToursToStrava_Task;
+   public static String Dialog_UploadToursToStrava_Title;
+   public static String Dialog_UseTourTypeMappingModified_Title;
+   public static String Dialog_UseTourTypeMappingActivated_Message;
+   public static String Dialog_UseTourTypeMappingDeactivated_Message;
+   public static String Log_UploadToursToStrava_001_Start;
+   public static String Log_UploadToursToStrava_002_NoTourTitle;
+   public static String Log_UploadToursToStrava_003_ActivityLink;
+   public static String Log_UploadToursToStrava_003_UploadStatus;
+   public static String Log_UploadToursToStrava_004_UploadError;
+   public static String Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes;
+   public static String PrefPage_AccountInformation_Label_AthleteName;
+   public static String PrefPage_AccountInformation_Label_AthleteWebPage;
+   public static String PrefPage_AccountInformation_Link_Strava_WebPage;
+   public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
+   public static String PrefPage_UploadConfiguration_Button_AddWeatherIconInTitle;
+   public static String PrefPage_UploadConfiguration_Button_SendDescription;
+   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping;
+   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip;
+   public static String VendorName_Strava;
 
    //SUUNTO
    public static String Dialog_DownloadWorkoutsFromSuunto_Message;
@@ -79,29 +105,6 @@ public class Messages extends NLS {
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
    public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
-
-   //STRAVA
-   public static String Dialog_UploadToursToStrava_Message;
-   public static String Dialog_UploadToursToStrava_SubTask;
-   public static String Dialog_UploadToursToStrava_Task;
-   public static String Dialog_UploadToursToStrava_Title;
-   public static String Dialog_UseTourTypeMappingModified_Title;
-   public static String Dialog_UseTourTypeMappingActivated_Message;
-   public static String Dialog_UseTourTypeMappingDeactivated_Message;
-   public static String Log_UploadToursToStrava_001_Start;
-   public static String Log_UploadToursToStrava_002_NoTourTitle;
-   public static String Log_UploadToursToStrava_003_ActivityLink;
-   public static String Log_UploadToursToStrava_003_UploadStatus;
-   public static String Log_UploadToursToStrava_004_UploadError;
-   public static String Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes;
-   public static String PrefPage_AccountInformation_Label_AthleteName;
-   public static String PrefPage_AccountInformation_Label_AthleteWebPage;
-   public static String PrefPage_AccountInformation_Link_Strava_WebPage;
-   public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
-   public static String PrefPage_UploadConfiguration_Button_SendDescription;
-   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping;
-   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip;
-   public static String VendorName_Strava;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
