@@ -6614,7 +6614,6 @@ public class Map2 extends Canvas {
    }
 
    /**
-<<<<<<< HEAD
     * Set cursor only when needed, to optimize performance
     *
     * @param cursor
@@ -6631,8 +6630,6 @@ public class Map2 extends Canvas {
    }
 
    /**
-=======
->>>>>>> refs/heads/main
     * Set map dimming level for the current map factory, this will dim the map images
     *
     * @param mapDimLevel
