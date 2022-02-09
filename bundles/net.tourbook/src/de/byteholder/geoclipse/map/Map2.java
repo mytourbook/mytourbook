@@ -1162,6 +1162,15 @@ public class Map2 extends Canvas {
       _mp.disposeTiles();
    }
 
+   private void fireEvent_HoveredTour(final Long hoveredTourId, final int hoveredValuePointIndex) {
+
+      final MapHoveredTourEvent event = new MapHoveredTourEvent(hoveredTourId, hoveredValuePointIndex);
+
+      for (final Object listener : _allHoveredTourListeners.getListeners()) {
+         ((IHoveredTourListener) listener).setHoveredTourId(event);
+      }
+   }
+
    private void fireEvent_MapGrid(final boolean isGridSelected, final MapGridData mapGridData) {
 
       final Object[] listeners = _allMapGridListener.getListeners();
@@ -1345,6 +1354,7 @@ public class Map2 extends Canvas {
    /**
     * Find a more precise hovered position
     *
+    * @param hoveredTourId
     * @param devMouseTileY
     * @param devMouseTileX
     * @param devHoveredTileY
@@ -1354,15 +1364,14 @@ public class Map2 extends Canvas {
     * @param allPainted_HoveredSerieIndices
     * @return
     */
-   private int getHoveredValuePointIndex(final int devMouseTileX,
+   private int getHoveredValuePointIndex(final Long hoveredTourId,
+                                         final int devMouseTileX,
                                          final int devMouseTileY,
                                          final int devHoveredTileX,
                                          final int devHoveredTileY,
                                          final Rectangle[] allPainted_HoveredRectangle,
                                          final long[] allPainted_HoveredTourId,
                                          final int[] allPainted_HoveredSerieIndices) {
-
-      final long hoveredTourId = _allHoveredTourIds.get(0);
 
       /*
        * Get indices which are containing the hovered tour id
@@ -2504,6 +2513,8 @@ public class Map2 extends Canvas {
 
                hoveredValuePointIndex = getHoveredValuePointIndex(
 
+                     _allHoveredTourIds.get(0),
+
                      devMouseTileX,
                      devMouseTileY,
 
@@ -2522,11 +2533,7 @@ public class Map2 extends Canvas {
                hoveredValuePointIndex = _allHoveredSerieIndices.get(0);
             }
 
-            final MapHoveredTourEvent event = new MapHoveredTourEvent(getHoveredTourId(), hoveredValuePointIndex);
-
-            for (final Object listener : _allHoveredTourListeners.getListeners()) {
-               ((IHoveredTourListener) listener).setHoveredTourId(event);
-            }
+            fireEvent_HoveredTour(getHoveredTourId(), hoveredValuePointIndex);
          }
       }
 

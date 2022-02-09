@@ -515,7 +515,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireBarSelectionEvent(final int serieIndex, final int valueIndex) {
+   void fireEvent_BarSelection(final int serieIndex, final int valueIndex) {
 
       _barSelectionSerieIndex = serieIndex;
       _barSelectionValueIndex = valueIndex;
@@ -527,7 +527,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireChartDoubleClick(final int serieIndex, final int valueIndex) {
+   void fireEvent_ChartDoubleClick(final int serieIndex, final int valueIndex) {
 
       _barSelectionSerieIndex = serieIndex;
       _barSelectionValueIndex = valueIndex;
@@ -539,7 +539,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireChartMouseEvent(final ChartMouseEvent mouseEvent) {
+   private void fireEvent_ChartMouse(final ChartMouseEvent mouseEvent) {
 
       final Object[] listeners = _chartMouseListener.getListeners();
       for (final Object listener : listeners) {
@@ -579,7 +579,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireChartMouseMoveEvent(final ChartMouseEvent mouseEvent) {
+   private void fireEvent_ChartMouseMove(final ChartMouseEvent mouseEvent) {
 
       final Object[] listeners = _chartMouseMoveListener.getListeners();
       for (final Object listener : listeners) {
@@ -592,7 +592,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireHoveredValueEvent(final int hoveredValuePointIndex) {
+   void fireEvent_HoveredValue(final int hoveredValuePointIndex) {
 
       final Object[] allListeners = _chartHoveredValueListener.getListeners();
 
@@ -601,7 +601,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireKeyEvent(final ChartKeyEvent keyEvent) {
+   private void fireEvent_Key(final ChartKeyEvent keyEvent) {
 
       final Object[] listeners = _chartKeyListener.getListeners();
       for (final Object listener : listeners) {
@@ -621,7 +621,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   public void fireSliderMoveEvent() {
+   public void fireEvent_SliderMove() {
 
       if (_isInUpdateUI) {
          return;
@@ -881,7 +881,7 @@ public class Chart extends ViewForm {
 
    void onExternalChartResize() {
 
-      fireChartMouseEvent(
+      fireEvent_ChartMouse(
             new ChartMouseEvent(//
                   Chart.ChartResized,
                   System.currentTimeMillis(),
@@ -893,7 +893,7 @@ public class Chart extends ViewForm {
 
       final ChartKeyEvent keyEvent = new ChartKeyEvent(Chart.KeyDown, event.keyCode, event.stateMask);
 
-      fireKeyEvent(keyEvent);
+      fireEvent_Key(keyEvent);
 
       return keyEvent;
    }
@@ -906,7 +906,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -918,14 +918,14 @@ public class Chart extends ViewForm {
 
       final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDown, eventTime, devXMouse, devYMouse, stateMask);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
 
    void onExternalMouseExit(final long eventTime) {
 
-      fireChartMouseEvent(new ChartMouseEvent(Chart.MouseExit, eventTime, 0, 0));
+      fireEvent_ChartMouse(new ChartMouseEvent(Chart.MouseExit, eventTime, 0, 0));
    }
 
    ChartMouseEvent onExternalMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
@@ -936,7 +936,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -949,7 +949,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseMoveEvent(event);
+      fireEvent_ChartMouseMove(event);
 
       return event;
    }
@@ -962,7 +962,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -1198,7 +1198,7 @@ public class Chart extends ViewForm {
 
       _chartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
 
-      fireBarSelectionEvent(0, _barSelectionValueIndex);
+      fireEvent_BarSelection(0, _barSelectionValueIndex);
    }
 
    public void setSelectedLines(final boolean isSelectionVisible) {
@@ -1427,7 +1427,7 @@ public class Chart extends ViewForm {
       }
 
       // update chart info view
-      fireSliderMoveEvent();
+      fireEvent_SliderMove();
    }
 
    /**

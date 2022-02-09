@@ -338,7 +338,8 @@ public class Map2View extends ViewPart implements
    //
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider    = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
-   private final TourWeatherToolTipProvider  _tourWeatherToolTipProvider = new TourWeatherToolTipProvider(TOUR_WEATHER_TOOLTIP_X,
+   private final TourWeatherToolTipProvider  _tourWeatherToolTipProvider = new TourWeatherToolTipProvider(
+         TOUR_WEATHER_TOOLTIP_X,
          TOUR_WEATHER_TOOLTIP_Y);
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
    private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter();
@@ -1183,7 +1184,7 @@ public class Map2View extends ViewPart implements
 
                if (_selectionWhenHidden != null) {
 
-                  onSelectionChanged(_selectionWhenHidden);
+                  onSelection(_selectionWhenHidden);
 
                   _selectionWhenHidden = null;
                }
@@ -1320,7 +1321,7 @@ public class Map2View extends ViewPart implements
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = (part, selection) -> onSelectionChanged(selection);
+      _postSelectionListener = (part, selection) -> onSelection(selection);
 
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
@@ -1355,20 +1356,20 @@ public class Map2View extends ViewPart implements
 
             if (eventData instanceof SelectionTourMarker) {
 
-               onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
+               onSelection_TourMarker((SelectionTourMarker) eventData, false);
             }
 
          } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
 
-            onSelectionChanged_TourPause((SelectionTourPause) eventData, false);
+            onSelection_TourPause((SelectionTourPause) eventData, false);
 
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelection((ISelection) eventData);
 
          } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelection((ISelection) eventData);
 
          } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
@@ -2548,8 +2549,10 @@ public class Map2View extends ViewPart implements
 
       if (_actionShowValuePoint.isChecked()) {
 
-         //  hide external value point
-
+         /*
+          * Hide external value point, it can be irritating when the hovered value and the external
+          * value point are displayed at the same time
+          */
          _externalValuePointIndex = -1;
 
          // repaint map
@@ -2616,7 +2619,7 @@ public class Map2View extends ViewPart implements
 
       _map.getDisplay().asyncExec(() -> {
 
-         onSelectionChanged(selection);
+         onSelection(selection);
       });
 
       TourManager.fireEventWithCustomData(
@@ -2777,26 +2780,10 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
-
-      final Long tourId = hoveredValueData.tourId;
-      final TourData tourData = TourManager.getTour(tourId);
-
-      if (tourData == null) {
-         return;
-      }
-
-      _externalValuePointIndex = hoveredValueData.hoveredValuePointIndex;
-
-      paintToursAndPhotos(tourData, null);
-
-      updateUI_HoveredValuePoint();
-   }
-
    /**
     * @param selection
     */
-   private void onSelectionChanged(final ISelection selection) {
+   private void onSelection(final ISelection selection) {
 
       if (_isPartVisible == false) {
 
@@ -2980,7 +2967,7 @@ public class Map2View extends ViewPart implements
 
          final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
 
-         onSelectionChanged_TourMarker(markerSelection, true);
+         onSelection_TourMarker(markerSelection, true);
 
       } else if (selection instanceof SelectionMapPosition) {
 
@@ -3144,7 +3131,19 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection, final boolean isDrawSlider) {
+   private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
+
+      final Long tourId = hoveredValueData.tourId;
+
+
+      _externalValuePointIndex = hoveredValueData.hoveredTourSerieIndex;
+
+//      paintToursAndPhotos(tourData, null);
+
+      updateUI_HoveredValuePoint();
+   }
+
+   private void onSelection_TourMarker(final SelectionTourMarker markerSelection, final boolean isDrawSlider) {
 
       final TourData tourData = markerSelection.getTourData();
 
@@ -3203,7 +3202,7 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private void onSelectionChanged_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
+   private void onSelection_TourPause(final SelectionTourPause pauseSelection, final boolean isDrawSlider) {
 
       final TourData tourData = pauseSelection.getTourData();
 
@@ -3689,11 +3688,11 @@ public class Map2View extends ViewPart implements
 
          if (data instanceof TourPhotoLinkSelection) {
 
-            onSelectionChanged((TourPhotoLinkSelection) data);
+            onSelection((TourPhotoLinkSelection) data);
 
          } else if (data instanceof PhotoSelection) {
 
-            onSelectionChanged((PhotoSelection) data);
+            onSelection((PhotoSelection) data);
          }
 
       } else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
@@ -4751,7 +4750,7 @@ public class Map2View extends ViewPart implements
           * <p>
           * When multiple tours are selected in the tourbook view, _allTourData contains multiple
           * tours. However when tour chart is selected and it contains multiple tours, then one
-          * TourData with isMultipleTour is displayed in the map ->complicated
+          * TourData with isMultipleTour is displayed in the map -> complicated
           */
 
          int adjustedValuePointIndex = _externalValuePointIndex;

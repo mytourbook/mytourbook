@@ -548,7 +548,7 @@ public class ChartComponentGraph extends Canvas {
 
       setSelectedBars(selectedBarItems);
 
-      _chart.fireBarSelectionEvent(_hoveredBarSerieIndex, _hoveredBarValueIndex);
+      _chart.fireEvent_BarSelection(_hoveredBarSerieIndex, _hoveredBarValueIndex);
    }
 
    /**
@@ -7473,7 +7473,7 @@ public class ChartComponentGraph extends Canvas {
           * execute the action which is defined when a bar is selected with the left mouse button
           */
 
-         _chart.fireChartDoubleClick(_hoveredBarSerieIndex, _hoveredBarValueIndex);
+         _chart.fireEvent_ChartDoubleClick(_hoveredBarSerieIndex, _hoveredBarValueIndex);
 
       } else {
 
@@ -8029,7 +8029,7 @@ public class ChartComponentGraph extends Canvas {
 
       // fire event for the current hovered value point
       if (_hoveredValuePointIndex != -1) {
-         _chart.fireHoveredValueEvent(_hoveredValuePointIndex);
+         _chart.fireEvent_HoveredValue(_hoveredValuePointIndex);
       }
 
       // update value point tooltip

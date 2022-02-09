@@ -22,12 +22,18 @@ public class HoveredValueData {
    private static final char NL = UI.NEW_LINE;
 
    public Long               tourId;
-   public int                hoveredValuePointIndex;
+   public int                hoveredTourSerieIndex;
 
-   public HoveredValueData(final Long tourId, final int hoveredValuePointIndex) {
+   /**
+    * @param tourId
+    *           Id for a single real tour and not for a multiple tour
+    * @param hoveredTourSerieIndex
+    *           Index into the tour data series
+    */
+   public HoveredValueData(final Long tourId, final int hoveredTourSerieIndex) {
 
       this.tourId = tourId;
-      this.hoveredValuePointIndex = hoveredValuePointIndex;
+      this.hoveredTourSerieIndex = hoveredTourSerieIndex;
    }
 
    @Override
@@ -37,8 +43,8 @@ public class HoveredValueData {
 
             + "[" + NL//$NON-NLS-1$
 
-            + "hoveredValuePointIndex  =" + hoveredValuePointIndex + NL //$NON-NLS-1$
-            + "tourId                  =" + tourId + NL//$NON-NLS-1$
+            + "tourId                  = " + tourId + NL//$NON-NLS-1$
+            + "hoveredTourSerieIndex   = " + hoveredTourSerieIndex + NL //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

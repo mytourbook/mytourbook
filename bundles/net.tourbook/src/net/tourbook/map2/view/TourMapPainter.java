@@ -1126,7 +1126,7 @@ public class TourMapPainter extends Map2Painter {
          tourSerieIndex = multipleStartTimeIndex[tourIndex];
          numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
 
-         final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
+         final ArrayList<TourMarker> allTourMarkers = tourData.multipleTourMarkers;
 
          // draw tour marker
 
@@ -1245,7 +1245,7 @@ public class TourMapPainter extends Map2Painter {
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final List<List<Long>> allTourPauses = tourData.multiTourPauses;
+         final List<List<Long>> allTourPauses = tourData.multipleTourPauses;
          int currentTourPauseIndex = 0;
          int pauseCounter = 0;
          final int[] timeSerie = tourData.timeSerie;

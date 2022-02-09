@@ -507,7 +507,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             Util.showView(GeoCompareView.ID, false);
 
             // start comparing with the current position
-            fireSliderMoveEvent();
+            fireEvent_SliderMove();
          }
       }
    }
@@ -1851,7 +1851,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          tourSerieIndex = multipleStartTimeIndex[tourIndex];
          numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
 
-         final ArrayList<TourMarker> allTourMarkers = _tourData.multiTourMarkers;
+         final ArrayList<TourMarker> allTourMarkers = _tourData.multipleTourMarkers;
 
          for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
 
@@ -2092,9 +2092,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    private void createLayer_NightSections_ChartLabel(final ChartNightConfig chartNightConfig,
-                                               final double[] xAxisSerie,
-                                               final int xAxisSerieIndex,
-                                               final int xAxisEndSerieIndex) {
+                                                     final double[] xAxisSerie,
+                                                     final int xAxisSerieIndex,
+                                                     final int xAxisEndSerieIndex) {
 
       final ChartLabelNightSection chartLabelNight = new ChartLabelNightSection();
 
@@ -2174,7 +2174,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final List<List<Long>> allTourPauses = _tourData.multiTourPauses;
+         final List<List<Long>> allTourPauses = _tourData.multipleTourPauses;
          int currentTourPauseIndex = 0;
 
          for (int tourIndex = 0; tourIndex < numTours; ++tourIndex) {
@@ -2347,13 +2347,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    private ChartLabelPause createLayer_Pauses_ChartLabel(final long pausedTime_Start,
-                                                        final long pausedTime_End,
-                                                        final boolean isAutoPause,
-                                                        final String timeZoneId,
-                                                        final double[] xAxisSerie,
-                                                        final int xAxisSerieIndex,
-                                                        final int pauseIndex,
-                                                        final LabelAlignment labelAlignment) {
+                                                         final long pausedTime_End,
+                                                         final boolean isAutoPause,
+                                                         final String timeZoneId,
+                                                         final double[] xAxisSerie,
+                                                         final int xAxisSerieIndex,
+                                                         final int pauseIndex,
+                                                         final LabelAlignment labelAlignment) {
 
       final ChartLabelPause chartLabelPause = new ChartLabelPause();
 
@@ -2711,7 +2711,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
           */
 
          // this will update the chart
-         fireTourMarkerModifyEvent(tourMarker, true);
+         fireEvent_TourMarkerModify(tourMarker, true);
 
       } else {
 
@@ -2726,7 +2726,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             Assert.isTrue(isRemoved);
 
             // tour will be saved and the chart will also be updated
-            fireTourModifyEvent_Globally();
+            fireEvent_TourModify_Globally();
          }
       }
    }
@@ -3162,7 +3162,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param tourMarker
     * @param isTourMarkerDeleted
     */
-   private void fireTourMarkerModifyEvent(final TourMarker tourMarker, final boolean isTourMarkerDeleted) {
+   private void fireEvent_TourMarkerModify(final TourMarker tourMarker, final boolean isTourMarkerDeleted) {
 
       final Object[] listeners = _tourMarkerModifyListener.getListeners();
       for (final Object listener2 : listeners) {
@@ -3172,7 +3172,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private void fireTourMarkerSelection(final TourMarker tourMarker) {
+   private void fireEvent_TourMarkerSelection(final TourMarker tourMarker) {
 
       // update selection locally (e.g. in a dialog)
 
@@ -3181,14 +3181,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
 
-      Arrays.asList(_tourMarkerSelectionListener.getListeners()).forEach(listener -> ((ITourMarkerSelectionListener) listener).selectionChanged(
-            tourMarkerSelection));
+      Arrays.asList(_tourMarkerSelectionListener.getListeners())
+            .forEach(listener -> ((ITourMarkerSelectionListener) listener).selectionChanged(tourMarkerSelection));
 
       if (_isDisplayedInDialog) {
          return;
       }
 
-      TourManager.fireEventWithCustomData(//
+      TourManager.fireEventWithCustomData(
             TourEventId.MARKER_SELECTION,
             tourMarkerSelection,
             _part);
@@ -3197,7 +3197,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    /**
     * Fires an event when a tour is modified.
     */
-   private void fireTourModifyEvent_Globally() {
+   private void fireEvent_TourModify_Globally() {
 
       final Object[] listeners = _tourModifyListener.getListeners();
       for (final Object listener2 : listeners) {
@@ -3207,7 +3207,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private void fireTourPauseSelection(final ChartLabelPause tourPause) {
+   private void fireEvent_TourPauseSelection(final ChartLabelPause tourPause) {
 
       // update selection locally (e.g. in a dialog)
       final SelectionTourPause tourPauseSelection = new SelectionTourPause(
@@ -3688,7 +3688,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          _selectedTourMarker = tourMarker;
 
-         fireTourMarkerSelection(tourMarker);
+         fireEvent_TourMarkerSelection(tourMarker);
 
          _firedTourMarker = tourMarker;
 
@@ -3776,7 +3776,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          if (_firedTourMarker == null || _firedTourMarker != hoveredTourMarker) {
 
             // select the tour marker when the context menu is opened
-            fireTourMarkerSelection(hoveredTourMarker);
+            fireEvent_TourMarkerSelection(hoveredTourMarker);
          }
          _firedTourMarker = null;
       }
@@ -3801,7 +3801,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // notify the chart mouse listener that no other actions should be done
       mouseEvent.isWorked = true;
 
-      fireTourPauseSelection(tourPause);
+      fireEvent_TourPauseSelection(tourPause);
 
       // redraw chart
       setChartOverlayDirty();
@@ -4821,8 +4821,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          _customBackgroundPainter = null;
       }
    }
-
-
 
    /**
     * When a tour chart is opened in a dialog, some actions should not be done.
@@ -5967,12 +5965,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       if (_isDisplayedInDialog) {
 
          // this will update the chart
-         fireTourMarkerModifyEvent(tourMarker, false);
+         fireEvent_TourMarkerModify(tourMarker, false);
 
       } else {
 
          // tour will be saved and the chart is also updated
-         fireTourModifyEvent_Globally();
+         fireEvent_TourModify_Globally();
       }
    }
 
