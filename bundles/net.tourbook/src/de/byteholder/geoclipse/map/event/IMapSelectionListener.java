@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,15 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
-public interface IHoveredTourListener {
+import org.eclipse.jface.viewers.ISelection;
 
-   public void setHoveredTourId(MapHoveredTourEvent event);
+public interface IMapSelectionListener {
+
+   /**
+    * Is called when something is selected in the map
+    *
+    * @param selection
+    */
+   public void onMapSelection(ISelection selection);
+
 }

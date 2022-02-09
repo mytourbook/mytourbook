@@ -238,7 +238,7 @@ public class ChartXSlider {
 
       // fire change event when the position has changed
       if (isFireEvent && (long) xxDevLinePos != xxDevOldPos) {
-         _chartGraph._chart.fireSliderMoveEvent();
+         _chartGraph._chart.fireEvent_SliderMove();
       }
    }
 

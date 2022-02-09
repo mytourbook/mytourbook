@@ -15,7 +15,17 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map.event;
 
-public interface IHoveredTourListener {
+import net.tourbook.common.map.GeoPosition;
 
-   public void setHoveredTourId(MapHoveredTourEvent event);
+public class MapGeoPositionEvent {
+
+   public GeoPosition mapGeoPosition;
+   public int         mapZoomLevel;
+
+   public MapGeoPositionEvent(final GeoPosition mousePosition, final int zoomLevel) {
+
+      mapGeoPosition = mousePosition;
+      mapZoomLevel = zoomLevel;
+   }
+
 }

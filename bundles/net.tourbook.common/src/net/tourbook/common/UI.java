@@ -627,13 +627,15 @@ public class UI {
 
    public static Color           SYS_COLOR_BLACK;
    public static Color           SYS_COLOR_BLUE;
-   public static Color           SYS_COLOR_DARK_GRAY;
    public static Color           SYS_COLOR_GRAY;
    public static Color           SYS_COLOR_GREEN;
    public static Color           SYS_COLOR_MAGENTA;
    public static Color           SYS_COLOR_RED;
    public static Color           SYS_COLOR_WHITE;
    public static Color           SYS_COLOR_YELLOW;
+
+   public static Color           SYS_COLOR_DARK_GRAY;
+   public static Color           SYS_COLOR_DARK_GREEN;
 
 // SET_FORMATTING_ON
 
@@ -676,13 +678,15 @@ public class UI {
 
       SYS_COLOR_BLACK       = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
       SYS_COLOR_BLUE        = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-      SYS_COLOR_DARK_GRAY   = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
       SYS_COLOR_GRAY        = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
       SYS_COLOR_GREEN       = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
       SYS_COLOR_MAGENTA     = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
       SYS_COLOR_RED         = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
       SYS_COLOR_WHITE       = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
       SYS_COLOR_YELLOW      = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
+
+      SYS_COLOR_DARK_GRAY   = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+      SYS_COLOR_DARK_GREEN  = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
 
 // SET_FORMATTING_ON
 

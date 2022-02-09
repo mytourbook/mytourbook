@@ -839,40 +839,44 @@ public class TourManager {
       final float[] cadenceSerieData = new float[numTimeSlices];
       joinedTourData.setCadenceSerie(cadenceSerieData);
 
-      final int[] toTimeSerie = joinedTourData.timeSerie = new int[numTimeSlices];
-      final float[] toAltitudeSerie = joinedTourData.altitudeSerie = new float[numTimeSlices];
-      final float[] toCadenceSerie = cadenceSerieData;
-      final float[] toDistanceSerie = joinedTourData.distanceSerie = new float[numTimeSlices];
-      final long[] toGearSerie = joinedTourData.gearSerie = new long[numTimeSlices];
-      final double[] toLatitudeSerie = joinedTourData.latitudeSerie = new double[numTimeSlices];
-      final double[] toLongitudeSerie = joinedTourData.longitudeSerie = new double[numTimeSlices];
-      final float[] toPowerSerie = new float[numTimeSlices];
-      final float[] toPulseSerie = joinedTourData.pulseSerie = new float[numTimeSlices];
-      final float[] toPulseSerie_FromTime = joinedTourData.pulseSerie_FromTime = new float[numTimeSlices];
-      final float[] toTemperaturSerie = joinedTourData.temperatureSerie = new float[numTimeSlices];
+// SET_FORMATTING_OFF
 
-      final short[] toRunDyn_StanceTime = joinedTourData.runDyn_StanceTime = new short[numTimeSlices];
-      final short[] toRunDyn_StanceTimeBalance = joinedTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
-      final short[] toRunDyn_StepLength = joinedTourData.runDyn_StepLength = new short[numTimeSlices];
-      final short[] toRunDyn_VertOscillation = joinedTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
-      final short[] toRunDyn_VertRatio = joinedTourData.runDyn_VerticalRatio = new short[numTimeSlices];
+      final int[] toTimeSerie                   = joinedTourData.timeSerie                         = new int[numTimeSlices];
+      final float[] toAltitudeSerie             = joinedTourData.altitudeSerie                     = new float[numTimeSlices];
+      final float[] toCadenceSerie              = cadenceSerieData;
+      final float[] toDistanceSerie             = joinedTourData.distanceSerie                     = new float[numTimeSlices];
+      final long[] toGearSerie                  = joinedTourData.gearSerie                         = new long[numTimeSlices];
+      final double[] toLatitudeSerie            = joinedTourData.latitudeSerie                     = new double[numTimeSlices];
+      final double[] toLongitudeSerie           = joinedTourData.longitudeSerie                    = new double[numTimeSlices];
+      final float[] toPowerSerie                = new float[numTimeSlices];
+      final float[] toPulseSerie                = joinedTourData.pulseSerie                        = new float[numTimeSlices];
+      final float[] toPulseSerie_FromTime       = joinedTourData.pulseSerie_FromTime               = new float[numTimeSlices];
+      final float[] toTemperaturSerie           = joinedTourData.temperatureSerie                  = new float[numTimeSlices];
 
-      final short[] toswim_LengthType = joinedTourData.swim_LengthType = new short[numSwimTimeSlices];
-      final short[] toSwim_Cadence = joinedTourData.swim_Cadence = new short[numSwimTimeSlices];
-      final short[] toSwim_Strokes = joinedTourData.swim_Strokes = new short[numSwimTimeSlices];
-      final short[] toSwim_StrokeStyle = joinedTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
-      final int[] toSwim_Time = joinedTourData.swim_Time = new int[numSwimTimeSlices];
+      final short[] toRunDyn_StanceTime         = joinedTourData.runDyn_StanceTime                 = new short[numTimeSlices];
+      final short[] toRunDyn_StanceTimeBalance  = joinedTourData.runDyn_StanceTimeBalance          = new short[numTimeSlices];
+      final short[] toRunDyn_StepLength         = joinedTourData.runDyn_StepLength                 = new short[numTimeSlices];
+      final short[] toRunDyn_VertOscillation    = joinedTourData.runDyn_VerticalOscillation        = new short[numTimeSlices];
+      final short[] toRunDyn_VertRatio          = joinedTourData.runDyn_VerticalRatio              = new short[numTimeSlices];
 
-      final Long[] allTourIds = joinedTourData.multipleTourIds = new Long[numTours];
-      final float[] allTours_CadenceMultiplier = joinedTourData.multipleTours_CadenceMultiplier = new float[numTours];
-      final int[] allStartIndex = joinedTourData.multipleTourStartIndex = new int[numTours];
-      final ZonedDateTime[] allStartTime = joinedTourData.multipleTourZonedStartTime = new ZonedDateTime[numTours];
-      final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
-      final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
-      final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
-      final List<List<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
-      final int[] allTourPausesNumbers = joinedTourData.multipleNumberOfPauses = new int[numTours];
-      final int[] allSwimStartIndex = joinedTourData.multipleSwimStartIndex = new int[numTours];
+      final short[] toswim_LengthType           = joinedTourData.swim_LengthType                   = new short[numSwimTimeSlices];
+      final short[] toSwim_Cadence              = joinedTourData.swim_Cadence                      = new short[numSwimTimeSlices];
+      final short[] toSwim_Strokes              = joinedTourData.swim_Strokes                      = new short[numSwimTimeSlices];
+      final short[] toSwim_StrokeStyle          = joinedTourData.swim_StrokeStyle                  = new short[numSwimTimeSlices];
+      final int[] toSwim_Time                   = joinedTourData.swim_Time                         = new int[numSwimTimeSlices];
+
+      final Long[] allTourIds                   = joinedTourData.multipleTourIds                   = new Long[numTours];
+      final float[] allTours_CadenceMultiplier  = joinedTourData.multipleTours_CadenceMultiplier   = new float[numTours];
+      final int[] allStartIndex                 = joinedTourData.multipleTourStartIndex            = new int[numTours];
+      final ZonedDateTime[] allStartTime        = joinedTourData.multipleTourZonedStartTime        = new ZonedDateTime[numTours];
+      final ArrayList<TourMarker> allTourMarker = joinedTourData.multipleTourMarkers               = new ArrayList<>();
+      final List<List<Long>> allTourPauses      = joinedTourData.multipleTourPauses                = new ArrayList<>();
+      final String[] allTourTitle               = joinedTourData.multipleTourTitles                = new String[numTours];
+      final int[] allTourMarkerNumbers          = joinedTourData.multipleNumberOfMarkers           = new int[numTours];
+      final int[] allTourPausesNumbers          = joinedTourData.multipleNumberOfPauses            = new int[numTours];
+      final int[] allSwimStartIndex             = joinedTourData.multipleSwimStartIndex            = new int[numTours];
+
+// SET_FORMATTING_ON
 
       final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
 
@@ -3095,7 +3099,7 @@ public class TourManager {
       tourSerieIndex = multipleStartTimeIndex[tourIndex];
       numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
 
-      final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
+      final ArrayList<TourMarker> allTourMarkers = tourData.multipleTourMarkers;
 
       for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
 

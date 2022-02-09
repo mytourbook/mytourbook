@@ -231,7 +231,7 @@ public class ChartComponentGraph extends Canvas {
    private boolean                     _isXSliderAreaVisible;
 
    /*
-    * chart slider
+    * Left/right chart sliders
     */
    private final ChartXSlider         _xSliderA;
    private final ChartXSlider         _xSliderB;
@@ -548,7 +548,7 @@ public class ChartComponentGraph extends Canvas {
 
       setSelectedBars(selectedBarItems);
 
-      _chart.fireBarSelectionEvent(_hoveredBarSerieIndex, _hoveredBarValueIndex);
+      _chart.fireEvent_BarSelection(_hoveredBarSerieIndex, _hoveredBarValueIndex);
    }
 
    /**
@@ -3015,7 +3015,7 @@ public class ChartComponentGraph extends Canvas {
             // add the right part of the rectangle width into the previous rectangle
             prevLineRect.width += devXDiffWidth + 1;
 
-            // check if hovered line is hit, this check is an inline for .contains(...)
+            // check if hovered line is hit
             if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
                _hoveredValuePointIndex = prevValueIndex;
                isSetHoveredIndex = true;
@@ -7473,7 +7473,7 @@ public class ChartComponentGraph extends Canvas {
           * execute the action which is defined when a bar is selected with the left mouse button
           */
 
-         _chart.fireChartDoubleClick(_hoveredBarSerieIndex, _hoveredBarValueIndex);
+         _chart.fireEvent_ChartDoubleClick(_hoveredBarSerieIndex, _hoveredBarValueIndex);
 
       } else {
 
@@ -8029,9 +8029,10 @@ public class ChartComponentGraph extends Canvas {
 
       // fire event for the current hovered value point
       if (_hoveredValuePointIndex != -1) {
-         _chart.fireHoveredValueEvent(_hoveredValuePointIndex);
+         _chart.fireEvent_HoveredValue(_hoveredValuePointIndex);
       }
 
+      // update value point tooltip
       final IHoveredValueTooltipListener hoveredValueTooltipListener = _chart.getHoveredValueTooltipListener();
       if (_isHoveredLineVisible || hoveredValueTooltipListener != null) {
 
@@ -9242,6 +9243,65 @@ public class ChartComponentGraph extends Canvas {
       _xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true, false);
    }
 
+   void setHovered_ValuePoint_Index(final int newHoveredValuePointIndex) {
+
+      if (_lineDevPositions.size() == 0
+
+            // this can happen when multiple tours are selected in the map
+            // but only one tour is displayed in the chart
+            // -> needs a fix but is not simple
+            || newHoveredValuePointIndex >= _lineDevPositions.get(0).length
+
+      ) {
+         return;
+      }
+
+      final PointLong[] lineDevPositions = _lineDevPositions.get(0);
+      PointLong lineDevPos = lineDevPositions[newHoveredValuePointIndex];
+
+      /*
+       * When points are skipped because of the same position then lineDevPos is null -> search for
+       * a near position
+       */
+      if (lineDevPos == null) {
+
+         int lineDevIndex = newHoveredValuePointIndex;
+
+         // check forward
+         while (lineDevIndex < lineDevPositions.length - 1) {
+
+            lineDevPos = lineDevPositions[++lineDevIndex];
+
+            if (lineDevPos != null) {
+               _hoveredValuePointIndex = lineDevIndex;
+               break;
+            }
+         }
+
+         if (lineDevPos == null) {
+
+            lineDevIndex = _hoveredValuePointIndex;
+
+            // check backward
+            while (lineDevIndex > 0) {
+
+               lineDevPos = lineDevPositions[--lineDevIndex];
+
+               if (lineDevPos != null) {
+                  _hoveredValuePointIndex = lineDevIndex;
+                  break;
+               }
+            }
+         }
+
+      } else {
+
+         _hoveredValuePointIndex = newHoveredValuePointIndex;
+      }
+
+      redraw();
+   }
+
    /**
     * Check if mouse has moved over a line value and sets {@link #_hoveredValuePointIndex} to the
     * value index or <code>-1</code> when focus rectangle is not hit.
@@ -9291,6 +9351,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {
+
       _lineSelectionPainter = lineSelectionPainter;
    }
 

@@ -1566,7 +1566,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * it should.
     */
    @Transient
-   public ArrayList<TourMarker>   multiTourMarkers;
+   public ArrayList<TourMarker>   multipleTourMarkers;
 
    /**
     * Contains the number of tour pauses for each tour.
@@ -1578,7 +1578,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * List containing all the tour pauses used only for multiple tours.
     */
    @Transient
-   public List<List<Long>>    multiTourPauses;
+   public List<List<Long>>    multipleTourPauses;
 
 
    @Transient

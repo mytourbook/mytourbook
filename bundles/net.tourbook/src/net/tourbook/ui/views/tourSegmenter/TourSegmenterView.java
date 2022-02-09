@@ -1093,7 +1093,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Object[] markerSerie;
       if (tourData.isMultipleTours()) {
-         markerSerie = tourData.multiTourMarkers.toArray();
+         markerSerie = tourData.multipleTourMarkers.toArray();
       } else {
          markerSerie = tourData.getTourMarkers().toArray();
       }
@@ -1642,7 +1642,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final int numTimeSlices = timeSerie.length;
 
       final Collection<TourMarker> tourMarkers = isMultipleTours //
-            ? _tourData.multiTourMarkers
+            ? _tourData.multipleTourMarkers
             : _tourData.getTourMarkers();
 
       // sort markers by time - they can be unsorted
@@ -4104,7 +4104,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final int numTimeSlices = timeSerie.length;
 
       final Collection<TourMarker> tourMarkers = isMultipleTours //
-            ? _tourData.multiTourMarkers
+            ? _tourData.multipleTourMarkers
             : _tourData.getTourMarkers();
 
       // sort markers by time - they can be unsorted

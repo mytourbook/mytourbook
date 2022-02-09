@@ -2361,7 +2361,7 @@ public class ChartComponents extends Composite {
                    */
                   _lastKeyDownCounter[0] = __runnableKeyDownCounter;
 
-                  _chart.fireBarSelectionEvent(0, selectedIndex[0]);
+                  _chart.fireEvent_BarSelection(0, selectedIndex[0]);
                }
             }
          }));

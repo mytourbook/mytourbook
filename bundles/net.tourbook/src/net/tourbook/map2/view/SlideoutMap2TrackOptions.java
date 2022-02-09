@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,10 +59,10 @@ import org.eclipse.swt.widgets.ToolBar;
 public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String           MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
-
+   //
    private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
    private IDialogSettings               _state;
-
+   //
    private IPropertyChangeListener       _defaultChangePropertyListener;
    private MouseWheelListener            _defaultMouseWheelListener;
    private SelectionListener             _defaultSelectionListener;
@@ -72,23 +72,24 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private SelectionListener             _defaultMapOptions_SelectionListener;
    private MouseWheelListener            _defaultMapOptions_MouseWheelListener;
    private IPropertyChangeListener       _defaultMapOptions_ChangePropertyListener;
-
+   //
    private ActionResetToDefaults         _actionRestoreDefaults;
    private ActionOpenPrefDialog          _actionPrefDialog;
-
+   //
    private PixelConverter                _pc;
    private int                           _firstColumnIndent;
+   //
    private GridDataFactory               _firstColoumLayoutData;
    private GridDataFactory               _secondColoumLayoutData;
    private GridDataFactory               _spinnerLayoutData;
-
+   //
    private Map2View                      _map2View;
 
    /*
     * UI controls
     */
    private Composite             _parent;
-
+   //
    private Button                _chkPaintWithBorder;
    private Button                _chkShowBreadcrumbs;
    private Button                _chkShowEnhancedWarning;
@@ -97,7 +98,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private Button                _chkShowSlider_Path;
    private Button                _chkShowTourDirections;
    private Button                _chkTrackOpacity;
-
+   //
    private Button                _rdoBorderColorDarker;
    private Button                _rdoBorderColorColor;
    private Button                _rdoPainting_Simple;
@@ -105,7 +106,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private Button                _rdoSymbolLine;
    private Button                _rdoSymbolDot;
    private Button                _rdoSymbolSquare;
-
+   //
    private Label                 _lblBorder_Color;
    private Label                 _lblBorder_Width;
    private Label                 _lblBreadcrumbItems;
@@ -119,7 +120,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private Label                 _lblTourDirection_LineWidth;
    private Label                 _lblTourDirection_SymbolColor;
    private Label                 _lblTourDirection_SymbolSize;
-
+   //
    private Spinner               _spinnerBorder_ColorDarker;
    private Spinner               _spinnerBorder_Width;
    private Spinner               _spinnerBreadcrumbItems;
@@ -134,7 +135,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private Spinner               _spinnerTourDirection_LineWidth;
    private Spinner               _spinnerTourDirection_SymbolSize;
    private Spinner               _spinnerTrackOpacity;
-
+   //
    private ColorSelectorExtended _colorBorderColor;
    private ColorSelectorExtended _colorHoveredSelected_Hovered;
    private ColorSelectorExtended _colorHoveredSelected_Selected;
@@ -769,14 +770,17 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
 // SET_FORMATTING_OFF
 
-      final boolean isUseTrackOpacity = _chkTrackOpacity.getSelection();
-      final boolean isShowSliderPath = _chkShowSlider_Path.getSelection();
-      final boolean isPaintWithBorder = _chkPaintWithBorder.getSelection();
-      final boolean isEnhancedPaintingMode = _rdoPainting_Complex.getSelection();
+      final boolean isUseTrackOpacity              = _chkTrackOpacity.getSelection();
+      final boolean isShowSliderPath               = _chkShowSlider_Path.getSelection();
+      final boolean isPaintWithBorder              = _chkPaintWithBorder.getSelection();
+      final boolean isEnhancedPaintingMode         = _rdoPainting_Complex.getSelection();
 
-      final boolean isHoveredSelected = _chkShowHoveredSelectedTour.getSelection();
-      final boolean isShowTourDirection = _chkShowTourDirections.getSelection() && isHoveredSelected;
-      final boolean isShowBreadcrumbs = _chkShowBreadcrumbs.getSelection() && isHoveredSelected;
+      final boolean isHoveredSelected              = _chkShowHoveredSelectedTour.getSelection();
+      final boolean isShowTourDirection            = _chkShowTourDirections.getSelection() && isHoveredSelected;
+      final boolean isShowBreadcrumbs              = _chkShowBreadcrumbs.getSelection() && isHoveredSelected;
+
+      final boolean isBasicPaintingMode            = isEnhancedPaintingMode == false;
+      final boolean isHoveredSelectedAndBasicMode  = isHoveredSelected && isBasicPaintingMode;
 
       _spinnerTrackOpacity.setEnabled(isUseTrackOpacity);
 
@@ -802,31 +806,32 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _chkShowEnhancedWarning       .setEnabled(isEnhancedPaintingMode);
 
       // hovered + selected
-      _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelected);
-      _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelected);
-      _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelected);
-      _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelected);
-      _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelected);
-      _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelected);
-      _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelected);
-      _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelected);
-      _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelected);
+      _chkShowHoveredSelectedTour                        .setEnabled(isBasicPaintingMode);
+      _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelectedAndBasicMode);
+      _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelectedAndBasicMode);
+      _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelectedAndBasicMode);
+      _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelectedAndBasicMode);
+      _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelectedAndBasicMode);
+      _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelectedAndBasicMode);
+      _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelectedAndBasicMode);
+      _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelectedAndBasicMode);
+      _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelectedAndBasicMode);
 
       // breadcrumbs
-      _chkShowBreadcrumbs                       .setEnabled(isHoveredSelected);
-      _lblBreadcrumbItems                       .setEnabled(isShowBreadcrumbs);
-      _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs);
+      _chkShowBreadcrumbs                       .setEnabled(isHoveredSelectedAndBasicMode);
+      _lblBreadcrumbItems                       .setEnabled(isShowBreadcrumbs && isHoveredSelectedAndBasicMode);
+      _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs && isHoveredSelectedAndBasicMode);
 
       // tour direction
-      _chkShowTourDirections                    .setEnabled(isHoveredSelected);
-      _colorTourDirection_SymbolColor           .setEnabled(isShowTourDirection);
-      _lblTourDirection_DistanceBetweenMarkers  .setEnabled(isShowTourDirection);
-      _lblTourDirection_LineWidth               .setEnabled(isShowTourDirection);
-      _lblTourDirection_SymbolColor             .setEnabled(isShowTourDirection);
-      _lblTourDirection_SymbolSize              .setEnabled(isShowTourDirection);
-      _spinnerTourDirection_MarkerGap           .setEnabled(isShowTourDirection);
-      _spinnerTourDirection_LineWidth           .setEnabled(isShowTourDirection);
-      _spinnerTourDirection_SymbolSize          .setEnabled(isShowTourDirection);
+      _chkShowTourDirections                    .setEnabled(isHoveredSelectedAndBasicMode);
+      _colorTourDirection_SymbolColor           .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _lblTourDirection_DistanceBetweenMarkers  .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _lblTourDirection_LineWidth               .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _lblTourDirection_SymbolColor             .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _lblTourDirection_SymbolSize              .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _spinnerTourDirection_MarkerGap           .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _spinnerTourDirection_LineWidth           .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _spinnerTourDirection_SymbolSize          .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
 
 // SET_FORMATTING_ON
    }
@@ -1018,14 +1023,14 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _colorTourDirection_SymbolColor.setColorValue(  Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
 
       // slider location
-      _chkShowSlider_Location.setSelection(     Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT);
+      _chkShowSlider_Location.setSelection(           Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT);
 
       // slider path
-      _chkShowSlider_Path.setSelection(         Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
-      _spinnerSliderPath_Opacity.setSelection(  Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT);
-      _spinnerSliderPath_Segments.setSelection( Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT);
-      _spinnerSliderPath_LineWidth.setSelection(Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT);
-      _colorSliderPathColor.setColorValue(      Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT);
+      _chkShowSlider_Path.setSelection(               Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
+      _spinnerSliderPath_Opacity.setSelection(        Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT);
+      _spinnerSliderPath_Segments.setSelection(       Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT);
+      _spinnerSliderPath_LineWidth.setSelection(      Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT);
+      _colorSliderPathColor.setColorValue(            Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT);
 
       // track opacity
       _chkTrackOpacity.setSelection(            _prefStore.getDefaultBoolean( ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
@@ -1057,6 +1062,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
    private void restoreState() {
 
+
       // hovered/selected tour
       _chkShowHoveredSelectedTour.setSelection(                         Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
       _spinnerHoveredSelected_HoveredOpacity.setSelection(              Util.getStateInt(_state,      Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT));
@@ -1078,14 +1084,14 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _colorTourDirection_SymbolColor.setColorValue(  Util.getStateRGB(_state,      Map2View.STATE_TOUR_DIRECTION_RGB,           Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT));
 
       // slider location
-      _chkShowSlider_Location.setSelection(     Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_SLIDER_IN_MAP,  Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
+      _chkShowSlider_Location.setSelection(           Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_SLIDER_IN_MAP,  Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
 
       // slider path
-      _chkShowSlider_Path.setSelection(         Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_SLIDER_PATH,    Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT));
-      _spinnerSliderPath_Opacity.setSelection(  Util.getStateInt(_state,      Map2View.STATE_SLIDER_PATH_OPACITY,    Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT));
-      _spinnerSliderPath_Segments.setSelection( Util.getStateInt(_state,      Map2View.STATE_SLIDER_PATH_SEGMENTS,   Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT));
-      _spinnerSliderPath_LineWidth.setSelection(Util.getStateInt(_state,      Map2View.STATE_SLIDER_PATH_LINE_WIDTH, Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT));
-      _colorSliderPathColor.setColorValue(      Util.getStateRGB(_state,      Map2View.STATE_SLIDER_PATH_COLOR,      Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT));
+      _chkShowSlider_Path.setSelection(               Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_SLIDER_PATH,    Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT));
+      _spinnerSliderPath_Opacity.setSelection(        Util.getStateInt(_state,      Map2View.STATE_SLIDER_PATH_OPACITY,    Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT));
+      _spinnerSliderPath_Segments.setSelection(       Util.getStateInt(_state,      Map2View.STATE_SLIDER_PATH_SEGMENTS,   Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT));
+      _spinnerSliderPath_LineWidth.setSelection(      Util.getStateInt(_state,      Map2View.STATE_SLIDER_PATH_LINE_WIDTH, Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT));
+      _colorSliderPathColor.setColorValue(            Util.getStateRGB(_state,      Map2View.STATE_SLIDER_PATH_COLOR,      Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT));
 
       // track opacity
       _chkTrackOpacity.setSelection(            _prefStore.getBoolean(  ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
