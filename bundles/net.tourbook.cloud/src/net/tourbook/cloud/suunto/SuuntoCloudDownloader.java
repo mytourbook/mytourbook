@@ -261,12 +261,23 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return UI.EMPTY_STRING;
    }
 
-   private long getSuuntoWorkoutFilterSinceDate() {
+   private long getSuuntoWorkoutFilterEndDate() {
 
       if (_useActivePerson) {
-         return _prefStore.getLong(Preferences.getSuuntoWorkoutFilterSinceDate_Active_Person_String());
+         return _prefStore.getLong(Preferences.getSuuntoWorkoutFilterEndDate_Active_Person_String());
       } else if (_useAllPeople) {
-         return _prefStore.getLong(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(UI.EMPTY_STRING));
+         return _prefStore.getLong(Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(UI.EMPTY_STRING));
+      }
+
+      return 0;
+   }
+
+   private long getSuuntoWorkoutFilterStartDate() {
+
+      if (_useActivePerson) {
+         return _prefStore.getLong(Preferences.getSuuntoWorkoutFilterStartDate_Active_Person_String());
+      } else if (_useAllPeople) {
+         return _prefStore.getLong(Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(UI.EMPTY_STRING));
       }
 
       return 0;
@@ -329,9 +340,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private Workouts retrieveWorkoutsList() {
 
-      final var sinceDateFilter = getSuuntoWorkoutFilterSinceDate();
+      //todo fb we should only use the since date filter if the user has seleceted so. Bug ??
+      final long startDateFilter = getSuuntoWorkoutFilterStartDate();
+      final long endDateFilter = getSuuntoWorkoutFilterStartDate();
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=" + sinceDateFilter))//$NON-NLS-1$
+            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=" + startDateFilter + "&until=" + endDateFilter))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();

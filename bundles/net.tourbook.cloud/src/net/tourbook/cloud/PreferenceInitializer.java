@@ -29,6 +29,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
    //This is the date (01/26/2021) that Suunto forced the users to switch to Suunto App.
    public static final long SUUNTO_FILTER_SINCE_DATE = 1611619200000L;
+   // Tuesday, January 1, 2030 1:00:00 AM GMT
+   public static final long SUUNTO_FILTER_END_DATE   = 1893459600000L;
 
    @Override
    public void initializeDefaultPreferences() {
@@ -72,8 +74,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
          store.setDefault(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
          store.setDefault(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
          store.setDefault(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
-         store.setDefault(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
-         store.setDefault(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), SUUNTO_FILTER_SINCE_DATE);
+         store.setDefault(Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(tourPersonId), false);
+         store.setDefault(Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(tourPersonId), SUUNTO_FILTER_SINCE_DATE);
+         store.setDefault(Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(tourPersonId), false);
+         store.setDefault(Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(tourPersonId), SUUNTO_FILTER_END_DATE);
       }
    }
 }

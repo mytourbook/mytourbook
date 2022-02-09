@@ -89,10 +89,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    private Button   _btnCleanup;
    private Button   _btnSelectFolder;
    private Button   _chkShowHidePasswords;
-   private Button   _chkUseDateFilter;
+   private Button   _chkUseStartDateFilter;
+   private Button   _chkUseEndDateFilter;
    private Combo    _comboDownloadFolderPath;
    private Combo    _comboPeopleList;
-   private DateTime _dtFilterSince;
+   private DateTime _dtFilterStart;
+   private DateTime _dtFilterEnd;
    private Group    _groupCloudAccount;
    private Label    _labelAccessToken;
    private Label    _labelExpiresAt;
@@ -125,11 +127,20 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
             if (!event.getOldValue().equals(event.getNewValue())) {
 
-               _txtAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
-               _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
-                     _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-                     _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
-               _txtRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+               _txtAccessToken_Value.setText(
+                     _prefStore.getString(
+                           Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+
+               _labelExpiresAt_Value.setText(
+                     OAuth2Utils.computeAccessTokenExpirationDate(
+                           _prefStore.getLong(
+                                 Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
+                           _prefStore.getLong(
+                                 Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
+
+               _txtRefreshToken_Value.setText(
+                     _prefStore.getString(
+                           Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
                _groupCloudAccount.redraw();
 
@@ -288,19 +299,36 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
          {
             /*
-             * Checkbox: Use a "since" date filter
+             * Checkbox: Use a start (or "since") date filter
              */
-            _chkUseDateFilter = new Button(group, SWT.CHECK);
-            _chkUseDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter);
-            _chkUseDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseDateFilter);
-            _chkUseDateFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _dtFilterSince.setEnabled(_chkUseDateFilter
+            _chkUseStartDateFilter = new Button(group, SWT.CHECK);
+            _chkUseStartDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter);
+            _chkUseStartDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseStartDateFilter);
+            _chkUseStartDateFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _dtFilterStart.setEnabled(_chkUseStartDateFilter
                   .getSelection())));
 
-            _dtFilterSince = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-            _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterSince);
+            _dtFilterStart = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+            _dtFilterStart.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterStart);
          }
+
+         {
+            /*
+             * Checkbox: Use an end date filter
+             */
+            _chkUseEndDateFilter = new Button(group, SWT.CHECK);
+            _chkUseEndDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter);
+            _chkUseEndDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseEndDateFilter);
+            _chkUseEndDateFilter.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _dtFilterEnd.setEnabled(_chkUseEndDateFilter.getSelection())));
+
+            _dtFilterEnd = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+            _dtFilterEnd.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterEnd);
+         }
+
       }
    }
 
@@ -316,16 +344,17 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _labelDownloadFolder.setEnabled(isAuthorized);
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);
-      _chkUseDateFilter.setEnabled(isAuthorized);
-      _dtFilterSince.setEnabled(isAuthorized && _chkUseDateFilter.getSelection());
+      _chkUseStartDateFilter.setEnabled(isAuthorized);
+      _dtFilterStart.setEnabled(isAuthorized && _chkUseStartDateFilter.getSelection());
+      _dtFilterEnd.setEnabled(isAuthorized && _chkUseEndDateFilter.getSelection());
       _btnCleanup.setEnabled(isAuthorized);
    }
 
-   private long getFilterSinceDate() {
+   private long getFilterDate(final DateTime filterDate) {
 
-      final int year = _dtFilterSince.getYear();
-      final int month = _dtFilterSince.getMonth() + 1;
-      final int day = _dtFilterSince.getDay();
+      final int year = filterDate.getYear();
+      final int month = filterDate.getMonth() + 1;
+      final int day = filterDate.getDay();
       return ZonedDateTime.of(
             year,
             month,
@@ -335,6 +364,16 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             0,
             0,
             ZoneId.of("Etc/GMT")).toEpochSecond() * 1000; //$NON-NLS-1$
+   }
+
+   private long getFilterEndDate() {
+
+      return getFilterDate(_dtFilterEnd);
+   }
+
+   private long getFilterStartDate() {
+
+      return getFilterDate(_dtFilterStart);
    }
 
    private String getSelectedPersonId() {
@@ -439,18 +478,34 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    protected void performDefaults() {
 
       // Restore the default values for the "All People" UI
-      _comboPeopleList.select(_prefStore.getDefaultInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
+      _comboPeopleList.select(
+            _prefStore.getDefaultInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
 
-      final String selectedPersonId = _prefStore.getDefaultString(Preferences.SUUNTO_SELECTED_PERSON_ID);
+      final String selectedPersonId =
+            _prefStore.getDefaultString(Preferences.SUUNTO_SELECTED_PERSON_ID);
 
-      _txtAccessToken_Value.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+      _txtAccessToken_Value.setText(
+            _prefStore.getDefaultString(
+                  Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
-      _txtRefreshToken_Value.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+      _txtRefreshToken_Value.setText(
+            _prefStore.getDefaultString(
+                  Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
-      _comboDownloadFolderPath.setText(_prefStore.getDefaultString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
+      _comboDownloadFolderPath.setText(
+            _prefStore.getDefaultString(
+                  Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
 
-      _chkUseDateFilter.setSelection(_prefStore.getDefaultBoolean(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(selectedPersonId)));
-      setFilterSinceDate(_prefStore.getDefaultLong(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(selectedPersonId)));
+      _chkUseStartDateFilter.setSelection(
+            _prefStore.getDefaultBoolean(
+                  Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(selectedPersonId)));
+      setFilterSinceDate(_prefStore.getDefaultLong(
+            Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(selectedPersonId)));
+      _chkUseEndDateFilter.setSelection(
+            _prefStore.getDefaultBoolean(
+                  Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(selectedPersonId)));
+      setFilterEndDate(_prefStore.getDefaultLong(
+            Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(selectedPersonId)));
 
       enableControls();
 
@@ -465,16 +520,17 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             tourPerson -> tourPersonIds.add(
                   String.valueOf(tourPerson.getPersonId())));
 
-      for (final String tourPersonId : tourPersonIds) {
-
+      tourPersonIds.forEach(tourPersonId -> {
          _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
          _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
          _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
          _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
          _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
-         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(tourPersonId), false);
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_SINCE_DATE);
-      }
+         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(tourPersonId), false);
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_SINCE_DATE);
+         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(tourPersonId), false);
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_END_DATE);
+      });
 
       super.performDefaults();
    }
@@ -517,8 +573,10 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             }
          }
 
-         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(personId), _chkUseDateFilter.getSelection());
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(personId), getFilterSinceDate());
+         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(personId), _chkUseStartDateFilter.getSelection());
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(personId), getFilterStartDate());
+         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(personId), _chkUseEndDateFilter.getSelection());
+         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(personId), getFilterEndDate());
 
          final int selectedPersonIndex = _comboPeopleList.getSelectionIndex();
          _prefStore.setValue(Preferences.SUUNTO_SELECTED_PERSON_INDEX, selectedPersonIndex);
@@ -538,8 +596,18 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       _comboDownloadFolderPath.setText(_prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
 
-      _chkUseDateFilter.setSelection(_prefStore.getBoolean(Preferences.getPerson_SuuntoUseWorkoutFilterSinceDate_String(selectedPersonId)));
-      setFilterSinceDate(_prefStore.getLong(Preferences.getPerson_SuuntoWorkoutFilterSinceDate_String(selectedPersonId)));
+      _chkUseStartDateFilter.setSelection(
+            _prefStore.getBoolean(
+                  Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(selectedPersonId)));
+      setFilterSinceDate(
+            _prefStore.getLong(
+                  Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(selectedPersonId)));
+      _chkUseEndDateFilter.setSelection(
+            _prefStore.getBoolean(
+                  Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(selectedPersonId)));
+      setFilterEndDate(
+            _prefStore.getLong(
+                  Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(selectedPersonId)));
    }
 
    private void restoreState() {
@@ -562,11 +630,20 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _comboPeopleList.select(_prefStore.getInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
    }
 
+   private void setFilterEndDate(final long filterEndDate) {
+
+      final LocalDate suuntoFileDownloadEndDate = TimeTools.toLocalDate(filterEndDate);
+
+      _dtFilterEnd.setDate(suuntoFileDownloadEndDate.getYear(),
+            suuntoFileDownloadEndDate.getMonthValue() - 1,
+            suuntoFileDownloadEndDate.getDayOfMonth());
+   }
+
    private void setFilterSinceDate(final long filterSinceDate) {
 
       final LocalDate suuntoFileDownloadSinceDate = TimeTools.toLocalDate(filterSinceDate);
 
-      _dtFilterSince.setDate(suuntoFileDownloadSinceDate.getYear(),
+      _dtFilterStart.setDate(suuntoFileDownloadSinceDate.getYear(),
             suuntoFileDownloadSinceDate.getMonthValue() - 1,
             suuntoFileDownloadSinceDate.getDayOfMonth());
    }

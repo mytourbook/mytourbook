@@ -99,8 +99,9 @@ public class Messages extends NLS {
    public static String Log_UploadRoutesToSuunto_003_UploadStatus;
    public static String Log_UploadRoutesToSuunto_004_UploadError;
    public static String PrefPage_AccountInformation_Link_SuuntoApp_WebPage;
-   public static String PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter;
-   public static String PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip;
+   public static String PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter;
+   public static String PrefPage_SuuntoWorkouts_DatesFilter_Tooltip;
+   public static String PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter;
    public static String PrefPage_SuuntoWorkouts_Label_FolderPath;
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
    public static String VendorName_Suunto_Routes;
