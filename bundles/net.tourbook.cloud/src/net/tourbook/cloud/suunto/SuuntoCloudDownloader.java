@@ -261,6 +261,28 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return UI.EMPTY_STRING;
    }
 
+   private boolean getSuuntoUseWorkoutFilterEndDate() {
+
+      if (_useActivePerson) {
+         return _prefStore.getBoolean(Preferences.getSuuntoUseWorkoutFilterEndDate_Active_Person_String());
+      } else if (_useAllPeople) {
+         return _prefStore.getBoolean(Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(UI.EMPTY_STRING));
+      }
+
+      return false;
+   }
+
+   private boolean getSuuntoUseWorkoutFilterStartDate() {
+
+      if (_useActivePerson) {
+         return _prefStore.getBoolean(Preferences.getSuuntoUseWorkoutFilterStartDate_Active_Person_String());
+      } else if (_useAllPeople) {
+         return _prefStore.getBoolean(Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(UI.EMPTY_STRING));
+      }
+
+      return false;
+   }
+
    private long getSuuntoWorkoutFilterEndDate() {
 
       if (_useActivePerson) {
@@ -340,11 +362,30 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private Workouts retrieveWorkoutsList() {
 
-      //todo fb we should only use the since date filter if the user has seleceted so. Bug ??
-      final long startDateFilter = getSuuntoWorkoutFilterStartDate();
-      final long endDateFilter = getSuuntoWorkoutFilterStartDate();
+      //TODO FB is there a way to build in a better way the build parameter
+      // i am thinking like the body build with json ?
+
+      //TODO FB
+      //if the start date is after the end date, deactivate the end date ? set the end date to start date ?
+      //Same thing for when the end date is before the start date
+      final StringBuilder queryParameters = new StringBuilder();
+      final boolean useWorkoutFilterStartDate = getSuuntoUseWorkoutFilterStartDate();
+      if (useWorkoutFilterStartDate) {
+         final long startDateFilter = getSuuntoWorkoutFilterStartDate();
+         queryParameters.append("since=" + startDateFilter); //$NON-NLS-1$
+      }
+      if (getSuuntoUseWorkoutFilterEndDate()) {
+         final long endDateFilter = getSuuntoWorkoutFilterEndDate();
+         if (useWorkoutFilterStartDate) {
+            queryParameters.append('&');
+         }
+         queryParameters.append("until=" + endDateFilter); //$NON-NLS-1$
+      }
+
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=" + startDateFilter + "&until=" + endDateFilter))//$NON-NLS-1$
+            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL +
+                  "/suunto/workouts?" + //$NON-NLS-1$
+                  queryParameters.toString()))
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();

@@ -157,6 +157,20 @@ public final class Preferences {
       return getPerson_SuuntoRefreshToken_String(personId);
    }
 
+   public static String getSuuntoUseWorkoutFilterEndDate_Active_Person_String() {
+
+      final String personId = getActivePersonId();
+
+      return getPerson_SuuntoUseWorkoutFilterEndDate_String(personId);
+   }
+
+   public static String getSuuntoUseWorkoutFilterStartDate_Active_Person_String() {
+
+      final String personId = getActivePersonId();
+
+      return getPerson_SuuntoUseWorkoutFilterStartDate_String(personId);
+   }
+
    public static String getSuuntoWorkoutDownloadFolder_Active_Person_String() {
 
       final String personId = getActivePersonId();

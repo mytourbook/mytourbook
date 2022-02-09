@@ -81,6 +81,9 @@ Improvements
 * Cloud Integration (Frederic)
   - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
 
+* Suunto Integration (Frederic)   
+  - Added a workout filter end date
+
                                         
 Changes
 =======
