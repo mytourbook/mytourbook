@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Payload {
 
+   public int    activityId;
    public long   startTime;
    public String workoutKey;
 
