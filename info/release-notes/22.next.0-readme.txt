@@ -81,13 +81,16 @@ Improvements
 * Cloud Integration (Frederic)
   - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
 
-                                        
+
 Changes
 =======
 
 * Tour Editor
   - Time difference column shows now the time difference to the next time slice, until now the time difference to the previous time slice was displayed
-  - A "wrong" time slice is deleted		https://github.com/mytourbook/mytourbook/issues/456
+  - A "wrong" time slice is deleted          https://github.com/mytourbook/mytourbook/issues/456
+  - When time slices are deleted, then the distance differences will always be removed. 
+    Until now, the distances were kept with the action "Delete Time Slices and Keep Time"
+                                             https://github.com/mytourbook/mytourbook/issues/462
 
 Bugfix
 ======

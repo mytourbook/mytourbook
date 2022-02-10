@@ -2241,12 +2241,13 @@ public class TourManager {
       // this must be done with the original timeSerie
       removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
 
-      if (isRemoveTime || (isRemoveTime && isAdjustTourStartTime)) {
-
-         // this must be done before the time series are modified
-
-         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex, isAdjustTourStartTime);
-      }
+      // this must be done before the time series are modified
+      removeTimeSlices_TimeAndDistance(
+            tourData,
+            firstIndex,
+            lastIndex,
+            isRemoveTime,
+            isAdjustTourStartTime);
 
       short[] shortSerie;
       int[] intSerie;
@@ -2521,12 +2522,13 @@ public class TourManager {
    private static void removeTimeSlices_TimeAndDistance(final TourData tourData,
                                                         final int firstIndex,
                                                         final int lastIndex,
+                                                        final boolean isRemoveTime,
                                                         final boolean isAdjustTourStartTime) {
 
       final int[] timeSerie = tourData.timeSerie;
       final float[] distSerie = tourData.distanceSerie;
 
-      if ((timeSerie == null) || (timeSerie.length == 0)) {
+      if (timeSerie == null || timeSerie.length == 0) {
          return;
       }
 
@@ -2540,9 +2542,12 @@ public class TourManager {
       final int timeFirstIndex = timeSerie[firstIndex];
       final int timeNextIndex = timeSerie[lastIndex + 1];
 
-      final int timeDiff = timeNextIndex - timeFirstIndex;
-      float distDiff = -1;
+      int timeDiff = 0;
+      if (isRemoveTime) {
+         timeDiff = timeNextIndex - timeFirstIndex;
+      }
 
+      float distDiff = -1;
       if (distSerie != null) {
          distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
       }
@@ -2550,14 +2555,16 @@ public class TourManager {
       // update remaining time and distance data series
       for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
 
-         timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
+         if (isRemoveTime) {
+            timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
+         }
 
          if (distDiff != -1) {
             distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
          }
       }
 
-      if (isAdjustTourStartTime) {
+      if (isRemoveTime && isAdjustTourStartTime) {
 
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
          final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);
