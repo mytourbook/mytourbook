@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -57,6 +58,7 @@ import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.tour.TourLogManager;
 
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -362,42 +364,40 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private Workouts retrieveWorkoutsList() {
 
-      //TODO FB is there a way to build in a better way the build parameter
-      // i am thinking like the body build with json ?
-
-      //TODO FB
-      //if the start date is after the end date, deactivate the end date ? set the end date to start date ?
-      //Same thing for when the end date is before the start date
-      final StringBuilder queryParameters = new StringBuilder();
-      final boolean useWorkoutFilterStartDate = getSuuntoUseWorkoutFilterStartDate();
-      if (useWorkoutFilterStartDate) {
-         final long startDateFilter = getSuuntoWorkoutFilterStartDate();
-         queryParameters.append("since=" + startDateFilter); //$NON-NLS-1$
-      }
-      if (getSuuntoUseWorkoutFilterEndDate()) {
-         final long endDateFilter = getSuuntoWorkoutFilterEndDate();
-         if (useWorkoutFilterStartDate) {
-            queryParameters.append('&');
-         }
-         queryParameters.append("until=" + endDateFilter); //$NON-NLS-1$
-      }
-
-      final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL +
-                  "/suunto/workouts?" + //$NON-NLS-1$
-                  queryParameters.toString()))
-            .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
-            .GET()
-            .build();
-
       try {
+
+         final URI herokuUri = new URI(OAuth2Constants.HEROKU_APP_URL);
+
+         final URIBuilder uriBuilder = new URIBuilder()
+               .setScheme(herokuUri.getScheme())
+               .setHost(herokuUri.getHost())
+               .setPath("suunto/workouts"); //$NON-NLS-1$
+
+         //TODO FB
+         //if the start date is after the end date, deactivate the end date ? set the end date to start date ?
+         //Same thing for when the end date is before the start date
+         if (getSuuntoUseWorkoutFilterStartDate()) {
+            final long startDateFilter = getSuuntoWorkoutFilterStartDate();
+            uriBuilder.setParameter("since", String.valueOf(startDateFilter)); //$NON-NLS-1$
+         }
+         if (getSuuntoUseWorkoutFilterEndDate()) {
+            final long endDateFilter = getSuuntoWorkoutFilterEndDate();
+            uriBuilder.setParameter("until", String.valueOf(endDateFilter)); //$NON-NLS-1$
+         }
+
+         final HttpRequest request = HttpRequest.newBuilder()
+               .uri(uriBuilder.build())
+               .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
+               .GET()
+               .build();
+
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
 
             return new ObjectMapper().readValue(response.body(), Workouts.class);
          }
-      } catch (IOException | InterruptedException e) {
+      } catch (IOException | InterruptedException | URISyntaxException e) {
          StatusUtil.log(e);
          Thread.currentThread().interrupt();
       }
