@@ -1677,7 +1677,7 @@ public class TourMapPainter extends Map2Painter {
                }
 
                /*
-                * Get sub tour
+                * Get sub tour id
                 */
                if (isMultipleTours) {
 
