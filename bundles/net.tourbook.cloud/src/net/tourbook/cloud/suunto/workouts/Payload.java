@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,4 +22,6 @@ public class Payload {
 
    public long   startTime;
    public String workoutKey;
+
+   //TODO fb add the necessary properties here
 }

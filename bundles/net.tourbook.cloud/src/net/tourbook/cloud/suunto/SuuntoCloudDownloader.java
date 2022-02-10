@@ -80,10 +80,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
 
-   //TODO FB problem is that they only give the date file
-
-   //TODO FB put the until filter
-
    //todo fb unit tests for downloading and sending files
 
    //https://sourceforge.net/p/mytourbook/feature-requests/198/
