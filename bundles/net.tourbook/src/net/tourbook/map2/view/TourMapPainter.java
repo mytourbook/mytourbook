@@ -106,8 +106,8 @@ public class TourMapPainter extends Map2Painter {
    private static RGB                      _prefBorderRGB;
    private static int                      _prefBorderType;
    private static int                      _prefBorderWidth;
+   private static boolean                  _prefIsAntialiasPainting;
    private static boolean                  _prefIsDrawLine;
-
    private static boolean                  _prefIsDrawSquare;
    private static boolean                  _prefIsWithBorder;
    private static int                      _prefLineWidth;
@@ -719,15 +719,21 @@ public class TourMapPainter extends Map2Painter {
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
-      _prefIsDrawLine = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
-      _prefIsDrawSquare = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE);
+// SET_FORMATTING_OFF
 
-      _prefLineWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
-      _prefIsWithBorder = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
+      _prefIsDrawLine            = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
+      _prefIsDrawSquare          = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE);
 
-      _prefBorderRGB = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR);
-      _prefBorderType = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE);
-      _prefBorderWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+      _prefIsAntialiasPainting   = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING);
+
+      _prefLineWidth             = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
+      _prefIsWithBorder          = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
+
+      _prefBorderRGB             = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR);
+      _prefBorderType            = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE);
+      _prefBorderWidth           = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+
+// SET_FORMATTING_ON
 
       final int prefBorderDimmValue = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE);
       _borderBrightness = (float) (1.0 - prefBorderDimmValue / 100.0);
@@ -840,7 +846,11 @@ public class TourMapPainter extends Map2Painter {
       // first draw the tour, then the marker and photos
       if (_tourPaintConfig.isTourVisible) {
 
-//         gcTile.setAntialias(SWT.ON);
+         if (_prefIsAntialiasPainting) {
+            gcTile.setAntialias(SWT.ON);
+         } else {
+            gcTile.setAntialias(SWT.OFF);
+         }
 
          final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
@@ -1520,9 +1530,6 @@ public class TourMapPainter extends Map2Painter {
       final int tileWidth = tileSize;
       final int tileHeight = tileSize;
 
-      int devFrom_WithOffsetX = 0;
-      int devFrom_WithOffsetY = 0;
-
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;
       final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie;
@@ -1549,8 +1556,8 @@ public class TourMapPainter extends Map2Painter {
             ? allMultipleTourIds[0]
             : tourData.getTourId();
 
-      boolean isFirstVisibleDataPoint = false;
-      boolean isPrevVisibleDataPoint = false;
+      boolean isVisibleDataPoint_AfterIsWasHidden = false;
+      boolean isPreviousVisibleDataPoint = false;
 
       /*
        * World positions are cached to optimize performance when multiple tours are selected
@@ -1617,6 +1624,11 @@ public class TourMapPainter extends Map2Painter {
          _symbolHoveredMargin2 = _symbolHoveredMargin / 2;
 
          gcTile.setLineWidth(_symbolSize);
+         
+         int devFrom_WithOffsetX = 0;
+         int devFrom_WithOffsetY = 0;
+         
+         Color lastVisibleColor = null;
 
          for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
@@ -1663,16 +1675,18 @@ public class TourMapPainter extends Map2Painter {
                }
 
                /*
-                * Check surfing points
+                * Check visible points
                 */
                boolean isVisibleDataPoint = true;
                if (visibleDataPointSerie != null) {
 
+                  // visible data points are available -> use it
+
                   isVisibleDataPoint = visibleDataPointSerie[serieIndex];
 
-                  if (isPrevVisibleDataPoint == false && isVisibleDataPoint) {
+                  if (isPreviousVisibleDataPoint == false && isVisibleDataPoint) {
 
-                     isFirstVisibleDataPoint = true;
+                     isVisibleDataPoint_AfterIsWasHidden = true;
                   }
                }
 
@@ -1700,10 +1714,18 @@ public class TourMapPainter extends Map2Painter {
                   }
                }
 
+//               if (serieIndex == 1146) {
+//                  int a = 0;
+//                  a++;
+//               }
+
                Color color = null;
 
-               // check if position is in the viewport, this condition is an inline for:
-               // tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+               /*
+                * Check if position is in the viewport, this condition is an inline for:
+                * -
+                * tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+                */
                if ((tourWorldPixelX >= tileWorldPixelX)
                      && (tourWorldPixelY >= tileWorldPixelY)
                      && tourWorldPixelX < (tileWorldPixelX + tileWidth)
@@ -1726,11 +1748,11 @@ public class TourMapPainter extends Map2Painter {
                               isGeoCompareRefTour,
                               isInRefTourPart);
 
-                        if (isFirstVisibleDataPoint) {
+                        lastVisibleColor = color;
 
-                           if (color != null) {
-                              gcTile.setForeground(color);
-                           }
+                        if (isVisibleDataPoint_AfterIsWasHidden) {
+
+                           // draw starting point after a pause/break
 
                            drawTour_40_Dot(gcTile,
                                  devFrom_WithOffsetX,
@@ -1738,7 +1760,9 @@ public class TourMapPainter extends Map2Painter {
                                  color,
                                  tile,
                                  tourId,
-                                 serieIndex);
+
+                                 // adjust to the previous index otherwise the index is wrong
+                                 serieIndex - 1);
 
                         }
 
@@ -1758,8 +1782,8 @@ public class TourMapPainter extends Map2Painter {
                   lastInsideIndex = serieIndex;
                }
 
-               // current position is outside the tile
 
+               // check first outside point
                if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
 
                   /*
@@ -1767,13 +1791,38 @@ public class TourMapPainter extends Map2Painter {
                    * the last inside to the first outside position
                    */
 
+                  if (isVisibleDataPoint_AfterIsWasHidden) {
+
+                     if (lastVisibleColor == null) {
+
+                        lastVisibleColor = getTourColor(
+                              tourData,
+                              serieIndex,
+                              isBorder,
+                              true,
+                              isGeoCompareRefTour,
+                              isInRefTourPart);
+                     }
+
+                     drawTour_40_Dot(gcTile,
+                           devFrom_WithOffsetX,
+                           devFrom_WithOffsetY,
+                           lastVisibleColor,
+                           tile,
+                           tourId,
+
+                           // adjust to the previous index otherwise the index is wrong
+                           serieIndex - 1);
+
+                  }
+
                   drawTour_20_Line(
                         gcTile,
                         devFrom_WithOffsetX,
                         devFrom_WithOffsetY,
                         devTo_WithOffsetX,
                         devTo_WithOffsetY,
-                        color,
+                        lastVisibleColor,
                         tile,
                         tourId,
                         serieIndex);
@@ -1783,7 +1832,7 @@ public class TourMapPainter extends Map2Painter {
                devFrom_WithOffsetX = devTo_WithOffsetX;
                devFrom_WithOffsetY = devTo_WithOffsetY;
 
-               isPrevVisibleDataPoint = isVisibleDataPoint;
+               isPreviousVisibleDataPoint = isVisibleDataPoint;
 
             } else {
 
@@ -1802,7 +1851,7 @@ public class TourMapPainter extends Map2Painter {
                   if (!(devX == devFrom_WithOffsetX && devY == devFrom_WithOffsetY)) {
 
                      /*
-                      * Check surfing points
+                      * Check visible points
                       */
                      boolean isVisibleDataPoint = true;
                      if (visibleDataPointSerie != null) {
@@ -1912,8 +1961,8 @@ public class TourMapPainter extends Map2Painter {
       if (color != null) {
          gc.setForeground(color);
       }
-      gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 
+      gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
    }
 
    private void drawTour_30_Square(final GC gc,

@@ -1266,11 +1266,15 @@ public class Map2View extends ViewPart implements
                || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
 
             // update tour and legend
-
             createLegendImage(_tourPainterConfig.getMapColorProvider());
 
             _map.updateGraphColors();
             _map.updateMapOptions();
+
+            // show/hide line gaps in pauses, this must be done AFTER updateMapOptions() !!!
+            for (final TourData tourData : _allTourData) {
+               setVisibleDataPoints(tourData);
+            }
 
             _map.disposeOverlayImageCache();
             _map.paint();
@@ -2541,8 +2545,8 @@ public class Map2View extends ViewPart implements
 
       // update the tour info icon depending if breadcrumbs are visible
 
-      setTourInfoIconPosition();
-      setTourWeatherIconPosition();
+      setIconPosition_TourInfo();
+      setIconPosition_TourWeather();
    }
 
    private void mapListener_HoveredTour(final MapHoveredTourEvent mapHoveredTourEvent) {
@@ -2817,8 +2821,8 @@ public class Map2View extends ViewPart implements
             // special case :-)
 
             _map.tourBreadcrumb().addBreadcrumTour(tourIdSelection.getTourId());
-            setTourInfoIconPosition();
-            setTourWeatherIconPosition();
+            setIconPosition_TourInfo();
+            setIconPosition_TourWeather();
 
          } else {
 
@@ -3133,12 +3137,7 @@ public class Map2View extends ViewPart implements
 
    private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
 
-      final Long tourId = hoveredValueData.tourId;
-
-
       _externalValuePointIndex = hoveredValueData.hoveredTourSerieIndex;
-
-//      paintToursAndPhotos(tourData, null);
 
       updateUI_HoveredValuePoint();
    }
@@ -3369,8 +3368,9 @@ public class Map2View extends ViewPart implements
           * filter is reselected
           */
          _map.tourBreadcrumb().setBreadcrumbTours(_allTourData);
-         setTourInfoIconPosition();
-         setTourWeatherIconPosition();
+
+         setIconPosition_TourInfo();
+         setIconPosition_TourWeather();
 
          return;
       }
@@ -3441,7 +3441,7 @@ public class Map2View extends ViewPart implements
    }
 
    /**
-    * Show tours which are set in {@link #_allTourData}.
+    * Paint tours which are set in {@link #_allTourData}.
     */
    private void paintTours_10_All() {
 
@@ -4109,7 +4109,7 @@ public class Map2View extends ViewPart implements
       _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
 
       /*
-       * Background color
+       * Painting
        */
       _tourPainterConfig.isBackgroundDark = isBackgroundDark;
 
@@ -4134,8 +4134,8 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-      setTourInfoIconPosition();
-      setTourWeatherIconPosition();
+      setIconPosition_TourInfo();
+      setIconPosition_TourWeather();
 
       // create legend image after the dim level is modified
       createLegendImage(_tourPainterConfig.getMapColorProvider());
@@ -4145,31 +4145,19 @@ public class Map2View extends ViewPart implements
 
    void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {
 
-      _actionShowSliderInMap.setChecked(Util.getStateBoolean(_state,
-            STATE_IS_SHOW_SLIDER_IN_MAP,
-            Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
+// SET_FORMATTING_OFF
+
+      _actionShowSliderInMap.setChecked(          Util.getStateBoolean(_state,   STATE_IS_SHOW_SLIDER_IN_MAP,  STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
 
       _sliderPathPaintingData = new SliderPathPaintingData();
 
-      _sliderPathPaintingData.isShowSliderPath = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_SLIDER_PATH,
-            Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
+      _sliderPathPaintingData.isShowSliderPath  = Util.getStateBoolean(_state,   STATE_IS_SHOW_SLIDER_PATH,    STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
+      _sliderPathPaintingData.opacity           = Util.getStateInt(_state,       STATE_SLIDER_PATH_OPACITY,    STATE_SLIDER_PATH_OPACITY_DEFAULT);
+      _sliderPathPaintingData.segments          = Util.getStateInt(_state,       STATE_SLIDER_PATH_SEGMENTS,   STATE_SLIDER_PATH_SEGMENTS_DEFAULT);
+      _sliderPathPaintingData.lineWidth         = Util.getStateInt(_state,       STATE_SLIDER_PATH_LINE_WIDTH, STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT);
+      _sliderPathPaintingData.color             = Util.getStateRGB(_state,       STATE_SLIDER_PATH_COLOR,      STATE_SLIDER_PATH_COLOR_DEFAULT);
 
-      _sliderPathPaintingData.opacity = (Util.getStateInt(_state,
-            Map2View.STATE_SLIDER_PATH_OPACITY,
-            Map2View.STATE_SLIDER_PATH_OPACITY_DEFAULT));
-
-      _sliderPathPaintingData.segments = (Util.getStateInt(_state,
-            Map2View.STATE_SLIDER_PATH_SEGMENTS,
-            Map2View.STATE_SLIDER_PATH_SEGMENTS_DEFAULT));
-
-      _sliderPathPaintingData.lineWidth = (Util.getStateInt(_state,
-            Map2View.STATE_SLIDER_PATH_LINE_WIDTH,
-            Map2View.STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT));
-
-      _sliderPathPaintingData.color = (Util.getStateRGB(_state,
-            Map2View.STATE_SLIDER_PATH_COLOR,
-            Map2View.STATE_SLIDER_PATH_COLOR_DEFAULT));
+// SET_FORMATTING_ON
 
       if (isUpdateMapUI) {
 
@@ -4371,39 +4359,9 @@ public class Map2View extends ViewPart implements
    }
 
    /**
-    * Set tour data for the map, this is a central point to set the data.
-    *
-    * @param tourData
-    */
-   private void setTourData(final ArrayList<TourData> allTourData) {
-
-      _allTourData.clear();
-      _allTourData.addAll(allTourData);
-
-      _map.tourBreadcrumb().addBreadcrumTours(allTourData);
-      setTourInfoIconPosition();
-      setTourWeatherIconPosition();
-   }
-
-   /**
-    * Set tour data for the map, this is a central point to set the data.
-    *
-    * @param tourData
-    */
-   private void setTourData(final TourData tourData) {
-
-      _allTourData.clear();
-      _allTourData.add(tourData);
-
-      _map.tourBreadcrumb().addBreadcrumTour(tourData.getTourId());
-      setTourInfoIconPosition();
-      setTourWeatherIconPosition();
-   }
-
-   /**
     * Adjust tour info tooltip according to the breadcrumb toolbar visibility
     */
-   private void setTourInfoIconPosition() {
+   private void setIconPosition_TourInfo() {
 
       final int devXTooltip = TOUR_INFO_TOOLTIP_X;
       final int devYTooltip =
@@ -4420,19 +4378,10 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
    }
 
-   private void setTourPainterColorProvider(final MapGraphId colorId) {
-
-      _tourColorId = colorId;
-
-      final IMapColorProvider mapColorProvider = getColorProvider(colorId);
-
-      _tourPainterConfig.setMapColorProvider(mapColorProvider);
-   }
-
    /**
     * Adjust tour weather icon according to the breadcrumb toolbar visibility
     */
-   private void setTourWeatherIconPosition() {
+   private void setIconPosition_TourWeather() {
 
       final int devXTooltip = TOUR_WEATHER_TOOLTIP_X;
       final int devYTooltip =
@@ -4447,6 +4396,82 @@ public class Map2View extends ViewPart implements
                         : TOUR_INFO_TOOLTIP_X;
 
       _tourWeatherToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
+   }
+
+   /**
+    * Set tour data for the map, this is a central point to set the data.
+    *
+    * @param tourData
+    */
+   private void setTourData(final ArrayList<TourData> allTourData) {
+
+      _allTourData.clear();
+      _allTourData.addAll(allTourData);
+
+      for (final TourData tourData : allTourData) {
+         setVisibleDataPoints(tourData);
+      }
+
+      _map.tourBreadcrumb().addBreadcrumTours(allTourData);
+
+      setIconPosition_TourInfo();
+      setIconPosition_TourWeather();
+   }
+
+   /**
+    * Set tour data for the map, this is a central point to set the data.
+    *
+    * @param tourData
+    */
+   private void setTourData(final TourData tourData) {
+
+      _allTourData.clear();
+      _allTourData.add(tourData);
+
+      setVisibleDataPoints(tourData);
+
+      _map.tourBreadcrumb().addBreadcrumTour(tourData.getTourId());
+
+      setIconPosition_TourInfo();
+      setIconPosition_TourWeather();
+   }
+
+   private void setTourPainterColorProvider(final MapGraphId colorId) {
+
+      _tourColorId = colorId;
+
+      final IMapColorProvider mapColorProvider = getColorProvider(colorId);
+
+      _tourPainterConfig.setMapColorProvider(mapColorProvider);
+   }
+
+   private void setVisibleDataPoints(final TourData tourData) {
+
+      if (_map.isCutOffLinesInPauses() == false) {
+
+         // all lines are visible -> reset visible points
+
+         tourData.visibleDataPointSerie = null;
+
+         return;
+      }
+
+      /*
+       * Cut off lines within a pause -> set visible and hidden points
+       */
+      final int[] timeSerie = tourData.timeSerie;
+      final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie = new boolean[timeSerie.length];
+
+      final boolean[] breakTimeSerie = tourData.getBreakTimeSerie();
+
+      for (int timeIndex = 0; timeIndex < breakTimeSerie.length; timeIndex++) {
+
+         final boolean isBreakTime = breakTimeSerie[timeIndex];
+
+         if (isBreakTime == false) {
+            visibleDataPointSerie[timeIndex] = true;
+         }
+      }
    }
 
    /**
@@ -4487,8 +4512,8 @@ public class Map2View extends ViewPart implements
       _map.resetTours_HoveredData();
 
       _map.tourBreadcrumb().removeAllCrumbs();
-      setTourInfoIconPosition();
-      setTourWeatherIconPosition();
+      setIconPosition_TourInfo();
+      setIconPosition_TourWeather();
 
       _map.setShowOverlays(isShowOverlays);
       _map.setShowLegend(false);

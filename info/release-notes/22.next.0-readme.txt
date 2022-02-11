@@ -57,6 +57,10 @@ Improvements
   - Customize simple import tiles in the easy import page 
                                         https://github.com/mytourbook/mytourbook/issues/460
   
+* 2D Map
+  - Cut off lines in pauses				https://github.com/mytourbook/mytourbook/issues/463
+  - Enable/disable antialias painting for the tour tracks. A dimmed map may look better without antialiasing
+  
 * Tour Segmenter
   - Show power value for each segment	https://sourceforge.net/p/mytourbook/feature-requests/204/
 

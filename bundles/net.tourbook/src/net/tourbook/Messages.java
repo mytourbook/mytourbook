@@ -2006,7 +2006,11 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip;
    public static String        Slideout_Map_Bookmark_Label_Title;
 
+   public static String        Slideout_Map_Options_Checkbox_AntialiasPainting;
+   public static String        Slideout_Map_Options_Checkbox_AntialiasPainting_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String        Slideout_Map_Options_Checkbox_CutOffLinesInPauses;
+   public static String        Slideout_Map_Options_Checkbox_CutOffLinesInPauses_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_DimMap;
    public static String        Slideout_Map_Options_Checkbox_ShowBreadcrumbs;
    public static String        Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip;
