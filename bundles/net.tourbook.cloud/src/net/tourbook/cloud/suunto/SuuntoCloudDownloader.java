@@ -65,6 +65,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
@@ -79,6 +80,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
+
+   /*
+    * UI controls
+    */
+   private CTabFolder _tabFolder;
 
    //todo fb unit tests for downloading and sending files
 
