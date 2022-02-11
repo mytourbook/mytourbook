@@ -69,6 +69,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    //TODO FB tabs
    // Cloud Account
    //File download ?
+   //but that might not work since it's different for each user
 
    private static final String     APP_BTN_BROWSE                   = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE = net.tourbook.Messages.dialog_export_dir_dialog_message;
