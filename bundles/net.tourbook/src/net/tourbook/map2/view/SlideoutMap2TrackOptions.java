@@ -90,6 +90,8 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
     */
    private Composite             _parent;
    //
+   private Button                _chkIsCutOffLinesInPauses;
+   private Button                _chkIsAntialiasPainting;
    private Button                _chkPaintWithBorder;
    private Button                _chkShowBreadcrumbs;
    private Button                _chkShowEnhancedWarning;
@@ -279,6 +281,19 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
             _rdoSymbolSquare.setText(Messages.pref_map_layout_symbol_square);
             _rdoSymbolSquare.addSelectionListener(_defaultSelectionListener);
          }
+         {
+            // Checkbox: Cut off lines in pauses
+            _chkIsCutOffLinesInPauses = new Button(radioContainer, SWT.CHECK);
+            _chkIsCutOffLinesInPauses.setText(Messages.Slideout_Map_Options_Checkbox_CutOffLinesInPauses);
+            _chkIsCutOffLinesInPauses.setToolTipText(Messages.Slideout_Map_Options_Checkbox_CutOffLinesInPauses_Tooltip);
+            _chkIsCutOffLinesInPauses.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(3, 1)
+                  .indent(_firstColumnIndent, 0)
+                  .applyTo(_chkIsCutOffLinesInPauses);
+
+         }
       }
       {
          /*
@@ -319,6 +334,18 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
             _spinnerTrackOpacity.addSelectionListener(_defaultSelectionListener);
             _spinnerTrackOpacity.addMouseWheelListener(_defaultMouseWheelListener);
             _spinnerLayoutData.applyTo(_spinnerTrackOpacity);
+         }
+      }
+      {
+         /*
+          * Antialias painting
+          */
+         {
+            // checkbox
+            _chkIsAntialiasPainting = new Button(parent, SWT.CHECK);
+            _chkIsAntialiasPainting.setText(Messages.Slideout_Map_Options_Checkbox_AntialiasPainting);
+            _chkIsAntialiasPainting.setToolTipText(Messages.Slideout_Map_Options_Checkbox_AntialiasPainting_Tooltip);
+            _chkIsAntialiasPainting.addSelectionListener(_defaultSelectionListener);
          }
       }
 
@@ -773,6 +800,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       final boolean isUseTrackOpacity              = _chkTrackOpacity.getSelection();
       final boolean isShowSliderPath               = _chkShowSlider_Path.getSelection();
       final boolean isPaintWithBorder              = _chkPaintWithBorder.getSelection();
+      final boolean isCutOffLinesInPauses          = _rdoSymbolLine.getSelection();
       final boolean isEnhancedPaintingMode         = _rdoPainting_Complex.getSelection();
 
       final boolean isHoveredSelected              = _chkShowHoveredSelectedTour.getSelection();
@@ -782,7 +810,8 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       final boolean isBasicPaintingMode            = isEnhancedPaintingMode == false;
       final boolean isHoveredSelectedAndBasicMode  = isHoveredSelected && isBasicPaintingMode;
 
-      _spinnerTrackOpacity.setEnabled(isUseTrackOpacity);
+      _chkIsCutOffLinesInPauses     .setEnabled(isCutOffLinesInPauses);
+      _spinnerTrackOpacity          .setEnabled(isUseTrackOpacity);
 
       // border
       _lblBorder_Color              .setEnabled(isPaintWithBorder);
@@ -1038,8 +1067,10 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // plot type
       updateUI_SetPlotType(                     _prefStore.getDefaultString(  ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE));
+      _chkIsCutOffLinesInPauses.setSelection(   _prefStore.getDefaultBoolean( ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES));
 
       // line
+      _chkIsAntialiasPainting.setSelection(     _prefStore.getDefaultBoolean( ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING));
       _spinnerLineWidth.setSelection(           _prefStore.getDefaultInt(     ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH));
 
       // border
@@ -1058,6 +1089,8 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       onChangeUI_UpdateMap_MapOptions();
       onChangeUI_UpdateMap_TrackOptions();
+
+      onChangeUI();
    }
 
    private void restoreState() {
@@ -1099,8 +1132,10 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // plot type
       updateUI_SetPlotType(                     _prefStore.getString(   ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE));
+      _chkIsCutOffLinesInPauses.setSelection(   _prefStore.getBoolean(  ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES));
 
       // line
+      _chkIsAntialiasPainting.setSelection(     _prefStore.getBoolean(  ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING));
       _spinnerLineWidth.setSelection(           _prefStore.getInt(      ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH));
 
       // border
@@ -1156,8 +1191,10 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       // plot type
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   getPlotType());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES,  _chkIsCutOffLinesInPauses.getSelection());
 
       // line
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING,       _chkIsAntialiasPainting.getSelection());
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,                _spinnerLineWidth.getSelection());
 
       // border

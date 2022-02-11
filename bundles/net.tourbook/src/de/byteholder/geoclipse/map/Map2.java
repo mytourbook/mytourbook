@@ -625,13 +625,10 @@ public class Map2 extends Canvas {
 
    private Font              _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-// private RGB     _prefOptions_BorderRGB;
-// private int     _prefOptions_BorderType;
-   private int     _prefOptions_BorderWidth;
-// private boolean _prefOptions_IsDrawLine;
-   private boolean _prefOptions_IsDrawSquare;
-// private boolean _prefOptions_IsWithBorder;
-   private int     _prefOptions_LineWidth;
+   private int               _prefOptions_BorderWidth;
+   private boolean           _prefOptions_isCutOffLinesInPauses;
+   private boolean           _prefOptions_IsDrawSquare;
+   private int               _prefOptions_LineWidth;
 
    private static enum HoveredPoint_PaintMode {
 
@@ -2165,6 +2162,10 @@ public class Map2 extends Canvas {
 
       _worldPixel_MapCenter = new Point2D.Double(tileDefaultCenter, tileDefaultCenter);
       _worldPixel_TopLeft_Viewport = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
+   }
+
+   public boolean isCutOffLinesInPauses() {
+      return _prefOptions_isCutOffLinesInPauses;
    }
 
    public boolean isMapBackgroundDark() {
@@ -7401,15 +7402,12 @@ public class Map2 extends Canvas {
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
-//    _prefOptions_IsDrawLine = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
       _prefOptions_IsDrawSquare = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE);
-
       _prefOptions_LineWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
-//    _prefOptions_IsWithBorder = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
-
-//    _prefOptions_BorderRGB = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR);
-//    _prefOptions_BorderType = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE);
       _prefOptions_BorderWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+
+      final boolean isCutOffLinesInPauses = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES);
+      _prefOptions_isCutOffLinesInPauses = isCutOffLinesInPauses && drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
    }
 
    /**
