@@ -187,8 +187,6 @@ public class Map2 extends Canvas {
    private static final String          DIRECTION_N                                    = "N";                                                    //$NON-NLS-1$
 
    private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                               //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_DISTANCE                          = "%s\t\t%s %s";                                          //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_TRACK_POINT                       = "%s\t%s";                                               //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
@@ -609,10 +607,20 @@ public class Map2 extends Canvas {
    private boolean                   _isFastMapPainting_Active;
    private boolean                   _isInInverseKeyboardPanning;
 
+   /**
+    * Tour direction is displayed only when tour is hovered
+    */
+   private boolean                   _isDrawTourDirection;
+
+   /**
+    * When <code>true</code> then the tour directions are displayed always but this is valid only,
+    * when just one tour is displayed
+    */
+   private boolean                   _isDrawTourDirection_Always;
+
    /*
     * Direction arrows
     */
-   private boolean           _isDrawTourDirection;
    private int               _tourDirection_MarkerGap;
    private int               _tourDirection_LineWidth;
    private RGB               _tourDirection_RGB;
@@ -629,6 +637,7 @@ public class Map2 extends Canvas {
    private boolean           _prefOptions_isCutOffLinesInPauses;
    private boolean           _prefOptions_IsDrawSquare;
    private int               _prefOptions_LineWidth;
+   private List<Long>        _allTourIds;
 
    private static enum HoveredPoint_PaintMode {
 
@@ -4147,13 +4156,13 @@ public class Map2 extends Canvas {
       boolean isPaintTourInfo = false;
       boolean isPaintBreadcrumbs = false;
 
-      final int numTours = _allHoveredDevPoints.size();
+      final int numHoveredTours = _allHoveredDevPoints.size();
 
-      if (numTours > 0) {
+      if (numHoveredTours > 0) {
 
          isPaintTourInfo = true;
 
-         if (numTours == 1) {
+         if (numHoveredTours == 1) {
 
             hoveredTourId = _allHoveredTourIds.get(0);
 
@@ -4206,11 +4215,11 @@ public class Map2 extends Canvas {
 
          isPaintBreadcrumbs = _isShowBreadcrumbs;
 
-         if (numTours > 0) {
+         if (numHoveredTours > 0) {
 
             isPaintTourInfo = true;
 
-            if (numTours == 1) {
+            if (numHoveredTours == 1) {
 
                if (// paint hovered tour when
 
@@ -4261,6 +4270,34 @@ public class Map2 extends Canvas {
                }
             }
          }
+      }
+
+      /*
+       * Paint tour directions when not yet painted
+       */
+      if (_isDrawTourDirection
+
+            && _isDrawTourDirection_Always
+
+            // currently only one tour is supported
+            && _allTourIds.size() == 1
+
+            // nothing is currently hovered
+            && numHoveredTours == 0
+
+      ) {
+
+         final Long tourId = _allTourIds.get(0);
+
+         final int[] devXYTourPositions = paint_HoveredTour_12_GetTourPositions(tourId);
+
+         if (devXYTourPositions != null) {
+            paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
+         }
+
+//         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"
+//               + "\tdirection arrows are painted");
+// TODO remove SYSTEM.OUT.PRINTLN
       }
 
       /*
@@ -4438,10 +4475,10 @@ public class Map2 extends Canvas {
 
                final float directionRotation = (float) MtMath.angleOf(devX1, devY1, devX2, devY2);
 
+// when debugging then autoScapeUp provided the wrong values when using a 4k display !!!
 //               final int xPos1 = DPIUtil.autoScaleUp(devX1);
 //               final int yPos1 = DPIUtil.autoScaleUp(devY1);
 
-               // when debugging then autoScapeUp provided the wrong values when using a 4k display !!!
                final int xPos1 = devX1;
                final int yPos1 = devY1;
 
@@ -6601,12 +6638,14 @@ public class Map2 extends Canvas {
    }
 
    public void setConfig_TourDirection(final boolean isShowTourDirection,
+                                       final boolean isShowTourDirection_Always,
                                        final int markerGap,
                                        final int lineWidth,
                                        final float symbolSize,
                                        final RGB tourDirection_RGB) {
 
       _isDrawTourDirection = isShowTourDirection;
+      _isDrawTourDirection_Always = isShowTourDirection_Always;
 
       _tourDirection_MarkerGap = markerGap;
       _tourDirection_LineWidth = lineWidth;
@@ -7116,6 +7155,15 @@ public class Map2 extends Canvas {
 
    public void setShowScale(final boolean isScaleVisible) {
       _isScaleVisible = isScaleVisible;
+   }
+
+   /**
+    * Set tours which are currently painted in the map
+    *
+    * @param allTourIds
+    */
+   public void setTourIds(final List<Long> allTourIds) {
+      _allTourIds = allTourIds;
    }
 
    public void setTourPaintMethodEnhanced(final boolean isEnhanced, final boolean isShowWarning) {
