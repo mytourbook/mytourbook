@@ -210,7 +210,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblDistance_Unit;
    private Label     _lblElevation;
    private Label     _lblElevation_Unit;
-   private Label     _lblGears;
+   private Label     _lblGearRatio;
+   private Label     _lblGearTeeth;
    private Label     _lblGradient;
    private Label     _lblGradient_Unit;
    private Label     _lblPace;
@@ -400,6 +401,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isHorizontal == false) {
 
+         // vertical orientation
+
          // compute width for all controls and equalize column width for the different sections
          _shellContainer.layout(true, true);
          UI.setEqualizeColumWidths(_firstColumnControls);
@@ -428,8 +431,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
             .applyTo(_shellContainer);
 
-//      _shellContainer.setForeground(_fgColor);
-//      _shellContainer.setBackground(_bgColor);
       _shellContainer.addPaintListener(this::onPaintShellContainer);
 //      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
@@ -470,7 +471,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                .applyTo(container);
       }
 
-//      container.setBackground(_bgColor);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          createUI_100_TimeSlices(container);
@@ -505,15 +505,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * create toolbar
        */
       _toolbarControl = new ToolBar(parent, SWT.FLAT);
+//      _toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       GridDataFactory.fillDefaults()
-//            .align(SWT.END, SWT.FILL)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(_toolbarControl);
-//      _toolbarControl.setForeground(_fgColor);
-//      _toolbarControl.setBackground(_bgColor);
 
-//      _toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-//      _toolbarControl.setBackground(_fgToolbar);
 
       final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
 
@@ -527,8 +523,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_isVisible_And_Available_TimeSlice) {
 
          final Composite container = new Composite(parent, SWT.NONE);
-//         container.setForeground(_fgColor);
-//         container.setBackground(_bgColor);
          GridDataFactory.fillDefaults()
                .align(SWT.CENTER, SWT.FILL)
                .grab(true, false)
@@ -537,7 +531,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                .numColumns(3)
                .spacing(2, 0)
                .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
 
             // label: current value
@@ -925,22 +919,28 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_isVisible_And_Available_Gears) {
 
          final Composite container = createUIValueContainer(parent);
+//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
          {
-            _lblGears = createUI_Label_Value(//
+            _lblGearTeeth = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
-                  10,
+                  5,
                   GRAPH_LABEL_GEARS,
 
                   // this is a bit tricky, use default color because the text color is white
-                  null
-//                  GraphColorManager.PREF_GRAPH_GEAR
-            );
+                  null);
 
-            // no unit
-            createUILabel(container, UI.EMPTY_STRING, GRAPH_LABEL_GEARS, GraphColorManager.PREF_GRAPH_GEAR);
+            _lblGearRatio = createUI_Label_Value(
+                  container,
+                  SWT.LEAD,
+                  4,
+                  GRAPH_LABEL_GEARS,
+
+                  // this is a bit tricky, use default color because the text color is white
+                  null);
          }
-         _firstColumnControls.add(_lblGears);
+
+         _firstColumnControls.add(_lblGearTeeth);
          _firstColumnContainerControls.add(container);
       }
    }
@@ -1120,24 +1120,18 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       final Composite shellContainer = new Composite(parent, SWT.NONE);
-//      shellContainer.setForeground(_fgColor);
-//      shellContainer.setBackground(_bgColor);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
 
          final Composite container = new Composite(shellContainer, SWT.NONE);
-//         container.setForeground(_fgColor);
-//         container.setBackground(_bgColor);
          GridLayoutFactory
-               .fillDefaults()//
+               .fillDefaults()
                .extendedMargins(5, 5, 0, 0)
                .applyTo(container);
          {
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Tooltip_ValuePoint_Label_NoData);
             label.setToolTipText(Messages.Tooltip_ValuePoint_Label_NoData_Tooltip);
-//            label.setForeground(_fgColor);
-//            label.setBackground(_bgColor);
          }
       }
 
@@ -1183,8 +1177,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             .hint(charsWidth, SWT.DEFAULT)
             .applyTo(label);
 
-//      label.setBackground(_bgColor);
-
       if (tooltip != null) {
          label.setToolTipText(tooltip);
       }
@@ -1215,8 +1207,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                                final String colorId) {
 
       final Label label = new Label(parent, SWT.NONE);
-//      label.setForeground(_fgColor);
-//      label.setBackground(_bgColor);
 
       if (labelText != null) {
          label.setText(labelText);
@@ -1243,8 +1233,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).spacing(_valueUnitDistance, 0).applyTo(container);
-//      container.setForeground(_fgColor);
-//      container.setBackground(_bgColor);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
       return container;
@@ -1726,19 +1714,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final float[][] gears = _tourData.getGears();
 
-//         _gears[0] = gear ratio
-//         _gears[1] = front gear teeth
-//         _gears[2] = rear gear teeth
-//         _gears[3] = front gear number, starting with 1
-//         _gears[4] = rear gear number, starting with 1
+//       _gears[0] = gear ratio
+//       _gears[1] = front gear teeth
+//       _gears[2] = rear gear teeth
+//       _gears[3] = front gear number, starting with 1
+//       _gears[4] = rear gear number, starting with 1
 
-         _lblGears.setText(String.format(
-               TourManager.GEAR_VALUE_FORMAT,
+         _lblGearTeeth.setText(String.format(
+               TourManager.GEAR_TEETH_FORMAT,
                (int) gears[1][valueIndex],
-               (int) gears[2][valueIndex],
-               gears[0][valueIndex]
-         //
-         ));
+               (int) gears[2][valueIndex]));
+
+         _lblGearRatio.setText(String.format(
+               TourManager.GEAR_RATIO_FORMAT,
+               gears[0][valueIndex]));
       }
 
       if (_isVisible_And_Available_Gradient) {
@@ -1903,7 +1892,10 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_Gears) {
-         updateUI_Color(_lblGears, GraphColorManager.PREF_GRAPH_GEAR);
+//         updateUI_Color(_lblGearTeeth, GraphColorManager.PREF_GRAPH_GEAR);
+//         updateUI_Color(_lblGearRatio, GraphColorManager.PREF_GRAPH_GEAR);
+         updateUI_Color(_lblGearTeeth, null);
+         updateUI_Color(_lblGearRatio, null);
       }
 
       if (_isVisible_And_Available_Gradient) {
