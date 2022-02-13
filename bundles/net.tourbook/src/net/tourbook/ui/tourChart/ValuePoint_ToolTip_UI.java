@@ -1318,6 +1318,12 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       super.onDispose();
    }
 
+   @Override
+   protected void onEvent_ContextMenu(final Event event) {
+
+      _ttMenuMgr.openToolTipMenu(event, _tourData, _allVisibleValueIds, _isHorizontal);
+   }
+
    private void onPaintShellContainer(final PaintEvent event) {
 
       final GC gc = event.gc;
@@ -1481,11 +1487,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _isAvailable_Pulse_BpmFromDevice                = _tourData.pulseSerie                          != null;
       _isAvailable_Pulse_RRIntervals                  = _tourData.getPulse_RRIntervals()              != null;
-                                                                                                      
+
       final boolean isAvailable_Altimeter             = _tourData.getAltimeterSerie()                 != null;
       final boolean isAvailable_Altitude              = _tourData.getAltitudeSerie()                  != null;
       final boolean isAvailable_Cadence               = _tourData.getCadenceSerie()                   != null;
-      final boolean isAvailable_ChartZoomFactor       = true;                                         
+      final boolean isAvailable_ChartZoomFactor       = true;
       final boolean isAvailable_Distance              = _tourData.distanceSerie                       != null;
       final boolean isAvailable_Gears                 = _tourData.getGears()                          != null;
       final boolean isAvailable_Gradient              = _tourData.getGradientSerie()                  != null;

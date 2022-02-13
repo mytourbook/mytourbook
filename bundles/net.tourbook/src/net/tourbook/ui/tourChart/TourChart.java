@@ -887,7 +887,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourSegmenterTooltip = new TourSegmenterTooltip(this);
 
       /*
-       * setup value point tooltip
+       * Setup value point tooltip
        */
       final IPinned_Tooltip_Owner vpToolTipOwner = new IPinned_Tooltip_Owner() {
 

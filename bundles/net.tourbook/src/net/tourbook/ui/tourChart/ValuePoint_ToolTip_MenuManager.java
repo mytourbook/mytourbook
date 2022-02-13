@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
@@ -86,11 +85,6 @@ public class ValuePoint_ToolTip_MenuManager {
    private Menu                          _menu                                    = null;
 
    private boolean                       _isHorizontal;
-
-   /**
-    * Parent of this tool item is the parent for the tooltip menu.
-    */
-   private ToolItem                      _menuParentItem;
 
    private ActionHideToolTip             _actionHideToolTip;
    private ActionSetDefaults             _actionSetDefaults;
@@ -330,7 +324,7 @@ public class ValuePoint_ToolTip_MenuManager {
       final ToolItem toolItem = _valuePointToolTipUI.actionVisibleValues(_allVisibleValueIds);
 
       // reopen context menu
-      openToolTipMenu10Reopen(toolItem);
+      openToolTipMenu_10_OpenWithLocation(toolItem.getParent(), toolItem.getBounds());
    }
 
    private void addItem(final Action action) {
@@ -541,33 +535,33 @@ public class ValuePoint_ToolTip_MenuManager {
 
 // SET_FORMATTING_OFF
 
-      _actionPinLocation_Screen           .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.Screen);
-      _actionPinLocation_TopLeft          .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopLeft);
-      _actionPinLocation_TopRight         .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopRight);
-      _actionPinLocation_BottomLeft       .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomLeft);
-      _actionPinLocation_BottomRight      .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomRight);
-      _actionPinLocation_MouseXPosition   .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition);
+      _actionPinLocation_Screen                 .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.Screen);
+      _actionPinLocation_TopLeft                .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopLeft);
+      _actionPinLocation_TopRight               .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopRight);
+      _actionPinLocation_BottomLeft             .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomLeft);
+      _actionPinLocation_BottomRight            .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomRight);
+      _actionPinLocation_MouseXPosition         .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition);
 
-      _actionValue_Header.setEnabled(false);
+      _actionValue_Header                       .setEnabled(false);
 
-      _actionValue_Altimeter           .setState((_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,            _tourData.getAltimeterSerie() != null);
-      _actionValue_Altitude            .setState((_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,             _tourData.getAltitudeSerie() != null);
-      _actionValue_Cadence             .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie() != null);
-      _actionValue_ChartZoomFactor     .setState((_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,    true);
-      _actionValue_Distance            .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie != null);
-      _actionValue_Gears               .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears() != null);
-      _actionValue_Gradient            .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie() != null);
-      _actionValue_Pace                .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie() != null);
-      _actionValue_Pace_Summarized     .setState((_allVisibleValueIds & VALUE_ID_PACE_SUMMARIZED) > 0,      _tourData.getPaceSerie_Summarized_Seconds() != null);
-      _actionValue_Power               .setState((_allVisibleValueIds & VALUE_ID_POWER) > 0,                _tourData.getPowerSerie() != null);
-      _actionValue_Pulse               .setState((_allVisibleValueIds & VALUE_ID_PULSE) > 0,                _tourData.pulseSerie != null);
-      _actionValue_Speed               .setState((_allVisibleValueIds & VALUE_ID_SPEED) > 0,                _tourData.getSpeedSerie() != null);
-      _actionValue_Speed_Summarized    .setState((_allVisibleValueIds & VALUE_ID_SPEED_SUMMARIZED) > 0,     _tourData.getSpeedSerie_Summarized() != null);
-      _actionValue_Temperature         .setState((_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,          _tourData.temperatureSerie != null);
-      _actionValue_TimeDuration        .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie != null);
-      _actionValue_TimeOfDay           .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie != null);
-      _actionValue_TimeSlices          .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
-      _actionValue_TourCompareResult   .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
+      _actionValue_Altimeter                    .setState((_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,            _tourData.getAltimeterSerie() != null);
+      _actionValue_Altitude                     .setState((_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,             _tourData.getAltitudeSerie() != null);
+      _actionValue_Cadence                      .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie() != null);
+      _actionValue_ChartZoomFactor              .setState((_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,    true);
+      _actionValue_Distance                     .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie != null);
+      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears() != null);
+      _actionValue_Gradient                     .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie() != null);
+      _actionValue_Pace                         .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie() != null);
+      _actionValue_Pace_Summarized              .setState((_allVisibleValueIds & VALUE_ID_PACE_SUMMARIZED) > 0,      _tourData.getPaceSerie_Summarized_Seconds() != null);
+      _actionValue_Power                        .setState((_allVisibleValueIds & VALUE_ID_POWER) > 0,                _tourData.getPowerSerie() != null);
+      _actionValue_Pulse                        .setState((_allVisibleValueIds & VALUE_ID_PULSE) > 0,                _tourData.pulseSerie != null);
+      _actionValue_Speed                        .setState((_allVisibleValueIds & VALUE_ID_SPEED) > 0,                _tourData.getSpeedSerie() != null);
+      _actionValue_Speed_Summarized             .setState((_allVisibleValueIds & VALUE_ID_SPEED_SUMMARIZED) > 0,     _tourData.getSpeedSerie_Summarized() != null);
+      _actionValue_Temperature                  .setState((_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,          _tourData.temperatureSerie != null);
+      _actionValue_TimeDuration                 .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie != null);
+      _actionValue_TimeOfDay                    .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie != null);
+      _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
+      _actionValue_TourCompareResult            .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
 
       _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime() != null);
       _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance() != null);
@@ -666,25 +660,39 @@ public class ValuePoint_ToolTip_MenuManager {
       _allVisibleValueIds = allVisibleValueIds;
       _isHorizontal = isHorizontal;
 
-      // open and position drop down menu below the action button
-      final Widget item = event.widget;
-      if (item instanceof ToolItem) {
-         openToolTipMenu10Reopen((ToolItem) item);
+      final Widget widget = event.widget;
+
+      if (widget instanceof ToolItem) {
+
+         // open and position drop down menu below the action button
+
+         final ToolItem toolItem = (ToolItem) widget;
+
+         openToolTipMenu_10_OpenWithLocation(toolItem.getParent(), toolItem.getBounds());
+
+      } else if (widget instanceof Control) {
+         
+         // open and position drop down menu at the mouse position
+
+         final Control menuParent_Control = (Control) widget;
+
+         final Point topLeft_Mouse = new Point(event.x, event.y);
+         final Point topLeft_Menu = menuParent_Control.toDisplay(topLeft_Mouse);
+
+         final Menu menu = getMenu(menuParent_Control);
+
+         menu.setLocation(topLeft_Menu.x, topLeft_Menu.y);
+         menu.setVisible(true);
       }
    }
 
-   private void openToolTipMenu10Reopen(final ToolItem toolItem) {
+   private void openToolTipMenu_10_OpenWithLocation(final Control menuParent_Control, final Rectangle menuParent_Bounds) {
 
-      _menuParentItem = toolItem;
+      final Point topLeft_Parent = new Point(menuParent_Bounds.x, menuParent_Bounds.y + menuParent_Bounds.height);
+      final Point topLeft_Menu = menuParent_Control.toDisplay(topLeft_Parent);
 
-      final ToolBar menuParentControl = _menuParentItem.getParent();
-      final Rectangle toolItemBounds = _menuParentItem.getBounds();
-
-      Point topLeft = new Point(toolItemBounds.x, toolItemBounds.y + toolItemBounds.height);
-      topLeft = menuParentControl.toDisplay(topLeft);
-
-      final Menu menu = getMenu(menuParentControl);
-      menu.setLocation(topLeft.x, topLeft.y);
+      final Menu menu = getMenu(menuParent_Control);
+      menu.setLocation(topLeft_Menu.x, topLeft_Menu.y);
       menu.setVisible(true);
    }
 }
