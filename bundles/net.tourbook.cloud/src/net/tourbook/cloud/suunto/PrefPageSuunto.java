@@ -47,13 +47,16 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -64,7 +67,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferencePage {
 
    //TODO FB tabs
    // Cloud Account
@@ -82,8 +85,9 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
    public static final int         CALLBACK_PORT                    = 4919;
 
-   private IPreferenceStore        _prefStore                       = Activator.getDefault().getPreferenceStore();
+   private static final String     STATE_SUUNTO_CLOUD_SELECTED_TAB  = "suuntoCloud.selectedTab";                             //$NON-NLS-1$
 
+   private IPreferenceStore        _prefStore                       = Activator.getDefault().getPreferenceStore();
    private final IDialogSettings   _state                           = TourbookPlugin.getState(DialogEasyImportConfig.ID);
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
@@ -92,30 +96,31 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
-   private Button   _btnCleanup;
-   private Button   _btnSelectFolder;
-   private Button   _chkShowHidePasswords;
-   private Button   _chkUseStartDateFilter;
-   private Button   _chkUseEndDateFilter;
-   private Combo    _comboDownloadFolderPath;
-   private Combo    _comboPeopleList;
-   private DateTime _dtFilterStart;
-   private DateTime _dtFilterEnd;
-   private Group    _groupCloudAccount;
-   private Label    _labelAccessToken;
-   private Label    _labelExpiresAt;
-   private Label    _labelExpiresAt_Value;
-   private Label    _labelRefreshToken;
-   private Label    _labelDownloadFolder;
-   private Text     _txtAccessToken_Value;
-   private Text     _txtRefreshToken_Value;
+   private CTabFolder _tabFolder;
+   private Button     _btnCleanup;
+   private Button     _btnSelectFolder;
+   private Button     _chkShowHidePasswords;
+   private Button     _chkUseStartDateFilter;
+   private Button     _chkUseEndDateFilter;
+   private Combo      _comboDownloadFolderPath;
+   private Combo      _comboPeopleList;
+   private DateTime   _dtFilterStart;
+   private DateTime   _dtFilterEnd;
+   private Group      _groupCloudAccount;
+   private Label      _labelAccessToken;
+   private Label      _labelExpiresAt;
+   private Label      _labelExpiresAt_Value;
+   private Label      _labelRefreshToken;
+   private Label      _labelDownloadFolder;
+   private Text       _txtAccessToken_Value;
+   private Text       _txtRefreshToken_Value;
 
    @Override
-   protected void createFieldEditors() {
+   protected Control createContents(final Composite parent) {
 
       initUI();
 
-      createUI();
+      final Composite container = createUI(parent);
 
       restoreState();
 
@@ -158,19 +163,40 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             }
          });
       };
+
+      return container;
    }
 
-   private Composite createUI() {
+   private Composite createUI(final Composite parent) {
 
-      final Composite parent = getFieldEditorParent();
-      GridLayoutFactory.fillDefaults().applyTo(parent);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
+      {
+         _tabFolder = new CTabFolder(container, SWT.TOP);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
+         {
+            final CTabItem tabCloudAccount = new CTabItem(_tabFolder, SWT.NONE);
+            tabCloudAccount.setControl(createUI_10_AccountInformation(_tabFolder));
+            tabCloudAccount.setText("Account Information");//Messages.Compute_Values_Group_Smoothing);
 
-      createUI_10_Authorize(parent);
-      createUI_20_TokensInformation(parent);
-      createUI_30_TourDownload(parent);
-      createUI_100_AccountCleanup(parent);
+            final CTabItem tabFileNameCustomization = new CTabItem(_tabFolder, SWT.NONE);
+            tabFileNameCustomization.setControl(createUI_10_FileNameCustomiation(_tabFolder));
+            tabFileNameCustomization.setText("Messages.tabFileNameCustomization");
+         }
+      }
 
-      return parent;
+      return _tabFolder;
+   }
+
+   private Control createUI_10_AccountInformation(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      createUI_10_Authorize(container);
+      createUI_20_TokensInformation(container);
+      createUI_30_TourDownload(container);
+      createUI_100_AccountCleanup(container);
+
+      return container;
    }
 
    private void createUI_10_Authorize(final Composite parent) {
@@ -202,16 +228,41 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       }
    }
 
-   private void createUI_100_AccountCleanup(final Composite parent) {
+   private Composite createUI_10_FileNameCustomiation(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(2).applyTo(container);
+
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+      {
+         final Composite containerTitle = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerTitle);
+         GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 10).numColumns(1).applyTo(containerTitle);
+         {
+            /*
+             * label: compute break time by
+             */
+            final Label label = new Label(containerTitle, SWT.NONE);
+            label.setText("Messages.Compute_BreakTime_Label_Title");
+         }
+
+      }
+
+      container.layout(true, true);
+
+      return container;
+   }
+
+   private void createUI_100_AccountCleanup(final Composite parent) {
+
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
+      GridLayoutFactory.fillDefaults().applyTo(parent);
       {
          /*
           * Clean-up button
           */
-         _btnCleanup = new Button(container, SWT.NONE);
+         _btnCleanup = new Button(parent, SWT.NONE);
          _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
          _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
          _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
@@ -351,6 +402,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);
       _chkUseStartDateFilter.setEnabled(isAuthorized);
+      _chkUseEndDateFilter.setEnabled(isAuthorized);
       _dtFilterStart.setEnabled(isAuthorized && _chkUseStartDateFilter.getSelection());
       _dtFilterEnd.setEnabled(isAuthorized && _chkUseEndDateFilter.getSelection());
       _btnCleanup.setEnabled(isAuthorized);
@@ -587,6 +639,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          final int selectedPersonIndex = _comboPeopleList.getSelectionIndex();
          _prefStore.setValue(Preferences.SUUNTO_SELECTED_PERSON_INDEX, selectedPersonIndex);
          _prefStore.setValue(Preferences.SUUNTO_SELECTED_PERSON_ID, personId);
+
+         _prefStore.setValue(STATE_SUUNTO_CLOUD_SELECTED_TAB, _tabFolder.getSelectionIndex());
       }
 
       return isOK;
@@ -634,6 +688,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       }
 
       _comboPeopleList.select(_prefStore.getInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
+
+      _tabFolder.setSelection(_prefStore.getInt(STATE_SUUNTO_CLOUD_SELECTED_TAB));
    }
 
    private void setFilterEndDate(final long filterEndDate) {

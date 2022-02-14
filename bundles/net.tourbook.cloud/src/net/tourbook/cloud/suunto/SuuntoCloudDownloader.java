@@ -436,16 +436,30 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       }
 
       //TODO FB get the configured file name strcture from the prefs
+      /*
+       * Year
+       * Month
+       * Day
+       * Time (if available) but then which timezone !???
+       * User text
+       * User name
+       * file name <= the one by default
+       * Workout Id
+       * extension (.fit)
+       */
+
       final Path filePath = Paths.get(
             getDownloadFolder(),
-            StringUtils.sanitizeFileName(fileName));
+            StringUtils.sanitizeFileName(fileName) + workoutPayload.startTime);
       workoutDownload.setAbsoluteFilePath(filePath.toAbsolutePath().toString());
 
       if (filePath.toFile().exists()) {
 
-         workoutDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_006_FileAlreadyExists,
-               workoutDownload.getWorkoutKey(),
-               filePath.toAbsolutePath().toString()));
+         workoutDownload.setError(
+               NLS.bind(
+                     Messages.Log_DownloadWorkoutsFromSuunto_006_FileAlreadyExists,
+                     workoutDownload.getWorkoutKey(),
+                     filePath.toAbsolutePath().toString()));
          return workoutDownload;
       }
 

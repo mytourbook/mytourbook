@@ -17,12 +17,36 @@ package net.tourbook.cloud.suunto.workouts;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import de.byteholder.geoclipse.map.UI;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Payload {
 
    public int    activityId;
    public long   startTime;
+   public int    timeOffsetInMinutes;
    public String workoutKey;
 
    //TODO fb add the necessary properties here
+
+   /**
+    * Gets a sport name from an activity Id.
+    * The mapping is available here (cf. column "FIT file"):
+    * https://apimgmtstfbqznm5nc6zmvgx.blob.core.windows.net/content/MediaLibrary/docs/Suunto%20Watches-%20SuuntoApp%20-Movescount-FIT-Activities.pdf
+    *
+    * @return
+    */
+   public String getSportNameFromActivityId() {
+
+      switch (activityId) {
+      case 0:
+         return "GENERIC";
+      case 1:
+         return "RUNNING";
+      case 2:
+         return "CYCLING";
+      }
+
+      return UI.EMPTY_STRING;
+   }
 }
