@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2021 Frédéric Bard
+ * Copyright (C) 2019, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,6 +43,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.views.calendar.CalendarProfile;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -61,7 +62,7 @@ public class HistoricalWeatherRetriever {
 
          Util.logSystemProperty_IsEnabled(CalendarProfile.class,
                SYS_PROP__LOG_WEATHER_DATA,
-               "Weather data are logged"); //$NON-NLS-1$
+               "Weather data is logged"); //$NON-NLS-1$
       }
    }
 
@@ -285,23 +286,28 @@ public class HistoricalWeatherRetriever {
     */
    private String sendWeatherApiRequest() {
 
-      final String weatherRequestWithParameters =
-
-            getApiUrl() + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)
-
-                  + "&q=" + searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$ //$NON-NLS-2$
-                  + "&date=" + startDate //$NON-NLS-1$
-                  + "&tp=1" //$NON-NLS-1$
-                  + "&format=json" //$NON-NLS-1$
-
-                  + "&includelocation=yes" //$NON-NLS-1$
-                  + "&extra=utcDateTime" //$NON-NLS-1$
-      ;
-
-      //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
-
+      String weatherRequestWithParameters = UI.EMPTY_STRING;
       String weatherHistory = UI.EMPTY_STRING;
+
       try {
+         final URI apiUri = new URI(baseApiUrl);
+
+         final URIBuilder uriBuilder = new URIBuilder()
+               .setScheme(apiUri.getScheme())
+               .setHost(apiUri.getHost())
+               .setPath(apiUri.getPath());
+
+         uriBuilder.setParameter("key", _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+         uriBuilder.setParameter("q", searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude());
+         uriBuilder.setParameter("date", startDate);
+         //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
+         uriBuilder.setParameter("tp", "1");
+         uriBuilder.setParameter("format", "json");
+         uriBuilder.setParameter("includelocation", "yes");
+         uriBuilder.setParameter("extra", "utcDateTime");
+
+         weatherRequestWithParameters = uriBuilder.build().toString();
+
          // NOTE :
          // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
@@ -317,6 +323,7 @@ public class HistoricalWeatherRetriever {
          StatusUtil.logError(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
                      + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
+         Thread.currentThread().interrupt();
          return UI.EMPTY_STRING;
       }
 
