@@ -54,8 +54,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -135,90 +133,35 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private final ArrayList<PartUIItem> PART_ITEMS = new ArrayList<>();
 
    {
-      PART_ITEMS.add(new PartUIItem(//
+      PART_ITEMS.add(new PartUIItem(
             PART_TYPE.NONE,
             WIDGET_KEY.PAGE_NONE,
             UI.EMPTY_STRING,
             UI.EMPTY_STRING));
 
-   }
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.SUUNTO_FILE_NAME,
+            WIDGET_KEY.PAGE_HTML,
+            "Suunto file name <= the one by default",
+            "Suunto file name <= the one by default_Abbr"));
 
-   enum PART_TYPE {
-      NONE, //
-      HTML, //
-      //
-      ZOOM, //
-      X, //
-      Y, //
-      //
-      RANDOM_INTEGER, //
-      RANDOM_ALPHA, //
-      //
-   }
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.EXTENSION,
+            WIDGET_KEY.TEXT_HTML,
+            "Messages.Url_Parameter_Text",
+            "Messages.Url_Parameter_Text_Abbr"));
 
-   private class PartRow {
-
-      private final Combo                   rowCombo;
-
-      /**
-       * The EnumMap contains all widgets for one row
+      /*
+       * Year
+       * Month
+       * Day
+       * Time (if available) but then which timezone !???
+       * User text
+       * User name
+       * Workout Id
+       * extension (.fit)
        */
-      private final Map<WIDGET_KEY, Widget> rowWidgets;
 
-      public PartRow(final Combo combo, final Map<WIDGET_KEY, Widget> widgets) {
-         rowCombo = combo;
-         rowWidgets = widgets;
-      }
-   }
-
-   private class PartUIItem {
-
-      PART_TYPE  partKey;
-      WIDGET_KEY widgetKey;
-
-      String     text;
-      String     abbreviation;
-
-      public PartUIItem(final PART_TYPE partItemKey,
-                        final WIDGET_KEY partWidgetKey,
-                        final String partText,
-                        final String partAbbr) {
-
-         partKey = partItemKey;
-         widgetKey = partWidgetKey;
-         text = partText;
-         abbreviation = partAbbr;
-      }
-   }
-
-   private enum WIDGET_KEY {
-      //
-      PAGEBOOK, //
-      //
-      PAGE_NONE, //
-      PAGE_HTML, //
-      PAGE_X, //
-      PAGE_Y, //
-      PAGE_ZOOM, //
-      PAGE_RANDOM, //
-      //
-//    PAGE_LAT_TOP, //
-//    PAGE_LAT_BOTTOM, //
-//    PAGE_LON_LEFT, //
-//    PAGE_LON_RIGHT, //
-//
-      SPINNER_RANDOM_START, //
-      SPINNER_RANDOM_END, //
-      //
-      INPUT_ZOOM,
-      //
-      TEXT_HTML,
-      //
-      LABEL_X_SIGN, //
-      SPINNER_X_VALUE,
-      //
-      INPUT_Y_SIGN, //
-      SPINNER_Y_VALUE, //
    }
 
    @Override
@@ -514,29 +457,20 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       // combo: parameter item type
       final Combo combo = new Combo(container, SWT.READ_ONLY);
       combo.setVisibleItemCount(10);
-      combo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      combo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            if (false/* _isInitUI */) {
-               return;
-            }
+         final Combo widgetCombo = (Combo) selectionEvent.widget;
 
-            final Combo combo = (Combo) e.widget;
+         /*
+          * show page according to the selected item in the combobox
+          */
+         final Map<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).getRowWidgets();
 
-            /*
-             * show page according to the selected item in the combobox
-             */
-            final Map<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
-
-            onSelectPart(combo, rowWidgets);
-         }
-      });
+         onSelectPart(widgetCombo, rowWidgets);
+      }));
 
       // fill combo
-      for (final PartUIItem paraItem : PART_ITEMS) {
-         combo.add(paraItem.text);
-      }
+      PART_ITEMS.forEach(paraItem -> combo.add(paraItem.text));
 
       // select default
       combo.select(0);
@@ -944,19 +878,19 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       for (final PartRow row : PART_ROWS) {
 
-         final Map<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
-         final PartUIItem selectedParaItem = PART_ITEMS.get(row.rowCombo.getSelectionIndex());
+         final Map<WIDGET_KEY, Widget> rowWidgets = row.getRowWidgets();
+         final PartUIItem selectedParaItem = PART_ITEMS.get(row.getRowCombo().getSelectionIndex());
 
          switch (selectedParaItem.partKey) {
 
-         case HTML:
+         case SUUNTO_FILE_NAME:
 
             final Text txtHtml = (Text) rowWidgets.get(WIDGET_KEY.TEXT_HTML);
             sb.append(txtHtml.getText());
 
             break;
 
-         case RANDOM_INTEGER:
+         case EXTENSION:
 
             final Spinner fromSpinner = (Spinner) rowWidgets.get(WIDGET_KEY.SPINNER_RANDOM_START);
             final Spinner toSpinner = (Spinner) rowWidgets.get(WIDGET_KEY.SPINNER_RANDOM_END);

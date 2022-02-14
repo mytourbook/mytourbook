@@ -481,5 +481,4 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       return workoutDownload;
    }
-
 }
