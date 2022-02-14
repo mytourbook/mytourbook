@@ -80,8 +80,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
 
-
-
    //todo fb unit tests for downloading and sending files
 
    //https://sourceforge.net/p/mytourbook/feature-requests/198/
@@ -93,15 +91,15 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             Activator.getImageAbsoluteFilePath(CloudImages.Cloud_Suunto));
    }
 
-   private CompletableFuture<WorkoutDownload> downloadFile(final String workoutKey) {
+   private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=" + workoutKey))//$NON-NLS-1$
+            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();
 
-      return sendAsyncRequest(workoutKey, request);
+      return sendAsyncRequest(workoutPayload, request);
    }
 
    private int downloadFiles(final List<Payload> newWorkouts, final IProgressMonitor monitor) {
@@ -110,11 +108,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       //ici on passe carrement lobjet payload pour avoir toutes les infos necessaires
       final List<CompletableFuture<WorkoutDownload>> workoutDownloads = new ArrayList<>();
 
-      newWorkouts.stream().forEach(newWorkout -> {
+      newWorkouts.stream().forEach(workout -> {
          if (monitor.isCanceled()) {
             return;
          } else {
-            workoutDownloads.add(downloadFile(newWorkout.workoutKey));
+            workoutDownloads.add(downloadFile(workout));
          }
       });
 
@@ -405,12 +403,13 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return new Workouts();
    }
 
-   private CompletableFuture<WorkoutDownload> sendAsyncRequest(final String workoutKey, final HttpRequest request) {
+   private CompletableFuture<WorkoutDownload> sendAsyncRequest(final Payload workoutPayload,
+                                                               final HttpRequest request) {
 
       final CompletableFuture<WorkoutDownload> workoutDownload = _httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
-            .thenApply(response -> writeFileToFolder(workoutKey, response))
+            .thenApply(response -> writeFileToFolder(workoutPayload, response))
             .exceptionally(e -> {
-               final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutKey);
+               final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutPayload.workoutKey);
                erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_007_Error,
                      erroneousDownload.getWorkoutKey(),
                      e.getMessage()));
@@ -421,18 +420,25 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return workoutDownload;
    }
 
-   private WorkoutDownload writeFileToFolder(final String workoutKey, final HttpResponse<InputStream> response) {
+   private WorkoutDownload writeFileToFolder(final Payload workoutPayload,
+                                             final HttpResponse<InputStream> response) {
 
-      final WorkoutDownload workoutDownload = new WorkoutDownload(workoutKey);
+      final WorkoutDownload workoutDownload = new WorkoutDownload(workoutPayload.workoutKey);
 
-      final Optional<String> contentDisposition = response.headers().firstValue("Content-Disposition"); //$NON-NLS-1$
+      final Optional<String> contentDisposition =
+            response.headers().firstValue("Content-Disposition"); //$NON-NLS-1$
 
       String fileName = UI.EMPTY_STRING;
       if (contentDisposition.isPresent()) {
-         fileName = contentDisposition.get().replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+         fileName = contentDisposition
+               .get()
+               .replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
-      final Path filePath = Paths.get(getDownloadFolder(), StringUtils.sanitizeFileName(fileName));
+      //TODO FB get the configured file name strcture from the prefs
+      final Path filePath = Paths.get(
+            getDownloadFolder(),
+            StringUtils.sanitizeFileName(fileName));
       workoutDownload.setAbsoluteFilePath(filePath.toAbsolutePath().toString());
 
       if (filePath.toFile().exists()) {

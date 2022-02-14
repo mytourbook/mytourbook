@@ -83,6 +83,8 @@ public class SuuntoCloudDownloaderTests {
             }
          }
       });
+
+      // _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
    }
 
    @AfterEach
