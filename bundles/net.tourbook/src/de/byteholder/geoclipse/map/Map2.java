@@ -85,7 +85,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipProvider;
@@ -110,7 +109,6 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -1502,6 +1500,74 @@ public class Map2 extends Canvas {
       }
 
       return _poi_Tooltip;
+   }
+
+   /**
+    * @param tourId
+    * @return Return dev X/Y position of the hovered tour or <code>null</code>
+    */
+   private int[] getReducesTourPositions(final long tourId) {
+
+      final TourData tourData = TourManager.getTour(tourId);
+
+      if (tourData == null) {
+
+         // this happened, it can be that previously a history/multiple tour was displayed
+         return null;
+      }
+
+      final MP mp = getMapProvider();
+      final int zoomLevel = getZoom();
+
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+
+      // paint with much less points to speed it up
+      final int numMaxSegments = 1000;
+      final float numSlices = latitudeSerie.length;
+      final int numSegments = (int) Math.min(numMaxSegments, numSlices);
+
+      final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
+
+      // get world position for the first lat/lon
+      final java.awt.Point worldPos_FirstAWT = mp.geoToPixel(
+            new GeoPosition(latitudeSerie[0], longitudeSerie[0]),
+            zoomLevel);
+
+      // convert world position into device position
+      int devPosX1 = worldPos_FirstAWT.x - worldPosition_Viewport.x;
+      int devPosY1 = worldPos_FirstAWT.y - worldPosition_Viewport.y;
+
+      final int[] devXY = new int[numSegments * 2];
+
+      // set first position
+      devXY[0] = devPosX1;
+      devXY[1] = devPosY1;
+
+      for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
+
+         final int nextSerieIndex = (int) (numSlices / numSegments * segmentIndex);
+
+         // get world position for the current lat/lon
+         final java.awt.Point worldPosAWT = mp.geoToPixel(
+               new GeoPosition(latitudeSerie[nextSerieIndex], longitudeSerie[nextSerieIndex]),
+               zoomLevel);
+
+         // convert world position into device position
+         final int devPosX2 = worldPosAWT.x - worldPosition_Viewport.x;
+         final int devPosY2 = worldPosAWT.y - worldPosition_Viewport.y;
+
+         final int devXYIndex = segmentIndex * 2;
+
+         devXY[devXYIndex + 0] = devPosX2;
+         devXY[devXYIndex + 1] = devPosY2;
+
+         // advance to the next segment
+         devPosX1 = devPosX2;
+         devPosY1 = devPosY2;
+      }
+
+      return devXY;
    }
 
    /**
@@ -4260,7 +4326,7 @@ public class Map2 extends Canvas {
                      // paint direction arrows
                      if (_isDrawTourDirection) {
 
-                        final int[] devXYTourPositions = paint_HoveredTour_12_GetTourPositions(hoveredTourId);
+                        final int[] devXYTourPositions = getReducesTourPositions(hoveredTourId);
 
                         if (devXYTourPositions != null) {
                            paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
@@ -4289,15 +4355,11 @@ public class Map2 extends Canvas {
 
          final Long tourId = _allTourIds.get(0);
 
-         final int[] devXYTourPositions = paint_HoveredTour_12_GetTourPositions(tourId);
+         final int[] devXYTourPositions = getReducesTourPositions(tourId);
 
          if (devXYTourPositions != null) {
             paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
          }
-
-//         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"
-//               + "\tdirection arrows are painted");
-// TODO remove SYSTEM.OUT.PRINTLN
       }
 
       /*
@@ -4325,7 +4387,7 @@ public class Map2 extends Canvas {
 
       gc.setAntialias(SWT.ON);
       {
-         devXYTourPositions = paint_HoveredTour_12_GetTourPositions(tourId);
+         devXYTourPositions = getReducesTourPositions(tourId);
          if (devXYTourPositions != null) {
             gc.drawPolyline(devXYTourPositions);
          }
@@ -4336,74 +4398,6 @@ public class Map2 extends Canvas {
       if (_isDrawTourDirection && devXYTourPositions != null) {
          paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
       }
-   }
-
-   /**
-    * @param tourId
-    * @return Return dev X/Y position of the hovered tour or <code>null</code>
-    */
-   private int[] paint_HoveredTour_12_GetTourPositions(final long tourId) {
-
-      final TourData tourData = TourManager.getTour(tourId);
-
-      if (tourData == null) {
-
-         // this happened, it can be that previously a history/multiple tour was displayed
-         return null;
-      }
-
-      final MP mp = getMapProvider();
-      final int zoomLevel = getZoom();
-
-      final double[] latitudeSerie = tourData.latitudeSerie;
-      final double[] longitudeSerie = tourData.longitudeSerie;
-
-      // paint with much less points to speed it up
-      final int numMaxSegments = 1000;
-      final float numSlices = latitudeSerie.length;
-      final int numSegments = (int) Math.min(numMaxSegments, numSlices);
-
-      final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
-
-      // get world position for the first lat/lon
-      final java.awt.Point worldPos_FirstAWT = mp.geoToPixel(
-            new GeoPosition(latitudeSerie[0], longitudeSerie[0]),
-            zoomLevel);
-
-      // convert world position into device position
-      int devPosX1 = worldPos_FirstAWT.x - worldPosition_Viewport.x;
-      int devPosY1 = worldPos_FirstAWT.y - worldPosition_Viewport.y;
-
-      final int[] devXY = new int[numSegments * 2];
-
-      // set first position
-      devXY[0] = devPosX1;
-      devXY[1] = devPosY1;
-
-      for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
-
-         final int nextSerieIndex = (int) (numSlices / numSegments * segmentIndex);
-
-         // get world position for the current lat/lon
-         final java.awt.Point worldPosAWT = mp.geoToPixel(
-               new GeoPosition(latitudeSerie[nextSerieIndex], longitudeSerie[nextSerieIndex]),
-               zoomLevel);
-
-         // convert world position into device position
-         final int devPosX2 = worldPosAWT.x - worldPosition_Viewport.x;
-         final int devPosY2 = worldPosAWT.y - worldPosition_Viewport.y;
-
-         final int devXYIndex = segmentIndex * 2;
-
-         devXY[devXYIndex + 0] = devPosX2;
-         devXY[devXYIndex + 1] = devPosY2;
-
-         // advance to the next segment
-         devPosX1 = devPosX2;
-         devPosY1 = devPosY2;
-      }
-
-      return devXY;
    }
 
    private void paint_HoveredTour_14_DirectionArrows(final GC gc, final int[] devXY) {
@@ -4556,18 +4550,8 @@ public class Map2 extends Canvas {
 
       if (numTours == 1) {
 
-         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
-
-         if (tourData == null) {
-
-            // this occurred, it can be that previously a history/multiple tour was displayed
-
-         } else {
-
-            // tour data are available
-
-            paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData, _allHoveredSerieIndices.get(0));
-         }
+         // - tour info can be displayed with the tour info tooltip
+         // - tour track info can be displayed in the value point tooltip
 
       } else {
 
@@ -4581,220 +4565,6 @@ public class Map2 extends Canvas {
                ThemeUtil.getDefaultBackgroundColor_Shell(),
                true);
       }
-   }
-
-   private void paint_HoveredTour_52_TourDetail(final GC gc,
-                                                final int devXMouse,
-                                                final int devYMouse,
-                                                final TourData tourData,
-                                                final int hoveredSerieIndex) {
-
-      final Font normalFont = gc.getFont();
-
-      final String text_TourDateTime = TourManager.getTourDateTimeFull(tourData);
-      final String text_TourTitle = tourData.getTourTitle();
-      final boolean isTourTitle = text_TourTitle.length() > 0;
-
-      final long movingTime = tourData.getTourComputedTime_Moving();
-      final long recordedTime = tourData.getTourDeviceTime_Recorded();
-      final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
-
-      /*
-       * Tour values
-       */
-      final String text_TourMovingTime = String.format(VALUE_FORMAT_TIME,
-            TOUR_TOOLTIP_LABEL_MOVING_TIME,
-            FormatManager.formatMovingTime(movingTime));
-
-      final String text_TourRecordedTime = String.format("Recorded time\t%s",
-            FormatManager.formatRecordedTime(recordedTime));
-
-      final String text_TourDistance = String.format("Distance\t\t%s\t%s",
-            FormatManager.formatDistance(distance / 1000.0),
-            UI.UNIT_LABEL_DISTANCE);
-
-      /*
-       * Track values
-       */
-
-      // trackpoint
-      final String text_TrackPoint = String.format("Trackpoint\t%s",
-            Integer.toString(hoveredSerieIndex
-
-                  // start with 1 and not with 0
-                  + 1));
-
-      // time
-      String text_Time = null;
-      final int[] timeSerie = tourData.timeSerie;
-      if (timeSerie != null) {
-
-         text_Time = String.format("Time\t\t%s",
-               UI.format_hh_mm_ss(timeSerie[hoveredSerieIndex]));
-      }
-
-      // distance
-      String text_Distance = null;
-      final float[] distanceSerie = tourData.distanceSerie;
-      if (distanceSerie != null) {
-
-         text_Distance = String.format("Distance\t\t%s\t%s",
-               _nf3.format(distanceSerie[hoveredSerieIndex] / 1000 / UI.UNIT_VALUE_DISTANCE),
-               UI.UNIT_LABEL_DISTANCE);
-      }
-
-      // elevation
-      String text_Elevation = UI.EMPTY_STRING;
-      final float[] altitudeSerie = tourData.altitudeSerie;
-      if (altitudeSerie != null) {
-
-         text_Elevation = String.format("Elevation\t%s\t%s",
-               _nf2.format(altitudeSerie[hoveredSerieIndex] / UI.UNIT_VALUE_ELEVATION),
-               UI.UNIT_LABEL_ELEVATION);
-      }
-
-      // pulse
-      String text_Pulse = null;
-      final float[] pulseSerie = tourData.pulseSerie;
-      if (pulseSerie != null) {
-
-         text_Pulse = String.format("Pulse\t\t%s\t%s",
-               _nf0.format(pulseSerie[hoveredSerieIndex]),
-               GRAPH_LABEL_HEARTBEAT_UNIT);
-      }
-
-      // speed
-      String text_Speed = null;
-      final float[] speedSerie = tourData.getSpeedSerie();
-      if (speedSerie != null) {
-
-         text_Speed = String.format("Speed\t\t%s\t%s",
-               _nf1.format(speedSerie[hoveredSerieIndex]),
-               UI.UNIT_LABEL_SPEED);
-      }
-
-      // pace
-      String text_Pace = null;
-      final float[] paceSerie = tourData.getPaceSerieSeconds();
-      if (paceSerie != null) {
-
-         text_Pace = String.format("Pace\t\t%s\t%s",
-               UI.format_mm_ss((long) (paceSerie[hoveredSerieIndex] * UI.UNIT_VALUE_DISTANCE)),
-               UI.UNIT_LABEL_PACE);
-      }
-
-      final StringBuilder sb = new StringBuilder();
-
-      sb.append(NL);
-      sb.append(text_TourDateTime + NL);
-      sb.append(NL);
-      sb.append(text_TourDistance + NL);
-      sb.append(text_TourMovingTime + NL);
-      sb.append(text_TourRecordedTime + NL);
-      sb.append(NL);
-
-      sb.append(text_TrackPoint);
-      sb.append(NL);
-
-      if (text_Time != null) {
-         sb.append(NL + text_Time);
-      }
-
-      if (text_Distance != null) {
-         sb.append(NL + text_Distance);
-      }
-
-      if (text_Elevation != null) {
-         sb.append(NL + text_Elevation);
-      }
-
-      if (text_Speed != null) {
-         sb.append(NL + text_Speed);
-      }
-
-      if (text_Pace != null) {
-         sb.append(NL + text_Pace);
-      }
-
-      if (text_Pulse != null) {
-         sb.append(NL + text_Pulse);
-      }
-
-      final Point size_DateTime = gc.textExtent(text_TourDateTime);
-      final Point size_Values = gc.textExtent(sb.toString());
-
-      Point size_Title = new Point(0, 0);
-      String wrappedTitle = null;
-      int titleHeight = 0;
-
-      if (isTourTitle) {
-
-         wrappedTitle = WordUtils.wrap(text_TourTitle, 40);
-
-         gc.setFont(_boldFont);
-         size_Title = gc.textExtent(wrappedTitle);
-
-         titleHeight = size_Title.y;
-      }
-
-      final int lineHeight = size_DateTime.y;
-
-      final int marginHorizontal = 3;
-      final int marginVertical = 1;
-
-      final int contentWidth = Math.max(Math.max(size_DateTime.x, size_Values.x), size_Title.x);
-      final int contentHeight = 0
-            + (isTourTitle ? titleHeight : -lineHeight)
-            + size_Values.y;
-
-      final int detailWidth = contentWidth + marginHorizontal * 2;
-      final int detailHeight = contentHeight + marginVertical * 2;
-
-      final int marginAboveMouse = 50;
-      final int marginBelowMouse = 40;
-
-      int devXDetail = devXMouse + 20;
-      int devYDetail = devYMouse - marginAboveMouse;
-
-      // ensure that the tour detail is fully visible
-      final int viewportWidth = _devMapViewport.width;
-      if (devXDetail + detailWidth > viewportWidth) {
-         devXDetail = viewportWidth - detailWidth;
-      }
-      if (devYDetail - detailHeight < 0) {
-         devYDetail = devYMouse + detailHeight + marginBelowMouse;
-      }
-
-      final Rectangle clippingRect = new Rectangle(
-            devXDetail,
-            devYDetail - detailHeight,
-            detailWidth,
-            detailHeight);
-
-      gc.setClipping(clippingRect);
-
-      gc.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
-      gc.fillRectangle(clippingRect);
-
-      gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
-
-      final int devX = devXDetail + marginHorizontal;
-      int devY = devYDetail - contentHeight - marginVertical;
-
-      if (isTourTitle) {
-
-         gc.setFont(_boldFont);
-         gc.drawText(wrappedTitle, devX, devY);
-
-         devY += titleHeight;
-
-      } else {
-
-         devY -= lineHeight;
-      }
-
-      gc.setFont(normalFont);
-      gc.drawText(sb.toString(), devX, devY);
    }
 
    private void paint_HoveredTrackpoint_10(final GC gc,

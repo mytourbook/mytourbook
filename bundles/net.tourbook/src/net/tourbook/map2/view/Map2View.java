@@ -44,9 +44,11 @@ import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.HoveredValuePointData;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -57,6 +59,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ITourToolTipProvider;
@@ -143,6 +146,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
+import net.tourbook.ui.ValuePoint_ToolTip_UI;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
@@ -166,11 +170,13 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolBar;
@@ -346,6 +352,8 @@ public class Map2View extends ViewPart implements
          TOUR_WEATHER_TOOLTIP_X,
          TOUR_WEATHER_TOOLTIP_Y);
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
+   private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
+   //
    private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter();
    //
    private final MapInfoManager              _mapInfoManager             = MapInfoManager.getInstance();
@@ -407,9 +415,9 @@ public class Map2View extends ViewPart implements
    /*
     * Current position for the x-sliders and value point
     */
-   private int                               _currentLeftSliderValueIndex;
-   private int                               _currentRightSliderValueIndex;
-   private int                               _currentSelectedSliderValueIndex;
+   private int                               _currentSliderValueIndex_Left;
+   private int                               _currentSliderValueIndex_Right;
+   private int                               _currentSliderValueIndex_Selected;
    private int                               _externalValuePointIndex;
    //
    private MapLegend                         _mapLegend;
@@ -782,9 +790,9 @@ public class Map2View extends ViewPart implements
 
          positionMapTo_0_TourSliders(
                firstTourData,
-               _currentLeftSliderValueIndex,
-               _currentRightSliderValueIndex,
-               _currentSelectedSliderValueIndex,
+               _currentSliderValueIndex_Left,
+               _currentSliderValueIndex_Right,
+               _currentSliderValueIndex_Selected,
                null);
       }
 
@@ -883,9 +891,9 @@ public class Map2View extends ViewPart implements
 
          positionMapTo_0_TourSliders(
                _allTourData.get(0), // sync with first tour
-               _currentLeftSliderValueIndex,
-               _currentRightSliderValueIndex,
-               _currentSelectedSliderValueIndex,
+               _currentSliderValueIndex_Left,
+               _currentSliderValueIndex_Right,
+               _currentSliderValueIndex_Selected,
                null);
       }
 
@@ -1084,8 +1092,8 @@ public class Map2View extends ViewPart implements
             _isShowTour,
             _allTourData.get(0),
 
-            _currentLeftSliderValueIndex,
-            _currentRightSliderValueIndex,
+            _currentSliderValueIndex_Left,
+            _currentSliderValueIndex_Right,
             _externalValuePointIndex,
 
             isShowSliderInMap,
@@ -1171,6 +1179,8 @@ public class Map2View extends ViewPart implements
       _map.addPOIListener           (this::mapListener_POI);
       _map.addTourSelectionListener (this::mapListener_InsideMap);
 
+      _map.addControlListener       (controlResizedAdapter(this::mapListener_ControlResize));
+
 // SET_FORMATTING_ON
 
       _map.setMapContextProvider(this);
@@ -1180,11 +1190,33 @@ public class Map2View extends ViewPart implements
 
       _partListener = new IPartListener2() {
 
+         private void onPartClosed(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map2View.this) {
+
+               _mapInfoManager.resetInfo();
+            }
+         }
+
+         private void onPartHidden(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map2View.this) {
+
+               _isPartVisible = false;
+
+               // hide value point tooltip
+               _valuePointTooltipUI.setShellVisible(false);
+            }
+         }
+
          private void onPartVisible(final IWorkbenchPartReference partRef) {
 
             if (partRef.getPart(false) == Map2View.this && _isPartVisible == false) {
 
                _isPartVisible = true;
+
+               // show tool tip again
+               _valuePointTooltipUI.setShellVisible(true);
 
                if (_selectionWhenHidden != null) {
 
@@ -1207,10 +1239,7 @@ public class Map2View extends ViewPart implements
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {
-
-            if (partRef.getPart(false) == Map2View.this) {
-               _mapInfoManager.resetInfo();
-            }
+            onPartClosed(partRef);
          }
 
          @Override
@@ -1218,9 +1247,7 @@ public class Map2View extends ViewPart implements
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
-            if (partRef.getPart(false) == Map2View.this) {
-               _isPartVisible = false;
-            }
+            onPartHidden(partRef);
          }
 
          @Override
@@ -1315,6 +1342,8 @@ public class Map2View extends ViewPart implements
             _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
             createLegendImage(_tourPainterConfig.getMapColorProvider());
+
+            _valuePointTooltipUI.reopen();
 
             _map.paint();
          }
@@ -1706,36 +1735,26 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setActionsEnabled(true);
       _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
-      _map.addControlListener(controlResizedAdapter(ControlEvent -> {
+      /*
+       * Setup value point tooltip
+       */
+      final IPinned_Tooltip_Owner valuePoint_ToolTipOwner = new IPinned_Tooltip_Owner() {
 
-         /*
-          * Check if the legend size must be adjusted
-          */
-         final Image legendImage = _mapLegend.getImage();
-         if ((legendImage == null) || legendImage.isDisposed()) {
-            return;
+         @Override
+         public Control getControl() {
+            return _map;
          }
 
-         if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
-            return;
+         @Override
+         public void handleMouseEvent(final Event event, final org.eclipse.swt.graphics.Point mouseDisplayPosition) {
+            handleTooltipMouseEvent(event, mouseDisplayPosition);
          }
-
-         /*
-          * Check height
-          */
-         final Rectangle mapBounds = _map.getBounds();
-         final Rectangle legendBounds = legendImage.getBounds();
-
-         final int mapHeight = mapBounds.height;
-         final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
-         final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
-
-         if ((mapHeight < defaultLegendHeight + legendTopMargin)
-               || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
-
-            createLegendImage(_tourPainterConfig.getMapColorProvider());
-         }
-      }));
+      };
+      _valuePointTooltipUI = new ValuePoint_ToolTip_UI(
+            valuePoint_ToolTipOwner,
+            "2D Map",
+            _state,
+            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2);
 
       createActions();
 
@@ -1844,6 +1863,8 @@ public class Map2View extends ViewPart implements
       }
 
       _map.disposeOverlayImageCache();
+
+      _valuePointTooltipUI.hide();
 
       getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
@@ -2485,6 +2506,11 @@ public class Map2View extends ViewPart implements
       return mapPositions;
    }
 
+   private void handleTooltipMouseEvent(final Event event, final org.eclipse.swt.graphics.Point mouseDisplayPosition) {
+      // TODO Auto-generated method stub
+
+   }
+
    private void hideGeoGrid() {
 
       _map.showGeoSearchGrid(null);
@@ -2553,6 +2579,37 @@ public class Map2View extends ViewPart implements
       setIconPosition_TourWeather();
    }
 
+   private void mapListener_ControlResize(final ControlEvent event) {
+
+      /*
+       * Check if the legend size must be adjusted
+       */
+      final Image legendImage = _mapLegend.getImage();
+      if ((legendImage == null) || legendImage.isDisposed()) {
+         return;
+      }
+
+      if ((_isTourOrWayPoint == false) || (_isShowTour == false) || (_isShowLegend == false)) {
+         return;
+      }
+
+      /*
+       * Check height
+       */
+      final Rectangle mapBounds = _map.getBounds();
+      final Rectangle legendBounds = legendImage.getBounds();
+
+      final int mapHeight = mapBounds.height;
+      final int defaultLegendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
+      final int legendTopMargin = IMapColorProvider.LEGEND_TOP_MARGIN;
+
+      if ((mapHeight < defaultLegendHeight + legendTopMargin)
+            || ((mapHeight > defaultLegendHeight + legendTopMargin) && (legendBounds.height < defaultLegendHeight))) {
+
+         createLegendImage(_tourPainterConfig.getMapColorProvider());
+      }
+   }
+
    private void mapListener_HoveredTour(final MapHoveredTourEvent mapHoveredTourEvent) {
 
       if (_actionShowValuePoint.isChecked()) {
@@ -2570,8 +2627,8 @@ public class Map2View extends ViewPart implements
                _isShowTour,
                _allTourData.get(0),
 
-               _currentLeftSliderValueIndex,
-               _currentRightSliderValueIndex,
+               _currentSliderValueIndex_Left,
+               _currentSliderValueIndex_Right,
                _externalValuePointIndex,
 
                _actionShowSliderInMap.isChecked(),
@@ -2583,9 +2640,22 @@ public class Map2View extends ViewPart implements
          _map.redraw();
       }
 
+      final int hoveredValuePointIndex = mapHoveredTourEvent.hoveredValuePointIndex;
+
+      // update value point tooltip
+      if (hoveredValuePointIndex != -1) {
+
+         final PointLong hoveredLinePosition = new PointLong(300, 300);
+
+         _valuePointTooltipUI.setHoveredData(
+               200,
+               200,
+               new HoveredValuePointData(hoveredValuePointIndex, hoveredLinePosition, 11));
+      }
+
       final HoveredValueData hoveredValueData = new HoveredValueData(
             mapHoveredTourEvent.hoveredTourId,
-            mapHoveredTourEvent.hoveredValuePointIndex);
+            hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
             TourEventId.HOVERED_VALUE_POSITION,
@@ -2709,8 +2779,8 @@ public class Map2View extends ViewPart implements
                valueIndex2 = valueIndex1Backup;
             }
 
-            _currentLeftSliderValueIndex = valueIndex1;
-            _currentRightSliderValueIndex = valueIndex2;
+            _currentSliderValueIndex_Left = valueIndex1;
+            _currentSliderValueIndex_Right = valueIndex2;
 
             // hide the external value point
             _externalValuePointIndex = -1;
@@ -2722,8 +2792,8 @@ public class Map2View extends ViewPart implements
                   _isShowTour,
                   _allTourData.get(0),
 
-                  _currentLeftSliderValueIndex,
-                  _currentRightSliderValueIndex,
+                  _currentSliderValueIndex_Left,
+                  _currentSliderValueIndex_Right,
                   _externalValuePointIndex,
 
                   isShowSliderInMap,
@@ -3487,7 +3557,9 @@ public class Map2View extends ViewPart implements
       _isTourOrWayPoint = true;
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
+
          showDefaultMap(false);
+
          return;
       }
 
@@ -3531,8 +3603,8 @@ public class Map2View extends ViewPart implements
             _isShowTour,
             tourData,
 
-            _currentLeftSliderValueIndex,
-            _currentRightSliderValueIndex,
+            _currentSliderValueIndex_Left,
+            _currentSliderValueIndex_Right,
             _externalValuePointIndex,
 
             _actionShowSliderInMap.isChecked(),
@@ -3748,9 +3820,9 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      _currentLeftSliderValueIndex = leftSliderValuesIndex;
-      _currentRightSliderValueIndex = rightSliderValuesIndex;
-      _currentSelectedSliderValueIndex = selectedSliderIndex;
+      _currentSliderValueIndex_Left = leftSliderValuesIndex;
+      _currentSliderValueIndex_Right = rightSliderValuesIndex;
+      _currentSliderValueIndex_Selected = selectedSliderIndex;
 
       _directMappingPainter.setPaintContext(
 
@@ -3791,7 +3863,7 @@ public class Map2View extends ViewPart implements
 
             } else {
 
-               positionMapTo_ValueIndex(tourData, _currentSelectedSliderValueIndex);
+               positionMapTo_ValueIndex(tourData, _currentSliderValueIndex_Selected);
             }
          }
 
@@ -4284,7 +4356,9 @@ public class Map2View extends ViewPart implements
       Util.setStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _photoFilter_RatingStar_Operator);
       _actionMap2_PhotoFilter.getPhotoFilterSlideout().saveState();
 
-      // tour color
+      /*
+       * Tour color
+       */
       MapGraphId colorId;
 
       if (_actionTourColor_Gradient.isChecked()) {
@@ -4310,6 +4384,9 @@ public class Map2View extends ViewPart implements
          colorId = MapGraphId.Altitude;
       }
       _state.put(STATE_TOUR_COLOR_ID, colorId.name());
+
+      // value point tooltip
+      _valuePointTooltipUI.saveState();
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
@@ -4403,9 +4480,9 @@ public class Map2View extends ViewPart implements
    }
 
    /**
-    * Set tour data for the map, this is a central point to set the data.
+    * Set tour data for the map, this is THE central point to set new tours into the map.
     *
-    * @param tourData
+    * @param allTourData
     */
    private void setTourData(final ArrayList<TourData> allTourData) {
 
@@ -4418,18 +4495,20 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().addBreadcrumTours(allTourData);
 
+      _valuePointTooltipUI.setTourData(allTourData.get(0));
+
+      // update tour id's in the map
       final List<Long> allTourIds = new ArrayList<>();
       for (final TourData tourData : allTourData) {
          allTourIds.add(tourData.getTourId());
       }
       _map.setTourIds(allTourIds);
 
-      setIconPosition_TourInfo();
-      setIconPosition_TourWeather();
+      setTourData_Common();
    }
 
    /**
-    * Set tour data for the map, this is a central point to set the data.
+    * Set tour data for the map, this is THE central point to set new tours into the map.
     *
     * @param tourData
     */
@@ -4444,10 +4523,24 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().addBreadcrumTour(tourId);
 
+      _valuePointTooltipUI.setTourData(tourData);
+
+      // update tour id's in the map
       final List<Long> allTourIds = new ArrayList<>();
       allTourIds.add(tourId);
       _map.setTourIds(allTourIds);
 
+      setTourData_Common();
+   }
+
+   private void setTourData_Common() {
+
+      // with new tours these values are invalid
+//      _currentSliderValueIndex_Left = -1;
+//      _currentSliderValueIndex_Right = -1;
+//      _currentSliderValueIndex_Selected = -1;
+
+      // this must be set AFTER the breadcrumbs are set
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();
    }
@@ -4499,6 +4592,8 @@ public class Map2View extends ViewPart implements
 
       _tourInfoToolTipProvider.setTourData(null);
       _tourWeatherToolTipProvider.setTourData(null);
+
+      _valuePointTooltipUI.setTourData(null);
 
       // disable tour actions in this view
       _isTourOrWayPoint = false;
@@ -4825,8 +4920,8 @@ public class Map2View extends ViewPart implements
             _isShowTour,
             hoveredTourData,
 
-            _currentLeftSliderValueIndex,
-            _currentRightSliderValueIndex,
+            _currentSliderValueIndex_Left,
+            _currentSliderValueIndex_Right,
             hoveredSerieIndex,
 
             _actionShowSliderInMap.isChecked(),

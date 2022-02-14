@@ -228,7 +228,7 @@ public abstract class Pinned_ToolTip_Shell {
                case SWT.MouseDown:
 
                   if (event.button == 3) {
-                     
+
                      // open context menu
 
                      onEvent_ContextMenu(event);
@@ -348,6 +348,7 @@ public abstract class Pinned_ToolTip_Shell {
 
       _tooltipOwner = tooltipOwner;
       _ownerControl = tooltipOwner.getControl();
+
       _display = _ownerControl.getDisplay();
 
       this.state = state;
@@ -1193,12 +1194,11 @@ public abstract class Pinned_ToolTip_Shell {
 
       if (shouldCreateToolTip(event)) {
 
-         final Shell shell = new Shell(_ownerControl.getShell(), //
-               SWT.ON_TOP //
-//                     | SWT.TOOL
+         final Shell shell = new Shell(_ownerControl.getShell(),
+               SWT.ON_TOP
                      | SWT.NO_FOCUS
                      | SWT.NO_TRIM
-         //
+
          );
 
          shell.setLayout(new FillLayout());
@@ -1216,7 +1216,7 @@ public abstract class Pinned_ToolTip_Shell {
          return;
       }
 
-      if (shouldHideToolTip(event)) {
+      if (shouldHideToolTip(event) && _ownerControl.isDisposed() == false) {
 
          final Shell ownerShell = _ownerControl.getShell();
          ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
