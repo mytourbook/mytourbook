@@ -26,8 +26,8 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_InvalidTokens;
 
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
-   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords;
-   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip;
+   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens;
+   public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip;
    public static String        PrefPage_CloudConnectivity_Group_CloudAccount;
    public static String        PrefPage_CloudConnectivity_Group_TourDownload;
    public static String        PrefPage_CloudConnectivity_Group_TourUpload;
@@ -104,6 +104,8 @@ public class Messages extends NLS {
    public static String PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter;
    public static String PrefPage_SuuntoWorkouts_Label_FolderPath;
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
+   public static String SuuntoCloud_Group_AccountInformation;
+   public static String SuuntoCloud_Group_FileNameCustomization;
    public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
 

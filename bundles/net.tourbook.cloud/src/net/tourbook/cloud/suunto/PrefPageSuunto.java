@@ -99,7 +99,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private CTabFolder _tabFolder;
    private Button     _btnCleanup;
    private Button     _btnSelectFolder;
-   private Button     _chkShowHidePasswords;
+   private Button     _chkShowHideTokens;
    private Button     _chkUseStartDateFilter;
    private Button     _chkUseEndDateFilter;
    private Combo      _comboDownloadFolderPath;
@@ -177,11 +177,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          {
             final CTabItem tabCloudAccount = new CTabItem(_tabFolder, SWT.NONE);
             tabCloudAccount.setControl(createUI_10_AccountInformation(_tabFolder));
-            tabCloudAccount.setText("Account Information");//Messages.Compute_Values_Group_Smoothing);
+            tabCloudAccount.setText(Messages.SuuntoCloud_Group_AccountInformation);
 
             final CTabItem tabFileNameCustomization = new CTabItem(_tabFolder, SWT.NONE);
-            tabFileNameCustomization.setControl(createUI_10_FileNameCustomiation(_tabFolder));
-            tabFileNameCustomization.setText("Messages.tabFileNameCustomization");
+            tabFileNameCustomization.setControl(createUI_10_FileNameCustomization(_tabFolder));
+            tabFileNameCustomization.setText(Messages.SuuntoCloud_Group_FileNameCustomization);
          }
       }
 
@@ -228,7 +228,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private Composite createUI_10_FileNameCustomiation(final Composite parent) {
+   private Composite createUI_10_FileNameCustomization(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -316,12 +316,12 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _chkShowHidePasswords = new Button(_groupCloudAccount, SWT.CHECK);
-            _chkShowHidePasswords.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords);
-            _chkShowHidePasswords.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip);
-            _chkShowHidePasswords.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHidePasswords
+            _chkShowHideTokens = new Button(_groupCloudAccount, SWT.CHECK);
+            _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
+            _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
                   .getSelection())));
-            GridDataFactory.fillDefaults().applyTo(_chkShowHidePasswords);
+            GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
       }
    }
@@ -397,7 +397,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
-      _chkShowHidePasswords.setEnabled(isAuthorized);
+      _chkShowHideTokens.setEnabled(isAuthorized);
       _labelDownloadFolder.setEnabled(isAuthorized);
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);
@@ -438,8 +438,9 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       final int selectedPersonIndex = _comboPeopleList.getSelectionIndex();
 
-      final String personId = selectedPersonIndex == 0 ? UI.EMPTY_STRING : String.valueOf(_personIds.get(
-            selectedPersonIndex));
+      final String personId = selectedPersonIndex == 0
+            ? UI.EMPTY_STRING
+            : String.valueOf(_personIds.get(selectedPersonIndex));
 
       return personId;
    }
@@ -473,7 +474,8 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          _server.stopCallBackServer();
       }
 
-      final SuuntoTokensRetrievalHandler tokensRetrievalHandler = new SuuntoTokensRetrievalHandler(getSelectedPersonId());
+      final SuuntoTokensRetrievalHandler tokensRetrievalHandler =
+            new SuuntoTokensRetrievalHandler(getSelectedPersonId());
       _server = new LocalHostServer(CALLBACK_PORT, "Suunto", _prefChangeListener); //$NON-NLS-1$
       final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
@@ -485,9 +487,15 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       authorizeUrlBuilder.setScheme("https"); //$NON-NLS-1$
       authorizeUrlBuilder.setHost("cloudapi-oauth.suunto.com"); //$NON-NLS-1$
       authorizeUrlBuilder.setPath("/oauth/authorize"); //$NON-NLS-1$
-      authorizeUrlBuilder.addParameter(OAuth2Constants.PARAM_RESPONSE_TYPE, OAuth2Constants.PARAM_CODE);
-      authorizeUrlBuilder.addParameter(OAuth2Constants.PARAM_CLIENT_ID, ClientId);
-      authorizeUrlBuilder.addParameter(OAuth2Constants.PARAM_REDIRECT_URI, "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$
+      authorizeUrlBuilder.addParameter(
+            OAuth2Constants.PARAM_RESPONSE_TYPE,
+            OAuth2Constants.PARAM_CODE);
+      authorizeUrlBuilder.addParameter(
+            OAuth2Constants.PARAM_CLIENT_ID,
+            ClientId);
+      authorizeUrlBuilder.addParameter(
+            OAuth2Constants.PARAM_REDIRECT_URI,
+            "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$
       try {
          final String authorizeUrl = authorizeUrlBuilder.build().toString();
 
@@ -499,7 +507,9 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
    private void onSelectBrowseDirectory() {
 
-      final DirectoryDialog dialog = new DirectoryDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+      final DirectoryDialog dialog = new DirectoryDialog(
+            Display.getCurrent().getActiveShell(),
+            SWT.SAVE);
       dialog.setText(DIALOG_EXPORT_DIR_DIALOG_TEXT);
       dialog.setMessage(DIALOG_EXPORT_DIR_DIALOG_MESSAGE);
 
@@ -579,15 +589,33 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
                   String.valueOf(tourPerson.getPersonId())));
 
       tourPersonIds.forEach(tourPersonId -> {
-         _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(tourPersonId), UI.EMPTY_STRING);
-         _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId), UI.EMPTY_STRING);
-         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId), 0L);
-         _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId), 0L);
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId), UI.EMPTY_STRING);
-         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(tourPersonId), false);
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_SINCE_DATE);
-         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(tourPersonId), false);
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(tourPersonId), PreferenceInitializer.SUUNTO_FILTER_END_DATE);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoAccessToken_String(tourPersonId),
+               UI.EMPTY_STRING);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoRefreshToken_String(tourPersonId),
+               UI.EMPTY_STRING);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(tourPersonId),
+               0L);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(tourPersonId),
+               0L);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(tourPersonId),
+               UI.EMPTY_STRING);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(tourPersonId),
+               false);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(tourPersonId),
+               PreferenceInitializer.SUUNTO_FILTER_SINCE_DATE);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(tourPersonId),
+               false);
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(tourPersonId),
+               PreferenceInitializer.SUUNTO_FILTER_END_DATE);
       });
 
       super.performDefaults();
@@ -602,12 +630,20 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
          final String personId = getSelectedPersonId();
 
-         _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String(personId), _txtAccessToken_Value.getText());
-         _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String(personId), _txtRefreshToken_Value.getText());
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoAccessToken_String(personId),
+               _txtAccessToken_Value.getText());
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoRefreshToken_String(personId),
+               _txtRefreshToken_Value.getText());
 
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId), 0L);
-            _prefStore.setValue(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId), 0L);
+            _prefStore.setValue(
+                  Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(personId),
+                  0L);
+            _prefStore.setValue(
+                  Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(personId),
+                  0L);
          }
 
          if (_server != null) {
@@ -718,5 +754,4 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       Preferences.showOrHidePasswords(texts, showPasswords);
    }
-
 }
