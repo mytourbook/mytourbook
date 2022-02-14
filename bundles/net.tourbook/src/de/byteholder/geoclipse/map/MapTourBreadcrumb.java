@@ -132,7 +132,7 @@ public class MapTourBreadcrumb {
     */
    public void addBreadcrumTours(final ArrayList<TourData> allTourData) {
 
-      // keep only tour id's, allTourData list is be reused outside !!!
+      // keep only tour id's, allTourData list is reused outside !!!
 
       final int numNewTours = allTourData.size();
       final int numTourCrumbs = _allCrumbsWithAllTours.size();
@@ -415,11 +415,15 @@ public class MapTourBreadcrumb {
 
       int devX = 0;
 
+      boolean isBreadcrumbPainted = false;
+
       if (isPaintBreadcrumbs && _allCrumbsWithAllTours.isEmpty() == false) {
 
          /*
           * Crumbs are available -> Paint crumbs
           */
+
+         isBreadcrumbPainted = true;
 
          final int devY = 0;
 
@@ -602,12 +606,12 @@ public class MapTourBreadcrumb {
          final String warningText = Messages.Map2_TourBreadcrumb_Info_EnhancedPaintingWarning;
          final Point warningSize = gc.textExtent(warningText);
 
-         final int devXWarning = isPaintBreadcrumbs
+         final int devXWarning = isBreadcrumbPainted
 
                ? devX
 
                // the 'i' icon is displayed when bread crumb is not displayed -> move warning to the right
-               : 30;
+               : 60;
 
          final int devYWarning = 0;
 
@@ -682,6 +686,21 @@ public class MapTourBreadcrumb {
       _numVisibleCrumbs = numVisibleBreadcrumbs;
 
       checkVisibleCrumbs();
+   }
+
+   @Override
+   public String toString() {
+
+      return "MapTourBreadcrumb"
+
+            + "\n"
+            + "["
+            + "\n"
+
+            + "_numVisibleCrumbs       =" + _numVisibleCrumbs + "\n"
+            + "_allCrumbsWithAllTours  =" + _allCrumbsWithAllTours + "\n"
+
+            + "]";
    }
 
 }

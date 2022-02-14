@@ -200,6 +200,8 @@ public class Map2View extends ViewPart implements
 
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
+   static final String           STATE_TRACK_OPTIONS_SELECTED_TAB                      = "STATE_TRACK_OPTIONS_SELECTED_TAB";                    //$NON-NLS-1$
+
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
    static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
@@ -218,7 +220,7 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                        = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
    private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
 
@@ -244,6 +246,8 @@ public class Map2View extends ViewPart implements
 
    static final String           STATE_IS_SHOW_TOUR_DIRECTION                          = "STATE_IS_SHOW_TOUR_DIRECTION";                        //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT                  = true;
+   static final String           STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS                   = "STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS";                 //$NON-NLS-1$
+   static final boolean          STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS_DEFAULT           = false;
    static final String           STATE_TOUR_DIRECTION_LINE_WIDTH                       = "STATE_TOUR_DIRECTION_LINE_WIDTH";                     //$NON-NLS-1$
    static final int              STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT               = 3;
    static final String           STATE_TOUR_DIRECTION_MARKER_GAP                       = "STATE_TOUR_DIRECTION_MARKER_GAP";                     //$NON-NLS-1$
@@ -4033,7 +4037,7 @@ public class Map2View extends ViewPart implements
 
       // debug info
       final boolean isShowGeoGrid = _prefStore.getBoolean(PREF_DEBUG_MAP_SHOW_GEO_GRID);
-      final boolean isShowTileInfo = _prefStore.getBoolean(Map2View.PREF_SHOW_TILE_INFO);
+      final boolean isShowTileInfo = _prefStore.getBoolean(PREF_SHOW_TILE_INFO);
       final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
       _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
@@ -4051,16 +4055,16 @@ public class Map2View extends ViewPart implements
       /*
        * Hovered/selected tour
        */
-      final boolean isShowHoveredOrSelectedTour = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
-      final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   Map2View.STATE_IS_SHOW_BREADCRUMBS,                               Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
+      final boolean isShowHoveredOrSelectedTour = Util.getStateBoolean(_state,   STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
+      final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   STATE_IS_SHOW_BREADCRUMBS,                               STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
 
-      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       Map2View.STATE_VISIBLE_BREADCRUMBS,                               Map2View.STATE_VISIBLE_BREADCRUMBS_DEFAULT);
-      final int hoveredOpacity                  = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 Map2View.STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
-      final int hoveredAndSelectedOpacity       = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
-      final int selectedOpacity                 = Util.getStateInt(_state,       Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY,                Map2View.STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
-      final RGB hoveredRGB                      = Util.getStateRGB(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB,                     Map2View.STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT);
-      final RGB hoveredAndSelectedRGB           = Util.getStateRGB(_state,       Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,        Map2View.STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT);
-      final RGB selectedRGB                     = Util.getStateRGB(_state,       Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB,                    Map2View.STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
+      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       STATE_VISIBLE_BREADCRUMBS,                               STATE_VISIBLE_BREADCRUMBS_DEFAULT);
+      final int hoveredOpacity                  = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
+      final int hoveredAndSelectedOpacity       = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
+      final int selectedOpacity                 = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__SELECTED_OPACITY,                STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
+      final RGB hoveredRGB                      = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__HOVERED_RGB,                     STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT);
+      final RGB hoveredAndSelectedRGB           = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,        STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT);
+      final RGB selectedRGB                     = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__SELECTED_RGB,                    STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
 
       _map.setConfig_HoveredSelectedTour(
 
@@ -4082,28 +4086,30 @@ public class Map2View extends ViewPart implements
       /*
        * Tour direction
        */
-      final boolean isShowTourDirection      = Util.getStateBoolean(_state,      Map2View.STATE_IS_SHOW_TOUR_DIRECTION,       Map2View.STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
-      final int tourDirection_MarkerGap      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_MARKER_GAP,    Map2View.STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
-      final int tourDirection_LineWidth      = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH,    Map2View.STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
-      final float tourDirection_SymbolSize   = Util.getStateInt(_state,          Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE,   Map2View.STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
-      final RGB tourDirection_RGB            = Util.getStateRGB(_state,          Map2View.STATE_TOUR_DIRECTION_RGB,           Map2View.STATE_TOUR_DIRECTION_RGB_DEFAULT);
+      final boolean isShowTourDirection         = Util.getStateBoolean(_state,      STATE_IS_SHOW_TOUR_DIRECTION,          STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
+      final boolean isShowTourDirection_Always  = Util.getStateBoolean(_state,      STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS,   STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS_DEFAULT);
+      final int tourDirection_MarkerGap         = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_MARKER_GAP,       STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
+      final int tourDirection_LineWidth         = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_LINE_WIDTH,       STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
+      final float tourDirection_SymbolSize      = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_SYMBOL_SIZE,      STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
+      final RGB tourDirection_RGB               = Util.getStateRGB(_state,          STATE_TOUR_DIRECTION_RGB,              STATE_TOUR_DIRECTION_RGB_DEFAULT);
 
       _map.setConfig_TourDirection(
             isShowTourDirection,
+            isShowTourDirection_Always,
             tourDirection_MarkerGap,
             tourDirection_LineWidth,
             tourDirection_SymbolSize,
             tourDirection_RGB);
 
-      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,      Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   STATE_IS_TOGGLE_KEYBOARD_PANNING,   STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,      STATE_IS_ZOOM_WITH_MOUSE_POSITION,  STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
       /*
        * Set dim level/color after the map providers are set
        */
-      final boolean isMapDimmed     = Util.getStateBoolean( _state, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
-      final int mapDimValue         = Util.getStateInt(     _state, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-      final RGB mapDimColor         = Util.getStateRGB(     _state, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
+      final boolean isMapDimmed     = Util.getStateBoolean( _state, STATE_IS_MAP_DIMMED, STATE_IS_MAP_DIMMED_DEFAULT);
+      final int mapDimValue         = Util.getStateInt(     _state, STATE_DIM_MAP_VALUE, STATE_DIM_MAP_VALUE_DEFAULT);
+      final RGB mapDimColor         = Util.getStateRGB(     _state, STATE_DIM_MAP_COLOR, STATE_DIM_MAP_COLOR_DEFAULT);
       final boolean isBackgroundDark = isBackgroundDark();
 
       _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
@@ -4366,14 +4372,13 @@ public class Map2View extends ViewPart implements
       final int devXTooltip = TOUR_INFO_TOOLTIP_X;
       final int devYTooltip =
 
-            _tourPainterConfig.isShowBreadcrumbs
-                  && _map.tourBreadcrumb().getUsedCrumbs() > 0
+            _tourPainterConfig.isShowBreadcrumbs && _map.tourBreadcrumb().getUsedCrumbs() > 0
 
-                        // show tooltip icon below the crumbs
-                        ? TOUR_INFO_TOOLTIP_Y
+                  // show tooltip icon below the crumbs
+                  ? TOUR_INFO_TOOLTIP_Y
 
-                        // breadcrumb is not visible -> "center" icon in the top left corner
-                        : TOUR_INFO_TOOLTIP_X;
+                  // breadcrumb is not visible -> "center" icon in the top left corner
+                  : TOUR_INFO_TOOLTIP_X;
 
       _tourInfoToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
    }
@@ -4386,14 +4391,13 @@ public class Map2View extends ViewPart implements
       final int devXTooltip = TOUR_WEATHER_TOOLTIP_X;
       final int devYTooltip =
 
-            _tourPainterConfig.isShowBreadcrumbs
-                  && _map.tourBreadcrumb().getUsedCrumbs() > 0
+            _tourPainterConfig.isShowBreadcrumbs && _map.tourBreadcrumb().getUsedCrumbs() > 0
 
-                        // show tooltip icon below the crumbs
-                        ? TOUR_WEATHER_TOOLTIP_Y
+                  // show tooltip icon below the crumbs
+                  ? TOUR_WEATHER_TOOLTIP_Y
 
-                        // breadcrumb is not visible -> "center" icon in the top left corner
-                        : TOUR_INFO_TOOLTIP_X;
+                  // breadcrumb is not visible -> "center" icon in the top left corner
+                  : TOUR_INFO_TOOLTIP_X;
 
       _tourWeatherToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
    }
@@ -4414,6 +4418,12 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().addBreadcrumTours(allTourData);
 
+      final List<Long> allTourIds = new ArrayList<>();
+      for (final TourData tourData : allTourData) {
+         allTourIds.add(tourData.getTourId());
+      }
+      _map.setTourIds(allTourIds);
+
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();
    }
@@ -4425,12 +4435,18 @@ public class Map2View extends ViewPart implements
     */
    private void setTourData(final TourData tourData) {
 
+      final Long tourId = tourData.getTourId();
+
       _allTourData.clear();
       _allTourData.add(tourData);
 
       setVisibleDataPoints(tourData);
 
-      _map.tourBreadcrumb().addBreadcrumTour(tourData.getTourId());
+      _map.tourBreadcrumb().addBreadcrumTour(tourId);
+
+      final List<Long> allTourIds = new ArrayList<>();
+      allTourIds.add(tourId);
+      _map.setTourIds(allTourIds);
 
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();

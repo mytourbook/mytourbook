@@ -59,7 +59,9 @@ Improvements
   
 * 2D Map
   - Cut off lines in pauses				https://github.com/mytourbook/mytourbook/issues/463
-  - Enable/disable antialias painting for the tour tracks. A dimmed map may look better without antialiasing
+  - Show tour directions always
+  - Paint tour tracks with/without antialiasing. A dimmed map may look better without antialiasing
+  - Track options slideout has a new UI to reduce the size of this slideout
   
 * Tour Segmenter
   - Show power value for each segment	https://sourceforge.net/p/mytourbook/feature-requests/204/
