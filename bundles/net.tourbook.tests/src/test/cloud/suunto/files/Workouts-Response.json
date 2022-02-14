@@ -1,0 +1,386 @@
+{
+	"error": null,
+	"payload": [
+		{
+			"workoutId": 0,
+			"activityId": 1,
+			"description": "Plan improvise :\n30mns a 70% + 15mn allure course (80%)\n\nEncore des douleurs a lavant de la jambe gauche et au tibia. Xa Pro 3d ? changer chaussures ?\n\nSalomonXAPro 3DGTX",
+			"startTime": 1294887748000,
+			"totalTime": 3178.1,
+			"totalDistance": 8500.0,
+			"totalAscent": 0.0,
+			"totalDescent": 0.0,
+			"startPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"stopPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"centerPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"maxSpeed": 0.0,
+			"stepCount": 0,
+			"recoveryTime": 0,
+			"cumulativeRecoveryTime": 0,
+			"rankings": {
+				"totalTimeOnRouteRanking": {
+					"originalRanking": 0,
+					"originalNumberOfWorkouts": 0
+				}
+			},
+			"extensions": [
+				{
+					"type": "SummaryExtension",
+					"avgSpeed": 2.675,
+					"avgPower": null,
+					"maxPower": null,
+					"avgCadence": 0.0,
+					"maxCadence": null,
+					"ascent": 9.0,
+					"descent": 9.0,
+					"ascentTime": 368.0,
+					"descentTime": 284.0,
+					"pte": 3.2,
+					"peakEpoc": 73.2,
+					"performanceLevel": null,
+					"recoveryTime": null,
+					"weather": null,
+					"minTemperature": null,
+					"avgTemperature": null,
+					"maxTemperature": null,
+					"workoutType": null,
+					"feeling": null,
+					"tags": null,
+					"gear": null,
+					"exerciseId": null,
+					"apps": []
+				}
+			],
+			"extensionTypes": [
+				"ALTITUDESTREAM", "ENERGYCONSUMPTIONSTREAM", "HEARTRATESTREAM", "IBISTREAM", "INTENSITY", "SUMMARY"
+			],
+			"minAltitude": 130.0,
+			"maxAltitude": 220.0,
+			"externalMoveId": 1085138,
+			"isEdited": false,
+			"isManuallyAdded": false,
+			"tss": {
+				"calculationMethod": "MET",
+				"trainingStressScore": 49.437115,
+				"intensityFactor": null,
+				"normalizedPower": null,
+				"averageGradeAdjustedPace": null
+			},
+			"cadence": {
+				"max": 0,
+				"avg": 0
+			},
+			"timeOffsetInMinutes": -480,
+			"avgSpeed": 2.67,
+			"hrdata": {
+				"workoutMaxHR": 148,
+				"workoutAvgHR": 131,
+				"userMaxHR": 180,
+				"max": 180,
+				"avg": 131,
+				"hrmax": 148
+			},
+			"workoutKey": "601227a563c46e612c20b579",
+			"energyConsumption": 614,
+			"avgPace": 6.23,
+			"commentCount": 0,
+			"pictureCount": 0,
+			"viewCount": 0
+		}, {
+			"workoutId": 0,
+			"activityId": 1,
+			"description": "Semaine 7 improvisee car plan initial termine\n30mns a 70% + 3x5mns a 80% avec 10mns de recup\n\nDouleur a lavant de la jambe gauche (xa pro 3d ou courbatures de la sortie raquette d'hier ? )\n\nSalomonXAPro 3DGTX",
+			"startTime": 1294716006000,
+			"totalTime": 3439.5,
+			"totalDistance": 9000.0,
+			"totalAscent": 0.0,
+			"totalDescent": 0.0,
+			"startPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"stopPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"centerPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"maxSpeed": 0.0,
+			"stepCount": 0,
+			"recoveryTime": 0,
+			"cumulativeRecoveryTime": 0,
+			"rankings": {
+				"totalTimeOnRouteRanking": {
+					"originalRanking": 0,
+					"originalNumberOfWorkouts": 0
+				}
+			},
+			"extensions": [
+				{
+					"type": "SummaryExtension",
+					"avgSpeed": 2.61667,
+					"avgPower": null,
+					"maxPower": null,
+					"avgCadence": 0.0,
+					"maxCadence": null,
+					"ascent": 53.0,
+					"descent": 47.0,
+					"ascentTime": 774.0,
+					"descentTime": 674.0,
+					"pte": 3.2,
+					"peakEpoc": 72.9,
+					"performanceLevel": null,
+					"recoveryTime": null,
+					"weather": null,
+					"minTemperature": null,
+					"avgTemperature": null,
+					"maxTemperature": null,
+					"workoutType": null,
+					"feeling": null,
+					"tags": null,
+					"gear": null,
+					"exerciseId": null,
+					"apps": []
+				}
+			],
+			"extensionTypes": [
+				"ALTITUDESTREAM", "ENERGYCONSUMPTIONSTREAM", "HEARTRATESTREAM", "IBISTREAM", "INTENSITY", "SUMMARY"
+			],
+			"minAltitude": 950.0,
+			"maxAltitude": 1130.0,
+			"externalMoveId": 1085137,
+			"isEdited": false,
+			"isManuallyAdded": false,
+			"tss": {
+				"calculationMethod": "MET",
+				"trainingStressScore": 53.503334,
+				"intensityFactor": null,
+				"normalizedPower": null,
+				"averageGradeAdjustedPace": null
+			},
+			"cadence": {
+				"max": 0,
+				"avg": 0
+			},
+			"timeOffsetInMinutes": -480,
+			"avgSpeed": 2.62,
+			"hrdata": {
+				"workoutMaxHR": 159,
+				"workoutAvgHR": 130,
+				"userMaxHR": 180,
+				"max": 180,
+				"avg": 130,
+				"hrmax": 159
+			},
+			"workoutKey": "601227a490f37a52d087133b",
+			"energyConsumption": 656,
+			"avgPace": 6.37,
+			"commentCount": 0,
+			"pictureCount": 0,
+			"viewCount": 0
+		}, {
+			"workoutId": 0,
+			"activityId": 1,
+			"description": "45 mns a 70%\n\nSalomon XA Pro 3d GTX",
+			"startTime": 1294507405000,
+			"totalTime": 2926.5,
+			"totalDistance": 8400.0,
+			"totalAscent": 0.0,
+			"totalDescent": 0.0,
+			"startPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"stopPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"centerPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"maxSpeed": 0.0,
+			"stepCount": 0,
+			"recoveryTime": 0,
+			"cumulativeRecoveryTime": 0,
+			"rankings": {
+				"totalTimeOnRouteRanking": {
+					"originalRanking": 0,
+					"originalNumberOfWorkouts": 0
+				}
+			},
+			"extensions": [
+				{
+					"type": "SummaryExtension",
+					"avgSpeed": 2.86944,
+					"avgPower": null,
+					"maxPower": null,
+					"avgCadence": 0.0,
+					"maxCadence": null,
+					"ascent": 27.0,
+					"descent": 24.0,
+					"ascentTime": 426.0,
+					"descentTime": 706.0,
+					"pte": 2.9,
+					"peakEpoc": 40.7,
+					"performanceLevel": null,
+					"recoveryTime": null,
+					"weather": null,
+					"minTemperature": null,
+					"avgTemperature": null,
+					"maxTemperature": null,
+					"workoutType": null,
+					"feeling": null,
+					"tags": null,
+					"gear": null,
+					"exerciseId": null,
+					"apps": []
+				}
+			],
+			"extensionTypes": [
+				"ALTITUDESTREAM", "ENERGYCONSUMPTIONSTREAM", "HEARTRATESTREAM", "IBISTREAM", "INTENSITY", "SUMMARY"
+			],
+			"minAltitude": 1530.0,
+			"maxAltitude": 1690.0,
+			"externalMoveId": 1056107,
+			"isEdited": false,
+			"isManuallyAdded": false,
+			"tss": {
+				"calculationMethod": "MET",
+				"trainingStressScore": 45.523335,
+				"intensityFactor": null,
+				"normalizedPower": null,
+				"averageGradeAdjustedPace": null
+			},
+			"cadence": {
+				"max": 0,
+				"avg": 0
+			},
+			"timeOffsetInMinutes": 60,
+			"avgSpeed": 2.87,
+			"hrdata": {
+				"workoutMaxHR": 150,
+				"workoutAvgHR": 131,
+				"userMaxHR": 180,
+				"max": 180,
+				"avg": 131,
+				"hrmax": 150
+			},
+			"workoutKey": "601227a390f37a52d0871339",
+			"energyConsumption": 371,
+			"avgPace": 5.81,
+			"commentCount": 0,
+			"pictureCount": 0,
+			"viewCount": 0
+		}, {
+			"workoutId": 0,
+			"activityId": 1,
+			"description": "30mns a 70% + 5x1mn de cote (pres pont st michel) avec recup 1mn + 10 mn footing recup\nSalomonXAPro 3DGTX",
+			"startTime": 1294338764000,
+			"totalTime": 3429.6,
+			"totalDistance": 8996.0,
+			"totalAscent": 0.0,
+			"totalDescent": 0.0,
+			"startPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"stopPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"centerPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"maxSpeed": 0.0,
+			"stepCount": 0,
+			"recoveryTime": 0,
+			"cumulativeRecoveryTime": 0,
+			"rankings": {
+				"totalTimeOnRouteRanking": {
+					"originalRanking": 0,
+					"originalNumberOfWorkouts": 0
+				}
+			},
+			"extensions": [
+				{
+					"type": "SummaryExtension",
+					"avgSpeed": 2.62305,
+					"avgPower": null,
+					"maxPower": null,
+					"avgCadence": 0.0,
+					"maxCadence": null,
+					"ascent": 60.0,
+					"descent": 54.0,
+					"ascentTime": 580.0,
+					"descentTime": 554.0,
+					"pte": 3.0,
+					"peakEpoc": 46.2,
+					"performanceLevel": null,
+					"recoveryTime": null,
+					"weather": null,
+					"minTemperature": null,
+					"avgTemperature": null,
+					"maxTemperature": null,
+					"workoutType": null,
+					"feeling": null,
+					"tags": null,
+					"gear": null,
+					"exerciseId": null,
+					"apps": []
+				}
+			],
+			"extensionTypes": [
+				"ALTITUDESTREAM", "ENERGYCONSUMPTIONSTREAM", "HEARTRATESTREAM", "IBISTREAM", "INTENSITY", "MANUALLAP", "SUMMARY"
+			],
+			"minAltitude": 1680.0,
+			"maxAltitude": 1860.0,
+			"externalMoveId": 1056106,
+			"isEdited": false,
+			"isManuallyAdded": false,
+			"tss": {
+				"calculationMethod": "MET",
+				"trainingStressScore": 53.349335,
+				"intensityFactor": null,
+				"normalizedPower": null,
+				"averageGradeAdjustedPace": null
+			},
+			"cadence": {
+				"max": 0,
+				"avg": 0
+			},
+			"timeOffsetInMinutes": 60,
+			"avgSpeed": 2.62,
+			"hrdata": {
+				"workoutMaxHR": 156,
+				"workoutAvgHR": 128,
+				"userMaxHR": 180,
+				"max": 180,
+				"avg": 128,
+				"hrmax": 156
+			},
+			"workoutKey": "601227a366fab340b1d4b55c",
+			"energyConsumption": 422,
+			"avgPace": 6.35,
+			"commentCount": 0,
+			"pictureCount": 0,
+			"viewCount": 0
+		}
+	],
+	"metadata": {
+		"workoutcount": "4",
+		"until": "1295049600000"
+	}
+}
