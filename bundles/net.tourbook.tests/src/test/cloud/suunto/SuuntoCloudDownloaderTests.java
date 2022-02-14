@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.cloud.oauth2.OAuth2Constants;
@@ -50,7 +49,7 @@ public class SuuntoCloudDownloaderTests {
    static HttpClientMock        httpClientMock;
    static SuuntoCloudDownloader suuntoCloudDownloader;
 
-   private List<TourData>       selectedTours        = new ArrayList<>();
+//   private List<TourData>       selectedTours        = new ArrayList<>();
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
@@ -89,14 +88,14 @@ public class SuuntoCloudDownloaderTests {
    @AfterEach
    public void cleanUpEach() {
       TourLogManager.clear();
-      selectedTours.clear();
+//      selectedTours.clear();
    }
 
    @Test
    void testTourDownload() {
 
       final String suuntoResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
-            + "ManualTour-StravaResponse.json"); //$NON-NLS-1$
+            + "ManualTour-SuntoTODOResponse.json"); //$NON-NLS-1$
       httpClientMock.onGet(
             OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=") //$NON-NLS-1$
             .doReturn(suuntoResponse)
@@ -104,7 +103,7 @@ public class SuuntoCloudDownloaderTests {
 
       final TourData tour = Initializer.createManualTour();
 
-      selectedTours.add(tour);
+//      selectedTours.add(tour);
       suuntoCloudDownloader.downloadTours();
 
       httpClientMock.verify().get(HEROKU_APP_URL_TOKEN).called();
