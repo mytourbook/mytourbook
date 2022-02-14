@@ -102,31 +102,32 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    /*
     * UI controls
     */
-   private CTabFolder _tabFolder;
-   private Composite  _partContainer;
+   private CTabFolder                  _tabFolder;
+   private Composite                   _partContainer;
 
-   private Button     _btnCleanup;
-   private Button     _btnSelectFolder;
-   private Button     _chkShowHideTokens;
-   private Button     _chkUseStartDateFilter;
-   private Button     _chkUseEndDateFilter;
-   private Combo      _comboDownloadFolderPath;
-   private Combo      _comboPeopleList;
-   private DateTime   _dtFilterStart;
-   private DateTime   _dtFilterEnd;
-   private Group      _groupCloudAccount;
-   private Label      _labelAccessToken;
-   private Label      _labelExpiresAt;
-   private Label      _labelExpiresAt_Value;
-   private Label      _labelRefreshToken;
-   private Label      _labelDownloadFolder;
-   private Text       _txtAccessToken_Value;
-   private Text       _txtRefreshToken_Value;
+   private Button                      _btnCleanup;
+   private Button                      _btnSelectFolder;
+   private Button                      _chkShowHideTokens;
+   private Button                      _chkUseStartDateFilter;
+   private Button                      _chkUseEndDateFilter;
+   private Combo                       _comboDownloadFolderPath;
+   private Combo                       _comboPeopleList;
+   private DateTime                    _dtFilterStart;
+   private DateTime                    _dtFilterEnd;
+   private Group                       _groupCloudAccount;
+   private Label                       _labelAccessToken;
+   private Label                       _labelExpiresAt;
+   private Label                       _labelExpiresAt_Value;
+   private Label                       _labelRefreshToken;
+   private Label                       _labelDownloadFolder;
+   private Text                        _txtAccessToken_Value;
+   private Text                        _txtCustomFileName;
+   private Text                        _txtRefreshToken_Value;
 
    /**
     * contains all rows with url parts which are displayed in the UI
     */
-   private final ArrayList<PartRow> PART_ROWS = new ArrayList<>();
+   private final ArrayList<PartRow>    PART_ROWS  = new ArrayList<>();
 
    /**
     * url parameter items which can be selected in the combobox for each parameter
@@ -303,6 +304,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       return container;
    }
+
    private void createUI_101_Authorize(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -332,235 +334,239 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-      private void createUI_102_TokensInformation(final Composite parent) {
+   private void createUI_102_TokensInformation(final Composite parent) {
 
-         final PixelConverter pc = new PixelConverter(parent);
+      final PixelConverter pc = new PixelConverter(parent);
 
-         _groupCloudAccount = new Group(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupCloudAccount);
-         _groupCloudAccount.setText(Messages.PrefPage_CloudConnectivity_Group_CloudAccount);
-         GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupCloudAccount);
+      _groupCloudAccount = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupCloudAccount);
+      _groupCloudAccount.setText(Messages.PrefPage_CloudConnectivity_Group_CloudAccount);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupCloudAccount);
+      {
          {
-            {
-               final Label labelWebPage = new Label(_groupCloudAccount, SWT.NONE);
-               labelWebPage.setText(Messages.PrefPage_CloudConnectivity_Label_WebPage);
-               GridDataFactory.fillDefaults().applyTo(labelWebPage);
+            final Label labelWebPage = new Label(_groupCloudAccount, SWT.NONE);
+            labelWebPage.setText(Messages.PrefPage_CloudConnectivity_Label_WebPage);
+            GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
-               final Link linkWebPage = new Link(_groupCloudAccount, SWT.NONE);
-               linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage + UI.LINK_TAG_END);
-               linkWebPage.setEnabled(true);
-               linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
-                     Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage)));
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
-            }
-            {
-               _labelAccessToken = new Label(_groupCloudAccount, SWT.NONE);
-               _labelAccessToken.setText(Messages.PrefPage_CloudConnectivity_Label_AccessToken);
-               GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
+            final Link linkWebPage = new Link(_groupCloudAccount, SWT.NONE);
+            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage + UI.LINK_TAG_END);
+            linkWebPage.setEnabled(true);
+            linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+                  Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage)));
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
+         }
+         {
+            _labelAccessToken = new Label(_groupCloudAccount, SWT.NONE);
+            _labelAccessToken.setText(Messages.PrefPage_CloudConnectivity_Label_AccessToken);
+            GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
-               _txtAccessToken_Value = new Text(_groupCloudAccount, SWT.READ_ONLY | SWT.PASSWORD);
-               GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_txtAccessToken_Value);
-            }
-            {
-               _labelRefreshToken = new Label(_groupCloudAccount, SWT.NONE);
-               _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
-               GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
+            _txtAccessToken_Value = new Text(_groupCloudAccount, SWT.READ_ONLY | SWT.PASSWORD);
+            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_txtAccessToken_Value);
+         }
+         {
+            _labelRefreshToken = new Label(_groupCloudAccount, SWT.NONE);
+            _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
+            GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
-               _txtRefreshToken_Value = new Text(_groupCloudAccount, SWT.READ_ONLY | SWT.PASSWORD);
-               GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_txtRefreshToken_Value);
-            }
-            {
-               _labelExpiresAt = new Label(_groupCloudAccount, SWT.NONE);
-               _labelExpiresAt.setText(Messages.PrefPage_CloudConnectivity_Label_ExpiresAt);
-               GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
+            _txtRefreshToken_Value = new Text(_groupCloudAccount, SWT.READ_ONLY | SWT.PASSWORD);
+            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_txtRefreshToken_Value);
+         }
+         {
+            _labelExpiresAt = new Label(_groupCloudAccount, SWT.NONE);
+            _labelExpiresAt.setText(Messages.PrefPage_CloudConnectivity_Label_ExpiresAt);
+            GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
-               _labelExpiresAt_Value = new Label(_groupCloudAccount, SWT.NONE);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
-            }
-            {
-               _chkShowHideTokens = new Button(_groupCloudAccount, SWT.CHECK);
-               _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
-               _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-               _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
-                     .getSelection())));
-               GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
-            }
+            _labelExpiresAt_Value = new Label(_groupCloudAccount, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+         }
+         {
+            _chkShowHideTokens = new Button(_groupCloudAccount, SWT.CHECK);
+            _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
+            _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
+                  .getSelection())));
+            GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
       }
+   }
 
-      private void createUI_103_TourDownload(final Composite parent) {
+   private void createUI_103_TourDownload(final Composite parent) {
 
-         final Group group = new Group(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-         group.setText(Messages.PrefPage_CloudConnectivity_Group_TourDownload);
-         GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(Messages.PrefPage_CloudConnectivity_Group_TourDownload);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      {
          {
-            {
-               _labelDownloadFolder = new Label(group, SWT.NONE);
-               _labelDownloadFolder.setText(Messages.PrefPage_SuuntoWorkouts_Label_FolderPath);
-               _labelDownloadFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_labelDownloadFolder);
+            _labelDownloadFolder = new Label(group, SWT.NONE);
+            _labelDownloadFolder.setText(Messages.PrefPage_SuuntoWorkouts_Label_FolderPath);
+            _labelDownloadFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_labelDownloadFolder);
 
-               /*
-                * combo: path
-                */
-               _comboDownloadFolderPath = new Combo(group, SWT.SINGLE | SWT.BORDER);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboDownloadFolderPath);
-               _comboDownloadFolderPath.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
-               _comboDownloadFolderPath.setEnabled(false);
+            /*
+             * combo: path
+             */
+            _comboDownloadFolderPath = new Combo(group, SWT.SINGLE | SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboDownloadFolderPath);
+            _comboDownloadFolderPath.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
+            _comboDownloadFolderPath.setEnabled(false);
 
-               _btnSelectFolder = new Button(group, SWT.PUSH);
-               _btnSelectFolder.setText(APP_BTN_BROWSE);
-               _btnSelectFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
-               _btnSelectFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectBrowseDirectory()));
-               setButtonLayoutData(_btnSelectFolder);
-            }
-
-            {
-               /*
-                * Checkbox: Use a start (or "since") date filter
-                */
-               _chkUseStartDateFilter = new Button(group, SWT.CHECK);
-               _chkUseStartDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter);
-               _chkUseStartDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseStartDateFilter);
-               _chkUseStartDateFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _dtFilterStart.setEnabled(_chkUseStartDateFilter
-                     .getSelection())));
-
-               _dtFilterStart = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-               _dtFilterStart.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterStart);
-            }
-
-            {
-               /*
-                * Checkbox: Use an end date filter
-                */
-               _chkUseEndDateFilter = new Button(group, SWT.CHECK);
-               _chkUseEndDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter);
-               _chkUseEndDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseEndDateFilter);
-               _chkUseEndDateFilter.addSelectionListener(widgetSelectedAdapter(
-                     selectionEvent -> _dtFilterEnd.setEnabled(_chkUseEndDateFilter.getSelection())));
-
-               _dtFilterEnd = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-               _dtFilterEnd.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterEnd);
-            }
-
+            _btnSelectFolder = new Button(group, SWT.PUSH);
+            _btnSelectFolder.setText(APP_BTN_BROWSE);
+            _btnSelectFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
+            _btnSelectFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectBrowseDirectory()));
+            setButtonLayoutData(_btnSelectFolder);
          }
-      }
 
-      private void createUI_104_AccountCleanup(final Composite parent) {
-
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
-         GridLayoutFactory.fillDefaults().applyTo(parent);
          {
             /*
-             * Clean-up button
+             * Checkbox: Use a start (or "since") date filter
              */
-            _btnCleanup = new Button(parent, SWT.NONE);
-            _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
-            _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
-            _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
-            GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
+            _chkUseStartDateFilter = new Button(group, SWT.CHECK);
+            _chkUseStartDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter);
+            _chkUseStartDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseStartDateFilter);
+            _chkUseStartDateFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _dtFilterStart.setEnabled(_chkUseStartDateFilter
+                  .getSelection())));
+
+            _dtFilterStart = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+            _dtFilterStart.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterStart);
          }
-      }
 
-      private Composite createUI_200_FileNameCustomization(final Composite parent) {
-
-         Label label;
-
-         final Composite container = new Composite(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-         GridLayoutFactory.fillDefaults().applyTo(container);
          {
-            // label: url parameter
-            label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().span(2, 1).align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-            label.setText("Messages.Dialog_CustomConfig_Label_UrlParts");
+            /*
+             * Checkbox: Use an end date filter
+             */
+            _chkUseEndDateFilter = new Button(group, SWT.CHECK);
+            _chkUseEndDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter);
+            _chkUseEndDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseEndDateFilter);
+            _chkUseEndDateFilter.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _dtFilterEnd.setEnabled(_chkUseEndDateFilter.getSelection())));
 
-            // url parts
-            _partContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).span(1, 1).applyTo(_partContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_partContainer);
-            {
-               PART_ROWS.add(createUI210PartRow(_partContainer, 0));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 1));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 2));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 3));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 4));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 5));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 6));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 7));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 8));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 9));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 10));
-               PART_ROWS.add(createUI210PartRow(_partContainer, 11));
-            }
-
-//            createUI220Details(container);
-//            createUI240DebugInfo(container);
+            _dtFilterEnd = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+            _dtFilterEnd.setToolTipText(Messages.PrefPage_SuuntoWorkouts_DatesFilter_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(2, 1).applyTo(_dtFilterEnd);
          }
-         return container;
+
       }
-      private PartRow createUI210PartRow(final Composite container, final int row) {
+   }
 
-         // combo: parameter item type
-         final Combo combo = new Combo(container, SWT.READ_ONLY);
-         combo.setVisibleItemCount(10);
-         combo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+   private void createUI_104_AccountCleanup(final Composite parent) {
 
-               if (false/* _isInitUI */) {
-                  return;
-               }
-
-               final Combo combo = (Combo) e.widget;
-
-               /*
-                * show page according to the selected item in the combobox
-                */
-               final Map<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
-
-               onSelectPart(combo, rowWidgets);
-            }
-         });
-
-         // fill combo
-         for (final PartUIItem paraItem : PART_ITEMS) {
-            combo.add(paraItem.text);
-         }
-
-         // select default
-         combo.select(0);
-
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
+      GridLayoutFactory.fillDefaults().applyTo(parent);
+      {
          /*
-          * pagebook: parameter widgets
+          * Clean-up button
           */
-         //final EnumMap<WIDGET_KEY, Widget> paraWidgets = new EnumMap<>()//createUI212ParaWidgets(container);
-
-         return new PartRow(combo, null);
+         _btnCleanup = new Button(parent, SWT.NONE);
+         _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
+         _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+         _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
       }
-      private void enableControls() {
+   }
 
-         final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText())
-               && StringUtils.hasContent(_txtRefreshToken_Value.getText());
+   private Composite createUI_200_FileNameCustomization(final Composite parent) {
 
-         _labelRefreshToken.setEnabled(isAuthorized);
-         _labelExpiresAt.setEnabled(isAuthorized);
-         _labelAccessToken.setEnabled(isAuthorized);
-         _chkShowHideTokens.setEnabled(isAuthorized);
-         _labelDownloadFolder.setEnabled(isAuthorized);
-         _comboDownloadFolderPath.setEnabled(isAuthorized);
-         _btnSelectFolder.setEnabled(isAuthorized);
-         _chkUseStartDateFilter.setEnabled(isAuthorized);
-         _chkUseEndDateFilter.setEnabled(isAuthorized);
-         _dtFilterStart.setEnabled(isAuthorized && _chkUseStartDateFilter.getSelection());
-         _dtFilterEnd.setEnabled(isAuthorized && _chkUseEndDateFilter.getSelection());
-         _btnCleanup.setEnabled(isAuthorized);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         // Label: custom file name
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText("Messages.Dialog_MapConfig_Label_CustomUrl");
+         //label.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
+
+         // Text: custom file name
+         _txtCustomFileName = new Text(container, SWT.BORDER | SWT.READ_ONLY);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtCustomFileName);
+         //  _txtCustomUrl.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
+         _txtCustomFileName.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+         // File name parts
+         _partContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).span(1, 1).applyTo(_partContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_partContainer);
+         {
+            PART_ROWS.add(createUI210PartRow(_partContainer, 0));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 1));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 2));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 3));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 4));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 5));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 6));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 7));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 8));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 9));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 10));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 11));
+         }
       }
+      return container;
+   }
+
+   private PartRow createUI210PartRow(final Composite container, final int row) {
+
+      // combo: parameter item type
+      final Combo combo = new Combo(container, SWT.READ_ONLY);
+      combo.setVisibleItemCount(10);
+      combo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+
+            if (false/* _isInitUI */) {
+               return;
+            }
+
+            final Combo combo = (Combo) e.widget;
+
+            /*
+             * show page according to the selected item in the combobox
+             */
+            final Map<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
+
+            onSelectPart(combo, rowWidgets);
+         }
+      });
+
+      // fill combo
+      for (final PartUIItem paraItem : PART_ITEMS) {
+         combo.add(paraItem.text);
+      }
+
+      // select default
+      combo.select(0);
+
+      /*
+       * pagebook: parameter widgets
+       */
+      //final EnumMap<WIDGET_KEY, Widget> paraWidgets = new EnumMap<>()//createUI212ParaWidgets(container);
+
+      return new PartRow(combo, null);
+   }
+
+   private void enableControls() {
+
+      final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText())
+            && StringUtils.hasContent(_txtRefreshToken_Value.getText());
+
+      _labelRefreshToken.setEnabled(isAuthorized);
+      _labelExpiresAt.setEnabled(isAuthorized);
+      _labelAccessToken.setEnabled(isAuthorized);
+      _chkShowHideTokens.setEnabled(isAuthorized);
+      _labelDownloadFolder.setEnabled(isAuthorized);
+      _comboDownloadFolderPath.setEnabled(isAuthorized);
+      _btnSelectFolder.setEnabled(isAuthorized);
+      _chkUseStartDateFilter.setEnabled(isAuthorized);
+      _chkUseEndDateFilter.setEnabled(isAuthorized);
+      _dtFilterStart.setEnabled(isAuthorized && _chkUseStartDateFilter.getSelection());
+      _dtFilterEnd.setEnabled(isAuthorized && _chkUseEndDateFilter.getSelection());
+      _btnCleanup.setEnabled(isAuthorized);
+   }
 
    private long getFilterDate(final DateTime filterDate) {
 
