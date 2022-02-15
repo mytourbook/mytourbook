@@ -2729,7 +2729,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              * Checkbox: Cloud apps
              */
             _chkOptions_ShowTile_CloudApps = new Button(group, SWT.CHECK);
-            _chkOptions_ShowTile_CloudApps.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_CoudApps);
+            _chkOptions_ShowTile_CloudApps.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_CloudApps);
             _chkOptions_ShowTile_CloudApps.addSelectionListener(_liveUpdateListener);
          }
          {

@@ -627,7 +627,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_SaveTour_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
-   public static String        Dialog_ImportConfig_Checkbox_ShowTile_CoudApps;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_CloudApps;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_Files;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_FossilUI;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_SerialPort;
