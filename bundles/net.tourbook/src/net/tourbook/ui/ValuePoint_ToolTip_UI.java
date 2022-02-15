@@ -1501,7 +1501,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _currentValueIndex = 0;
 
       if (tourData == null) {
+
          hide();
+
          return;
       }
 

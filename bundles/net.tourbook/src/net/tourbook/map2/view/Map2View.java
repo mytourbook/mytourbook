@@ -1757,7 +1757,6 @@ public class Map2View extends ViewPart implements
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2,
 
             false // do not show the chart zoom factor
-
       );
 
       createActions();
@@ -2644,6 +2643,7 @@ public class Map2View extends ViewPart implements
          _map.redraw();
       }
 
+      final Long hoveredTourId = mapHoveredTourEvent.hoveredTourId;
       final int hoveredValuePointIndex = mapHoveredTourEvent.hoveredValuePointIndex;
 
       // update value point tooltip
@@ -2654,6 +2654,10 @@ public class Map2View extends ViewPart implements
 
          final PointLong hoveredLinePosition = new PointLong(mousePositionX, mousePositionY);
 
+         // when multiple tours are displayed then the tour data into the value point must be set
+         final TourData tourData = TourManager.getTour(hoveredTourId);
+         _valuePointTooltipUI.setTourData(tourData);
+
          _valuePointTooltipUI.setHoveredData(
                mousePositionX,
                mousePositionY,
@@ -2661,7 +2665,7 @@ public class Map2View extends ViewPart implements
       }
 
       final HoveredValueData hoveredValueData = new HoveredValueData(
-            mapHoveredTourEvent.hoveredTourId,
+            hoveredTourId,
             hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
@@ -4502,7 +4506,8 @@ public class Map2View extends ViewPart implements
 
       _map.tourBreadcrumb().addBreadcrumTours(allTourData);
 
-      _valuePointTooltipUI.setTourData(allTourData.get(0));
+      // the value point tooltip do not support multiple tours
+      _valuePointTooltipUI.setTourData(null);
 
       // update tour id's in the map
       final List<Long> allTourIds = new ArrayList<>();
