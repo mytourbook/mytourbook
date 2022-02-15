@@ -643,7 +643,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
                   .applyTo(text);
             text.addModifyListener(modifyListener);
 
-            paraWidgets.put(WIDGET_KEY.PAGE_USER_TEXT, text);
+            paraWidgets.put(WIDGET_KEY.TEXT_USER_TEXT, text);
          }
          paraWidgets.put(WIDGET_KEY.PAGE_USER_TEXT, textContainer);
       }
@@ -1116,7 +1116,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             break;
 
          case USER_TEXT:
-            final Text txtHtml = (Text) rowWidgets.get(WIDGET_KEY.PAGE_USER_TEXT);
+            final Text txtHtml = (Text) rowWidgets.get(WIDGET_KEY.TEXT_USER_TEXT);
             stringBuilder.append(txtHtml.getText());
             break;
 

@@ -26,5 +26,7 @@ public enum WIDGET_KEY {
    PAGE_MONTH, //
    PAGE_DAY, //
    PAGE_USER_NAME, //
-   PAGE_USER_TEXT
+   PAGE_USER_TEXT, //
+   //
+   TEXT_USER_TEXT, //
 }
