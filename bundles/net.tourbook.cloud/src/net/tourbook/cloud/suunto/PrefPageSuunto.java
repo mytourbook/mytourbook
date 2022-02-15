@@ -74,11 +74,6 @@ import org.eclipse.ui.part.PageBook;
 
 public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferencePage {
 
-   //TODO FB tabs
-   // Cloud Account
-   //File download ?
-   //but that might not work since it's different for each user
-
    //todo fb strava: why is it successful when I upload a duplicate tour !?!?!?!
    private static final String     APP_BTN_BROWSE                   = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE = net.tourbook.Messages.dialog_export_dir_dialog_message;
@@ -125,12 +120,12 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private Text                        _txtRefreshToken_Value;
 
    /**
-    * contains all rows with url parts which are displayed in the UI
+    * Contains all rows with file name parts that are displayed in the UI
     */
    private final ArrayList<PartRow>    PART_ROWS  = new ArrayList<>();
 
    /**
-    * url parameter items which can be selected in the combobox for each parameter
+    * File name parts that can be selected in the combobox for each parameter
     */
    private final ArrayList<PartUIItem> PART_ITEMS = new ArrayList<>();
 
@@ -143,27 +138,54 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       PART_ITEMS.add(new PartUIItem(
             PART_TYPE.SUUNTO_FILE_NAME,
-            WIDGET_KEY.PAGE_HTML,
-            "Suunto file name <= the one by default",
-            "Suunto file name <= the one by default_Abbr"));
+            WIDGET_KEY.PAGE_SUUNTO_FILE_NAME,
+            Messages.Filename_Component_SuuntoName,
+            Messages.Filename_Component_SuuntoName_Abbr));
+      //TODO FB
+//            "Suunto file name <= the one by default",
+//            "Suunto file name <= the one by default_Abbr"));
 
       PART_ITEMS.add(new PartUIItem(
             PART_TYPE.FIT_EXTENSION,
-            WIDGET_KEY.TEXT_HTML,
-            "Messages.Url_Parameter_Text",
-            "Messages.Url_Parameter_Text_Abbr"));
+            WIDGET_KEY.PAGE_FIT_EXTENSION,
+            Messages.Filename_Component_FitExtension,
+            Messages.Filename_Component_FitExtension_Abbr));
 
-      /*
-       * Year
-       * Month
-       * Day
-       * Time (if available) but then which timezone !???
-       * User text
-       * User name
-       * Workout Id
-       * extension (.fit)
-       */
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.WORKOUT_ID,
+            WIDGET_KEY.PAGE_WORKOUT_ID,
+            Messages.Filename_Component_ActivityId,
+            Messages.Filename_Component_ActivityId_Abbr));
 
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.YEAR,
+            WIDGET_KEY.PAGE_YEAR,
+            Messages.Filename_Component_Year,
+            Messages.Filename_Component_Year_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.MONTH,
+            WIDGET_KEY.PAGE_MONTH,
+            Messages.Filename_Component_Month,
+            Messages.Filename_Component_Month_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.DAY,
+            WIDGET_KEY.PAGE_DAY,
+            Messages.Filename_Component_Day,
+            Messages.Filename_Component_Day_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.USER_NAME,
+            WIDGET_KEY.PAGE_USER_NAME,
+            Messages.Filename_Component_UserName,
+            Messages.Filename_Component_UserName_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.USER_TEXT,
+            WIDGET_KEY.PAGE_USER_TEXT,
+            Messages.Filename_Component_UserText,
+            Messages.Filename_Component_UserText_Abbr));
    }
 
    @Override
@@ -449,6 +471,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             PART_ROWS.add(createUI210PartRow(_partContainer, 9));
             PART_ROWS.add(createUI210PartRow(_partContainer, 10));
             PART_ROWS.add(createUI210PartRow(_partContainer, 11));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 12));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 13));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 14));
+            PART_ROWS.add(createUI210PartRow(_partContainer, 15));
          }
       }
       return container;
@@ -489,78 +515,137 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       final EnumMap<WIDGET_KEY, Widget> paraWidgets = new EnumMap<>(WIDGET_KEY.class);
 
-      final ModifyListener modifyListener = event -> updateUICustomUrl();
+      final ModifyListener modifyListener = event -> updateCustomFileName();
 
       final PageBook bookParameter = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(bookParameter);
       paraWidgets.put(WIDGET_KEY.PAGEBOOK, bookParameter);
       {
-         // page: none
+         // Page: none
          Label label = new Label(bookParameter, SWT.NONE);
          paraWidgets.put(WIDGET_KEY.PAGE_NONE, label);
 
          /*
-          * page: html text
+          * Page: Suunto's file name
+          */
+         final Composite suuntoFilenameContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(suuntoFilenameContainer);
+         {
+            label = new Label(suuntoFilenameContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_SUUNTO_FILE_NAME, suuntoFilenameContainer);
+
+/*
+ * Page: FIT Extension
+ */
+         final Composite fitExtensionContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(fitExtensionContainer);
+         {
+            label = new Label(fitExtensionContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.FIT_EXTENSION));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_FIT_EXTENSION, fitExtensionContainer);
+
+         /*
+          * Page: Workout ID
+          */
+         final Composite workoutIdContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(workoutIdContainer);
+         {
+            label = new Label(workoutIdContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.WORKOUT_ID));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_WORKOUT_ID, workoutIdContainer);
+
+         /*
+          * Page: year
+          */
+         final Composite yearContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(yearContainer);
+         {
+            label = new Label(yearContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.YEAR));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_YEAR, yearContainer);
+
+         /*
+          * Page: month
+          */
+         final Composite monthContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(monthContainer);
+         {
+            label = new Label(monthContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.MONTH));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_MONTH, monthContainer);
+
+         /*
+          * Page: day
+          */
+         final Composite dayContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(dayContainer);
+         {
+            label = new Label(dayContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.DAY));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_DAY, dayContainer);
+
+         /*
+          * Page: user name
+          */
+         final Composite userNameContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(userNameContainer);
+         {
+            label = new Label(userNameContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.USER_NAME));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_USER_NAME, userNameContainer);
+
+         /*
+          * Page: User text
           */
          final Composite textContainer = new Composite(bookParameter, SWT.NONE);
          GridLayoutFactory.fillDefaults().applyTo(textContainer);
          {
-            final Text txtHtml = new Text(textContainer, SWT.BORDER);
+            final Text text = new Text(textContainer, SWT.BORDER);
             GridDataFactory.fillDefaults()//
                   .grab(true, true)
                   .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(txtHtml);
-            txtHtml.addModifyListener(modifyListener);
+                  .applyTo(text);
+            text.addModifyListener(modifyListener);
 
-            paraWidgets.put(WIDGET_KEY.TEXT_HTML, txtHtml);
+            paraWidgets.put(WIDGET_KEY.PAGE_USER_TEXT, text);
          }
-         paraWidgets.put(WIDGET_KEY.PAGE_HTML, textContainer);
-
-         /*
-          * page: x
-          */
-         final Composite xContainer = new Composite(bookParameter, SWT.NONE);
-         GridLayoutFactory.fillDefaults().applyTo(xContainer);
-         {
-            label = new Label(xContainer, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .grab(true, true)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
-            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
-         }
-         paraWidgets.put(WIDGET_KEY.PAGE_X, xContainer);
-
-         /*
-          * page: y
-          */
-         final Composite yContainer = new Composite(bookParameter, SWT.NONE);
-         GridLayoutFactory.fillDefaults().applyTo(yContainer);
-         {
-            label = new Label(yContainer, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .grab(true, true)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
-            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
-         }
-         paraWidgets.put(WIDGET_KEY.PAGE_Y, yContainer);
-
-         /*
-          * page: zoom
-          */
-         final Composite zoomContainer = new Composite(bookParameter, SWT.NONE);
-         GridLayoutFactory.fillDefaults().applyTo(zoomContainer);
-         {
-            label = new Label(zoomContainer, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .grab(true, true)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
-            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
-         }
-         paraWidgets.put(WIDGET_KEY.PAGE_ZOOM, zoomContainer);
-
+         paraWidgets.put(WIDGET_KEY.PAGE_USER_TEXT, textContainer);
       }
 
       // show hide page
@@ -732,7 +817,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       _partContainer.layout();
 
-      updateUICustomUrl();
+      updateCustomFileName();
    }
 
    private void onSelectPerson() {
@@ -869,9 +954,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
             final String[] currentDeviceFolderHistoryItems = _state.getArray(
                   DialogEasyImportConfig.STATE_DEVICE_FOLDER_HISTORY_ITEMS);
-            final List<String> stateDeviceFolderHistoryItems = currentDeviceFolderHistoryItems != null ? new ArrayList<>(Arrays.asList(
-                  currentDeviceFolderHistoryItems))
-                  : new ArrayList<>();
+            final List<String> stateDeviceFolderHistoryItems =
+                  currentDeviceFolderHistoryItems != null
+                        ? new ArrayList<>(Arrays.asList(currentDeviceFolderHistoryItems))
+                        : new ArrayList<>();
 
             if (!stateDeviceFolderHistoryItems.contains(downloadFolder)) {
                stateDeviceFolderHistoryItems.add(downloadFolder);
@@ -880,10 +966,18 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             }
          }
 
-         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(personId), _chkUseStartDateFilter.getSelection());
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(personId), getFilterStartDate());
-         _prefStore.setValue(Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(personId), _chkUseEndDateFilter.getSelection());
-         _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(personId), getFilterEndDate());
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoUseWorkoutFilterStartDate_String(personId),
+               _chkUseStartDateFilter.getSelection());
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoWorkoutFilterStartDate_String(personId),
+               getFilterStartDate());
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoUseWorkoutFilterEndDate_String(personId),
+               _chkUseEndDateFilter.getSelection());
+         _prefStore.setValue(
+               Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(personId),
+               getFilterEndDate());
 
          final int selectedPersonIndex = _comboPeopleList.getSelectionIndex();
          _prefStore.setValue(Preferences.SUUNTO_SELECTED_PERSON_INDEX, selectedPersonIndex);
@@ -897,13 +991,24 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
    private void restoreAccountInformation(final String selectedPersonId) {
 
-      _txtAccessToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
-      _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
-            _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(selectedPersonId)),
-            _prefStore.getLong(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(selectedPersonId)) * 1000));
-      _txtRefreshToken_Value.setText(_prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
+      _txtAccessToken_Value.setText(
+            _prefStore.getString(
+                  Preferences.getPerson_SuuntoAccessToken_String(selectedPersonId)));
+      _labelExpiresAt_Value.setText(
+            OAuth2Utils.computeAccessTokenExpirationDate(
+                  _prefStore.getLong(
+                        Preferences.getPerson_SuuntoAccessTokenIssueDateTime_String(
+                              selectedPersonId)),
+                  _prefStore.getLong(
+                        Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(
+                              selectedPersonId)) * 1000));
+      _txtRefreshToken_Value.setText(
+            _prefStore.getString(
+                  Preferences.getPerson_SuuntoRefreshToken_String(selectedPersonId)));
 
-      _comboDownloadFolderPath.setText(_prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
+      _comboDownloadFolderPath.setText(
+            _prefStore.getString(
+                  Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(selectedPersonId)));
 
       _chkUseStartDateFilter.setSelection(
             _prefStore.getBoolean(
@@ -969,11 +1074,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    }
 
    /**
-    * update custom url from url parts
+    * Update the custom file name
     */
-   private void updateUICustomUrl() {
+   private void updateCustomFileName() {
 
-      final StringBuilder sb = new StringBuilder();
+      final StringBuilder stringBuilder = new StringBuilder();
 
       for (final PartRow row : PART_ROWS) {
 
@@ -983,29 +1088,43 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          switch (selectedParaItem.partKey) {
 
          case SUUNTO_FILE_NAME:
-
-            final Text txtHtml = (Text) rowWidgets.get(WIDGET_KEY.TEXT_HTML);
-            sb.append(txtHtml.getText());
-
+            stringBuilder.append(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
             break;
 
          case FIT_EXTENSION:
-            sb.append(createUI214Parameter(PART_TYPE.FIT_EXTENSION));
+            stringBuilder.append(createUI214Parameter(PART_TYPE.FIT_EXTENSION));
             break;
 
-//         case Y:
-//            sb.append(createUI214Parameter(PART_TYPE.Y));
-//            break;
-//
-//         case ZOOM:
-//            sb.append(createUI214Parameter(PART_TYPE.ZOOM));
-//            break;
+         case WORKOUT_ID:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.WORKOUT_ID));
+            break;
+
+         case YEAR:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.YEAR));
+            break;
+
+         case MONTH:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.MONTH));
+            break;
+
+         case DAY:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.DAY));
+            break;
+
+         case USER_NAME:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.USER_NAME));
+            break;
+
+         case USER_TEXT:
+            final Text txtHtml = (Text) rowWidgets.get(WIDGET_KEY.PAGE_USER_TEXT);
+            stringBuilder.append(txtHtml.getText());
+            break;
 
          default:
             break;
          }
       }
 
-      _txtCustomFileName.setText(sb.toString());
+      _txtCustomFileName.setText(stringBuilder.toString());
    }
 }

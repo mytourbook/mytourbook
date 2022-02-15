@@ -86,6 +86,23 @@ public class Messages extends NLS {
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
+   public static String Filename_Component_FitExtension;
+   public static String Filename_Component_FitExtension_Abbr;
+   public static String Filename_Component_SuuntoName;
+   public static String Filename_Component_SuuntoName_Abbr;
+   public static String Filename_Component_ActivityId;
+   public static String Filename_Component_ActivityId_Abbr;
+   public static String Filename_Component_Year;
+   public static String Filename_Component_Year_Abbr;
+   public static String Filename_Component_Month;
+   public static String Filename_Component_Month_Abbr;
+   public static String Filename_Component_Day;
+   public static String Filename_Component_Day_Abbr;
+   public static String Filename_Component_UserName;
+   public static String Filename_Component_UserName_Abbr;
+   public static String Filename_Component_UserText;
+   public static String Filename_Component_UserText_Abbr;
+
    public static String Import_Data_HTML_SuuntoWorkoutsDownloader_Tooltip;
    public static String Log_DownloadWorkoutsFromSuunto_001_Start;
    public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;

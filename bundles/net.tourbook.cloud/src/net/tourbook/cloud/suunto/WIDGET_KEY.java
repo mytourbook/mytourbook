@@ -17,31 +17,14 @@ package net.tourbook.cloud.suunto;
 
 public enum WIDGET_KEY {
 
-   //
    PAGEBOOK, //
-   //
    PAGE_NONE, //
-   PAGE_HTML, //
-   PAGE_X, //
-   PAGE_Y, //
-   PAGE_ZOOM, //
-   PAGE_RANDOM, //
-   //
-//    PAGE_LAT_TOP, //
-//    PAGE_LAT_BOTTOM, //
-//    PAGE_LON_LEFT, //
-//    PAGE_LON_RIGHT, //
-//
-   SPINNER_RANDOM_START, //
-   SPINNER_RANDOM_END, //
-   //
-   INPUT_ZOOM,
-   //
-   TEXT_HTML,
-   //
-   LABEL_X_SIGN, //
-   SPINNER_X_VALUE,
-   //
-   INPUT_Y_SIGN, //
-   SPINNER_Y_VALUE, //
+   PAGE_SUUNTO_FILE_NAME, //
+   PAGE_FIT_EXTENSION, //
+   PAGE_WORKOUT_ID, //
+   PAGE_YEAR, //
+   PAGE_MONTH, //
+   PAGE_DAY, //
+   PAGE_USER_NAME, //
+   PAGE_USER_TEXT
 }

@@ -24,12 +24,6 @@ public enum PART_TYPE {
    YEAR, //
    MONTH, //
    DAY, //
-   //TIME,//
    USER_NAME, //
    USER_TEXT
-
-   /*
-    * Time (if available) but then which timezone !???
-    */
-
 }

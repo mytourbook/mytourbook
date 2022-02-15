@@ -104,8 +104,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private int downloadFiles(final List<Payload> newWorkouts, final IProgressMonitor monitor) {
 
-      //todo fb here
-      //ici on passe carrement lobjet payload pour avoir toutes les infos necessaires
       final List<CompletableFuture<WorkoutDownload>> workoutDownloads = new ArrayList<>();
 
       newWorkouts.stream().forEach(workout -> {
