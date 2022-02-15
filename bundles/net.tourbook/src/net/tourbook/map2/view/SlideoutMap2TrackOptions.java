@@ -388,6 +388,9 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
             _chkIsAntialiasPainting.setText(Messages.Slideout_Map_Options_Checkbox_AntialiasPainting);
             _chkIsAntialiasPainting.setToolTipText(Messages.Slideout_Map_Options_Checkbox_AntialiasPainting_Tooltip);
             _chkIsAntialiasPainting.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkIsAntialiasPainting);
          }
       }
    }

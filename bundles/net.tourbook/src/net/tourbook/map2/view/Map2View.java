@@ -4576,17 +4576,26 @@ public class Map2View extends ViewPart implements
       /*
        * Cut off lines within a pause -> set visible and hidden points
        */
-      final int[] timeSerie = tourData.timeSerie;
-      final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie = new boolean[timeSerie.length];
-
       final boolean[] breakTimeSerie = tourData.getBreakTimeSerie();
+      final boolean isBreakTimeAvailable = breakTimeSerie != null;
 
-      for (int timeIndex = 0; timeIndex < breakTimeSerie.length; timeIndex++) {
+      final int numSlices = tourData.timeSerie.length;
 
-         final boolean isBreakTime = breakTimeSerie[timeIndex];
+      tourData.visibleDataPointSerie = isBreakTimeAvailable
+            ? new boolean[numSlices]
+            : null;
 
-         if (isBreakTime == false) {
-            visibleDataPointSerie[timeIndex] = true;
+      if (isBreakTimeAvailable) {
+
+         final boolean[] visibleDataPointSerie = tourData.visibleDataPointSerie;
+
+         for (int timeIndex = 0; timeIndex < breakTimeSerie.length; timeIndex++) {
+
+            final boolean isBreakTime = breakTimeSerie[timeIndex];
+
+            if (isBreakTime == false) {
+               visibleDataPointSerie[timeIndex] = true;
+            }
          }
       }
    }
