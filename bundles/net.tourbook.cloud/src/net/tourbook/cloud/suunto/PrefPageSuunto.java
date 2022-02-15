@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -476,13 +478,109 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       combo.select(0);
 
       /*
-       * pagebook: parameter widgets
+       * Pagebook: parameter widgets
        */
-      //final EnumMap<WIDGET_KEY, Widget> paraWidgets = new EnumMap<>()//createUI212ParaWidgets(container);
+      final EnumMap<WIDGET_KEY, Widget> paraWidgets = createUI212ParaWidgets(container);
 
-      return new PartRow(combo, null);
+      return new PartRow(combo, paraWidgets);
    }
 
+   private EnumMap<WIDGET_KEY, Widget> createUI212ParaWidgets(final Composite parent) {
+
+      final EnumMap<WIDGET_KEY, Widget> paraWidgets = new EnumMap<>(WIDGET_KEY.class);
+
+      final ModifyListener modifyListener = event -> updateUICustomUrl();
+
+      final PageBook bookParameter = new PageBook(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(bookParameter);
+      paraWidgets.put(WIDGET_KEY.PAGEBOOK, bookParameter);
+      {
+         // page: none
+         Label label = new Label(bookParameter, SWT.NONE);
+         paraWidgets.put(WIDGET_KEY.PAGE_NONE, label);
+
+         /*
+          * page: html text
+          */
+         final Composite textContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(textContainer);
+         {
+            final Text txtHtml = new Text(textContainer, SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(txtHtml);
+            txtHtml.addModifyListener(modifyListener);
+
+            paraWidgets.put(WIDGET_KEY.TEXT_HTML, txtHtml);
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_HTML, textContainer);
+
+         /*
+          * page: x
+          */
+         final Composite xContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(xContainer);
+         {
+            label = new Label(xContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_X, xContainer);
+
+         /*
+          * page: y
+          */
+         final Composite yContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(yContainer);
+         {
+            label = new Label(yContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_Y, yContainer);
+
+         /*
+          * page: zoom
+          */
+         final Composite zoomContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(zoomContainer);
+         {
+            label = new Label(zoomContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_ZOOM, zoomContainer);
+
+      }
+
+      // show hide page
+      bookParameter.showPage((Control) paraWidgets.get(WIDGET_KEY.PAGE_NONE));
+
+      return paraWidgets;
+   }
+
+   private String createUI214Parameter(final PART_TYPE itemKey) {
+
+      for (final PartUIItem paraItem : PART_ITEMS) {
+         if (paraItem.partKey == itemKey) {
+            return "" + paraItem.abbreviation + "";
+         }
+      }
+
+      StatusUtil.showStatus("invalid itemKey '" + itemKey + "'", new Exception()); //$NON-NLS-1$ //$NON-NLS-2$
+
+      return UI.EMPTY_STRING;
+   }
    private void enableControls() {
 
       final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText())
