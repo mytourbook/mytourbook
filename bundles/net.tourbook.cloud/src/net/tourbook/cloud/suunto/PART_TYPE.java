@@ -19,24 +19,17 @@ public enum PART_TYPE {
 
    NONE, //
    SUUNTO_FILE_NAME, //
-   EXTENSION, //
+   FIT_EXTENSION, //
    WORKOUT_ID, //
    YEAR, //
    MONTH, //
    DAY, //
    //TIME,//
    USER_NAME, //
-   USER_TEXT //
-   //
+   USER_TEXT
 
    /*
-    * Year
-    * Month
-    * Day
     * Time (if available) but then which timezone !???
-    * User text
-    * User name
-    * extension (.fit)
     */
 
 }

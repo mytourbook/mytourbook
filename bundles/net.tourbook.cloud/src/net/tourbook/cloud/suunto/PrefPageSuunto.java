@@ -66,7 +66,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
@@ -149,7 +148,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             "Suunto file name <= the one by default_Abbr"));
 
       PART_ITEMS.add(new PartUIItem(
-            PART_TYPE.EXTENSION,
+            PART_TYPE.FIT_EXTENSION,
             WIDGET_KEY.TEXT_HTML,
             "Messages.Url_Parameter_Text",
             "Messages.Url_Parameter_Text_Abbr"));
@@ -990,33 +989,17 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
             break;
 
-         case EXTENSION:
-
-            final Spinner fromSpinner = (Spinner) rowWidgets.get(WIDGET_KEY.SPINNER_RANDOM_START);
-            final Spinner toSpinner = (Spinner) rowWidgets.get(WIDGET_KEY.SPINNER_RANDOM_END);
-
-            final int fromValue = fromSpinner.getSelection();
-            final int toValue = toSpinner.getSelection();
-
-            sb.append(PARAMETER_LEADING_CHAR);
-            sb.append(Integer.toString(fromValue));
-            sb.append("..."); //$NON-NLS-1$
-            sb.append(Integer.toString(toValue));
-            sb.append(PARAMETER_TRAILING_CHAR);
-
+         case FIT_EXTENSION:
+            sb.append(createUI214Parameter(PART_TYPE.FIT_EXTENSION));
             break;
 
-//         case X:
-//            sb.append(createUI214Parameter(PART_TYPE.X));
-//            break;
-//
 //         case Y:
 //            sb.append(createUI214Parameter(PART_TYPE.Y));
 //            break;
 //
 //         case ZOOM:
 //            sb.append(createUI214Parameter(PART_TYPE.ZOOM));
-         // break;
+//            break;
 
          default:
             break;
