@@ -6709,7 +6709,7 @@ public class ChartComponentGraph extends Canvas {
       boolean isAdjusted = false;
 
       /*
-       * it happened, that lineDevPos was null
+       * It happened, that lineDevPos was null
        */
       if (lineDevPos == null) {
 
@@ -6746,6 +6746,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       if (isAdjusted) {
+
          // force repaining
          _isOverlayDirty = true;
       }
@@ -6824,13 +6825,13 @@ public class ChartComponentGraph extends Canvas {
       return _zoomRatioLeftBorder;
    }
 
-   private void handleChartResizeForSliders(final boolean isFireEvent) {
+   private void handleChartResize_ForSliders() {
 
       // update the width in the sliders
       final int visibleGraphHeight = getDevVisibleGraphHeight();
 
-      getLeftSlider().handleChartResize(visibleGraphHeight, isFireEvent);
-      getRightSlider().handleChartResize(visibleGraphHeight, isFireEvent);
+      getLeftSlider().handleChartResize(visibleGraphHeight, false);
+      getRightSlider().handleChartResize(visibleGraphHeight, false);
    }
 
    /**
@@ -10189,7 +10190,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          setZoomRatioLeftBorder();
-         handleChartResizeForSliders(false);
+         handleChartResize_ForSliders();
 
          updateVisibleMinMaxValues();
          moveSlidersToBorder();
@@ -10281,7 +10282,7 @@ public class ChartComponentGraph extends Canvas {
          _zoomRatioCenter = devCenterPos / devVirtualWidth;
       }
 
-      handleChartResizeForSliders(false);
+      handleChartResize_ForSliders();
 
       updateVisibleMinMaxValues();
 
@@ -10369,7 +10370,7 @@ public class ChartComponentGraph extends Canvas {
 
          setZoomRatioLeftBorder();
 
-         handleChartResizeForSliders(false);
+         handleChartResize_ForSliders();
          updateVisibleMinMaxValues();
 
          if (isUpdateChart) {
@@ -10387,7 +10388,7 @@ public class ChartComponentGraph extends Canvas {
 
             setZoomRatioLeftBorder();
 
-            handleChartResizeForSliders(false);
+            handleChartResize_ForSliders();
             updateVisibleMinMaxValues();
 
             if (isUpdateChart) {

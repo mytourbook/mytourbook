@@ -6182,9 +6182,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             serieIndex++;
          }
 
-         System.out.println(this.getClass().getCanonicalName() + " - used srtm1 Values: " + usedSrtm1Values
-               + ", used srtm3 Values: " + usedSrtm3Values
-               + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues);
+         System.out.println(this.getClass().getCanonicalName() + " - used srtm1 Values: " + usedSrtm1Values //$NON-NLS-1$
+               + ", used srtm3 Values: " + usedSrtm3Values //$NON-NLS-1$
+               + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues); //$NON-NLS-1$
 
          if (isSRTMValid) {
             srtmSerie = newSRTMSerie;

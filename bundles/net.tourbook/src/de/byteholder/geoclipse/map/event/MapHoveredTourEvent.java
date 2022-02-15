@@ -24,10 +24,22 @@ public class MapHoveredTourEvent {
    public Long               hoveredTourId;
    public int                hoveredValuePointIndex;
 
-   public MapHoveredTourEvent(final Long hoveredTourId, final int hoveredValuePointIndex) {
+   /**
+    * Mouse x position relative to the owner control
+    */
+   public int                mousePositionX;
+   public int                mousePositionY;
+
+   public MapHoveredTourEvent(final Long hoveredTourId,
+                              final int hoveredValuePointIndex,
+                              final int mousePositionX,
+                              final int mousePositionY) {
 
       this.hoveredTourId = hoveredTourId;
       this.hoveredValuePointIndex = hoveredValuePointIndex;
+
+      this.mousePositionX = mousePositionX;
+      this.mousePositionY = mousePositionY;
    }
 
    @Override
@@ -39,8 +51,8 @@ public class MapHoveredTourEvent {
 
             + "[" + NL //                                                        //$NON-NLS-1$
 
-            + "hoveredTourId=" + hoveredTourId + NL //                           //$NON-NLS-1$
-            + "hoveredValuePointIndex=" + hoveredValuePointIndex + NL //         //$NON-NLS-1$
+            + "hoveredTourId           =" + hoveredTourId + NL //                //$NON-NLS-1$
+            + "hoveredValuePointIndex  =" + hoveredValuePointIndex + NL //       //$NON-NLS-1$
 
             + "]"; //                                                            //$NON-NLS-1$
    }

@@ -110,8 +110,8 @@ public class StravaUploaderTests {
       httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
       httpClientMock
             .verify()
-            .post("https://www.strava.com/api/v3/uploads")
-            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888")
+            .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
+            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$ //$NON-NLS-2$
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
@@ -137,10 +137,10 @@ public class StravaUploaderTests {
       httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
       httpClientMock
             .verify()
-            .post("https://www.strava.com/api/v3/activities")
-            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888")
+            .post("https://www.strava.com/api/v3/activities") //$NON-NLS-1$
+            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$ //$NON-NLS-2$
             .withBody(equalTo(
-                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour\",\"elapsed_time\":3600,\"description\":\"\",\"type\":\"Run\"}"))
+                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour\",\"elapsed_time\":3600,\"description\":\"\",\"type\":\"Run\"}")) //$NON-NLS-1$
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
