@@ -1170,7 +1170,11 @@ public class Map2 extends Canvas {
 
    private void fireEvent_HoveredTour(final Long hoveredTourId, final int hoveredValuePointIndex) {
 
-      final MapHoveredTourEvent event = new MapHoveredTourEvent(hoveredTourId, hoveredValuePointIndex);
+      final MapHoveredTourEvent event = new MapHoveredTourEvent(
+            hoveredTourId,
+            hoveredValuePointIndex,
+            _mouseMove_DevPosition_X,
+            _mouseMove_DevPosition_Y);
 
       for (final Object listener : _allHoveredTourListeners.getListeners()) {
          ((IHoveredTourListener) listener).setHoveredTourId(event);

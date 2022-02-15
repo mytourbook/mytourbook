@@ -188,6 +188,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isAvailable_Pulse_BpmFromDevice;
    private boolean _isAvailable_Pulse_RRIntervals;
 
+   private boolean _canBeDisplayed_ChartZoomFactor = true;
+
    /*
     * UI resources
     */
@@ -274,16 +276,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * @param state
     * @param prefKey_TooltipIsVisible
     *           Key in pref store to show/hide value point tooltip
+    * @param isVisible_ChartZoomFactor
     */
    public ValuePoint_ToolTip_UI(final IPinned_Tooltip_Owner tooltipOwner,
                                 final String title,
                                 final IDialogSettings state,
-                                final String prefKey_TooltipIsVisible) {
+                                final String prefKey_TooltipIsVisible,
+                                final boolean isVisible_ChartZoomFactor) {
 
       super(tooltipOwner, state);
 
       _headerTitle = title;
       _prefKey_TooltipIsVisible = prefKey_TooltipIsVisible;
+
+      _canBeDisplayed_ChartZoomFactor = isVisible_ChartZoomFactor;
 
       // get state if the tooltip is visible or hidden
       _isToolTipVisible = _prefStore.getBoolean(_prefKey_TooltipIsVisible);
@@ -389,6 +395,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private void createActions() {
 
       _ttMenuMgr = new ValuePoint_ToolTip_MenuManager(this, state);
+
+      _ttMenuMgr.setCanBeDisplayed_ChartZoomFactor(_canBeDisplayed_ChartZoomFactor);
 
       _actionOpenTooltipMenu = new ActionOpenTooltipMenu();
    }
@@ -1449,27 +1457,30 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          return;
       }
 
-      final HoveredValuePointData hoveredValuePointData = (HoveredValuePointData) hoveredData;
+      if (hoveredData instanceof HoveredValuePointData) {
 
-      _devXMouse = devXMouseMove;
-      _devYMouse = devYMouseMove;
+         final HoveredValuePointData hoveredValuePointData = (HoveredValuePointData) hoveredData;
 
-      _chartZoomFactor = hoveredValuePointData.graphZoomFactor;
+         _devXMouse = devXMouseMove;
+         _devYMouse = devYMouseMove;
 
-      if (_shellContainer == null || _shellContainer.isDisposed()) {
+         _chartZoomFactor = hoveredValuePointData.graphZoomFactor;
 
-         /*
-          * tool tip is disposed, this happens on a mouse exit, display the tooltip again
-          */
-         show(new Point(devXMouseMove, devYMouseMove));
-      }
+         if (_shellContainer == null || _shellContainer.isDisposed()) {
 
-      // check again
-      if (_shellContainer != null && !_shellContainer.isDisposed()) {
+            /*
+             * tool tip is disposed, this happens on a mouse exit, display the tooltip again
+             */
+            show(new Point(devXMouseMove, devYMouseMove));
+         }
 
-         setTTShellLocation(devXMouseMove, devYMouseMove, hoveredValuePointData.valueDevPosition);
+         // check again
+         if (_shellContainer != null && !_shellContainer.isDisposed()) {
 
-         updateUI(hoveredValuePointData.valueIndex);
+            setTTShellLocation(devXMouseMove, devYMouseMove, hoveredValuePointData.valueDevPosition);
+
+            updateUI(hoveredValuePointData.valueIndex);
+         }
       }
    }
 
@@ -1571,7 +1582,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final boolean isAvailable_Altimeter             = _tourData.getAltimeterSerie()                 != null;
       final boolean isAvailable_Altitude              = _tourData.getAltitudeSerie()                  != null;
       final boolean isAvailable_Cadence               = _tourData.getCadenceSerie()                   != null;
-      final boolean isAvailable_ChartZoomFactor       = true;
+      final boolean isAvailable_ChartZoomFactor       = _canBeDisplayed_ChartZoomFactor;
       final boolean isAvailable_Distance              = _tourData.distanceSerie                       != null;
       final boolean isAvailable_Gears                 = _tourData.getGears()                          != null;
       final boolean isAvailable_Gradient              = _tourData.getGradientSerie()                  != null;
@@ -1651,7 +1662,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             ;
 
       _isVisible_And_Available_Altimeter           = isAvailable_Altimeter          && visibleId_Altimeter > 0;
-      _isVisible_And_Available_Elevation            = isAvailable_Altitude           && visibleId_Altitude > 0;
+      _isVisible_And_Available_Elevation           = isAvailable_Altitude           && visibleId_Altitude > 0;
       _isVisible_And_Available_Cadence             = isAvailable_Cadence            && visibleId_Cadence > 0;
       _isVisible_And_Available_ChartZoomFactor     = isAvailable_ChartZoomFactor    && visibleId_ChartZoomFactor > 0;
       _isVisible_And_Available_Distance            = isAvailable_Distance           && visibleId_Distance > 0;

@@ -1754,7 +1754,11 @@ public class Map2View extends ViewPart implements
             valuePoint_ToolTipOwner,
             "2D Map",
             _state,
-            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2);
+            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2,
+
+            false // do not show the chart zoom factor
+
+      );
 
       createActions();
 
@@ -2645,12 +2649,15 @@ public class Map2View extends ViewPart implements
       // update value point tooltip
       if (hoveredValuePointIndex != -1) {
 
-         final PointLong hoveredLinePosition = new PointLong(300, 300);
+         final int mousePositionX = mapHoveredTourEvent.mousePositionX;
+         final int mousePositionY = mapHoveredTourEvent.mousePositionY;
+
+         final PointLong hoveredLinePosition = new PointLong(mousePositionX, mousePositionY);
 
          _valuePointTooltipUI.setHoveredData(
-               200,
-               200,
-               new HoveredValuePointData(hoveredValuePointIndex, hoveredLinePosition, 11));
+               mousePositionX,
+               mousePositionY,
+               new HoveredValuePointData(hoveredValuePointIndex, hoveredLinePosition, -1));
       }
 
       final HoveredValueData hoveredValueData = new HoveredValueData(

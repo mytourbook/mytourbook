@@ -906,7 +906,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             valuePoint_ToolTipOwner,
             "Tour Chart",
             _state,
-            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART);
+            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART,
+
+            true // allow to show the chart zoom factor
+      );
       setValuePointToolTipProvider(_valuePointTooltipUI);
 
       _photoTooltip = new ChartPhotoToolTip(this, _state);

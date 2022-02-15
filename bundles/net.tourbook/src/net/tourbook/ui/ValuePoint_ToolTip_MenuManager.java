@@ -82,7 +82,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
    private ValuePoint_ToolTip_UI         _valuePointToolTipUI;
 
-   private Menu                          _menu                                    = null;
+   private Menu                          _menu;
 
    private boolean                       _isHorizontal;
 
@@ -126,6 +126,8 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionPinLocation             _actionPinLocation_BottomLeft;
    private ActionPinLocation             _actionPinLocation_BottomRight;
    private ActionPinLocation             _actionPinLocation_MouseXPosition;
+
+   public boolean                        canBeDisplayed_ChartZoomFactor           = true;
 
    private final class ActionCloseTTContextMenu extends Action {
 
@@ -609,7 +611,9 @@ public class ValuePoint_ToolTip_MenuManager {
       addItem(_actionValue_RunDyn_VerticalOscillation);
       addItem(_actionValue_RunDyn_VerticalRatio);
       addItem(_actionValue_TourCompareResult);
-      addItem(_actionValue_ChartZoomFactor);
+      if (canBeDisplayed_ChartZoomFactor) {
+         addItem(_actionValue_ChartZoomFactor);
+      }
       addItem(_actionCloseTTContextMenu);
 
       (new Separator()).fill(_menu, -1);
@@ -671,7 +675,7 @@ public class ValuePoint_ToolTip_MenuManager {
          openToolTipMenu_10_OpenWithLocation(toolItem.getParent(), toolItem.getBounds());
 
       } else if (widget instanceof Control) {
-         
+
          // open and position drop down menu at the mouse position
 
          final Control menuParent_Control = (Control) widget;
@@ -694,5 +698,10 @@ public class ValuePoint_ToolTip_MenuManager {
       final Menu menu = getMenu(menuParent_Control);
       menu.setLocation(topLeft_Menu.x, topLeft_Menu.y);
       menu.setVisible(true);
+   }
+
+   void setCanBeDisplayed_ChartZoomFactor(final boolean canBeDisplayed_ChartZoomFactor) {
+
+      this.canBeDisplayed_ChartZoomFactor = canBeDisplayed_ChartZoomFactor;
    }
 }
