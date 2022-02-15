@@ -157,8 +157,9 @@ import org.eclipse.swt.widgets.Event;
 
 public class Map2 extends Canvas {
 
-   private static final String          GRAPH_LABEL_HEARTBEAT_UNIT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE                    = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME                 = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
+   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
    private static final char            NL                                             = UI.NEW_LINE;
 
@@ -183,14 +184,15 @@ public class Map2 extends Canvas {
    public static final int              EXPANDED_HOVER_SIZE                            = 20;
    public static final int              EXPANDED_HOVER_SIZE2                           = EXPANDED_HOVER_SIZE / 2;
 
-   private static final String          DIRECTION_E                                    = "E";                                                    //$NON-NLS-1$
-   private static final String          DIRECTION_N                                    = "N";                                                    //$NON-NLS-1$
+   private static final String          DIRECTION_E                                    = "E";                                                     //$NON-NLS-1$
+   private static final String          DIRECTION_N                                    = "N";                                                     //$NON-NLS-1$
 
-   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                               //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                                //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_DISTANCE                          = "%s\t\t%s %s";                                           //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
-   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                               //$NON-NLS-1$
+   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                                //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -4623,10 +4625,12 @@ public class Map2 extends Canvas {
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
-      final String text_TourRecordedTime = String.format("Recorded time\t%s",
-            FormatManager.formatRecordedTime(recordedTime));
+      final String text_TourRecordedTime = String.format(VALUE_FORMAT_TIME,
+            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+            FormatManager.formatMovingTime(recordedTime));
 
-      final String text_TourDistance = String.format("Distance\t\t%s %s",
+      final String text_TourDistance = String.format(VALUE_FORMAT_DISTANCE,
+            TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 

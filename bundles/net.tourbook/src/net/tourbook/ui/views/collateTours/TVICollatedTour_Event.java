@@ -104,7 +104,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
             + NL
 
-            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // get tag id's
             + "LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //    //$NON-NLS-1$ //$NON-NLS-2$

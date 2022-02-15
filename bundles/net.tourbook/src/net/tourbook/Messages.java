@@ -2547,6 +2547,8 @@ public class Messages extends NLS {
    public static String        Tour_Book_Monitor_CollateTask;
    public static String        Tour_Book_SortColumnTooltip;
 
+   public static String        Tour_Chart_Label_ValuePoint_Title;
+
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;
    public static String        Tour_Database_CannotConnectToDerbyServer_Message;

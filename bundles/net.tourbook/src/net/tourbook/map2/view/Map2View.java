@@ -1747,12 +1747,13 @@ public class Map2View extends ViewPart implements
 
          @Override
          public void handleMouseEvent(final Event event, final org.eclipse.swt.graphics.Point mouseDisplayPosition) {
-            handleTooltipMouseEvent(event, mouseDisplayPosition);
+
+            // is not yet used
          }
       };
       _valuePointTooltipUI = new ValuePoint_ToolTip_UI(
             valuePoint_ToolTipOwner,
-            "2D Map",
+            Messages.Map_Label_ValuePoint_Title,
             _state,
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2,
 
@@ -2507,11 +2508,6 @@ public class Map2View extends ViewPart implements
       mapPositions.add(rightPosition);
 
       return mapPositions;
-   }
-
-   private void handleTooltipMouseEvent(final Event event, final org.eclipse.swt.graphics.Point mouseDisplayPosition) {
-      // TODO Auto-generated method stub
-
    }
 
    private void hideGeoGrid() {

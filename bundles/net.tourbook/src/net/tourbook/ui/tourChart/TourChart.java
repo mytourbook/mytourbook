@@ -904,7 +904,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       };
       _valuePointTooltipUI = new ValuePoint_ToolTip_UI(
             valuePoint_ToolTipOwner,
-            "Tour Chart",
+            Messages.Tour_Chart_Label_ValuePoint_Title,
             _state,
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART,
 

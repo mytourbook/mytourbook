@@ -35,10 +35,10 @@ public class TourMergerTests {
    @Test
    void testMergeTours() {
 
-      final String sourceFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "Move_2011_07_03_08_01_04_Trail+running.fit");
+      final String sourceFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "Move_2011_07_03_08_01_04_Trail+running.fit"); //$NON-NLS-1$
       _sourceTour = Initializer.importTour_FIT(sourceFilePath);
 
-      final String targetFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "2011-07-03_KiliansClassik.gpx");
+      final String targetFilePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "2011-07-03_KiliansClassik.gpx"); //$NON-NLS-1$
       _targetTour = Initializer.importTour_GPX(targetFilePath);
 
       _tourMerger = new TourMerger(_sourceTour, _targetTour, false, false, false, 0);
