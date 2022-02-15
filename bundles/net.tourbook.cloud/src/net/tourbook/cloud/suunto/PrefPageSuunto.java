@@ -84,7 +84,8 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private static final String     APP_BTN_BROWSE                   = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE = net.tourbook.Messages.dialog_export_dir_dialog_message;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_TEXT    = net.tourbook.Messages.dialog_export_dir_dialog_text;
-
+   private static final String     PARAMETER_TRAILING_CHAR          = "}";                                                   //$NON-NLS-1$
+   private static final String     PARAMETER_LEADING_CHAR           = "{";
    public static final String      ID                               = "net.tourbook.cloud.PrefPageSuunto";                   //$NON-NLS-1$
 
    public static final String      ClientId                         = "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8";                //$NON-NLS-1$
@@ -573,7 +574,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       for (final PartUIItem paraItem : PART_ITEMS) {
          if (paraItem.partKey == itemKey) {
-            return "" + paraItem.abbreviation + "";
+            return PARAMETER_LEADING_CHAR + paraItem.abbreviation + PARAMETER_TRAILING_CHAR;
          }
       }
 
@@ -581,6 +582,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       return UI.EMPTY_STRING;
    }
+
    private void enableControls() {
 
       final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText())
@@ -996,11 +998,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             final int fromValue = fromSpinner.getSelection();
             final int toValue = toSpinner.getSelection();
 
-//            sb.append(PARAMETER_LEADING_CHAR);
-//            sb.append(Integer.toString(fromValue));
-//            sb.append("..."); //$NON-NLS-1$
-//            sb.append(Integer.toString(toValue));
-//            sb.append(PARAMETER_TRAILING_CHAR);
+            sb.append(PARAMETER_LEADING_CHAR);
+            sb.append(Integer.toString(fromValue));
+            sb.append("..."); //$NON-NLS-1$
+            sb.append(Integer.toString(toValue));
+            sb.append(PARAMETER_TRAILING_CHAR);
 
             break;
 
@@ -1021,9 +1023,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          }
       }
 
-//      _btnShowMap.setEnabled(sb.length() > 5);
-//      _customUrl = sb.toString();
-//
-//      _txtCustomUrl.setText(_customUrl);
+      _txtCustomFileName.setText(sb.toString());
    }
 }
