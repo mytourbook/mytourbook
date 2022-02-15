@@ -471,7 +471,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       super.configureShell(shell);
 
-      shell.setText(Messages.Dialog_MergeTours_Dialog_Title);
+      shell.setText(Messages.tour_merger_dialog_title);
 
       shell.addDisposeListener(disposeEvent -> onDispose());
    }
