@@ -54,6 +54,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       initializeDefaultSuuntoPreferences(store);
       store.setDefault(Preferences.SUUNTO_SELECTED_PERSON_INDEX, 0);
       store.setDefault(Preferences.SUUNTO_SELECTED_PERSON_ID, UI.EMPTY_STRING);
+      store.setDefault(Preferences.SUUNTO_FILENAME_COMPONENTS, "{SUUNTO_FILE_NAME}.{FIT_EXTENSION}"); //$NON-NLS-1$
    }
 
    private void initializeDefaultSuuntoPreferences(final IPreferenceStore store) {

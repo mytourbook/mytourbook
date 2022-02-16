@@ -93,6 +93,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
    private List<Long>              _personIds;
+   private String                  _internalFileNameComponents;
 
    /*
     * UI controls
@@ -186,6 +187,23 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             WIDGET_KEY.PAGE_USER_TEXT,
             Messages.Filename_Component_UserText,
             Messages.Filename_Component_UserText_Abbr));
+   }
+
+   private String buildComponentKey(final PART_TYPE partType) {
+      return "{" + partType.toString() + "}";
+   }
+
+   private String buildEnhancedComponentKey(final PART_TYPE partType, final String additionalString)
+   {
+      String componentKey = "{" + partType.toString();
+      if (partType == PART_TYPE.USER_TEXT) {
+
+         componentKey += ":" + additionalString.trim();
+      }
+
+      componentKey += "}";
+
+      return componentKey;
    }
 
    @Override
@@ -686,6 +704,19 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       _btnCleanup.setEnabled(isAuthorized);
    }
 
+   private void fillComponentsPartRows(final String suuntoFilenameComponents) {
+
+      if (StringUtils.isNullOrEmpty(suuntoFilenameComponents)) {
+         return;
+      }
+
+      final String[] components = suuntoFilenameComponents.split("\\{");
+
+      for (final String component : components) {
+         System.out.println(component);
+      }
+   }
+
    private long getFilterDate(final DateTime filterDate) {
 
       final int year = filterDate.getYear();
@@ -873,6 +904,12 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       setFilterEndDate(_prefStore.getDefaultLong(
             Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(selectedPersonId)));
 
+      final String suuntoFilenameComponents = _prefStore.getDefaultString(Preferences.SUUNTO_FILENAME_COMPONENTS);
+      _txtCustomFileName.setText(suuntoFilenameComponents);
+      _internalFileNameComponents = suuntoFilenameComponents;
+      //todo fb
+      fillComponentsPartRows(suuntoFilenameComponents);
+
       enableControls();
 
       // Restore the default values in the preferences for each person. Otherwise,
@@ -984,6 +1021,8 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          _prefStore.setValue(Preferences.SUUNTO_SELECTED_PERSON_ID, personId);
 
          _prefStore.setValue(STATE_SUUNTO_CLOUD_SELECTED_TAB, _tabFolder.getSelectionIndex());
+
+         _prefStore.setValue(Preferences.SUUNTO_FILENAME_COMPONENTS, _internalFileNameComponents);
       }
 
       return isOK;
@@ -1022,6 +1061,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       setFilterEndDate(
             _prefStore.getLong(
                   Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(selectedPersonId)));
+
+      final String suuntoFilenameComponents = _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
+      _txtCustomFileName.setText(suuntoFilenameComponents);
+      _internalFileNameComponents = suuntoFilenameComponents;
+      fillComponentsPartRows(suuntoFilenameComponents);
    }
 
    private void restoreState() {
@@ -1079,6 +1123,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private void updateCustomFileName() {
 
       final StringBuilder stringBuilder = new StringBuilder();
+      final StringBuilder internalFileNameComponentsBuilder = new StringBuilder();
 
       for (final PartRow row : PART_ROWS) {
 
@@ -1089,35 +1134,43 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
          case SUUNTO_FILE_NAME:
             stringBuilder.append(createUI214Parameter(PART_TYPE.SUUNTO_FILE_NAME));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.SUUNTO_FILE_NAME));
             break;
 
          case FIT_EXTENSION:
-            stringBuilder.append(createUI214Parameter(PART_TYPE.FIT_EXTENSION));
+            stringBuilder.append(UI.SYMBOL_DOT + createUI214Parameter(PART_TYPE.FIT_EXTENSION));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.FIT_EXTENSION));
             break;
 
          case WORKOUT_ID:
             stringBuilder.append(createUI214Parameter(PART_TYPE.WORKOUT_ID));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.WORKOUT_ID));
             break;
 
          case YEAR:
             stringBuilder.append(createUI214Parameter(PART_TYPE.YEAR));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.YEAR));
             break;
 
          case MONTH:
             stringBuilder.append(createUI214Parameter(PART_TYPE.MONTH));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.MONTH));
             break;
 
          case DAY:
             stringBuilder.append(createUI214Parameter(PART_TYPE.DAY));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.DAY));
             break;
 
          case USER_NAME:
             stringBuilder.append(createUI214Parameter(PART_TYPE.USER_NAME));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.USER_NAME));
             break;
 
          case USER_TEXT:
             final Text txtHtml = (Text) rowWidgets.get(WIDGET_KEY.TEXT_USER_TEXT);
             stringBuilder.append(txtHtml.getText());
+            internalFileNameComponentsBuilder.append(buildEnhancedComponentKey(PART_TYPE.USER_TEXT, txtHtml.getText()));
             break;
 
          default:
@@ -1125,6 +1178,8 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          }
       }
 
+      // TODO FB to save in the preferences
+      _internalFileNameComponents = internalFileNameComponentsBuilder.toString();
       _txtCustomFileName.setText(stringBuilder.toString());
    }
 }

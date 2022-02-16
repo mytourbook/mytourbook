@@ -426,29 +426,19 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       final Optional<String> contentDisposition =
             response.headers().firstValue("Content-Disposition"); //$NON-NLS-1$
 
-      String fileName = UI.EMPTY_STRING;
+      String suuntoFileName = UI.EMPTY_STRING;
       if (contentDisposition.isPresent()) {
-         fileName = contentDisposition
+         suuntoFileName = contentDisposition
                .get()
                .replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
-      //TODO FB get the configured file name strcture from the prefs
-      /*
-       * Year
-       * Month
-       * Day
-       * Time (if available) but then which timezone !???
-       * User text
-       * User name
-       * file name <= the one by default
-       * Workout Id
-       * extension (.fit)
-       */
+      final String customizedFileName =
+            CustomFileNameBuilder.buildCustomizedFileName(workoutPayload, suuntoFileName);
 
       final Path filePath = Paths.get(
             getDownloadFolder(),
-            StringUtils.sanitizeFileName(fileName) + workoutPayload.startTime);
+            StringUtils.sanitizeFileName(customizedFileName));
       workoutDownload.setAbsoluteFilePath(filePath.toAbsolutePath().toString());
 
       if (filePath.toFile().exists()) {
