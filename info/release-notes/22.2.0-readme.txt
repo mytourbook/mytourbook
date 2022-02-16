@@ -5,7 +5,7 @@ New
 ===
 
 * 2D Map - Select trackpoint           https://github.com/mytourbook/mytourbook/issues/461
-  - A trackpoint can be selected with the mouse when one tour is displayed
+  - A trackpoint can be selected with the mouse when only one tour is displayed 
   - With the <Shift> key the 2nd trackpoint can be selected
   - Select in-between trackpoints can be activated/deactivated in the "2D Map Options" slideout
 
@@ -23,12 +23,12 @@ Improvements
 * Tour Import
   - Sort imported tours by number of markers/waypoints
   - Customize simple import tiles in the easy import page 
-                                        https://github.com/mytourbook/mytourbook/issues/460
+                                       https://github.com/mytourbook/mytourbook/issues/460
   
 * 2D Map 
   - Added the possibility to show/hide the tour weather icon on the map  (Frederic)
-  - Cut off lines in pauses				https://github.com/mytourbook/mytourbook/issues/463
-  - Show tour directions always
+  - Cut off lines in pauses			   https://github.com/mytourbook/mytourbook/issues/463
+  - Show tour directions always        https://github.com/mytourbook/mytourbook/issues/464
   - Paint tour tracks with/without antialiasing. A dimmed map may look better without antialiasing
   - Track options slideout has a new UI to reduce the size of this slideout
 
@@ -40,10 +40,10 @@ Improvements
   - Show photo location in view                         
 
 
-* SRTM (Thomas)
-  - Additionally to the already usable SRTM3 Altitudes, SRTM1 is now also usable. 
-    The Data Files must be manually copied to the new SRTM1 folder. 
-    SRTM1 size is 25.9 MB per file. SRTM3 file size is 2.9 MB per file
+* SRTM 1 (Thomas)
+  - Additionally to the already usable SRTM3 elevations, SRTM1 is now also usable. The data files must be manually copied to the new SRTM1 folder. 7e83518a 122
+    - SRTM1 file size is 25.9 MB
+    - SRTM3 file size is 2.9 MB
                                        https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
                                        https://sourceforge.net/p/mytourbook/feature-requests/122/
 
@@ -89,10 +89,6 @@ Bugfix
   - Removing the lat/lon tags when those values are invalid/not provided as it creates an invalid TCX file
 
 
-GitHub Milestone
-================
-* 22.2   https://github.com/mytourbook/mytourbook/milestone/2?closed=1
-
 
 Translation    
 ===========
@@ -109,3 +105,4 @@ System
 
 * Eclipse 2021-06
 * FIT SDK 21.67
+* Milestone 22.2   https://github.com/mytourbook/mytourbook/milestone/2?closed=1

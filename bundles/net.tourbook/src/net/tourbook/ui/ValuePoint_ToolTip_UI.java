@@ -614,18 +614,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_TimeSlice) {
 
-         final Composite container = new Composite(parent, SWT.NONE);
-         GridDataFactory.fillDefaults()
-               .align(SWT.CENTER, SWT.FILL)
-               .grab(true, false)
-               .applyTo(container);
-         GridLayoutFactory.fillDefaults()
-               .numColumns(3)
-               .spacing(2, 0)
-               .applyTo(container);
-//         container.setBackground(UI.SYS_COLOR_BLUE);
+         final Composite container = createUI_ValueContainer(parent);
          {
-
             // label: current value
             _lblDataSerieCurrent = createUI_Label_Value(
                   container,
@@ -633,9 +623,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   7,
                   Messages.Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip,
                   null);
-
-            // label: separator
-            createUI_Label(container, UI.SYMBOL_COLON, null, null);
 
             // label: max value
             _lblDataSerieMax = createUI_Label_Value(
@@ -645,6 +632,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   Messages.Tooltip_ValuePoint_Label_SlicesMax_Tooltip,
                   null);
          }
+
+         _firstColumnControls.add(_lblDataSerieCurrent);
+         _firstColumnContainerControls.add(container);
       }
    }
 
@@ -1469,7 +1459,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          if (_shellContainer == null || _shellContainer.isDisposed()) {
 
             /*
-             * tool tip is disposed, this happens on a mouse exit, display the tooltip again
+             * Tool tip is disposed, this happens on a mouse exit, display the tooltip again
              */
             show(new Point(devXMouseMove, devYMouseMove));
          }
@@ -1497,8 +1487,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     */
    public void setTourData(final TourData tourData) {
 
+      if (_tourData != null && tourData != null
+            && _tourData.getTourId().equals(tourData.getTourId())) {
+
+         // the same tour is already set
+
+         return;
+      }
+
       _tourData = tourData;
-      _currentValueIndex = 0;
+      _currentValueIndex = -1;
 
       if (tourData == null) {
 
@@ -1724,7 +1722,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       // get time when the redraw is requested
       final long requestedRedrawTime = System.currentTimeMillis();
 
-      if (requestedRedrawTime > _lastUpdateUITime + 100) {
+      if (requestedRedrawTime > _lastUpdateUITime + 300) {
 
          // force a redraw
 
@@ -1743,7 +1741,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
                // update UI delayed
                if (__runnableCounter != _updateCounter[0]) {
+
                   // a new update UI occured
+
                   return;
                }
 
@@ -1779,7 +1779,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final int[] timeSerie = _tourData.timeSerie;
 
       if (timeSerie == null) {
+
          // this happened with .fitlog import files
+
+         return;
+      }
+
+      if (valueIndex == _currentValueIndex) {
+
+         // UI is updated with the current value index -> nothing more to do
+
          return;
       }
 
@@ -1997,8 +2006,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_Gears) {
-//         updateUI_Color(_lblGearTeeth, GraphColorManager.PREF_GRAPH_GEAR);
-//         updateUI_Color(_lblGearRatio, GraphColorManager.PREF_GRAPH_GEAR);
          updateUI_Color(_lblGearTeeth, null);
          updateUI_Color(_lblGearRatio, null);
       }
