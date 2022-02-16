@@ -38,7 +38,7 @@ public class CustomFileNameBuilder {
 
       //Replace each component by the appropriate workout data
       final StringBuilder customizedFileName = new StringBuilder();
-      final Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+      final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
       final Matcher matcher = pattern.matcher(suuntoFilenameComponents);
       while (matcher.find()) {
 
@@ -49,7 +49,7 @@ public class CustomFileNameBuilder {
             customizedFileName.append(suuntoFileName);
             break;
          case FIT_EXTENSION:
-            customizedFileName.append(".fit");
+            customizedFileName.append(".fit"); //$NON-NLS-1$
             break;
          case WORKOUT_ID:
             customizedFileName.append(workoutPayload.workoutKey);

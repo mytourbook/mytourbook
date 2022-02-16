@@ -193,12 +193,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       return "{" + partType.toString() + "}";
    }
 
-   private String buildEnhancedComponentKey(final PART_TYPE partType, final String additionalString)
-   {
+   private String buildEnhancedComponentKey(final PART_TYPE partType, final String additionalString) {
       String componentKey = "{" + partType.toString();
       if (partType == PART_TYPE.USER_TEXT) {
 
-         componentKey += ":" + additionalString.trim();
+         componentKey += ":" + StringUtils.sanitizeFileName(additionalString).trim();
       }
 
       componentKey += "}";
