@@ -15,10 +15,8 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +26,7 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -54,43 +53,64 @@ public class CustomFileNameBuilder {
                ? PART_TYPE.USER_TEXT
                : PART_TYPE.valueOf(currentComponent);
          switch (partType) {
+
          case SUUNTO_FILE_NAME:
+
             customizedFileName.append(suuntoFileName);
             break;
+
          case FIT_EXTENSION:
+
             customizedFileName.append(".fit"); //$NON-NLS-1$
             break;
+
          case WORKOUT_ID:
+
             customizedFileName.append(workoutPayload.workoutKey);
             break;
+
          case YEAR:
-            customizedFileName.append(suuntoFileName);
+
+            final int year = getWorkoutOffsetDateTime(workoutPayload).getYear();
+            customizedFileName.append(year);
             break;
+
          case MONTH:
-            customizedFileName.append(suuntoFileName);
+
+            final int month = getWorkoutOffsetDateTime(workoutPayload).getMonthValue();
+            customizedFileName.append(month);
             break;
          case DAY:
-            //todo is that a common time function already ?
-            final Instant i = Instant.ofEpochMilli(workoutPayload.startTime);
-            final var toto = ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
 
-            final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
-            final OffsetDateTime timeUtc = toto.toOffsetDateTime(); //18:11:06 UTC
-            final OffsetDateTime offsetTime = timeUtc.withOffsetSameInstant(zoneOffset); //21:11:06 +03:00
-
-            final var titi = offsetTime.getHour();
-            customizedFileName.append(offsetTime.getHour());
+            final int day = getWorkoutOffsetDateTime(workoutPayload).getDayOfMonth();
+            customizedFileName.append(day);
             break;
+         case HOUR:
+
+            final int hour = getWorkoutOffsetDateTime(workoutPayload).getHour();
+            customizedFileName.append(hour);
+            break;
+
+         case MINUTE:
+
+            final int minute = getWorkoutOffsetDateTime(workoutPayload).getMinute();
+            customizedFileName.append(minute);
+            break;
+
          case USER_NAME:
+
             final TourPerson activePerson = TourbookPlugin.getActivePerson();
             final String personName = activePerson == null
                   ? Messages.App_People_item_all
                   : activePerson.getName();
             customizedFileName.append(personName);
             break;
+
          case USER_TEXT:
+
             customizedFileName.append(currentComponent.substring(currentComponent.indexOf(UI.SYMBOL_COLON)));
             break;
+
          case NONE:
          default:
             break;
@@ -113,5 +133,18 @@ public class CustomFileNameBuilder {
        * extension (.fit)
        */
 
+   }
+
+   private static OffsetDateTime getWorkoutOffsetDateTime(final Payload workoutPayload) {
+
+      final OffsetDateTime offsetDateTime = TimeTools
+            .getZonedDateTimeWithUTC(workoutPayload.startTime)
+            .toOffsetDateTime();
+
+      final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
+
+      final OffsetDateTime offsetTime = offsetDateTime.withOffsetSameInstant(zoneOffset);
+
+      return offsetTime;
    }
 }

@@ -26,6 +26,8 @@ public enum PART_TYPE {
    YEAR, //
    MONTH, //
    DAY, //
+   HOUR, //
+   MINUTE, //
    USER_NAME, //
    USER_TEXT
 }
