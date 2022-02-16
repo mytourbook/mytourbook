@@ -15,13 +15,20 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.common.UI;
+import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -61,10 +68,21 @@ public class CustomFileNameBuilder {
             customizedFileName.append(suuntoFileName);
             break;
          case DAY:
+            final Instant i = Instant.ofEpochSecond(workoutPayload.startTime);
+            final var toto = ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
+
+            final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
+            final OffsetDateTime timeUtc = toto.toOffsetDateTime(); //18:11:06 UTC
+            final OffsetDateTime offsetTime = timeUtc.withOffsetSameInstant(zoneOffset); //21:11:06 +03:00
+
             customizedFileName.append(suuntoFileName);
             break;
          case USER_NAME:
-            customizedFileName.append(suuntoFileName);
+            final TourPerson activePerson = TourbookPlugin.getActivePerson();
+            final String personName = activePerson == null
+                  ? Messages.App_People_item_all
+                  : activePerson.getName();
+            customizedFileName.append(personName);
             break;
          case USER_TEXT:
             customizedFileName.append(currentComponent.substring(currentComponent.indexOf(UI.SYMBOL_COLON)));
@@ -76,7 +94,6 @@ public class CustomFileNameBuilder {
       }
 
       return customizedFileName.toString();
-
 
       //TODO FB get the configured file name strcture from the prefs
       /*
