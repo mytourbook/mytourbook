@@ -17,8 +17,6 @@ package net.tourbook.cloud.suunto.workouts;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import de.byteholder.geoclipse.map.UI;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Payload {
 
@@ -147,7 +145,7 @@ public class Payload {
          break;
 
       default:
-         sportName = UI.EMPTY_STRING;
+         sportName = String.valueOf(activityId);
          break;
       }
 
