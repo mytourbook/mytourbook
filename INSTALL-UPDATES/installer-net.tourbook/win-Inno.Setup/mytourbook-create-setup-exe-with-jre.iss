@@ -11,7 +11,7 @@ AppCopyright         = MyTourbook Contributors 2005, {#AppYear}
 AppID                = {{A20227AD-322E-4B3D-B67A-9C1FECF7B4A6}
 
 OutputDir            = {#ProductRoot}{#AppVersion}
-OutputBaseFilename   = mytourbook-with-java-runtime-{#AppVersion}{#AppSubVersion}-win-setup
+OutputBaseFilename   = mytourbook-{#AppVersion}{#AppSubVersion}-win-setup-with-java-runtime
 
 DefaultGroupName     = MyTourbook
 DefaultDirName       = {pf}\MyTourbook
