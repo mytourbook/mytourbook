@@ -50,7 +50,9 @@ public class CustomFileNameBuilder {
       while (matcher.find()) {
 
          final String currentComponent = matcher.group(1);
-         final PART_TYPE partType = PART_TYPE.valueOf(currentComponent);
+         final PART_TYPE partType = currentComponent.startsWith(PART_TYPE.USER_TEXT.toString())
+               ? PART_TYPE.USER_TEXT
+               : PART_TYPE.valueOf(currentComponent);
          switch (partType) {
          case SUUNTO_FILE_NAME:
             customizedFileName.append(suuntoFileName);
@@ -68,14 +70,16 @@ public class CustomFileNameBuilder {
             customizedFileName.append(suuntoFileName);
             break;
          case DAY:
-            final Instant i = Instant.ofEpochSecond(workoutPayload.startTime);
+            //todo is that a common time function already ?
+            final Instant i = Instant.ofEpochMilli(workoutPayload.startTime);
             final var toto = ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
 
             final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
             final OffsetDateTime timeUtc = toto.toOffsetDateTime(); //18:11:06 UTC
             final OffsetDateTime offsetTime = timeUtc.withOffsetSameInstant(zoneOffset); //21:11:06 +03:00
 
-            customizedFileName.append(suuntoFileName);
+            final var titi = offsetTime.getHour();
+            customizedFileName.append(offsetTime.getHour());
             break;
          case USER_NAME:
             final TourPerson activePerson = TourbookPlugin.getActivePerson();
