@@ -4354,7 +4354,7 @@ public class Map2 extends Canvas {
             && _isDrawTourDirection_Always
 
             // currently only one tour is supported
-            && _allTourIds.size() == 1
+            && _allTourIds != null && _allTourIds.size() == 1
 
             // nothing is currently hovered
             && numHoveredTours == 0
@@ -4555,7 +4555,9 @@ public class Map2 extends Canvas {
       final int devYMouse = _mouseMove_DevPosition_Y;
 
       final int numHoveredTours = _allHoveredTourIds.size();
-      final int numDisplayedTours = _allTourIds.size();
+      final int numDisplayedTours = _allTourIds != null
+            ? _allTourIds.size()
+            : 0;
 
       if (numHoveredTours == 1) {
 
