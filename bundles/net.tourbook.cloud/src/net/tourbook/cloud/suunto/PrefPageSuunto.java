@@ -490,7 +490,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
          // File name parts
          _partContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, true).span(1, 1).applyTo(_partContainer);
+         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(_partContainer);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_partContainer);
          {
             PART_ROWS.add(createUI210PartRow(_partContainer, 0));
