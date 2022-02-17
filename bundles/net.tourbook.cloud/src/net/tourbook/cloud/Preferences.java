@@ -49,14 +49,17 @@ public final class Preferences {
    /*
     * Suunto preferences
     */
-   public static final String  SUUNTO_SELECTED_PERSON_INDEX         = "SUUNTO_SELECTED_PERSON_INDEX";         //$NON-NLS-1$
-   public static final String  SUUNTO_SELECTED_PERSON_ID            = "SUUNTO_SELECTED_PERSON_ID";            //$NON-NLS-1$
    private static final String SUUNTO_ACCESSTOKEN                   = "SUUNTO_ACCESSTOKEN";                   //$NON-NLS-1$
-   private static final String SUUNTO_REFRESHTOKEN                  = "SUUNTO_REFRESHTOKEN";                  //$NON-NLS-1$
    private static final String SUUNTO_ACCESSTOKEN_EXPIRES_IN        = "SUUNTO_ACCESSTOKEN_EXPIRES_IN";        //$NON-NLS-1$
    private static final String SUUNTO_ACCESSTOKEN_ISSUE_DATETIME    = "SUUNTO_ACCESSTOKEN_ISSUE_DATETIME";    //$NON-NLS-1$
-   private static final String SUUNTO_WORKOUT_DOWNLOAD_FOLDER       = "SUUNTO_DOWNLOAD_FOLDER";               //$NON-NLS-1$
+   public static final String  SUUNTO_FILENAME_COMPONENTS           = "SUUNTO_FILENAME_COMPONENTS";           //$NON-NLS-1$
+   private static final String SUUNTO_REFRESHTOKEN                  = "SUUNTO_REFRESHTOKEN";                  //$NON-NLS-1$
+   public static final String  SUUNTO_SELECTED_PERSON_INDEX         = "SUUNTO_SELECTED_PERSON_INDEX";         //$NON-NLS-1$
+   public static final String  SUUNTO_SELECTED_PERSON_ID            = "SUUNTO_SELECTED_PERSON_ID";            //$NON-NLS-1$
+   private static final String SUUNTO_USE_WORKOUT_FILTER_END_DATE   = "SUUNTO_USE_WORKOUT_FILTER_END_DATE";   //$NON-NLS-1$
    private static final String SUUNTO_USE_WORKOUT_FILTER_SINCE_DATE = "SUUNTO_USE_WORKOUT_FILTER_SINCE_DATE"; //$NON-NLS-1$
+   private static final String SUUNTO_WORKOUT_DOWNLOAD_FOLDER       = "SUUNTO_DOWNLOAD_FOLDER";               //$NON-NLS-1$
+   private static final String SUUNTO_WORKOUT_FILTER_END_DATE       = "SUUNTO_WORKOUT_FILTER_END_DATE";       //$NON-NLS-1$
    private static final String SUUNTO_WORKOUT_FILTER_SINCE_DATE     = "SUUNTO_WORKOUT_FILTER_SINCE_DATE";     //$NON-NLS-1$
 
    private static String getActivePersonId() {
@@ -91,7 +94,12 @@ public final class Preferences {
       return getPersonPreferenceString(personId, SUUNTO_REFRESHTOKEN);
    }
 
-   public static String getPerson_SuuntoUseWorkoutFilterSinceDate_String(final String personId) {
+   public static String getPerson_SuuntoUseWorkoutFilterEndDate_String(final String personId) {
+
+      return getPersonPreferenceString(personId, SUUNTO_USE_WORKOUT_FILTER_END_DATE);
+   }
+
+   public static String getPerson_SuuntoUseWorkoutFilterStartDate_String(final String personId) {
 
       return getPersonPreferenceString(personId, SUUNTO_USE_WORKOUT_FILTER_SINCE_DATE);
    }
@@ -101,7 +109,12 @@ public final class Preferences {
       return getPersonPreferenceString(personId, SUUNTO_WORKOUT_DOWNLOAD_FOLDER);
    }
 
-   public static String getPerson_SuuntoWorkoutFilterSinceDate_String(final String personId) {
+   public static String getPerson_SuuntoWorkoutFilterEndDate_String(final String personId) {
+
+      return getPersonPreferenceString(personId, SUUNTO_WORKOUT_FILTER_END_DATE);
+   }
+
+   public static String getPerson_SuuntoWorkoutFilterStartDate_String(final String personId) {
 
       return getPersonPreferenceString(personId, SUUNTO_WORKOUT_FILTER_SINCE_DATE);
    }
@@ -145,6 +158,20 @@ public final class Preferences {
       return getPerson_SuuntoRefreshToken_String(personId);
    }
 
+   public static String getSuuntoUseWorkoutFilterEndDate_Active_Person_String() {
+
+      final String personId = getActivePersonId();
+
+      return getPerson_SuuntoUseWorkoutFilterEndDate_String(personId);
+   }
+
+   public static String getSuuntoUseWorkoutFilterStartDate_Active_Person_String() {
+
+      final String personId = getActivePersonId();
+
+      return getPerson_SuuntoUseWorkoutFilterStartDate_String(personId);
+   }
+
    public static String getSuuntoWorkoutDownloadFolder_Active_Person_String() {
 
       final String personId = getActivePersonId();
@@ -152,11 +179,18 @@ public final class Preferences {
       return getPerson_SuuntoWorkoutDownloadFolder_String(personId);
    }
 
-   public static String getSuuntoWorkoutFilterSinceDate_Active_Person_String() {
+   public static String getSuuntoWorkoutFilterEndDate_Active_Person_String() {
 
       final String personId = getActivePersonId();
 
-      return getPerson_SuuntoWorkoutFilterSinceDate_String(personId);
+      return getPerson_SuuntoWorkoutFilterEndDate_String(personId);
+   }
+
+   public static String getSuuntoWorkoutFilterStartDate_Active_Person_String() {
+
+      final String personId = getActivePersonId();
+
+      return getPerson_SuuntoWorkoutFilterStartDate_String(personId);
    }
 
    public static void showOrHidePasswords(final List<Text> texts, final boolean showPasswords) {
