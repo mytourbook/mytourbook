@@ -603,6 +603,21 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          paraWidgets.put(WIDGET_KEY.PAGE_WORKOUT_ID, workoutIdContainer);
 
          /*
+          * Page: Activity Type
+          */
+         final Composite activityTypeContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(activityTypeContainer);
+         {
+            label = new Label(activityTypeContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.ACTIVITY_TYPE));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_ACTIVITY_TYPE, activityTypeContainer);
+
+         /*
           * Page: year
           */
          final Composite yearContainer = new Composite(bookParameter, SWT.NONE);
@@ -646,6 +661,36 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             label.setText(createUI214Parameter(PART_TYPE.DAY));
          }
          paraWidgets.put(WIDGET_KEY.PAGE_DAY, dayContainer);
+
+         /*
+          * Page: hour
+          */
+         final Composite hourContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(hourContainer);
+         {
+            label = new Label(hourContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.HOUR));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_HOUR, hourContainer);
+
+         /*
+          * Page: minute
+          */
+         final Composite minuteContainer = new Composite(bookParameter, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(minuteContainer);
+         {
+            label = new Label(minuteContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+            label.setText(createUI214Parameter(PART_TYPE.DAY));
+         }
+         paraWidgets.put(WIDGET_KEY.PAGE_MINUTE, minuteContainer);
 
          /*
           * Page: user name
