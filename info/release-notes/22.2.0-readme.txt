@@ -4,17 +4,24 @@
 New
 ===
 
-* 2D Map - Select trackpoint           https://github.com/mytourbook/mytourbook/issues/461
+* 2D Map - Select Trackpoint           https://github.com/mytourbook/mytourbook/issues/461
   - A trackpoint can be selected with the mouse when only one tour is displayed 
   - With the <Shift> key the 2nd trackpoint can be selected
   - Select in-between trackpoints can be activated/deactivated in the "2D Map Options" slideout
 
-* Tour Pauses
-  - Show all tour pauses in a list
-
 * Suunto Integration (Frederic)   
   - Added the possibility to customize the downloaded file names https://sourceforge.net/p/mytourbook/feature-requests/198/
   - Added a workout filter end date
+
+* SRTM 1 (Thomas)
+  - Additionally to the already usable SRTM3 elevations, SRTM1 is now also usable. The data files must be manually copied to the new SRTM1 folder. 7e83518a 122
+    - SRTM1 file size is 25.9 MB
+    - SRTM3 file size is 2.9 MB
+                                       https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
+                                       https://sourceforge.net/p/mytourbook/feature-requests/122/
+
+* Tour Pauses
+  - Show all tour pauses in a list
 
 
 Improvements
@@ -43,25 +50,14 @@ Improvements
     - Saved time
   - Show photo location in view                         
 
-
-* SRTM 1 (Thomas)
-  - Additionally to the already usable SRTM3 elevations, SRTM1 is now also usable. The data files must be manually copied to the new SRTM1 folder. 7e83518a 122
-    - SRTM1 file size is 25.9 MB
-    - SRTM3 file size is 2.9 MB
-                                       https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
-                                       https://sourceforge.net/p/mytourbook/feature-requests/122/
-
 * Tour Segmenter
   - Show power value for each segment	https://sourceforge.net/p/mytourbook/feature-requests/204/
   
-
 * Cloud Integration (Frederic)
   - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
 
-  
 * Strava Integration (Frederic)   
   - Added the possibility to add the tour weather icon in the uploaded Strava activity title
-
 
 * Tour Merging (Frederic)
  - Added the possibility to merge speed
@@ -80,7 +76,7 @@ Changes
 Bugfix
 ======
 
-* Suunto App Integration (Frederic)   
+* Suunto Integration (Frederic)   
   - When determining if a Suunto activity already exists in the database, only the tours for the selected user are compared with the activities available on the Suunto App
 
 * Map25 (Thomas)
@@ -92,7 +88,6 @@ Bugfix
 
 * TCX Tour Export (Frederic)
   - Removing the lat/lon tags when those values are invalid/not provided as it creates an invalid TCX file
-
 
 
 Translation    
@@ -108,6 +103,6 @@ Translation
 System   
 ======
 
-* Eclipse 2021-06
+* Eclipse 2021-06			https://github.com/mytourbook/mytourbook/issues/440
 * FIT SDK 21.67
-* Milestone 22.2   https://github.com/mytourbook/mytourbook/milestone/2?closed=1
+* Milestone 22.2   		https://github.com/mytourbook/mytourbook/milestone/2?closed=1
