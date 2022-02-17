@@ -627,7 +627,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_SaveTour_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
-   public static String        Dialog_ImportConfig_Checkbox_ShowTile_CoudApps;
+   public static String        Dialog_ImportConfig_Checkbox_ShowTile_CloudApps;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_Files;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_FossilUI;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_SerialPort;
@@ -2547,6 +2547,8 @@ public class Messages extends NLS {
    public static String        Tour_Book_Monitor_CollateTask;
    public static String        Tour_Book_SortColumnTooltip;
 
+   public static String        Tour_Chart_Label_ValuePoint_Title;
+
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;
    public static String        Tour_Database_CannotConnectToDerbyServer_Message;
@@ -2842,7 +2844,7 @@ public class Messages extends NLS {
    public static String        tour_merger_chk_use_synced_start_time_tooltip;
    public static String        tour_merger_dialog_header_message;
    public static String        tour_merger_dialog_header_title;
-   public static String        Dialog_MergeTours_Dialog_Title;
+   public static String        tour_merger_dialog_title;
    public static String        tour_merger_group_adjust_altitude;
    public static String        tour_merger_group_adjust_time;
    public static String        tour_merger_group_save_actions;

@@ -691,16 +691,16 @@ public class MapTourBreadcrumb {
    @Override
    public String toString() {
 
-      return "MapTourBreadcrumb"
+      return "MapTourBreadcrumb" //$NON-NLS-1$
 
-            + "\n"
-            + "["
-            + "\n"
+            + "\n" //$NON-NLS-1$
+            + "[" //$NON-NLS-1$
+            + "\n" //$NON-NLS-1$
 
-            + "_numVisibleCrumbs       =" + _numVisibleCrumbs + "\n"
-            + "_allCrumbsWithAllTours  =" + _allCrumbsWithAllTours + "\n"
+            + "_numVisibleCrumbs       =" + _numVisibleCrumbs + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_allCrumbsWithAllTours  =" + _allCrumbsWithAllTours + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "]";
+            + "]"; //$NON-NLS-1$
    }
 
 }

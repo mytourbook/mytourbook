@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,26 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map;
+package net.tourbook.cloud.suunto;
 
-import java.util.ArrayList;
+public enum WIDGET_KEY {
 
-import org.eclipse.swt.graphics.Point;
-
-public class HoveredTourData {
-
-   ArrayList<Long>  allHoveredTourIds;
-
-   /**
-    * Point in a tour which is hovered
-    */
-   ArrayList<Point> allDevHoveredTourPoint;
-
-   public HoveredTourData(final ArrayList<Long> _allHoveredTourIds,
-                          final ArrayList<Point> allDevHoveredPoint) {
-
-      this.allHoveredTourIds = _allHoveredTourIds;
-
-      this.allDevHoveredTourPoint = allDevHoveredPoint;
-   }
+   PAGEBOOK, //
+   PAGE_NONE, //
+   PAGE_SUUNTO_FILE_NAME, //
+   PAGE_FIT_EXTENSION, //
+   PAGE_WORKOUT_ID, //
+   PAGE_ACTIVITY_TYPE, //
+   PAGE_YEAR, //
+   PAGE_MONTH, //
+   PAGE_DAY, //
+   PAGE_HOUR, //
+   PAGE_MINUTE, //
+   PAGE_USER_NAME, //
+   PAGE_USER_TEXT, //
+   //
+   TEXT_USER_TEXT,
 }

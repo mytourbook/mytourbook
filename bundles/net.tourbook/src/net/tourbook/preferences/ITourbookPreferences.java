@@ -560,7 +560,8 @@ public interface ITourbookPreferences {
    /*
     * Value point tool tip
     */
-   public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE = "VALUE_POINT_TOOL_TIP_IS_VISIBLE"; //$NON-NLS-1$
+   public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2  = "VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2";  //$NON-NLS-1$
+   public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART = "VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART"; //$NON-NLS-1$
 
    /*
     * Map 2 D

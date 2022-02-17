@@ -70,7 +70,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     * UI controls
     */
    private Button                  _btnCleanup;
-   private Button                  _chkShowHidePasswords;
+   private Button                  _chkShowHideTokens;
    private Group                   _group;
    private Label                   _labelAccessToken;
    private Label                   _labelExpiresAt;
@@ -212,12 +212,12 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _chkShowHidePasswords = new Button(_group, SWT.CHECK);
-            _chkShowHidePasswords.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords);
-            _chkShowHidePasswords.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHidePasswords_Tooltip);
-            _chkShowHidePasswords.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHidePasswords
+            _chkShowHideTokens = new Button(_group, SWT.CHECK);
+            _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
+            _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
                   .getSelection())));
-            GridDataFactory.fillDefaults().applyTo(_chkShowHidePasswords);
+            GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
          {
             _linkRevokeAccess = new Link(_group, SWT.NONE);
@@ -240,7 +240,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
-      _chkShowHidePasswords.setEnabled(isAuthorized);
+      _chkShowHideTokens.setEnabled(isAuthorized);
       _linkRevokeAccess.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
    }

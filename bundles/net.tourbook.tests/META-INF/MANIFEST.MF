@@ -2,11 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Integration tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.tests;singleton:=true
-Bundle-Version: 22.1.0.qualifier
+Bundle-Version: 22.2.0.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  net.tourbook,
  net.tourbook.ext.jars,
- net.tourbook.ext.ejb3
+ net.tourbook.ext.ejb3,
+ net.tourbook.cloud,
+ org.eclipse.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
@@ -20,6 +22,7 @@ Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
  net.tourbook.cloud.oauth2,
  net.tourbook.cloud.strava,
+ net.tourbook.cloud.suunto,
  net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,

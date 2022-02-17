@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.ui;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
@@ -34,6 +35,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.PulseGraph;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -104,6 +107,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private ValuePoint_ToolTip_MenuManager _ttMenuMgr;
    private ActionOpenTooltipMenu          _actionOpenTooltipMenu;
 
+   private String                         _headerTitle;
+   private String                         _prefKey_TooltipIsVisible;
+
    private int                            _devXMouse;
    private int                            _devYMouse;
 
@@ -117,7 +123,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private int[]                          _updateCounter = new int[] { 0 };
    private long                           _lastUpdateUITime;
-   private boolean                        _isHorizontal;
+   private boolean                        _isHorizontalOrientation;
 
    private final NumberFormat             _nf0           = NumberFormat.getNumberInstance();
    private final NumberFormat             _nf1           = NumberFormat.getNumberInstance();
@@ -182,6 +188,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isAvailable_Pulse_BpmFromDevice;
    private boolean _isAvailable_Pulse_RRIntervals;
 
+   private boolean _canBeDisplayed_ChartZoomFactor = true;
+
    /*
     * UI resources
     */
@@ -210,7 +218,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblDistance_Unit;
    private Label     _lblElevation;
    private Label     _lblElevation_Unit;
-   private Label     _lblGears;
+   private Label     _lblGearRatio;
+   private Label     _lblGearTeeth;
    private Label     _lblGradient;
    private Label     _lblGradient_Unit;
    private Label     _lblPace;
@@ -256,16 +265,34 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       @Override
       public void runWithEvent(final Event event) {
-         _ttMenuMgr.openToolTipMenu(event, _tourData, _allVisibleValueIds, _isHorizontal);
+         _ttMenuMgr.openToolTipMenu(event, _tourData, _allVisibleValueIds, _isHorizontalOrientation);
       }
    }
 
-   public ValuePoint_ToolTip_UI(final IPinned_Tooltip_Owner tooltipOwner, final IDialogSettings state) {
+   /**
+    * @param tooltipOwner
+    * @param title
+    *           Header title
+    * @param state
+    * @param prefKey_TooltipIsVisible
+    *           Key in pref store to show/hide value point tooltip
+    * @param isVisible_ChartZoomFactor
+    */
+   public ValuePoint_ToolTip_UI(final IPinned_Tooltip_Owner tooltipOwner,
+                                final String title,
+                                final IDialogSettings state,
+                                final String prefKey_TooltipIsVisible,
+                                final boolean isVisible_ChartZoomFactor) {
 
       super(tooltipOwner, state);
 
+      _headerTitle = title;
+      _prefKey_TooltipIsVisible = prefKey_TooltipIsVisible;
+
+      _canBeDisplayed_ChartZoomFactor = isVisible_ChartZoomFactor;
+
       // get state if the tooltip is visible or hidden
-      _isToolTipVisible = _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
+      _isToolTipVisible = _prefStore.getBoolean(_prefKey_TooltipIsVisible);
 
       _allVisibleValueIds = Util.getStateLong(
             state,
@@ -280,7 +307,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             ValuePoint_ToolTip_MenuManager.STATE_VALUE_POINT_TOOLTIP_ORIENTATION,
             ValuePoint_ToolTip_MenuManager.DEFAULT_ORIENTATION.name());
 
-      _isHorizontal = ValuePoint_ToolTip_Orientation.valueOf(
+      _isHorizontalOrientation = ValuePoint_ToolTip_Orientation.valueOf(
             stateOrientation) == ValuePoint_ToolTip_Orientation.Horizontal;
 
       addPrefListener();
@@ -288,7 +315,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    void actionHideToolTip() {
 
-      _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, false);
+      _prefStore.setValue(_prefKey_TooltipIsVisible, false);
 
       _isToolTipVisible = false;
 
@@ -297,7 +324,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    void actionOrientation(final ValuePoint_ToolTip_Orientation orientation, final boolean isReopenToolTip) {
 
-      _isHorizontal = orientation == ValuePoint_ToolTip_Orientation.Horizontal;
+      _isHorizontalOrientation = orientation == ValuePoint_ToolTip_Orientation.Horizontal;
 
       if (isReopenToolTip) {
          reopen();
@@ -343,9 +370,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          /*
           * create a new chart configuration when the preferences has changed
           */
-         if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)
-         //
-         ) {
+         if (property.equals(_prefKey_TooltipIsVisible)) {
+
             _isToolTipVisible = (Boolean) propertyChangeEvent.getNewValue();
 
             if (_isToolTipVisible) {
@@ -370,6 +396,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _ttMenuMgr = new ValuePoint_ToolTip_MenuManager(this, state);
 
+      _ttMenuMgr.setCanBeDisplayed_ChartZoomFactor(_canBeDisplayed_ChartZoomFactor);
+
       _actionOpenTooltipMenu = new ActionOpenTooltipMenu();
    }
 
@@ -389,7 +417,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             ? ThemeUtil.getDefaultBackgroundColor_Shell()
             : _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
 
-      _valueUnitDistance = _isHorizontal ? 2 : 5;
+      _valueUnitDistance = _isHorizontalOrientation ? 2 : 5;
 
       _firstColumnControls.clear();
       _firstColumnContainerControls.clear();
@@ -398,14 +426,25 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       updateUI(_currentValueIndex);
 
-      if (_isHorizontal == false) {
+      if (_isHorizontalOrientation == false) {
 
-         // compute width for all controls and equalize column width for the different sections
-         _shellContainer.layout(true, true);
-         UI.setEqualizeColumWidths(_firstColumnControls);
+         // vertical orientation
 
-         _shellContainer.layout(true, true);
-         UI.setEqualizeColumWidths(_firstColumnContainerControls);
+         parent.getDisplay().asyncExec(() -> {
+
+            if (_shellContainer.isDisposed()) {
+               return;
+            }
+
+            // this must be running async, after some UI changes it did not layout, the withs were 0
+
+            // compute width for all controls and equalize column width for the different sections
+            _shellContainer.layout(true, true);
+            UI.setEqualizeColumWidths(_firstColumnControls);
+
+            _shellContainer.layout(true, true);
+            UI.setEqualizeColumWidths(_firstColumnContainerControls);
+         });
       }
 
       return shell;
@@ -419,38 +458,105 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       _shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults()
-            .spacing(0, 0)
-            .numColumns(2)
-
-            // set margin to draw the border
-            .extendedMargins(1, 1, 1, 1)
-
-            .applyTo(_shellContainer);
-
-//      _shellContainer.setForeground(_fgColor);
-//      _shellContainer.setBackground(_bgColor);
       _shellContainer.addPaintListener(this::onPaintShellContainer);
-//      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      _shellContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
+         if (_isHorizontalOrientation) {
 
-         if (_allVisibleAndAvailable_ValueIds > 0) {
+            GridLayoutFactory.fillDefaults()
+                  .spacing(0, 0)
+                  .numColumns(3)
 
-            createUI_020_AllValues(_shellContainer);
+                  // set margin to draw the border
+                  .extendedMargins(1, 1, 1, 1)
+
+                  .applyTo(_shellContainer);
+
+            createUI_030_Title(_shellContainer);
+            createUI_050_Content(_shellContainer);
+            createUI_040_Actions(_shellContainer);
 
          } else {
 
-            createUI_999_NoData(_shellContainer);
-         }
+            // vertical orientation
 
-         // action toolbar in the top right corner
-         createUI_030_Actions(_shellContainer);
+            GridLayoutFactory.fillDefaults()
+                  .spacing(0, 0)
+                  .numColumns(1)
+
+                  // set margin to draw the border
+                  .extendedMargins(1, 1, 1, 1)
+
+                  .applyTo(_shellContainer);
+
+            createUI_020_VerticalHeader(_shellContainer);
+            createUI_050_Content(_shellContainer);
+         }
       }
 
       return _shellContainer;
    }
 
-   private void createUI_020_AllValues(final Composite parent) {
+   private void createUI_020_VerticalHeader(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
+      {
+         createUI_030_Title(container);
+         createUI_040_Actions(container);
+      }
+   }
+
+   private void createUI_030_Title(final Composite parent) {
+
+      /*
+       * Title
+       */
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(_headerTitle);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .align(SWT.FILL, SWT.CENTER)
+            .indent(2, 0)
+            .applyTo(label);
+
+      MTFont.setBannerFont(label);
+//      MTFont.setHeaderFont(label);
+   }
+
+   private void createUI_040_Actions(final Composite parent) {
+
+      /*
+       * create toolbar
+       */
+      _toolbarControl = new ToolBar(parent, SWT.FLAT);
+//      _toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+      GridDataFactory.fillDefaults()
+            .align(SWT.END, SWT.BEGINNING)
+            .applyTo(_toolbarControl);
+
+      final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
+
+      tbm.add(_actionOpenTooltipMenu);
+
+      tbm.update(true);
+   }
+
+   private void createUI_050_Content(final Composite parent) {
+
+      if (_allVisibleAndAvailable_ValueIds > 0) {
+
+         createUI_099_AllValues(parent);
+
+      } else {
+
+         createUI_999_NoData(parent);
+      }
+   }
+
+   private void createUI_099_AllValues(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -458,20 +564,25 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             .grab(true, false)
             .applyTo(container);
 
-      if (_isHorizontal) {
+      if (_isHorizontalOrientation) {
+
+         // horizontal orientation
+
          GridLayoutFactory.fillDefaults()
                .numColumns(_allVisibleAndAvailable_ValueCounter)
                .spacing(5, 0)
                .extendedMargins(3, 2, 0, 0)
                .applyTo(container);
       } else {
+
+         // vertical orientation
+
          GridLayoutFactory.fillDefaults()
                .spacing(5, 0)
                .applyTo(container);
       }
 
-//      container.setBackground(_bgColor);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          createUI_100_TimeSlices(container);
          createUI_110_TimeDuration(container);
@@ -499,47 +610,12 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_030_Actions(final Composite parent) {
-
-      /*
-       * create toolbar
-       */
-      _toolbarControl = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()
-//            .align(SWT.END, SWT.FILL)
-            .align(SWT.END, SWT.BEGINNING)
-            .applyTo(_toolbarControl);
-//      _toolbarControl.setForeground(_fgColor);
-//      _toolbarControl.setBackground(_bgColor);
-
-//      _toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-//      _toolbarControl.setBackground(_fgToolbar);
-
-      final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
-
-      tbm.add(_actionOpenTooltipMenu);
-
-      tbm.update(true);
-   }
-
    private void createUI_100_TimeSlices(final Composite parent) {
 
       if (_isVisible_And_Available_TimeSlice) {
 
-         final Composite container = new Composite(parent, SWT.NONE);
-//         container.setForeground(_fgColor);
-//         container.setBackground(_bgColor);
-         GridDataFactory.fillDefaults()
-               .align(SWT.CENTER, SWT.FILL)
-               .grab(true, false)
-               .applyTo(container);
-         GridLayoutFactory.fillDefaults()
-               .numColumns(3)
-               .spacing(2, 0)
-               .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+         final Composite container = createUI_ValueContainer(parent);
          {
-
             // label: current value
             _lblDataSerieCurrent = createUI_Label_Value(
                   container,
@@ -547,9 +623,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   7,
                   Messages.Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip,
                   null);
-
-            // label: separator
-            createUILabel(container, UI.SYMBOL_COLON, null, null);
 
             // label: max value
             _lblDataSerieMax = createUI_Label_Value(
@@ -559,6 +632,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   Messages.Tooltip_ValuePoint_Label_SlicesMax_Tooltip,
                   null);
          }
+
+         _firstColumnControls.add(_lblDataSerieCurrent);
+         _firstColumnContainerControls.add(container);
       }
    }
 
@@ -566,7 +642,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_TimeDuration) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblTimeDuration = createUI_Label_Value(
                   container,
@@ -575,7 +651,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_TIME_DURATION,
                   GraphColorManager.PREF_GRAPH_TIME);
 
-            _lblTimeDuration_Unit = createUILabel(
+            _lblTimeDuration_Unit = createUI_Label(
                   container,
                   UI.UNIT_LABEL_TIME,
                   GRAPH_LABEL_TIME_DURATION,
@@ -591,7 +667,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_TimeOfDay) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblTimeOfDay = createUI_Label_Value(
                   container,
@@ -600,7 +676,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_TIME_OF_DAY,
                   GraphColorManager.PREF_GRAPH_TIME);
 
-            _lblTimeOfDay_Unit = createUILabel(
+            _lblTimeOfDay_Unit = createUI_Label(
                   container,
                   UI.UNIT_LABEL_TIME,
                   GRAPH_LABEL_TIME_OF_DAY,
@@ -616,7 +692,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Distance) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblDistance = createUI_Label_Value(
                   container,
@@ -642,7 +718,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Elevation) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblElevation = createUI_Label_Value(
                   container,
@@ -668,7 +744,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Pulse) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblPulse = createUI_Label_Value(
                   container,
@@ -677,7 +753,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_HEARTBEAT,
                   GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-            _lblPulse_Unit = createUILabel(
+            _lblPulse_Unit = createUI_Label(
                   container,
                   GRAPH_LABEL_HEARTBEAT_UNIT,
                   GRAPH_LABEL_HEARTBEAT,
@@ -692,7 +768,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Speed) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblSpeed = createUI_Label_Value(
                   container,
@@ -719,7 +795,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Speed_Summarized) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblSpeed_Summarized = createUI_Label_Value(
                   container,
@@ -746,7 +822,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Pace) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblPace = createUI_Label_Value(
                   container,
@@ -773,7 +849,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Pace_Summarized) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblPace_Summarized = createUI_Label_Value(
                   container,
@@ -800,7 +876,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Power) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblPower = createUI_Label_Value(
                   container,
@@ -809,7 +885,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_POWER,
                   GraphColorManager.PREF_GRAPH_POWER);
 
-            _lblPower_Unit = createUILabel(
+            _lblPower_Unit = createUI_Label(
                   container,
                   GRAPH_LABEL_POWER_UNIT,
                   GRAPH_LABEL_POWER,
@@ -824,7 +900,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Temperature) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblTemperature = createUI_Label_Value(
                   container,
@@ -850,7 +926,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Gradient) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblGradient = createUI_Label_Value(
                   container,
@@ -859,7 +935,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_GRADIENT,
                   GraphColorManager.PREF_GRAPH_GRADIENT);
 
-            _lblGradient_Unit = createUILabel(
+            _lblGradient_Unit = createUI_Label(
                   container,
                   GRAPH_LABEL_GRADIENT_UNIT,
                   GRAPH_LABEL_GRADIENT,
@@ -874,7 +950,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Altimeter) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblAltimeter = createUI_Label_Value(
                   container,
@@ -900,7 +976,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Cadence) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblCadence = createUI_Label_Value(
                   container,
@@ -909,7 +985,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_CADENCE,
                   GraphColorManager.PREF_GRAPH_CADENCE);
 
-            _lblCadence_Unit = createUILabel(
+            _lblCadence_Unit = createUI_Label(
                   container,
                   GRAPH_LABEL_CADENCE_UNIT_RPM,
                   GRAPH_LABEL_CADENCE,
@@ -924,23 +1000,29 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Gears) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
+//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
          {
-            _lblGears = createUI_Label_Value(//
+            _lblGearTeeth = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
-                  10,
+                  5,
                   GRAPH_LABEL_GEARS,
 
                   // this is a bit tricky, use default color because the text color is white
-                  null
-//                  GraphColorManager.PREF_GRAPH_GEAR
-            );
+                  null);
 
-            // no unit
-            createUILabel(container, UI.EMPTY_STRING, GRAPH_LABEL_GEARS, GraphColorManager.PREF_GRAPH_GEAR);
+            _lblGearRatio = createUI_Label_Value(
+                  container,
+                  SWT.LEAD,
+                  4,
+                  GRAPH_LABEL_GEARS,
+
+                  // this is a bit tricky, use default color because the text color is white
+                  null);
          }
-         _firstColumnControls.add(_lblGears);
+
+         _firstColumnControls.add(_lblGearTeeth);
          _firstColumnContainerControls.add(container);
       }
    }
@@ -949,7 +1031,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_TourCompareResult) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblTourCompareResult = createUI_Label_Value(
                   container,
@@ -959,7 +1041,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GraphColorManager.PREF_GRAPH_GRADIENT);
 
             // no unit
-            createUILabel(
+            createUI_Label(
                   container,
                   UI.EMPTY_STRING,
                   GRAPH_LABEL_TOUR_COMPARE,
@@ -975,7 +1057,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_RunDyn_StanceTime) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblRunDyn_StanceTime = createUI_Label_Value(
                   container,
@@ -984,7 +1066,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
 
-            _lblRunDyn_StanceTime_Unit = createUILabel(
+            _lblRunDyn_StanceTime_Unit = createUI_Label(
                   container,
                   UI.UNIT_MS,
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME,
@@ -999,7 +1081,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_RunDyn_StanceTimeBalance) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblRunDyn_StanceTimeBalance = createUI_Label_Value(
                   container,
@@ -1008,7 +1090,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
 
-            _lblRunDyn_StanceTimeBalance_Unit = createUILabel(
+            _lblRunDyn_StanceTimeBalance_Unit = createUI_Label(
                   container,
                   UI.UNIT_PERCENT,
                   GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
@@ -1023,7 +1105,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_RunDyn_StepLength) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblRunDyn_StepLength = createUI_Label_Value(
                   container,
@@ -1032,7 +1114,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
 
-            _lblRunDyn_StepLength_Unit = createUILabel(
+            _lblRunDyn_StepLength_Unit = createUI_Label(
                   container,
                   UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
                   GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
@@ -1047,7 +1129,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_RunDyn_VerticalOscillation) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblRunDyn_VerticalOscillation = createUI_Label_Value(
                   container,
@@ -1056,7 +1138,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 
-            _lblRunDyn_VerticalOscillation_Unit = createUILabel(
+            _lblRunDyn_VerticalOscillation_Unit = createUI_Label(
                   container,
                   UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
                   GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
@@ -1071,7 +1153,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_RunDyn_VerticalRatio) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
             _lblRunDyn_VerticalRatio = createUI_Label_Value(
                   container,
@@ -1080,7 +1162,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
 
-            _lblRunDyn_VerticalRatio_Unit = createUILabel(
+            _lblRunDyn_VerticalRatio_Unit = createUI_Label(
                   container,
                   UI.UNIT_PERCENT,
                   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
@@ -1095,7 +1177,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_ChartZoomFactor) {
 
-         final Composite container = createUIValueContainer(parent);
+         final Composite container = createUI_ValueContainer(parent);
          {
 
             _lblChartZoomFactor = createUI_Label_Value(
@@ -1116,32 +1198,60 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Composite createUI_999_NoData(final Composite parent) {
 
       /*
-       * shell container is necessary because the margins of the inner container will hide the
+       * A shell container is necessary because the margins of the inner container will hide the
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       final Composite shellContainer = new Composite(parent, SWT.NONE);
-//      shellContainer.setForeground(_fgColor);
-//      shellContainer.setBackground(_bgColor);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
 
          final Composite container = new Composite(shellContainer, SWT.NONE);
-//         container.setForeground(_fgColor);
-//         container.setBackground(_bgColor);
          GridLayoutFactory
-               .fillDefaults()//
+               .fillDefaults()
                .extendedMargins(5, 5, 0, 0)
                .applyTo(container);
          {
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Tooltip_ValuePoint_Label_NoData);
             label.setToolTipText(Messages.Tooltip_ValuePoint_Label_NoData_Tooltip);
-//            label.setForeground(_fgColor);
-//            label.setBackground(_bgColor);
          }
       }
 
       return shellContainer;
+   }
+
+   /**
+    * @param parent
+    * @param labelText
+    * @param tooltip
+    * @param colorId
+    * @return Returns created label.
+    */
+   private Label createUI_Label(final Composite parent,
+                                final String labelText,
+                                final String tooltip,
+                                final String colorId) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      if (labelText != null) {
+         label.setText(labelText);
+      }
+
+      if (tooltip != null) {
+         label.setToolTipText(tooltip);
+      }
+
+      if (colorId != null) {
+
+         final Color fgColor = _colorCache.getColor(
+               colorId,
+               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active_Themed());
+
+         label.setForeground(fgColor);
+      }
+
+      return label;
    }
 
    /**
@@ -1183,8 +1293,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             .hint(charsWidth, SWT.DEFAULT)
             .applyTo(label);
 
-//      label.setBackground(_bgColor);
-
       if (tooltip != null) {
          label.setToolTipText(tooltip);
       }
@@ -1202,50 +1310,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       return createUI_Label_Value(parent, style, SWT.DEFAULT, tooltip, colorId);
    }
 
-   /**
-    * @param parent
-    * @param labelText
-    * @param tooltip
-    * @param colorId
-    * @return Returns created label.
-    */
-   private Label createUILabel(final Composite parent,
-                               final String labelText,
-                               final String tooltip,
-                               final String colorId) {
-
-      final Label label = new Label(parent, SWT.NONE);
-//      label.setForeground(_fgColor);
-//      label.setBackground(_bgColor);
-
-      if (labelText != null) {
-         label.setText(labelText);
-      }
-
-      if (tooltip != null) {
-         label.setToolTipText(tooltip);
-      }
-
-      if (colorId != null) {
-
-         final Color fgColor = _colorCache.getColor(
-               colorId,
-               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active_Themed());
-
-         label.setForeground(fgColor);
-      }
-
-      return label;
-   }
-
-   private Composite createUIValueContainer(final Composite parent) {
+   private Composite createUI_ValueContainer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).spacing(_valueUnitDistance, 0).applyTo(container);
-//      container.setForeground(_fgColor);
-//      container.setBackground(_bgColor);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+      GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.CENTER)
+            .applyTo(container);
+
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(_valueUnitDistance, 0)
+            .applyTo(container);
+
+//      container.setBackground(UI.SYS_COLOR_RED);
 
       return container;
    }
@@ -1318,6 +1396,12 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       super.onDispose();
    }
 
+   @Override
+   protected void onEvent_ContextMenu(final Event event) {
+
+      _ttMenuMgr.openToolTipMenu(event, _tourData, _allVisibleValueIds, _isHorizontalOrientation);
+   }
+
    private void onPaintShellContainer(final PaintEvent event) {
 
       final GC gc = event.gc;
@@ -1363,27 +1447,30 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          return;
       }
 
-      final HoveredValuePointData hoveredValuePointData = (HoveredValuePointData) hoveredData;
+      if (hoveredData instanceof HoveredValuePointData) {
 
-      _devXMouse = devXMouseMove;
-      _devYMouse = devYMouseMove;
+         final HoveredValuePointData hoveredValuePointData = (HoveredValuePointData) hoveredData;
 
-      _chartZoomFactor = hoveredValuePointData.graphZoomFactor;
+         _devXMouse = devXMouseMove;
+         _devYMouse = devYMouseMove;
 
-      if (_shellContainer == null || _shellContainer.isDisposed()) {
+         _chartZoomFactor = hoveredValuePointData.graphZoomFactor;
 
-         /*
-          * tool tip is disposed, this happens on a mouse exit, display the tooltip again
-          */
-         show(new Point(devXMouseMove, devYMouseMove));
-      }
+         if (_shellContainer == null || _shellContainer.isDisposed()) {
 
-      // check again
-      if (_shellContainer != null && !_shellContainer.isDisposed()) {
+            /*
+             * Tool tip is disposed, this happens on a mouse exit, display the tooltip again
+             */
+            show(new Point(devXMouseMove, devYMouseMove));
+         }
 
-         setTTShellLocation(devXMouseMove, devYMouseMove, hoveredValuePointData.valueDevPosition);
+         // check again
+         if (_shellContainer != null && !_shellContainer.isDisposed()) {
 
-         updateUI(hoveredValuePointData.valueIndex);
+            setTTShellLocation(devXMouseMove, devYMouseMove, hoveredValuePointData.valueDevPosition);
+
+            updateUI(hoveredValuePointData.valueIndex);
+         }
       }
    }
 
@@ -1398,13 +1485,23 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * @param tourData
     *           When <code>null</code> the tooltip will be hidden.
     */
-   void setTourData(final TourData tourData) {
+   public void setTourData(final TourData tourData) {
+
+      if (_tourData != null && tourData != null
+            && _tourData.getTourId().equals(tourData.getTourId())) {
+
+         // the same tour is already set
+
+         return;
+      }
 
       _tourData = tourData;
-      _currentValueIndex = 0;
+      _currentValueIndex = -1;
 
       if (tourData == null) {
+
          hide();
+
          return;
       }
 
@@ -1481,11 +1578,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _isAvailable_Pulse_BpmFromDevice                = _tourData.pulseSerie                          != null;
       _isAvailable_Pulse_RRIntervals                  = _tourData.getPulse_RRIntervals()              != null;
-                                                                                                      
+
       final boolean isAvailable_Altimeter             = _tourData.getAltimeterSerie()                 != null;
       final boolean isAvailable_Altitude              = _tourData.getAltitudeSerie()                  != null;
       final boolean isAvailable_Cadence               = _tourData.getCadenceSerie()                   != null;
-      final boolean isAvailable_ChartZoomFactor       = true;                                         
+      final boolean isAvailable_ChartZoomFactor       = _canBeDisplayed_ChartZoomFactor;
       final boolean isAvailable_Distance              = _tourData.distanceSerie                       != null;
       final boolean isAvailable_Gears                 = _tourData.getGears()                          != null;
       final boolean isAvailable_Gradient              = _tourData.getGradientSerie()                  != null;
@@ -1565,7 +1662,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             ;
 
       _isVisible_And_Available_Altimeter           = isAvailable_Altimeter          && visibleId_Altimeter > 0;
-      _isVisible_And_Available_Elevation            = isAvailable_Altitude           && visibleId_Altitude > 0;
+      _isVisible_And_Available_Elevation           = isAvailable_Altitude           && visibleId_Altitude > 0;
       _isVisible_And_Available_Cadence             = isAvailable_Cadence            && visibleId_Cadence > 0;
       _isVisible_And_Available_ChartZoomFactor     = isAvailable_ChartZoomFactor    && visibleId_ChartZoomFactor > 0;
       _isVisible_And_Available_Distance            = isAvailable_Distance           && visibleId_Distance > 0;
@@ -1625,7 +1722,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       // get time when the redraw is requested
       final long requestedRedrawTime = System.currentTimeMillis();
 
-      if (requestedRedrawTime > _lastUpdateUITime + 100) {
+      if (requestedRedrawTime > _lastUpdateUITime + 300) {
 
          // force a redraw
 
@@ -1644,7 +1741,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
                // update UI delayed
                if (__runnableCounter != _updateCounter[0]) {
+
                   // a new update UI occured
+
                   return;
                }
 
@@ -1680,7 +1779,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final int[] timeSerie = _tourData.timeSerie;
 
       if (timeSerie == null) {
+
          // this happened with .fitlog import files
+
+         return;
+      }
+
+      if (valueIndex == _currentValueIndex) {
+
+         // UI is updated with the current value index -> nothing more to do
+
          return;
       }
 
@@ -1720,19 +1828,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final float[][] gears = _tourData.getGears();
 
-//         _gears[0] = gear ratio
-//         _gears[1] = front gear teeth
-//         _gears[2] = rear gear teeth
-//         _gears[3] = front gear number, starting with 1
-//         _gears[4] = rear gear number, starting with 1
+//       _gears[0] = gear ratio
+//       _gears[1] = front gear teeth
+//       _gears[2] = rear gear teeth
+//       _gears[3] = front gear number, starting with 1
+//       _gears[4] = rear gear number, starting with 1
 
-         _lblGears.setText(String.format(
-               TourManager.GEAR_VALUE_FORMAT,
+         _lblGearTeeth.setText(String.format(
+               TourManager.GEAR_TEETH_FORMAT,
                (int) gears[1][valueIndex],
-               (int) gears[2][valueIndex],
-               gears[0][valueIndex]
-         //
-         ));
+               (int) gears[2][valueIndex]));
+
+         _lblGearRatio.setText(String.format(
+               TourManager.GEAR_RATIO_FORMAT,
+               gears[0][valueIndex]));
       }
 
       if (_isVisible_And_Available_Gradient) {
@@ -1897,7 +2006,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_Gears) {
-         updateUI_Color(_lblGears, GraphColorManager.PREF_GRAPH_GEAR);
+         updateUI_Color(_lblGearTeeth, null);
+         updateUI_Color(_lblGearRatio, null);
       }
 
       if (_isVisible_And_Available_Gradient) {

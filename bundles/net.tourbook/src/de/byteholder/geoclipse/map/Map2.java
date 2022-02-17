@@ -157,8 +157,9 @@ import org.eclipse.swt.widgets.Event;
 
 public class Map2 extends Canvas {
 
-   private static final String          GRAPH_LABEL_HEARTBEAT_UNIT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE                    = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME                 = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
+   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
    private static final char            NL                                             = UI.NEW_LINE;
 
@@ -183,14 +184,15 @@ public class Map2 extends Canvas {
    public static final int              EXPANDED_HOVER_SIZE                            = 20;
    public static final int              EXPANDED_HOVER_SIZE2                           = EXPANDED_HOVER_SIZE / 2;
 
-   private static final String          DIRECTION_E                                    = "E";                                                    //$NON-NLS-1$
-   private static final String          DIRECTION_N                                    = "N";                                                    //$NON-NLS-1$
+   private static final String          DIRECTION_E                                    = "E";                                                     //$NON-NLS-1$
+   private static final String          DIRECTION_N                                    = "N";                                                     //$NON-NLS-1$
 
-   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                               //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                                //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_DISTANCE                          = "%s\t\t%s %s";                                           //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
-   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                               //$NON-NLS-1$
+   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                                //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -1170,7 +1172,11 @@ public class Map2 extends Canvas {
 
    private void fireEvent_HoveredTour(final Long hoveredTourId, final int hoveredValuePointIndex) {
 
-      final MapHoveredTourEvent event = new MapHoveredTourEvent(hoveredTourId, hoveredValuePointIndex);
+      final MapHoveredTourEvent event = new MapHoveredTourEvent(
+            hoveredTourId,
+            hoveredValuePointIndex,
+            _mouseMove_DevPosition_X,
+            _mouseMove_DevPosition_Y);
 
       for (final Object listener : _allHoveredTourListeners.getListeners()) {
          ((IHoveredTourListener) listener).setHoveredTourId(event);
@@ -1502,6 +1508,74 @@ public class Map2 extends Canvas {
       }
 
       return _poi_Tooltip;
+   }
+
+   /**
+    * @param tourId
+    * @return Return dev X/Y position of the hovered tour or <code>null</code>
+    */
+   private int[] getReducesTourPositions(final long tourId) {
+
+      final TourData tourData = TourManager.getTour(tourId);
+
+      if (tourData == null) {
+
+         // this happened, it can be that previously a history/multiple tour was displayed
+         return null;
+      }
+
+      final MP mp = getMapProvider();
+      final int zoomLevel = getZoom();
+
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+
+      // paint with much less points to speed it up
+      final int numMaxSegments = 1000;
+      final float numSlices = latitudeSerie.length;
+      final int numSegments = (int) Math.min(numMaxSegments, numSlices);
+
+      final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
+
+      // get world position for the first lat/lon
+      final java.awt.Point worldPos_FirstAWT = mp.geoToPixel(
+            new GeoPosition(latitudeSerie[0], longitudeSerie[0]),
+            zoomLevel);
+
+      // convert world position into device position
+      int devPosX1 = worldPos_FirstAWT.x - worldPosition_Viewport.x;
+      int devPosY1 = worldPos_FirstAWT.y - worldPosition_Viewport.y;
+
+      final int[] devXY = new int[numSegments * 2];
+
+      // set first position
+      devXY[0] = devPosX1;
+      devXY[1] = devPosY1;
+
+      for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
+
+         final int nextSerieIndex = (int) (numSlices / numSegments * segmentIndex);
+
+         // get world position for the current lat/lon
+         final java.awt.Point worldPosAWT = mp.geoToPixel(
+               new GeoPosition(latitudeSerie[nextSerieIndex], longitudeSerie[nextSerieIndex]),
+               zoomLevel);
+
+         // convert world position into device position
+         final int devPosX2 = worldPosAWT.x - worldPosition_Viewport.x;
+         final int devPosY2 = worldPosAWT.y - worldPosition_Viewport.y;
+
+         final int devXYIndex = segmentIndex * 2;
+
+         devXY[devXYIndex + 0] = devPosX2;
+         devXY[devXYIndex + 1] = devPosY2;
+
+         // advance to the next segment
+         devPosX1 = devPosX2;
+         devPosY1 = devPosY2;
+      }
+
+      return devXY;
    }
 
    /**
@@ -4260,7 +4334,7 @@ public class Map2 extends Canvas {
                      // paint direction arrows
                      if (_isDrawTourDirection) {
 
-                        final int[] devXYTourPositions = paint_HoveredTour_12_GetTourPositions(hoveredTourId);
+                        final int[] devXYTourPositions = getReducesTourPositions(hoveredTourId);
 
                         if (devXYTourPositions != null) {
                            paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
@@ -4280,7 +4354,7 @@ public class Map2 extends Canvas {
             && _isDrawTourDirection_Always
 
             // currently only one tour is supported
-            && _allTourIds.size() == 1
+            && _allTourIds != null && _allTourIds.size() == 1
 
             // nothing is currently hovered
             && numHoveredTours == 0
@@ -4289,15 +4363,11 @@ public class Map2 extends Canvas {
 
          final Long tourId = _allTourIds.get(0);
 
-         final int[] devXYTourPositions = paint_HoveredTour_12_GetTourPositions(tourId);
+         final int[] devXYTourPositions = getReducesTourPositions(tourId);
 
          if (devXYTourPositions != null) {
             paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
          }
-
-//         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()"
-//               + "\tdirection arrows are painted");
-// TODO remove SYSTEM.OUT.PRINTLN
       }
 
       /*
@@ -4325,7 +4395,7 @@ public class Map2 extends Canvas {
 
       gc.setAntialias(SWT.ON);
       {
-         devXYTourPositions = paint_HoveredTour_12_GetTourPositions(tourId);
+         devXYTourPositions = getReducesTourPositions(tourId);
          if (devXYTourPositions != null) {
             gc.drawPolyline(devXYTourPositions);
          }
@@ -4336,74 +4406,6 @@ public class Map2 extends Canvas {
       if (_isDrawTourDirection && devXYTourPositions != null) {
          paint_HoveredTour_14_DirectionArrows(gc, devXYTourPositions);
       }
-   }
-
-   /**
-    * @param tourId
-    * @return Return dev X/Y position of the hovered tour or <code>null</code>
-    */
-   private int[] paint_HoveredTour_12_GetTourPositions(final long tourId) {
-
-      final TourData tourData = TourManager.getTour(tourId);
-
-      if (tourData == null) {
-
-         // this happened, it can be that previously a history/multiple tour was displayed
-         return null;
-      }
-
-      final MP mp = getMapProvider();
-      final int zoomLevel = getZoom();
-
-      final double[] latitudeSerie = tourData.latitudeSerie;
-      final double[] longitudeSerie = tourData.longitudeSerie;
-
-      // paint with much less points to speed it up
-      final int numMaxSegments = 1000;
-      final float numSlices = latitudeSerie.length;
-      final int numSegments = (int) Math.min(numMaxSegments, numSlices);
-
-      final Rectangle worldPosition_Viewport = _worldPixel_TopLeft_Viewport;
-
-      // get world position for the first lat/lon
-      final java.awt.Point worldPos_FirstAWT = mp.geoToPixel(
-            new GeoPosition(latitudeSerie[0], longitudeSerie[0]),
-            zoomLevel);
-
-      // convert world position into device position
-      int devPosX1 = worldPos_FirstAWT.x - worldPosition_Viewport.x;
-      int devPosY1 = worldPos_FirstAWT.y - worldPosition_Viewport.y;
-
-      final int[] devXY = new int[numSegments * 2];
-
-      // set first position
-      devXY[0] = devPosX1;
-      devXY[1] = devPosY1;
-
-      for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
-
-         final int nextSerieIndex = (int) (numSlices / numSegments * segmentIndex);
-
-         // get world position for the current lat/lon
-         final java.awt.Point worldPosAWT = mp.geoToPixel(
-               new GeoPosition(latitudeSerie[nextSerieIndex], longitudeSerie[nextSerieIndex]),
-               zoomLevel);
-
-         // convert world position into device position
-         final int devPosX2 = worldPosAWT.x - worldPosition_Viewport.x;
-         final int devPosY2 = worldPosAWT.y - worldPosition_Viewport.y;
-
-         final int devXYIndex = segmentIndex * 2;
-
-         devXY[devXYIndex + 0] = devPosX2;
-         devXY[devXYIndex + 1] = devPosY2;
-
-         // advance to the next segment
-         devPosX1 = devPosX2;
-         devPosY1 = devPosY2;
-      }
-
-      return devXY;
    }
 
    private void paint_HoveredTour_14_DirectionArrows(final GC gc, final int[] devXY) {
@@ -4552,26 +4554,45 @@ public class Map2 extends Canvas {
       final int devXMouse = _mouseMove_DevPosition_X;
       final int devYMouse = _mouseMove_DevPosition_Y;
 
-      final int numTours = _allHoveredTourIds.size();
+      final int numHoveredTours = _allHoveredTourIds.size();
+      final int numDisplayedTours = _allTourIds != null
+            ? _allTourIds.size()
+            : 0;
 
-      if (numTours == 1) {
+      if (numHoveredTours == 1) {
 
-         final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
+         // one tour is hovered -> show tour details
 
-         if (tourData == null) {
+         if (numDisplayedTours > 1) {
 
-            // this occurred, it can be that previously a history/multiple tour was displayed
+            // multiple tours are displayed
+
+            final TourData tourData = TourManager.getTour(_allHoveredTourIds.get(0));
+
+            if (tourData == null) {
+
+               // this occurred, it can be that previously a history/multiple tour was displayed
+
+            } else {
+
+               // tour data are available
+
+               paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData, _allHoveredSerieIndices.get(0));
+            }
 
          } else {
 
-            // tour data are available
+            // one tour is displayed
 
-            paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData, _allHoveredSerieIndices.get(0));
+            // - tour track info can be displayed in the value point tooltip
+            // - tour info can be displayed with the tour info tooltip
          }
 
       } else {
 
-         final String hoverText = Integer.toString(numTours) + UI.SPACE + Messages.Map2_Hovered_Tours;
+         // multiple tours are hovered -> show number of hovered tours
+
+         final String hoverText = Integer.toString(numHoveredTours) + UI.SPACE + Messages.Map2_Hovered_Tours;
 
          paint_Text_Label(gc,
                devXMouse,
@@ -4606,10 +4627,12 @@ public class Map2 extends Canvas {
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
-      final String text_TourRecordedTime = String.format("Recorded time\t%s",
-            FormatManager.formatRecordedTime(recordedTime));
+      final String text_TourRecordedTime = String.format(VALUE_FORMAT_TIME,
+            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+            FormatManager.formatMovingTime(recordedTime));
 
-      final String text_TourDistance = String.format("Distance\t\t%s\t%s",
+      final String text_TourDistance = String.format(VALUE_FORMAT_DISTANCE,
+            TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
@@ -4618,70 +4641,6 @@ public class Map2 extends Canvas {
        */
 
       // trackpoint
-      final String text_TrackPoint = String.format("Trackpoint\t%s",
-            Integer.toString(hoveredSerieIndex
-
-                  // start with 1 and not with 0
-                  + 1));
-
-      // time
-      String text_Time = null;
-      final int[] timeSerie = tourData.timeSerie;
-      if (timeSerie != null) {
-
-         text_Time = String.format("Time\t\t%s",
-               UI.format_hh_mm_ss(timeSerie[hoveredSerieIndex]));
-      }
-
-      // distance
-      String text_Distance = null;
-      final float[] distanceSerie = tourData.distanceSerie;
-      if (distanceSerie != null) {
-
-         text_Distance = String.format("Distance\t\t%s\t%s",
-               _nf3.format(distanceSerie[hoveredSerieIndex] / 1000 / UI.UNIT_VALUE_DISTANCE),
-               UI.UNIT_LABEL_DISTANCE);
-      }
-
-      // elevation
-      String text_Elevation = UI.EMPTY_STRING;
-      final float[] altitudeSerie = tourData.altitudeSerie;
-      if (altitudeSerie != null) {
-
-         text_Elevation = String.format("Elevation\t%s\t%s",
-               _nf2.format(altitudeSerie[hoveredSerieIndex] / UI.UNIT_VALUE_ELEVATION),
-               UI.UNIT_LABEL_ELEVATION);
-      }
-
-      // pulse
-      String text_Pulse = null;
-      final float[] pulseSerie = tourData.pulseSerie;
-      if (pulseSerie != null) {
-
-         text_Pulse = String.format("Pulse\t\t%s\t%s",
-               _nf0.format(pulseSerie[hoveredSerieIndex]),
-               GRAPH_LABEL_HEARTBEAT_UNIT);
-      }
-
-      // speed
-      String text_Speed = null;
-      final float[] speedSerie = tourData.getSpeedSerie();
-      if (speedSerie != null) {
-
-         text_Speed = String.format("Speed\t\t%s\t%s",
-               _nf1.format(speedSerie[hoveredSerieIndex]),
-               UI.UNIT_LABEL_SPEED);
-      }
-
-      // pace
-      String text_Pace = null;
-      final float[] paceSerie = tourData.getPaceSerieSeconds();
-      if (paceSerie != null) {
-
-         text_Pace = String.format("Pace\t\t%s\t%s",
-               UI.format_mm_ss((long) (paceSerie[hoveredSerieIndex] * UI.UNIT_VALUE_DISTANCE)),
-               UI.UNIT_LABEL_PACE);
-      }
 
       final StringBuilder sb = new StringBuilder();
 
@@ -4690,35 +4649,7 @@ public class Map2 extends Canvas {
       sb.append(NL);
       sb.append(text_TourDistance + NL);
       sb.append(text_TourMovingTime + NL);
-      sb.append(text_TourRecordedTime + NL);
-      sb.append(NL);
-
-      sb.append(text_TrackPoint);
-      sb.append(NL);
-
-      if (text_Time != null) {
-         sb.append(NL + text_Time);
-      }
-
-      if (text_Distance != null) {
-         sb.append(NL + text_Distance);
-      }
-
-      if (text_Elevation != null) {
-         sb.append(NL + text_Elevation);
-      }
-
-      if (text_Speed != null) {
-         sb.append(NL + text_Speed);
-      }
-
-      if (text_Pace != null) {
-         sb.append(NL + text_Pace);
-      }
-
-      if (text_Pulse != null) {
-         sb.append(NL + text_Pulse);
-      }
+      sb.append(text_TourRecordedTime);
 
       final Point size_DateTime = gc.textExtent(text_TourDateTime);
       final Point size_Values = gc.textExtent(sb.toString());
