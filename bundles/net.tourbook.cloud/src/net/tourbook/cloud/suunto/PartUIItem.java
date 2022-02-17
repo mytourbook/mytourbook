@@ -26,11 +26,11 @@ public class PartUIItem {
    public PartUIItem(final PART_TYPE partItemKey,
                      final WIDGET_KEY partWidgetKey,
                      final String partText,
-                     final String partAbbr) {
+                     final String partAbbreviation) {
 
       partKey = partItemKey;
       widgetKey = partWidgetKey;
       text = partText;
-      abbreviation = partAbbr;
+      abbreviation = partAbbreviation;
    }
 }
