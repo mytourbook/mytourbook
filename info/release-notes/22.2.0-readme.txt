@@ -12,6 +12,9 @@ New
 * Tour Pauses
   - Show all tour pauses in a list
 
+* Suunto Integration (Frederic)   
+  - Added the possibility to customize the downloaded file names https://sourceforge.net/p/mytourbook/feature-requests/198/
+
 
 Improvements
 ============
@@ -60,6 +63,9 @@ Improvements
 
 * Tour Merging (Frederic)
  - Added the possibility to merge speed
+
+ * Suunto Integration (Frederic)   
+  - Added a workout filter end date
 
 
 Changes

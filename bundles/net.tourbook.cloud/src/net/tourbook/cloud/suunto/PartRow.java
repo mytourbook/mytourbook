@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,28 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package cloud.oauth2;
+package net.tourbook.cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Map;
 
-import net.tourbook.cloud.oauth2.OAuth2Utils;
-import net.tourbook.common.UI;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Widget;
 
-import org.junit.jupiter.api.Test;
+public class PartRow {
 
-public class OAuth2UtilsTests {
+   private final Combo                   rowCombo;
 
-   @Test
-   public void testComputeAccessTokenExpirationDate() {
+   /**
+    * The EnumMap contains all widgets for one row
+    */
+   private final Map<WIDGET_KEY, Widget> rowWidgets;
 
-      assertEquals(
-            "2000-11-22T23:26:27Z[UTC]", //$NON-NLS-1$
-            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 0));
+   public PartRow(final Combo combo, final Map<WIDGET_KEY, Widget> widgets) {
 
-      assertEquals(
-            "2000-11-22T23:31:27Z[UTC]", //$NON-NLS-1$
-            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 300000));
+      rowCombo = combo;
+      rowWidgets = widgets;
+   }
 
-      assertEquals(UI.EMPTY_STRING, OAuth2Utils.computeAccessTokenExpirationDate(0, 0));
+   public Combo getRowCombo() {
+      return rowCombo;
+   }
+
+   public Map<WIDGET_KEY, Widget> getRowWidgets() {
+      return rowWidgets;
    }
 }

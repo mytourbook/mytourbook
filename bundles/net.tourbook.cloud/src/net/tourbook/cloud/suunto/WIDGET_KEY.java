@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,28 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package cloud.oauth2;
+package net.tourbook.cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public enum WIDGET_KEY {
 
-import net.tourbook.cloud.oauth2.OAuth2Utils;
-import net.tourbook.common.UI;
-
-import org.junit.jupiter.api.Test;
-
-public class OAuth2UtilsTests {
-
-   @Test
-   public void testComputeAccessTokenExpirationDate() {
-
-      assertEquals(
-            "2000-11-22T23:26:27Z[UTC]", //$NON-NLS-1$
-            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 0));
-
-      assertEquals(
-            "2000-11-22T23:31:27Z[UTC]", //$NON-NLS-1$
-            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 300000));
-
-      assertEquals(UI.EMPTY_STRING, OAuth2Utils.computeAccessTokenExpirationDate(0, 0));
-   }
+   PAGEBOOK, //
+   PAGE_NONE, //
+   PAGE_SUUNTO_FILE_NAME, //
+   PAGE_FIT_EXTENSION, //
+   PAGE_WORKOUT_ID, //
+   PAGE_ACTIVITY_TYPE, //
+   PAGE_YEAR, //
+   PAGE_MONTH, //
+   PAGE_DAY, //
+   PAGE_HOUR, //
+   PAGE_MINUTE, //
+   PAGE_USER_NAME, //
+   PAGE_USER_TEXT, //
+   //
+   TEXT_USER_TEXT,
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,28 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package cloud.oauth2;
+package net.tourbook.cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public class PartUIItem {
 
-import net.tourbook.cloud.oauth2.OAuth2Utils;
-import net.tourbook.common.UI;
+   PART_TYPE  partKey;
+   WIDGET_KEY widgetKey;
 
-import org.junit.jupiter.api.Test;
+   String     text;
+   String     abbreviation;
 
-public class OAuth2UtilsTests {
+   public PartUIItem(final PART_TYPE partItemKey,
+                     final WIDGET_KEY partWidgetKey,
+                     final String partText,
+                     final String partAbbreviation) {
 
-   @Test
-   public void testComputeAccessTokenExpirationDate() {
-
-      assertEquals(
-            "2000-11-22T23:26:27Z[UTC]", //$NON-NLS-1$
-            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 0));
-
-      assertEquals(
-            "2000-11-22T23:31:27Z[UTC]", //$NON-NLS-1$
-            OAuth2Utils.computeAccessTokenExpirationDate(974935587000L, 300000));
-
-      assertEquals(UI.EMPTY_STRING, OAuth2Utils.computeAccessTokenExpirationDate(0, 0));
+      partKey = partItemKey;
+      widgetKey = partWidgetKey;
+      text = partText;
+      abbreviation = partAbbreviation;
    }
 }
