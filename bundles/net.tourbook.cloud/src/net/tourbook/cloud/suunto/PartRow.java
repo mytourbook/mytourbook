@@ -13,18 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Map;
 
-import org.junit.jupiter.api.Test;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Widget;
 
-public class FilesUtilsTests {
+public class PartRow {
 
-   @Test
-   void testRemoveExtensions() {
+   private final Combo                   rowCombo;
 
-      assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals("file", FilesUtils.removeExtensions("file")); //$NON-NLS-1$ //$NON-NLS-2$
+   /**
+    * The EnumMap contains all widgets for one row
+    */
+   private final Map<WIDGET_KEY, Widget> rowWidgets;
+
+   public PartRow(final Combo combo, final Map<WIDGET_KEY, Widget> widgets) {
+
+      rowCombo = combo;
+      rowWidgets = widgets;
+   }
+
+   public Combo getRowCombo() {
+      return rowCombo;
+   }
+
+   public Map<WIDGET_KEY, Widget> getRowWidgets() {
+      return rowWidgets;
    }
 }

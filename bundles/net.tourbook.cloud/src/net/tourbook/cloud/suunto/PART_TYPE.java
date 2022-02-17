@@ -13,18 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public enum PART_TYPE {
 
-import org.junit.jupiter.api.Test;
-
-public class FilesUtilsTests {
-
-   @Test
-   void testRemoveExtensions() {
-
-      assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals("file", FilesUtils.removeExtensions("file")); //$NON-NLS-1$ //$NON-NLS-2$
-   }
+   NONE, //
+   SUUNTO_FILE_NAME, //
+   FIT_EXTENSION, //
+   WORKOUT_ID, //
+   ACTIVITY_TYPE, //
+   YEAR, //
+   MONTH, //
+   DAY, //
+   HOUR, //
+   MINUTE, //
+   USER_NAME, //
+   USER_TEXT
 }

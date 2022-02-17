@@ -13,18 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public class PartUIItem {
 
-import org.junit.jupiter.api.Test;
+   PART_TYPE  partKey;
+   WIDGET_KEY widgetKey;
 
-public class FilesUtilsTests {
+   String     text;
+   String     abbreviation;
 
-   @Test
-   void testRemoveExtensions() {
+   public PartUIItem(final PART_TYPE partItemKey,
+                     final WIDGET_KEY partWidgetKey,
+                     final String partText,
+                     final String partAbbr) {
 
-      assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals("file", FilesUtils.removeExtensions("file")); //$NON-NLS-1$ //$NON-NLS-2$
+      partKey = partItemKey;
+      widgetKey = partWidgetKey;
+      text = partText;
+      abbreviation = partAbbr;
    }
 }

@@ -32,13 +32,19 @@ New
 
 * 
 
+* Suunto Integration (Frederic)   
+  - Added the possibility to customize the downloaded file names https://sourceforge.net/p/mytourbook/feature-requests/198/
+
 
 Improvements
 ============
 
 * 
 
+* Suunto Integration (Frederic)   
+  - Added a workout filter end date
 
+                                        
 Changes
 =======
 
