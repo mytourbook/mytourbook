@@ -22,8 +22,8 @@ import com.pgssoft.httpclient.HttpClientMock;
 import java.lang.reflect.Field;
 
 import net.tourbook.data.TourData;
-import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherData;
+import net.tourbook.weather.worldweatheronline.HistoricalWeatherRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

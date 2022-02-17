@@ -30,7 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.weather.HistoricalWeatherRetriever;
+import net.tourbook.weather.worldweatheronline.HistoricalWeatherRetriever;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.MessageDialog;

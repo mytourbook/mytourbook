@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.weather.worldweatheronline;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,6 +42,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.views.calendar.CalendarProfile;
+import net.tourbook.weather.WWOHourlyResults;
+import net.tourbook.weather.WeatherData;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -49,7 +51,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
-public class HistoricalWeatherRetriever {
+public class HistoricalWeatherRetriever /* extends IHistoricalWeatherRetriever */ {
+
+   //TODO FB
+   // the IHistoricalWeatherRetriever will provide a setter for each provider data (avg temp, max, min, wind chill....)
 
    private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                                      //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;

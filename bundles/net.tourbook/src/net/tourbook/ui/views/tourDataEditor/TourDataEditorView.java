@@ -229,6 +229,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //display the weather in the calendar view
 
+   //In the weather pref page, create a tab for each vendor
+
+   //Make a weather category for device and for provider/fournisseur.
+   //That way, when downloading provider's data, we don't override the device data.
+
+   //By default, the wind should not be north but empty. is that possible ?
+
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
