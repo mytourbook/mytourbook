@@ -17,9 +17,8 @@ package cloud.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.byteholder.geoclipse.map.UI;
-
 import net.tourbook.cloud.oauth2.OAuth2Utils;
+import net.tourbook.common.UI;
 
 import org.junit.jupiter.api.Test;
 
