@@ -366,9 +366,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                .setHost(herokuUri.getHost())
                .setPath("suunto/workouts"); //$NON-NLS-1$
 
-         //TODO FB
-         //if the start date is after the end date, deactivate the end date ? set the end date to start date ?
-         //Same thing for when the end date is before the start date
          if (getSuuntoUseWorkoutFilterStartDate()) {
             final long startDateFilter = getSuuntoWorkoutFilterStartDate();
             uriBuilder.setParameter("since", String.valueOf(startDateFilter)); //$NON-NLS-1$
