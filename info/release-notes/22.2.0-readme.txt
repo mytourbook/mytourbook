@@ -14,6 +14,7 @@ New
 
 * Suunto Integration (Frederic)   
   - Added the possibility to customize the downloaded file names https://sourceforge.net/p/mytourbook/feature-requests/198/
+  - Added a workout filter end date
 
 
 Improvements
@@ -53,19 +54,17 @@ Improvements
 * Tour Segmenter
   - Show power value for each segment	https://sourceforge.net/p/mytourbook/feature-requests/204/
   
-  
-* Strava Integration (Frederic)   
-  - Added the possibility to add the tour weather icon in the uploaded Strava activity title
 
 * Cloud Integration (Frederic)
   - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
 
+  
+* Strava Integration (Frederic)   
+  - Added the possibility to add the tour weather icon in the uploaded Strava activity title
+
 
 * Tour Merging (Frederic)
  - Added the possibility to merge speed
-
- * Suunto Integration (Frederic)   
-  - Added a workout filter end date
 
 
 Changes

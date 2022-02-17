@@ -276,6 +276,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
       {
          _tabFolder = new CTabFolder(container, SWT.TOP);
@@ -473,19 +474,19 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.swtDefaults().applyTo(container);
       {
          // Label: custom file name
          final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
          label.setText(Messages.Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename);
          label.setToolTipText(Messages.Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
          // Text: custom file name
          _txtCustomFileName = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtCustomFileName);
          _txtCustomFileName.setToolTipText(Messages.Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename_Tooltip);
          _txtCustomFileName.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtCustomFileName);
 
          // File name parts
          _partContainer = new Composite(container, SWT.NONE);
@@ -517,7 +518,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       // combo: parameter item type
       final Combo combo = new Combo(container, SWT.READ_ONLY);
-      combo.setVisibleItemCount(10);
+      combo.setVisibleItemCount(20);
       combo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
          final Combo widgetCombo = (Combo) selectionEvent.widget;
