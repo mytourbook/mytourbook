@@ -17,6 +17,8 @@ package net.tourbook.cloud.suunto;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,21 +52,14 @@ public class CustomFileNameBuilder {
       final String suuntoFilenameComponents =
             _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
 
-      //This pattern looks for all the substrings in between '{' and '}'
-      final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
-      final Matcher matcher = pattern.matcher(suuntoFilenameComponents);
+      final List<String> fileNameComponents = extractFileNameComponents(suuntoFilenameComponents);
 
       //Replace each component by the appropriate workout data
       final StringBuilder customizedFileName = new StringBuilder();
 
-      while (matcher.find()) {
+      for (final String fileNameComponent : fileNameComponents) {
 
-         final String currentComponent = matcher.group(1);
-
-         final PART_TYPE partType = currentComponent.startsWith(
-               PART_TYPE.USER_TEXT.toString())
-                     ? PART_TYPE.USER_TEXT
-                     : PART_TYPE.valueOf(currentComponent);
+         final PART_TYPE partType = getPartTypeFromComponent(fileNameComponent);
 
          switch (partType) {
 
@@ -130,8 +125,8 @@ public class CustomFileNameBuilder {
          case USER_TEXT:
 
             customizedFileName.append(
-                  currentComponent.substring(
-                        currentComponent.indexOf(UI.SYMBOL_COLON)));
+                  fileNameComponent.substring(
+                        fileNameComponent.indexOf(UI.SYMBOL_COLON) + 1));
             break;
 
          case NONE:
@@ -141,6 +136,30 @@ public class CustomFileNameBuilder {
       }
 
       return customizedFileName.toString();
+   }
+
+   public static List<String> extractFileNameComponents(final String suuntoFilenameComponents) {
+
+      //This pattern looks for all the substrings in between '{' and '}'
+      final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
+      final Matcher matcher = pattern.matcher(suuntoFilenameComponents);
+
+      final List<String> fileNameComponents = new ArrayList<>();
+      while (matcher.find()) {
+
+         fileNameComponents.add(matcher.group(1));
+      }
+
+      return fileNameComponents;
+   }
+
+   public static PART_TYPE getPartTypeFromComponent(final String fileNameComponent) {
+
+      final PART_TYPE partType = fileNameComponent.startsWith(
+            PART_TYPE.USER_TEXT.toString())
+                  ? PART_TYPE.USER_TEXT
+                  : PART_TYPE.valueOf(fileNameComponent);
+      return partType;
    }
 
    private static OffsetDateTime getWorkoutOffsetDateTime(final Payload workoutPayload) {

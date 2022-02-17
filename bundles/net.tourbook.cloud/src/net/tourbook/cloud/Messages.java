@@ -77,6 +77,8 @@ public class Messages extends NLS {
    public static String VendorName_Strava;
 
    //SUUNTO
+   public static String Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename;
+   public static String Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename_Tooltip;
    public static String Dialog_DownloadWorkoutsFromSuunto_Message;
    public static String Dialog_DownloadWorkoutsFromSuunto_SubTask;
    public static String Dialog_DownloadWorkoutsFromSuunto_Task;

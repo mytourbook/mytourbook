@@ -78,7 +78,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE = net.tourbook.Messages.dialog_export_dir_dialog_message;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_TEXT    = net.tourbook.Messages.dialog_export_dir_dialog_text;
    private static final String     PARAMETER_TRAILING_CHAR          = "}";                                                   //$NON-NLS-1$
-   private static final String     PARAMETER_LEADING_CHAR           = "{";
+   private static final String     PARAMETER_LEADING_CHAR           = "{";                                                   //$NON-NLS-1$
    public static final String      ID                               = "net.tourbook.cloud.PrefPageSuunto";                   //$NON-NLS-1$
 
    public static final String      ClientId                         = "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8";                //$NON-NLS-1$
@@ -204,17 +204,17 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    }
 
    private String buildComponentKey(final PART_TYPE partType) {
-      return "{" + partType.toString() + "}";
+      return PARAMETER_LEADING_CHAR + partType.toString() + PARAMETER_TRAILING_CHAR;
    }
 
    private String buildEnhancedComponentKey(final PART_TYPE partType, final String additionalString) {
-      String componentKey = "{" + partType.toString();
+      String componentKey = PARAMETER_LEADING_CHAR + partType.toString();
       if (partType == PART_TYPE.USER_TEXT) {
 
-         componentKey += ":" + StringUtils.sanitizeFileName(additionalString).trim();
+         componentKey += UI.SYMBOL_COLON + StringUtils.sanitizeFileName(additionalString).trim();
       }
 
-      componentKey += "}";
+      componentKey += PARAMETER_TRAILING_CHAR;
 
       return componentKey;
    }
@@ -227,6 +227,8 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       final Composite container = createUI(parent);
 
       restoreState();
+
+      initializeUIFromModel();
 
       enableControls();
 
@@ -453,7 +455,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
    private void createUI_104_AccountCleanup(final Composite parent) {
 
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
       GridLayoutFactory.fillDefaults().applyTo(parent);
       {
          /*
@@ -463,7 +465,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          _btnCleanup.setText(Messages.PrefPage_CloudConnectivity_Label_Cleanup);
          _btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
          _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults()));
-         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, false).applyTo(_btnCleanup);
       }
    }
 
@@ -476,14 +478,13 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          // Label: custom file name
          final Label label = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-         label.setText("Messages.Dialog_MapConfig_Label_CustomUrl");
-         //todo fb
-         //label.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
+         label.setText(Messages.Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename);
+         label.setToolTipText(Messages.Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename_Tooltip);
 
          // Text: custom file name
          _txtCustomFileName = new Text(container, SWT.BORDER | SWT.READ_ONLY);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtCustomFileName);
-         //  _txtCustomUrl.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
+         _txtCustomFileName.setToolTipText(Messages.Dialog_DownloadWorkoutsFromSuunto_Label_CustomFilename_Tooltip);
          _txtCustomFileName.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
          // File name parts
@@ -688,7 +689,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
                   .grab(true, true)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
-            label.setText(createUI214Parameter(PART_TYPE.DAY));
+            label.setText(createUI214Parameter(PART_TYPE.MINUTE));
          }
          paraWidgets.put(WIDGET_KEY.PAGE_MINUTE, minuteContainer);
 
@@ -763,19 +764,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       _btnCleanup.setEnabled(isAuthorized);
    }
 
-   private void fillComponentsPartRows(final String suuntoFilenameComponents) {
-
-      if (StringUtils.isNullOrEmpty(suuntoFilenameComponents)) {
-         return;
-      }
-
-      final String[] components = suuntoFilenameComponents.split("\\{");
-
-      for (final String component : components) {
-         System.out.println(component);
-      }
-   }
-
    private long getFilterDate(final DateTime filterDate) {
 
       final int year = filterDate.getYear();
@@ -815,6 +803,14 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
    @Override
    public void init(final IWorkbench workbench) {}
+
+   private void initializeUIFromModel() {
+
+      final String fileNameComponent = _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
+      final List<String> fileNameComponents = CustomFileNameBuilder.extractFileNameComponents(fileNameComponent);
+      updateUIFilenameComponents(fileNameComponents);
+      updateCustomFileName();
+   }
 
    private void initUI() {
 
@@ -966,8 +962,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       final String suuntoFilenameComponents = _prefStore.getDefaultString(Preferences.SUUNTO_FILENAME_COMPONENTS);
       _txtCustomFileName.setText(suuntoFilenameComponents);
       _internalFileNameComponents = suuntoFilenameComponents;
-      //todo fb
-      fillComponentsPartRows(suuntoFilenameComponents);
+      initializeUIFromModel();
 
       enableControls();
 
@@ -1120,11 +1115,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       setFilterEndDate(
             _prefStore.getLong(
                   Preferences.getPerson_SuuntoWorkoutFilterEndDate_String(selectedPersonId)));
-
-      final String suuntoFilenameComponents = _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
-      _txtCustomFileName.setText(suuntoFilenameComponents);
-      _internalFileNameComponents = suuntoFilenameComponents;
-      fillComponentsPartRows(suuntoFilenameComponents);
    }
 
    private void restoreState() {
@@ -1147,6 +1137,27 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       _comboPeopleList.select(_prefStore.getInt(Preferences.SUUNTO_SELECTED_PERSON_INDEX));
 
       _tabFolder.setSelection(_prefStore.getInt(STATE_SUUNTO_CLOUD_SELECTED_TAB));
+   }
+
+   /**
+    * select part type in the row combo
+    */
+   private int selectPartType(final PartRow partRow, final PART_TYPE partType) {
+
+      int partTypeIndex = 0;
+      for (final PartUIItem partItem : PART_ITEMS) {
+         if (partItem.partKey == partType) {
+            break;
+         }
+         partTypeIndex++;
+      }
+
+      final Combo rowCombo = partRow.getRowCombo();
+      rowCombo.select(partTypeIndex);
+
+      onSelectPart(rowCombo, partRow.getRowWidgets());
+
+      return partTypeIndex;
    }
 
    private void setFilterEndDate(final long filterEndDate) {
@@ -1206,6 +1217,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.WORKOUT_ID));
             break;
 
+         case ACTIVITY_TYPE:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.ACTIVITY_TYPE));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.ACTIVITY_TYPE));
+            break;
+
          case YEAR:
             stringBuilder.append(createUI214Parameter(PART_TYPE.YEAR));
             internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.YEAR));
@@ -1219,6 +1235,16 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          case DAY:
             stringBuilder.append(createUI214Parameter(PART_TYPE.DAY));
             internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.DAY));
+            break;
+
+         case HOUR:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.HOUR));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.HOUR));
+            break;
+
+         case MINUTE:
+            stringBuilder.append(createUI214Parameter(PART_TYPE.MINUTE));
+            internalFileNameComponentsBuilder.append(buildComponentKey(PART_TYPE.MINUTE));
             break;
 
          case USER_NAME:
@@ -1239,5 +1265,38 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
       _internalFileNameComponents = internalFileNameComponentsBuilder.toString();
       _txtCustomFileName.setText(stringBuilder.toString());
+   }
+
+   private void updateUIFilenameComponents(final List<String> fileNameComponents) {
+
+      int rowIndex = 0;
+      for (final String fileNameComponent : fileNameComponents) {
+
+         // check bounds
+         if (rowIndex >= PART_ROWS.size()) {
+            StatusUtil.log("there are too few part rows", new Exception()); //$NON-NLS-1$
+            break;
+         }
+
+         final PartRow partRow = PART_ROWS.get(rowIndex++);
+         final PART_TYPE partType = CustomFileNameBuilder.getPartTypeFromComponent(fileNameComponent);
+
+         // display part widget (page/input widget)
+         selectPartType(partRow, partType);
+
+         if (partType == PART_TYPE.USER_TEXT) {
+            final Text txtHtml = (Text) partRow.getRowWidgets().get(WIDGET_KEY.TEXT_USER_TEXT);
+            txtHtml.setText(fileNameComponent.substring(
+                  fileNameComponent.indexOf(UI.SYMBOL_COLON) + 1));
+         }
+      }
+
+      // hide part rows which are not used
+      rowIndex = rowIndex < 0 ? 0 : rowIndex;
+      for (int partRowIndex = rowIndex; partRowIndex < PART_ROWS.size(); partRowIndex++) {
+         final PartRow partRow = PART_ROWS.get(partRowIndex);
+         selectPartType(partRow, PART_TYPE.NONE);
+      }
+
    }
 }
