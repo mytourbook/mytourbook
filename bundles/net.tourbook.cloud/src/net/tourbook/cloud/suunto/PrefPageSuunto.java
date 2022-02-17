@@ -74,7 +74,6 @@ import org.eclipse.ui.part.PageBook;
 
 public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb strava: why is it successful when I upload a duplicate tour !?!?!?!
    private static final String     APP_BTN_BROWSE                   = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE = net.tourbook.Messages.dialog_export_dir_dialog_message;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_TEXT    = net.tourbook.Messages.dialog_export_dir_dialog_text;
@@ -142,9 +141,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             WIDGET_KEY.PAGE_SUUNTO_FILE_NAME,
             Messages.Filename_Component_SuuntoName,
             Messages.Filename_Component_SuuntoName_Abbr));
-      //TODO FB
-//            "Suunto file name <= the one by default",
-//            "Suunto file name <= the one by default_Abbr"));
 
       PART_ITEMS.add(new PartUIItem(
             PART_TYPE.FIT_EXTENSION,
@@ -157,6 +153,12 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             WIDGET_KEY.PAGE_WORKOUT_ID,
             Messages.Filename_Component_ActivityId,
             Messages.Filename_Component_ActivityId_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.ACTIVITY_TYPE,
+            WIDGET_KEY.PAGE_ACTIVITY_TYPE,
+            Messages.Filename_Component_ActivityType,
+            Messages.Filename_Component_ActivityType_Abbr));
 
       PART_ITEMS.add(new PartUIItem(
             PART_TYPE.YEAR,
@@ -175,6 +177,18 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             WIDGET_KEY.PAGE_DAY,
             Messages.Filename_Component_Day,
             Messages.Filename_Component_Day_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.HOUR,
+            WIDGET_KEY.PAGE_HOUR,
+            Messages.Filename_Component_Hour,
+            Messages.Filename_Component_Hour_Abbr));
+
+      PART_ITEMS.add(new PartUIItem(
+            PART_TYPE.MINUTE,
+            WIDGET_KEY.PAGE_MINUTE,
+            Messages.Filename_Component_Minute,
+            Messages.Filename_Component_Minute_Abbr));
 
       PART_ITEMS.add(new PartUIItem(
             PART_TYPE.USER_NAME,
@@ -463,6 +477,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          final Label label = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
          label.setText("Messages.Dialog_MapConfig_Label_CustomUrl");
+         //todo fb
          //label.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
 
          // Text: custom file name
@@ -1177,7 +1192,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          }
       }
 
-      // TODO FB to save in the preferences
       _internalFileNameComponents = internalFileNameComponentsBuilder.toString();
       _txtCustomFileName.setText(stringBuilder.toString());
    }

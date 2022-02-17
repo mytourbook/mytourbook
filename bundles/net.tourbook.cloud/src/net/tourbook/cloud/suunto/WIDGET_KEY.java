@@ -22,11 +22,14 @@ public enum WIDGET_KEY {
    PAGE_SUUNTO_FILE_NAME, //
    PAGE_FIT_EXTENSION, //
    PAGE_WORKOUT_ID, //
+   PAGE_ACTIVITY_TYPE, //
    PAGE_YEAR, //
    PAGE_MONTH, //
    PAGE_DAY, //
+   PAGE_HOUR, //
+   PAGE_MINUTE, //
    PAGE_USER_NAME, //
    PAGE_USER_TEXT, //
    //
-   TEXT_USER_TEXT, //
+   TEXT_USER_TEXT,
 }

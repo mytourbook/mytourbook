@@ -86,6 +86,8 @@ public class Messages extends NLS {
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
+   public static String Filename_Component_ActivityType;
+   public static String Filename_Component_ActivityType_Abbr;
    public static String Filename_Component_FitExtension;
    public static String Filename_Component_FitExtension_Abbr;
    public static String Filename_Component_SuuntoName;
@@ -98,6 +100,10 @@ public class Messages extends NLS {
    public static String Filename_Component_Month_Abbr;
    public static String Filename_Component_Day;
    public static String Filename_Component_Day_Abbr;
+   public static String Filename_Component_Hour;
+   public static String Filename_Component_Hour_Abbr;
+   public static String Filename_Component_Minute;
+   public static String Filename_Component_Minute_Abbr;
    public static String Filename_Component_UserName;
    public static String Filename_Component_UserName_Abbr;
    public static String Filename_Component_UserText;

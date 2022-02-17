@@ -6,7 +6,9 @@ Bundle-Version: 22.2.0.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  net.tourbook,
  net.tourbook.ext.jars,
- net.tourbook.ext.ejb3
+ net.tourbook.ext.ejb3,
+ net.tourbook.cloud,
+ org.eclipse.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,

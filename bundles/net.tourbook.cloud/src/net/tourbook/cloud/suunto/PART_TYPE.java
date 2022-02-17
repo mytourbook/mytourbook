@@ -17,12 +17,11 @@ package net.tourbook.cloud.suunto;
 
 public enum PART_TYPE {
 
-   //todo fb
-   //store those enums in the preferences
    NONE, //
    SUUNTO_FILE_NAME, //
    FIT_EXTENSION, //
    WORKOUT_ID, //
+   ACTIVITY_TYPE, //
    YEAR, //
    MONTH, //
    DAY, //

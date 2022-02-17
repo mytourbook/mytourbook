@@ -82,7 +82,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    //todo fb unit tests for downloading and sending files
 
-   //https://sourceforge.net/p/mytourbook/feature-requests/198/
    public SuuntoCloudDownloader() {
 
       super("SUUNTO", //$NON-NLS-1$
@@ -454,9 +453,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       try (InputStream inputStream = response.body();
             FileOutputStream fileOutputStream = new FileOutputStream(filePath.toFile())) {
 
-         int inByte;
-         while ((inByte = inputStream.read()) != -1) {
-            fileOutputStream.write(inByte);
+         int inputStreamByte;
+         while ((inputStreamByte = inputStream.read()) != -1) {
+            fileOutputStream.write(inputStreamByte);
          }
 
       } catch (final IOException e) {

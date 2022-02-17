@@ -27,36 +27,50 @@ import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class CustomFileNameBuilder {
 
-   private static IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
+   private static IPreferenceStore _prefStore =
+         Activator.getDefault().getPreferenceStore();
 
+   /**
+    * Build the file name to download based on what the user has configured
+    *
+    * @param workoutPayload
+    * @param suuntoFileName
+    * @return
+    */
    public static String buildCustomizedFileName(final Payload workoutPayload,
                                                 final String suuntoFileName) {
-      final String suuntoFilenameComponents = _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
 
-      //todo fb
-      //make a function to parse the startime to datetime ?
+      final String suuntoFilenameComponents =
+            _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
+
+      //This pattern looks for all the substrings in between '{' and '}'
+      final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
+      final Matcher matcher = pattern.matcher(suuntoFilenameComponents);
 
       //Replace each component by the appropriate workout data
       final StringBuilder customizedFileName = new StringBuilder();
-      final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
-      final Matcher matcher = pattern.matcher(suuntoFilenameComponents);
+
       while (matcher.find()) {
 
          final String currentComponent = matcher.group(1);
-         final PART_TYPE partType = currentComponent.startsWith(PART_TYPE.USER_TEXT.toString())
-               ? PART_TYPE.USER_TEXT
-               : PART_TYPE.valueOf(currentComponent);
+
+         final PART_TYPE partType = currentComponent.startsWith(
+               PART_TYPE.USER_TEXT.toString())
+                     ? PART_TYPE.USER_TEXT
+                     : PART_TYPE.valueOf(currentComponent);
+
          switch (partType) {
 
          case SUUNTO_FILE_NAME:
 
-            customizedFileName.append(suuntoFileName);
+            customizedFileName.append(FilesUtils.removeExtensions(suuntoFileName));
             break;
 
          case FIT_EXTENSION:
@@ -67,6 +81,11 @@ public class CustomFileNameBuilder {
          case WORKOUT_ID:
 
             customizedFileName.append(workoutPayload.workoutKey);
+            break;
+
+         case ACTIVITY_TYPE:
+
+            customizedFileName.append(workoutPayload.getSportNameFromActivityId());
             break;
 
          case YEAR:
@@ -80,11 +99,13 @@ public class CustomFileNameBuilder {
             final int month = getWorkoutOffsetDateTime(workoutPayload).getMonthValue();
             customizedFileName.append(month);
             break;
+
          case DAY:
 
             final int day = getWorkoutOffsetDateTime(workoutPayload).getDayOfMonth();
             customizedFileName.append(day);
             break;
+
          case HOUR:
 
             final int hour = getWorkoutOffsetDateTime(workoutPayload).getHour();
@@ -108,7 +129,9 @@ public class CustomFileNameBuilder {
 
          case USER_TEXT:
 
-            customizedFileName.append(currentComponent.substring(currentComponent.indexOf(UI.SYMBOL_COLON)));
+            customizedFileName.append(
+                  currentComponent.substring(
+                        currentComponent.indexOf(UI.SYMBOL_COLON)));
             break;
 
          case NONE:
@@ -118,21 +141,6 @@ public class CustomFileNameBuilder {
       }
 
       return customizedFileName.toString();
-
-      //TODO FB get the configured file name strcture from the prefs
-      /*
-       * Year
-       * Month
-       * Day
-       * Time (if available) but then which timezone !???Well, the timezone is gien in the json, the
-       * offset more specifically
-       * User text
-       * User name
-       * file name <= the one by default
-       * Workout Id
-       * extension (.fit)
-       */
-
    }
 
    private static OffsetDateTime getWorkoutOffsetDateTime(final Payload workoutPayload) {
@@ -141,9 +149,11 @@ public class CustomFileNameBuilder {
             .getZonedDateTimeWithUTC(workoutPayload.startTime)
             .toOffsetDateTime();
 
-      final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
+      final ZoneOffset zoneOffset =
+            ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
 
-      final OffsetDateTime offsetTime = offsetDateTime.withOffsetSameInstant(zoneOffset);
+      final OffsetDateTime offsetTime =
+            offsetDateTime.withOffsetSameInstant(zoneOffset);
 
       return offsetTime;
    }
