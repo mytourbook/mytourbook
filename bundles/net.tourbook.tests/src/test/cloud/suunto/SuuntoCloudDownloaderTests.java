@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -120,12 +122,10 @@ public class SuuntoCloudDownloaderTests {
             .doReturn(workoutsResponse)
             .withStatus(200);
 
-      final String workout601227Response = Comparison.readFileContent(SUUNTO_FILE_PATH
-            + "Workout-601227a563c46e612c20b579-Response.json"); //$NON-NLS-1$
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
             OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579") //$NON-NLS-1$
-            .doReturn(workout601227Response)
+            .doReturn(UI.EMPTY_STRING)
             .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             .withStatus(200);
 
