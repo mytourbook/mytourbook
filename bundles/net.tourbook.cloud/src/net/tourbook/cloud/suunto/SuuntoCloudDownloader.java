@@ -80,8 +80,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
 
-   //todo fb unit tests for downloading and sending files
-
    public SuuntoCloudDownloader() {
 
       super("SUUNTO", //$NON-NLS-1$

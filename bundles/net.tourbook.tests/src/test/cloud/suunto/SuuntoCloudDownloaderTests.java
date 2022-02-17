@@ -54,25 +54,25 @@ public class SuuntoCloudDownloaderTests {
       //happen
       _prefStore.setValue(
             Preferences.getSuuntoAccessToken_Active_Person_String(),
-            "8888888888888888888888888888888888888888");
+            "8888888888888888888888888888888888888888"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoRefreshToken_Active_Person_String(),
-            "8888888888888888888888888888888888888888");
+            "8888888888888888888888888888888888888888"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "4071156189000");
+            "4071156189000"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String(),
-            "12609");
+            "12609"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String(),
-            "./");
+            "./"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoWorkoutFilterStartDate_Active_Person_String(),
-            "1293840000000");
+            "1293840000000"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoWorkoutFilterEndDate_Active_Person_String(),
-            "1295049600000");
+            "1295049600000"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoUseWorkoutFilterStartDate_Active_Person_String(),
             true);
@@ -122,17 +122,17 @@ public class SuuntoCloudDownloaderTests {
 
       final String workout601227Response = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Workout-601227a563c46e612c20b579-Response.json"); //$NON-NLS-1$
-      final String filename = "2011-01-13.fit";
+      final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
             OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579") //$NON-NLS-1$
             .doReturn(workout601227Response)
-            .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+            .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             .withStatus(200);
 
       suuntoCloudDownloader.downloadTours();
 
-      httpClientMock.verify().get(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000").called();
-      httpClientMock.verify().get(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").called();
+      httpClientMock.verify().get(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000").called(); //$NON-NLS-1$
+      httpClientMock.verify().get(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
@@ -140,4 +140,11 @@ public class SuuntoCloudDownloaderTests {
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             filename)));
    }
+
+   /*
+    * TODO
+    * @Test
+    * void testTourUpload() {
+    * }
+    */
 }
