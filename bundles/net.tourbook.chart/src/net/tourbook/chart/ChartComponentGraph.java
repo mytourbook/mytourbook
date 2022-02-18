@@ -8602,6 +8602,9 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
+      // check bounds, a bounds exception occurred
+      selectedIndex = Math.min(Math.max(0, selectedIndex), lastIndex);
+
       _selectedBarItems[selectedIndex] = true;
 
       setChartPosition(selectedIndex);
