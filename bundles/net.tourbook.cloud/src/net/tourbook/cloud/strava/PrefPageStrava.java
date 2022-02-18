@@ -82,6 +82,14 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Button             _btnCleanup;
    private Button             _chkAddWeatherIconInTitle;
    private Button             _chkSendDescription;
+   private Button _chkSendWeatherData;      //todo fb tooltip :
+   //"Send weather data in the activity notes
+
+   //The weather data will be as below (assuming it is existing in the tour):
+   //Weather emoji description, average temp, (if any during the tour aka >0)  precipitations X mm, wind chill, wind speed, direction
+
+   //From Klimat.app Clear sky, 25°F, Feels like 14°F, Humidity 71%, Wind 11mph from S - by Klimat.app
+   //"
    private Button             _chkShowHideTokens;
    private Button             _chkUseTourTypeMapping;
    private Label              _labelAccessToken;
