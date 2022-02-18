@@ -53,6 +53,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
+   //todo fb add a tab for each provider
+   //make it as generic as possible so a new provider can be quickly added
+   //put each tab's code in a new file and create a generic file for "Generic Weather Provider's tab.java"
+
    public static final String     ID         = "net.tourbook.preferences.PrefPageWeather";                           //$NON-NLS-1$
 
    private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();

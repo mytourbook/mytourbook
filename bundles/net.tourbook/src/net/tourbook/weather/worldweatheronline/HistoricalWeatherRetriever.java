@@ -42,6 +42,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.views.calendar.CalendarProfile;
+import net.tourbook.weather.IHistoricalWeatherRetriever;
 import net.tourbook.weather.WWOHourlyResults;
 import net.tourbook.weather.WeatherData;
 
@@ -51,10 +52,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
-public class HistoricalWeatherRetriever /* extends IHistoricalWeatherRetriever */ {
+public class HistoricalWeatherRetriever implements IHistoricalWeatherRetriever {
 
    //TODO FB
-   // the IHistoricalWeatherRetriever will provide a setter for each provider data (avg temp, max, min, wind chill....)
+   // the IHistoricalWeatherRetriever will provide a getter for each provider data
+   //and for each data in the tour data editor view that can be retrieved from a weather provider
+   //(avg temp, max, min, wind chill....)
 
    private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                                      //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
@@ -210,6 +213,12 @@ public class HistoricalWeatherRetriever /* extends IHistoricalWeatherRetriever *
 
    public WeatherData getHistoricalWeatherData() {
       return historicalWeatherData;
+   }
+
+   @Override
+   public int getMinTemperature() {
+      // TODO Auto-generated method stub
+      return 0;
    }
 
    /**

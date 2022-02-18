@@ -229,12 +229,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //display the weather in the calendar view
 
-   //In the weather pref page, create a tab for each vendor
+   //Add a label : Weather provider: WWO or OpenWeathermap
 
-   //Make a weather category for device and for provider/fournisseur.
    //That way, when downloading provider's data, we don't override the device data.
 
    //By default, the wind should not be north but empty. is that possible ?
+
+   //Draw the weather station (if provided) location on the map just like in CG ?
 
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -6524,8 +6525,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             && _tourData.latitudeSerie != null
             && _tourData.latitudeSerie.length > 0;
 
-      final boolean canEditTemperature = canEdit && _tourData != null && (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi());
-      final boolean enableWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
+      final boolean canEditTemperature = canEdit &&
+            _tourData != null &&
+            (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi());
+      final boolean enableWeatherRetrieval =
+            _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
 
       _comboTitle.setEnabled(canEdit);
