@@ -90,6 +90,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    //From Klimat.app Clear sky, 25°F, Feels like 14°F, Humidity 71%, Wind 11mph from S - by Klimat.app
    //"
+
    private Button             _chkShowHideTokens;
    private Button             _chkUseTourTypeMapping;
    private Label              _labelAccessToken;
