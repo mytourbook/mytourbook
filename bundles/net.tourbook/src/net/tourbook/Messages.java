@@ -2136,7 +2136,9 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
    public static String        Slideout_TourChartOptions_Label_Title;
-
+   public static String        Slideout_TourChartOptions_Radio_SRTM1;
+   public static String        Slideout_TourChartOptions_Radio_SRTM1_Tooltip;
+   public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
    public static String        Slideout_TourEditor_Label_LatLonDigits;
