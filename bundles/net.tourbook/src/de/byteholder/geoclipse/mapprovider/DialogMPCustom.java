@@ -308,18 +308,21 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
    @Override
    public void actionZoomIn() {
+
       _map.setZoom(_map.getZoom() + 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOut() {
+
       _map.setZoom(_map.getZoom() - 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOutToMinZoom() {
+
       _map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
       _map.paint();
    }

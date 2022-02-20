@@ -351,8 +351,12 @@ public class Images {
    public static final String XAxis_ShowTime                             = "x-axis-time.png";                                     //$NON-NLS-1$
    public static final String ZeroValues                                 = "app-zero-values.png";                                 //$NON-NLS-1$
    public static final String ZeroValues_Disabled                        = "app-zero-values-disabled.png";                        //$NON-NLS-1$
-   public static final String Zoom_CenterTour                            = "zoom-center-tour.png";                                //$NON-NLS-1$
-   public static final String Zoom_CenterTour_Disabled                   = "zoom-center-tour-disabled.png";                       //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Map                          = "zoom-center-map.png";                                 //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Map_Disabled                 = "zoom-center-map-disabled.png";                        //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Mouse                        = "zoom-center-mouse.png";                               //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Mouse_Disabled               = "zoom-center-mouse-disabled.png";                      //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Tour                         = "zoom-center-tour.png";                                //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Tour_Disabled                = "zoom-center-tour-disabled.png";                       //$NON-NLS-1$
    public static final String Zoom_FitGraph                              = "zoom-fit-graph.gif";                                  //$NON-NLS-1$
    public static final String Zoom_In                                    = "zoom-in.png";                                         //$NON-NLS-1$
    public static final String Zoom_In_Disabled                           = "zoom-in-disabled.png";                                //$NON-NLS-1$

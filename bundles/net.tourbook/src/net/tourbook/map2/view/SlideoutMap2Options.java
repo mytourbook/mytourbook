@@ -74,7 +74,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
     */
    private Button                _chkIsDimMap;
    private Button                _chkIsToggleKeyboardPanning;
-   private Button                _chkIsZoomWithMousePosition;
    private Button                _chkSelectInbetweenTimeSlices;
    private Button                _chkShowValuePointTooltip;
 
@@ -189,16 +188,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       {
          {
             /*
-             * Zoom to mouse position
-             */
-            _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
-            _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-            _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-            _chkIsZoomWithMousePosition.addSelectionListener(_defaultSelectionListener);
-            gdSpan2.applyTo(_chkIsZoomWithMousePosition);
-         }
-         {
-            /*
              * Show value point tooltip
              */
             _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
@@ -304,7 +293,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
-      _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
 
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
@@ -336,7 +324,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkIsToggleKeyboardPanning.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,     Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
@@ -359,7 +346,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
-      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
 

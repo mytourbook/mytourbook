@@ -284,7 +284,8 @@ public class Map2 extends Canvas {
     * and 20.
     */
    private int                     _mapZoomLevel;
-   private boolean                 _isZoomWithMousePosition;
+
+   private CenterMapBy             _centerMapBy;
 
    /**
     * This image contains the map which is painted in the map viewport
@@ -1349,6 +1350,10 @@ public class Map2 extends Canvas {
       return rect;
    }
 
+   public CenterMapBy getCenterMapBy() {
+      return _centerMapBy;
+   }
+
    /**
     * Retrieve, if any, the current tour hovered by the user.
     *
@@ -1642,61 +1647,6 @@ public class Map2 extends Canvas {
     */
    public int getZoom() {
       return _mapZoomLevel;
-   }
-
-   /**
-    * @param boundingBox
-    * @return Returns zoom level or -1 when bounding box is <code>null</code>.
-    */
-   public int getZoom(final String boundingBox) {
-
-      // original: setBoundsZoomLevel
-
-      if (boundingBox == null) {
-         return -1;
-      }
-
-      final Set<GeoPosition> positions = getBoundingBoxPositions(boundingBox);
-      if (positions == null) {
-         return -1;
-      }
-
-      final MP mp = getMapProvider();
-
-      final int maximumZoomLevel = mp.getMaximumZoomLevel();
-      int zoom = mp.getMinimumZoomLevel();
-
-      Rectangle positionRect = getWorldPixelFromGeoPositions(positions, zoom);
-      Rectangle viewport = getWorldPixelViewport();
-
-      // zoom in until bounding box is larger than the viewport
-      while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
-
-         // center position in the map
-         final java.awt.Point center = new java.awt.Point(
-               positionRect.x + positionRect.width / 2,
-               positionRect.y + positionRect.height / 2);
-
-         setMapCenter(mp.pixelToGeo(center, zoom));
-
-         zoom++;
-
-         // check zoom level
-         if (zoom >= maximumZoomLevel) {
-            break;
-         }
-         setZoom(zoom);
-
-         positionRect = getWorldPixelFromGeoPositions(positions, zoom);
-         viewport = getWorldPixelViewport();
-      }
-
-      // the algorithm generated a larger zoom level as necessary
-      zoom--;
-
-      setZoom(zoom);
-
-      return zoom;
    }
 
    /**
@@ -2885,10 +2835,10 @@ public class Map2 extends Canvas {
 
       switch (event.character) {
       case '+':
-         zoomIn();
+         zoomIn(CenterMapBy.Map);
          break;
       case '-':
-         zoomOut();
+         zoomOut(CenterMapBy.Map);
          break;
       }
 
@@ -3015,14 +2965,8 @@ public class Map2 extends Canvas {
          /*
           * Zoom to geo filter zoom level
           */
-         // prevent recenter
-         final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
-         _isZoomWithMousePosition = false;
-         {
-            // set zoom level first, that recalculation is correct
-            setZoom(_geoGrid_MapZoomLevel);
-         }
-         _isZoomWithMousePosition = isZoomWithMousePosition;
+         // set zoom level first, that recalculation is correct ->/ prevent recenter
+         setZoom(_geoGrid_MapZoomLevel);
 
          /*
           * Center to geo filter position
@@ -3536,9 +3480,12 @@ public class Map2 extends Canvas {
    private void onMouse_Wheel(final Event event) {
 
       if (event.count < 0) {
-         zoomOut();
+
+         zoomOut(_centerMapBy);
+
       } else {
-         zoomIn();
+
+         zoomIn(_centerMapBy);
       }
    }
 
@@ -6528,6 +6475,10 @@ public class Map2 extends Canvas {
 
    }
 
+   public void setCenterMapBy(final CenterMapBy _centerMapBy) {
+      this._centerMapBy = _centerMapBy;
+   }
+
    public void setConfig_HoveredSelectedTour(final boolean isShowHoveredOrSelectedTour,
                                              final boolean isShowBreadcrumbs,
 
@@ -6648,10 +6599,6 @@ public class Map2 extends Canvas {
 
    public void setIsShowTour(final boolean isShowTour) {
       _isShowTour = isShowTour;
-   }
-
-   public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {
-      _isZoomWithMousePosition = isZoomWithMousePosition;
    }
 
    /**
@@ -6877,9 +6824,12 @@ public class Map2 extends Canvas {
        * !!! initialize map by setting the zoom level which setups all important data !!!
        */
       if (refresh) {
+
          setZoom(zoom);
          setMapCenter(center);
+
       } else {
+
          setZoom(mapProvider.getDefaultZoomLevel());
       }
 
@@ -7136,6 +7086,21 @@ public class Map2 extends Canvas {
     */
    public void setZoom(final int newZoomLevel) {
 
+      setZoom(newZoomLevel, CenterMapBy.Map);
+   }
+
+   /**
+    * Set the zoom level for the map and centers the map to <code>centerMapBy</code>. The zoom level
+    * is checked if the map provider supports the requested zoom level.
+    * <p>
+    * The map is initialize when this is not yet done be setting all internal data !!!
+    *
+    * @param newZoomLevel
+    *           zoom level for the map, it is adjusted to the min/max zoom levels
+    * @param centerMapBy
+    */
+   public void setZoom(final int newZoomLevel, final CenterMapBy centerMapBy) {
+
       if (_mp == null) {
          return;
       }
@@ -7198,12 +7163,12 @@ public class Map2 extends Canvas {
 
       Point2D.Double wpNewMapCenter;
 
-      if (_isZoomWithMousePosition
+      if (centerMapBy.equals(CenterMapBy.Mouse)
 
             // fixes this "issue" https://github.com/wolfgang-ch/mytourbook/issues/370
             && isNewZoomLevel) {
 
-         // set map center to the current mouse position
+         // set map center to the current mouse position but only when a new zoom level is set !!!
 
          final Rectangle wpViewPort = _worldPixel_TopLeft_Viewport;
 
@@ -7213,7 +7178,9 @@ public class Map2 extends Canvas {
 
       } else {
 
-         // zoom behavior until 18.5
+         // for any other cases: center zoom to the map center
+
+         // this is also the zoom behavior until 18.5
       }
 
       wpNewMapCenter = new Point2D.Double(
@@ -7223,9 +7190,8 @@ public class Map2 extends Canvas {
       setMapCenterInWorldPixel(wpNewMapCenter);
 
       updateViewPortData();
-
       updateTourToolTip();
-//      updatePoiVisibility();
+//    updatePoiVisibility();
 
       isTourHovered();
       paint();
@@ -7234,6 +7200,60 @@ public class Map2 extends Canvas {
       fireEvent_MapInfo();
 
       fireEvent_MapPosition(true);
+   }
+
+   /**
+    * @param boundingBox
+    * @return Returns zoom level or -1 when bounding box is <code>null</code>.
+    */
+   public int setZoomToBoundingBox(final String boundingBox) {
+
+      if (boundingBox == null) {
+         return -1;
+      }
+
+      final Set<GeoPosition> positions = getBoundingBoxPositions(boundingBox);
+      if (positions == null) {
+         return -1;
+      }
+
+      final MP mp = getMapProvider();
+
+      final int maximumZoomLevel = mp.getMaximumZoomLevel();
+      int zoom = mp.getMinimumZoomLevel();
+
+      Rectangle positionRect = getWorldPixelFromGeoPositions(positions, zoom);
+      Rectangle viewport = getWorldPixelViewport();
+
+      // zoom in until bounding box is larger than the viewport
+      while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
+
+         // center position in the map
+         final java.awt.Point center = new java.awt.Point(
+               positionRect.x + positionRect.width / 2,
+               positionRect.y + positionRect.height / 2);
+
+         setMapCenter(mp.pixelToGeo(center, zoom));
+
+         zoom++;
+
+         // check zoom level
+         if (zoom >= maximumZoomLevel) {
+            break;
+         }
+
+         setZoom(zoom);
+
+         positionRect = getWorldPixelFromGeoPositions(positions, zoom);
+         viewport = getWorldPixelViewport();
+      }
+
+      // the algorithm generated a larger zoom level as necessary
+      zoom--;
+
+      setZoom(zoom);
+
+      return zoom;
    }
 
    /**
@@ -7277,14 +7297,8 @@ public class Map2 extends Canvas {
 
          if (isSyncMapPosition) {
 
-            // prevent recenter
-            final boolean isZoomWithMousePosition = _isZoomWithMousePosition;
-            _isZoomWithMousePosition = false;
-            {
-               // set zoom level first, that recalculation is correct
-               setZoom(_geoGrid_MapZoomLevel);
-            }
-            _isZoomWithMousePosition = isZoomWithMousePosition;
+            // set zoom level first, that recalculation is correct
+            setZoom(_geoGrid_MapZoomLevel);
          }
 
          MapGridData mapGridData = tourGeoFilter.mapGridData;
@@ -7639,15 +7653,17 @@ public class Map2 extends Canvas {
       grid_UpdateGeoGridData();
    }
 
-   public void zoomIn() {
+   public void zoomIn(final CenterMapBy centerMapBy) {
 
-      setZoom(_mapZoomLevel + 1);
+      setZoom(_mapZoomLevel + 1, centerMapBy);
+
       paint();
    }
 
-   public void zoomOut() {
+   public void zoomOut(final CenterMapBy centerMapBy) {
 
-      setZoom(_mapZoomLevel - 1);
+      setZoom(_mapZoomLevel - 1, centerMapBy);
+
       paint();
    }
 

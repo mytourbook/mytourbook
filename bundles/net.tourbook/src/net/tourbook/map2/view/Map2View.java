@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
+import de.byteholder.geoclipse.map.CenterMapBy;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
@@ -109,7 +110,7 @@ import net.tourbook.map2.action.ActionSyncMapWith_Slider_One;
 import net.tourbook.map2.action.ActionSyncMapWith_Tour;
 import net.tourbook.map2.action.ActionSyncMapWith_ValuePoint;
 import net.tourbook.map2.action.ActionTourColor;
-import net.tourbook.map2.action.ActionZoomCentered;
+import net.tourbook.map2.action.ActionZoomCenterBy;
 import net.tourbook.map2.action.ActionZoomIn;
 import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
@@ -213,8 +214,6 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
-   static final String           STATE_IS_ZOOM_WITH_MOUSE_POSITION                     = "STATE_IS_ZOOM_WITH_MOUSE_POSITION";                   //$NON-NLS-1$
-   static final boolean          STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT             = true;
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
 
@@ -228,7 +227,6 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
-   private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
@@ -262,17 +260,6 @@ public class Map2View extends ViewPart implements
    static final int              STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT              = 10;
    static final String           STATE_TOUR_DIRECTION_RGB                              = "STATE_TOUR_DIRECTION_RGB";                            //$NON-NLS-1$
    static final RGB              STATE_TOUR_DIRECTION_RGB_DEFAULT                      = new RGB(55, 55, 55);
-
-   private static final String   STATE_MAP_SYNC_MODE                                   = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
-   private static final String   STATE_MAP_SYNC_MODE_IS_ACTIVE                         = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
-
-   private static final String   STATE_ZOOM_LEVEL_ADJUSTMENT                           = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
-   private static final String   STATE_SELECTED_MAP_PROVIDER_ID                        = "selected.map-provider-id";                            //$NON-NLS-1$
-
-   private static final String   STATE_DEFAULT_POSITION_ZOOM                           = "STATE_DEFAULT_POSITION_ZOOM";                         //$NON-NLS-1$
-   private static final String   STATE_DEFAULT_POSITION_LATITUDE                       = "STATE_DEFAULT_POSITION_LATITUDE";                     //$NON-NLS-1$
-   private static final String   STATE_DEFAULT_POSITION_LONGITUDE                      = "STATE_DEFAULT_POSITION_LONGITUDE";                    //$NON-NLS-1$
-   private static final String   STATE_TOUR_COLOR_ID                                   = "STATE_TOUR_COLOR_ID";                                 //$NON-NLS-1$
 
    static final String           PREF_DEBUG_MAP_SHOW_GEO_GRID                          = "PREF_DEBUG_MAP_SHOW_GEO_GRID";                        //$NON-NLS-1$
    static final String           PREF_SHOW_TILE_INFO                                   = "PREF_SHOW_TILE_INFO";                                 //$NON-NLS-1$
@@ -318,7 +305,20 @@ public class Map2View extends ViewPart implements
    public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                 //$NON-NLS-1$
    public static final int       STATE_DIM_MAP_VALUE_DEFAULT                           = MAX_DIM_STEPS / 2;
 
-   private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
+   private static final String      GRAPH_CONTRIBUTION_ID_SLIDEOUT                     = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
+
+   private static final String      STATE_CENTER_MAP_BY                                = "STATE_CENTER_MAP_BY";                                 //$NON-NLS-1$
+   private static final CenterMapBy STATE_CENTER_MAP_BY_DEFAULT                        = CenterMapBy.Mouse;
+   private static final String      STATE_MAP_SYNC_MODE                                = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
+   private static final String      STATE_MAP_SYNC_MODE_IS_ACTIVE                      = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
+
+   private static final String      STATE_ZOOM_LEVEL_ADJUSTMENT                        = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
+   private static final String      STATE_SELECTED_MAP_PROVIDER_ID                     = "selected.map-provider-id";                            //$NON-NLS-1$
+
+   private static final String      STATE_DEFAULT_POSITION_ZOOM                        = "STATE_DEFAULT_POSITION_ZOOM";                         //$NON-NLS-1$
+   private static final String      STATE_DEFAULT_POSITION_LATITUDE                    = "STATE_DEFAULT_POSITION_LATITUDE";                     //$NON-NLS-1$
+   private static final String      STATE_DEFAULT_POSITION_LONGITUDE                   = "STATE_DEFAULT_POSITION_LONGITUDE";                    //$NON-NLS-1$
+   private static final String      STATE_TOUR_COLOR_ID                                = "STATE_TOUR_COLOR_ID";                                 //$NON-NLS-1$
 
    private static final MapGraphId[]   _allGraphContribId = {
 
@@ -391,17 +391,15 @@ public class Map2View extends ViewPart implements
    private boolean                           _isShowTour;
    private boolean                           _isShowPhoto;
    private boolean                           _isShowLegend;
-   private boolean                           _isPositionCentered;
    private boolean                           _isInSelectBookmark;
-   private boolean                           _isInZoom;
    //
-   private int                               _defaultZoom;
-   private GeoPosition                       _defaultPosition;
+   private int         _defaultZoom;
+   private GeoPosition _defaultPosition;
    //
    /**
     * When <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
     */
-   private boolean                           _isTourOrWayPoint;
+   private boolean     _isTourOrWayPoint;
    //
    /*
     * Tool tips
@@ -509,7 +507,7 @@ public class Map2View extends ViewPart implements
    //
    private ActionZoomIn                      _actionZoom_In;
    private ActionZoomOut                     _actionZoom_Out;
-   private ActionZoomCentered                _actionZoom_Centered;
+   private ActionZoomCenterBy                _actionZoom_CenterMapBy;
    private ActionZoomShowEntireMap           _actionZoom_ShowEntireMap;
    private ActionZoomShowEntireTour          _actionZoom_ShowEntireTour;
    //
@@ -1033,15 +1031,74 @@ public class Map2View extends ViewPart implements
       createLegendImage(getColorProvider(colorId));
    }
 
-   public void actionSetZoomCentered() {
+   /**
+    * Toggle sequence between
+    * <ul>
+    * <li>Center to map center</li>
+    * <li>Center to mouse position</li>
+    * <li>Center whole tour</li>
+    * </ul>
+    *
+    * @param event
+    */
+   public void actionSetZoomCentered(final Event event) {
 
-      _isPositionCentered = _actionZoom_Centered.isChecked();
+      final boolean isForwards = UI.isCtrlKey(event) == false;
 
-      _isInZoom = true;
-      {
+      CenterMapBy newCenterMode;
+
+      switch (_map.getCenterMapBy()) {
+      case Tour:
+         if (isForwards) {
+
+            // tour -> map
+            newCenterMode = CenterMapBy.Map;
+
+         } else {
+
+            // tour -> mous
+            newCenterMode = CenterMapBy.Mouse;
+         }
+
+         break;
+
+      case Map:
+         if (isForwards) {
+
+            // map -> mouse
+            newCenterMode = CenterMapBy.Mouse;
+
+         } else {
+
+            // map -> tour
+            newCenterMode = CenterMapBy.Tour;
+         }
+
+         break;
+
+      default:
+      case Mouse:
+         if (isForwards) {
+
+            // mouse -> tour
+            newCenterMode = CenterMapBy.Tour;
+
+         } else {
+
+            // mouse -> map
+            newCenterMode = CenterMapBy.Map;
+         }
+         break;
+      }
+
+      _map.setCenterMapBy(newCenterMode);
+
+      _actionZoom_CenterMapBy.setCenterMode(newCenterMode);
+
+      if (newCenterMode == CenterMapBy.Tour) {
+
          centerTour();
       }
-      _isInZoom = false;
    }
 
    public void actionShowLegend() {
@@ -1116,26 +1173,26 @@ public class Map2View extends ViewPart implements
 
    public void actionZoomIn() {
 
-      _isInZoom = true;
-      {
-         _map.setZoom(_map.getZoom() + 1);
-      }
-      _isInZoom = false;
+      final CenterMapBy centerMapBy = _map.getCenterMapBy();
 
-      centerTour();
+      _map.setZoom(_map.getZoom() + 1, centerMapBy);
+
+      if (centerMapBy.equals(CenterMapBy.Tour)) {
+         centerTour();
+      }
 
       _map.paint();
    }
 
    public void actionZoomOut() {
 
-      _isInZoom = true;
-      {
-         _map.setZoom(_map.getZoom() - 1);
-      }
-      _isInZoom = false;
+      final CenterMapBy centerMapBy = _map.getCenterMapBy();
 
-      centerTour();
+      _map.setZoom(_map.getZoom() - 1, centerMapBy);
+
+      if (centerMapBy.equals(CenterMapBy.Tour)) {
+         centerTour();
+      }
 
       _map.paint();
    }
@@ -1478,34 +1535,35 @@ public class Map2View extends ViewPart implements
     */
    private void centerTour() {
 
-      if (_isInZoom && _isPositionCentered) {
+      final int zoom = _map.getZoom();
 
-         final int zoom = _map.getZoom();
+      Set<GeoPosition> positionBounds = null;
 
-         Set<GeoPosition> positionBounds = null;
-         if (_isTourOrWayPoint) {
-            positionBounds = _tourPainterConfig.getTourBounds();
-            if (positionBounds == null) {
-               return;
-            }
-         } else {
-            if (_poiPosition == null) {
-               return;
-            }
-            positionBounds = new HashSet<>();
-            positionBounds.add(_poiPosition);
+      if (_isTourOrWayPoint) {
+
+         positionBounds = _tourPainterConfig.getTourBounds();
+         if (positionBounds == null) {
+            return;
          }
 
-         final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
+      } else {
 
-         final Point center = new Point(//
-               positionRect.x + positionRect.width / 2,
-               positionRect.y + positionRect.height / 2);
-
-         final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
-
-         _map.setMapCenter(geoPosition);
+         if (_poiPosition == null) {
+            return;
+         }
+         positionBounds = new HashSet<>();
+         positionBounds.add(_poiPosition);
       }
+
+      final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
+
+      final Point center = new Point(
+            positionRect.x + positionRect.width / 2,
+            positionRect.y + positionRect.height / 2);
+
+      final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
+
+      _map.setMapCenter(geoPosition);
    }
 
    private void clearView() {
@@ -1597,9 +1655,9 @@ public class Map2View extends ViewPart implements
       _actionMap2_SyncMap                 = new ActionSyncMap();
       _actionMap2_TourColors              = new ActionMap2_Graphs();
 
+      _actionZoom_CenterMapBy             = new ActionZoomCenterBy(this);
       _actionZoom_In                      = new ActionZoomIn(this);
       _actionZoom_Out                     = new ActionZoomOut(this);
-      _actionZoom_Centered                = new ActionZoomCentered(this);
       _actionZoom_ShowEntireMap           = new ActionZoomShowEntireMap(this);
       _actionZoom_ShowEntireTour          = new ActionZoomShowEntireTour(this);
 
@@ -1951,7 +2009,7 @@ public class Map2View extends ViewPart implements
       _actionShowTourPauses               .setEnabled(_isTourOrWayPoint);
       _actionShowTourWeatherInMap         .setEnabled(isTourAvailable);
       _actionShowWayPoints                .setEnabled(_isTourOrWayPoint);
-      _actionZoom_Centered                .setEnabled(isTourAvailable);
+      _actionZoom_CenterMapBy             .setEnabled(true);
       _actionZoom_ShowEntireTour          .setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
       _actionZoomLevelAdjustment          .setEnabled(isTourAvailable);
 
@@ -2043,8 +2101,7 @@ public class Map2View extends ViewPart implements
 
       tbm.add(_actionZoom_In);
       tbm.add(_actionZoom_Out);
-      tbm.add(_actionZoom_ShowEntireMap);
-      tbm.add(_actionZoom_Centered);
+      tbm.add(_actionZoom_CenterMapBy);
 
       tbm.add(new Separator());
 
@@ -2084,6 +2141,7 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowValuePoint);
       menuMgr.add(_actionShowSliderInMap);
       menuMgr.add(_actionShowSliderInLegend);
+      menuMgr.add(_actionZoom_ShowEntireMap);
 
       menuMgr.add(new Separator());
 
@@ -2734,7 +2792,7 @@ public class Map2View extends ViewPart implements
       _mapInfoManager.setMapPosition(mapCenter.latitude, mapCenter.longitude, mapZoomLevel);
    }
 
-   private void mapListener_MapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isCenterTour) {
+   private void mapListener_MapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isZoomed) {
 
       if (_isInSelectBookmark) {
 
@@ -2742,11 +2800,9 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      _isInZoom = isCenterTour;
-      {
+      if (isZoomed && _map.getCenterMapBy().equals(CenterMapBy.Tour)) {
          centerTour();
       }
-      _isInZoom = false;
 
       if (_isInMapSync) {
          return;
@@ -3090,7 +3146,7 @@ public class Map2View extends ViewPart implements
          if (boundingBox == null) {
             _poiZoomLevel = _map.getZoom();
          } else {
-            _poiZoomLevel = _map.getZoom(boundingBox);
+            _poiZoomLevel = _map.setZoomToBoundingBox(boundingBox);
          }
 
          if (_poiZoomLevel == -1) {
@@ -3653,16 +3709,17 @@ public class Map2View extends ViewPart implements
          if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
 
             // use default position for the tour
+
             positionMapTo_MapPosition(tourBoundsSet, true);
 
          } else {
 
             // position tour to the previous position
+
             _map.setZoom(tourData.mapZoomLevel);
-            _map.setMapCenter(
-                  new GeoPosition(
-                        tourData.mapCenterPositionLatitude,
-                        tourData.mapCenterPositionLongitude));
+            _map.setMapCenter(new GeoPosition(
+                  tourData.mapCenterPositionLatitude,
+                  tourData.mapCenterPositionLongitude));
          }
 
       } else if (isNewTour) {
@@ -3978,10 +4035,10 @@ public class Map2View extends ViewPart implements
 
       _actionShowValuePoint.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_VALUE_POINT, STATE_IS_SHOW_VALUE_POINT_DEFAULT));
 
-      // is tour centered
-      final boolean isTourCentered = _state.getBoolean(STATE_IS_ZOOM_CENTERED);
-      _actionZoom_Centered.setChecked(isTourCentered);
-      _isPositionCentered = isTourCentered;
+      // center map by ...
+      final CenterMapBy centerMapBy = (CenterMapBy) Util.getStateEnum(_state, STATE_CENTER_MAP_BY, STATE_CENTER_MAP_BY_DEFAULT);
+      _map.setCenterMapBy(centerMapBy);
+      _actionZoom_CenterMapBy.setCenterMode(centerMapBy);
 
       // synch map with ...
       _currentMapSyncMode = (MapSyncMode) Util.getStateEnum(_state, STATE_MAP_SYNC_MODE, MapSyncMode.IsSyncWith_Tour);
@@ -4183,7 +4240,6 @@ public class Map2View extends ViewPart implements
             tourDirection_RGB);
 
       _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   STATE_IS_TOGGLE_KEYBOARD_PANNING,   STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,      STATE_IS_ZOOM_WITH_MOUSE_POSITION,  STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
       /*
        * Set dim level/color after the map providers are set
@@ -4332,7 +4388,6 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
       Util.setStateEnum(_state, STATE_MAP_SYNC_MODE,              _currentMapSyncMode);
 
-      _state.put(STATE_IS_ZOOM_CENTERED,                          _actionZoom_Centered.isChecked());
       _state.put(STATE_ZOOM_LEVEL_ADJUSTMENT,                     _actionZoomLevelAdjustment.getZoomLevel());
 
       final MP selectedMapProvider = _actionMap2_MapProvider.getSelectedMapProvider();

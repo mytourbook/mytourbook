@@ -36,13 +36,15 @@ New
 Improvements
 ============
 
-* 
+* 2D Map
+  - Consolidated "Set map center when zoomed to ..."		https://github.com/mytourbook/mytourbook/issues/468
 
 
 Changes
 =======
 
-* 
+* 2D Map
+  - Moved action "Show eath map" from the toolbar into the map context menu
 
 
 Bugfix

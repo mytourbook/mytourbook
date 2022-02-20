@@ -80,15 +80,17 @@ public class Messages extends NLS {
    public static String Map_Action_SearchTourByLocation;
    public static String Map_Action_SearchTourByLocation_Tooltip;
    public static String Map_Action_ShowAllFilteredPhotos_Tooltip;
+   public static String Map_Action_ShowEarchMap;
    public static String Map_Action_ShowPhotos_Tooltip;
    public static String Map_Action_ShowTourInfoInMap;
    public static String Map_Action_ShowTourWeatherInMap;
    public static String Map_Action_ShowValuePoint;
    public static String Map_Action_ShowWayPoints;
    public static String Map_Action_SynchWith_ValuePoint;
-
    public static String Map_Action_SynchWithSlider_Centered;
    public static String Map_Action_SyncPhotoWithMap_Tooltip;
+   public static String Map_Action_Zoom_CenteredBy_Map_Tooltip;
+   public static String Map_Action_Zoom_CenteredBy_Mouse_Tooltip;
 
    public static String Map_Label_ValuePoint_Title;
 
@@ -116,7 +118,6 @@ public class Messages extends NLS {
    public static String map_action_zoom_level_default;
    public static String map_action_zoom_level_x_value;
    public static String map_action_zoom_out;
-   public static String map_action_zoom_show_all;
    public static String map_action_zoom_show_entire_tour;
 
    public static String map_dlg_dim_warning_message;
