@@ -67,6 +67,7 @@ import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +88,7 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
@@ -158,6 +160,7 @@ import org.eclipse.swt.widgets.Event;
 public class Map2 extends Canvas {
 
    private static final String          TOUR_TOOLTIP_LABEL_DISTANCE                    = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
+   private static final String          TOUR_TOOLTIP_LABEL_ELEVATION_UP                = net.tourbook.ui.Messages.Tour_Tooltip_Label_AltitudeUp;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME                 = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
    private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
@@ -186,9 +189,6 @@ public class Map2 extends Canvas {
 
    private static final String          DIRECTION_E                                    = "E";                                                     //$NON-NLS-1$
    private static final String          DIRECTION_N                                    = "N";                                                     //$NON-NLS-1$
-
-   private static final String          VALUE_FORMAT_TIME                              = "%s\t%s";                                                //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_DISTANCE                          = "%s\t\t%s %s";                                           //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
@@ -4527,38 +4527,30 @@ public class Map2 extends Canvas {
 
                // tour data are available
 
-               paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData, _allHoveredSerieIndices.get(0));
+               paint_HoveredTour_52_OneTour(gc, devXMouse, devYMouse, tourData, _allHoveredSerieIndices.get(0));
             }
 
          } else {
 
-            // one tour is displayed
+            // just one tour is displayed
 
-            // - tour track info can be displayed in the value point tooltip
-            // - tour info can be displayed with the tour info tooltip
+            // ** tour track info can be displayed in the value point tooltip
+            // ** tour info can be displayed with the tour info tooltip
          }
 
       } else {
 
          // multiple tours are hovered -> show number of hovered tours
 
-         final String hoverText = Integer.toString(numHoveredTours) + UI.SPACE + Messages.Map2_Hovered_Tours;
-
-         paint_Text_Label(gc,
-               devXMouse,
-               devYMouse,
-               hoverText,
-               ThemeUtil.getDefaultForegroundColor_Shell(),
-               ThemeUtil.getDefaultBackgroundColor_Shell(),
-               true);
+         paint_HoveredTour_54_MultipleTours(gc, devXMouse, devYMouse, _allHoveredTourIds);
       }
    }
 
-   private void paint_HoveredTour_52_TourDetail(final GC gc,
-                                                final int devXMouse,
-                                                final int devYMouse,
-                                                final TourData tourData,
-                                                final int hoveredSerieIndex) {
+   private void paint_HoveredTour_52_OneTour(final GC gc,
+                                             final int devXMouse,
+                                             final int devYMouse,
+                                             final TourData tourData,
+                                             final int hoveredSerieIndex) {
 
       final Font normalFont = gc.getFont();
 
@@ -4569,22 +4561,28 @@ public class Map2 extends Canvas {
       final long movingTime = tourData.getTourComputedTime_Moving();
       final long recordedTime = tourData.getTourDeviceTime_Recorded();
       final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
+      final int elevationUp = tourData.getTourAltUp();
 
       /*
        * Tour values
        */
-      final String text_TourMovingTime = String.format(VALUE_FORMAT_TIME,
+      final String text_TourMovingTime = String.format(Messages.Map2_TourTooltip_Time,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
-      final String text_TourRecordedTime = String.format(VALUE_FORMAT_TIME,
+      final String text_TourRecordedTime = String.format(Messages.Map2_TourTooltip_Time,
             TOUR_TOOLTIP_LABEL_RECORDED_TIME,
             FormatManager.formatMovingTime(recordedTime));
 
-      final String text_TourDistance = String.format(VALUE_FORMAT_DISTANCE,
+      final String text_TourDistance = String.format(Messages.Map2_TourTooltip_Distance,
             TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
+
+      final String text_ElevationUp = String.format(Messages.Map2_TourTooltip_Elevation,
+            TOUR_TOOLTIP_LABEL_ELEVATION_UP,
+            FormatManager.formatElevation(elevationUp),
+            UI.UNIT_LABEL_ELEVATION);
 
       /*
        * Track values
@@ -4598,6 +4596,7 @@ public class Map2 extends Canvas {
       sb.append(text_TourDateTime + NL);
       sb.append(NL);
       sb.append(text_TourDistance + NL);
+      sb.append(text_ElevationUp + NL);
       sb.append(text_TourMovingTime + NL);
       sb.append(text_TourRecordedTime);
 
@@ -4675,6 +4674,95 @@ public class Map2 extends Canvas {
       }
 
       gc.setFont(normalFont);
+      gc.drawText(sb.toString(), devX, devY);
+   }
+
+   private void paint_HoveredTour_54_MultipleTours(final GC gc,
+                                                   final int devXMouse,
+                                                   final int devYMouse,
+                                                   final List<Long> allHoveredTourIds) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      // Show number of hovered tours
+      sb.append(String.format("%d %s", //$NON-NLS-1$
+            allHoveredTourIds.size(),
+            Messages.Map2_Hovered_Tours));
+      sb.append(NL);
+
+      for (final Long tourId : allHoveredTourIds) {
+
+         final TourData tourData = TourManager.getTour(tourId);
+         if (tourData == null) {
+            continue;
+         }
+
+         final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+         final long movingTime = tourData.getTourComputedTime_Moving();
+         final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
+
+         final String text_TourDateTime = String.format("%s\t%s", //$NON-NLS-1$
+               tourStartTime.format(TimeTools.Formatter_DateTime_S),
+               tourStartTime.format(TimeTools.Formatter_Weekday));
+
+         final String text_TourMovingTime = FormatManager.formatMovingTime(movingTime);
+         final String text_TourDistance = String.format("%s %s", //$NON-NLS-1$
+               FormatManager.formatDistance(distance / 1000.0),
+               UI.UNIT_LABEL_DISTANCE);
+
+         /*
+          * Combine tour values
+          */
+         sb.append(NL);
+         sb.append(String.format("%s\t%s\t%s", //$NON-NLS-1$
+               text_TourDateTime,
+               text_TourMovingTime,
+               text_TourDistance));
+
+      }
+
+      final Point size_Values = gc.textExtent(sb.toString());
+
+      final int marginHorizontal = 3;
+      final int marginVertical = 1;
+
+      final int contentWidth = size_Values.x;
+      final int contentHeight = size_Values.y;
+
+      final int detailWidth = contentWidth + marginHorizontal * 2;
+      final int detailHeight = contentHeight + marginVertical * 2;
+
+      final int marginAboveMouse = 50;
+      final int marginBelowMouse = 40;
+
+      int devXDetail = devXMouse + 20;
+      int devYDetail = devYMouse - marginAboveMouse;
+
+      // ensure that the tour detail is fully visible
+      final int viewportWidth = _devMapViewport.width;
+      if (devXDetail + detailWidth > viewportWidth) {
+         devXDetail = viewportWidth - detailWidth;
+      }
+      if (devYDetail - detailHeight < 0) {
+         devYDetail = devYMouse + detailHeight + marginBelowMouse;
+      }
+
+      final Rectangle clippingRect = new Rectangle(
+            devXDetail,
+            devYDetail - detailHeight,
+            detailWidth,
+            detailHeight);
+
+      gc.setClipping(clippingRect);
+
+      gc.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
+      gc.fillRectangle(clippingRect);
+
+      gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+
+      final int devX = devXDetail + marginHorizontal;
+      final int devY = devYDetail - contentHeight - marginVertical;
+
       gc.drawText(sb.toString(), devX, devY);
    }
 

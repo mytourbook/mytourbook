@@ -4044,9 +4044,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="113.40225"
-     inkscape:cx="574.87781"
-     inkscape:zoom="5.6568543"
+     inkscape:cy="82.859374"
+     inkscape:cx="607.26562"
+     inkscape:zoom="32"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -7278,7 +7278,7 @@
        sodipodi:nodetypes="cccccsssss" />
     <path
        id="rect17705-5-0-3-7-0-8-2-2-0-9-6"
-       style="fill:none;fill-opacity:1;stroke:#750037;stroke-width:1.002;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:none;fill-opacity:1;stroke:#bf0059;stroke-width:1.002;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        d="m 605.89444,75.935922 2.30801,6.064618 -2.30801,6.064616 13.85143,-6.064616 z"
        sodipodi:nodetypes="ccccc" />
   </g>
