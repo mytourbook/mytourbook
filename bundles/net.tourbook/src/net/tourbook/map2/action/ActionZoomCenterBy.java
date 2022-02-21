@@ -45,6 +45,11 @@ public class ActionZoomCenterBy extends Action {
       _mapView.actionSetZoomCentered(event);
    }
 
+   /**
+    * Update image and tooltip to the center mode
+    *
+    * @param centerMapBy
+    */
    public void setCenterMode(final CenterMapBy centerMapBy) {
 
       switch (centerMapBy) {
@@ -60,7 +65,7 @@ public class ActionZoomCenterBy extends Action {
 
       case Tour:
 
-         setToolTipText(Messages.map_action_zoom_centered);
+         setToolTipText(Messages.Map_Action_Zoom_CenteredBy_Tour_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Tour));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Tour_Disabled));

@@ -91,6 +91,7 @@ public class Messages extends NLS {
    public static String Map_Action_SyncPhotoWithMap_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Map_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Mouse_Tooltip;
+   public static String Map_Action_Zoom_CenteredBy_Tour_Tooltip;
 
    public static String Map_Label_ValuePoint_Title;
 
@@ -112,7 +113,6 @@ public class Messages extends NLS {
    public static String map_action_tour_color_pase_tooltip;
    public static String map_action_tour_color_pulse_tooltip;
    public static String map_action_tour_color_speed_tooltip;
-   public static String map_action_zoom_centered;
    public static String map_action_zoom_in;
    public static String map_action_zoom_level_centered_tour;
    public static String map_action_zoom_level_default;

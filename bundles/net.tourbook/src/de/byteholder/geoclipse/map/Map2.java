@@ -6475,8 +6475,8 @@ public class Map2 extends Canvas {
 
    }
 
-   public void setCenterMapBy(final CenterMapBy _centerMapBy) {
-      this._centerMapBy = _centerMapBy;
+   public void setCenterMapBy(final CenterMapBy centerMapBy) {
+      _centerMapBy = centerMapBy;
    }
 
    public void setConfig_HoveredSelectedTour(final boolean isShowHoveredOrSelectedTour,
