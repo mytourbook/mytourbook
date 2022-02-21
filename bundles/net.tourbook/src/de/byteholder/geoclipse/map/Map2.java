@@ -4700,6 +4700,7 @@ public class Map2 extends Canvas {
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
          final long movingTime = tourData.getTourComputedTime_Moving();
          final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
+         final int elevationUp = tourData.getTourAltUp();
 
          final String text_TourDateTime = String.format("%s\t%s", //$NON-NLS-1$
                tourStartTime.format(TimeTools.Formatter_DateTime_S),
@@ -4710,14 +4711,18 @@ public class Map2 extends Canvas {
                FormatManager.formatDistance(distance / 1000.0),
                UI.UNIT_LABEL_DISTANCE);
 
+         final String text_ElevationUp = String.format("%s %s",
+               FormatManager.formatElevation(elevationUp),
+               UI.UNIT_LABEL_ELEVATION);
          /*
           * Combine tour values
           */
          sb.append(NL);
-         sb.append(String.format("%s\t%s\t%s", //$NON-NLS-1$
+         sb.append(String.format("%s\t%s\t%s\t%s", //$NON-NLS-1$
                text_TourDateTime,
                text_TourMovingTime,
-               text_TourDistance));
+               text_TourDistance,
+               text_ElevationUp));
 
       }
 
