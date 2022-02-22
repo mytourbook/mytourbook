@@ -4726,37 +4726,61 @@ public class Map2 extends Canvas {
 
       }
 
-      final Point size_Values = gc.textExtent(sb.toString());
+      final Point contentSize = gc.textExtent(sb.toString());
 
       final int marginHorizontal = 3;
       final int marginVertical = 1;
 
-      final int contentWidth = size_Values.x;
-      final int contentHeight = size_Values.y;
+      final int contentWidth = contentSize.x;
+      final int contentHeight = contentSize.y;
 
-      final int detailWidth = contentWidth + marginHorizontal * 2;
-      final int detailHeight = contentHeight + marginVertical * 2;
+      final int tooltipWidth = contentWidth + marginHorizontal * 2;
+      final int tooltipHeight = contentHeight + marginVertical * 2;
 
-      final int marginAboveMouse = 50;
-      final int marginBelowMouse = 40;
+      final int marginAroundMouse = 20;
 
-      int devXDetail = devXMouse + 20;
-      int devYDetail = devYMouse - marginAboveMouse;
+      int devXTooltip = devXMouse + marginAroundMouse;
+      int devYTooltip = devYMouse - marginAroundMouse;
 
-      // ensure that the tour detail is fully visible
+      /*
+       * Ensure that the tour detail is fully visible
+       */
       final int viewportWidth = _devMapViewport.width;
-      if (devXDetail + detailWidth > viewportWidth) {
-         devXDetail = viewportWidth - detailWidth;
-      }
-      if (devYDetail - detailHeight < 0) {
-         devYDetail = devYMouse + detailHeight + marginBelowMouse;
+      final int viewportHeight = _devMapViewport.height;
+
+      if (devXTooltip + tooltipWidth > viewportWidth) {
+
+         // tooltip is truncated at the right side -> move tooltip to the left of the mouse
+
+         devXTooltip = devXMouse - marginAroundMouse - tooltipWidth;
       }
 
+
+      if (devYTooltip - tooltipHeight < 0) {
+
+         // tooltip is truncated at the top -> move tooltip below the mouse
+
+         devYTooltip = devYMouse + tooltipHeight + marginAroundMouse;
+
+         if (devYTooltip + tooltipHeight > viewportHeight) {
+
+            // tooltip is truncated at the bottom -> snap to the top
+
+            devYTooltip = tooltipHeight;
+         }
+      }
+
+      final int devX = devXTooltip + marginHorizontal;
+      final int devY = devYTooltip - contentHeight - marginVertical;
+
+      /*
+       * Paint tooltip
+       */
       final Rectangle clippingRect = new Rectangle(
-            devXDetail,
-            devYDetail - detailHeight,
-            detailWidth,
-            detailHeight);
+            devXTooltip,
+            devYTooltip - tooltipHeight,
+            tooltipWidth,
+            tooltipHeight);
 
       gc.setClipping(clippingRect);
 
@@ -4764,10 +4788,6 @@ public class Map2 extends Canvas {
       gc.fillRectangle(clippingRect);
 
       gc.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
-
-      final int devX = devXDetail + marginHorizontal;
-      final int devY = devYDetail - contentHeight - marginVertical;
-
       gc.drawText(sb.toString(), devX, devY);
    }
 
