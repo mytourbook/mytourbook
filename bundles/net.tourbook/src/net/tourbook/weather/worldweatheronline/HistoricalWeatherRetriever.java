@@ -58,7 +58,6 @@ public class HistoricalWeatherRetriever implements IHistoricalWeatherRetriever {
    // the IHistoricalWeatherRetriever will provide a getter for each provider data
    //and for each data in the tour data editor view that can be retrieved from a weather provider
    //(avg temp, max, min, wind chill....)
-
    private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                                      //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
