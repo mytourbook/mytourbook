@@ -47,6 +47,9 @@ Improvements
   - Consolidated "Set map center when zoomed to ..."		               https://github.com/mytourbook/mytourbook/issues/468
   - Show more details when multiple tours are hovered                   https://github.com/mytourbook/mytourbook/issues/470
 
+* Strava Integration (Frederic)   
+  - Added the possibility to send the weather data in the uploaded activity's description
+
 
 Changes
 =======

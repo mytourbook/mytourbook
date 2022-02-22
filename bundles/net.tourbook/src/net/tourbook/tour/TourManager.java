@@ -2730,6 +2730,7 @@ public class TourManager {
          return false;
       }
 
+      //todo fb use by default openweathermap api but if wwo is used, use that one
       final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
 

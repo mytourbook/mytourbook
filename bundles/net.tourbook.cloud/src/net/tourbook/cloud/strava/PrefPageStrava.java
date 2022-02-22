@@ -82,14 +82,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Button             _btnCleanup;
    private Button             _chkAddWeatherIconInTitle;
    private Button             _chkSendDescription;
-   private Button _chkSendWeatherData;      //todo fb tooltip :
-   //"Send weather data in the activity notes
-
-   //The weather data will be as below (assuming it is existing in the tour):
-   //Weather emoji description, average temp, (if any during the tour aka >0)  precipitations X mm, wind chill, wind speed, direction
-
-   //From Klimat.app Clear sky, 25°F, Feels like 14°F, Humidity 71%, Wind 11mph from S - by Klimat.app
-   //"
+   private Button             _chkSendWeatherDataInDescription;
 
    private Button             _chkShowHideTokens;
    private Button             _chkUseTourTypeMapping;
@@ -317,6 +310,16 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             /*
+             * Checkbox: Send the weather data in the tour description
+             */
+            _chkSendWeatherDataInDescription = new Button(group, SWT.CHECK);
+            GridDataFactory.fillDefaults().applyTo(_chkSendWeatherDataInDescription);
+
+            _chkSendWeatherDataInDescription.setText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription);
+            _chkSendWeatherDataInDescription.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip);
+         }
+         {
+            /*
              * Checkbox: Use tour type mapping
              */
             _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
@@ -367,6 +370,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _chkShowHideTokens.setEnabled(isAuthorized);
       _chkAddWeatherIconInTitle.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
+      _chkSendWeatherDataInDescription.setEnabled(isAuthorized);
       _chkUseTourTypeMapping.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
 
@@ -461,6 +465,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       _chkAddWeatherIconInTitle.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkSendWeatherDataInDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
 
       enableControls();
@@ -482,6 +487,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
          _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, _chkAddWeatherIconInTitle.getSelection());
          _prefStore.setValue(Preferences.STRAVA_SENDDESCRIPTION, _chkSendDescription.getSelection());
+         _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, _chkSendWeatherDataInDescription.getSelection());
 
          final boolean prefUseTourTypeMapping = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING);
          final boolean currentUseTourTypeMapping = _chkUseTourTypeMapping.getSelection();
@@ -533,6 +539,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       _chkAddWeatherIconInTitle.setSelection(_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkSendWeatherDataInDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
    }
 
