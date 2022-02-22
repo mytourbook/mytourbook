@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -978,19 +978,22 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.elevationGain > 0 && data.distance > 0) {
+            //todo fb that works
+            return "\ud83c\udf26";
 
-               final float totalDistance = data.distance / UI.UNIT_VALUE_DISTANCE;
-               final float totalElevationChange = (data.elevationGain + data.elevationLoss) / UI.UNIT_VALUE_ELEVATION;
-               final String valueText = valueFormatter.printDouble(UI.computeAverageElevationChange(totalElevationChange, totalDistance));
-
-               return isShowValueUnit
-                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE //$NON-NLS-1$
-                     : valueText + UI.SPACE;
-
-            } else {
-               return UI.EMPTY_STRING;
-            }
+//            if (data.elevationGain > 0 && data.distance > 0) {
+//
+//               final float totalDistance = data.distance / UI.UNIT_VALUE_DISTANCE;
+//               final float totalElevationChange = (data.elevationGain + data.elevationLoss) / UI.UNIT_VALUE_ELEVATION;
+//               final String valueText = valueFormatter.printDouble(UI.computeAverageElevationChange(totalElevationChange, totalDistance));
+//
+//               return isShowValueUnit
+//                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE //$NON-NLS-1$
+//                     : valueText + UI.SPACE;
+//
+//            } else {
+//               return UI.EMPTY_STRING;
+//            }
          }
 
          @Override
@@ -3114,43 +3117,44 @@ public class CalendarProfileManager {
 
             final String xmlProfileType = xmlProfile.getType();
 
-            if (xmlProfileType.equals(TAG_CALENDAR)) {
+            if (!xmlProfileType.equals(TAG_CALENDAR)) {
+               continue;
+            }
 
-               // <Calendar>
+            // <Calendar>
 
-               final CalendarProfile profile = restoreProfile(xmlProfile);
+            final CalendarProfile profile = restoreProfile(xmlProfile);
 
-               if (profile.defaultId == DefaultId.XML_DEFAULT) {
+            if (profile.defaultId == DefaultId.XML_DEFAULT) {
 
-                  /*
-                   * The default id is unknown, this occured when switching vom 17.12.0 -> 17.12.1
-                   * but it can occure when data are corrup, setup as default
-                   */
-                  profile.defaultId = DefaultId.DEFAULT;
+               /*
+                * The default id is unknown, this occurred when switching from 17.12.0 -> 17.12.1
+                * but it can occur when data are corrupted, setup as default
+                */
+               profile.defaultId = DefaultId.DEFAULT;
 
-                  // this cannot be a default default
-                  profile.isDefaultDefault = false;
-                  profile.isUserParentDefault = false;
-                  profile.userParentDefaultId = UI.EMPTY_STRING;
-               }
+               // this cannot be a default default
+               profile.isDefaultDefault = false;
+               profile.isUserParentDefault = false;
+               profile.userParentDefaultId = UI.EMPTY_STRING;
+            }
 
-               // set profile default name
-               if (profile.isDefaultDefault) {
+            // set profile default name
+            if (profile.isDefaultDefault) {
 
-                  // overwrite default default profile name, it is readonly
+               // overwrite default default profile name, it is readonly
 
-                  for (final CalendarProfile defaultProfile : _allDefaultDefaultProfiles) {
+               for (final CalendarProfile defaultProfile : _allDefaultDefaultProfiles) {
 
-                     if (profile.defaultId == defaultProfile.defaultId) {
+                  if (profile.defaultId == defaultProfile.defaultId) {
 
-                        profile.profileName = defaultProfile.profileName;
-                        break;
-                     }
+                     profile.profileName = defaultProfile.profileName;
+                     break;
                   }
                }
-
-               allCalendarProfiles.add(profile);
             }
+
+            allCalendarProfiles.add(profile);
 
          } catch (final Exception e) {
             StatusUtil.log(Util.dumpMemento(xmlProfile), e);
