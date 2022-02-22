@@ -637,4 +637,9 @@ public interface ITourbookPreferences {
    public static final String TOURMARKERVIEW_USE_ELAPSED_TIME  = "TOURMARKERVIEW_USE_ELAPSED_TIME";  //$NON-NLS-1$
    public static final String TOURMARKERVIEW_USE_MOVING_TIME   = "TOURMARKERVIEW_USE_MOVING_TIME";   //$NON-NLS-1$
    public static final String TOURMARKERVIEW_USE_RECORDED_TIME = "TOURMARKERVIEW_USE_RECORDED_TIME"; //$NON-NLS-1$
+
+   /*
+    * Value ranges
+    */
+   public static final String TRANSFORM_VALUE_OPACITY_MAX = "TRANSFORM_VALUE_OPACITY_MAX"; //$NON-NLS-1$
 }

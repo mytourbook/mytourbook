@@ -540,8 +540,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Heart rate variability
        */
-      store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, 20); // milliseconds
-      store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, false);
+      store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE,   20); // milliseconds
+      store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR,      false);
 
       /*
        * Time zone
@@ -552,15 +552,20 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Weather
        */
-      store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
+      store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,    false);
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
 
       /*
        * Tour Marker View
        */
-      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME,true);
-      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, false);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME,  true);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME,   false);
       store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, false);
+
+      /*
+       * Value ranges
+       */
+      store.setDefault(ITourbookPreferences.TRANSFORM_VALUE_OPACITY_MAX, 10);
 
 // SET_FORMATTING_ON
    }
