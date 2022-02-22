@@ -36,13 +36,23 @@ New
 Improvements
 ============
 
-* 
+* Calendar View (Frederic)
+  - The combo of years now displays the most recent years at the top as it is more likely to be selected than the oldest years
+    https://github.com/mytourbook/mytourbook/pull/472
+
+* Tour Chart
+  - Switch between SRTM 1 and SRTM 3 values                             https://github.com/mytourbook/mytourbook/issues/469 
+
+* 2D Map
+  - Consolidated "Set map center when zoomed to ..."		               https://github.com/mytourbook/mytourbook/issues/468
+  - Show more details when multiple tours are hovered                   https://github.com/mytourbook/mytourbook/issues/470
 
 
 Changes
 =======
 
-* 
+* 2D Map
+  - Moved action "Show eath map" from the toolbar into the map context menu
 
 
 Bugfix
@@ -54,7 +64,6 @@ Bugfix
 Translation    
 ===========
 
-- Czech 20.11 (Lukas)
 - Dutch (Maarten)
 - French (Frederic)
 - German
@@ -64,5 +73,6 @@ Translation
 System   
 ======
 
-* Eclipse 2021-06
+* Milestone             https://github.com/mytourbook/mytourbook/milestone/3?closed=1
+* Eclipse 2021-06       https://github.com/mytourbook/mytourbook/issues/440
 * FIT SDK 21.67

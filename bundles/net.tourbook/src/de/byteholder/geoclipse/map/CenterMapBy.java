@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,33 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package de.byteholder.geoclipse.map;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
+public enum CenterMapBy {
 
-import org.eclipse.jface.action.Action;
-
-public class ActionZoomShowEntireMap extends Action {
-
-   private Map2View _mapView;
-
-   public ActionZoomShowEntireMap(final Map2View mapView) {
-
-      super(null, AS_PUSH_BUTTON);
-
-      _mapView = mapView;
-
-      setText(Messages.Map_Action_ShowEarchMap);
-
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireMap));
-   }
-
-   @Override
-   public void run() {
-      _mapView.actionZoomShowEntireMap();
-   }
-
+   Map, //
+   Mouse, //
+   Tour, //
 }

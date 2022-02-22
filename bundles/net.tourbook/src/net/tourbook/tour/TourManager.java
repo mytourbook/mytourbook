@@ -768,15 +768,6 @@ public class TourManager {
 
       final boolean isTourStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
       tcc.xAxisTime = isTourStartTime ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
-      tcc.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
-
-      tcc.isGraphOverlapped = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED);
-
-      tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
-      tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
-
-      tcc.isShowBreaktimeValues = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
-      tcc.isShowValuePointValue = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
 
       tcc.updateZoomOptions();
 
@@ -3046,7 +3037,7 @@ public class TourManager {
 
          for (final TourData tourData : allTourData) {
 
-            final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
+            final boolean isReplaced = tourData.replaceAltitudeWithSRTM(true);
 
             returnValue[0] = returnValue[0] || isReplaced;
          }
@@ -4413,7 +4404,7 @@ public class TourManager {
 
             if (tcc.isSRTMDataVisible) {
 
-               final float[] srtmDataSerie = tourData.getSRTMSerie();
+               final float[] srtmDataSerie = tourData.getSRTMSerie(tcc.isShowSrtm1Values);
                if (srtmDataSerie != null) {
 
                   // create altitude dataserie and adjust min/max values with with the srtm values

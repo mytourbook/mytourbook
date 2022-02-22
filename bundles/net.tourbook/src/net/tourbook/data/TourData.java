@@ -1005,6 +1005,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private float[]               srtmSerieImperial;
 
+   /**
+    * Is <code>true</code> when {@link #srtmSerie} contains SRTM 1 values, otherwise SRTM 3 values
+    */
+   @Transient
+   private boolean               _isSRTM1Values;
+
    @Transient
    private float[]               cadenceSerie;
 
@@ -2192,6 +2198,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       srtmSerie = null;
       srtmSerieImperial = null;
+      _isSRTM1Values = false;
 
       _geoBounds = null;
       _isGeoBoundsChecked = false;
@@ -6097,7 +6104,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourSegments;
    }
 
-   private void createSRTMDataSerie() {
+   private void createSRTMDataSerie(final boolean isUseSrtm1Values) {
 
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
@@ -6116,21 +6123,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          int usedSrtm3Values = 0;
          int usedCorrectedSrtmValues = 0;
 
+         // when true then SRTM 1 values are used OR partly used
+         boolean isSRTM1Values = false;
+
          for (final double latitude : latitudeSerie) {
 
             final double longitude = longitudeSerie[serieIndex];
-            final float srtm1Value, srtm3Value;
+            float srtm1Value = Float.MIN_VALUE;
+            final float srtm3Value;
             float srtmValue = 0;
 
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
 
-               srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               // use SRTM 1 values when requested, this makes it possible to disable the use of SRTM 1 values
+               if (isUseSrtm1Values) {
+
+                  srtm1Value = _elevationSRTM1.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               }
 
                if (srtm1Value != Float.MIN_VALUE
 
                      // check if valid srtm1Value. sometimes illegal value is also -32767.0
                      && srtm1Value > lowerLimit && srtm1Value < upperLimit) {
+
+                  isSRTM1Values = true;
 
                   srtmValue = srtm1Value;
                   isSRTMValid = true;
@@ -6182,16 +6199,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             serieIndex++;
          }
 
-         System.out.println(this.getClass().getCanonicalName() + " - used srtm1 Values: " + usedSrtm1Values //$NON-NLS-1$
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSRTMDataSerie()"
+               + " - used srtm1 Values: " + usedSrtm1Values //$NON-NLS-1$
                + ", used srtm3 Values: " + usedSrtm3Values //$NON-NLS-1$
-               + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues); //$NON-NLS-1$
+               + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues //$NON-NLS-1$
+         );
+// TODO remove SYSTEM.OUT.PRINTLN
 
          if (isSRTMValid) {
+
             srtmSerie = newSRTMSerie;
             srtmSerieImperial = newSRTMSerieImperial;
+
+            _isSRTM1Values = isSRTM1Values;
+
          } else {
-            // set state that srtm altitude is invalid
+
+            // set state that srtm elevation is invalid
+
             srtmSerie = new float[0];
+            srtmSerieImperial = new float[0];
+
+            _isSRTM1Values = false;
          }
       });
    }
@@ -9061,21 +9090,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @param isUseSRTM1Values
     * @return Returns SRTM metric or imperial data serie depending on the active measurement or
     *         <code>null</code> when SRTM data serie is not available
     */
    @JsonIgnore
-   public float[] getSRTMSerie() {
+   public float[] getSRTMSerie(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
          return null;
       }
 
-      if (srtmSerie == null) {
-         createSRTMDataSerie();
+      if (srtmSerie == null ||
+
+      // ensure that requested data are returned
+            _isSRTM1Values != isUseSRTM1Values
+
+      ) {
+
+         createSRTMDataSerie(isUseSRTM1Values);
       }
 
       if (srtmSerie.length == 0) {
+
          // SRTM data are invalid
          return null;
       }
@@ -9093,6 +9130,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @param isUseSRTM1Values
     * @return Returned SRTM values:
     *         <p>
     *         metric <br>
@@ -9101,17 +9139,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         or <code>null</code> when SRTM data serie is not available
     */
    @JsonIgnore
-   public float[][] getSRTMValues() {
+   public float[][] getSRTMValues(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
          return null;
       }
 
-      if (srtmSerie == null) {
-         createSRTMDataSerie();
+      if (srtmSerie == null ||
+
+      // ensure that requested data are returned
+            _isSRTM1Values != isUseSRTM1Values
+
+      ) {
+         createSRTMDataSerie(isUseSRTM1Values);
       }
 
       if (srtmSerie.length == 0) {
+
          // invalid SRTM values
          return null;
       }
@@ -9900,6 +9944,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return
+    *         Returns <code>true</code> then {@link #srtmSerie} contains SRTM 1 values or partly,
+    *         otherwise SRTM 3 values
+    */
+   public boolean isSRTM1Values() {
+      return _isSRTM1Values;
+   }
+
+   /**
     * @return Returns <code>true</code> when SRTM data are available or when they can be available
     *         but not yet computed.
     */
@@ -10266,9 +10319,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public boolean replaceAltitudeWithSRTM() {
+   public boolean replaceAltitudeWithSRTM(final boolean isUseSRTM1Values) {
 
-      if (getSRTMSerie() == null) {
+      if (getSRTMSerie(isUseSRTM1Values) == null) {
          return false;
       }
 
@@ -10824,9 +10877,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.isSpeedSerieFromDevice = speedSerie != null;
    }
 
-   public void setSRTMValues(final float[] srtm, final float[] srtmImperial) {
+   public void setSRTMValues(final float[] srtm, final float[] srtmImperial, final boolean isSRTM1Values) {
+
       srtmSerie = srtm;
       srtmSerieImperial = srtmImperial;
+
+      _isSRTM1Values = isSRTM1Values;
    }
 
    public void setStartAltitude(final short startAltitude) {

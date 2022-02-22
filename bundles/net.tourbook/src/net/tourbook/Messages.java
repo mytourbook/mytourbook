@@ -2028,8 +2028,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
-   public static String        Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
-   public static String        Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String        Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String        Slideout_Map_Options_Group_TourTrack;
    public static String        Slideout_Map_Options_Label_BreadcrumbItems;
@@ -2136,7 +2134,9 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
    public static String        Slideout_TourChartOptions_Label_Title;
-
+   public static String        Slideout_TourChartOptions_Radio_SRTM1;
+   public static String        Slideout_TourChartOptions_Radio_SRTM1_Tooltip;
+   public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
    public static String        Slideout_TourEditor_Label_LatLonDigits;
