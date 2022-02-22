@@ -640,6 +640,7 @@ public class Map2View extends ViewPart implements
          super.onSelect();
 
          _isShowTour = getSelection();
+         _map.setIsShowTour(_isShowTour);
 
          paintTours_10_All();
       }
@@ -3958,6 +3959,7 @@ public class Map2View extends ViewPart implements
       // is show tour
       _isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
       _actionShowTour.setSelection(_isShowTour);
+      _map.setIsShowTour(_isShowTour);
 
       // photo states
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);

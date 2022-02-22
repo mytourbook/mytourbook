@@ -479,6 +479,7 @@ public class Map2 extends Canvas {
    private String      _distanceUnitLabel = UI.EMPTY_STRING;
 
    private boolean     _isScaleVisible;
+   private boolean     _isShowTour;
 
    private final Color _transparentColor;
    private Color       _defaultBackgroundColor;
@@ -4349,7 +4350,9 @@ public class Map2 extends Canvas {
       /*
        * Paint tour directions when not yet painted
        */
-      if (_isDrawTourDirection
+      if (_isShowTour
+
+            && _isDrawTourDirection
 
             && _isDrawTourDirection_Always
 
@@ -6641,6 +6644,10 @@ public class Map2 extends Canvas {
 
    public void setIsMultipleTours(final boolean isMultipleTours) {
       _hoveredSelectedTour_CanSelectTour = isMultipleTours;
+   }
+
+   public void setIsShowTour(final boolean isShowTour) {
+      _isShowTour = isShowTour;
    }
 
    public void setIsZoomWithMousePosition(final boolean isZoomWithMousePosition) {

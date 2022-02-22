@@ -1174,7 +1174,7 @@ public abstract class Pinned_ToolTip_Shell {
    public void show(final Point location) {
 
       /*
-       * show tooltip only when this is the active shell, this check is necessary that when a tour
+       * Show tooltip only when this is the active shell, this check is necessary that when a tour
        * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in the
        * tour chart view is also displayed
        */

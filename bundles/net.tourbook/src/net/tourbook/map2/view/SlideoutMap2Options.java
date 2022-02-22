@@ -199,6 +199,26 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
          }
          {
             /*
+             * Show value point tooltip
+             */
+            _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
+            _chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
+            _chkShowValuePointTooltip.addSelectionListener(widgetSelectedAdapter(selectionEvent -> saveState_ValuePointTooltip()));
+            gdSpan2.applyTo(_chkShowValuePointTooltip);
+         }
+         {
+            /*
+             * Options to select all the time slices in between the left and right sliders or only
+             * the current slider's one
+             */
+            _chkSelectInbetweenTimeSlices = new Button(container, SWT.CHECK);
+            _chkSelectInbetweenTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
+            _chkSelectInbetweenTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
+            _chkSelectInbetweenTimeSlices.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkSelectInbetweenTimeSlices);
+         }
+         {
+            /*
              * Inverse keyboard panning
              */
             _chkIsToggleKeyboardPanning = new Button(container, SWT.CHECK);
@@ -236,26 +256,6 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
                _colorMapDimmColor.addListener(_defaultChangePropertyListener);
                _colorMapDimmColor.addOpenListener(this);
             }
-         }
-         {
-            /*
-             * Show value point tooltip
-             */
-            _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
-            _chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
-            _chkShowValuePointTooltip.addSelectionListener(widgetSelectedAdapter(selectionEvent -> saveState_ValuePointTooltip()));
-            gdSpan2.applyTo(_chkShowValuePointTooltip);
-         }
-         {
-            /*
-             * Options to select all the time slices in between the left and right sliders or only
-             * the current slider's one
-             */
-            _chkSelectInbetweenTimeSlices = new Button(container, SWT.CHECK);
-            _chkSelectInbetweenTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
-            _chkSelectInbetweenTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
-            _chkSelectInbetweenTimeSlices.addSelectionListener(_defaultSelectionListener);
-            gdSpan2.applyTo(_chkSelectInbetweenTimeSlices);
          }
       }
    }
