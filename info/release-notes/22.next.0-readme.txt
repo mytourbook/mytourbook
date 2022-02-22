@@ -36,7 +36,8 @@ New
 Improvements
 ============
 
-* 
+* Calendar View (Frederic)
+ - The combo of years now displays the most recent years at the top as it is more likely to be selected than the oldest years
 
 
 Changes
