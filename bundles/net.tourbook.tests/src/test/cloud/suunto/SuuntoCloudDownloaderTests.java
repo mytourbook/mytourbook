@@ -140,7 +140,7 @@ public class SuuntoCloudDownloaderTests {
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
-      final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-RUNNING.fit"; //$NON-NLS-1$
+      final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             downloadedFilename)));
    }
