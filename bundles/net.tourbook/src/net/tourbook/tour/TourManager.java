@@ -2752,8 +2752,8 @@ public class TourManager {
       tourData.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
       tourData.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
       tourData.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      tourData.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
-      tourData.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
+      tourData.setWeather_Temperature_Max_Provider(historicalWeatherData.getTemperatureMax());
+      tourData.setWeather_Temperature_Min_Provider(historicalWeatherData.getTemperatureMin());
       tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
 
       TourLogManager.subLog_OK(getTourDateTimeShort(tourData));

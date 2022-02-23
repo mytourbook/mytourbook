@@ -21,6 +21,7 @@ import net.tourbook.common.weather.IWeather;
  * Class to store data from the WorldWeatherOnline API.
  * Documentation : https://www.worldweatheronline.com/developer/api/docs/historical-weather-api.aspx
  */
+//todo fb this is the WWO weather implementation of the ihistorical weather retrieval
 public class WeatherData {
 
    private int    maxTemperature;

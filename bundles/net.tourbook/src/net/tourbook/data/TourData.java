@@ -555,6 +555,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 weather_Temperature_Min;                              // db-version 39
    private float                 weather_Temperature_Max;                              // db-version 39
    private float                 weather_Temperature_WindChill;                        // db-version 39
+   private float weather_Temperature_Max_Provider;
+   private float weather_Temperature_Min_Provider;
 
 
    // ############################################# POWER #############################################
@@ -9283,11 +9285,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       float[] serie;
 
-      final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
+      final float unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
       final float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
       final float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
 
-      if (unitValueTempterature != 1) {
+      if (unitValueTemperature != 1) {
 
          // use imperial system
 
@@ -11865,8 +11867,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.weather_Temperature_Max = weatherMaxTemperature;
    }
 
+   public void setWeather_Temperature_Max_Provider(final float temperatureMax) {
+     weather_Temperature_Max_Provider = temperatureMax;
+
+   }
+
    public void setWeather_Temperature_Min(final float weatherMinTemperature) {
       this.weather_Temperature_Min = weatherMinTemperature;
+   }
+
+   public void setWeather_Temperature_Min_Provider(final float temperatureMin) {
+     weather_Temperature_Min_Provider = temperatureMin;
+
    }
 
    public void setWeather_Temperature_WindChill(final float weatherWindChill) {

@@ -681,11 +681,6 @@ public class RawDataManager {
                      : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
 
          avgTemperature = UI.convertTemperatureFromMetric(newTourData.getAvgTemperature_Device());
-         if (!UI.UNIT_IS_TEMPERATURE_CELSIUS) {
-            avgTemperature = avgTemperature
-                  * UI.UNIT_FAHRENHEIT_MULTI
-                  + UI.UNIT_FAHRENHEIT_ADD;
-         }
          newData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
                      ? UI.SYMBOL_TEMPERATURE_CELSIUS
