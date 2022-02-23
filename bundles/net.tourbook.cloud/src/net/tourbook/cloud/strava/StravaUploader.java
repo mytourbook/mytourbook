@@ -203,6 +203,24 @@ public class StravaUploader extends TourbookCloudUploader {
       return compressedFilePath;
    }
 
+   private String buildFormattedDescription(final TourData tourData) {
+
+      final StringBuilder description = new StringBuilder();
+      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
+
+         description.append(tourData.getTourDescription());
+      }
+      if (_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION)) {
+
+         if (StringUtils.hasContent(description.toString())) {
+            description.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+         }
+         description.append(buildWeatherData(tourData));
+      }
+
+      return description.toString();
+   }
+
    private String buildFormattedTitle(final TourData tourData) {
 
       String title = tourData.getTourTitle();
@@ -221,9 +239,45 @@ public class StravaUploader extends TourbookCloudUploader {
     */
    private String buildWeatherData(final TourData tourData) {
 
-      final String weatherData = "";
+      final List<String> weatherDataList = new ArrayList<>();
 
-      return UI.SPACE1 + weatherData;
+      //todo fb put it in the unit tests by manually entering all the weather data, or traking it from a tour when the Openweather api is usable
+      final String weatherIcon = getWeatherIcon(tourData.getWeatherIndex());
+      if (StringUtils.hasContent(weatherIcon)) {
+         weatherDataList.add(weatherIcon);
+      }
+      final String weatherText = tourData.getWeather();
+      if (StringUtils.hasContent(weatherText)) {
+         weatherDataList.add(weatherText);
+      }
+      final float averageTemperature = tourData.getAvgTemperature();
+
+      if (averageTemperature != Float.MIN_VALUE) {
+         weatherDataList.add(UI.convertTemperatureFromMetric(averageTemperature) + UI.UNIT_LABEL_TEMPERATURE);
+      }
+      final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
+      //"feels like"
+      if (temperatureWindChill != Float.MIN_VALUE) {
+         weatherDataList.add(UI.convertTemperatureFromMetric(temperatureWindChill) + UI.UNIT_LABEL_TEMPERATURE);
+      }
+      //humidity
+
+      //  wind \
+      final int windSpeed = tourData.getWeatherWindSpeed();
+      if (windSpeed != Float.MIN_VALUE) {
+         weatherDataList.add(UI.convertSpeed_FromMetric(windSpeed) + UI.UNIT_LABEL_SPEED);
+         weatherDataList.add(" from ");
+         //WNW weatherDataList.add(tourData.getWeatherWindDir());
+      }
+
+      final float precipitation = tourData.getWeather_Precipitation();
+      if (precipitation != Float.MIN_VALUE) {
+         weatherDataList.add(UI.convertPrecipitation_FromMetric(averageTemperature) + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      }
+
+      final String weatherData = String.join(UI.COMMA_SPACE, weatherDataList);
+
+      return weatherData;
    }
 
    private void createCompressedTcxTourFile(final IProgressMonitor monitor,
@@ -577,9 +631,8 @@ public class StravaUploader extends TourbookCloudUploader {
             .addPart("name", title) //$NON-NLS-1$
             .addPart("file", Paths.get(compressedTourAbsoluteFilePath)); //$NON-NLS-1$
 
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
-         publisher.addPart("description", tourData.getTourDescription()); //$NON-NLS-1$
-      }
+      final String description = buildFormattedDescription(tourData);
+      publisher.addPart("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(StravaBaseUrl + "/uploads")) //$NON-NLS-1$
@@ -615,15 +668,7 @@ public class StravaUploader extends TourbookCloudUploader {
       body.put("distance", tourData.getTourDistance()); //$NON-NLS-1$
       body.put("trainer", (isTrainerActivity ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      final StringBuilder description = new StringBuilder();
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
-         description.append(tourData.getTourDescription());
-      }
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION)) {
-         description.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE +
-               buildWeatherData(tourData));
-      }
-
+      final String description = buildFormattedDescription(tourData);
       body.put("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()

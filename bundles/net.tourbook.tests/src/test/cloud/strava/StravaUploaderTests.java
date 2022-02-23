@@ -48,8 +48,7 @@ public class StravaUploaderTests {
    private static final String           HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
    private static final IPreferenceStore _prefStore           = Activator.getDefault().getPreferenceStore();
 
-   private static final String           STRAVA_FILE_PATH     =
-         FilesUtils.rootPath + "cloud/strava/files/";                                                             //$NON-NLS-1$
+   private static final String           STRAVA_FILE_PATH     = FilesUtils.rootPath + "cloud/strava/files/";      //$NON-NLS-1$
 
    static HttpClientMock                 httpClientMock;
    static StravaUploader                 stravaUploader;

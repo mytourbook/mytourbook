@@ -1089,6 +1089,25 @@ public class UI {
    }
 
    /**
+    * @param speed
+    * @return Returns the speed value in the current measurement system.
+    */
+   public static float convertSpeed_FromMetric(final float speed) {
+
+      if (UNIT_IS_DISTANCE_MILE) {
+
+         return speed / UI.UNIT_MILE;
+
+      } else if (UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         return speed / UI.UNIT_NAUTICAL_MILE;
+
+      }
+
+      return speed;
+   }
+
+   /**
     * @param temperature
     * @return Returns the temperature in the current measurement system.
     */
