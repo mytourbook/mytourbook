@@ -38,6 +38,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -295,10 +296,14 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                   .applyTo(nightContainer);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(nightContainer);
             {
+               final String tooltipText = NLS.bind(
+                     Messages.Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip,
+                     _transformOpacityMax);
+
                // label: night sections opacity
                _lblNightSectionsOpacity = new Label(nightContainer, SWT.CHECK);
                _lblNightSectionsOpacity.setText(Messages.Slideout_TourChartOptions_Label_NightSectionsOpacity);
-               _lblNightSectionsOpacity.setToolTipText(Messages.Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip);
+               _lblNightSectionsOpacity.setToolTipText(tooltipText);
 
                // spinner: Night sections opacity
                _spinnerNightSectionsOpacity = new Spinner(nightContainer, SWT.BORDER);
@@ -306,7 +311,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                _spinnerNightSectionsOpacity.setMaximum(_transformOpacityMax);
                _spinnerNightSectionsOpacity.setIncrement(1);
                _spinnerNightSectionsOpacity.setPageIncrement(10);
-               _spinnerNightSectionsOpacity.setToolTipText(Messages.Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip);
+               _spinnerNightSectionsOpacity.setToolTipText(tooltipText);
                _spinnerNightSectionsOpacity.addSelectionListener(_defaultSelectionListener);
                _spinnerNightSectionsOpacity.addMouseWheelListener(_defaultMouseWheelListener);
             }
