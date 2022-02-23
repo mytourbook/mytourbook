@@ -1525,11 +1525,15 @@ public class Map2 extends Canvas {
          return null;
       }
 
-      final MP mp = getMapProvider();
-      final int zoomLevel = getZoom();
-
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;
+
+      if (latitudeSerie == null) {
+         return null;
+      }
+
+      final MP mp = getMapProvider();
+      final int zoomLevel = getZoom();
 
       // paint with much less points to speed it up
       final int numMaxSegments = 1000;
