@@ -250,7 +250,7 @@ public class StravaUploader extends TourbookCloudUploader {
       if (StringUtils.hasContent(weatherText)) {
          weatherDataList.add(weatherText);
       }
-      final float averageTemperature = tourData.getAvgTemperature();
+      final float averageTemperature = tourData.getAvgTemperature_Provider();
 
       if (averageTemperature != Float.MIN_VALUE) {
          weatherDataList.add(UI.convertTemperatureFromMetric(averageTemperature) + UI.UNIT_LABEL_TEMPERATURE);

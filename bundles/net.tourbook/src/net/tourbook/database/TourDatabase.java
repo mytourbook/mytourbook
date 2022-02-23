@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -4142,6 +4142,7 @@ public class TourDatabase {
 
       SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
    }
+   //TODO FB rename avgTemperature to avgTemperature_Device
 
    /**
     * create table {@link #}

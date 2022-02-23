@@ -520,7 +520,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    //todo fb rename to device avg temp
    //create a provider avg temp
-   private float                 avgTemperature;                                          // db-version 4
+   private float                 avgTemperature_Device;                                          // db-version 4
+   private float                 avgTemperature_Provider;
 
    // ############################################# WEATHER #############################################
 
@@ -3453,7 +3454,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          weather_Temperature_Min = temperatureMin;
          weather_Temperature_Max = temperatureMax;
 
-         avgTemperature = temperatureSum / tempLength;
+         avgTemperature_Device = temperatureSum / tempLength;
       }
    }
 
@@ -7520,8 +7521,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns metric average temperature
     */
-   public float getAvgTemperature() {
-      return avgTemperature;
+   public float getAvgTemperature_Device() {
+      return avgTemperature_Device;
+   }
+
+   public float getAvgTemperature_Provider() {
+      return avgTemperature_Provider;
    }
 
    public short[] getBattery_Percentage() {
@@ -10401,8 +10406,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param avgTemperature
     *           the avgTemperature to set
     */
-   public void setAvgTemperature(final float avgTemperature) {
-      this.avgTemperature = avgTemperature;
+   public void setAvgTemperature_Device(final float avgTemperature) {
+      this.avgTemperature_Device = avgTemperature;
    }
 
    public void setBattery_Percentage(final short[] battery_Percentage) {
