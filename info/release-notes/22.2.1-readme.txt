@@ -1,0 +1,8 @@
+22.2.1                                                 24. February 2022
+
+
+Bugfix
+======
+
+* 2D Map
+  - Fixed 2 NPE which were caused when saving manual tours
