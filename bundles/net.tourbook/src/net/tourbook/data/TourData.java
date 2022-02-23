@@ -10410,6 +10410,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.avgTemperature_Device = avgTemperature;
    }
 
+   public void setAvgTemperature_Provider(final int temperatureAverage) {
+      avgTemperature_Provider = temperatureAverage;
+
+   }
+
    public void setBattery_Percentage(final short[] battery_Percentage) {
       this.battery_Percentage = battery_Percentage;
    }

@@ -493,11 +493,11 @@ public class TourManager {
          temperatureSerie[serieIndex] = initialTemperature;
       }
 
-      final float oldAvgTemperature = tourData.getAvgTemperature();
+      final float oldAvgTemperature = tourData.getAvgTemperature_Device();
 
       tourData.computeAvg_Temperature();
 
-      final float newAvgTemperature = tourData.getAvgTemperature();
+      final float newAvgTemperature = tourData.getAvgTemperature_Device();
 
       TourLogManager.subLog_OK(String.format(
             LOG_TEMP_ADJUST_003_TOUR_CHANGES,
@@ -2743,7 +2743,7 @@ public class TourManager {
 
       tourData.setIsWeatherDataFromApi(true);
 
-      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
+      tourData.setAvgTemperature_Provider(historicalWeatherData.getTemperatureAverage());
       tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
       tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
       tourData.setWeather(historicalWeatherData.getWeatherDescription());

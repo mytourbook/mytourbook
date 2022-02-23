@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1240,7 +1240,7 @@ public class TourInfoUI {
          // sensor label/link
          final Link link = createUI_Link(parent, sensor.getLabel());
          link.setData(sensor);
-         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
+         link.addSelectionListener(widgetSelectedAdapter(this::onSelect_Sensor));
          _allSensorValue_Link.add(link);
 
          _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
@@ -1742,13 +1742,9 @@ public class TourInfoUI {
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
             UI.getCardinalDirectionText(weatherWindDirDegree * 10)));
 
+      //todo fb temp from device
       // temperature
-      float temperature = _tourData.getAvgTemperature();
-      if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
-         temperature = temperature
-               * UI.UNIT_FAHRENHEIT_MULTI
-               + UI.UNIT_FAHRENHEIT_ADD;
-      }
+      final float temperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Device());
       _lblTemperature.setText(_nf1.format(temperature));
 
       // weather clouds

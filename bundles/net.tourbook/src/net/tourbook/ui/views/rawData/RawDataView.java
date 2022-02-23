@@ -5016,7 +5016,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       for (final TourData tourData : importedTours) {
 
-         final float oldTourAvgTemperature = tourData.getAvgTemperature();
+         final float oldTourAvgTemperature = tourData.getAvgTemperature_Device();
 
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {

@@ -674,18 +674,13 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-         float avgTemperature = oldTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_TEMPERATURE_CELSIUS) {
-            avgTemperature = avgTemperature
-                  * UI.UNIT_FAHRENHEIT_MULTI
-                  + UI.UNIT_FAHRENHEIT_ADD;
-         }
+         float avgTemperature = UI.convertTemperatureFromMetric(oldTourData.getAvgTemperature_Device());
          previousData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
                      ? UI.SYMBOL_TEMPERATURE_CELSIUS
                      : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
 
-         avgTemperature = newTourData.getAvgTemperature();
+         avgTemperature = UI.convertTemperatureFromMetric(newTourData.getAvgTemperature_Device());
          if (!UI.UNIT_IS_TEMPERATURE_CELSIUS) {
             avgTemperature = avgTemperature
                   * UI.UNIT_FAHRENHEIT_MULTI
@@ -1452,7 +1447,7 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-               tourDataDummyClone.setAvgTemperature(oldTourData.getAvgTemperature());
+               tourDataDummyClone.setAvgTemperature_Device(oldTourData.getAvgTemperature_Device());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1757,10 +1752,10 @@ public class RawDataManager {
 
             case TIME_SLICES__TEMPERATURE:
 
-               clonedTourData.setAvgTemperature(tourData.getAvgTemperature());
+               clonedTourData.setAvgTemperature_Device(tourData.getAvgTemperature_Device());
 
                tourData.temperatureSerie = null;
-               tourData.setAvgTemperature(0);
+               tourData.setAvgTemperature_Device(0);
                break;
 
             case TIME_SLICES__TIME:

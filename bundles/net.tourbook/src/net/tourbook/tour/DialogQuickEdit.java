@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -81,7 +81,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private boolean                  _isWindSpeedManuallyModified   = false;
    private int[]                    _unitValueWindSpeed;
    private float                    _unitValueDistance;
-   private float                    _unitValueTemperature;
 
    /*
     * UI controls
@@ -215,7 +214,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
       _unitValueDistance = UI.UNIT_VALUE_DISTANCE;
-      _unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
       _unitValueWindSpeed = IWeather.getAllWindSpeeds();
 
       _tk = new FormToolkit(parent.getDisplay());
@@ -948,13 +946,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       if (_isTemperatureManuallyModified) {
 
-         float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
+         final float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
 
-         if (_unitValueTemperature != 1) {
-            temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
-         }
-
-         _tourData.setAvgTemperature(temperature);
+         _tourData.setAvgTemperature_Device(UI.convertTemperatureToMetric(temperature));
       }
 
    }
@@ -1007,14 +1001,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
          /*
           * Avg temperature
           */
-         float avgTemperature = _tourData.getAvgTemperature();
-
-         if (_unitValueTemperature != 1) {
-            final float metricTemperature = avgTemperature;
-            avgTemperature = metricTemperature
-                  * UI.UNIT_FAHRENHEIT_MULTI
-                  + UI.UNIT_FAHRENHEIT_ADD;
-         }
+         final float avgTemperature =
+               UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Device());
 
          _spinWeather_Temperature_Avg.setDigits(1);
          _spinWeather_Temperature_Avg.setSelection(Math.round(avgTemperature * 10));
