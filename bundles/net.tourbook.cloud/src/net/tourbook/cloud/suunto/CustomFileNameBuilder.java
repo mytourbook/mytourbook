@@ -40,7 +40,7 @@ public class CustomFileNameBuilder {
          Activator.getDefault().getPreferenceStore();
 
    private static String addLeadingZero(final int number) {
-      return String.format("%02d", number);
+      return String.format("%02d", number); //$NON-NLS-1$
    }
 
    /**
