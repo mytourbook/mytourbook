@@ -24,11 +24,14 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.strava.StravaUploader;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -42,18 +45,22 @@ import utils.Initializer;
 
 public class StravaUploaderTests {
 
-   private static final String HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
+   private static final String           HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore           = Activator.getDefault().getPreferenceStore();
 
-   private static final String STRAVA_FILE_PATH     =
-         FilesUtils.rootPath + "cloud/strava/files/";                                                   //$NON-NLS-1$
+   private static final String           STRAVA_FILE_PATH     =
+         FilesUtils.rootPath + "cloud/strava/files/";                                                             //$NON-NLS-1$
 
-   static HttpClientMock       httpClientMock;
-   static StravaUploader       stravaUploader;
+   static HttpClientMock                 httpClientMock;
+   static StravaUploader                 stravaUploader;
 
-   private List<TourData>      selectedTours        = new ArrayList<>();
+   private List<TourData>                selectedTours        = new ArrayList<>();
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
+
+      _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, true);
+      _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, true);
 
       httpClientMock = new HttpClientMock();
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
@@ -96,33 +103,6 @@ public class StravaUploaderTests {
    void testManualTourUpload() {
 
       final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
-      httpClientMock.onPost(
-            "https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
-            .doReturn(stravaResponse)
-            .withStatus(201);
-
-      final TourData tour = Initializer.importTour();
-
-      selectedTours.add(tour);
-      stravaUploader.uploadTours(selectedTours);
-
-      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
-      httpClientMock
-            .verify()
-            .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
-            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$ //$NON-NLS-2$
-            .called();
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
-   }
-
-   @Test
-   void testTourUpload() {
-
-      final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
             + "ManualTour-StravaResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
             "https://www.strava.com/api/v3/activities") //$NON-NLS-1$
@@ -138,7 +118,9 @@ public class StravaUploaderTests {
       httpClientMock
             .verify()
             .post("https://www.strava.com/api/v3/activities") //$NON-NLS-1$
-            .withHeader("Authorization", OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$ //$NON-NLS-2$
+            .withHeader(
+                  "Authorization",
+                  OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
             .withBody(equalTo(
                   "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour\",\"elapsed_time\":3600,\"description\":\"\",\"type\":\"Run\"}")) //$NON-NLS-1$
             .called();
@@ -146,5 +128,34 @@ public class StravaUploaderTests {
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
+   }
+
+   @Test
+   void testTourUpload() {
+
+      final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
+            + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
+      httpClientMock.onPost(
+            "https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
+            .doReturn(stravaResponse)
+            .withStatus(201);
+
+      final TourData tour = Initializer.importTour();
+
+      selectedTours.add(tour);
+      stravaUploader.uploadTours(selectedTours);
+
+      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock
+            .verify()
+            .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
+            .withHeader(
+                  "Authorization",
+                  OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
+            .called();
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "message      = 7/4/20, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
    }
 }
