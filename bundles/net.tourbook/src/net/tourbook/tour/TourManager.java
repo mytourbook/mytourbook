@@ -97,7 +97,7 @@ import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.WeatherData;
-import net.tourbook.weather.worldweatheronline.HistoricalWeatherRetriever;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -2731,7 +2731,7 @@ public class TourManager {
       }
 
       //todo fb use by default openweathermap api but if wwo is used, use that one
-      final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
+      final WeatherData historicalWeatherData = new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
 
          TourLogManager.subLog_ERROR(NLS.bind(

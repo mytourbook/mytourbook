@@ -30,7 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.weather.worldweatheronline.HistoricalWeatherRetriever;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -189,7 +189,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
          try {
 
             final HttpRequest request = HttpRequest
-                  .newBuilder(URI.create(HistoricalWeatherRetriever.getApiUrl() +
+                  .newBuilder(URI.create(WorldWeatherOnlineRetriever.getApiUrl() +
                         _textApiKey.getText()))
                   .GET()
                   .build();
@@ -200,11 +200,11 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             final String responseMessage = response.body();
 
             final String message = statusCode == HttpURLConnection.HTTP_OK
-                  ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, HistoricalWeatherRetriever.getBaseApiUrl())
+                  ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, WorldWeatherOnlineRetriever.getBaseApiUrl())
                   : NLS.bind(
                         Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
                         new Object[] {
-                              HistoricalWeatherRetriever.getBaseApiUrl(),
+                              WorldWeatherOnlineRetriever.getBaseApiUrl(),
                               statusCode,
                               responseMessage });
 

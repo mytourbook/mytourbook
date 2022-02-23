@@ -19,8 +19,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
-import com.javadocmd.simplelatlng.LatLngTool;
-import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -45,6 +43,7 @@ import net.tourbook.ui.views.calendar.CalendarProfile;
 import net.tourbook.weather.IHistoricalWeatherRetriever;
 import net.tourbook.weather.WWOHourlyResults;
 import net.tourbook.weather.WeatherData;
+import net.tourbook.weather.WeatherUtils;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -52,12 +51,15 @@ import org.eclipse.jface.preference.IPreferenceStore;
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
-public class HistoricalWeatherRetriever implements IHistoricalWeatherRetriever {
+public class WorldWeatherOnlineRetriever implements IHistoricalWeatherRetriever {
 
    //TODO FB
    // the IHistoricalWeatherRetriever will provide a getter for each provider data
    //and for each data in the tour data editor view that can be retrieved from a weather provider
    //(avg temp, max, min, wind chill....)
+
+   //todo fb
+   //add a weather retrieval submenu for each provider ??
    private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                                      //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
@@ -86,17 +88,17 @@ public class HistoricalWeatherRetriever implements IHistoricalWeatherRetriever {
 
    private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
-   public HistoricalWeatherRetriever() {}
+   public WorldWeatherOnlineRetriever() {}
 
    /*
     * @param tour
     * The tour for which we need to retrieve the weather data.
     */
-   public HistoricalWeatherRetriever(final TourData tour) {
+   public WorldWeatherOnlineRetriever(final TourData tour) {
 
       this.tour = tour;
 
-      determineWeatherSearchArea();
+      WeatherUtils.determineWeatherSearchAreaCenter(tour);
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
 
       final double roundedStartTime = tour.getTourStartTime().getHour();
@@ -182,34 +184,6 @@ public class HistoricalWeatherRetriever implements IHistoricalWeatherRetriever {
       weatherData.setPrecipitation(sumPrecipitation);
    }
 
-   /**
-    * Determines the geographic area covered by a GPS track. The goal is to
-    * encompass most of the track to search a weather station as close as possible
-    * to the overall course and not just to a specific point.
-    */
-   private void determineWeatherSearchArea() {
-      // Looking for the farthest point of the track
-      double maxDistance = Double.MIN_VALUE;
-      LatLng furthestPoint = null;
-      final LatLng startPoint = new LatLng(tour.latitudeSerie[0], tour.longitudeSerie[0]);
-      for (int index = 1; index < tour.latitudeSerie.length && index < tour.longitudeSerie.length; ++index) {
-         final LatLng currentPoint = new LatLng(tour.latitudeSerie[index], tour.longitudeSerie[index]);
-
-         final double distanceFromStart = LatLngTool.distance(startPoint, currentPoint, LengthUnit.METER);
-
-         if (distanceFromStart > maxDistance) {
-            maxDistance = distanceFromStart;
-            furthestPoint = currentPoint;
-         }
-      }
-
-      final double distanceFromStart = LatLngTool.distance(startPoint, furthestPoint, LengthUnit.METER);
-      final double bearingBetweenPoint = LatLngTool.initialBearing(startPoint, furthestPoint);
-
-      // We find the center of the circle formed by the starting point and the farthest point
-      searchAreaCenter = LatLngTool.travel(startPoint, bearingBetweenPoint, distanceFromStart / 2, LengthUnit.METER);
-   }
-
    public WeatherData getHistoricalWeatherData() {
       return historicalWeatherData;
    }
@@ -275,12 +249,18 @@ public class HistoricalWeatherRetriever implements IHistoricalWeatherRetriever {
       return weatherData;
    }
 
+   @Override
+   public boolean populateTourWeatherData(final TourData tourData) {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    /**
     * Retrieves the historical weather data
     *
     * @return The weather data, if found.
     */
-   public HistoricalWeatherRetriever retrieveHistoricalWeatherData() {
+   public WorldWeatherOnlineRetriever retrieveHistoricalWeatherData() {
 
       final String rawWeatherData = sendWeatherApiRequest();
       if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherData;
-import net.tourbook.weather.worldweatheronline.HistoricalWeatherRetriever;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class WorldWeatherOnlineTests {
          FilesUtils.rootPath + "data/weather/worldweatheronline/files/"; //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
-   HistoricalWeatherRetriever  historicalWeatherRetriever;
+   WorldWeatherOnlineRetriever  historicalWeatherRetriever;
 
    @BeforeAll
    static void initAll() {
@@ -57,12 +57,12 @@ public class WorldWeatherOnlineTests {
       httpClientMock.onGet(
             "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime") //$NON-NLS-1$
             .doReturn(worldWeatherOnlineResponse);
-      final Field field = HistoricalWeatherRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      final Field field = WorldWeatherOnlineRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
-      historicalWeatherRetriever = new HistoricalWeatherRetriever(tour);
+      historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
 
       final WeatherData historicalWeatherData =
             historicalWeatherRetriever.retrieveHistoricalWeatherData().getHistoricalWeatherData();
