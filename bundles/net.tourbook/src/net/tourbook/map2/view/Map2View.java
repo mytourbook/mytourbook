@@ -4618,13 +4618,18 @@ public class Map2View extends ViewPart implements
          return;
       }
 
+      final int[] timeSerie = tourData.timeSerie;
+      if (timeSerie == null) {
+         return;
+      }
+
       /*
        * Cut off lines within a pause -> set visible and hidden points
        */
       final boolean[] breakTimeSerie = tourData.getBreakTimeSerie();
       final boolean isBreakTimeAvailable = breakTimeSerie != null;
 
-      final int numSlices = tourData.timeSerie.length;
+      final int numSlices = timeSerie.length;
 
       tourData.visibleDataPointSerie = isBreakTimeAvailable
             ? new boolean[numSlices]
