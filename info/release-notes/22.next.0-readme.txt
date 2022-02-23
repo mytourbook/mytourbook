@@ -57,6 +57,12 @@ Improvements
 Changes
 =======
 
+* Tour Chart
+  - Moved the options
+    - Graph line transparency
+    - Draw line graphs with antialiasing
+    from the pref page into the chart options slideout
+
 * 2D Map
   - Moved action "Show eath map" from the toolbar into the map context menu
 

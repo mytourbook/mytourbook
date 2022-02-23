@@ -5463,8 +5463,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       segmentAlternateColor_Light   = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor_Dark    = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK);
 
-      graphTransparency_Line        = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-      graphTransparency_Filling = ColorUtil.getTransparencyFromPercentage(UI.isDarkTheme()
+      graphTransparency_Line        = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      graphTransparency_Filling     = ColorUtil.getTransparencyFromPercentage(UI.isDarkTheme()
             ? prefGraphTransparencyFilling_Dark
             : prefGraphTransparencyFilling_Light);
 
