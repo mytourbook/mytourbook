@@ -39,6 +39,10 @@ public class CustomFileNameBuilder {
    private static IPreferenceStore _prefStore =
          Activator.getDefault().getPreferenceStore();
 
+   private static String addLeadingZero(final int number) {
+      return String.format("%02d", number);
+   }
+
    /**
     * Build the file name to download based on what the user has configured
     *
@@ -92,25 +96,25 @@ public class CustomFileNameBuilder {
          case MONTH:
 
             final int month = getWorkoutOffsetDateTime(workoutPayload).getMonthValue();
-            customizedFileName.append(month);
+            customizedFileName.append(addLeadingZero(month));
             break;
 
          case DAY:
 
             final int day = getWorkoutOffsetDateTime(workoutPayload).getDayOfMonth();
-            customizedFileName.append(day);
+            customizedFileName.append(addLeadingZero(day));
             break;
 
          case HOUR:
 
             final int hour = getWorkoutOffsetDateTime(workoutPayload).getHour();
-            customizedFileName.append(hour);
+            customizedFileName.append(addLeadingZero(hour));
             break;
 
          case MINUTE:
 
             final int minute = getWorkoutOffsetDateTime(workoutPayload).getMinute();
-            customizedFileName.append(minute);
+            customizedFileName.append(addLeadingZero(minute));
             break;
 
          case USER_NAME:
