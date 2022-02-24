@@ -73,7 +73,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "maxPulse, " //                                     16    //$NON-NLS-1$
             + "avgPulse, " //                                     17    //$NON-NLS-1$
             + "avgCadence, " //                                   18    //$NON-NLS-1$
-            + "avgTemperature, " //                               19    //$NON-NLS-1$
+            + "avgTemperature_Device, " //                               19    //$NON-NLS-1$
 
             + "TourStartTime, " //                                20    //$NON-NLS-1$
             + "TimeZoneId, " //                                   21    //$NON-NLS-1$
@@ -221,7 +221,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "AvgCadence," + NL //                                        //$NON-NLS-1$
             + "AvgPulse," + NL //                                          //$NON-NLS-1$
-            + "AvgTemperature," + NL //                                    //$NON-NLS-1$
+            + "AvgTemperature_Device," + NL //                                    //$NON-NLS-1$
             + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
             + "TemperatureScale," + NL //                                  //$NON-NLS-1$
             + "WeatherWindDir," + NL //                                    //$NON-NLS-1$
