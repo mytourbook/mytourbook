@@ -74,8 +74,6 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
    private MouseWheelListener            _defaultMouseWheelListener;
    private FocusListener                 _keepOpenListener;
 
-   private int                           _transformOpacityMax;
-
    /*
     * UI controls
     */
@@ -235,7 +233,7 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
           */
          final String tooltipText = NLS.bind(
                Messages.Pref_Graphs_Label_GraphTransparency_Tooltip,
-               _transformOpacityMax);
+               UI.TRANSFORM_OPACITY_MAX);
 
          final Label label = new Label(parent, SWT.NONE);
          label.setText(Messages.Pref_Graphs_Label_GraphTransparency);
@@ -253,7 +251,7 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
              */
             _spinnerGraphFillingTransparency_Light = new Spinner(container, SWT.BORDER);
             _spinnerGraphFillingTransparency_Light.setMinimum(0);
-            _spinnerGraphFillingTransparency_Light.setMaximum(_transformOpacityMax);
+            _spinnerGraphFillingTransparency_Light.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             _spinnerGraphFillingTransparency_Light.setIncrement(1);
             _spinnerGraphFillingTransparency_Light.setPageIncrement(10);
             _spinnerGraphFillingTransparency_Light.setToolTipText(APP_THEME_VALUE_FOR_LIGHT_TOOLTIP);
@@ -268,7 +266,7 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
              */
             _spinnerGraphFillingTransparency_Dark = new Spinner(container, SWT.BORDER);
             _spinnerGraphFillingTransparency_Dark.setMinimum(0);
-            _spinnerGraphFillingTransparency_Dark.setMaximum(_transformOpacityMax);
+            _spinnerGraphFillingTransparency_Dark.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             _spinnerGraphFillingTransparency_Dark.setIncrement(1);
             _spinnerGraphFillingTransparency_Dark.setPageIncrement(10);
             _spinnerGraphFillingTransparency_Dark.setToolTipText(APP_THEME_VALUE_FOR_DARK_TOOLTIP);
@@ -330,8 +328,6 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
 
    private void initUI() {
 
-      _transformOpacityMax = _prefStore.getInt(ITourbookPreferences.TRANSFORM_VALUE_OPACITY_MAX);
-
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
       _defaultMouseWheelListener = mouseEvent -> {
@@ -378,8 +374,8 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
       final int graphFillingTransparency_Dark = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK);
       final int graphFillingTransparency_Light = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 
-      final int graphFillingTransparency_Dark_Transformed = (int) (graphFillingTransparency_Dark / 255.0f * _transformOpacityMax);
-      final int graphFillingTransparency_Light_Transformed = (int) (graphFillingTransparency_Light / 255.0f * _transformOpacityMax);
+      final int graphFillingTransparency_Dark_Transformed = UI.transformOpacity_WhenRestored(graphFillingTransparency_Dark);
+      final int graphFillingTransparency_Light_Transformed = UI.transformOpacity_WhenRestored(graphFillingTransparency_Light);
 
       _spinnerGraphFillingTransparency_Light.setSelection(graphFillingTransparency_Light_Transformed);
       _spinnerGraphFillingTransparency_Dark.setSelection(graphFillingTransparency_Dark_Transformed);
@@ -408,8 +404,8 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
       final int graphFillingTransparency_Dark = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK);
       final int graphFillingTransparency_Light = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 
-      final int graphFillingTransparency_Dark_Transformed = (int) (graphFillingTransparency_Dark / 255.0f * _transformOpacityMax);
-      final int graphFillingTransparency_Light_Transformed = (int) (graphFillingTransparency_Light / 255.0f * _transformOpacityMax);
+      final int graphFillingTransparency_Dark_Transformed = UI.transformOpacity_WhenRestored(graphFillingTransparency_Dark);
+      final int graphFillingTransparency_Light_Transformed = UI.transformOpacity_WhenRestored(graphFillingTransparency_Light);
 
       _spinnerGraphFillingTransparency_Light.setSelection(graphFillingTransparency_Light_Transformed);
       _spinnerGraphFillingTransparency_Dark.setSelection(graphFillingTransparency_Dark_Transformed);
@@ -432,8 +428,8 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
       final int graphFillingOpacity_Dark              = _spinnerGraphFillingTransparency_Dark.getSelection();
       final int graphFillingOpacity_Light             = _spinnerGraphFillingTransparency_Light.getSelection();
 
-      final int graphFillingOpacity_Transformed_Dark  = (int) ((255.0f / _transformOpacityMax) * graphFillingOpacity_Dark);
-      final int graphFillingOpacity_Transformed_Light = (int) ((255.0f / _transformOpacityMax) * graphFillingOpacity_Light);
+      final int graphFillingOpacity_Transformed_Dark  = UI.transformOpacity_WhenSaved(graphFillingOpacity_Dark);
+      final int graphFillingOpacity_Transformed_Light = UI.transformOpacity_WhenSaved(graphFillingOpacity_Light);
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK,  graphFillingOpacity_Transformed_Dark);
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING,       graphFillingOpacity_Transformed_Light);

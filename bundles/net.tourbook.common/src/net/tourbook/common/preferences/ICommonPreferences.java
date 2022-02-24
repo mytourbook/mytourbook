@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,5 +74,10 @@ public interface ICommonPreferences {
    /** MO=1 .. SO=7 */
    public static final String CALENDAR_WEEK_FIRST_DAY_OF_WEEK      = "CALENDAR_WEEK_FIRST_DAY_OF_WEEK";      //$NON-NLS-1$
    public static final String CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK = "CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK"; //$NON-NLS-1$
+
+   /*
+    * Transform values
+    */
+   public static final String TRANSFORM_VALUE_OPACITY_MAX = "TRANSFORM_VALUE_OPACITY_MAX"; //$NON-NLS-1$
 
 }

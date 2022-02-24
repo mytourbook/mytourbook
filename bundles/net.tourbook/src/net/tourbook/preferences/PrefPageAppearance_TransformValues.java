@@ -16,7 +16,8 @@
 package net.tourbook.preferences;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -33,9 +34,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearance_TransformValues extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     ID         = "net.tourbook.preferences.PrefPageAppearance_TransformValues"; //$NON-NLS-1$
+   public static final String      ID                = "net.tourbook.preferences.PrefPageAppearance_TransformValues"; //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
 //   private SelectionListener _defaultSelectionListener;
 
@@ -101,9 +102,7 @@ public class PrefPageAppearance_TransformValues extends PreferencePage implement
    }
 
    @Override
-   public void init(final IWorkbench workbench) {
-      setPreferenceStore(_prefStore);
-   }
+   public void init(final IWorkbench workbench) {}
 
    private void initUI(final Composite parent) {
 
@@ -139,7 +138,7 @@ public class PrefPageAppearance_TransformValues extends PreferencePage implement
 
 // SET_FORMATTING_OFF
 
-      final int defaultInt = _prefStore.getDefaultInt(ITourbookPreferences.TRANSFORM_VALUE_OPACITY_MAX);
+      final int defaultInt = _prefStore_Common.getDefaultInt(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX);
 
       _spinnerTransformOpacity.setSelection(defaultInt);
 
@@ -160,7 +159,7 @@ public class PrefPageAppearance_TransformValues extends PreferencePage implement
 
 // SET_FORMATTING_OFF
 
-      _spinnerTransformOpacity.setSelection(_prefStore.getInt(ITourbookPreferences.TRANSFORM_VALUE_OPACITY_MAX));
+      _spinnerTransformOpacity.setSelection(_prefStore_Common.getInt(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX));
 
 // SET_FORMATTING_ON
 
@@ -170,7 +169,7 @@ public class PrefPageAppearance_TransformValues extends PreferencePage implement
 
 // SET_FORMATTING_OFF
 
-      _prefStore.setValue(ITourbookPreferences.TRANSFORM_VALUE_OPACITY_MAX, _spinnerTransformOpacity.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX, _spinnerTransformOpacity.getSelection());
 
 // SET_FORMATTING_ON
 

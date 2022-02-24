@@ -6612,13 +6612,13 @@ public class Map2 extends Canvas {
 
 
       _hoveredSelectedTour_Hovered_Color              = new Color(hoveredRGB);
-      _hoveredSelectedTour_Hovered_Opacity            = UI.convertOpacity(hoveredOpacity);
+      _hoveredSelectedTour_Hovered_Opacity            = hoveredOpacity;
 
       _hoveredSelectedTour_HoveredAndSelected_Color   = new Color(hoveredAndSelectedRGB);
-      _hoveredSelectedTour_HoveredAndSelected_Opacity = UI.convertOpacity(hoveredAndSelectedOpacity);
+      _hoveredSelectedTour_HoveredAndSelected_Opacity = hoveredAndSelectedOpacity;
 
       _hoveredSelectedTour_Selected_Color             = new Color(selectedRGB);
-      _hoveredSelectedTour_Selected_Opacity           = UI.convertOpacity(selectedOpacity);
+      _hoveredSelectedTour_Selected_Opacity           = selectedOpacity;
 
 // SET_FORMATTING_ON
 

@@ -230,15 +230,15 @@ public class Map2View extends ViewPart implements
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
    static final String           STATE_HOVERED_SELECTED__HOVERED_OPACITY                        = "STATE_HOVERED_SELECTED__HOVERED_OPACITY";             //$NON-NLS-1$
-   static final int              STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT                = UI.MAX_OPACITY / 2;
+   static final int              STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT                = 0x80;
    static final String           STATE_HOVERED_SELECTED__HOVERED_RGB                            = "STATE_HOVERED_SELECTED__HOVERED_RGB";                 //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT                    = new RGB(255, 255, 0);
    static final String           STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY           = "STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY";//$NON-NLS-1$
-   static final int              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT   = UI.MAX_OPACITY / 2;
+   static final int              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT   = 0x80;
    static final String           STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB               = "STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB";    //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT       = new RGB(0, 255, 255);
    static final String           STATE_HOVERED_SELECTED__SELECTED_OPACITY                       = "STATE_HOVERED_SELECTED__SELECTED_OPACITY";            //$NON-NLS-1$
-   static final int              STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT               = UI.MAX_OPACITY / 2;
+   static final int              STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT               = 0x80;
    static final String           STATE_HOVERED_SELECTED__SELECTED_RGB                           = "STATE_HOVERED_SELECTED__SELECTED_RGB";                //$NON-NLS-1$
    static final RGB              STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT                   = new RGB(0, 255, 0);
 
@@ -288,7 +288,7 @@ public class Map2View extends ViewPart implements
 
    static final boolean          STATE_IS_SHOW_SLIDER_PATH_DEFAULT                     = true;
    static final int              STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT                  = 30;
-   static final int              STATE_SLIDER_PATH_OPACITY_DEFAULT                     = 60;
+   static final int              STATE_SLIDER_PATH_OPACITY_DEFAULT                     = 150; // 60%;
    static final int              STATE_SLIDER_PATH_SEGMENTS_DEFAULT                    = 200;
    static final RGB              STATE_SLIDER_PATH_COLOR_DEFAULT                       = new RGB(0xff, 0xff, 0x80);
 

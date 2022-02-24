@@ -562,11 +562,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME,   false);
       store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, false);
 
-      /*
-       * Value ranges
-       */
-      store.setDefault(ITourbookPreferences.TRANSFORM_VALUE_OPACITY_MAX, 10);
-
 // SET_FORMATTING_ON
    }
 
