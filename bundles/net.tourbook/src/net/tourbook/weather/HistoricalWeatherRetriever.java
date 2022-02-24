@@ -17,11 +17,11 @@ package net.tourbook.weather;
 
 import net.tourbook.data.TourData;
 
-public interface IHistoricalWeatherRetriever {
+public abstract class HistoricalWeatherRetriever {
 
-   int getMinTemperature();
+   protected TourData _tour;
 
-   boolean populateTourWeatherData(TourData tourData);
+   public abstract boolean populateTourWeatherData(TourData tourData);
    // boolean retrieveHistoricalWeatherData();
 
 }

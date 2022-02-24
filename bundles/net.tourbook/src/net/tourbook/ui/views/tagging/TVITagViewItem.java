@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "AVG( CASE WHEN AVGPULSE = 0         THEN NULL ELSE AVGPULSE END)," //                                    8   //$NON-NLS-1$
             + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," //                                 9   //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //  10   //$NON-NLS-1$
+            + "AVG( CASE WHEN avgTemperature_Device = 0   THEN NULL ELSE DOUBLE(avgTemperature_Device) / TemperatureScale END )," //  10   //$NON-NLS-1$
 
             + "SUM(TourDeviceTime_Recorded)," //    11   //$NON-NLS-1$
 
@@ -150,7 +150,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
              * to hide the '+' for an item which has no children, an empty list of children will be
              * created
              */
-            tagItem.setChildren(new ArrayList<TreeViewerItem>());
+            tagItem.setChildren(new ArrayList<>());
          }
 
       } catch (final SQLException e) {

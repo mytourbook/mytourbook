@@ -16,17 +16,12 @@
 package net.tourbook.weather.openweathermap;
 
 import net.tourbook.data.TourData;
-import net.tourbook.weather.IHistoricalWeatherRetriever;
+import net.tourbook.weather.HistoricalWeatherRetriever;
 
-public class OpenWeatherMapRetriever implements IHistoricalWeatherRetriever {
+public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    public OpenWeatherMapRetriever(final TourData tour) {}
 
-   @Override
-   public int getMinTemperature() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
 
    @Override
    public boolean populateTourWeatherData(final TourData tourData) {

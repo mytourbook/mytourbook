@@ -106,7 +106,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 46;
+   private static final int TOURBOOK_DB_VERSION = 47;
 
 //   private static final int TOURBOOK_DB_VERSION = 46; // 21.?
 
@@ -244,8 +244,10 @@ public class TourDatabase {
    private static final String RENAMED__BIKER_WEIGHT__INTO        = "BodyWeight";                                           //$NON-NLS-1$
    private static final String RENAMED__TOUR_DRIVING_TIME__FROM   = "tourDrivingTime";                                      //$NON-NLS-1$
    private static final String RENAMED__TOUR_DRIVING_TIME__INTO   = "TourComputedTime_Moving";                              //$NON-NLS-1$
-   private static final String RENAMED__TOUR_RECORDING_TIME__FROM = "tourRecordingTime";                                    //$NON-NLS-1$
-   private static final String RENAMED__TOUR_RECORDING_TIME__INTO = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__FROM  = "tourRecordingTime";                                    //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__INTO  = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
+   private static final String RENAMED__TOUR_AVG_TEMPERATURE__FROM = "avgTemperature";                                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_AVG_TEMPERATURE__INTO = "avgTemperature_Device";                                //$NON-NLS-1$
 
    private static final String DEFAULT_0                          = "0";                                                    //$NON-NLS-1$
    private static final String DEFAULT_1_0                        = "1.0";                                                  //$NON-NLS-1$
@@ -3948,7 +3950,7 @@ public class TourDatabase {
             + " maxPulse               FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
             + " avgPulse               FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
             + " avgCadence             FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " avgTemperature         FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " avgTemperature_Device  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
 
             // version 21 end ---------
 
@@ -4117,6 +4119,14 @@ public class TourDatabase {
 
             // version 46 start  -  after 21.9
             // version 46 end
+
+            // version 47 start  -  after 2X.X
+
+            + " avgTemperature_Provider  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weather_Temperature_Max_Provider  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weather_Temperature_Min_Provider  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+
+            // version 47 end
 
             // version 5 start
             /**
@@ -5776,6 +5786,11 @@ public class TourDatabase {
          // 45 -> 46    21.?
          if (currentDbVersion == 45) {
             currentDbVersion = _dbDesignVersion_New = updateDb_045_To_046(conn, splashManager);
+         }
+
+         // 46 -> 47    22.?
+         if (currentDbVersion == 46) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_046_To_047(conn, splashManager);
          }
 
          // update db design version number
@@ -8934,6 +8949,40 @@ public class TourDatabase {
          }
       }
       stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * DB version 46 -> 47 ... MT version 21.?
+    *
+    * @param conn
+    * @param splashManager
+    * @return
+    * @throws SQLException
+    */
+   private int updateDb_046_To_047(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 47;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      try (Statement stmt = conn.createStatement()) {
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "avgTemperature_Provider", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Max_Provider", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Min_Provider", DEFAULT_0);                   //$NON-NLS-1$
+
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_AVG_TEMPERATURE__FROM,    RENAMED__TOUR_AVG_TEMPERATURE__INTO);
+
+// SET_FORMATTING_ON
+      }
 
       logDbUpdate_End(newDbVersion);
 

@@ -22,6 +22,7 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 import net.tourbook.data.TourData;
 
 public class WeatherUtils {
+
    /**
     * Determines the geographic area covered by a GPS track. The goal is to
     * encompass most of the track to search a weather station as close as possible
@@ -29,13 +30,18 @@ public class WeatherUtils {
     */
    public static LatLng determineWeatherSearchAreaCenter(final TourData tour) {
 
+      final double[] latitudeSerie = tour.latitudeSerie;
+      final double[] longitudeSerie = tour.longitudeSerie;
+
       // Looking for the farthest point of the track
       LatLng furthestPoint = null;
       double maxDistance = Double.MIN_VALUE;
-      final LatLng startPoint = new LatLng(tour.latitudeSerie[0], tour.longitudeSerie[0]);
-      for (int index = 1; index < tour.latitudeSerie.length && index < tour.longitudeSerie.length; ++index) {
+      final LatLng startPoint = new LatLng(latitudeSerie[0], longitudeSerie[0]);
+
+      for (int index = 1; index < latitudeSerie.length && index < longitudeSerie.length; ++index) {
+
          final LatLng currentPoint =
-               new LatLng(tour.latitudeSerie[index], tour.longitudeSerie[index]);
+               new LatLng(latitudeSerie[index], longitudeSerie[index]);
 
          final double distanceFromStart =
                LatLngTool.distance(startPoint, currentPoint, LengthUnit.METER);

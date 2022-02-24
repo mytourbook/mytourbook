@@ -57,6 +57,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    //make it as generic as possible so a new provider can be quickly added
    //put each tab's code in a new file and create a generic file for "Generic Weather Provider's tab.java"
 
+   //todo fb hide the api key just like in the clod pref page
    public static final String     ID         = "net.tourbook.preferences.PrefPageWeather";                           //$NON-NLS-1$
 
    private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();

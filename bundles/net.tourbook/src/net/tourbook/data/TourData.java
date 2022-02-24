@@ -518,8 +518,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is float since db version 21, before it was int. In db version 20 this field was
     *        already float but not the database field.
     */
-   //todo fb rename to device avg temp
-   //create a provider avg temp
    private float                 avgTemperature_Device;                                          // db-version 4
    private float                 avgTemperature_Provider;
 

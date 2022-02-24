@@ -40,7 +40,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.views.calendar.CalendarProfile;
-import net.tourbook.weather.IHistoricalWeatherRetriever;
+import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WWOHourlyResults;
 import net.tourbook.weather.WeatherData;
 import net.tourbook.weather.WeatherUtils;
@@ -51,7 +51,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
-public class WorldWeatherOnlineRetriever implements IHistoricalWeatherRetriever {
+public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    //TODO FB
    // the IHistoricalWeatherRetriever will provide a getter for each provider data
@@ -77,7 +77,6 @@ public class WorldWeatherOnlineRetriever implements IHistoricalWeatherRetriever 
 
    private static final String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
    private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
-   private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
    private String                 startTime;
@@ -96,7 +95,7 @@ public class WorldWeatherOnlineRetriever implements IHistoricalWeatherRetriever 
     */
    public WorldWeatherOnlineRetriever(final TourData tour) {
 
-      this.tour = tour;
+      this._tour = tour;
 
       WeatherUtils.determineWeatherSearchAreaCenter(tour);
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
@@ -188,12 +187,6 @@ public class WorldWeatherOnlineRetriever implements IHistoricalWeatherRetriever 
       return historicalWeatherData;
    }
 
-   @Override
-   public int getMinTemperature() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
    /**
     * Parses a JSON weather data object into a WeatherData object.
     *
@@ -205,10 +198,10 @@ public class WorldWeatherOnlineRetriever implements IHistoricalWeatherRetriever 
 
       if (_isLogWeatherData) {
 
-         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
-         final ZonedDateTime zdtTourStart = tour.getTourStartTime();
+         final long elapsedTime = _tour.getTourDeviceTime_Elapsed();
+         final ZonedDateTime zdtTourStart = _tour.getTourStartTime();
          final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
-         final String tourTitle = tour.getTourTitle();
+         final String tourTitle = _tour.getTourTitle();
 
          System.out.println();
 

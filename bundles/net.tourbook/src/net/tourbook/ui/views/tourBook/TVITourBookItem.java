@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -266,7 +266,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             //
             + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END), " + NL //                                    9     //$NON-NLS-1$
             + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END)," + NL //    11    //$NON-NLS-1$
+            + "AVG( CASE WHEN avgTemperature_Device = 0   THEN NULL ELSE DOUBLE(avgTemperature_Device) / TemperatureScale END)," + NL //    11    //$NON-NLS-1$
             + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END), " + NL //                              12    //$NON-NLS-1$
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END), " + NL //                              13    //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END), " + NL //                                   14    //$NON-NLS-1$

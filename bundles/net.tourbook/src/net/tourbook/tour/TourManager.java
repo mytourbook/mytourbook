@@ -2730,6 +2730,12 @@ public class TourManager {
          return false;
       }
 
+      final boolean[] result = new boolean[1];
+      result[0] = true;
+
+      BusyIndicator.showWhile(Display.getCurrent(),
+            () -> {
+
       //todo fb use by default openweathermap api but if wwo is used, use that one
       final WeatherData historicalWeatherData = new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
@@ -2738,7 +2744,7 @@ public class TourManager {
                Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
                TourManager.getTourDateTimeShort(tourData)));
 
-         return false;
+                  result[0] = false;
       }
 
       tourData.setIsWeatherDataFromApi(true);
@@ -2755,10 +2761,10 @@ public class TourManager {
       tourData.setWeather_Temperature_Max_Provider(historicalWeatherData.getTemperatureMax());
       tourData.setWeather_Temperature_Min_Provider(historicalWeatherData.getTemperatureMin());
       tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
-
+            });
       TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
 
-      return true;
+      return result[0];
    }
 
    /**
