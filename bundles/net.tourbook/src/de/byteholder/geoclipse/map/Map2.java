@@ -84,7 +84,6 @@ import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
-import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
@@ -102,7 +101,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPage_Map2_Appearance;
+import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
@@ -4759,7 +4758,6 @@ public class Map2 extends Canvas {
          devXTooltip = devXMouse - marginAroundMouse - tooltipWidth;
       }
 
-
       if (devYTooltip - tooltipHeight < 0) {
 
          // tooltip is truncated at the top -> move tooltip below the mouse
@@ -7508,8 +7506,7 @@ public class Map2 extends Canvas {
 
       _overlayAlpha = _prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY)
 
-            // convert % to 0xff
-            ? ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY))
+            ? _prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY)
 
             // no opacity
             : 0xff;
@@ -7519,12 +7516,12 @@ public class Map2 extends Canvas {
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
-      _prefOptions_IsDrawSquare = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE);
+      _prefOptions_IsDrawSquare = drawSymbol.equals(Map2_Appearance.PLOT_TYPE_SQUARE);
       _prefOptions_LineWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
       _prefOptions_BorderWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
 
       final boolean isCutOffLinesInPauses = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES);
-      _prefOptions_isCutOffLinesInPauses = isCutOffLinesInPauses && drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
+      _prefOptions_isCutOffLinesInPauses = isCutOffLinesInPauses && drawSymbol.equals(Map2_Appearance.PLOT_TYPE_LINE);
    }
 
    /**

@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
@@ -31,7 +30,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPage_Map2_Appearance;
+import net.tourbook.preferences.Map2_Appearance;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -76,7 +75,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private IPropertyChangeListener       _defaultMapOptions_ChangePropertyListener;
    //
    private ActionResetToDefaults         _actionRestoreDefaults;
-   private ActionOpenPrefDialog          _actionPrefDialog;
    //
    private PixelConverter                _pc;
    private int                           _firstColumnIndent;
@@ -180,10 +178,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
    private void createActions() {
 
       _actionRestoreDefaults = new ActionResetToDefaults(this);
-
-      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPage_Map2_Appearance.ID);
-      _actionPrefDialog.closeThisTooltip(this);
-      _actionPrefDialog.setShell(_parent.getShell());
    }
 
    @Override
@@ -270,7 +264,6 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
             final ToolBarManager tbm = new ToolBarManager(toolbar);
 
             tbm.add(_actionRestoreDefaults);
-            tbm.add(_actionPrefDialog);
 
             tbm.update(true);
          }
@@ -369,7 +362,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
          {
             // spinner
             _spinnerTrackOpacity = new Spinner(parent, SWT.BORDER);
-            _spinnerTrackOpacity.setMinimum(PrefPage_Map2_Appearance.MAP_OPACITY_MINIMUM);
+            _spinnerTrackOpacity.setMinimum(Map2_Appearance.MAP_OPACITY_MINIMUM);
             _spinnerTrackOpacity.setMaximum(100);
             _spinnerTrackOpacity.setIncrement(1);
             _spinnerTrackOpacity.setPageIncrement(10);
@@ -490,11 +483,13 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
             // Radio: Simple
             _rdoPainting_Simple = new Button(paintingContainer, SWT.RADIO);
             _rdoPainting_Simple.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple);
+            _rdoPainting_Simple.setToolTipText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip);
             _rdoPainting_Simple.addSelectionListener(_defaultSelectionListener);
 
             // Radio: Enhanced
             _rdoPainting_Complex = new Button(paintingContainer, SWT.RADIO);
             _rdoPainting_Complex.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex);
+            _rdoPainting_Complex.setToolTipText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip);
             _rdoPainting_Complex.addSelectionListener(_defaultSelectionListener);
 
             // Checkbox: Show warning
@@ -944,11 +939,11 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
       final int borderType = _rdoBorderColorColor.getSelection()
 
-            ? PrefPage_Map2_Appearance.BORDER_TYPE_COLOR
+            ? Map2_Appearance.BORDER_TYPE_COLOR
             : _rdoBorderColorDarker.getSelection()
 
-                  ? PrefPage_Map2_Appearance.BORDER_TYPE_DARKER
-                  : PrefPage_Map2_Appearance.DEFAULT_BORDER_TYPE;
+                  ? Map2_Appearance.BORDER_TYPE_DARKER
+                  : Map2_Appearance.DEFAULT_BORDER_TYPE;
 
       return borderType;
    }
@@ -958,13 +953,13 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       final String plotType;
 
       if (_rdoSymbolDot.getSelection()) {
-         plotType = PrefPage_Map2_Appearance.PLOT_TYPE_DOT;
+         plotType = Map2_Appearance.PLOT_TYPE_DOT;
       } else if (_rdoSymbolLine.getSelection()) {
-         plotType = PrefPage_Map2_Appearance.PLOT_TYPE_LINE;
+         plotType = Map2_Appearance.PLOT_TYPE_LINE;
       } else if (_rdoSymbolSquare.getSelection()) {
-         plotType = PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE;
+         plotType = Map2_Appearance.PLOT_TYPE_SQUARE;
       } else {
-         plotType = PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE;
+         plotType = Map2_Appearance.DEFAULT_PLOT_TYPE;
       }
 
       return plotType;
@@ -1037,7 +1032,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
          // get current painting method
          final String prefPaintingMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-         final boolean isEnhancedPainting = PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
+         final boolean isEnhancedPainting = Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
 
          if (isEnhancedPainting) {
 
@@ -1075,7 +1070,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
                   // set painting method to basic
                   _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-                        PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
+                        Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
                }
             }
             setIsAnotherDialogOpened(false);
@@ -1162,8 +1157,8 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       // painting method
       final String paintingMethod =             _prefStore.getDefaultString(  ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
       _chkShowEnhancedWarning.setSelection(     _prefStore.getDefaultBoolean( ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
-      _rdoPainting_Simple.setSelection(         PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
-      _rdoPainting_Complex.setSelection(        PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
+      _rdoPainting_Simple.setSelection(         Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
+      _rdoPainting_Complex.setSelection(        Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
 
       onChangeUI_UpdateMap_MapOptions();
       onChangeUI_UpdateMap_TrackOptions();
@@ -1228,7 +1223,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       _colorBorderColor.setColorValue(PreferenceConverter.getColor( _prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
       // painting method
-      final boolean isComplex = PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+      final boolean isComplex = Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
       _chkShowEnhancedWarning.setSelection(     _prefStore.getBoolean(  ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
       _rdoPainting_Simple.setSelection(         isComplex == false);
       _rdoPainting_Complex.setSelection(        isComplex);
@@ -1290,8 +1285,8 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
       // painting method
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   _chkShowEnhancedWarning.getSelection());
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           _rdoPainting_Complex.getSelection()
-               ? PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX
-               : PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
+               ? Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX
+               : Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
    }
 
    private void saveUIState() {
@@ -1307,27 +1302,27 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
    private void updateUI_SetBorderType(int borderType) {
 
-      if (borderType != PrefPage_Map2_Appearance.BORDER_TYPE_COLOR
-            && borderType != PrefPage_Map2_Appearance.BORDER_TYPE_DARKER) {
+      if (borderType != Map2_Appearance.BORDER_TYPE_COLOR
+            && borderType != Map2_Appearance.BORDER_TYPE_DARKER) {
 
-         borderType = PrefPage_Map2_Appearance.DEFAULT_BORDER_TYPE;
+         borderType = Map2_Appearance.DEFAULT_BORDER_TYPE;
       }
 
-      _rdoBorderColorColor.setSelection(borderType == PrefPage_Map2_Appearance.BORDER_TYPE_COLOR);
-      _rdoBorderColorDarker.setSelection(borderType == PrefPage_Map2_Appearance.BORDER_TYPE_DARKER);
+      _rdoBorderColorColor.setSelection(borderType == Map2_Appearance.BORDER_TYPE_COLOR);
+      _rdoBorderColorDarker.setSelection(borderType == Map2_Appearance.BORDER_TYPE_DARKER);
    }
 
    private void updateUI_SetPlotType(String plotType) {
 
-      if (plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_DOT) == false
-            && plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE) == false
-            && plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE) == false) {
+      if (plotType.equals(Map2_Appearance.PLOT_TYPE_DOT) == false
+            && plotType.equals(Map2_Appearance.PLOT_TYPE_LINE) == false
+            && plotType.equals(Map2_Appearance.PLOT_TYPE_SQUARE) == false) {
 
-         plotType = PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE;
+         plotType = Map2_Appearance.DEFAULT_PLOT_TYPE;
       }
 
-      _rdoSymbolDot.setSelection(plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_DOT));
-      _rdoSymbolLine.setSelection(plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE));
-      _rdoSymbolSquare.setSelection(plotType.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE));
+      _rdoSymbolDot.setSelection(plotType.equals(Map2_Appearance.PLOT_TYPE_DOT));
+      _rdoSymbolLine.setSelection(plotType.equals(Map2_Appearance.PLOT_TYPE_LINE));
+      _rdoSymbolSquare.setSelection(plotType.equals(Map2_Appearance.PLOT_TYPE_SQUARE));
    }
 }

@@ -390,19 +390,19 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        */
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING,       true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES,  true);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   Map2_Appearance.DEFAULT_PLOT_TYPE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,                6);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,           true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,                1);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,           80); // 0...100
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,    new RGB(0x50, 0x50, 0x50));
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
       store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,      false);
-      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         70);     // opacity in %
+      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         180); // ~70 %
 
 
       /*
