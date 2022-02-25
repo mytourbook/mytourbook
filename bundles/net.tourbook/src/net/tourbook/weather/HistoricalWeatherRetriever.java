@@ -19,9 +19,11 @@ import net.tourbook.data.TourData;
 
 public abstract class HistoricalWeatherRetriever {
 
-   protected TourData _tour;
+   public TourData _tour;
 
-   public abstract boolean populateTourWeatherData(TourData tourData);
-   // boolean retrieveHistoricalWeatherData();
+   protected HistoricalWeatherRetriever(final TourData tourData) {
+      _tour = tourData;
+   }
 
+   public abstract boolean retrieveHistoricalWeatherData();
 }

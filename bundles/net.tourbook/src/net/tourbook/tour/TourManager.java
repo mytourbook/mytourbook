@@ -96,8 +96,7 @@ import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.weather.WeatherData;
-import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
+import net.tourbook.weather.HistoricalWeatherRetriever;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -2736,32 +2735,18 @@ public class TourManager {
       BusyIndicator.showWhile(Display.getCurrent(),
             () -> {
 
-      //todo fb use by default openweathermap api but if wwo is used, use that one
-      final WeatherData historicalWeatherData = new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
-      if (historicalWeatherData == null) {
+               //todo fb use by default openweathermap api but if wwo is used, use that one
+               final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever();
+               if (historicalWeatherRetriever.retrieveWeatherData(tourData) == false) {
 
-         TourLogManager.subLog_ERROR(NLS.bind(
-               Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-               TourManager.getTourDateTimeShort(tourData)));
+                  TourLogManager.subLog_ERROR(NLS.bind(
+                        Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+                        TourManager.getTourDateTimeShort(tourData)));
 
                   result[0] = false;
-      }
-
-      tourData.setIsWeatherDataFromApi(true);
-
-      tourData.setAvgTemperature_Provider(historicalWeatherData.getTemperatureAverage());
-      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
-      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
-      tourData.setWeather(historicalWeatherData.getWeatherDescription());
-      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
-
-      tourData.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
-      tourData.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
-      tourData.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      tourData.setWeather_Temperature_Max_Provider(historicalWeatherData.getTemperatureMax());
-      tourData.setWeather_Temperature_Min_Provider(historicalWeatherData.getTemperatureMin());
-      tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
+               }
             });
+
       TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
 
       return result[0];

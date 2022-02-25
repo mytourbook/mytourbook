@@ -13,20 +13,25 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather.openweathermap;
+package net.tourbook.weather;
 
 import net.tourbook.data.TourData;
-import net.tourbook.weather.HistoricalWeatherRetriever;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
-public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
+public class TourWeatherRetriever {
 
-   public OpenWeatherMapRetriever(final TourData tour) {
-      super(tour);
+   protected TourData _tour;
+
+   //public abstract boolean populateTourWeatherData(TourData tourData);
+   // boolean retrieveHistoricalWeatherData();
+   public boolean retrieveWeatherData(final TourData tourData) {
+
+      //if favorite weather provide is WWO then retrieve WWO retriever
+      return new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData();
+
+
+
+      //return true;
    }
 
-   @Override
-   public boolean retrieveHistoricalWeatherData() {
-      // TODO Auto-generated method stub
-      return false;
-   }
 }

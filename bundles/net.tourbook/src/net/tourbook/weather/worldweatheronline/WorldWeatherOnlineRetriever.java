@@ -87,15 +87,13 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
-   public WorldWeatherOnlineRetriever() {}
-
    /*
     * @param tour
     * The tour for which we need to retrieve the weather data.
     */
    public WorldWeatherOnlineRetriever(final TourData tour) {
 
-      this._tour = tour;
+      super(tour);
 
       WeatherUtils.determineWeatherSearchAreaCenter(tour);
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
@@ -119,7 +117,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       return baseApiUrl;
    }
 
-   private void ComputeFinalWeatherData(final WeatherData weatherData,
+   private void computeFinalWeatherData(final WeatherData weatherData,
                                         final List<WWOHourlyResults> rawWeatherData) {
 
       boolean isTourStartData = false;
@@ -183,10 +181,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       weatherData.setPrecipitation(sumPrecipitation);
    }
 
-   public WeatherData getHistoricalWeatherData() {
-      return historicalWeatherData;
-   }
-
    /**
     * Parses a JSON weather data object into a WeatherData object.
     *
@@ -230,7 +224,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
          final List<WWOHourlyResults> rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
-         ComputeFinalWeatherData(weatherData, rawWeatherData);
+         computeFinalWeatherData(weatherData, rawWeatherData);
 
       } catch (final Exception e) {
          StatusUtil.logError(
@@ -242,27 +236,36 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       return weatherData;
    }
 
-   @Override
-   public boolean populateTourWeatherData(final TourData tourData) {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
    /**
     * Retrieves the historical weather data
     *
     * @return The weather data, if found.
     */
-   public WorldWeatherOnlineRetriever retrieveHistoricalWeatherData() {
+   @Override
+   public boolean retrieveHistoricalWeatherData() {
 
       final String rawWeatherData = sendWeatherApiRequest();
       if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
-         return null;
+         return false;
       }
 
       historicalWeatherData = parseWeatherData(rawWeatherData);
 
-      return this;
+      _tour.setIsWeatherDataFromApi(true);
+      _tour.setAvgTemperature_Provider(historicalWeatherData.getTemperatureAverage());
+      _tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
+      _tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
+      _tour.setWeather(historicalWeatherData.getWeatherDescription());
+      _tour.setWeatherClouds(historicalWeatherData.getWeatherType());
+
+      _tour.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
+      _tour.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
+      _tour.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
+      _tour.setWeather_Temperature_Max_Provider(historicalWeatherData.getTemperatureMax());
+      _tour.setWeather_Temperature_Min_Provider(historicalWeatherData.getTemperatureMin());
+      _tour.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
+
+      return true;
    }
 
    /**
