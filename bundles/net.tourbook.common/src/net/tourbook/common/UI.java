@@ -1695,6 +1695,16 @@ public class UI {
       return null;
    }
 
+   public static GridDataFactory gridLayout_AlignFillCenter() {
+
+      return GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+   }
+
+   public static GridDataFactory gridLayout_Span_2_1() {
+
+      return GridDataFactory.fillDefaults().span(2, 1);
+   }
+
    /**
     * @param event
     * @return Returns <code>true</code> when <Ctrl> key is pressed.
@@ -2628,7 +2638,7 @@ public class UI {
     */
    public static int transformOpacity_WhenRestored(final int opacity) {
 
-      int transformedValue = (int) (opacity / 255.0f * TRANSFORM_OPACITY_MAX);
+      int transformedValue = Math.round(opacity / 255.0f * TRANSFORM_OPACITY_MAX);
 
       // ensure valid opacity
       if (transformedValue > 255) {
@@ -2646,7 +2656,7 @@ public class UI {
     */
    public static int transformOpacity_WhenSaved(final int opacity) {
 
-      int transformedValue = (int) ((255.0f / TRANSFORM_OPACITY_MAX) * opacity);
+      int transformedValue = Math.round(255.0f / TRANSFORM_OPACITY_MAX * opacity);
 
       // ensure valid opacity
       if (transformedValue > 255) {

@@ -2575,7 +2575,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             .setXDataSerie(xDataSerie);
 
       // draw the graph lighter that the segments are more visible
-      setGraphAlpha(graphOpacity / 100.0);
+      setGraphAlpha(graphOpacity / 255.0f);
    }
 
    private void createSelectedLines() {
