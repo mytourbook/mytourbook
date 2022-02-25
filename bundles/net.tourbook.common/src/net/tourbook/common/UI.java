@@ -641,6 +641,9 @@ public class UI {
 
    public static final int               DECORATOR_HORIZONTAL_INDENT = 2;
 
+   /**
+    * Contains the value that opacity is 100% opaque
+    */
    public static int                     TRANSFORM_OPACITY_MAX;
 
    private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
@@ -1695,14 +1698,14 @@ public class UI {
       return null;
    }
 
-   public static GridDataFactory gridLayoutData_AlignFillCenter() {
-
-      return GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
-   }
-
    public static GridDataFactory gridLayoutData_AlignBeginningFill() {
 
       return GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL);
+   }
+
+   public static GridDataFactory gridLayoutData_AlignFillCenter() {
+
+      return GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
    }
 
    public static GridDataFactory gridLayoutData_Span_2_1() {

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
@@ -443,7 +442,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblTrackColor = new Label(parent, SWT.NONE);
          _lblTrackColor.setText(Messages.TourTrack_Properties_Label_TrackColor);
-         _lblTrackColor.setToolTipText(Messages.TourTrack_Properties_Label_TrackColor_Tooltip);
+         _lblTrackColor.setToolTipText(NLS.bind(Messages.TourTrack_Properties_Label_TrackColor_Tooltip, UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter().applyTo(_lblTrackColor);
 
          final Composite container = new Composite(parent, SWT.NONE);
@@ -470,7 +469,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblOutlineColor = new Label(parent, SWT.NONE);
          _lblOutlineColor.setText(Messages.TourTrack_Properties_Label_OutlineColor);
-         _lblOutlineColor.setToolTipText(Messages.TourTrack_Properties_Label_OutlineColor_Tooltip);
+         _lblOutlineColor.setToolTipText(NLS.bind(Messages.TourTrack_Properties_Label_OutlineColor_Tooltip, UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter().applyTo(_lblOutlineColor);
 
          final Composite container = new Composite(parent, SWT.NONE);
@@ -490,7 +489,9 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblOutlineColor_Selected = new Label(parent, SWT.NONE);
          _lblOutlineColor_Selected.setText(Messages.TourTrack_Properties_Label_OutlineColorSelected);
-         _lblOutlineColor_Selected.setToolTipText(Messages.TourTrack_Properties_Label_OutlineColorSelected_Tooltip);
+         _lblOutlineColor_Selected.setToolTipText(NLS.bind(
+               Messages.TourTrack_Properties_Label_OutlineColorSelected_Tooltip,
+               UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter().applyTo(_lblOutlineColor_Selected);
 
          final Composite container = new Composite(parent, SWT.NONE);
@@ -510,7 +511,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          final Label label = new Label(parent, SWT.NONE);
          label.setText(Messages.TourTrack_Properties_Label_OutlineColorHovered);
-         label.setToolTipText(Messages.TourTrack_Properties_Label_OutlineColorHovered_Tooltip);
+         label.setToolTipText(NLS.bind(Messages.TourTrack_Properties_Label_OutlineColorHovered_Tooltip, UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter().applyTo(label);
 
          final Composite container = new Composite(parent, SWT.NONE);
@@ -532,7 +533,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
          UI.gridLayoutData_AlignFillCenter().applyTo(_lblOutlineColor_HovSel);
 
          _lblOutlineColor_HovSel.setText(Messages.TourTrack_Properties_Label_OutlineColorHovSel);
-         _lblOutlineColor_HovSel.setToolTipText(Messages.TourTrack_Properties_Label_OutlineColorHovSel_Tooltip);
+         _lblOutlineColor_HovSel.setToolTipText(NLS.bind(Messages.TourTrack_Properties_Label_OutlineColorHovSel_Tooltip, UI.TRANSFORM_OPACITY_MAX));
 
          final Composite container = new Composite(parent, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -571,7 +572,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblInteriorColor = new Label(parent, SWT.NONE);
          _lblInteriorColor.setText(Messages.TourTrack_Properties_Label_CurtainColor);
-         _lblInteriorColor.setToolTipText(Messages.TourTrack_Properties_Label_CurtainColor_Tooltip);
+         _lblInteriorColor.setToolTipText(NLS.bind(Messages.TourTrack_Properties_Label_CurtainColor_Tooltip, UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter()
                .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                .applyTo(_lblInteriorColor);
@@ -592,7 +593,9 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblInteriorColor_Selected = new Label(parent, SWT.NONE);
          _lblInteriorColor_Selected.setText(Messages.TourTrack_Properties_Label_CurtainColorSelected);
-         _lblInteriorColor_Selected.setToolTipText(Messages.TourTrack_Properties_Label_CurtainColorSelected_Tooltip);
+         _lblInteriorColor_Selected.setToolTipText(NLS.bind(
+               Messages.TourTrack_Properties_Label_CurtainColorSelected_Tooltip,
+               UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter()
                .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                .applyTo(_lblInteriorColor_Selected);
@@ -613,7 +616,9 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblInteriorColor_Hovered = new Label(parent, SWT.NONE);
          _lblInteriorColor_Hovered.setText(Messages.TourTrack_Properties_Label_CurtainColorHovered);
-         _lblInteriorColor_Hovered.setToolTipText(Messages.TourTrack_Properties_Label_CurtainColorHovered_Tooltip);
+         _lblInteriorColor_Hovered.setToolTipText(NLS.bind(
+               Messages.TourTrack_Properties_Label_CurtainColorHovered_Tooltip,
+               UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter()
                .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                .applyTo(_lblInteriorColor_Hovered);
@@ -634,7 +639,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       {
          _lblInteriorColor_HovSel = new Label(parent, SWT.NONE);
          _lblInteriorColor_HovSel.setText(Messages.TourTrack_Properties_Label_CurtainColorHovSel);
-         _lblInteriorColor_HovSel.setToolTipText(Messages.TourTrack_Properties_Label_CurtainColorHovSel_Tooltip);
+         _lblInteriorColor_HovSel.setToolTipText(NLS.bind(Messages.TourTrack_Properties_Label_CurtainColorHovSel_Tooltip, UI.TRANSFORM_OPACITY_MAX));
          UI.gridLayoutData_AlignFillCenter()
                .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                .applyTo(_lblInteriorColor_HovSel);
@@ -845,8 +850,8 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
 
       final Spinner spinnerOpacity = new Spinner(parent, SWT.BORDER);
 
-      spinnerOpacity.setMinimum(Map3GradientColorManager.OPACITY_MIN);
-      spinnerOpacity.setMaximum(Map3GradientColorManager.OPACITY_MAX);
+      spinnerOpacity.setMinimum(0);
+      spinnerOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
       spinnerOpacity.setIncrement(1);
       spinnerOpacity.setPageIncrement(10);
       spinnerOpacity.addSelectionListener(_defaultSelectionListener);
@@ -1142,6 +1147,8 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       }
    }
 
+// SET_FORMATTING_OFF
+
    /**
     * Restores state values from the tour track configuration and update the UI.
     */
@@ -1160,67 +1167,66 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       _textConfigName.setText(config.name);
 
       // track
-      _spinnerDirectionArrowDistance.setSelection((int) (config.directionArrowDistance));
-      _spinnerDirectionArrowSize.setSelection((int) (config.directionArrowSize));
-      _spinnerTrackColorOpacity.setSelection((int) (config.trackColorOpacity * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
+      _spinnerDirectionArrowDistance   .setSelection((int) (config.directionArrowDistance));
+      _spinnerDirectionArrowSize       .setSelection((int) (config.directionArrowSize));
+      _spinnerTrackColorOpacity        .setSelection((int) (config.trackColorOpacity * UI.TRANSFORM_OPACITY_MAX));
 
       // line color
-      _spinnerOutlineWidth.setSelection((int) (config.outlineWidth));
+      _spinnerOutlineWidth             .setSelection((int) (config.outlineWidth));
 
-      _comboOutlineColorMode.select(config.getColorModeIndex(config.outlineColorMode));
-      _comboOutlineColorMode_Hovered.select(config.getColorModeIndex(config.outlineColorMode_Hovered));
-      _comboOutlineColorMode_HovSel.select(config.getColorModeIndex(config.outlineColorMode_HovSel));
-      _comboOutlineColorMode_Selected.select(config.getColorModeIndex(config.outlineColorMode_Selected));
+      _comboOutlineColorMode           .select(config.getColorModeIndex(config.outlineColorMode));
+      _comboOutlineColorMode_Hovered   .select(config.getColorModeIndex(config.outlineColorMode_Hovered));
+      _comboOutlineColorMode_HovSel    .select(config.getColorModeIndex(config.outlineColorMode_HovSel));
+      _comboOutlineColorMode_Selected  .select(config.getColorModeIndex(config.outlineColorMode_Selected));
 
-      _colorOutlineColor.setColorValue(config.outlineColor);
-      _colorOutlineColor_Hovered.setColorValue(config.outlineColor_Hovered);
-      _colorOutlineColor_HovSel.setColorValue(config.outlineColor_HovSel);
-      _colorOutlineColor_Selected.setColorValue(config.outlineColor_Selected);
+      _colorOutlineColor               .setColorValue(config.outlineColor);
+      _colorOutlineColor_Hovered       .setColorValue(config.outlineColor_Hovered);
+      _colorOutlineColor_HovSel        .setColorValue(config.outlineColor_HovSel);
+      _colorOutlineColor_Selected      .setColorValue(config.outlineColor_Selected);
 
-      _spinnerOutlineOpacity.setSelection((int) (config.outlineOpacity * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
-      _spinnerOutlineOpacity_Hovered.setSelection((int) (config.outlineOpacity_Hovered * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
-      _spinnerOutlineOpacity_HovSel.setSelection((int) (config.outlineOpacity_HovSel * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
-      _spinnerOutlineOpacity_Selected.setSelection((int) (config.outlineOpacity_Selected * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
+      _spinnerOutlineOpacity           .setSelection((int) (config.outlineOpacity            * UI.TRANSFORM_OPACITY_MAX));
+      _spinnerOutlineOpacity_Hovered   .setSelection((int) (config.outlineOpacity_Hovered    * UI.TRANSFORM_OPACITY_MAX));
+      _spinnerOutlineOpacity_HovSel    .setSelection((int) (config.outlineOpacity_HovSel     * UI.TRANSFORM_OPACITY_MAX));
+      _spinnerOutlineOpacity_Selected  .setSelection((int) (config.outlineOpacity_Selected   * UI.TRANSFORM_OPACITY_MAX));
 
       // curtain color
-      _chkShowInterior.setSelection(config.isShowInterior);
+      _chkShowInterior                 .setSelection(config.isShowInterior);
 
-      _comboInteriorColorMode.select(config.getColorModeIndex(config.interiorColorMode));
-      _comboInteriorColorMode_Hovered.select(config.getColorModeIndex(config.interiorColorMode_Hovered));
-      _comboInteriorColorMode_HovSel.select(config.getColorModeIndex(config.interiorColorMode_HovSel));
-      _comboInteriorColorMode_Selected.select(config.getColorModeIndex(config.interiorColorMode_Selected));
+      _comboInteriorColorMode          .select(config.getColorModeIndex(config.interiorColorMode));
+      _comboInteriorColorMode_Hovered  .select(config.getColorModeIndex(config.interiorColorMode_Hovered));
+      _comboInteriorColorMode_HovSel   .select(config.getColorModeIndex(config.interiorColorMode_HovSel));
+      _comboInteriorColorMode_Selected .select(config.getColorModeIndex(config.interiorColorMode_Selected));
 
-      _colorInteriorColor.setColorValue(config.interiorColor);
-      _colorInteriorColor_Hovered.setColorValue(config.interiorColor_Hovered);
-      _colorInteriorColor_HovSel.setColorValue(config.interiorColor_HovSel);
-      _colorInteriorColor_Selected.setColorValue(config.interiorColor_Selected);
+      _colorInteriorColor              .setColorValue(config.interiorColor);
+      _colorInteriorColor_Hovered      .setColorValue(config.interiorColor_Hovered);
+      _colorInteriorColor_HovSel       .setColorValue(config.interiorColor_HovSel);
+      _colorInteriorColor_Selected     .setColorValue(config.interiorColor_Selected);
 
-      _spinnerInteriorOpacity.setSelection((int) (config.interiorOpacity * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
-      _spinnerInteriorOpacity_Hovered.setSelection((int) (config.interiorOpacity_Hovered * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
-      _spinnerInteriorOpacity_HovSel.setSelection((int) (config.interiorOpacity_HovSel * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
-      _spinnerInteriorOpacity_Selected.setSelection((int) (config.interiorOpacity_Selected * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
+      _spinnerInteriorOpacity          .setSelection((int) (config.interiorOpacity           * UI.TRANSFORM_OPACITY_MAX));
+      _spinnerInteriorOpacity_Hovered  .setSelection((int) (config.interiorOpacity_Hovered   * UI.TRANSFORM_OPACITY_MAX));
+      _spinnerInteriorOpacity_HovSel   .setSelection((int) (config.interiorOpacity_HovSel    * UI.TRANSFORM_OPACITY_MAX));
+      _spinnerInteriorOpacity_Selected .setSelection((int) (config.interiorOpacity_Selected  * UI.TRANSFORM_OPACITY_MAX));
 
       // verticals
-      _chkDrawVerticals.setSelection(config.isDrawVerticals);
+      _chkDrawVerticals                .setSelection(config.isDrawVerticals);
 
       // track position
-      _chkTrackPositions.setSelection(config.isShowTrackPosition);
-      _spinnerTrackPositionSize.setSelection((int) (config.trackPositionSize));
-      _spinnerTrackPositionSize_Hovered.setSelection((int) (config.trackPositionSize_Hovered));
-      _spinnerTrackPositionSize_Selected.setSelection((int) (config.trackPositionSize_Selected));
-      _spinnerTrackPositionSize_HovSel.setSelection((int) (config.trackPositionSize_HovSel));
-      _spinnerTrackPositionThreshold.setSelection(config.trackPositionThreshold);
+      _chkTrackPositions                  .setSelection(config.isShowTrackPosition);
+      _spinnerTrackPositionSize           .setSelection((int) (config.trackPositionSize));
+      _spinnerTrackPositionSize_Hovered   .setSelection((int) (config.trackPositionSize_Hovered));
+      _spinnerTrackPositionSize_Selected  .setSelection((int) (config.trackPositionSize_Selected));
+      _spinnerTrackPositionSize_HovSel    .setSelection((int) (config.trackPositionSize_HovSel));
+      _spinnerTrackPositionThreshold      .setSelection(config.trackPositionThreshold);
 
       // altitude
-      _comboAltitude.select(config.getAltitudeModeIndex());
-      _chkAltitudeOffset.setSelection(config.isAltitudeOffset);
-      _chkAltitudeOffsetRandom.setSelection(config.isAltitudeOffsetRandom);
-      _rdoOffsetAbsolute.setSelection(isOffsetAbsolute);
-      _rdoOffsetRelative.setSelection(!isOffsetAbsolute);
-      _spinnerAltitudeOffsetAbsolute.setSelection(//
-            (int) (config.altitudeOffsetDistanceAbsolute / UI.UNIT_VALUE_ELEVATION));
-      _spinnerAltitudeOffsetRelative.setSelection(config.altitudeOffsetDistanceRelative);
-      _chkFollowTerrain.setSelection(config.isFollowTerrain);
+      _comboAltitude                      .select(config.getAltitudeModeIndex());
+      _chkAltitudeOffset                  .setSelection(config.isAltitudeOffset);
+      _chkAltitudeOffsetRandom            .setSelection(config.isAltitudeOffsetRandom);
+      _rdoOffsetAbsolute                  .setSelection(isOffsetAbsolute);
+      _rdoOffsetRelative                  .setSelection(!isOffsetAbsolute);
+      _spinnerAltitudeOffsetAbsolute      .setSelection((int) ((float)config.altitudeOffsetDistanceAbsolute / UI.UNIT_VALUE_ELEVATION));
+      _spinnerAltitudeOffsetRelative      .setSelection(config.altitudeOffsetDistanceRelative);
+      _chkFollowTerrain                   .setSelection(config.isFollowTerrain);
 
       updateUI();
 
@@ -1228,8 +1234,6 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
    }
 
    private void saveState() {
-
-// SET_FORMATTING_OFF
 
 		final int altitudeOffsetMetric = (int) (_spinnerAltitudeOffsetAbsolute.getSelection() * UI.UNIT_VALUE_ELEVATION);
 
@@ -1240,67 +1244,67 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
 		config.name = _textConfigName.getText();
 
 		// track
-		config.directionArrowSize = _spinnerDirectionArrowSize.getSelection();
-		config.directionArrowDistance = _spinnerDirectionArrowDistance.getSelection();
-		config.trackColorOpacity = _spinnerTrackColorOpacity.getSelection()
-		      / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
+		config.directionArrowSize               = _spinnerDirectionArrowSize.getSelection();
+		config.directionArrowDistance           = _spinnerDirectionArrowDistance.getSelection();
+		config.trackColorOpacity                = (float) _spinnerTrackColorOpacity.getSelection() / UI.TRANSFORM_OPACITY_MAX;
 
 		// line
-		config.outlineWidth = _spinnerOutlineWidth.getSelection();
-		config.outlineColorMode = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode)].value;
-		config.outlineColorMode_Hovered = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Hovered)].value;
-		config.outlineColorMode_HovSel = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_HovSel)].value;
-		config.outlineColorMode_Selected = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Selected)].value;
-		config.outlineColor = _colorOutlineColor.getColorValue();
-		config.outlineColor_Hovered = _colorOutlineColor_Hovered.getColorValue();
-		config.outlineColor_HovSel = _colorOutlineColor_HovSel.getColorValue();
-		config.outlineColor_Selected = _colorOutlineColor_Selected.getColorValue();
+		config.outlineWidth                     = _spinnerOutlineWidth.getSelection();
+		config.outlineColorMode                 = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode)].value;
+		config.outlineColorMode_Hovered         = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Hovered)].value;
+		config.outlineColorMode_HovSel          = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_HovSel)].value;
+		config.outlineColorMode_Selected        = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Selected)].value;
+		config.outlineColor                     = _colorOutlineColor.getColorValue();
+		config.outlineColor_Hovered             = _colorOutlineColor_Hovered.getColorValue();
+		config.outlineColor_HovSel              = _colorOutlineColor_HovSel.getColorValue();
+		config.outlineColor_Selected            = _colorOutlineColor_Selected.getColorValue();
 
-		config.outlineOpacity = _spinnerOutlineOpacity.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
-		config.outlineOpacity_Hovered = _spinnerOutlineOpacity_Hovered.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
-		config.outlineOpacity_HovSel = _spinnerOutlineOpacity_HovSel.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
-		config.outlineOpacity_Selected = _spinnerOutlineOpacity_Selected.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
+		config.outlineOpacity                   = (float) _spinnerOutlineOpacity.getSelection()            / UI.TRANSFORM_OPACITY_MAX;
+		config.outlineOpacity_Hovered           = (float) _spinnerOutlineOpacity_Hovered.getSelection()    / UI.TRANSFORM_OPACITY_MAX;
+		config.outlineOpacity_HovSel            = (float) _spinnerOutlineOpacity_HovSel.getSelection()     / UI.TRANSFORM_OPACITY_MAX;
+		config.outlineOpacity_Selected          = (float) _spinnerOutlineOpacity_Selected.getSelection()   / UI.TRANSFORM_OPACITY_MAX;
 
 		// interior
-		config.isShowInterior = _chkShowInterior.getSelection();
-		config.interiorColorMode = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode)].value;
-		config.interiorColorMode_Hovered = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Hovered)].value;
-		config.interiorColorMode_HovSel = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_HovSel)].value;
-		config.interiorColorMode_Selected = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Selected)].value;
-		config.interiorColor = _colorInteriorColor.getColorValue();
-		config.interiorColor_Hovered = _colorInteriorColor_Hovered.getColorValue();
-		config.interiorColor_HovSel = _colorInteriorColor_HovSel.getColorValue();
-		config.interiorColor_Selected = _colorInteriorColor_Selected.getColorValue();
+		config.isShowInterior                   = _chkShowInterior.getSelection();
+		config.interiorColorMode                = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode)].value;
+		config.interiorColorMode_Hovered        = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Hovered)].value;
+		config.interiorColorMode_HovSel         = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_HovSel)].value;
+		config.interiorColorMode_Selected       = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Selected)].value;
+		config.interiorColor                    = _colorInteriorColor.getColorValue();
+		config.interiorColor_Hovered            = _colorInteriorColor_Hovered.getColorValue();
+		config.interiorColor_HovSel             = _colorInteriorColor_HovSel.getColorValue();
+		config.interiorColor_Selected           = _colorInteriorColor_Selected.getColorValue();
 
-		config.interiorOpacity = _spinnerInteriorOpacity.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
-		config.interiorOpacity_Hovered = _spinnerInteriorOpacity_Hovered.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
-		config.interiorOpacity_HovSel = _spinnerInteriorOpacity_HovSel.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
-		config.interiorOpacity_Selected = _spinnerInteriorOpacity_Selected.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
+		config.interiorOpacity                  = (float) _spinnerInteriorOpacity.getSelection()           / UI.TRANSFORM_OPACITY_MAX;
+		config.interiorOpacity_Hovered          = (float) _spinnerInteriorOpacity_Hovered.getSelection()   / UI.TRANSFORM_OPACITY_MAX;
+		config.interiorOpacity_HovSel           = (float) _spinnerInteriorOpacity_HovSel.getSelection()    / UI.TRANSFORM_OPACITY_MAX;
+		config.interiorOpacity_Selected         = (float) _spinnerInteriorOpacity_Selected.getSelection()  / UI.TRANSFORM_OPACITY_MAX;
 
 		// verticals
-		config.isDrawVerticals = _chkDrawVerticals.getSelection();
+		config.isDrawVerticals                  = _chkDrawVerticals.getSelection();
 
 		// track position
-		config.isShowTrackPosition = _chkTrackPositions.getSelection();
-		config.trackPositionSize = _spinnerTrackPositionSize.getSelection();
-		config.trackPositionSize_Hovered = _spinnerTrackPositionSize_Hovered.getSelection();
-		config.trackPositionSize_Selected = _spinnerTrackPositionSize_Selected.getSelection();
-		config.trackPositionSize_HovSel = _spinnerTrackPositionSize_HovSel.getSelection();
-		config.trackPositionThreshold = _spinnerTrackPositionThreshold.getSelection();
+		config.isShowTrackPosition              = _chkTrackPositions.getSelection();
+		config.trackPositionSize                = _spinnerTrackPositionSize.getSelection();
+		config.trackPositionSize_Hovered        = _spinnerTrackPositionSize_Hovered.getSelection();
+		config.trackPositionSize_Selected       = _spinnerTrackPositionSize_Selected.getSelection();
+		config.trackPositionSize_HovSel         = _spinnerTrackPositionSize_HovSel.getSelection();
+		config.trackPositionThreshold           = _spinnerTrackPositionThreshold.getSelection();
 
 		// altitude
-		config.isAltitudeOffset = _chkAltitudeOffset.getSelection();
-		config.isAltitudeOffsetRandom = _chkAltitudeOffsetRandom.getSelection();
-		config.altitudeMode = TourTrackConfig.ALTITUDE_MODE[getComboIndex(_comboAltitude)].value;
-		config.altitudeOffsetMode = _rdoOffsetRelative.getSelection()
-				? TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE
-				: TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
-		config.altitudeOffsetDistanceAbsolute = altitudeOffsetMetric;
-		config.altitudeOffsetDistanceRelative = _spinnerAltitudeOffsetRelative.getSelection();
-		config.isFollowTerrain = _chkFollowTerrain.getSelection();
+		config.isAltitudeOffset                 = _chkAltitudeOffset.getSelection();
+		config.isAltitudeOffsetRandom           = _chkAltitudeOffsetRandom.getSelection();
+		config.altitudeMode                     = TourTrackConfig.ALTITUDE_MODE[getComboIndex(_comboAltitude)].value;
+		config.altitudeOffsetMode               = _rdoOffsetRelative.getSelection()
+                                       				? TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE
+                                       				: TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+
+		config.altitudeOffsetDistanceAbsolute   = altitudeOffsetMetric;
+		config.altitudeOffsetDistanceRelative   = _spinnerAltitudeOffsetRelative.getSelection();
+		config.isFollowTerrain                  = _chkFollowTerrain.getSelection();
+   }
 
 // SET_FORMATTING_ON
-   }
 
    /**
     * Saves state values from the UI in the tour track configuration.

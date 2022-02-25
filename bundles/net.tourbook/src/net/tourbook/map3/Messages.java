@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -85,7 +85,6 @@ public class Messages extends NLS {
    public static String        Map3Color_Dialog_ProfileColor_Tooltip;
    public static String        Map3Color_Dialog_Radio_AbsoluteValues;
    public static String        Map3Color_Dialog_Radio_AbsoluteValues_Tooltip;
-
    public static String        Map3Color_Dialog_Radio_ProntoColor_Tooltip;
    public static String        Map3Color_Dialog_Radio_RelativeValues;
    public static String        Map3Color_Dialog_Radio_RelativeValues_Tooltip;
@@ -94,9 +93,7 @@ public class Messages extends NLS {
    public static String        Map3Color_Dialog_Title;
 
    public static String        Map3Layer_Viewer_Column_Layer;
-
    public static String        Map3Layer_Viewer_Column_Opacity;
-
    public static String        Map3Layer_Viewer_Column_Opacity_Tooltip;
 
    public static String        Map3SelectColor_Dialog_Action_AddColor_Tooltip;
