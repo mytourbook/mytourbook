@@ -272,7 +272,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _chkShowSegmentLine = new Button(parent, SWT.CHECK);
          _chkShowSegmentLine.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentLine);
          _chkShowSegmentLine.addSelectionListener(_defaultSelectionListener);
-         UI.gridLayout_Span_2_1().applyTo(_chkShowSegmentLine);
+         UI.gridLayoutData_Span_2_1().applyTo(_chkShowSegmentLine);
       }
       {
          /*
@@ -283,7 +283,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _lblLineOpacity = new Label(parent, SWT.NONE);
          _lblLineOpacity.setText(Messages.Slideout_SegmenterChartOptions_Label_LineOpacity);
          _lblLineOpacity.setToolTipText(tooltipText);
-         UI.gridLayout_AlignFillCenter().applyTo(_lblLineOpacity);
+         UI.gridLayoutData_AlignFillCenter().applyTo(_lblLineOpacity);
 
          // Spinner:
          _spinLineOpacity = new Spinner(parent, SWT.BORDER);
@@ -301,7 +301,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _chkShowSegmentMarker = new Button(parent, SWT.CHECK);
          _chkShowSegmentMarker.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker);
          _chkShowSegmentMarker.addSelectionListener(_defaultSelectionListener);
-         UI.gridLayout_Span_2_1().applyTo(_chkShowSegmentMarker);
+         UI.gridLayoutData_Span_2_1().applyTo(_chkShowSegmentMarker);
       }
       {
          /*
@@ -312,7 +312,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _lblGraphOpacity = new Label(parent, SWT.NONE);
          _lblGraphOpacity.setText(Messages.Slideout_SegmenterChartOptions_Label_GraphOpacity);
          _lblGraphOpacity.setToolTipText(tooltipText);
-         UI.gridLayout_AlignFillCenter().applyTo(_lblGraphOpacity);
+         UI.gridLayoutData_AlignFillCenter().applyTo(_lblGraphOpacity);
 
          // Spinner:
          _spinGraphOpacity = new Spinner(parent, SWT.BORDER);
@@ -330,7 +330,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _chkShowSegmentTooltip = new Button(parent, SWT.CHECK);
          _chkShowSegmentTooltip.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentTooltip);
          _chkShowSegmentTooltip.addSelectionListener(_defaultSelectionListener);
-         UI.gridLayout_Span_2_1().applyTo(_chkShowSegmentTooltip);
+         UI.gridLayoutData_Span_2_1().applyTo(_chkShowSegmentTooltip);
       }
    }
 
@@ -354,7 +354,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _chkShowDecimalPlaces = new Button(parent, SWT.CHECK);
          _chkShowDecimalPlaces.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces);
          _chkShowDecimalPlaces.addSelectionListener(_defaultSelectionListener);
-         UI.gridLayout_Span_2_1()
+         UI.gridLayoutData_Span_2_1()
                .indent(_firstColumnIndent, 0)
                .applyTo(_chkShowDecimalPlaces);
       }
@@ -366,7 +366,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          _lblVisibleStackedValues = new Label(parent, SWT.NONE);
          _lblVisibleStackedValues.setText(Messages.Slideout_SegmenterChartOptions_Label_StackedValues);
          _lblVisibleStackedValues.setToolTipText(Messages.Slideout_SegmenterChartOptions_Label_StackedValues_Tooltip);
-         UI.gridLayout_AlignFillCenter().applyTo(_lblVisibleStackedValues);
+         UI.gridLayoutData_AlignFillCenter().applyTo(_lblVisibleStackedValues);
 
          // Spinner:
          _spinVisibleValuesStacked = new Spinner(parent, SWT.BORDER);
@@ -393,7 +393,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
             _chkHideSmallValues.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_HideSmallValues);
             _chkHideSmallValues.setToolTipText(Messages.Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip);
             _chkHideSmallValues.addSelectionListener(_defaultSelectionListener);
-            UI.gridLayout_AlignFillCenter()
+            UI.gridLayoutData_AlignFillCenter()
                   .indent(_firstColumnIndent, 0)
                   .applyTo(_chkHideSmallValues);
 
@@ -408,7 +408,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
             // Label %
             _lblHideSmallValuesUnit = new Label(containerSmall, SWT.NONE);
             _lblHideSmallValuesUnit.setText(UI.SYMBOL_PERCENTAGE);
-            UI.gridLayout_AlignFillCenter().applyTo(_lblHideSmallValuesUnit);
+            UI.gridLayoutData_AlignFillCenter().applyTo(_lblHideSmallValuesUnit);
          }
       }
       {

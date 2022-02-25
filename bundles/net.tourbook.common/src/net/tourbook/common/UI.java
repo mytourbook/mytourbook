@@ -1695,12 +1695,17 @@ public class UI {
       return null;
    }
 
-   public static GridDataFactory gridLayout_AlignFillCenter() {
+   public static GridDataFactory gridLayoutData_AlignFillCenter() {
 
       return GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
    }
 
-   public static GridDataFactory gridLayout_Span_2_1() {
+   public static GridDataFactory gridLayoutData_AlignBeginningFill() {
+
+      return GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL);
+   }
+
+   public static GridDataFactory gridLayoutData_Span_2_1() {
 
       return GridDataFactory.fillDefaults().span(2, 1);
    }
