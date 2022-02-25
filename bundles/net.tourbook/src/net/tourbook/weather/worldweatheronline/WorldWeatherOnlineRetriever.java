@@ -91,18 +91,18 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
     * @param tour
     * The tour for which we need to retrieve the weather data.
     */
-   public WorldWeatherOnlineRetriever(final TourData tour) {
+   public WorldWeatherOnlineRetriever(final TourData tourData) {
 
-      super(tour);
+      super(tourData);
 
-      WeatherUtils.determineWeatherSearchAreaCenter(tour);
-      startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
+      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(_tour);
+      startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(_tour.getTourStartTime()); //$NON-NLS-1$
 
-      final double roundedStartTime = tour.getTourStartTime().getHour();
+      final double roundedStartTime = _tour.getTourStartTime().getHour();
       startTime = (int) roundedStartTime + "00"; //$NON-NLS-1$
 
-      int roundedEndHour = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getHour();
-      final int roundedEndMinutes = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getMinute();
+      int roundedEndHour = Instant.ofEpochMilli(_tour.getTourEndTimeMS()).atZone(_tour.getTimeZoneIdWithDefault()).getHour();
+      final int roundedEndMinutes = Instant.ofEpochMilli(_tour.getTourEndTimeMS()).atZone(_tour.getTimeZoneIdWithDefault()).getMinute();
       if (roundedEndMinutes >= 30) {
          ++roundedEndHour;
       }

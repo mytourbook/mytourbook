@@ -16,13 +16,13 @@
 package data.weather.worldweatheronline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
 
 import net.tourbook.data.TourData;
-import net.tourbook.weather.WeatherData;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +38,7 @@ public class WorldWeatherOnlineTests {
          FilesUtils.rootPath + "data/weather/worldweatheronline/files/"; //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
-   WorldWeatherOnlineRetriever  historicalWeatherRetriever;
+   WorldWeatherOnlineRetriever historicalWeatherRetriever;
 
    @BeforeAll
    static void initAll() {
@@ -64,19 +64,18 @@ public class WorldWeatherOnlineTests {
       final TourData tour = Initializer.importTour();
       historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
 
-      final WeatherData historicalWeatherData =
-            historicalWeatherRetriever.retrieveHistoricalWeatherData().getHistoricalWeatherData();
+      assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
 
-      assertEquals(16, historicalWeatherData.getTemperatureAverage());
-      assertEquals(9, historicalWeatherData.getWindSpeed());
-      assertEquals(136, historicalWeatherData.getWindDirection());
-      assertEquals("Partly cloudy", historicalWeatherData.getWeatherDescription()); //$NON-NLS-1$
-      assertEquals("weather-cloudy", historicalWeatherData.getWeatherType()); //$NON-NLS-1$
-      assertEquals(50, historicalWeatherData.getAverageHumidity());
-      assertEquals(1.6, Math.round(historicalWeatherData.getPrecipitation() * 10.0) / 10.0);
-      assertEquals(1017, historicalWeatherData.getAveragePressure());
-      assertEquals(19, historicalWeatherData.getTemperatureMax());
-      assertEquals(8, historicalWeatherData.getTemperatureMin());
-      assertEquals(16, historicalWeatherData.getWindChill());
+      assertEquals(16, tour.getAvgTemperature_Provider());
+      assertEquals(9, tour.getWeatherWindSpeed());
+      assertEquals(136, tour.getWeatherWindDir());
+      assertEquals("Partly cloudy", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-cloudy", tour.getWeatherClouds()); //$NON-NLS-1$
+      assertEquals(50, tour.getWeather_Humidity());
+      assertEquals(1.6, Math.round(tour.getWeather_Precipitation() * 10.0) / 10.0);
+      assertEquals(1017, tour.getWeather_Pressure());
+      assertEquals(19, tour.getWeather_Temperature_Max());
+      assertEquals(8, tour.getWeather_Temperature_Min());
+      assertEquals(16, tour.getWeather_Temperature_WindChill());
    }
 }

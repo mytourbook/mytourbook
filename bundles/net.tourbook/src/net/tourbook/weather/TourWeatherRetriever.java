@@ -18,13 +18,11 @@ package net.tourbook.weather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
-public class TourWeatherRetriever {
-
-   protected TourData _tour;
+public final class TourWeatherRetriever {
 
    //public abstract boolean populateTourWeatherData(TourData tourData);
    // boolean retrieveHistoricalWeatherData();
-   public boolean retrieveWeatherData(final TourData tourData) {
+   public static boolean retrieveWeatherData(final TourData tourData) {
 
       //if favorite weather provide is WWO then retrieve WWO retriever
       return new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData();

@@ -20,8 +20,8 @@ import net.tourbook.weather.HistoricalWeatherRetriever;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   public OpenWeatherMapRetriever(final TourData tour) {
-      super(tour);
+   public OpenWeatherMapRetriever(final TourData tourData) {
+      super(tourData);
    }
 
    @Override
