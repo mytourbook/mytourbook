@@ -10134,6 +10134,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return serieData != null && serieData.visiblePoints_Surfing != null;
    }
 
+   //todo fb if isWeatherDataFromApi, copy from avg temp to the new one and erase the device one
+   // else copy current avg temp to new one and device one
    public boolean isWeatherDataFromApi() {
       return isWeatherDataFromApi;
    }

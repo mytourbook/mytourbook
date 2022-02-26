@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -394,6 +394,16 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          {
             /*
              * Checkbox: Temperature
+             */
+            _chkData_Temperature = new Button(group, SWT.CHECK);
+            _chkData_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
+            _chkData_Temperature.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Temperature);
+         }
+         {
+            /*
+             * TODO FB
+             * Checkbox: Temperature from device
              */
             _chkData_Temperature = new Button(group, SWT.CHECK);
             _chkData_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
