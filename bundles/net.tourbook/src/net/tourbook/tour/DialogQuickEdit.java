@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -187,7 +188,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       final Section section = _tk.createSection(parent, //
       //Section.TWISTIE |
 //            Section.SHORT_TITLE_BAR
-            Section.TITLE_BAR
+            ExpandableComposite.TITLE_BAR
       // | Section.DESCRIPTION
       // | Section.EXPANDED
       );
@@ -948,7 +949,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          final float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
 
-         _tourData.setAvgTemperature_Device(UI.convertTemperatureToMetric(temperature));
+         _tourData.setAverageTemperature_Device(UI.convertTemperatureToMetric(temperature));
       }
 
    }
@@ -1002,7 +1003,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
           * Avg temperature
           */
          final float avgTemperature =
-               UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Device());
+               UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
 
          _spinWeather_Temperature_Avg.setDigits(1);
          _spinWeather_Temperature_Avg.setSelection(Math.round(avgTemperature * 10));

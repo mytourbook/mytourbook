@@ -251,8 +251,12 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       historicalWeatherData = parseWeatherData(rawWeatherData);
 
+      if (historicalWeatherData == null) {
+         return false;
+      }
+
       _tour.setIsWeatherDataFromApi(true);
-      _tour.setAvgTemperature_Provider(historicalWeatherData.getTemperatureAverage());
+      _tour.setAverageTemperature(historicalWeatherData.getTemperatureAverage());
       _tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
       _tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
       _tour.setWeather(historicalWeatherData.getWeatherDescription());
@@ -261,8 +265,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       _tour.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
       _tour.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
       _tour.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      _tour.setWeather_Temperature_Max_Provider(historicalWeatherData.getTemperatureMax());
-      _tour.setWeather_Temperature_Min_Provider(historicalWeatherData.getTemperatureMin());
+      _tour.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
+      _tour.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
       _tour.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
 
       return true;

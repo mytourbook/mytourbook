@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -296,6 +297,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * influences the width of the columns in this editor
     */
    private static final int              _hintTextColumnWidth                      = IS_OSX ? 200 : 150;
+   //
+   DecimalFormat                         _temperatureFormat                        = new DecimalFormat("###.0");
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -662,11 +665,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinPerson_RestPulse;
 
    private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Temperature_Average_Device;
    private Spinner            _spinWeather_Temperature_Min;
-   private Spinner            _spinWeather_Temperature_Min_Device;
    private Spinner            _spinWeather_Temperature_Max;
-   private Spinner            _spinWeather_Temperature_Max_Device;
 
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
@@ -675,6 +675,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinWeather_Wind_DirectionValue;
    private Spinner            _spinWeather_Wind_SpeedValue;
    //
+   private Text               _txtWeather_Temperature_Average_Device;
+   private Text               _txtWeather_Temperature_Min_Device;
+   private Text               _txtWeather_Temperature_Max_Device;
    private Text               _txtAltitudeDown;
    private Text               _txtAltitudeUp;
    private Text               _txtDescription;
@@ -4350,22 +4353,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _spinWeather_Temperature_Average_Device = new Spinner(container, SWT.BORDER);
+            _txtWeather_Temperature_Average_Device = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory
                   .fillDefaults()//
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Temperature_Average_Device);
-            _spinWeather_Temperature_Average_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
+                  .applyTo(_txtWeather_Temperature_Average_Device);
+            _txtWeather_Temperature_Average_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
-            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-            _spinWeather_Temperature_Average_Device.setMinimum(-600);
-            _spinWeather_Temperature_Average_Device.setMaximum(1500);
-
-            _spinWeather_Temperature_Average_Device.addModifyListener(_modifyListener_Temperature);
-            _spinWeather_Temperature_Average_Device.addSelectionListener(_selectionListener_Temperature);
-            _spinWeather_Temperature_Average_Device.addMouseWheelListener(_mouseWheelListener_Temperature);
-            _spinWeather_Temperature_Average_Device.setEnabled(false);
+            _txtWeather_Temperature_Average_Device.setEnabled(false);
 
             // label: celsius, fahrenheit
             _lblWeather_TemperatureUnit_Avg = _formToolkit.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
@@ -4377,21 +4373,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _spinWeather_Temperature_Max_Device = new Spinner(container, SWT.BORDER);
-            _spinWeather_Temperature_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
-            _spinWeather_Temperature_Max_Device.addModifyListener(_modifyListener_Temperature);
-            _spinWeather_Temperature_Max_Device.addSelectionListener(_selectionListener_Temperature);
-            _spinWeather_Temperature_Max_Device.addMouseWheelListener(_mouseWheelListener_Temperature);
-            _spinWeather_Temperature_Max_Device.setEnabled(false);
-
-            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-            _spinWeather_Temperature_Max_Device.setMinimum(-600);
-            _spinWeather_Temperature_Max_Device.setMaximum(1500);
+            _txtWeather_Temperature_Max_Device = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _txtWeather_Temperature_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
+            _txtWeather_Temperature_Max_Device.setEnabled(false);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Temperature_Max_Device);
+                  .applyTo(_txtWeather_Temperature_Max_Device);
 
             // unit
             _lblWeather_TemperatureUnit_Max = _formToolkit.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
@@ -4403,21 +4392,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _spinWeather_Temperature_Min_Device = new Spinner(container, SWT.BORDER);
-            _spinWeather_Temperature_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
-            _spinWeather_Temperature_Min_Device.addModifyListener(_modifyListener_Temperature);
-            _spinWeather_Temperature_Min_Device.addSelectionListener(_selectionListener_Temperature);
-            _spinWeather_Temperature_Min_Device.addMouseWheelListener(_mouseWheelListener_Temperature);
-            _spinWeather_Temperature_Min_Device.setEnabled(false);
-
-            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-            _spinWeather_Temperature_Min_Device.setMinimum(-600);
-            _spinWeather_Temperature_Min_Device.setMaximum(1500);
+            _txtWeather_Temperature_Min_Device = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _txtWeather_Temperature_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
+            _txtWeather_Temperature_Min_Device.setEnabled(false);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Temperature_Min_Device);
+                  .applyTo(_txtWeather_Temperature_Min_Device);
 
             // unit
             _lblWeather_TemperatureUnit_Min = _formToolkit.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
@@ -8544,7 +8526,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             final float temperature_Max = _spinWeather_Temperature_Max.getSelection() / 10.0f;
             final float temperature_WindChill = _spinWeather_Temperature_WindChill.getSelection() / 10.0f;
 
-            _tourData.setAvgTemperature_Device(UI.convertTemperatureToMetric(temperature_Avg_Device));
+            _tourData.setAverageTemperature_Device(UI.convertTemperatureToMetric(temperature_Avg_Device));
             _tourData.setWeather_Temperature_Min(UI.convertTemperatureToMetric(temperature_Min));
             _tourData.setWeather_Temperature_Max(UI.convertTemperatureToMetric(temperature_Max));
             _tourData.setWeather_Temperature_WindChill(UI.convertTemperatureToMetric(temperature_WindChill));
@@ -8969,23 +8951,39 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // icon must be displayed after the combobox entry is selected
       displayCloudIcon();
 
+      final boolean isTourTemperature = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
       /*
        * Avg temperature from Device
        */
-      final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Device());
+      final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
+      _txtWeather_Temperature_Average_Device.setText(isTourTemperature
+            ?_temperatureFormat.format(avgTemperature_Device)
+                  : UI.EMPTY_STRING);
 
-      _spinWeather_Temperature_Average_Device.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
-      _spinWeather_Temperature_Average_Device.setDigits(1);
-      _spinWeather_Temperature_Average_Device.setSelection(Math.round(avgTemperature_Device * 10));
+      /*
+       * Min temperature from device
+       */
+      final float minTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Min());
+      _txtWeather_Temperature_Min_Device.setText(isTourTemperature
+            ? _temperatureFormat.format(minTemperature_Device)
+            : UI.EMPTY_STRING);
+
+      /*
+       * Max temperature from device
+       */
+      final float maxTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Max());
+      _txtWeather_Temperature_Max_Device.setText(isTourTemperature
+            ? _temperatureFormat.format(maxTemperature_Device)
+            : UI.EMPTY_STRING);
 
       /*
        * Avg temperature
        */
-      final float avgTemperature_Provider = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Provider());
+      final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Provider());
 
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Average.setDigits(1);
-      _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature_Provider * 10));
+      _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
 
       /*
        * Min temperature

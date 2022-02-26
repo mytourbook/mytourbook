@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -4505,6 +4505,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } catch (final Exception e) {
 
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
 
       } finally {
 
@@ -5016,7 +5017,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       for (final TourData tourData : importedTours) {
 
-         final float oldTourAvgTemperature = tourData.getAvgTemperature_Device();
+         final float oldTourAvgTemperature = tourData.getAverageTemperature_Device();
 
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
@@ -5909,6 +5910,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          } catch (final InterruptedException | ClosedWatchServiceException e3) {
             // no-op
+            Thread.currentThread().interrupt();
          } catch (final Exception e4) {
             TourLogManager.log_EXCEPTION_WithStacktrace(e4);
          } finally {

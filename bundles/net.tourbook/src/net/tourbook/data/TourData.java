@@ -518,8 +518,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is float since db version 21, before it was int. In db version 20 this field was
     *        already float but not the database field.
     */
-   private float                 avgTemperature_Device;                                          // db-version 4
-   private float                 avgTemperature_Provider;
+   private float                 averageTemperature_Device;                                          // db-version 4
+   private float                 averageTemperature;
 
    // ############################################# WEATHER #############################################
 
@@ -527,6 +527,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
+   //todo fb rename to isWeatherDataFromProvider
    private boolean               isWeatherDataFromApi = false;
 
    private int                   weatherWindDir;                                       // db-version 8
@@ -551,10 +552,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 weather_Pressure;                                     // db-version 39
 
    private float                 weather_Temperature_Min;                              // db-version 39
+   private float                 weather_Temperature_Min_Device;                              // db-version 39
    private float                 weather_Temperature_Max;                              // db-version 39
+   private float                 weather_Temperature_Max_Device;                              // db-version 39
    private float                 weather_Temperature_WindChill;                        // db-version 39
-   private float weather_Temperature_Max_Provider;
-   private float weather_Temperature_Min_Provider;
 
 
    // ############################################# POWER #############################################
@@ -3454,7 +3455,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          weather_Temperature_Min = temperatureMin;
          weather_Temperature_Max = temperatureMax;
 
-         avgTemperature_Device = temperatureSum / tempLength;
+         averageTemperature_Device = temperatureSum / tempLength;
       }
    }
 
@@ -7498,6 +7499,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns metric average temperature
+    */
+   public float getAverageTemperature_Device() {
+      return averageTemperature_Device;
+   }
+
+   /**
     * @return the {@link #avgAltitudeChange}
     */
    public int getAvgAltitudeChange() {
@@ -7518,15 +7526,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return avgPulse;
    }
 
-   /**
-    * @return Returns metric average temperature
-    */
-   public float getAvgTemperature_Device() {
-      return avgTemperature_Device;
-   }
-
    public float getAvgTemperature_Provider() {
-      return avgTemperature_Provider;
+      return averageTemperature;
    }
 
    public short[] getBattery_Percentage() {
@@ -10389,6 +10390,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       TourManager.saveModifiedTour(this, true);
    }
 
+   public void setAverageTemperature(final int averageTemperature) {
+      this.averageTemperature = averageTemperature;
+   }
+
+   /**
+    * @param avgTemperature
+    *           the avgTemperature to set
+    */
+   public void setAverageTemperature_Device(final float averageTemperature) {
+      averageTemperature_Device = averageTemperature;
+   }
+
    /**
     * @param avgCadence
     *           the avgCadence to set
@@ -10403,19 +10416,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setAvgPulse(final float avgPulse) {
       this.avgPulse = avgPulse;
-   }
-
-   /**
-    * @param avgTemperature
-    *           the avgTemperature to set
-    */
-   public void setAvgTemperature_Device(final float avgTemperature) {
-      this.avgTemperature_Device = avgTemperature;
-   }
-
-   public void setAvgTemperature_Provider(final int temperatureAverage) {
-      avgTemperature_Provider = temperatureAverage;
-
    }
 
    public void setBattery_Percentage(final short[] battery_Percentage) {
@@ -11864,22 +11864,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.weather_Pressure = weatherPressure;
    }
 
-   public void setWeather_Temperature_Max(final float weatherMaxTemperature) {
-      this.weather_Temperature_Max = weatherMaxTemperature;
-   }
-
-   public void setWeather_Temperature_Max_Provider(final float temperatureMax) {
-     weather_Temperature_Max_Provider = temperatureMax;
+   public void setWeather_Temperature_Max(final float temperatureMax) {
+      weather_Temperature_Max = temperatureMax;
 
    }
 
-   public void setWeather_Temperature_Min(final float weatherMinTemperature) {
-      this.weather_Temperature_Min = weatherMinTemperature;
+   public void setWeather_Temperature_Max_Device(final float weatherMaxTemperature) {
+      this.weather_Temperature_Max_Device = weatherMaxTemperature;
    }
 
-   public void setWeather_Temperature_Min_Provider(final float temperatureMin) {
-     weather_Temperature_Min_Provider = temperatureMin;
+   public void setWeather_Temperature_Min(final float temperatureMin) {
+      weather_Temperature_Min = temperatureMin;
 
+   }
+
+   public void setWeather_Temperature_Min_Device(final float weatherMinTemperature) {
+      this.weather_Temperature_Min_Device = weatherMinTemperature;
    }
 
    public void setWeather_Temperature_WindChill(final float weatherWindChill) {

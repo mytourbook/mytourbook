@@ -57,6 +57,7 @@ import net.tourbook.ui.views.sensors.SelectionSensor;
 import net.tourbook.ui.views.sensors.SensorChartView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -310,7 +311,7 @@ public class TourInfoUI {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
@@ -1744,7 +1745,7 @@ public class TourInfoUI {
 
       //todo fb temp from device
       // temperature
-      final float temperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Device());
+      final float temperature = UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
       _lblTemperature.setText(_nf1.format(temperature));
 
       // weather clouds

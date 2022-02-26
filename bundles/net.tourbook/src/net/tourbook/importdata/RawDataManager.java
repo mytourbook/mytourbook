@@ -674,13 +674,13 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-         float avgTemperature = UI.convertTemperatureFromMetric(oldTourData.getAvgTemperature_Device());
+         float avgTemperature = UI.convertTemperatureFromMetric(oldTourData.getAverageTemperature_Device());
          previousData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
                      ? UI.SYMBOL_TEMPERATURE_CELSIUS
                      : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
 
-         avgTemperature = UI.convertTemperatureFromMetric(newTourData.getAvgTemperature_Device());
+         avgTemperature = UI.convertTemperatureFromMetric(newTourData.getAverageTemperature_Device());
          newData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
                      ? UI.SYMBOL_TEMPERATURE_CELSIUS
@@ -1442,7 +1442,7 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-               tourDataDummyClone.setAvgTemperature_Device(oldTourData.getAvgTemperature_Device());
+               tourDataDummyClone.setAverageTemperature_Device(oldTourData.getAverageTemperature_Device());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1747,10 +1747,10 @@ public class RawDataManager {
 
             case TIME_SLICES__TEMPERATURE:
 
-               clonedTourData.setAvgTemperature_Device(tourData.getAvgTemperature_Device());
+               clonedTourData.setAverageTemperature_Device(tourData.getAverageTemperature_Device());
 
                tourData.temperatureSerie = null;
-               tourData.setAvgTemperature_Device(0);
+               tourData.setAverageTemperature_Device(0);
                break;
 
             case TIME_SLICES__TIME:
@@ -2143,6 +2143,7 @@ public class RawDataManager {
 
       } catch (final Exception e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
       }
    }
 
@@ -3776,6 +3777,7 @@ public class RawDataManager {
       } catch (final InvocationTargetException | InterruptedException e) {
 
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
       }
    }
 

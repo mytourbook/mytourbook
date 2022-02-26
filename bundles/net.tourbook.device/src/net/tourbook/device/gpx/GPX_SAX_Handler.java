@@ -681,7 +681,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_TEMPERATURE)) {
 
-         _tourData.setAvgTemperature_Device(getFloatValue(charData));
+         _tourData.setAverageTemperature_Device(getFloatValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER)) {
