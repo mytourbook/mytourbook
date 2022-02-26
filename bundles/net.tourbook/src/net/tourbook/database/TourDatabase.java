@@ -247,7 +247,7 @@ public class TourDatabase {
    private static final String RENAMED__TOUR_RECORDING_TIME__FROM  = "tourRecordingTime";                                    //$NON-NLS-1$
    private static final String RENAMED__TOUR_RECORDING_TIME__INTO  = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
    private static final String RENAMED__TOUR_AVG_TEMPERATURE__FROM = "avgTemperature";                                       //$NON-NLS-1$
-   private static final String RENAMED__TOUR_AVG_TEMPERATURE__INTO = "avgTemperature_Device";                                //$NON-NLS-1$
+   private static final String RENAMED__TOUR_AVG_TEMPERATURE__INTO = "averageTemperature_Device";                            //$NON-NLS-1$
 
    private static final String DEFAULT_0                          = "0";                                                    //$NON-NLS-1$
    private static final String DEFAULT_1_0                        = "1.0";                                                  //$NON-NLS-1$
@@ -3950,7 +3950,7 @@ public class TourDatabase {
             + " maxPulse               FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
             + " avgPulse               FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
             + " avgCadence             FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " avgTemperature_Device  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " averageTemperature_Device  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
 
             // version 21 end ---------
 
@@ -4076,8 +4076,9 @@ public class TourDatabase {
             + " weather_Humidity                      SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
             + " weather_Precipitation                 FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
             + " weather_Pressure                      FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Temperature_Min               FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Temperature_Max               FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            //TOOD FB
+            + " weather_Temperature_Min_Device               FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + " weather_Temperature_Max_Device               FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
             + " weather_Temperature_WindChill         FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
 
             // version 39 end
@@ -4122,9 +4123,9 @@ public class TourDatabase {
 
             // version 47 start  -  after 2X.X
 
-            + " avgTemperature_Provider  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weather_Temperature_Max_Provider  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weather_Temperature_Min_Provider  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " averageTemperature  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weather_Temperature_Max  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weather_Temperature_Min  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
 
             // version 47 end
 
@@ -8975,11 +8976,13 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "avgTemperature_Provider", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "averageTemperature", DEFAULT_0);                   //$NON-NLS-1$
             SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Max_Provider", DEFAULT_0);                   //$NON-NLS-1$
             SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Min_Provider", DEFAULT_0);                   //$NON-NLS-1$
 
             SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_AVG_TEMPERATURE__FROM,    RENAMED__TOUR_AVG_TEMPERATURE__INTO);
+          //  SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_AVG_TEMPERATURE_MAX__FROM,    RENAMED__TOUR_AVG_TEMPERATURE__INTO);
+        //TODO FB  //  SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_AVG_TEMPERATURE_MIN__FROM,    RENAMED__TOUR_AVG_TEMPERATURE__INTO);
 
 // SET_FORMATTING_ON
       }

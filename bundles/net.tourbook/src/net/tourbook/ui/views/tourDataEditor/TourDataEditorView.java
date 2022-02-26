@@ -8951,12 +8951,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // icon must be displayed after the combobox entry is selected
       displayCloudIcon();
 
-      final boolean isTourTemperature = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
+      final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
+      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Min() != 0 &&
+            _tourData.getWeather_Temperature_Max() != 0 &&
+            _tourData.getWeather_Temperature_Min() != 0;
       /*
        * Avg temperature from Device
        */
       final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
-      _txtWeather_Temperature_Average_Device.setText(isTourTemperature
+      _txtWeather_Temperature_Average_Device.setText(isTourTemperatureDeviceValid
             ?_temperatureFormat.format(avgTemperature_Device)
                   : UI.EMPTY_STRING);
 
@@ -8964,7 +8967,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * Min temperature from device
        */
       final float minTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Min());
-      _txtWeather_Temperature_Min_Device.setText(isTourTemperature
+      _txtWeather_Temperature_Min_Device.setText(isTourTemperatureDeviceValid
             ? _temperatureFormat.format(minTemperature_Device)
             : UI.EMPTY_STRING);
 
@@ -8972,7 +8975,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * Max temperature from device
        */
       final float maxTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Max());
-      _txtWeather_Temperature_Max_Device.setText(isTourTemperature
+      _txtWeather_Temperature_Max_Device.setText(isTourTemperatureDeviceValid
             ? _temperatureFormat.format(maxTemperature_Device)
             : UI.EMPTY_STRING);
 
@@ -8983,7 +8986,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Average.setDigits(1);
-      _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
+      _spinWeather_Temperature_Average.setSelection(isTourTemperatureValid
+            ? Math.round(avgTemperature * 10)
+            : 0);
 
       /*
        * Min temperature
@@ -8991,8 +8996,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Min());
 
       _spinWeather_Temperature_Min.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      int minTemperatureValue = 0;
+      if (isTourTemperatureValid) {
       _spinWeather_Temperature_Min.setDigits(1);
-      _spinWeather_Temperature_Min.setSelection(Math.round(minTemperature * 10));
+         minTemperatureValue = Math.round(minTemperature * 10);
+
+      }
+      _spinWeather_Temperature_Min.setSelection(minTemperatureValue);
 
       /*
        * Max temperature
@@ -9000,8 +9010,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float maxTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Max());
 
       _spinWeather_Temperature_Max.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
-      _spinWeather_Temperature_Max.setDigits(1);
-      _spinWeather_Temperature_Max.setSelection(Math.round(maxTemperature * 10));
+      int maxTemperatureValue = 0;
+      if (isTourTemperatureValid) {
+         _spinWeather_Temperature_Max.setDigits(1);
+         maxTemperatureValue = Math.round(maxTemperature * 10);
+
+      }
+      _spinWeather_Temperature_Min.setSelection(maxTemperatureValue);
 
       /*
        * Wind Chill
@@ -9009,8 +9024,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float avgWindChill = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_WindChill());
 
       _spinWeather_Temperature_WindChill.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
-      _spinWeather_Temperature_WindChill.setDigits(1);
-      _spinWeather_Temperature_WindChill.setSelection(Math.round(avgWindChill * 10));
+      int avgWindChillValue = 0;
+      if (isTourTemperatureValid) {
+         _spinWeather_Temperature_WindChill.setDigits(1);
+         avgWindChillValue = Math.round(avgWindChill * 10);
+
+      }
+      _spinWeather_Temperature_WindChill.setSelection(avgWindChillValue);
 
       /*
        * Humidity
