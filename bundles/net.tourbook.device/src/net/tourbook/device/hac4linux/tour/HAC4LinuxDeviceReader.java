@@ -474,7 +474,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields[0].equals("Temperature")) { //Temperature=24;22;20 //$NON-NLS-1$
                   final String[] sTemps = fields[1].split(";"); //$NON-NLS-1$
                   if (sTemps.length > 1) {
-                     tourData.setAverageTemperature_Device(Integer.parseInt(sTemps[1]));
+                     tourData.setWeather_Temperature_Average_Device(Integer.parseInt(sTemps[1]));
                   }
                }
                // TODO !! statistic information with no fields in tour data base!

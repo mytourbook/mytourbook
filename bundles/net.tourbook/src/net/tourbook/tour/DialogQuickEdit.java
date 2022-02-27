@@ -949,7 +949,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          final float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
 
-         _tourData.setAverageTemperature_Device(UI.convertTemperatureToMetric(temperature));
+         _tourData.setWeather_Temperature_Average_Device(UI.convertTemperatureToMetric(temperature));
       }
 
    }
@@ -1003,7 +1003,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
           * Avg temperature
           */
          final float avgTemperature =
-               UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
+               UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
 
          _spinWeather_Temperature_Avg.setDigits(1);
          _spinWeather_Temperature_Avg.setSelection(Math.round(avgTemperature * 10));

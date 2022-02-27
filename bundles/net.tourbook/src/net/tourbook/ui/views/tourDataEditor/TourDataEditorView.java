@@ -8526,7 +8526,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             final float temperature_Max = _spinWeather_Temperature_Max.getSelection() / 10.0f;
             final float temperature_WindChill = _spinWeather_Temperature_WindChill.getSelection() / 10.0f;
 
-            _tourData.setAverageTemperature_Device(UI.convertTemperatureToMetric(temperature_Avg_Device));
+            _tourData.setWeather_Temperature_Average(UI.convertTemperatureToMetric(temperature_Avg_Device));
             _tourData.setWeather_Temperature_Min(UI.convertTemperatureToMetric(temperature_Min));
             _tourData.setWeather_Temperature_Max(UI.convertTemperatureToMetric(temperature_Max));
             _tourData.setWeather_Temperature_WindChill(UI.convertTemperatureToMetric(temperature_WindChill));
@@ -8952,13 +8952,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       displayCloudIcon();
 
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Min() != 0 &&
+      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 &&
             _tourData.getWeather_Temperature_Max() != 0 &&
             _tourData.getWeather_Temperature_Min() != 0;
       /*
        * Avg temperature from Device
        */
-      final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
+      final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
       _txtWeather_Temperature_Average_Device.setText(isTourTemperatureDeviceValid
             ?_temperatureFormat.format(avgTemperature_Device)
                   : UI.EMPTY_STRING);
@@ -8982,13 +8982,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * Avg temperature
        */
-      final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature_Provider());
+      final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average());
 
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
-      _spinWeather_Temperature_Average.setDigits(1);
-      _spinWeather_Temperature_Average.setSelection(isTourTemperatureValid
-            ? Math.round(avgTemperature * 10)
-            : 0);
+      int avgTemperatureValue = 0;
+      if (isTourTemperatureValid) {
+         _spinWeather_Temperature_Average.setDigits(1);
+         avgTemperatureValue = Math.round(avgTemperature * 10);
+
+      }
+      _spinWeather_Temperature_Average.setSelection(avgTemperatureValue);
 
       /*
        * Min temperature

@@ -1745,7 +1745,7 @@ public class TourInfoUI {
 
       //todo fb temp from device
       // temperature
-      final float temperature = UI.convertTemperatureFromMetric(_tourData.getAverageTemperature_Device());
+      final float temperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
       _lblTemperature.setText(_nf1.format(temperature));
 
       // weather clouds

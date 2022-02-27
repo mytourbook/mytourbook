@@ -674,13 +674,13 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-         float avgTemperature = UI.convertTemperatureFromMetric(oldTourData.getAverageTemperature_Device());
+         float avgTemperature = UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average_Device());
          previousData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
                      ? UI.SYMBOL_TEMPERATURE_CELSIUS
                      : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
 
-         avgTemperature = UI.convertTemperatureFromMetric(newTourData.getAverageTemperature_Device());
+         avgTemperature = UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average_Device());
          newData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
                      ? UI.SYMBOL_TEMPERATURE_CELSIUS
@@ -1442,7 +1442,7 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-               tourDataDummyClone.setAverageTemperature_Device(oldTourData.getAverageTemperature_Device());
+               tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1747,10 +1747,10 @@ public class RawDataManager {
 
             case TIME_SLICES__TEMPERATURE:
 
-               clonedTourData.setAverageTemperature_Device(tourData.getAverageTemperature_Device());
+               clonedTourData.setWeather_Temperature_Average_Device(tourData.getWeather_Temperature_Average_Device());
 
                tourData.temperatureSerie = null;
-               tourData.setAverageTemperature_Device(0);
+               tourData.setWeather_Temperature_Average_Device(0);
                break;
 
             case TIME_SLICES__TIME:

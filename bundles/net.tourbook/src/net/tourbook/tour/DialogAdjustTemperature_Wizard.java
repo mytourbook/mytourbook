@@ -153,7 +153,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
                      ++workedTours,
                      _selectedTours.size()));
 
-               final float oldTourAvgTemperature = tourData.getAverageTemperature_Device();
+               final float oldTourAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
                // skip tours which avg temperature is above the minimum avg temperature
                if (oldTourAvgTemperature > avgTemperature) {

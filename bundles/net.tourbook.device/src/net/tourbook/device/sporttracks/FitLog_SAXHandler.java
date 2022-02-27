@@ -536,7 +536,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
       final float weatherTemperature = _currentActivity.weatherTemperature;
       if (weatherTemperature != Float.MIN_VALUE) {
-         tourData.setAverageTemperature_Device(weatherTemperature);
+         tourData.setWeather_Temperature_Average_Device(weatherTemperature);
       }
 
       if (_currentActivity.weatherWindSpeed != Integer.MIN_VALUE) {

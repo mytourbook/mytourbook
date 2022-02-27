@@ -492,11 +492,11 @@ public class TourManager {
          temperatureSerie[serieIndex] = initialTemperature;
       }
 
-      final float oldAvgTemperature = tourData.getAverageTemperature_Device();
+      final float oldAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
       tourData.computeAvg_Temperature();
 
-      final float newAvgTemperature = tourData.getAverageTemperature_Device();
+      final float newAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
       TourLogManager.subLog_OK(String.format(
             LOG_TEMP_ADJUST_003_TOUR_CHANGES,

@@ -73,7 +73,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "maxPulse, " //                                     16    //$NON-NLS-1$
             + "avgPulse, " //                                     17    //$NON-NLS-1$
             + "avgCadence, " //                                   18    //$NON-NLS-1$
-            + "avgTemperature_Device, " //                               19    //$NON-NLS-1$
+            + "weather_Temperature_Average_Device, " //                               19    //$NON-NLS-1$
 
             + "TourStartTime, " //                                20    //$NON-NLS-1$
             + "TimeZoneId, " //                                   21    //$NON-NLS-1$
@@ -221,7 +221,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "AvgCadence," + NL //                                        //$NON-NLS-1$
             + "AvgPulse," + NL //                                          //$NON-NLS-1$
-            + "AvgTemperature_Device," + NL //                                    //$NON-NLS-1$
+            + "weather_Temperature_Average_Device," + NL //                                    //$NON-NLS-1$
             + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
             + "TemperatureScale," + NL //                                  //$NON-NLS-1$
             + "WeatherWindDir," + NL //                                    //$NON-NLS-1$
@@ -266,7 +266,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             //
             + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END), " + NL //                                    9     //$NON-NLS-1$
             + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
-            + "AVG( CASE WHEN avgTemperature_Device = 0   THEN NULL ELSE DOUBLE(avgTemperature_Device) / TemperatureScale END)," + NL //    11    //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
+            + NL //    11
             + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END), " + NL //                              12    //$NON-NLS-1$
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END), " + NL //                              13    //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END), " + NL //                                   14    //$NON-NLS-1$

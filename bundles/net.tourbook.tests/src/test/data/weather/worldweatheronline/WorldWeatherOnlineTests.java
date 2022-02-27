@@ -66,7 +66,7 @@ public class WorldWeatherOnlineTests {
 
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
 
-      assertEquals(16, tour.getAvgTemperature_Provider());
+      assertEquals(16, tour.getWeather_Temperature_Average());
       assertEquals(9, tour.getWeatherWindSpeed());
       assertEquals(136, tour.getWeatherWindDir());
       assertEquals("Partly cloudy", tour.getWeather()); //$NON-NLS-1$

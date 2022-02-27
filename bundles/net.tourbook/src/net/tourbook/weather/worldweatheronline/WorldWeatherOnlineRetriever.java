@@ -256,7 +256,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       }
 
       _tour.setIsWeatherDataFromApi(true);
-      _tour.setAverageTemperature(historicalWeatherData.getTemperatureAverage());
+      _tour.setWeather_Temperature_Average(historicalWeatherData.getTemperatureAverage());
       _tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
       _tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
       _tour.setWeather(historicalWeatherData.getWeatherDescription());
