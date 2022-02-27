@@ -241,7 +241,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final List<String> weatherDataList = new ArrayList<>();
 
-      //todo fb put it in the unit tests by manually entering all the weather data, or traking it from a tour when the Openweather api is usable
+      //todo fb put it in the unit tests by manually entering all the weather data, or taking it from a tour when the Openweather api is usable
       final String weatherIcon = getWeatherIcon(tourData.getWeatherIndex());
       if (StringUtils.hasContent(weatherIcon)) {
          weatherDataList.add(weatherIcon);

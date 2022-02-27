@@ -768,6 +768,7 @@ public class Messages extends NLS {
    public static String        Dialog_ModifyTours_Checkbox_RunningDynamicsValues;
    public static String        Dialog_ModifyTours_Checkbox_SwimmingValues;
    public static String        Dialog_ModifyTours_Checkbox_TemperatureValues;
+   public static String        Dialog_ModifyTours_Checkbox_TemperatureValues_FromDevice;
    public static String        Dialog_ModifyTours_Checkbox_TourMarkers;
    public static String        Dialog_ModifyTours_Checkbox_TourTimerPauses;
    public static String        Dialog_ModifyTours_Checkbox_TrainingValues;
@@ -2690,8 +2691,11 @@ public class Messages extends NLS {
    public static String        Tour_Editor_Label_StrideSensor;
    public static String        Tour_Editor_Label_Temperature;
    public static String        Tour_Editor_Label_Temperature_Avg_Tooltip;
+   public static String        Tour_Editor_Label_Temperature_Avg_Device_Tooltip;
    public static String        Tour_Editor_Label_Temperature_Max_Tooltip;
+   public static String        Tour_Editor_Label_Temperature_Max_Device_Tooltip;
    public static String        Tour_Editor_Label_Temperature_Min_Tooltip;
+   public static String        Tour_Editor_Label_Temperature_Min_Device_Tooltip;
    public static String        Tour_Editor_Label_Temperature_Tooltip;
    public static String        Tour_Editor_Label_Temperature_WindChill_Tooltip;
    public static String        tour_editor_label_time;

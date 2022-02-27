@@ -518,8 +518,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   //todo fb rename to isWeatherDataFromProvider
-   private boolean               isWeatherDataFromApi = false;
+   private boolean               isWeatherDataFromProvider = false;
 
    private int                   weatherWindDir;                                       // db-version 8
    private int                   weatherWindSpd;                                       // db-version 8
@@ -10135,10 +10134,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return serieData != null && serieData.visiblePoints_Surfing != null;
    }
 
-   //todo fb if isWeatherDataFromApi, copy from avg temp to the new one and erase the device one
-   // else copy current avg temp to new one and device one
-   public boolean isWeatherDataFromApi() {
-      return isWeatherDataFromApi;
+   public boolean isWeatherDataFromProvider() {
+      return isWeatherDataFromProvider;
    }
 
    /**
@@ -10732,7 +10729,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public void setIsWeatherDataFromApi(final boolean isWeatherDataFromApi) {
-      this.isWeatherDataFromApi = isWeatherDataFromApi;
+      this.isWeatherDataFromProvider = isWeatherDataFromApi;
    }
 
    public void setMaxPulse(final float maxPulse) {

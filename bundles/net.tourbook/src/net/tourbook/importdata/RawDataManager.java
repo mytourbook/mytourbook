@@ -353,6 +353,7 @@ public class RawDataManager {
       TIME_SLICES__RUNNING_DYNAMICS, //
       TIME_SLICES__SWIMMING, //
       TIME_SLICES__TEMPERATURE, //
+      TIME_SLICES__TEMPERATURE_FROMDEVICE, //
       TIME_SLICES__TRAINING, //
       TIME_SLICES__TIME, //
       TIME_SLICES__TIMER_PAUSES //
@@ -1745,12 +1746,21 @@ public class RawDataManager {
                tourData.setSpeedSerie(null);
                break;
 
-            case TIME_SLICES__TEMPERATURE:
+            case TIME_SLICES__TEMPERATURE_FROMDEVICE:
 
                clonedTourData.setWeather_Temperature_Average_Device(tourData.getWeather_Temperature_Average_Device());
 
                tourData.temperatureSerie = null;
                tourData.setWeather_Temperature_Average_Device(0);
+               tourData.setWeather_Temperature_Max_Device(0);
+               tourData.setWeather_Temperature_Min_Device(0);
+               break;
+
+            case TIME_SLICES__TEMPERATURE:
+
+               tourData.setWeather_Temperature_Average(0);
+               tourData.setWeather_Temperature_Max(0);
+               tourData.setWeather_Temperature_Min(0);
                break;
 
             case TIME_SLICES__TIME:

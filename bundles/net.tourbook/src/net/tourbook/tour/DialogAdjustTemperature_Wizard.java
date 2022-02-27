@@ -63,7 +63,6 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
    public DialogAdjustTemperature_Wizard(final List<TourData> selectedTours,
                                          final ITourProvider2 tourProvider) {
 
-      //todo fb should submenu only be available when there is a temperature serie ?
       super();
 
       setNeedsProgressMonitor(true);

@@ -684,11 +684,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Text               _txtDistance;
    private Text               _txtWeather;
    //
-   private TimeDuration       _deviceTime_Elapsed;                        // Total time of the activity
-   private TimeDuration       _deviceTime_Recorded;                       // Time recorded by the device = Total time - paused times
-   private TimeDuration       _deviceTime_Paused;                         // Time where the user deliberately paused the device
-   private TimeDuration       _computedTime_Moving;                       // Computed time moving
-   private TimeDuration       _computedTime_Break;                        // Computed time stopped
+   private TimeDuration       _deviceTime_Elapsed;                   // Total time of the activity
+   private TimeDuration       _deviceTime_Recorded;                  // Time recorded by the device = Total time - paused times
+   private TimeDuration       _deviceTime_Paused;                    // Time where the user deliberately paused the device
+   private TimeDuration       _computedTime_Moving;                  // Computed time moving
+   private TimeDuration       _computedTime_Break;                   // Computed time stopped
 
    private Menu               _swimViewer_ContextMenu;
    private Menu               _timeViewer_ContextMenu;
@@ -4359,13 +4359,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtWeather_Temperature_Average_Device);
-            _txtWeather_Temperature_Average_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
+            _txtWeather_Temperature_Average_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
 
             _txtWeather_Temperature_Average_Device.setEnabled(false);
 
             // label: celsius, fahrenheit
             _lblWeather_TemperatureUnit_Avg = _formToolkit.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
+            _lblWeather_TemperatureUnit_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
          }
          {
             /*
@@ -4374,7 +4374,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _txtWeather_Temperature_Max_Device = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtWeather_Temperature_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
+            _txtWeather_Temperature_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
             _txtWeather_Temperature_Max_Device.setEnabled(false);
 
             GridDataFactory.fillDefaults()
@@ -4384,7 +4384,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // unit
             _lblWeather_TemperatureUnit_Max = _formToolkit.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
+            _lblWeather_TemperatureUnit_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
          }
          {
             /*
@@ -4393,7 +4393,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _txtWeather_Temperature_Min_Device = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtWeather_Temperature_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
+            _txtWeather_Temperature_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
             _txtWeather_Temperature_Min_Device.setEnabled(false);
 
             GridDataFactory.fillDefaults()
@@ -4403,7 +4403,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // unit
             _lblWeather_TemperatureUnit_Min = _formToolkit.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Min.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
+            _lblWeather_TemperatureUnit_Min.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
          }
 
       }
@@ -8960,8 +8960,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
       _txtWeather_Temperature_Average_Device.setText(isTourTemperatureDeviceValid
-            ?_temperatureFormat.format(avgTemperature_Device)
-                  : UI.EMPTY_STRING);
+            ? _temperatureFormat.format(avgTemperature_Device)
+            : UI.EMPTY_STRING);
 
       /*
        * Min temperature from device
@@ -8985,13 +8985,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average());
 
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_Average.setDigits(1);
       int avgTemperatureValue = 0;
       if (isTourTemperatureValid) {
-         _spinWeather_Temperature_Average.setDigits(1);
          avgTemperatureValue = Math.round(avgTemperature * 10);
 
       }
-      _spinWeather_Temperature_Average.setSelection(avgTemperatureValue);
+      _spinWeather_Temperature_Min.setSelection(avgTemperatureValue);
 
       /*
        * Min temperature
@@ -8999,9 +8999,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Min());
 
       _spinWeather_Temperature_Min.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_Min.setDigits(1);
       int minTemperatureValue = 0;
       if (isTourTemperatureValid) {
-      _spinWeather_Temperature_Min.setDigits(1);
          minTemperatureValue = Math.round(minTemperature * 10);
 
       }
@@ -9013,9 +9013,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float maxTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Max());
 
       _spinWeather_Temperature_Max.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_Max.setDigits(1);
       int maxTemperatureValue = 0;
       if (isTourTemperatureValid) {
-         _spinWeather_Temperature_Max.setDigits(1);
          maxTemperatureValue = Math.round(maxTemperature * 10);
 
       }
@@ -9027,9 +9027,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final float avgWindChill = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_WindChill());
 
       _spinWeather_Temperature_WindChill.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_WindChill.setDigits(1);
       int avgWindChillValue = 0;
       if (isTourTemperatureValid) {
-         _spinWeather_Temperature_WindChill.setDigits(1);
          avgWindChillValue = Math.round(avgWindChill * 10);
 
       }

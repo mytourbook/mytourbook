@@ -2736,7 +2736,6 @@ public class TourManager {
       BusyIndicator.showWhile(Display.getCurrent(),
             () -> {
 
-               //todo fb use by default openweathermap api but if wwo is used, use that one
                result[0] = TourWeatherRetriever.retrieveWeatherData(tourData);
                if (!result[0]) {
 

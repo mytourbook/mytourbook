@@ -53,7 +53,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb add a tab for each provider
+   //todo fb add drop down menu for each provider
    //make it as generic as possible so a new provider can be quickly added
    //put each tab's code in a new file and create a generic file for "Generic Weather Provider's tab.java"
 

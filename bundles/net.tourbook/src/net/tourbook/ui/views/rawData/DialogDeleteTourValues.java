@@ -46,8 +46,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -83,7 +82,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private final ITourViewer3           _tourViewer;
 
-   private SelectionAdapter             _defaultListener;
+   private SelectionListener            _defaultListener;
 
    //
    private Image _imageLockClosed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
@@ -108,6 +107,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private Button    _chkData_RunningDynamics;
    private Button    _chkData_Swimming;
    private Button    _chkData_Temperature;
+   private Button    _chkData_Temperature_FromDevice;
    private Button    _chkData_Training;
    private Button    _chkData_TourMarkers;
    private Button    _chkData_TourTimerPauses;
@@ -405,10 +405,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
              * TODO FB
              * Checkbox: Temperature from device
              */
-            _chkData_Temperature = new Button(group, SWT.CHECK);
-            _chkData_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
-            _chkData_Temperature.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Temperature);
+            _chkData_Temperature_FromDevice = new Button(group, SWT.CHECK);
+            _chkData_Temperature_FromDevice.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
+            _chkData_Temperature_FromDevice.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Temperature_FromDevice);
          }
 
          // row 4
@@ -477,12 +477,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
              */
             _btnDeselectAll = new Button(group, SWT.PUSH);
             _btnDeselectAll.setText(Messages.App_Action_DeselectAll);
-            _btnDeselectAll.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onDeselectAll_DataItems();
-               }
-            });
+            _btnDeselectAll.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeselectAll_DataItems()));
             GridDataFactory.fillDefaults()
                   .align(SWT.RIGHT, SWT.CENTER).span(2, 1).applyTo(_btnDeselectAll);
          }
@@ -494,7 +489,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             // column 1
             _chkData_Cadence,
             _chkData_Calories,
-            _chkData_Elevation,
+            _chkData_Temperature_FromDevice,
+            _chkData_TourMarkers,
             _chkData_Gear,
             _chkData_PowerAndPulse,
             _chkData_PowerAndSpeed,
@@ -503,7 +499,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_RunningDynamics,
             _chkData_Swimming,
             _chkData_Temperature,
-            _chkData_TourMarkers,
+            _chkData_Elevation,
             _chkData_TourTimerPauses,
             _chkData_Training,
 
@@ -645,6 +641,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_RunningDynamics.getSelection() ||
             _chkData_Swimming.getSelection() ||
             _chkData_Temperature.getSelection() ||
+            _chkData_Temperature_FromDevice.getSelection() ||
             _chkData_Training.getSelection() ||
             _chkData_TourMarkers.getSelection() ||
             _chkData_TourTimerPauses.getSelection();
@@ -676,13 +673,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private void initUI() {
 
-      _defaultListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-
-            enableControls();
-         }
-      };
+      _defaultListener = widgetSelectedAdapter(selectionEvent -> enableControls());
 
       _parent.addDisposeListener(disposeEvent -> {
          _imageLockClosed.dispose();
@@ -756,6 +747,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       _chkData_RunningDynamics.setSelection(false);
       _chkData_Swimming.setSelection(false);
       _chkData_Temperature.setSelection(false);
+      _chkData_Temperature_FromDevice.setSelection(false);
       _chkData_TourMarkers.setSelection(false);
       _chkData_TourTimerPauses.setSelection(false);
       _chkData_Training.setSelection(false);
