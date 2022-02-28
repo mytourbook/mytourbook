@@ -51,7 +51,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
-   //todo fb enablecontrols to enabe/disable the api key "check" button when displaying the ui
    private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
