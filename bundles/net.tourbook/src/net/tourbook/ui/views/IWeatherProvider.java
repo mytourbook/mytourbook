@@ -27,19 +27,16 @@ public interface IWeatherProvider {
    /**
     * @param weatherProvidersUI
     * @param parent
-    * @param isShowDescription
-    * @param isShowAdditionalActions
+    * @param toolkit
     * @return
     */
    Composite createUI(WeatherProvidersUI weatherProvidersUI,
                       Composite parent,
-                      FormToolkit toolkit,
-                      boolean isShowDescription,
-                      boolean isShowAdditionalActions);
+                      FormToolkit toolkit);
 
    void dispose();
 
-   void performDefaults(boolean isFireModifications);
+   void performDefaults();
 
    void updateUIFromPrefStore();
 

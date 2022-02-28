@@ -17,13 +17,13 @@ package net.tourbook.ui.views;
 
 public class WeatherProvider {
 
-	public String	weatherProviderId;
-	public String	uiText;
+   public String weatherProviderId;
+   public String uiText;
 
    public WeatherProvider(final String weatherProviderId, final String uiText) {
 
       this.weatherProviderId = weatherProviderId;
-		this.uiText = uiText;
-	}
+      this.uiText = uiText;
+   }
 
 }

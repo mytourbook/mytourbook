@@ -51,14 +51,15 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
+   //todo fb enablecontrols to enabe/disable the api key "check" button when displaying the ui
    private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
+   //todo fb hide the api key just like in the cloud pref page
    /*
     * UI controls
     */
    private Button _btnTestConnection;
-   private Button _chkWeatherRetrieval;
    private Label  _labelApiKey;
 
    private Text   _textApiKey;
@@ -68,9 +69,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
    @Override
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
                              final Composite parent,
-                             final FormToolkit tk,
-                             final boolean isShowDescription,
-                             final boolean isShowAdditionalActions) {
+                             final FormToolkit tk) {
 
       final int defaultHIndent = 16;
 
@@ -78,17 +77,18 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         {
-            /*
-             * Checkbox: Use the weather retrieval feature
-             */
-            _chkWeatherRetrieval = new Button(container, SWT.CHECK);
-            _chkWeatherRetrieval.setText(Messages.Pref_Weather_Checkbox_UseRetrieval);
-            _chkWeatherRetrieval.setToolTipText(Messages.Pref_Weather_Checkbox_UseRetrieval_Tooltip);
-            _chkWeatherRetrieval.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onSelectCheckWeatherRetrieval()));
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkWeatherRetrieval);
-         }
+         //todo fb is None" replacing that ?
+//         {
+//            /*
+//             * Checkbox: Use the weather retrieval feature
+//             */
+//            _chkWeatherRetrieval = new Button(container, SWT.CHECK);
+//            _chkWeatherRetrieval.setText(Messages.Pref_Weather_Checkbox_UseRetrieval);
+//            _chkWeatherRetrieval.setToolTipText(Messages.Pref_Weather_Checkbox_UseRetrieval_Tooltip);
+//            _chkWeatherRetrieval.addSelectionListener(widgetSelectedAdapter(
+//                  selectionEvent -> onSelectCheckWeatherRetrieval()));
+//            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkWeatherRetrieval);
+//         }
          {
             /*
              * API key
@@ -147,22 +147,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
    }
 
    @Override
-   public void dispose() {
-
-   }
-
-   private void enableControls() {
-
-      final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
-
-      _labelApiKey.setEnabled(useWeatherRetrieval);
-      _textApiKey.setEnabled(useWeatherRetrieval);
-      _btnTestConnection.setEnabled(useWeatherRetrieval);
-
-      if (useWeatherRetrieval) {
-         onModifyApiKey();
-      }
-   }
+   public void dispose() {}
 
    /**
     * This method ensures the connection to the API can be made successfully.
@@ -210,36 +195,30 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
       _btnTestConnection.setEnabled(StringUtils.hasContent(_textApiKey.getText()));
    }
 
-   private void onSelectCheckWeatherRetrieval() {
-      enableControls();
-   }
 
    @Override
-   public void performDefaults(final boolean isFireModifications) {
+   public void performDefaults() {
 
-      _chkWeatherRetrieval.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
+      // _chkWeatherRetrieval.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
       _textApiKey.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
-
-      enableControls();
    }
 
    private void restoreState() {
 
-      _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
+      // _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
       _textApiKey.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
    private void saveState() {
 
-      final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
+      // final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
 
-      _prefStore.setValue(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL, useWeatherRetrieval);
+      //  _prefStore.setValue(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL, useWeatherRetrieval);
       _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey.getText());
    }
 
    @Override
    public void updateUIFromPrefStore() {
       restoreState();
-      enableControls();
    }
 }

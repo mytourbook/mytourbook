@@ -20,30 +20,29 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
 
+   /*
+    * UI controls
+    */
+   private FormToolkit _tk;
+
    public WeatherProvider_OpenWeatherMap() {}
 
    @Override
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
                              final Composite parent,
-                             final FormToolkit tk,
-                             final boolean isShowDescription,
-                             final boolean isShowAdditionalActions) {
+                             final FormToolkit tk) {
+      _tk = tk;
+      final Composite container = _tk.createComposite(parent);
 
-      return parent;
+      return container;
    }
 
    @Override
-   public void dispose() {
-      // Nothing to do
-   }
+   public void dispose() {}
 
    @Override
-   public void performDefaults(final boolean isFireModifications) {
-      // Nothing to do
-   }
+   public void performDefaults() {}
 
    @Override
-   public void updateUIFromPrefStore() {
-      // Nothing to do
-   }
+   public void updateUIFromPrefStore() {}
 }
