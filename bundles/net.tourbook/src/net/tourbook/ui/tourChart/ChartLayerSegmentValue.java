@@ -283,7 +283,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                if (_isShowSegmenterLine /* && isShowValueText */) {
 
                   gc.setAlpha(_lineOpacity);
-                  gc.drawLine(//
+                  gc.drawLine(
                         devXPrev,
                         devYSegment,
                         devXSegment,
@@ -576,7 +576,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
    ChartLayerSegmentValue setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
 
       _isShowSegmenterLine = isShowSegmenterLine;
-      _lineOpacity = (int) (lineOpacity / 100.0 * 255);
+      _lineOpacity = lineOpacity;
 
       return this;
    }

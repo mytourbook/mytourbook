@@ -32,7 +32,7 @@ public class ActionZoomShowEntireMap extends Action {
 
       _mapView = mapView;
 
-      setText(Messages.Map_Action_ShowEarchMap);
+      setText(Messages.Map_Action_ShowEarthMap);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireMap));
    }

@@ -168,8 +168,8 @@ public class DirectMappingPainter implements IDirectPainter {
       // set alpha when requested
       int alpha = 0xff;
       final int opacity = _sliderPathPaintingData.opacity;
-      if (opacity < 100) {
-         alpha = 0xff * opacity / 100;
+      if (opacity <= 0xff) {
+         alpha = opacity;
       }
 
       final Color lineColor = new Color(gc.getDevice(), _sliderPathPaintingData.color);

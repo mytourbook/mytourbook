@@ -197,9 +197,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    public static final String  STATE_IS_SHOW_TOUR_SEGMENTS                    = "STATE_IS_SHOW_TOUR_SEGMENTS";            //$NON-NLS-1$
    public static final boolean STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT            = true;
    public static final String  STATE_GRAPH_OPACITY                            = "STATE_GRAPH_OPACITY";                    //$NON-NLS-1$
-   public static final int     STATE_GRAPH_OPACITY_DEFAULT                    = 10;
+   public static final int     STATE_GRAPH_OPACITY_DEFAULT                    = 25;                                       // 10%
    public static final String  STATE_LINE_OPACITY                             = "STATE_LINE_OPACITY";                     //$NON-NLS-1$
-   public static final int     STATE_LINE_OPACITY_DEFAULT                     = 100;
+   public static final int     STATE_LINE_OPACITY_DEFAULT                     = 0xff;
    public static final String  STATE_SMALL_VALUE_SIZE                         = "STATE_SMALL_VALUE_SIZE";                 //$NON-NLS-1$
    public static final int     STATE_SMALL_VALUE_SIZE_DEFAULT                 = 50;
    public static final String  STATE_STACKED_VISIBLE_VALUES                   = "STATE_STACKED_VISIBLE_VALUES";           //$NON-NLS-1$

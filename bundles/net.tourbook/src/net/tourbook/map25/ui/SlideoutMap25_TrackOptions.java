@@ -420,8 +420,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
                // opacity
                _spinnerSliderPath_Opacity = new Spinner(colorContainer, SWT.BORDER);
-               _spinnerSliderPath_Opacity.setMinimum(Map25ConfigManager.SLIDER_PATH_OPACITY_MIN);
-               _spinnerSliderPath_Opacity.setMaximum(Map25ConfigManager.SLIDER_PATH_OPACITY_MAX);
+               _spinnerSliderPath_Opacity.setMinimum((int) (UI.TRANSFORM_OPACITY_MAX * 0.2f));
+               _spinnerSliderPath_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                _spinnerSliderPath_Opacity.setIncrement(1);
                _spinnerSliderPath_Opacity.setPageIncrement(10);
                _spinnerSliderPath_Opacity.addSelectionListener(_defaultSelectionListener);
@@ -636,7 +636,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _chkShowSliderPath.setSelection(config.isShowSliderPath);
       _colorSliderPathColor.setColorValue(config.sliderPath_Color);
       _spinnerSliderPath_LineWidth.setSelection((int) (config.sliderPath_LineWidth * 10));
-      _spinnerSliderPath_Opacity.setSelection(config.sliderPath_Opacity);
+      _spinnerSliderPath_Opacity.setSelection(UI.transformOpacity_WhenRestored(config.sliderPath_Opacity));
 
       _isUpdateUI = false;
    }
@@ -666,7 +666,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.isShowSliderPath = _chkShowSliderPath.getSelection();
       config.sliderPath_Color = _colorSliderPathColor.getColorValue();
       config.sliderPath_LineWidth = _spinnerSliderPath_LineWidth.getSelection() / 10.0f;
-      config.sliderPath_Opacity = _spinnerSliderPath_Opacity.getSelection();
+      config.sliderPath_Opacity = UI.transformOpacity_WhenSaved(_spinnerSliderPath_Opacity.getSelection());
    }
 
    private void updateUI_SetActiveConfig() {

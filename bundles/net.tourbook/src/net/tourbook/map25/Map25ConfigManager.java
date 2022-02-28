@@ -156,11 +156,11 @@ public class Map25ConfigManager {
    public static final boolean DEFAULT_IS_SHOW_CHART_SLIDER        = true;
    public static final RGB     DEFAULT_SLIDER_PATH_COLOR           = new RGB(0xff, 0xff, 0x0);
    public static final float   DEFAULT_SLIDER_PATH_LINE_WIDTH      = 20.0f;
-   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 30;
+   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 75;                       // 30 %
    public static float         SLIDER_PATH_LINE_WIDTH_MIN          = 1.0f;
    public static final float   SLIDER_PATH_LINE_WIDTH_MAX          = 50.0f;
-   public static final int     SLIDER_PATH_OPACITY_MIN             = 1;
-   public static final int     SLIDER_PATH_OPACITY_MAX             = 100;
+   public static final int     SLIDER_PATH_OPACITY_MIN             = 50;                       // 20%
+   public static final int     SLIDER_PATH_OPACITY_MAX             = 0xff;
    //
    // other properties
    public static final int DEFAULT_ANIMATION_TIME = 2000;

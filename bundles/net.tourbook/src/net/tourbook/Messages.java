@@ -1729,6 +1729,9 @@ public class Messages extends NLS {
    public static String        Pref_Tour_Label_TourCacheSize;
    public static String        Pref_Tour_Label_TourCacheSize_Info;
 
+   public static String        Pref_TransformValues_Label_Opacity;
+   public static String        Pref_TransformValues_Label_Opacity_Tooltip;
+
    public static String        pref_view_layout_display_lines;
    public static String        pref_view_layout_display_lines_Tooltip;
    public static String        pref_view_layout_label_break_time_format;
