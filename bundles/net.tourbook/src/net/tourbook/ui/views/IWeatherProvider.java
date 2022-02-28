@@ -38,6 +38,4 @@ public interface IWeatherProvider {
 
    void performDefaults();
 
-   void updateUIFromPrefStore();
-
 }

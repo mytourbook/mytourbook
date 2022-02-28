@@ -143,11 +143,21 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
          }
       }
 
+      restoreState();
+      enableControls();
+
       return container;
    }
 
    @Override
    public void dispose() {}
+
+
+
+   private void enableControls() {
+
+         onModifyApiKey();
+   }
 
    /**
     * This method ensures the connection to the API can be made successfully.
@@ -190,35 +200,25 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
       });
    }
 
+
    private void onModifyApiKey() {
 
       _btnTestConnection.setEnabled(StringUtils.hasContent(_textApiKey.getText()));
    }
 
-
    @Override
    public void performDefaults() {
 
-      // _chkWeatherRetrieval.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
       _textApiKey.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
    private void restoreState() {
 
-      // _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
       _textApiKey.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
    private void saveState() {
 
-      // final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
-
-      //  _prefStore.setValue(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL, useWeatherRetrieval);
       _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey.getText());
-   }
-
-   @Override
-   public void updateUIFromPrefStore() {
-      restoreState();
    }
 }

@@ -15,21 +15,41 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 public final class TourWeatherRetriever {
+
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    //public abstract boolean populateTourWeatherData(TourData tourData);
    // boolean retrieveHistoricalWeatherData();
    public static boolean retrieveWeatherData(final TourData tourData) {
 
+      //todo busy indicator
+
+      final String weatherProvider = _prefStore.getString(
+            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+
+      switch (weatherProvider) {
+      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
+         //TODO FB
+         break;
+      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
+         return new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData();
+
+      case IWeatherProvider.WEATHER_PROVIDER_NONE:
+      default:
+         break;
       //if favorite weather provide is WWO then retrieve WWO retriever
-      return new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData();
+      }
 
-
-
-      //return true;
+      return true;
    }
 
 }

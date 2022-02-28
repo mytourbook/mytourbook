@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
@@ -261,12 +262,12 @@ public class WeatherProvidersUI {
 
    public void performDefaults() {
 
-      final String defaultSmoothingId = _prefStore.getDefaultString(//
-            ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
+      final String defaultWeatherProviderId = _prefStore.getDefaultString(//
+            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
-      _prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, defaultSmoothingId);
+      _prefStore.setValue(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID, defaultWeatherProviderId);
 
-      selectSmoothingAlgo(defaultSmoothingId);
+      selectWeatherProvider(defaultWeatherProviderId);
 
       updateUI();
 
@@ -281,8 +282,20 @@ public class WeatherProvidersUI {
 
       _isUpdateUI = true;
       {
-         // smoothing algorithm
-         selectSmoothingAlgo(_prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM));
+         String weatherProviderId =
+               _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+
+         //For backwards compatibility purpose, we should select WorldWeatherOnline when
+         //the api key is not.
+         //Maybe this code could be suppressed in the future once most of the
+         //users have upgraded to 22.X ?
+         if (StringUtils.isNullOrEmpty(weatherProviderId) &&
+               _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL)) {
+            weatherProviderId = IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE;
+         }
+
+         // Weather provider
+         selectWeatherProvider(weatherProviderId);
       }
       _isUpdateUI = false;
    }
@@ -292,25 +305,26 @@ public class WeatherProvidersUI {
     */
    private void saveState() {
 
-      // smoothing algorithm
       _prefStore.setValue(//
-            ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
+            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID,
             getSelectedWeatherProvider().weatherProviderId);
    }
 
-   private void selectSmoothingAlgo(final String prefAlgoId) {
+   private void selectWeatherProvider(final String prefWeatherProviderId) {
 
-      int prefAlgoIndex = -1;
-      for (int algoIndex = 0; algoIndex < WEATHER_PROVIDER.length; algoIndex++) {
-         if (WEATHER_PROVIDER[algoIndex].weatherProviderId.equals(prefAlgoId)) {
-            prefAlgoIndex = algoIndex;
+      int prefWeatherProviderIndex = -1;
+      for (int weatherProviderIndex = 0; weatherProviderIndex < WEATHER_PROVIDER.length; weatherProviderIndex++) {
+
+         if (WEATHER_PROVIDER[weatherProviderIndex].weatherProviderId.equals(prefWeatherProviderId)) {
+            prefWeatherProviderIndex = weatherProviderIndex;
             break;
          }
       }
-      if (prefAlgoIndex == -1) {
-         prefAlgoIndex = 0;
+      if (prefWeatherProviderIndex == -1) {
+         prefWeatherProviderIndex = 0;
       }
-      _comboWeatherProvider.select(prefAlgoIndex);
+      _comboWeatherProvider.select(prefWeatherProviderIndex);
+
    }
 
    private void setupUI() {

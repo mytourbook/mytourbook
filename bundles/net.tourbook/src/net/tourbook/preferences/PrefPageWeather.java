@@ -40,7 +40,6 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    private Composite createUI(final Composite parent) {
 
       _weatherProvidersUI = new WeatherProvidersUI();
-
       _weatherProvidersUI.createUI(parent);
 
       return parent;
