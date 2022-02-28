@@ -100,6 +100,10 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   .applyTo(_textApiKey_Value);
          }
          {
+            /*
+             * Show/hide API key
+             */
+
             _chkShowHideApiKey = new Button(container, SWT.CHECK);
             _chkShowHideApiKey.setText(Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey);
             _chkShowHideApiKey.setToolTipText(Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey_Tooltip);

@@ -33,6 +33,7 @@ import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -49,7 +50,6 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
    /*
     * UI controls
     */
-   private FormToolkit _tk;
    private Button      _btnTestConnection;
 
    public WeatherProvider_OpenWeatherMap() {}
@@ -58,10 +58,11 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
                              final Composite parent,
                              final FormToolkit tk) {
-      _tk = tk;
       final int defaultHIndent = 16;
 
-      final Composite container = _tk.createComposite(parent);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
          /*
           * OpenWeatherMap webpage

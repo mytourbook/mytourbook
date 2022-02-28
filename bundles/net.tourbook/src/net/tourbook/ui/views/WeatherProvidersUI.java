@@ -60,7 +60,7 @@ public class WeatherProvidersUI {
    /*
     * UI controls
     */
-   private FormToolkit _tk;
+   private FormToolkit _formToolkit;
 
    private Composite   _uiContainer;
 
@@ -88,7 +88,7 @@ public class WeatherProvidersUI {
 
    private void createUI_10(final Composite parent) {
 
-      _uiContainer = _tk.createComposite(parent);
+      _uiContainer = _formToolkit.createComposite(parent);
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(_uiContainer);
@@ -101,14 +101,14 @@ public class WeatherProvidersUI {
 
    private void createUI_10_WeatherProvider(final Composite parent) {
 
-      final Composite container = _tk.createComposite(parent);
+      final Composite container = _formToolkit.createComposite(parent);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(container);
       {
          /*
           * Label: weather provider
           */
-         final Label label = _tk.createLabel(container, "weather provider");//Messages.TourChart_Smoothing_Label_SmoothingAlgorithm);
+         final Label label = _formToolkit.createLabel(container, "weather provider");//Messages.TourChart_Smoothing_Label_SmoothingAlgorithm);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(label);
@@ -127,7 +127,7 @@ public class WeatherProvidersUI {
          GridDataFactory.fillDefaults()
                .indent(20, 0)
                .applyTo(_comboWeatherProvider);
-         _tk.adapt(_comboWeatherProvider, true, true);
+         _formToolkit.adapt(_comboWeatherProvider, true, true);
       }
    }
 
@@ -144,17 +144,17 @@ public class WeatherProvidersUI {
          _pageNoneUI = _weatherProvider_None.createUI(
                this,
                _pagebookWeatherProvider,
-               _tk);
+               _formToolkit);
 
          _pageOpenWeatherMapUI = _weatherProvider_OpenWeatherMap.createUI(
                this,
                _pagebookWeatherProvider,
-               _tk);
+               _formToolkit);
 
          _pageWorldWeatherOnlineUI = _weatherProvider_WorldWeatherOnline.createUI(
                this,
                _pagebookWeatherProvider,
-               _tk);
+               _formToolkit);
       }
    }
 
@@ -164,7 +164,7 @@ public class WeatherProvidersUI {
       _weatherProvider_OpenWeatherMap.dispose();
       _weatherProvider_WorldWeatherOnline.dispose();
 
-      _tk.dispose();
+      _formToolkit.dispose();
    }
 
    private WeatherProvider getSelectedWeatherProvider() {
@@ -173,10 +173,10 @@ public class WeatherProvidersUI {
 
    private void initUI(final Composite parent) {
 
-      if (_tk == null) {
+      if (_formToolkit == null) {
 
          // it could be already created
-         _tk = new FormToolkit(parent.getDisplay());
+         _formToolkit = new FormToolkit(parent.getDisplay());
       }
    }
 
