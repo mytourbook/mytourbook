@@ -64,16 +64,14 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
       final Composite container = _tk.createComposite(parent);
       {
          /*
-          * WWO Api Sign-up page
+          * OpenWeatherMap webpage
           */
-
-         // Link - see http(s)://www.worldweatheronline.com/developer/signup.aspx
          final Link linkApiSignup = new Link(container, SWT.PUSH);
-         linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
+         linkApiSignup.setText(Messages.Pref_Weather_OpenWeatherMap_Link);
          linkApiSignup.setEnabled(true);
          linkApiSignup.addListener(
                SWT.Selection,
-               event -> WEB.openUrl(Messages.External_Link_Weather_ApiSignup));
+               event -> WEB.openUrl(Messages.External_Link_Weather_OpenWeatherMap));
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(defaultHIndent, 0)
@@ -84,7 +82,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           * Button: test connection
           */
          _btnTestConnection = new Button(container, SWT.NONE);
-         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+         _btnTestConnection.setText(Messages.Pref_Weather_OpenWeatherMap_Button_TestConnection);
          _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
                selectionEvent -> onCheckConnection()));
          GridDataFactory.fillDefaults()

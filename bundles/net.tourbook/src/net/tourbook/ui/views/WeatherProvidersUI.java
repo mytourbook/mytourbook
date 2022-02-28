@@ -17,23 +17,15 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.text.NumberFormat;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -42,95 +34,45 @@ import org.eclipse.ui.part.PageBook;
 
 public class WeatherProvidersUI {
 
-   private static final WeatherProvider[] WEATHER_PROVIDER = {
+   private static final WeatherProvider[] WEATHER_PROVIDER                    = {
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_NONE,
-               "None"),                                                                    //Messages.TourChart_Smoothing_Algorithm_Initial),
+               "None"),                                                                                                  //Messages.TourChart_Smoothing_Algorithm_Initial),
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP,
-               "OpenWeatherMap"),                                                          //Messages.TourChart_Smoothing_Algorithm_Jamet),
+               "OpenWeatherMap"),                                                                                        //Messages.TourChart_Smoothing_Algorithm_Jamet),
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE,
-               "WWO")                                                                      //Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
+               "WWO")                                                                                                    //Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
    };
 
-   private final IPreferenceStore         _prefStore       = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStore                          = TourbookPlugin.getPrefStore();
 
-   private ITourEventListener             _tourEventListener;
+   private boolean                        _isUpdateUI;
 
-   private FocusListener                  _keepOpenListener;
-   {
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            if (_slideout != null) {
-
-               /*
-                * This will fix the problem that when the list of a combobox is displayed, then
-                * the slideout will disappear :-(((
-                */
-               _slideout.setIsAnotherDialogOpened(true);
-            }
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-
-            if (_slideout != null) {
-               _slideout.setIsAnotherDialogOpened(false);
-            }
-
-         }
-      };
-   }
-
-   private boolean          _isUpdateUI;
-
-   private IWeatherProvider _weatherProvider_None               = new WeatherProvider_None();
-   private IWeatherProvider _weatherProvider_OpenWeatherMap     = new WeatherProvider_OpenWeatherMap();
-   private IWeatherProvider _weatherProvider_WorldWeatherOnline = new WeatherProvider_WorldWeatherOnline();
-
-   private NumberFormat     _nf0                                = NumberFormat.getNumberInstance();
-
-   {
-      _nf0.setMinimumFractionDigits(0);
-      _nf0.setMaximumFractionDigits(0);
-   }
+   private IWeatherProvider               _weatherProvider_None               = new WeatherProvider_None();
+   private IWeatherProvider               _weatherProvider_OpenWeatherMap     = new WeatherProvider_OpenWeatherMap();
+   private IWeatherProvider               _weatherProvider_WorldWeatherOnline = new WeatherProvider_WorldWeatherOnline();
 
    /*
     * UI controls
     */
-   private FormToolkit     _tk;
+   private FormToolkit _tk;
 
-   private Composite       _uiContainer;
+   private Composite   _uiContainer;
 
-   private Combo           _comboWeatherProvider;
+   private Combo       _comboWeatherProvider;
 
-   private PageBook        _pagebookWeatherProvider;
+   private PageBook    _pagebookWeatherProvider;
 
-   private Composite       _pageNoneUI;
-   private Composite       _pageOpenWeatherMapUI;
-   private Composite       _pageWorldWeatherOnlineUI;
-
-   private ToolbarSlideout _slideout;
+   private Composite   _pageNoneUI;
+   private Composite   _pageOpenWeatherMapUI;
+   private Composite   _pageWorldWeatherOnlineUI;
 
    public WeatherProvidersUI() {}
-
-   /**
-    * @param tk
-    *           This toolkit will be disposed when the UI is disposed;
-    * @param toolbarSlideout
-    */
-   public WeatherProvidersUI(final FormToolkit tk, final ToolbarSlideout slideout) {
-
-      _tk = tk;
-      _slideout = slideout;
-   }
 
    public void createUI(final Composite parent) {
 
@@ -151,7 +93,6 @@ public class WeatherProvidersUI {
             .grab(true, true)
             .applyTo(_uiContainer);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_uiContainer);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
       {
          createUI_10_WeatherProvider(_uiContainer);
          createUI_20_WeatherProviderPagebook(_uiContainer);
@@ -163,7 +104,6 @@ public class WeatherProvidersUI {
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          /*
           * Label: weather provider
@@ -178,7 +118,6 @@ public class WeatherProvidersUI {
           */
          _comboWeatherProvider = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
          _comboWeatherProvider.setVisibleItemCount(10);
-         _comboWeatherProvider.addFocusListener(_keepOpenListener);
          _comboWeatherProvider.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             if (_isUpdateUI) {
                return;
@@ -186,7 +125,6 @@ public class WeatherProvidersUI {
             onSelectWeatherProvider();
          }));
          GridDataFactory.fillDefaults()
-//               .align(SWT.END, SWT.FILL)
                .indent(20, 0)
                .applyTo(_comboWeatherProvider);
          _tk.adapt(_comboWeatherProvider, true, true);
@@ -222,8 +160,6 @@ public class WeatherProvidersUI {
 
    public void dispose() {
 
-      TourManager.getInstance().removeTourEventListener(_tourEventListener);
-
       _weatherProvider_None.dispose();
       _weatherProvider_OpenWeatherMap.dispose();
       _weatherProvider_WorldWeatherOnline.dispose();
@@ -250,14 +186,7 @@ public class WeatherProvidersUI {
 
       updateUI();
 
-      // update pref store
       saveState();
-
-      // force tours to be recomputed
-      TourManager.getInstance().removeAllToursFromCache();
-
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
    }
 
    public void performDefaults() {
