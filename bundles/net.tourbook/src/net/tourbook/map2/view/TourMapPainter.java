@@ -66,7 +66,7 @@ import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPage_Map2_Appearance;
+import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
@@ -721,8 +721,8 @@ public class TourMapPainter extends Map2Painter {
 
 // SET_FORMATTING_OFF
 
-      _prefIsDrawLine            = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
-      _prefIsDrawSquare          = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE);
+      _prefIsDrawLine            = drawSymbol.equals(Map2_Appearance.PLOT_TYPE_LINE);
+      _prefIsDrawSquare          = drawSymbol.equals(Map2_Appearance.PLOT_TYPE_SQUARE);
 
       _prefIsAntialiasPainting   = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING);
 
@@ -2598,7 +2598,7 @@ public class TourMapPainter extends Map2Painter {
       /*
        * Get border color
        */
-      if (isBorder && _prefBorderType == PrefPage_Map2_Appearance.BORDER_TYPE_COLOR) {
+      if (isBorder && _prefBorderType == Map2_Appearance.BORDER_TYPE_COLOR) {
          return _colorCache.getColor(_prefBorderRGB);
       }
 

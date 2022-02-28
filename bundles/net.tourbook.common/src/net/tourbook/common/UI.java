@@ -40,6 +40,7 @@ import net.tourbook.common.measurement_system.Unit_Pace;
 import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.common.measurement_system.Unit_Temperature;
 import net.tourbook.common.measurement_system.Unit_Weight;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -52,11 +53,14 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Geometry;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -286,12 +290,6 @@ public class UI {
     */
    public static final int     DEFAULT_DESCRIPTION_WIDTH      = 350;
    public static final int     DEFAULT_FIELD_WIDTH            = 40;
-
-   /**
-    * The opacity can be set in SWT from 0...255 but no user want's so many steps. In the UI the
-    * user can select this max opacity value which will be converted into 255 when appied.
-    */
-   public static final int     MAX_OPACITY                    = 10;
 
    /**
     * Convert Joule in Calorie
@@ -639,9 +637,16 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-   public static final ImageRegistry IMAGE_REGISTRY;
+   public static final ImageRegistry     IMAGE_REGISTRY;
 
-   public static final int           DECORATOR_HORIZONTAL_INDENT = 2;
+   public static final int               DECORATOR_HORIZONTAL_INDENT = 2;
+
+   /**
+    * Contains the value that opacity is 100% opaque
+    */
+   public static int                     TRANSFORM_OPACITY_MAX;
+
+   private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
    static {
 
@@ -687,6 +692,23 @@ public class UI {
 
       SYS_COLOR_DARK_GRAY   = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
       SYS_COLOR_DARK_GREEN  = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+
+      TRANSFORM_OPACITY_MAX = _prefStore_Common.getInt(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX);
+
+      // add prop listener
+      _prefStore_Common.addPropertyChangeListener(new IPropertyChangeListener() {
+
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX)) {
+
+               TRANSFORM_OPACITY_MAX = (int) event.getNewValue();
+            }
+         }
+      });
 
 // SET_FORMATTING_ON
 
@@ -767,6 +789,7 @@ public class UI {
             .appendSuffix(Messages.Period_Format_Millisecond_Short, Messages.Period_Format_Millisecond_Short)
 
             .toFormatter();
+
    }
 
    /**
@@ -1013,27 +1036,6 @@ public class UI {
       }
 
       return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
-   }
-
-   /**
-    * Convert opacity value into 0...255 where 255 corresponds with {@link #MAX_OPACITY}
-    * <p>
-    * The tooltip should display
-    *
-    * <pre>
-    * 0 = transparent ... max = opaque
-    * </pre>
-    *
-    * that {@link #MAX_OPACITY} could be adjusted or customized by the user.
-    *
-    * @param opacity
-    * @return
-    */
-   public static int convertOpacity(final float opacity) {
-
-      final float opacityConverted = opacity / MAX_OPACITY * 0xff;
-
-      return (int) Math.min(0xff, opacityConverted);
    }
 
    /**
@@ -1694,6 +1696,21 @@ public class UI {
       }
 
       return null;
+   }
+
+   public static GridDataFactory gridLayoutData_AlignBeginningFill() {
+
+      return GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL);
+   }
+
+   public static GridDataFactory gridLayoutData_AlignFillCenter() {
+
+      return GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+   }
+
+   public static GridDataFactory gridLayoutData_Span_2_1() {
+
+      return GridDataFactory.fillDefaults().span(2, 1);
    }
 
    /**
@@ -2619,6 +2636,42 @@ public class UI {
 
    public static String timeStampNano() {
       return (new Timestamp()).toString();
+   }
+
+   /**
+    * Transform from 0...255 to {@link #TRANSFORM_OPACITY_MAX}
+    *
+    * @param opacity
+    * @return
+    */
+   public static int transformOpacity_WhenRestored(final int opacity) {
+
+      int transformedValue = Math.round(opacity / 255.0f * TRANSFORM_OPACITY_MAX);
+
+      // ensure valid opacity
+      if (transformedValue > 255) {
+         transformedValue = 255;
+      }
+
+      return transformedValue;
+   }
+
+   /**
+    * Transform value from {@link #TRANSFORM_OPACITY_MAX} to 0...255
+    *
+    * @param opacity
+    * @return
+    */
+   public static int transformOpacity_WhenSaved(final int opacity) {
+
+      int transformedValue = Math.round(255.0f / TRANSFORM_OPACITY_MAX * opacity);
+
+      // ensure valid opacity
+      if (transformedValue > 255) {
+         transformedValue = 255;
+      }
+
+      return transformedValue;
    }
 
    public static void updateScrolledContent(final Composite composite) {

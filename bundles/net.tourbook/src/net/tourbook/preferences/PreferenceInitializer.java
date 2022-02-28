@@ -164,7 +164,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             + Integer.toString(TourManager.GRAPH_POWER));
 
       store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING,               true);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,          100);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,          0xff);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING,       70);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK,  20);
 
@@ -249,7 +249,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       // night sections
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
-      store.setDefault(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY, 50);
+      store.setDefault(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY, 0x80);
 
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
@@ -390,19 +390,19 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        */
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING,       true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES,  true);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   Map2_Appearance.DEFAULT_PLOT_TYPE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,                6);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,           true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,                1);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,           80); // 0...100
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,    new RGB(0x50, 0x50, 0x50));
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
       store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,      false);
-      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         70);     // opacity in %
+      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         180); // ~70 %
 
 
       /*
@@ -540,8 +540,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Heart rate variability
        */
-      store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, 20); // milliseconds
-      store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, false);
+      store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE,   20); // milliseconds
+      store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR,      false);
 
       /*
        * Time zone
@@ -552,14 +552,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Weather
        */
-      store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
+      store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,    false);
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
 
       /*
        * Tour Marker View
        */
-      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME,true);
-      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME, false);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME,  true);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME,   false);
       store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, false);
 
 // SET_FORMATTING_ON

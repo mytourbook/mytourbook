@@ -33,8 +33,7 @@ Experimental
 New
 ===
 
-* 
-
+*
 
 Improvements
 ============
@@ -50,9 +49,19 @@ Improvements
   - Consolidated "Set map center when zoomed to ..."		               https://github.com/mytourbook/mytourbook/issues/468
   - Show more details when multiple tours are hovered                   https://github.com/mytourbook/mytourbook/issues/470
 
+* Transform Opacity
+  - Selecting/entering opacity values 0...100 or 0...255 is not user friendly. 
+    With this new transformation, which is defined in the user preferences, opacity values could be selected between e.g. 0...8 which is then transformed to 0...255
+
 
 Changes
 =======
+
+* Tour Chart
+  - Moved the options
+    - Graph line transparency
+    - Draw line graphs with antialiasing
+    from the pref page into the chart options slideout
 
 * 2D Map
   - Moved action "Show eath map" from the toolbar into the map context menu
