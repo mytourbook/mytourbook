@@ -38,4 +38,6 @@ public interface IWeatherProvider {
 
    void performDefaults();
 
+   void saveState();
+
 }

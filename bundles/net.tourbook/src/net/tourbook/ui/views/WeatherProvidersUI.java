@@ -272,9 +272,7 @@ public class WeatherProvidersUI {
       updateUI();
 
       _weatherProvider_None.performDefaults();
-
       _weatherProvider_OpenWeatherMap.performDefaults();
-
       _weatherProvider_WorldWeatherOnline.performDefaults();
    }
 
@@ -308,6 +306,10 @@ public class WeatherProvidersUI {
       _prefStore.setValue(//
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID,
             getSelectedWeatherProvider().weatherProviderId);
+
+      _weatherProvider_None.saveState();
+      _weatherProvider_OpenWeatherMap.saveState();
+      _weatherProvider_WorldWeatherOnline.saveState();
    }
 
    private void selectWeatherProvider(final String prefWeatherProviderId) {

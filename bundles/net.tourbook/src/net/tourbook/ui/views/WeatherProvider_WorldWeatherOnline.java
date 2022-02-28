@@ -77,18 +77,6 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         //todo fb is None" replacing that ?
-//         {
-//            /*
-//             * Checkbox: Use the weather retrieval feature
-//             */
-//            _chkWeatherRetrieval = new Button(container, SWT.CHECK);
-//            _chkWeatherRetrieval.setText(Messages.Pref_Weather_Checkbox_UseRetrieval);
-//            _chkWeatherRetrieval.setToolTipText(Messages.Pref_Weather_Checkbox_UseRetrieval_Tooltip);
-//            _chkWeatherRetrieval.addSelectionListener(widgetSelectedAdapter(
-//                  selectionEvent -> onSelectCheckWeatherRetrieval()));
-//            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkWeatherRetrieval);
-//         }
          {
             /*
              * API key
@@ -152,11 +140,9 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
    @Override
    public void dispose() {}
 
-
-
    private void enableControls() {
 
-         onModifyApiKey();
+      onModifyApiKey();
    }
 
    /**
@@ -200,7 +186,6 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
       });
    }
 
-
    private void onModifyApiKey() {
 
       _btnTestConnection.setEnabled(StringUtils.hasContent(_textApiKey.getText()));
@@ -217,7 +202,8 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
       _textApiKey.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
-   private void saveState() {
+   @Override
+   public void saveState() {
 
       _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey.getText());
    }

@@ -42,4 +42,7 @@ public class WeatherProvider_None implements IWeatherProvider {
 
    @Override
    public void performDefaults() {}
+
+   @Override
+   public void saveState() {}
 }

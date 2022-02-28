@@ -1746,8 +1746,6 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_title;
 
    public static String        Pref_Weather_Button_TestHTTPConnection;
-   public static String        Pref_Weather_Checkbox_UseRetrieval;
-   public static String        Pref_Weather_Checkbox_UseRetrieval_Tooltip;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
