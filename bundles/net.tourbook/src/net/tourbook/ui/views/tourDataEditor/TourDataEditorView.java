@@ -8987,7 +8987,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          avgTemperatureValue = Math.round(avgTemperature * 10);
 
       }
-      _spinWeather_Temperature_Min.setSelection(avgTemperatureValue);
+      _spinWeather_Temperature_Average.setSelection(avgTemperatureValue);
 
       /*
        * Min temperature
@@ -9015,7 +9015,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          maxTemperatureValue = Math.round(maxTemperature * 10);
 
       }
-      _spinWeather_Temperature_Min.setSelection(maxTemperatureValue);
+      _spinWeather_Temperature_Max.setSelection(maxTemperatureValue);
 
       /*
        * Wind Chill
