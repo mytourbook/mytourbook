@@ -28,8 +28,11 @@ import java.time.Duration;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.ui.views.ISmoothingAlgorithm;
+import net.tourbook.ui.views.WeatherProvidersUI;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 import net.tourbook.web.WEB;
 
@@ -53,14 +56,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
+   //todo fb hide the api key just like in the cloud pref page
+   public static final String ID = "net.tourbook.preferences.PrefPageWeather"; //$NON-NLS-1$
+
    //todo fb add drop down menu for each provider
    //make it as generic as possible so a new provider can be quickly added
    //put each tab's code in a new file and create a generic file for "Generic Weather Provider's tab.java"
 
-   //todo fb hide the api key just like in the clod pref page
-   public static final String     ID         = "net.tourbook.preferences.PrefPageWeather";                           //$NON-NLS-1$
-
    private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+
+   private WeatherProvidersUI       _weatherProvidersUI;
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
@@ -161,7 +166,6 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
       return container;
    }
-
    private void enableControls() {
 
       final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
@@ -265,6 +269,30 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
       _prefStore.setValue(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL, useWeatherRetrieval);
       _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey.getText());
+   }
+
+   private void updateUI() {
+
+      final String selectedWeatherProvider = getSelectedAlgorithm().algorithmId;
+
+      // select smoothing page
+      if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL)) {
+
+         _pagebookSmoothingAlgo.showPage(_pageInitialUI);
+
+      } else if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+
+         _pagebookSmoothingAlgo.showPage(_pageJametUI);
+
+      } else if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING)) {
+
+         _pagebookSmoothingAlgo.showPage(_pageNoSmoothingUI);
+      }
+
+      UI.updateScrolledContent(_uiContainer);
+
+      // fire event to pack the UI, this is needed when the UI is in a slideout
+      onModifySmoothingAlgo();
    }
 
 }

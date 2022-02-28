@@ -154,6 +154,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private ScrolledComposite _smoothingScrolledContainer;
    private Composite         _smoothingScrolledContent;
+   //todo fb a copier
    private SmoothingUI       _smoothingUI;
 
    private FormToolkit       _tk;
