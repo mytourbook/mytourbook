@@ -30,6 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 import net.tourbook.web.WEB;
@@ -54,14 +55,15 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
    private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-   //todo fb hide the api key just like in the cloud pref page
    /*
     * UI controls
     */
    private Button _btnTestConnection;
+   private Button _chkShowHideApiKey;
+
    private Label  _labelApiKey;
 
-   private Text   _textApiKey;
+   private Text   _textApiKey_Value;
 
    public WeatherProvider_WorldWeatherOnline() {}
 
@@ -90,12 +92,23 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   .applyTo(_labelApiKey);
 
             // text
-            _textApiKey = new Text(container, SWT.BORDER);
-            _textApiKey.setToolTipText(Messages.Pref_Weather_Label_ApiKey_Tooltip);
-            _textApiKey.addModifyListener(event -> onModifyApiKey());
+            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
+            _textApiKey_Value.setToolTipText(Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textApiKey_Value.addModifyListener(event -> onModifyApiKey());
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .applyTo(_textApiKey);
+                  .applyTo(_textApiKey_Value);
+         }
+         {
+            _chkShowHideApiKey = new Button(container, SWT.CHECK);
+            _chkShowHideApiKey.setText(Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey);
+            _chkShowHideApiKey.setToolTipText(Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey_Tooltip);
+            _chkShowHideApiKey.addSelectionListener(widgetSelectedAdapter(selectionEvent -> Util.showOrHidePassword(
+                  _textApiKey_Value,
+                  _chkShowHideApiKey.getSelection())));
+            GridDataFactory.fillDefaults()
+                  .indent(defaultHIndent, 0)
+                  .applyTo(_chkShowHideApiKey);
          }
          {
             /*
@@ -155,7 +168,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
             final HttpRequest request = HttpRequest
                   .newBuilder(URI.create(WorldWeatherOnlineRetriever.getApiUrl() +
-                        _textApiKey.getText()))
+                        _textApiKey_Value.getText()))
                   .GET()
                   .build();
 
@@ -187,23 +200,23 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
    private void onModifyApiKey() {
 
-      _btnTestConnection.setEnabled(StringUtils.hasContent(_textApiKey.getText()));
+      _btnTestConnection.setEnabled(StringUtils.hasContent(_textApiKey_Value.getText()));
    }
 
    @Override
    public void performDefaults() {
 
-      _textApiKey.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
+      _textApiKey_Value.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
    private void restoreState() {
 
-      _textApiKey.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      _textApiKey_Value.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey.getText());
+      _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey_Value.getText());
    }
 }

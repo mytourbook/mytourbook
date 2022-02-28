@@ -1752,6 +1752,8 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Label_ApiKey;
    public static String        Pref_Weather_Label_ApiKey_Tooltip;
    public static String        Pref_Weather_Link_ApiSignup;
+   public static String        Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey;
+   public static String        Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey_Tooltip;
 
    public static String        Search_Manager_CreateFTIndex;
    public static String        Search_Manager_Log_DeletingLuceneRootFolder;
