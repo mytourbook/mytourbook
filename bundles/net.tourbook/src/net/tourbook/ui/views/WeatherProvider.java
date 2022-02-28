@@ -15,35 +15,15 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
+public class WeatherProvider {
 
-public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
+	public String	weatherProviderId;
+	public String	uiText;
 
-   public WeatherProvider_OpenWeatherMap() {}
+   public WeatherProvider(final String weatherProviderId, final String uiText) {
 
-   @Override
-   public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
-                             final Composite parent,
-                             final FormToolkit tk,
-                             final boolean isShowDescription,
-                             final boolean isShowAdditionalActions) {
+      this.weatherProviderId = weatherProviderId;
+		this.uiText = uiText;
+	}
 
-      return parent;
-   }
-
-   @Override
-   public void dispose() {
-      // Nothing to do
-   }
-
-   @Override
-   public void performDefaults(final boolean isFireModifications) {
-      // Nothing to do
-   }
-
-   @Override
-   public void updateUIFromPrefStore() {
-      // Nothing to do
-   }
 }

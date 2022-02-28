@@ -15,36 +15,28 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.NumberFormat;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.data.TourData;
-import net.tourbook.database.IComputeTourValues;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.WeatherProvider;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 
@@ -53,23 +45,23 @@ public class WeatherProvidersUI {
    private static final WeatherProvider[] WEATHER_PROVIDER = {
 
          new WeatherProvider(
-               IWeatherProvider.SMOOTHING_ALGORITHM_INITIAL,
-               Messages.TourChart_Smoothing_Algorithm_Initial),
+               IWeatherProvider.WEATHER_PROVIDER_NONE,
+               "None"),                                                                    //Messages.TourChart_Smoothing_Algorithm_Initial),
 
          new WeatherProvider(
-               IWeatherProvider.SMOOTHING_ALGORITHM_JAMET,
-               Messages.TourChart_Smoothing_Algorithm_Jamet),
+               IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP,
+               "OpenWeatherMap"),                                                          //Messages.TourChart_Smoothing_Algorithm_Jamet),
 
          new WeatherProvider(
-               IWeatherProvider.SMOOTHING_ALGORITHM_NO_SMOOTHING,
-               Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
+               IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE,
+               "WWO")                                                                      //Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
    };
 
-   private final IPreferenceStore            _prefStore          = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStore       = TourbookPlugin.getPrefStore();
 
-   private ITourEventListener                _tourEventListener;
+   private ITourEventListener             _tourEventListener;
 
-   private FocusListener                     _keepOpenListener;
+   private FocusListener                  _keepOpenListener;
    {
       _keepOpenListener = new FocusListener() {
 
@@ -97,13 +89,13 @@ public class WeatherProvidersUI {
       };
    }
 
-   private boolean             _isUpdateUI;
+   private boolean          _isUpdateUI;
 
-   private ISmoothingAlgorithm _smoothing_Initial     = new SmoothingUI_Initial();
-   private ISmoothingAlgorithm _smoothing_Jamet       = new SmoothingUI_Jamet();
-   private ISmoothingAlgorithm _smoothing_NoSmoothing = new SmoothingUI_NoSmoothing();
+   private IWeatherProvider _weatherProvider_None               = new WeatherProvider_None();
+   private IWeatherProvider _weatherProvider_OpenWeatherMap     = new WeatherProvider_OpenWeatherMap();
+   private IWeatherProvider _weatherProvider_WorldWeatherOnline = new WeatherProvider_WorldWeatherOnline();
 
-   private NumberFormat        _nf0                   = NumberFormat.getNumberInstance();
+   private NumberFormat     _nf0                                = NumberFormat.getNumberInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -117,13 +109,13 @@ public class WeatherProvidersUI {
 
    private Composite       _uiContainer;
 
-   private Combo           _comboAlgorithm;
+   private Combo           _comboWeatherProvider;
 
-   private PageBook        _pagebookSmoothingAlgo;
+   private PageBook        _pagebookWeatherProvider;
 
-   private Composite       _pageInitialUI;
-   private Composite       _pageJametUI;
-   private Composite       _pageNoSmoothingUI;
+   private Composite       _pageNoneUI;
+   private Composite       _pageOpenWeatherMapUI;
+   private Composite       _pageWorldWeatherOnlineUI;
 
    private ToolbarSlideout _slideout;
 
@@ -140,77 +132,6 @@ public class WeatherProvidersUI {
       _slideout = slideout;
    }
 
-   private void addTourEventListener() {
-
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
-
-            // don't listen to the own events
-            if (part == WeatherProvidersUI.this) {
-               return;
-            }
-
-            if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-               updateUI_FromPropertyEvent();
-            }
-         }
-      };
-
-      TourManager.getInstance().addTourEventListener(_tourEventListener);
-   }
-
-   public void computeSmoothingForAllTours() {
-
-      // get smoothing algorithm
-      final String prefAlgoId = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
-      int prefAlgoIndex = -1;
-      for (int algoIndex = 0; algoIndex < SMOOTHING_ALGORITHM.length; algoIndex++) {
-         if (SMOOTHING_ALGORITHM[algoIndex].algorithmId.equals(prefAlgoId)) {
-            prefAlgoIndex = algoIndex;
-            break;
-         }
-      }
-      if (prefAlgoIndex == -1) {
-         // this case should not happen
-         prefAlgoIndex = 0;
-      }
-
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
-            Messages.TourChart_Smoothing_Dialog_SmoothAllTours_Title,
-            NLS.bind(
-                  Messages.TourChart_Smoothing_Dialog_SmoothAllTours_Message,
-                  SMOOTHING_ALGORITHM[prefAlgoIndex].uiText)) == false) {
-         return;
-      }
-
-      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
-
-         @Override
-         public boolean computeTourValues(final TourData oldTourData) {
-
-            oldTourData.computeComputedValues();
-
-            return true;
-         }
-
-         @Override
-         public String getResultText() {
-            return null;
-         }
-
-         @Override
-         public String getSubTaskText(final TourData savedTourData) {
-            return null;
-         }
-      };
-
-      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
-
-      fireTourModifyEvent();
-   }
-
    public void createUI(final Composite parent,
                         final boolean isShowDescription,
                         final boolean isShowAdditionalActions) {
@@ -223,8 +144,6 @@ public class WeatherProvidersUI {
 
       restoreState();
       updateUI();
-
-      addTourEventListener();
    }
 
    private void createUI_10(final Composite parent,
@@ -261,23 +180,20 @@ public class WeatherProvidersUI {
          /*
           * combo: smoothing algorithm
           */
-         _comboAlgorithm = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboAlgorithm.setVisibleItemCount(10);
-         _comboAlgorithm.addFocusListener(_keepOpenListener);
-         _comboAlgorithm.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelectSmoothingAlgo();
+         _comboWeatherProvider = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboWeatherProvider.setVisibleItemCount(10);
+         _comboWeatherProvider.addFocusListener(_keepOpenListener);
+         _comboWeatherProvider.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
-         });
+            onSelectSmoothingAlgo();
+         }));
          GridDataFactory.fillDefaults()
 //               .align(SWT.END, SWT.FILL)
                .indent(20, 0)
-               .applyTo(_comboAlgorithm);
-         _tk.adapt(_comboAlgorithm, true, true);
+               .applyTo(_comboWeatherProvider);
+         _tk.adapt(_comboWeatherProvider, true, true);
       }
    }
 
@@ -285,31 +201,31 @@ public class WeatherProvidersUI {
                                               final boolean isShowDescription,
                                               final boolean isShowAdditionalActions) {
       /*
-       * pagebook: smoothing algorithm
+       * Pagebook: Weather provider
        */
-      _pagebookSmoothingAlgo = new PageBook(parent, SWT.NONE);
+      _pagebookWeatherProvider = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .span(2, 1)
-            .applyTo(_pagebookSmoothingAlgo);
+            .applyTo(_pagebookWeatherProvider);
       {
-         _pageInitialUI = _smoothing_Initial.createUI(
+         _pageNoneUI = _weatherProvider_None.createUI(
                this,
-               _pagebookSmoothingAlgo,
+               _pagebookWeatherProvider,
                _tk,
                isShowDescription,
                isShowAdditionalActions);
 
-         _pageJametUI = _smoothing_Jamet.createUI(
+         _pageOpenWeatherMapUI = _weatherProvider_OpenWeatherMap.createUI(
                this,
-               _pagebookSmoothingAlgo,
+               _pagebookWeatherProvider,
                _tk,
                isShowDescription,
                isShowAdditionalActions);
 
-         _pageNoSmoothingUI = _smoothing_NoSmoothing.createUI(
+         _pageWorldWeatherOnlineUI = _weatherProvider_WorldWeatherOnline.createUI(
                this,
-               _pagebookSmoothingAlgo,
+               _pagebookWeatherProvider,
                _tk,
                isShowDescription,
                isShowAdditionalActions);
@@ -320,24 +236,15 @@ public class WeatherProvidersUI {
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-      _smoothing_Initial.dispose();
-      _smoothing_Jamet.dispose();
-      _smoothing_NoSmoothing.dispose();
+      _weatherProvider_None.dispose();
+      _weatherProvider_OpenWeatherMap.dispose();
+      _weatherProvider_WorldWeatherOnline.dispose();
 
       _tk.dispose();
    }
 
-   private void fireTourModifyEvent() {
-
-      TourManager.getInstance().removeAllToursFromCache();
-      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-   }
-
-   private SmoothingAlgorithm getSelectedAlgorithm() {
-      return SMOOTHING_ALGORITHM[_comboAlgorithm.getSelectionIndex()];
+   private WeatherProvider getSelectedWeatherProvider() {
+      return WEATHER_PROVIDER[_comboWeatherProvider.getSelectionIndex()];
    }
 
    private void initUI(final Composite parent) {
@@ -376,16 +283,16 @@ public class WeatherProvidersUI {
 
       updateUI();
 
-      final String algorithmId = getSelectedAlgorithm().algorithmId;
+      final String algorithmId = getSelectedWeatherProvider().weatherProviderId;
 
-      final boolean isInitialSelected = algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
-      _smoothing_Initial.performDefaults(isInitialSelected);
+      final boolean isInitialSelected = algorithmId.equals(IWeatherProvider.WEATHER_PROVIDER_NONE);
+      _weatherProvider_None.performDefaults(isInitialSelected);
 
-      final boolean isJametSelected = algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
-      _smoothing_Jamet.performDefaults(isJametSelected);
+      final boolean isJametSelected = algorithmId.equals(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP);
+      _weatherProvider_OpenWeatherMap.performDefaults(isJametSelected);
 
-      final boolean isNoSmoothingSelected = algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING);
-      _smoothing_NoSmoothing.performDefaults(isNoSmoothingSelected);
+      final boolean isNoSmoothingSelected = algorithmId.equals(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE);
+      _weatherProvider_WorldWeatherOnline.performDefaults(isNoSmoothingSelected);
    }
 
    private void restoreState() {
@@ -406,14 +313,14 @@ public class WeatherProvidersUI {
       // smoothing algorithm
       _prefStore.setValue(//
             ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
-            getSelectedAlgorithm().algorithmId);
+            getSelectedWeatherProvider().weatherProviderId);
    }
 
    private void selectSmoothingAlgo(final String prefAlgoId) {
 
       int prefAlgoIndex = -1;
-      for (int algoIndex = 0; algoIndex < SMOOTHING_ALGORITHM.length; algoIndex++) {
-         if (SMOOTHING_ALGORITHM[algoIndex].algorithmId.equals(prefAlgoId)) {
+      for (int algoIndex = 0; algoIndex < WEATHER_PROVIDER.length; algoIndex++) {
+         if (WEATHER_PROVIDER[algoIndex].weatherProviderId.equals(prefAlgoId)) {
             prefAlgoIndex = algoIndex;
             break;
          }
@@ -421,7 +328,7 @@ public class WeatherProvidersUI {
       if (prefAlgoIndex == -1) {
          prefAlgoIndex = 0;
       }
-      _comboAlgorithm.select(prefAlgoIndex);
+      _comboWeatherProvider.select(prefAlgoIndex);
    }
 
    private void setupUI() {
@@ -429,32 +336,32 @@ public class WeatherProvidersUI {
       _isUpdateUI = true;
       {
          /*
-          * fillup algorithm combo
+          * Fillup weather provider combo
           */
-         for (final SmoothingAlgorithm algo : SMOOTHING_ALGORITHM) {
-            _comboAlgorithm.add(algo.uiText);
+         for (final WeatherProvider weatherProvider : WEATHER_PROVIDER) {
+            _comboWeatherProvider.add(weatherProvider.uiText);
          }
-         _comboAlgorithm.select(0);
+         _comboWeatherProvider.select(0);
       }
       _isUpdateUI = false;
    }
 
    private void updateUI() {
 
-      final String selectedSmoothingAlgo = getSelectedAlgorithm().algorithmId;
+      final String selectedSmoothingAlgo = getSelectedWeatherProvider().weatherProviderId;
 
       // select smoothing page
-      if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL)) {
+      if (selectedSmoothingAlgo.equals(IWeatherProvider.WEATHER_PROVIDER_NONE)) {
 
-         _pagebookSmoothingAlgo.showPage(_pageInitialUI);
+         _pagebookWeatherProvider.showPage(_pageNoneUI);
 
-      } else if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+      } else if (selectedSmoothingAlgo.equals(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP)) {
 
-         _pagebookSmoothingAlgo.showPage(_pageJametUI);
+         _pagebookWeatherProvider.showPage(_pageOpenWeatherMapUI);
 
-      } else if (selectedSmoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING)) {
+      } else if (selectedSmoothingAlgo.equals(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)) {
 
-         _pagebookSmoothingAlgo.showPage(_pageNoSmoothingUI);
+         _pagebookWeatherProvider.showPage(_pageWorldWeatherOnlineUI);
       }
 
       UI.updateScrolledContent(_uiContainer);
@@ -462,16 +369,4 @@ public class WeatherProvidersUI {
       // fire event to pack the UI, this is needed when the UI is in a slideout
       onModifySmoothingAlgo();
    }
-
-   private void updateUI_FromPropertyEvent() {
-
-      _smoothing_Initial.updateUIFromPrefStore();
-      _smoothing_Jamet.updateUIFromPrefStore();
-      _smoothing_NoSmoothing.updateUIFromPrefStore();
-
-      restoreState();
-
-      updateUI();
-   }
-
 }

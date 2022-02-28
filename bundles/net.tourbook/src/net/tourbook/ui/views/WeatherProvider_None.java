@@ -18,29 +18,32 @@ package net.tourbook.ui.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public interface IWeatherProvider {
+public class WeatherProvider_None implements IWeatherProvider {
 
-   public static final String WEATHER_PROVIDER_NONE               = "NoWeatherProvider";  //$NON-NLS-1$
-   public static final String WEATHER_PROVIDER_OPENWEATHERMAP     = "OpenWeatherMap";     //$NON-NLS-1$
-   public static final String WEATHER_PROVIDER_WORLDWEATHERONLINE = "WorldWeatherOnline"; //$NON-NLS-1$
+   public WeatherProvider_None() {}
 
-   /**
-    * @param weatherProvidersUI
-    * @param parent
-    * @param isShowDescription
-    * @param isShowAdditionalActions
-    * @return
-    */
-   Composite createUI(WeatherProvidersUI weatherProvidersUI,
-                      Composite parent,
-                      FormToolkit toolkit,
-                      boolean isShowDescription,
-                      boolean isShowAdditionalActions);
+   @Override
+   public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
+                             final Composite parent,
+                             final FormToolkit tk,
+                             final boolean isShowDescription,
+                             final boolean isShowAdditionalActions) {
 
-   void dispose();
+      return parent;
+   }
 
-   void performDefaults(boolean isFireModifications);
+   @Override
+   public void dispose() {
+      // Nothing to do
+   }
 
-   void updateUIFromPrefStore();
+   @Override
+   public void performDefaults(final boolean isFireModifications) {
+      // Nothing to do
+   }
 
+   @Override
+   public void updateUIFromPrefStore() {
+      // Nothing to do
+   }
 }
