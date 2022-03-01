@@ -49,7 +49,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.DialogExportTour;
@@ -62,6 +61,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
+import net.tourbook.weather.WeatherUtils;
 
 import org.apache.http.HttpHeaders;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -215,7 +215,11 @@ public class StravaUploader extends TourbookCloudUploader {
          if (StringUtils.hasContent(description.toString())) {
             description.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
          }
-         description.append(buildWeatherData(tourData));
+         String weatherData = WeatherUtils.buildWeatherDataString(tourData);
+         if (StringUtils.hasContent(weatherData)) {
+            weatherData = UI.NEW_LINE1 + weatherData;
+         }
+         description.append(weatherData);
       }
 
       return description.toString();
@@ -226,79 +230,9 @@ public class StravaUploader extends TourbookCloudUploader {
       String title = tourData.getTourTitle();
 
       if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
-         title += getWeatherIcon(tourData.getWeatherIndex());
+         title += WeatherUtils.getWeatherIcon(tourData.getWeatherIndex());
       }
       return title;
-   }
-
-   /**
-    * Returns the weather data as a human readable string
-    * Example: ☀, Sunny, 98.6°F, 21.2°F, 11.184682mph, from , 1456.6929inch
-    *
-    * @param tourData
-    * @return
-    */
-   private String buildWeatherData(final TourData tourData) {
-
-      final List<String> weatherDataList = new ArrayList<>();
-
-      //todo fb put it in the unit tests by manually entering all the weather data, or taking it from a tour when the Openweather api is usable
-      final String weatherIcon = getWeatherIcon(tourData.getWeatherIndex());
-      if (StringUtils.hasContent(weatherIcon)) {
-         weatherDataList.add(weatherIcon.trim());
-      }
-
-      final String weatherText = tourData.getWeather();
-      if (StringUtils.hasContent(weatherText)) {
-
-         if (weatherDataList.size() == 1) {
-            weatherDataList.set(0, weatherDataList.get(0) + UI.SPACE + weatherText);
-         } else {
-            weatherDataList.add(weatherText);
-         }
-      }
-
-      final float averageTemperature = tourData.getWeather_Temperature_Average();
-      if (averageTemperature != Float.MIN_VALUE) {
-         weatherDataList.add(Math.round(UI.convertTemperatureFromMetric(averageTemperature)) +
-               UI.UNIT_LABEL_TEMPERATURE);
-      }
-
-      //"feels like"
-      final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
-      if (temperatureWindChill != Float.MIN_VALUE) {
-         weatherDataList.add("feels like " +
-               Math.round(UI.convertTemperatureFromMetric(temperatureWindChill)) +
-               UI.UNIT_LABEL_TEMPERATURE);
-      }
-
-      //humidity
-      final float humidity = tourData.getWeather_Humidity();
-      if (humidity != Float.MIN_VALUE) {
-         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE);
-      }
-
-      //  wind \
-      final int windSpeed = tourData.getWeatherWindSpeed();
-      if (windSpeed != Float.MIN_VALUE) {
-         weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
-               UI.UNIT_LABEL_SPEED +
-               " from ");
-         //WNW weatherDataList.add(tourData.getWeatherWindDir());
-      }
-
-      final float precipitation = tourData.getWeather_Precipitation();
-      if (precipitation > 0) {
-         weatherDataList.add(Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
-               UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
-      }
-
-      String weatherData = String.join(UI.COMMA_SPACE, weatherDataList);
-      if (StringUtils.hasContent(weatherData)) {
-         weatherData = UI.NEW_LINE1 + weatherData;
-      }
-
-      return weatherData;
    }
 
    private void createCompressedTcxTourFile(final IProgressMonitor monitor,
@@ -387,66 +321,6 @@ public class StravaUploader extends TourbookCloudUploader {
       }
 
       return isTokenValid;
-   }
-
-   /**
-    * Returns an appropriate weather Emoji based on the tour weather icon.
-    * To obtain the string representation of the icons in Unicode 7.0,
-    * I used the below code:
-    * https://stackoverflow.com/a/68537229/7066681
-    *
-    * @param weatherIndex
-    * @return
-    */
-   private String getWeatherIcon(final int weatherIndex) {
-
-      String weatherIcon;
-
-      switch (IWeather.cloudIcon[weatherIndex]) {
-
-      case IWeather.WEATHER_ID_CLEAR:
-         //https://emojipedia.org/sun/
-         weatherIcon = "\u2600"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_PART_CLOUDS:
-         //https://emojipedia.org/sun-behind-cloud/
-         weatherIcon = "\u26C5"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_OVERCAST:
-         weatherIcon = "\u2601"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
-         //https://emojipedia.org/sun-behind-rain-cloud/
-         weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_RAIN:
-         //https://emojipedia.org/cloud-with-rain/
-         weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_LIGHTNING:
-         //https://emojipedia.org/cloud-with-lightning/
-         weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_SNOW:
-
-         //https://emojipedia.org/snowflake/
-         weatherIcon = "\u2744"; //$NON-NLS-1$
-
-         //Below is the official "Cloud with snow" icon but because it looks too
-         //much like the "Cloud with rain" icon, instead, we choose the "Snowflake"
-         //icon.
-         //https://emojipedia.org/cloud-with-snow/
-         break;
-      case IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT:
-         //https://emojipedia.org/warning/
-         weatherIcon = "\u26A0"; //$NON-NLS-1$
-         break;
-      case UI.IMAGE_EMPTY_16:
-      default:
-         return UI.EMPTY_STRING;
-      }
-
-      return UI.SPACE1 + weatherIcon;
    }
 
    @Override

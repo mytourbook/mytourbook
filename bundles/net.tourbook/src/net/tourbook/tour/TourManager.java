@@ -97,6 +97,7 @@ import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.TourWeatherRetriever;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -2754,9 +2755,9 @@ public class TourManager {
                   if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
 
                      modifiedTours.add(tourData);
-                     TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
-                     //todo fb also print a string showing the data ? take the function from strava ? or create a new similar one ?
-                     //put it in weatherutils ?
+                     TourLogManager.subLog_OK(getTourDateTimeShort(tourData) +
+                           UI.SYMBOL_COLON + UI.SPACE +
+                           WeatherUtils.buildWeatherDataString(tourData));
 
                   } else {
                      TourLogManager.subLog_ERROR(NLS.bind(
