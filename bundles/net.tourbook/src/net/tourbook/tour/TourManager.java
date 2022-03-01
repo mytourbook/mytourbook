@@ -2715,22 +2715,19 @@ public class TourManager {
    }
 
    /**
-    * @param tourData
+    * @param tourDataList
     * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
     */
-   public static boolean retrieveWeatherData(final TourData tourData) {
+   public static List<TourData> retrieveWeatherData(final List<TourData> tourDataList) {
+
+      final List<TourData> modifiedTours = new ArrayList<>();
+
+      if (tourDataList == null || tourDataList.size() == 0) {
+         return modifiedTours;
+      }
 
       TourLogManager.showLogView();
-
-      // ensure data is available
-      if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
-
-         TourLogManager.subLog_ERROR(String.format(
-               LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-               getTourDateTimeShort(tourData)));
-
-         return false;
-      }
+      final long start = System.currentTimeMillis();
 
       final String weatherProvider = _prefStore.getString(
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
@@ -2739,26 +2736,41 @@ public class TourManager {
             LOG_RETRIEVE_WEATHER_DATA_001_START,
             weatherProvider));
 
-      final boolean[] result = new boolean[1];
-      result[0] = true;
+      for (final TourData tourData : tourDataList) {
 
-      BusyIndicator.showWhile(Display.getCurrent(),
-            () -> {
+         // ensure data is available
+         if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-               result[0] = TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider);
-               if (!result[0]) {
+            TourLogManager.subLog_ERROR(String.format(
+                  LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+                  getTourDateTimeShort(tourData)));
 
-                  TourLogManager.subLog_ERROR(NLS.bind(
-                        Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-                        TourManager.getTourDateTimeShort(tourData)));
-               }
-            });
+            return modifiedTours;
+         }
 
-      TourLogManager.subLog_INFO(LOG_RETRIEVE_WEATHER_DATA_002_END);
+         BusyIndicator.showWhile(Display.getCurrent(),
+               () -> {
 
-      TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
+                  if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
 
-      return result[0];
+                     modifiedTours.add(tourData);
+                     TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
+                     //todo fb also print a string showing the data ? take the function from strava ? or create a new similar one ?
+                     //put it in weatherutils ?
+
+                  } else {
+                     TourLogManager.subLog_ERROR(NLS.bind(
+                           Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+                           TourManager.getTourDateTimeShort(tourData)));
+                  }
+               });
+      }
+
+      TourLogManager.subLog_INFO(String.format(
+            LOG_RETRIEVE_WEATHER_DATA_002_END,
+            (System.currentTimeMillis() - start) / 1000.0));
+
+      return modifiedTours;
    }
 
    /**
@@ -2809,7 +2821,7 @@ public class TourManager {
     *           modified tours
     * @return Returns a list with all persisted {@link TourData}
     */
-   public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
+   public static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours) {
       return saveModifiedTours(modifiedTours, true);
    }
 
@@ -2826,7 +2838,7 @@ public class TourManager {
     *           when <code>true</code>, a notification is fired when the data are saved
     * @return a list with all persisted {@link TourData}
     */
-   private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
+   private static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours,
                                                         final boolean canFireNotification) {
 
       // reset multiple tour data cache

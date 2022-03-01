@@ -5100,7 +5100,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   getDurationText(importLauncher),
                   UI.UNIT_LABEL_TEMPERATURE }));
 
-      importedTours.forEach(TourManager::retrieveWeatherData);
+      TourManager.retrieveWeatherData(importedTours);
    }
 
    private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -124,13 +124,10 @@ public class ActionComputeMinMaxTemperature extends Action {
 
             TourManager.getInstance().clearTourDataCache();
 
-            Display.getDefault().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getDefault().asyncExec(() -> {
 
-                  TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-                  TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-               }
+               TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+               TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
             });
 
          }
@@ -179,8 +176,8 @@ public class ActionComputeMinMaxTemperature extends Action {
             tourData.computeAvg_Temperature();
 
             // update min/max temperature in the database
-            stmtUpdate.setFloat(1, tourData.getWeather_Temperature_Min());
-            stmtUpdate.setFloat(2, tourData.getWeather_Temperature_Max());
+            stmtUpdate.setFloat(1, tourData.getWeather_Temperature_Min_Device());
+            stmtUpdate.setFloat(2, tourData.getWeather_Temperature_Max_Device());
             stmtUpdate.setLong(3, tourData.getTourId());
 
             stmtUpdate.executeUpdate();
