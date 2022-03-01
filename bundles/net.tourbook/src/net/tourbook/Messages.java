@@ -2613,6 +2613,7 @@ public class Messages extends NLS {
    public static String Tour_Data_Text_SpeedValues;
    public static String Tour_Data_Text_SwimmingValues;
    public static String Tour_Data_Text_TemperatureValues;
+   public static String Tour_Data_Text_TemperatureFromDeviceValues;
    public static String Tour_Data_Text_Time;
    public static String Tour_Data_Text_TimeSlices;
    public static String Tour_Data_Text_TourMarkers;

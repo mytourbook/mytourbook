@@ -630,7 +630,7 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
 
-         final String heightLabel = UI.UNIT_IS_ELEVATION_METER ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
+         final String heightLabel = UI.UNIT_LABEL_ELEVATION;
 
          final int oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
          final int oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
@@ -673,19 +673,28 @@ public class RawDataManager {
          newData.add(Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
       }
 
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
+      if (isEntireTour_OR_AllTimeSlices ||
+            tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
 
-         float avgTemperature = UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average_Device());
-         previousData.add(
-               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
-                     ? UI.SYMBOL_TEMPERATURE_CELSIUS
-                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
+         float avgTemperature = UI.convertTemperatureFromMetric(
+               oldTourData.getWeather_Temperature_Average_Device());
+         previousData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
 
-         avgTemperature = UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average_Device());
-         newData.add(
-               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELSIUS
-                     ? UI.SYMBOL_TEMPERATURE_CELSIUS
-                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
+         avgTemperature = UI.convertTemperatureFromMetric(
+               newTourData.getWeather_Temperature_Average_Device());
+         newData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
+      }
+
+      if (isEntireTour_OR_AllTimeSlices ||
+            tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
+
+         float avgTemperature = UI.convertTemperatureFromMetric(
+               oldTourData.getWeather_Temperature_Average());
+         previousData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
+
+         avgTemperature = UI.convertTemperatureFromMetric(
+               newTourData.getWeather_Temperature_Average());
+         newData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1441,9 +1450,18 @@ public class RawDataManager {
                tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
             }
 
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
+            if (isEntireTour_OR_AllTimeSlices ||
+                  tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-               tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
+               tourDataDummyClone.setWeather_Temperature_Average(
+                     oldTourData.getWeather_Temperature_Average());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices ||
+                  tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+
+               tourDataDummyClone.setWeather_Temperature_Average_Device(
+                     oldTourData.getWeather_Temperature_Average_Device());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1527,6 +1545,11 @@ public class RawDataManager {
          // Temperature
          if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_TemperatureValues);
+         }
+
+         // Temperature from device
+         if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+            dataToModifyDetails.add(Messages.Tour_Data_Text_TemperatureFromDeviceValues);
          }
 
          // Training
@@ -1757,6 +1780,8 @@ public class RawDataManager {
                break;
 
             case TIME_SLICES__TEMPERATURE:
+
+               clonedTourData.setWeather_Temperature_Average(tourData.getWeather_Temperature_Average());
 
                tourData.setWeather_Temperature_Average(0);
                tourData.setWeather_Temperature_Max(0);
@@ -3284,6 +3309,7 @@ public class RawDataManager {
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__RUNNING_DYNAMICS)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__SWIMMING)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__TEMPERATURE)
+                  || tourValueTypes.contains(TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__TIMER_PAUSES)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__TRAINING)) {
 
@@ -3488,8 +3514,8 @@ public class RawDataManager {
          oldTourData.swim_Time = reimportedTourData.swim_Time;
       }
 
-      // Temperature
-      if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__TEMPERATURE)) {
+      // Temperature from device
+      if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE)) {
 
          // re-import temperature only
 

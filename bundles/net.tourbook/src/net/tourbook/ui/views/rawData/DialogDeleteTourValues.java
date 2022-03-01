@@ -73,6 +73,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                        //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TEMPERATURE                 = "STATE_IS_DELETE_TEMPERATURE";                     //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TEMPERATURE_FROMDEVICE      = "STATE_IS_DELETE_TEMPERATURE_FROMDEVICE";          //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                            //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                    //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                    //$NON-NLS-1$
@@ -384,6 +385,26 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          // row 3
          {
             /*
+             * Checkbox: Temperature
+             */
+            _chkData_Temperature = new Button(group, SWT.CHECK);
+            _chkData_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
+            _chkData_Temperature.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_Temperature);
+         }
+         {
+            /*
+             * Checkbox: Temperature from device
+             */
+            _chkData_Temperature_FromDevice = new Button(group, SWT.CHECK);
+            _chkData_Temperature_FromDevice.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues_FromDevice);
+            _chkData_Temperature_FromDevice.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Temperature_FromDevice);
+         }
+
+         // row 4
+         {
+            /*
              * Checkbox: Elevation
              */
             _chkData_Elevation = new Button(group, SWT.CHECK);
@@ -393,34 +414,15 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          }
          {
             /*
-             * Checkbox: Temperature
-             */
-            _chkData_Temperature = new Button(group, SWT.CHECK);
-            _chkData_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
-            _chkData_Temperature.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Temperature);
-         }
-         {
-            /*
-             * TODO FB
-             * Checkbox: Temperature from device
-             */
-            _chkData_Temperature_FromDevice = new Button(group, SWT.CHECK);
-            _chkData_Temperature_FromDevice.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
-            _chkData_Temperature_FromDevice.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Temperature_FromDevice);
-         }
-
-         // row 4
-         {
-            /*
              * Checkbox: Gear
              */
             _chkData_Gear = new Button(group, SWT.CHECK);
             _chkData_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
             _chkData_Gear.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Gear);
+            gridDataItem.applyTo(_chkData_Gear);
          }
+
+         // row 5
          {
             /*
              * Checkbox: Tour markers
@@ -428,10 +430,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_TourMarkers = new Button(group, SWT.CHECK);
             _chkData_TourMarkers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
             _chkData_TourMarkers.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TourMarkers);
+            gridDataItem_FirstColumn.applyTo(_chkData_TourMarkers);
          }
-
-         // row 5
          {
             /*
              * Checkbox: Power And Pulse
@@ -439,8 +439,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_PowerAndPulse = new Button(group, SWT.CHECK);
             _chkData_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
             _chkData_PowerAndPulse.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndPulse);
+            gridDataItem.applyTo(_chkData_PowerAndPulse);
          }
+
+         // row 6
          {
             /*
              * Checkbox: Tour pauses
@@ -448,10 +450,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_TourTimerPauses = new Button(group, SWT.CHECK);
             _chkData_TourTimerPauses.setText(Messages.Dialog_ModifyTours_Checkbox_TourTimerPauses);
             _chkData_TourTimerPauses.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TourTimerPauses);
+            gridDataItem_FirstColumn.applyTo(_chkData_TourTimerPauses);
          }
-
-         // row 6
          {
             /*
              * Checkbox: Power And Speed
@@ -459,8 +459,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_PowerAndSpeed = new Button(group, SWT.CHECK);
             _chkData_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
             _chkData_PowerAndSpeed.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndSpeed);
+            gridDataItem.applyTo(_chkData_PowerAndSpeed);
          }
+
+         // row 7
          {
             /*
              * Checkbox: Training
@@ -468,7 +470,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_Training = new Button(group, SWT.CHECK);
             _chkData_Training.setText(Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
             _chkData_Training.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Training);
+            gridDataItem_FirstColumn.applyTo(_chkData_Training);
          }
 
          {
@@ -490,18 +492,18 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_Cadence,
             _chkData_Calories,
             _chkData_Temperature_FromDevice,
+            _chkData_Elevation,
             _chkData_TourMarkers,
-            _chkData_Gear,
-            _chkData_PowerAndPulse,
-            _chkData_PowerAndSpeed,
+            _chkData_TourTimerPauses,
+            _chkData_Training,
 
             // column 2
             _chkData_RunningDynamics,
             _chkData_Swimming,
             _chkData_Temperature,
-            _chkData_Elevation,
-            _chkData_TourTimerPauses,
-            _chkData_Training,
+            _chkData_Gear,
+            _chkData_PowerAndPulse,
+            _chkData_PowerAndSpeed,
 
             _btnDeselectAll
       });
@@ -724,7 +726,14 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_PowerAndSpeed, TourValueType.TIME_SLICES__POWER_AND_SPEED, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_RunningDynamics, TourValueType.TIME_SLICES__RUNNING_DYNAMICS, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_Swimming, TourValueType.TIME_SLICES__SWIMMING, tourValueTypes);
-         DialogUtils.addTourValueTypeFromCheckbox(_chkData_Temperature, TourValueType.TIME_SLICES__TEMPERATURE, tourValueTypes);
+         DialogUtils.addTourValueTypeFromCheckbox(
+               _chkData_Temperature,
+               TourValueType.TIME_SLICES__TEMPERATURE,
+               tourValueTypes);
+         DialogUtils.addTourValueTypeFromCheckbox(
+               _chkData_Temperature_FromDevice,
+               TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE,
+               tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourTimerPauses, TourValueType.TIME_SLICES__TIMER_PAUSES, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_Training, TourValueType.TIME_SLICES__TRAINING, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourMarkers, TourValueType.TOUR__MARKER, tourValueTypes);
@@ -820,6 +829,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       _chkData_RunningDynamics.setSelection(_state.getBoolean(STATE_IS_DELETE_RUNNING_DYNAMICS));
       _chkData_Swimming.setSelection(_state.getBoolean(STATE_IS_DELETE_SWIMMING));
       _chkData_Temperature.setSelection(_state.getBoolean(STATE_IS_DELETE_TEMPERATURE));
+      _chkData_Temperature_FromDevice.setSelection(_state.getBoolean(STATE_IS_DELETE_TEMPERATURE_FROMDEVICE));
       _chkData_Training.setSelection(_state.getBoolean(STATE_IS_DELETE_TRAINING));
       _chkData_TourMarkers.setSelection(_state.getBoolean(STATE_IS_DELETE_TOUR_MARKERS));
       _chkData_TourTimerPauses.setSelection(_state.getBoolean(STATE_IS_DELETE_TIMER_PAUSES));
@@ -842,6 +852,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       _state.put(STATE_IS_DELETE_RUNNING_DYNAMICS, _chkData_RunningDynamics.getSelection());
       _state.put(STATE_IS_DELETE_SWIMMING, _chkData_Swimming.getSelection());
       _state.put(STATE_IS_DELETE_TEMPERATURE, _chkData_Temperature.getSelection());
+      _state.put(STATE_IS_DELETE_TEMPERATURE_FROMDEVICE, _chkData_Temperature_FromDevice.getSelection());
       _state.put(STATE_IS_DELETE_TRAINING, _chkData_Training.getSelection());
       _state.put(STATE_IS_DELETE_TIME, _chkData_Time.getSelection());
       _state.put(STATE_IS_DELETE_TOUR_MARKERS, _chkData_TourMarkers.getSelection());

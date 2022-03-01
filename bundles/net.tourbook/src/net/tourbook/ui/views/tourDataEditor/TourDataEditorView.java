@@ -230,13 +230,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //display the weather in the calendar view
 
-   //Add a label : Weather provider: WWO or OpenWeathermap
-
    //By default, the wind should not be north but empty. is that possible ?
 
-   //Draw the weather station (if provided) location on the map just like in CG ?
-
-   //Enhance the logging just like I did for the tour values reimport/deletion
+   //todo fb verify that WWO and OWM take the actual hour of the tour since I think i saw temperatures that were so low they could have been
+   //the same day but at night
 
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //

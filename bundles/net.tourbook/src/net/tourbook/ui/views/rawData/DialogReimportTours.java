@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1119,7 +1119,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_PowerAndSpeed,     TourValueType.TIME_SLICES__POWER_AND_SPEED,  tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_RunningDynamics,   TourValueType.TIME_SLICES__RUNNING_DYNAMICS, tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Swimming,          TourValueType.TIME_SLICES__SWIMMING,         tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Temperature,       TourValueType.TIME_SLICES__TEMPERATURE,      tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Temperature,       TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE,      tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_TourTimerPauses,   TourValueType.TIME_SLICES__TIMER_PAUSES,     tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Training,          TourValueType.TIME_SLICES__TRAINING,         tourValueTypes);
             }
