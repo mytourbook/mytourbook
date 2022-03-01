@@ -7018,11 +7018,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private int getWindDirectionTextIndex(final int degreeDirection) {
 
+      //todo fb
+      //if all the weather data is empty <= for old tours (refactored method that do all the necessary testing in TourData.java ?)
+      // or if degreeDirection == -1
+
+      if (degreeDirection == -1) {
+         return 0;
+      }
+
       final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
 
       final int directionIndex = ((int) degree) % 16;
 
-      return directionIndex;
+      return directionIndex + 1;
    }
 
    private int getWindSpeedTextIndex(final int speed) {
@@ -7405,7 +7413,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final int degree = (int) (selectedIndex * 22.5f * 10f);
 
-      _spinWeather_Wind_DirectionValue.setSelection(degree);
+      _spinWeather_Wind_DirectionValue.setSelection(degree + 1);
    }
 
    private void onSelect_WindDirectionValue() {

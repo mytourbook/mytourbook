@@ -31,6 +31,7 @@ public interface IWeather {
 
    public static final String[] windDirectionText               = new String[] {
 
+         UI.EMPTY_STRING,
          Messages.Weather_WindDirection_N,
          Messages.Weather_WindDirection_NNE,
          Messages.Weather_WindDirection_NE,

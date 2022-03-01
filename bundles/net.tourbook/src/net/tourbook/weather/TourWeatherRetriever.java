@@ -19,6 +19,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.views.IWeatherProvider;
+import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -27,27 +28,30 @@ public final class TourWeatherRetriever {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   //public abstract boolean populateTourWeatherData(TourData tourData);
-   // boolean retrieveHistoricalWeatherData();
    public static boolean retrieveWeatherData(final TourData tourData) {
 
       final String weatherProvider = _prefStore.getString(
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
+      HistoricalWeatherRetriever historicalWeatherRetriever = null;
+
       switch (weatherProvider) {
       case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
-         //TODO FB
+         historicalWeatherRetriever = new OpenWeatherMapRetriever(tourData);
          break;
       case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
-         return new WorldWeatherOnlineRetriever(tourData).retrieveHistoricalWeatherData();
-
+         historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tourData);
+         break;
       case IWeatherProvider.WEATHER_PROVIDER_NONE:
       default:
          break;
-      //if favorite weather provide is WWO then retrieve WWO retriever
       }
 
-      return true;
+      if (historicalWeatherRetriever != null) {
+         return historicalWeatherRetriever.retrieveHistoricalWeatherData();
+      }
+
+      return false;
    }
 
 }

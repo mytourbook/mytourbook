@@ -1743,7 +1743,7 @@ public class TourInfoUI {
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
             UI.getCardinalDirectionText(weatherWindDirDegree * 10)));
 
-      //todo fb temp from device
+      //todo fb temp from device & external
       // temperature
       final float temperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
       _lblTemperature.setText(_nf1.format(temperature));
