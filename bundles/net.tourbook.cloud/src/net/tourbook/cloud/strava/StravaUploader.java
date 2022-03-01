@@ -245,7 +245,7 @@ public class StravaUploader extends TourbookCloudUploader {
       //todo fb put it in the unit tests by manually entering all the weather data, or taking it from a tour when the Openweather api is usable
       final String weatherIcon = getWeatherIcon(tourData.getWeatherIndex());
       if (StringUtils.hasContent(weatherIcon)) {
-         weatherDataList.add(weatherIcon);
+         weatherDataList.add(weatherIcon.trim());
       }
 
       final String weatherText = tourData.getWeather();
@@ -288,11 +288,15 @@ public class StravaUploader extends TourbookCloudUploader {
       }
 
       final float precipitation = tourData.getWeather_Precipitation();
-      if (precipitation != Float.MIN_VALUE) {
-         weatherDataList.add(Math.round(UI.convertPrecipitation_FromMetric(precipitation)) + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      if (precipitation > 0) {
+         weatherDataList.add(Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
+               UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
-      final String weatherData = String.join(UI.COMMA_SPACE, weatherDataList);
+      String weatherData = String.join(UI.COMMA_SPACE, weatherDataList);
+      if (StringUtils.hasContent(weatherData)) {
+         weatherData = UI.NEW_LINE1 + weatherData;
+      }
 
       return weatherData;
    }
@@ -301,7 +305,9 @@ public class StravaUploader extends TourbookCloudUploader {
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
 
-      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "tcx"); //$NON-NLS-1$
+      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(
+            String.valueOf(tourData.getTourId()),
+            "tcx"); //$NON-NLS-1$
 
       final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
       if (StringUtils.hasContent(exportedTcxGzFile)) {

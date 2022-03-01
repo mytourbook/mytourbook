@@ -5092,7 +5092,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void runEasyImport_050_RetrieveWeatherData(final ImportLauncher importLauncher,
-                                                      final ArrayList<TourData> importedTours) {
+                                                      final List<TourData> importedTours) {
 
       TourLogManager.log_DEFAULT(NLS.bind(
             EasyImportManager.LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA,
@@ -5100,9 +5100,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   getDurationText(importLauncher),
                   UI.UNIT_LABEL_TEMPERATURE }));
 
-      for (final TourData tourData : importedTours) {
-         TourManager.retrieveWeatherData(tourData);
-      }
+      importedTours.forEach(TourManager::retrieveWeatherData);
    }
 
    private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {
