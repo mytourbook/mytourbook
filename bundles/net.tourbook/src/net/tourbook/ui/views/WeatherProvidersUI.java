@@ -17,6 +17,8 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.util.Arrays;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -230,7 +232,7 @@ public class WeatherProvidersUI {
    }
 
    /**
-    * Update new values in the pref store
+    * Update new values in the preference store
     */
    public void saveState() {
 
@@ -267,9 +269,8 @@ public class WeatherProvidersUI {
          /*
           * Fillup weather provider combo
           */
-         for (final WeatherProvider weatherProvider : WEATHER_PROVIDER) {
-            _comboWeatherProvider.add(weatherProvider.uiText);
-         }
+         Arrays.asList(WEATHER_PROVIDER)
+               .forEach(weatherProvider -> _comboWeatherProvider.add(weatherProvider.uiText));
          _comboWeatherProvider.select(0);
       }
       _isUpdateUI = false;

@@ -183,13 +183,17 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   .GET()
                   .build();
 
-            final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+            final HttpResponse<String> response = httpClient.send(
+                  request,
+                  BodyHandlers.ofString());
 
             final int statusCode = response.statusCode();
             final String responseMessage = response.body();
 
             final String message = statusCode == HttpURLConnection.HTTP_OK
-                  ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, WorldWeatherOnlineRetriever.getBaseApiUrl())
+                  ? NLS.bind(
+                        Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
+                        WorldWeatherOnlineRetriever.getBaseApiUrl())
                   : NLS.bind(
                         Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
                         new Object[] {

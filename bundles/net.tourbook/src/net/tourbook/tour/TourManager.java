@@ -2720,6 +2720,8 @@ public class TourManager {
     */
    public static boolean retrieveWeatherData(final TourData tourData) {
 
+      TourLogManager.showLogView();
+
       // ensure data is available
       if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
@@ -2730,13 +2732,20 @@ public class TourManager {
          return false;
       }
 
+      final String weatherProvider = _prefStore.getString(
+            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+
+      TourLogManager.subLog_INFO(NLS.bind(
+            LOG_RETRIEVE_WEATHER_DATA_001_START,
+            weatherProvider));
+
       final boolean[] result = new boolean[1];
       result[0] = true;
 
       BusyIndicator.showWhile(Display.getCurrent(),
             () -> {
 
-               result[0] = TourWeatherRetriever.retrieveWeatherData(tourData);
+               result[0] = TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider);
                if (!result[0]) {
 
                   TourLogManager.subLog_ERROR(NLS.bind(
@@ -2744,6 +2753,8 @@ public class TourManager {
                         TourManager.getTourDateTimeShort(tourData)));
                }
             });
+
+      TourLogManager.subLog_INFO(LOG_RETRIEVE_WEATHER_DATA_002_END);
 
       TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
 

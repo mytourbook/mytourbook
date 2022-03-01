@@ -221,8 +221,7 @@ import org.eclipse.ui.progress.UIJob;
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
    //TODO FB
-   // add "--" to the wind enumeration to be the vaue by default
-   // is there a way to have a non value to the spinner instead of 0 ???
+   // add " " to the wind enumeration to be the vaue by default
 
    //Use OpenWeatherMapApi to retrieve the weather data (use Heroku to avoid users to have to register)
    //make the code generic so that it's easier to add another weather provider in the future
@@ -233,11 +232,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //Add a label : Weather provider: WWO or OpenWeathermap
 
-   //That way, when downloading provider's data, we don't override the device data.
-
    //By default, the wind should not be north but empty. is that possible ?
 
    //Draw the weather station (if provided) location on the map just like in CG ?
+
+   //Enhance the logging just like I did for the tour values reimport/deletion
 
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //

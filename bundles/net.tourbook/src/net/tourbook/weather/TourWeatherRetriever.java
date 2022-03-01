@@ -15,23 +15,15 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
-import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
-
-import org.eclipse.jface.preference.IPreferenceStore;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;;
 
 public final class TourWeatherRetriever {
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-
-   public static boolean retrieveWeatherData(final TourData tourData) {
-
-      final String weatherProvider = _prefStore.getString(
-            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+   public static boolean retrieveWeatherData(final TourData tourData,
+                                             final String weatherProvider) {
 
       HistoricalWeatherRetriever historicalWeatherRetriever = null;
 
