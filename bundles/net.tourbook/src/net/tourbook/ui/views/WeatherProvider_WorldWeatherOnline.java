@@ -17,6 +17,8 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -70,11 +72,11 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
    @Override
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
                              final Composite parent,
-                             final FormToolkit tk) {
+                             final FormToolkit formToolkit) {
 
       final int defaultHIndent = 16;
 
-      final Composite container = new Composite(parent, SWT.NONE);
+      final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
@@ -84,15 +86,14 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
              */
 
             // label
-            _labelApiKey = new Label(container, SWT.WRAP);
-            _labelApiKey.setText(Messages.Pref_Weather_Label_ApiKey);
+            _labelApiKey = formToolkit.createLabel(container, Messages.Pref_Weather_Label_ApiKey, SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_labelApiKey);
 
             // text
-            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
+            _textApiKey_Value = formToolkit.createText(container, UI.EMPTY_STRING, SWT.PASSWORD | SWT.BORDER);
             _textApiKey_Value.setToolTipText(Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textApiKey_Value.addModifyListener(event -> onModifyApiKey());
             GridDataFactory.fillDefaults()
@@ -104,8 +105,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
              * Show/hide API key
              */
 
-            _chkShowHideApiKey = new Button(container, SWT.CHECK);
-            _chkShowHideApiKey.setText(Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey);
+            _chkShowHideApiKey = formToolkit.createButton(container, Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey, SWT.CHECK);
             _chkShowHideApiKey.setToolTipText(Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey_Tooltip);
             _chkShowHideApiKey.addSelectionListener(widgetSelectedAdapter(selectionEvent -> Util.showOrHidePassword(
                   _textApiKey_Value,
@@ -135,8 +135,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
             /*
              * Button: test connection
              */
-            _btnTestConnection = new Button(container, SWT.NONE);
-            _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+            _btnTestConnection = formToolkit.createButton(container, Messages.Pref_Weather_Button_TestHTTPConnection, SWT.NONE);
             _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onCheckConnection()));
             GridDataFactory.fillDefaults()

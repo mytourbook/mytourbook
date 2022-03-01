@@ -32,7 +32,7 @@ public interface IWeatherProvider {
     */
    Composite createUI(WeatherProvidersUI weatherProvidersUI,
                       Composite parent,
-                      FormToolkit toolkit);
+                      FormToolkit formToolkit);
 
    void dispose();
 

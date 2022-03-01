@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+
 import net.tourbook.ui.views.WeatherProvidersUI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -23,10 +25,9 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -40,28 +41,25 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    private ScrolledComposite  _smoothingScrolledContainer;
    private Composite          _smoothingScrolledContent;
 
-   private FormToolkit        _tk;
-   private PixelConverter     _pc;
+   private FormToolkit        _formToolkit;
+   private PixelConverter     _pixelConverter;
 
    @Override
    protected Control createContents(final Composite parent) {
 
       initUI(parent);
 
-      final Composite container = createUI(parent);
+      final Composite container = createUI();
 
       return container;
    }
 
-   private Composite createUI(final Composite parent) {
+   private Composite createUI() {
 
-      _tk = new FormToolkit(parent.getDisplay());
-      _weatherProvidersUI = new WeatherProvidersUI();
-
-      _smoothingScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_smoothingScrolledContainer);
       {
-         _smoothingScrolledContent = _tk.createComposite(_smoothingScrolledContainer);
+         _smoothingScrolledContent = _formToolkit.createComposite(_smoothingScrolledContainer);
+         _smoothingScrolledContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -70,7 +68,6 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
                .extendedMargins(5, 5, 10, 5)
                .numColumns(1)
                .applyTo(_smoothingScrolledContent);
-//  _smoothingScrolledContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
          {
             _weatherProvidersUI.createUI(_smoothingScrolledContent);
          }
@@ -78,13 +75,9 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
          // setup scrolled container
          _smoothingScrolledContainer.setExpandVertical(true);
          _smoothingScrolledContainer.setExpandHorizontal(true);
-         _smoothingScrolledContainer.addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(final ControlEvent e) {
-               _smoothingScrolledContainer.setMinSize(//
-                     _smoothingScrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-            }
-         });
+         _smoothingScrolledContainer.addControlListener(
+               controlResizedAdapter(controlEvent -> _smoothingScrolledContainer.setMinSize(
+                     _smoothingScrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT))));
 
          _smoothingScrolledContainer.setContent(_smoothingScrolledContent);
       }
@@ -96,9 +89,13 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    public void init(final IWorkbench workbench) {}
 
    private void initUI(final Composite parent) {
-      _pc = new PixelConverter(parent);
 
-      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(70);
+      _formToolkit = new FormToolkit(parent.getDisplay());
+      _pixelConverter = new PixelConverter(parent);
+      _weatherProvidersUI = new WeatherProvidersUI();
+      _smoothingScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+
+      DEFAULT_DESCRIPTION_WIDTH = _pixelConverter.convertWidthInCharsToPixels(70);
    }
 
 }

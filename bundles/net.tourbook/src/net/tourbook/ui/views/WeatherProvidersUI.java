@@ -28,6 +28,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
@@ -127,7 +128,6 @@ public class WeatherProvidersUI {
          GridDataFactory.fillDefaults()
                .indent(20, 0)
                .applyTo(_comboWeatherProvider);
-         _formToolkit.adapt(_comboWeatherProvider, true, true);
       }
    }
 
@@ -177,6 +177,7 @@ public class WeatherProvidersUI {
 
          // it could be already created
          _formToolkit = new FormToolkit(parent.getDisplay());
+         _formToolkit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
       }
    }
 

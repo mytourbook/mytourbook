@@ -57,10 +57,11 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
    @Override
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
                              final Composite parent,
-                             final FormToolkit tk) {
+                             final FormToolkit formToolkit) {
+
       final int defaultHIndent = 16;
 
-      final Composite container = new Composite(parent, SWT.NONE);
+      final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {

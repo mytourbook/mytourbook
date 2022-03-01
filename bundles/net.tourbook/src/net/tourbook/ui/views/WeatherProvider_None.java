@@ -20,19 +20,14 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_None implements IWeatherProvider {
 
-   /*
-    * UI controls
-    */
-   private FormToolkit _tk;
-
    public WeatherProvider_None() {}
 
    @Override
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
                              final Composite parent,
-                             final FormToolkit tk) {
-      _tk = tk;
-      final Composite container = _tk.createComposite(parent);
+                             final FormToolkit formToolkit) {
+
+      final Composite container = formToolkit.createComposite(parent);
 
       return container;
    }
