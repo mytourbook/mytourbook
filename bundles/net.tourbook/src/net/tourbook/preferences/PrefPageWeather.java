@@ -98,4 +98,12 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       DEFAULT_DESCRIPTION_WIDTH = _pixelConverter.convertWidthInCharsToPixels(70);
    }
 
+   @Override
+   public boolean performOk() {
+
+      _weatherProvidersUI.saveState();
+
+      return super.performOk();
+   }
+
 }

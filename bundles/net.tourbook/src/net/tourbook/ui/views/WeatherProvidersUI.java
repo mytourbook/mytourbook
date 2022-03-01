@@ -17,6 +17,7 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
@@ -109,7 +110,7 @@ public class WeatherProvidersUI {
          /*
           * Label: weather provider
           */
-         final Label label = _formToolkit.createLabel(container, "weather provider");//Messages.TourChart_Smoothing_Label_SmoothingAlgorithm);
+         final Label label = _formToolkit.createLabel(container, Messages.Pref_Weather_Label_WeatherProvider);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(label);
@@ -231,7 +232,7 @@ public class WeatherProvidersUI {
    /**
     * Update new values in the pref store
     */
-   private void saveState() {
+   public void saveState() {
 
       _prefStore.setValue(//
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID,
