@@ -233,6 +233,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    /**
     * Returns the weather data as a human readable string
+    * Example: ☀, Sunny, 98.6°F, 21.2°F, 11.184682mph, from , 1456.6929inch
     *
     * @param tourData
     * @return
@@ -246,33 +247,49 @@ public class StravaUploader extends TourbookCloudUploader {
       if (StringUtils.hasContent(weatherIcon)) {
          weatherDataList.add(weatherIcon);
       }
+
       final String weatherText = tourData.getWeather();
       if (StringUtils.hasContent(weatherText)) {
-         weatherDataList.add(weatherText);
-      }
-      final float averageTemperature = tourData.getWeather_Temperature_Average();
 
+         if (weatherDataList.size() == 1) {
+            weatherDataList.set(0, weatherDataList.get(0) + UI.SPACE + weatherText);
+         } else {
+            weatherDataList.add(weatherText);
+         }
+      }
+
+      final float averageTemperature = tourData.getWeather_Temperature_Average();
       if (averageTemperature != Float.MIN_VALUE) {
-         weatherDataList.add(UI.convertTemperatureFromMetric(averageTemperature) + UI.UNIT_LABEL_TEMPERATURE);
+         weatherDataList.add(Math.round(UI.convertTemperatureFromMetric(averageTemperature)) +
+               UI.UNIT_LABEL_TEMPERATURE);
       }
-      final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
+
       //"feels like"
+      final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
       if (temperatureWindChill != Float.MIN_VALUE) {
-         weatherDataList.add(UI.convertTemperatureFromMetric(temperatureWindChill) + UI.UNIT_LABEL_TEMPERATURE);
+         weatherDataList.add("feels like " +
+               Math.round(UI.convertTemperatureFromMetric(temperatureWindChill)) +
+               UI.UNIT_LABEL_TEMPERATURE);
       }
+
       //humidity
+      final float humidity = tourData.getWeather_Humidity();
+      if (humidity != Float.MIN_VALUE) {
+         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE);
+      }
 
       //  wind \
       final int windSpeed = tourData.getWeatherWindSpeed();
       if (windSpeed != Float.MIN_VALUE) {
-         weatherDataList.add(UI.convertSpeed_FromMetric(windSpeed) + UI.UNIT_LABEL_SPEED);
-         weatherDataList.add(" from ");
+         weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
+               UI.UNIT_LABEL_SPEED +
+               " from ");
          //WNW weatherDataList.add(tourData.getWeatherWindDir());
       }
 
       final float precipitation = tourData.getWeather_Precipitation();
       if (precipitation != Float.MIN_VALUE) {
-         weatherDataList.add(UI.convertPrecipitation_FromMetric(averageTemperature) + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         weatherDataList.add(Math.round(UI.convertPrecipitation_FromMetric(precipitation)) + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
       final String weatherData = String.join(UI.COMMA_SPACE, weatherDataList);

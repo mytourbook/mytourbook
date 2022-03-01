@@ -28,6 +28,7 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.strava.StravaUploader;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
@@ -109,6 +110,13 @@ public class StravaUploaderTests {
             .withStatus(201);
 
       final TourData tour = Initializer.createManualTour();
+      tour.setWeatherClouds(IWeather.WEATHER_ID_CLEAR);
+      tour.setWeather("Partly cloudy");
+      tour.setWeather_Temperature_Average(10);
+      tour.setWeather_Temperature_WindChill(10);
+      tour.setWeather_Humidity((short) 10);
+      tour.setWeatherWindSpeed(10);
+      tour.setWeather_Precipitation(10);
 
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
