@@ -31,8 +31,6 @@ public final class TourWeatherRetriever {
    // boolean retrieveHistoricalWeatherData();
    public static boolean retrieveWeatherData(final TourData tourData) {
 
-      //todo busy indicator
-
       final String weatherProvider = _prefStore.getString(
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
