@@ -109,6 +109,7 @@ import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -9758,19 +9759,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public int getWeatherIndex() {
 
-      int weatherCloudsIndex = -1;
-
-      if (weatherClouds != null) {
-         // binary search cannot be done because it requires sorting which we cannot...
-         for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
-            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
-               weatherCloudsIndex = cloudIndex;
-               break;
-            }
-         }
-      }
-
-      return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+      return WeatherUtils.getWeatherIndex(weatherClouds);
    }
 
    public int getWeatherWindDir() {

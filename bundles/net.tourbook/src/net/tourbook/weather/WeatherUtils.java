@@ -212,4 +212,21 @@ public class WeatherUtils {
       return UI.SPACE1 + weatherIcon;
    }
 
+   public static int getWeatherIndex(final String weatherClouds) {
+
+      int weatherCloudsIndex = -1;
+
+      if (StringUtils.hasContent(weatherClouds)) {
+         // binary search cannot be done because it requires sorting which we cannot...
+         for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
+            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
+               weatherCloudsIndex = cloudIndex;
+               break;
+            }
+         }
+      }
+
+      return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+   }
+
 }
