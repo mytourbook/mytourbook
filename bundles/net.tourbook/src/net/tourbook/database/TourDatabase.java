@@ -37,7 +37,6 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1973,10 +1972,8 @@ public class TourDatabase {
     */
    private static ConcurrentSkipListSet<String> getDistinctValues(final String db, final String fieldname) {
 
-      final ConcurrentSkipListSet<String> sortedValues = new ConcurrentSkipListSet<>(new Comparator<String>() {
-         @Override
-         public int compare(final String text1, final String text2) {
-
+      final ConcurrentSkipListSet<String> sortedValues = new ConcurrentSkipListSet<>((text1, text2) -> {
+         {
             // sort without case
             return text1.compareToIgnoreCase(text2);
          }
@@ -5352,7 +5349,7 @@ public class TourDatabase {
 
          if (dbVersion_BeforeDataUpdate < TOURBOOK_DB_VERSION) {
 
-            if (updateDb__2_Data(conn, dbVersion_BeforeDataUpdate, splashManager) == false) {
+            if (updateDb__2_Data(conn, splashManager) == false) {
                return false;
             }
 
@@ -5574,7 +5571,7 @@ public class TourDatabase {
 
          // 3 -> 4
          if (currentDbVersion == 3) {
-            updateDb_003_To_004(conn, splashManager);
+            updateDb_003_To_004(conn);
             currentDbVersion = _dbDesignVersion_New = 4;
          }
 
@@ -5691,7 +5688,7 @@ public class TourDatabase {
 
          // 25 -> 26    14.14 / 15.3
          if (currentDbVersion == 25) {
-            currentDbVersion = _dbDesignVersion_New = updateDb_025_To_026(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_025_To_026(splashManager);
          }
 
          // 26 -> 27    15.3.1
@@ -5817,7 +5814,7 @@ public class TourDatabase {
    /**
     * This method may be updated when the database version is updated
     */
-   private boolean updateDb__2_Data(final Connection conn, final int currentDbVersion, final SplashManager splashManager) {
+   private boolean updateDb__2_Data(final Connection conn, final SplashManager splashManager) {
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5837,7 +5834,7 @@ public class TourDatabase {
          updateDb_004_To_005_DataUpdate(conn, splashManager);
          updateDb_008_To_009_DataUpdate(conn, splashManager);
          updateDb_010_To_011_DataUpdate(conn, splashManager);
-         updateDb_012_To_013_DataUpdate(conn, splashManager);
+         updateDb_012_To_013_DataUpdate(conn);
          updateDb_019_To_020_DataUpdate(conn, splashManager);
          updateDb_021_To_022_DataUpdate(conn, splashManager);
          updateDb_022_To_023_DataUpdate(conn, splashManager);
@@ -5850,7 +5847,7 @@ public class TourDatabase {
          updateDb_039_To_040_DataUpdate(conn, splashManager);
          updateDb_041_To_042_DataUpdate(conn);
          updateDb_042_to_043_DataUpdate(conn, splashManager);
-         updateDb_046_to_047_DataUpdate(conn, splashManager);
+         updateDb_046_to_047_DataUpdate(conn);
 
       } catch (final SQLException e) {
 
@@ -5906,7 +5903,7 @@ public class TourDatabase {
       logDbUpdate_End(dbVersion);
    }
 
-   private void updateDb_003_To_004(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_003_To_004(final Connection conn) throws SQLException {
 
       final int dbVersion = 4;
 
@@ -6444,7 +6441,7 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDb_012_To_013_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_012_To_013_DataUpdate(final Connection conn) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
@@ -7499,7 +7496,7 @@ public class TourDatabase {
    }
 
    // 25 -> 26    14.14 / 15.3
-   private int updateDb_025_To_026(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_025_To_026(final SplashManager splashManager) {
 
       final int newDbVersion = 26;
 
@@ -8999,11 +8996,11 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-   private void updateDb_046_to_047_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_046_to_047_DataUpdate(final Connection conn) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
-      final int dbDataVersion = 42;
+      final int dbDataVersion = 47;
 
       if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
          // data version is higher -> nothing to do
