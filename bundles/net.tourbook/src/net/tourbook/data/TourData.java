@@ -523,7 +523,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    //todo fb do i need to set -1 in the db by default ?
    // see deviceTimeInterval
-   private int                   weatherWindDir  = -1;                                       // db-version 8
+   private int                   weatherWindDir  = -1;                                 // db-version 8
    private int                   weatherWindSpd;                                       // db-version 8
    private String                weatherClouds;                                        // db-version 8
 
