@@ -2757,7 +2757,7 @@ public class TourManager {
                      modifiedTours.add(tourData);
                      TourLogManager.subLog_OK(getTourDateTimeShort(tourData) +
                            UI.SYMBOL_COLON + UI.SPACE +
-                           WeatherUtils.buildWeatherDataString(tourData));
+                           WeatherUtils.buildWeatherDataString(tourData, true, true));
 
                   } else {
                      TourLogManager.subLog_ERROR(NLS.bind(

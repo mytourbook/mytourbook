@@ -51,7 +51,9 @@ public class WeatherUtils {
     * @param tourData
     * @return
     */
-   public static String buildWeatherDataString(final TourData tourData) {
+   public static String buildWeatherDataString(final TourData tourData,
+                                               final boolean displayMinimumTemperature,
+                                               final boolean displayMaximumTemperature) {
 
       final List<String> weatherDataList = new ArrayList<>();
 
@@ -94,10 +96,13 @@ public class WeatherUtils {
       //  wind \
       final int windSpeed = tourData.getWeatherWindSpeed();
       if (windSpeed != Float.MIN_VALUE) {
+
+         final String windDirection = tourData.getWeatherWindDir() != -1
+               ? " from " + getWindDirectionTextIndex(tourData.getWeatherWindDir())
+               : UI.EMPTY_STRING;
          weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
                UI.UNIT_LABEL_SPEED +
-               " from ");
-         //WNW weatherDataList.add(tourData.getWeatherWindDir());
+               windDirection);
       }
 
       final float precipitation = tourData.getWeather_Precipitation();
@@ -151,7 +156,6 @@ public class WeatherUtils {
 
       return searchAreaCenter;
    }
-
    /**
     * Returns an appropriate weather Emoji based on the tour weather icon.
     * To obtain the string representation of the icons in Unicode 7.0,
@@ -227,6 +231,23 @@ public class WeatherUtils {
       }
 
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+   }
+
+   public static  String getWindDirectionTextIndex(final int degreeDirection) {
+
+      //todo fb
+      //if all the weather data is empty <= for old tours (refactored method that do all the necessary testing in TourData.java ?)
+      // or if degreeDirection == -1
+
+      int directionIndex = 0;
+      if (degreeDirection != -1) {
+
+      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
+
+         directionIndex = ((int) degree) % 16;
+      }
+
+      return IWeather.windDirectionText[ directionIndex + 1];
    }
 
 }
