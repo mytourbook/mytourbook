@@ -42,15 +42,15 @@ public class WeatherProvidersUI {
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_NONE,
-               "None"),                                                                                                  //Messages.TourChart_Smoothing_Algorithm_Initial),
+               Messages.Weather_Provider_None),
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP,
-               "OpenWeatherMap"),                                                                                        //Messages.TourChart_Smoothing_Algorithm_Jamet),
+               IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP),
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE,
-               "WWO")                                                                                                    //Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
+               IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)
    };
 
    private final IPreferenceStore         _prefStore                          = TourbookPlugin.getPrefStore();
@@ -112,7 +112,9 @@ public class WeatherProvidersUI {
          /*
           * Label: weather provider
           */
-         final Label label = _formToolkit.createLabel(container, Messages.Pref_Weather_Label_WeatherProvider);
+         final Label label = _formToolkit.createLabel(
+               container,
+               Messages.Pref_Weather_Label_WeatherProvider);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(label);
@@ -176,15 +178,14 @@ public class WeatherProvidersUI {
 
    private void initUI(final Composite parent) {
 
-      if (_formToolkit == null) {
-
-         // it could be already created
-         _formToolkit = new FormToolkit(parent.getDisplay());
-         _formToolkit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+      if (_formToolkit != null) {
+         return;
       }
-   }
 
-   protected void onModifyWeatherProvider() {}
+      // it could be already created
+      _formToolkit = new FormToolkit(parent.getDisplay());
+      _formToolkit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+   }
 
    private void onSelectWeatherProvider() {
 
@@ -295,8 +296,5 @@ public class WeatherProvidersUI {
       }
 
       UI.updateScrolledContent(_uiContainer);
-
-      // fire event to pack the UI, this is needed when the UI is in a slideout
-      onModifyWeatherProvider();
    }
 }
