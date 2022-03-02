@@ -220,15 +220,10 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   //TODO FB
-   // add " " to the wind enumeration to be the vaue by default
-
    //Use OpenWeatherMapApi to retrieve the weather data (use Heroku to avoid users to have to register)
    //make the code generic so that it's easier to add another weather provider in the future
 
    // Unit tests
-
-   //By default, the wind should not be north but empty. is that possible ?
 
    //todo fb verify that WWO and OWM take the actual hour of the tour since I think i saw temperatures that were so low they could have been
    //the same day but at night
@@ -6504,7 +6499,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Humidity.setEnabled(canEdit);
       _spinWeather_PrecipitationValue.setEnabled(canEdit);
       _spinWeather_PressureValue.setEnabled(canEdit);
-      _spinWeather_Wind_DirectionValue.setEnabled(canEdit);
+      _spinWeather_Wind_DirectionValue.setEnabled(canEdit &&
+            _comboWeather_WindDirectionText.getSelectionIndex() > 0);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit);
 
@@ -7417,13 +7413,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
       // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
 
-      final int selectedIndex = _comboWeather_WindDirectionText.getSelectionIndex();
+      int selectedIndex = _comboWeather_WindDirectionText.getSelectionIndex();
 
-      // get degree from selected direction
+      int windDirectionValue = 0;
+      boolean isWindDirectionValueEnabled = true;
 
-      final int degree = (int) (selectedIndex * 22.5f * 10f);
+      //0 represents an empty value
+      if (selectedIndex == 0) {
 
-      _spinWeather_Wind_DirectionValue.setSelection(degree + 1);
+         isWindDirectionValueEnabled = false;
+         windDirectionValue = 0;
+      } else {
+
+         //We decrement the index value to take into account the first element
+         //that represents the empty value.
+         --selectedIndex;
+
+         // get degree from selected direction
+         windDirectionValue = (int) (selectedIndex * 22.5f * 10f);
+      }
+
+      _spinWeather_Wind_DirectionValue.setEnabled(isWindDirectionValueEnabled);
+      _spinWeather_Wind_DirectionValue.setSelection(windDirectionValue);
    }
 
    private void onSelect_WindDirectionValue() {
@@ -7441,8 +7452,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _spinWeather_Wind_DirectionValue.setSelection(degree);
       }
 
-      _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(degree));
+      int windDirectionTextIndex = 0;
+      if (_spinWeather_Wind_DirectionValue.isEnabled()) {
+         windDirectionTextIndex = getWindDirectionTextIndex(degree);
+      }
 
+      _comboWeather_WindDirectionText.select(windDirectionTextIndex);
    }
 
    private void onSelect_WindSpeedText() {
@@ -8497,7 +8512,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Weather
           */
          _tourData.setWeather(_txtWeather.getText().trim());
-         _tourData.setWeatherWindDir((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
+         final int weatherWindDir = _comboWeather_WindDirectionText.getSelectionIndex() == 0
+               ? -1
+               : (int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f);
+
+         _tourData.setWeatherWindDir(weatherWindDir);
 
          _tourData.setWeather_Humidity((short) _spinWeather_Humidity.getSelection());
 
@@ -8949,9 +8968,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDir() * 10;
-      _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
-      _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
+      final int weatherWindDir = _tourData.getWeatherWindDir();
+      if (weatherWindDir == -1) {
+         _spinWeather_Wind_DirectionValue.setSelection(0);
+         _spinWeather_Wind_DirectionValue.setEnabled(false);
+         _comboWeather_WindDirectionText.select(0);
+      } else {
+         final int weatherWindDirDegree = weatherWindDir * 10;
+         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
+         _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
+         _spinWeather_Wind_DirectionValue.setEnabled(true);
+      }
 
       // wind speed
       final int windSpeed = _tourData.getWeatherWindSpeed();

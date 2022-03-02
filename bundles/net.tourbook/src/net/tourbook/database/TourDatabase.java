@@ -3877,7 +3877,7 @@ public class TourDatabase {
 
             // version 8 start
 
-            + " weatherWindDir         INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weatherWindDir         INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
             + " weatherWindSpd         INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
             + " weatherClouds          VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + " restPulse              INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
