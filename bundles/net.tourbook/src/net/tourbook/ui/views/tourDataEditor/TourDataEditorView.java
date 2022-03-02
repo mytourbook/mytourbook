@@ -116,6 +116,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.databinding.conversion.text.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -7024,23 +7025,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private int getWindDirectionTextIndex(final int degreeDirection) {
-
-      //todo fb
-      //if all the weather data is empty <= for old tours (refactored method that do all the necessary testing in TourData.java ?)
-      // or if degreeDirection == -1
-
-      if (degreeDirection == -1) {
-         return 0;
-      }
-
-      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
-
-      final int directionIndex = ((int) degree) % 16;
-
-      return directionIndex + 1;
-   }
-
    private int getWindSpeedTextIndex(final int speed) {
 
       // set speed to max index value
@@ -7454,7 +7438,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       int windDirectionTextIndex = 0;
       if (_spinWeather_Wind_DirectionValue.isEnabled()) {
-         windDirectionTextIndex = getWindDirectionTextIndex(degree);
+         windDirectionTextIndex = WeatherUtils.getWindDirectionTextIndex((int) (degree / 10.0f));
       }
 
       _comboWeather_WindDirectionText.select(windDirectionTextIndex);
@@ -8976,7 +8960,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else {
          final int weatherWindDirDegree = weatherWindDir * 10;
          _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
-         _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
+         _comboWeather_WindDirectionText.select(WeatherUtils.getWindDirectionTextIndex((int) (weatherWindDirDegree / 10.0f)));
          _spinWeather_Wind_DirectionValue.setEnabled(true);
       }
 

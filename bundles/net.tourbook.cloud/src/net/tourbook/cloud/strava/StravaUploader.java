@@ -216,7 +216,7 @@ public class StravaUploader extends TourbookCloudUploader {
             description.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
          }
          String weatherData = WeatherUtils.buildWeatherDataString(tourData, false, false);
-         if (StringUtils.hasContent(weatherData)) {
+         if (StringUtils.hasContent(description.toString())) {
             weatherData = UI.NEW_LINE1 + weatherData;
          }
          description.append(weatherData);

@@ -73,13 +73,32 @@ public class WeatherUtils {
          }
       }
 
+      // Average temperature
       final float averageTemperature = tourData.getWeather_Temperature_Average();
       if (averageTemperature != Float.MIN_VALUE) {
          weatherDataList.add(Math.round(UI.convertTemperatureFromMetric(averageTemperature)) +
                UI.UNIT_LABEL_TEMPERATURE);
       }
 
-      //"feels like"
+      // Maximum temperature
+      if (displayMaximumTemperature) {
+         weatherDataList.add(
+               "Max. " +
+                     Math.round(
+                           UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
+                     UI.UNIT_LABEL_TEMPERATURE);
+      }
+
+      // Minimum temperature
+      if (displayMinimumTemperature) {
+         weatherDataList.add(
+               "Min. " +
+                     Math.round(
+                           UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
+                     UI.UNIT_LABEL_TEMPERATURE);
+      }
+
+      // Wind chill
       final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
       if (temperatureWindChill != Float.MIN_VALUE) {
          weatherDataList.add("feels like " +
@@ -87,22 +106,22 @@ public class WeatherUtils {
                UI.UNIT_LABEL_TEMPERATURE);
       }
 
-      //humidity
-      final float humidity = tourData.getWeather_Humidity();
-      if (humidity != Float.MIN_VALUE) {
-         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE);
-      }
-
-      //  wind \
+      // Wind
       final int windSpeed = tourData.getWeatherWindSpeed();
       if (windSpeed != Float.MIN_VALUE) {
 
          final String windDirection = tourData.getWeatherWindDir() != -1
-               ? " from " + getWindDirectionTextIndex(tourData.getWeatherWindDir())
+               ? " from " + getWindDirectionText(tourData.getWeatherWindDir())
                : UI.EMPTY_STRING;
          weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
                UI.UNIT_LABEL_SPEED +
                windDirection);
+      }
+
+      // Humidity
+      final float humidity = tourData.getWeather_Humidity();
+      if (humidity != Float.MIN_VALUE) {
+         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE);
       }
 
       final float precipitation = tourData.getWeather_Precipitation();
@@ -156,6 +175,7 @@ public class WeatherUtils {
 
       return searchAreaCenter;
    }
+
    /**
     * Returns an appropriate weather Emoji based on the tour weather icon.
     * To obtain the string representation of the icons in Unicode 7.0,
@@ -233,21 +253,22 @@ public class WeatherUtils {
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
    }
 
-   public static  String getWindDirectionTextIndex(final int degreeDirection) {
+   private static String getWindDirectionText(final int degreeDirection) {
 
-      //todo fb
-      //if all the weather data is empty <= for old tours (refactored method that do all the necessary testing in TourData.java ?)
-      // or if degreeDirection == -1
+      return IWeather.windDirectionText[getWindDirectionTextIndex(degreeDirection)];
+   }
 
-      int directionIndex = 0;
-      if (degreeDirection != -1) {
+   public static int getWindDirectionTextIndex(final int degreeDirection) {
 
-      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
-
-         directionIndex = ((int) degree) % 16;
+      if (degreeDirection == -1) {
+         return 0;
       }
 
-      return IWeather.windDirectionText[ directionIndex + 1];
+      final float degree = (degreeDirection + 11.25f) / 22.5f;
+
+      final int directionIndex = ((int) degree) % 16;
+
+      return directionIndex + 1;
    }
 
 }

@@ -109,7 +109,6 @@ public class StravaUploaderTests {
             .doReturn(stravaResponse)
             .withStatus(201);
 
-      //todo fb remove the ones that are not used in the strava weather description string
       final TourData tour = Initializer.createManualTour();
       tour.setWeatherClouds(IWeather.WEATHER_ID_PART_CLOUDS);
       tour.setWeather("Partly cloudy");
@@ -131,7 +130,7 @@ public class StravaUploaderTests {
                   "Authorization",
                   OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
             .withBody(equalTo(
-                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour\",\"elapsed_time\":3600,\"description\":\"\n☀ Sunny, 30°F, feels like 21°F, 59.0%, 11mph from , 0inch\",\"type\":\"Run\"}")) //$NON-NLS-1$
+                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour ⛅\",\"elapsed_time\":3600,\"description\":\"⛅ Partly cloudy, -1°C, feels like -6°C, 18km/h from W, 78.0%, 3mm\",\"type\":\"Run\"}")) //$NON-NLS-1$
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
