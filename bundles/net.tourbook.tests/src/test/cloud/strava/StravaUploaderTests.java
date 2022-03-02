@@ -109,14 +109,16 @@ public class StravaUploaderTests {
             .doReturn(stravaResponse)
             .withStatus(201);
 
+      //todo fb remove the ones that are not used in the strava weather description string
       final TourData tour = Initializer.createManualTour();
-      tour.setWeatherClouds(IWeather.WEATHER_ID_CLEAR);
+      tour.setWeatherClouds(IWeather.WEATHER_ID_PART_CLOUDS);
       tour.setWeather("Partly cloudy");
-      tour.setWeather_Temperature_Average(10);
-      tour.setWeather_Temperature_WindChill(10);
-      tour.setWeather_Humidity((short) 10);
-      tour.setWeatherWindSpeed(10);
-      tour.setWeather_Precipitation(10);
+      tour.setWeather_Temperature_Average(-1);
+      tour.setWeather_Temperature_WindChill(-6);
+      tour.setWeather_Humidity((short) 78);
+      tour.setWeatherWindSpeed(18);
+      tour.setWeatherWindDir(267);
+      tour.setWeather_Precipitation(3);
 
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
