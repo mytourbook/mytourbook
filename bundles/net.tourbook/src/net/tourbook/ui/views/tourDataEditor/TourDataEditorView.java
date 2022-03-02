@@ -228,8 +228,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    // Unit tests
 
-   //display the weather in the calendar view
-
    //By default, the wind should not be north but empty. is that possible ?
 
    //todo fb verify that WWO and OWM take the actual hour of the tour since I think i saw temperatures that were so low they could have been
