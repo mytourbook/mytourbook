@@ -32,7 +32,7 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
-public class WorldWeatherOnlineTests {
+public class WorldWeatherOnlineRetrieverTests {
 
    private static final String WORLDWEATHERONLINE_FILE_PATH =
          FilesUtils.rootPath + "data/weather/worldweatheronline/files/"; //$NON-NLS-1$
