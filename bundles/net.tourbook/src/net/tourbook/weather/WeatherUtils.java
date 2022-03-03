@@ -121,7 +121,7 @@ public class WeatherUtils {
       // Humidity
       final float humidity = tourData.getWeather_Humidity();
       if (humidity != Float.MIN_VALUE) {
-         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE);
+         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE + " Humidity");
       }
 
       final float precipitation = tourData.getWeather_Precipitation();

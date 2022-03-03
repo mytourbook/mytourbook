@@ -21,9 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -38,6 +40,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    //todo fb i might have to do more than 1 call as the results only ocntains the 24 hours around the given start time
    // that will work for most of the activities but not 100milers ....
+
+   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
 
    //todo fb this will be replaced by HEROKU
    private static final String baseApiUrl = "https://api.openweathermap.org/data/2.5/onecall/timemachine?"; //$NON-NLS-1$

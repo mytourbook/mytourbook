@@ -24,7 +24,6 @@ import java.lang.reflect.Field;
 
 import net.tourbook.data.TourData;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
-import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -56,27 +55,33 @@ public class OpenWeatherMapRetrieverTests {
       final String worldWeatherOnlineResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse.json"); //$NON-NLS-1$
       httpClientMock.onGet(
-            "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime") //$NON-NLS-1$
+            "https://api.openweathermap.org/data/2.5/onecall/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646136000") //$NON-NLS-1$
             .doReturn(worldWeatherOnlineResponse);
-      final Field field = WorldWeatherOnlineRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      final Field field = OpenWeatherMapRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
+      //Tuesday, March 1, 2022 12:00:00 PM
+      tour.setTourStartTime(2022, 3, 1, 12, 0, 0);
+
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+//      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
 
-      assertEquals(16, tour.getWeather_Temperature_Average());
-      assertEquals(9, tour.getWeatherWindSpeed());
-      assertEquals(136, tour.getWeatherWindDir());
-      assertEquals("Partly cloudy", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy", tour.getWeatherClouds()); //$NON-NLS-1$
-      assertEquals(50, tour.getWeather_Humidity());
-      assertEquals(1.6, Math.round(tour.getWeather_Precipitation() * 10.0) / 10.0);
-      assertEquals(1017, tour.getWeather_Pressure());
-      assertEquals(19, tour.getWeather_Temperature_Max());
-      assertEquals(8, tour.getWeather_Temperature_Min());
-      assertEquals(16, tour.getWeather_Temperature_WindChill());
+
+      //todo fb is that normal to have lots of decimals???
+      assertEquals("clear sky", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-sunny", tour.getWeatherClouds()); //$NON-NLS-1$
+      assertEquals(-5.788750171661377, tour.getWeather_Temperature_Average());
+      assertEquals(4.0, tour.getWeatherWindSpeed());
+      assertEquals(268.0, tour.getWeatherWindDir());
+      assertEquals(56.0, tour.getWeather_Humidity());
+      assertEquals(0, tour.getWeather_Precipitation());
+      assertEquals(1025.0, tour.getWeather_Pressure());
+      assertEquals(5.78000020980835, tour.getWeather_Temperature_Max());
+      assertEquals(-19.639999389648438, tour.getWeather_Temperature_Min());
+      assertEquals(-10.65291690826416, tour.getWeather_Temperature_WindChill());
    }
 }
