@@ -1526,7 +1526,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void defineColumn_Weather_AvgTemperature() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override

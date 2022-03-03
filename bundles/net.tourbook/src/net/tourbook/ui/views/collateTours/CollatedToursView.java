@@ -396,7 +396,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
             _columnManager.saveState(_state);
             _columnManager.clearColumns();
-            defineAllColumns(_viewerContainer);
+            defineAllColumns();
 
             _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
          }
@@ -494,7 +494,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
       _columnManager.setIsCategoryAvailable(true);
-      defineAllColumns(parent);
+      defineAllColumns();
 
       createUI(parent);
       createActions();
@@ -634,7 +634,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     *
     * @param parent
     */
-   private void defineAllColumns(final Composite parent) {
+   private void defineAllColumns() {
 
       defineColumn_1stColumn_CollateEvent();
       defineColumn_Time_WeekDay();
@@ -1637,7 +1637,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Weather_AvgTemperature() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2030,7 +2030,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
          // fire selection that nothing is selected
 
-         selection = new SelectionTourIds(new ArrayList<Long>());
+         selection = new SelectionTourIds(new ArrayList<>());
 
       } else {
 

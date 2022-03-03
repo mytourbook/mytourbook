@@ -341,11 +341,11 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory WEATHER_CLOUDS;
    public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";                                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
-   public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG";                         //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_DEVICE;
-   public static final String             WEATHER_TEMPERATURE_MIN_DEVICE_ID                  = "WEATHER_TEMPERATURE_MIN";                         //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_MIN_DEVICE_ID                  = "WEATHER_TEMPERATURE_MIN_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MAX_DEVICE;
-   public static final String             WEATHER_TEMPERATURE_MAX_DEVICE_ID                  = "WEATHER_TEMPERATURE_MAX";                         //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_MAX_DEVICE_ID                  = "WEATHER_TEMPERATURE_MAX_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_TIME_SLICE;
    public static final TableColumnFactory WEATHER_WIND_DIR;
    public static final String             WEATHER_WIND_DIRECTION_ID                          = "WEATHER_WIND_DIR";                                //$NON-NLS-1$

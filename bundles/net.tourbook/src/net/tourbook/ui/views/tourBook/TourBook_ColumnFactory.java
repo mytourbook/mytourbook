@@ -3618,7 +3618,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3651,7 +3651,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MAX.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3684,7 +3684,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MIN.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
