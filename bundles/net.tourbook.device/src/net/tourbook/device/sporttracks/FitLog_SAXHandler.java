@@ -532,7 +532,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
        * weather
        */
       tourData.setWeather(_currentActivity.weatherText);
-      tourData.setWeatherClouds(_weatherId.get(_currentActivity.weatherConditions));
+      tourData.setWeather_Clouds(_weatherId.get(_currentActivity.weatherConditions));
 
       final float weatherTemperature = _currentActivity.weatherTemperature;
       if (weatherTemperature != Float.MIN_VALUE) {
@@ -540,7 +540,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
       }
 
       if (_currentActivity.weatherWindSpeed != Integer.MIN_VALUE) {
-         tourData.setWeatherWindSpeed(_currentActivity.weatherWindSpeed);
+         tourData.setWeather_Wind_Speed(_currentActivity.weatherWindSpeed);
       }
 
       if (_currentActivity.customDataFields.size() > 0) {

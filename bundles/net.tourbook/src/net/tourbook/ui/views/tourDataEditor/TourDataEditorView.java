@@ -8501,11 +8501,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Weather
           */
          _tourData.setWeather(_txtWeather.getText().trim());
-         final int weatherWindDir = _comboWeather_WindDirectionText.getSelectionIndex() == 0
+         final int weatherWindDirection = _comboWeather_WindDirectionText.getSelectionIndex() == 0
                ? -1
                : (int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f);
 
-         _tourData.setWeatherWindDir(weatherWindDir);
+         _tourData.setWeather_Wind_Direction(weatherWindDirection);
 
          _tourData.setWeather_Humidity((short) _spinWeather_Humidity.getSelection());
 
@@ -8530,7 +8530,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * rounding errors
              */
 
-            _tourData.setWeatherWindSpeed(Math.round((_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance)));
+            _tourData.setWeather_Wind_Speed(Math.round((_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance)));
          }
 
          final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -8539,7 +8539,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // replace invalid cloud key
             cloudValue = UI.EMPTY_STRING;
          }
-         _tourData.setWeatherClouds(cloudValue);
+         _tourData.setWeather_Clouds(cloudValue);
 
          if (_isTemperatureManuallyModified) {
 
@@ -8957,7 +8957,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDir = _tourData.getWeatherWindDir();
+      final int weatherWindDir = _tourData.getWeatherWindDirection();
       if (weatherWindDir == -1) {
          _spinWeather_Wind_DirectionValue.setSelection(0);
          _spinWeather_Wind_DirectionValue.setEnabled(false);

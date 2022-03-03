@@ -1747,7 +1747,7 @@ public class TourInfoUI {
                   IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDir();
+      final int weatherWindDirDegree = _tourData.getWeatherWindDirection();
       _lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
       _lblWindDirectionUnit.setText(String.format(
             Messages.Tour_Tooltip_Format_WindDirectionUnit,

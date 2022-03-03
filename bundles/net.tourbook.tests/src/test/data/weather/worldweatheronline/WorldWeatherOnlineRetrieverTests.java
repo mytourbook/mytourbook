@@ -68,7 +68,7 @@ public class WorldWeatherOnlineRetrieverTests {
 
       assertEquals(16, tour.getWeather_Temperature_Average());
       assertEquals(9, tour.getWeatherWindSpeed());
-      assertEquals(136, tour.getWeatherWindDir());
+      assertEquals(136, tour.getWeatherWindDirection());
       assertEquals("Partly cloudy", tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-cloudy", tour.getWeatherClouds()); //$NON-NLS-1$
       assertEquals(50, tour.getWeather_Humidity());

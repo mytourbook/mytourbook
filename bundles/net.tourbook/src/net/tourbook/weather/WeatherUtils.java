@@ -110,8 +110,8 @@ public class WeatherUtils {
       final int windSpeed = tourData.getWeatherWindSpeed();
       if (windSpeed != Float.MIN_VALUE) {
 
-         final String windDirection = tourData.getWeatherWindDir() != -1
-               ? " from " + getWindDirectionText(tourData.getWeatherWindDir())
+         final String windDirection = tourData.getWeatherWindDirection() != -1
+               ? " from " + getWindDirectionText(tourData.getWeatherWindDirection())
                : UI.EMPTY_STRING;
          weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
                UI.UNIT_LABEL_SPEED +

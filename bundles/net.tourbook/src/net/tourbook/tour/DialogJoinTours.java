@@ -362,7 +362,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    private void createUI(final Composite parent) {
 
-      final SelectionListener defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
+      final SelectionListener defaultSelectionListener =
+            widgetSelectedAdapter(selectionEvent -> enableControls());
 
       _dlgInnerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
@@ -565,7 +566,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       GridDataFactory.fillDefaults()//
             .align(SWT.BEGINNING, SWT.FILL)
             .applyTo(_linkTag);
-      _linkTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTag)));
+      _linkTag.addSelectionListener(widgetSelectedAdapter(
+            selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTag)));
 
       _lblTourTags = new Label(parent, SWT.WRAP);
       GridDataFactory.fillDefaults()//
@@ -1263,7 +1265,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
             joinedWeather = tourData.getWeather();
             joinedWeatherClouds = tourData.getWeatherClouds();
-            joinedWeatherWindDir = tourData.getWeatherWindDir();
+            joinedWeatherWindDir = tourData.getWeatherWindDirection();
             joinedWeatherWindSpeed = tourData.getWeatherWindSpeed();
 
             joinedRestPulse = tourData.getRestPulse();
@@ -1375,9 +1377,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setRestPulse(joinedRestPulse);
 
       _joinedTourData.setWeather(joinedWeather);
-      _joinedTourData.setWeatherClouds(joinedWeatherClouds);
-      _joinedTourData.setWeatherWindDir(joinedWeatherWindDir);
-      _joinedTourData.setWeatherWindSpeed(joinedWeatherWindSpeed);
+      _joinedTourData.setWeather_Clouds(joinedWeatherClouds);
+      _joinedTourData.setWeather_Wind_Direction(joinedWeatherWindDir);
+      _joinedTourData.setWeather_Wind_Speed(joinedWeatherWindSpeed);
 
       _joinedTourData.setTourDeviceTime_Elapsed(joinedRecordedTime + joinedPausedTime);
       _joinedTourData.setTourDeviceTime_Recorded(joinedRecordedTime);

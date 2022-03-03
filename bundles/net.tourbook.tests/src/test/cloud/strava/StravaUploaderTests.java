@@ -110,13 +110,13 @@ public class StravaUploaderTests {
             .withStatus(201);
 
       final TourData tour = Initializer.createManualTour();
-      tour.setWeatherClouds(IWeather.WEATHER_ID_PART_CLOUDS);
+      tour.setWeather_Clouds(IWeather.WEATHER_ID_PART_CLOUDS);
       tour.setWeather("Partly cloudy");
       tour.setWeather_Temperature_Average(-1);
       tour.setWeather_Temperature_WindChill(-6);
       tour.setWeather_Humidity((short) 78);
-      tour.setWeatherWindSpeed(18);
-      tour.setWeatherWindDir(267);
+      tour.setWeather_Wind_Speed(18);
+      tour.setWeather_Wind_Direction(267);
       tour.setWeather_Precipitation(3);
 
       selectedTours.add(tour);

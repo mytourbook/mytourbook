@@ -56,6 +56,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
+   //todo fb also adapt the UI here for the weather ??
+
    private static final String      GRAPH_LABEL_HEARTBEAT_UNIT     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String      VALUE_UNIT_K_CALORIES          = net.tourbook.ui.Messages.Value_Unit_KCalories;
 
@@ -926,14 +928,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setRestPulse(_spinRestPulse.getSelection());
       _tourData.setCalories(_spinCalories.getSelection());
 
-      _tourData.setWeatherWindDir((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
+      _tourData.setWeather_Wind_Direction((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
       if (_isWindSpeedManuallyModified) {
          /*
           * update the speed only when it was modified because when the measurement is changed
           * when the tour is being modified then the computation of the speed value can cause
           * rounding errors
           */
-         _tourData.setWeatherWindSpeed((int) (_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance));
+         _tourData.setWeather_Wind_Speed((int) (_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance));
       }
 
       final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -942,7 +944,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          // replace invalid cloud key
          cloudValue = UI.EMPTY_STRING;
       }
-      _tourData.setWeatherClouds(cloudValue);
+      _tourData.setWeather_Clouds(cloudValue);
       _tourData.setWeather(_txtWeather.getText().trim());
 
       if (_isTemperatureManuallyModified) {
@@ -983,7 +985,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _txtWeather.setText(_tourData.getWeather());
 
          // wind direction
-         final int weatherWindDirDegree = _tourData.getWeatherWindDir() * 10;
+         final int weatherWindDirDegree = _tourData.getWeatherWindDirection() * 10;
          _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
          _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
 

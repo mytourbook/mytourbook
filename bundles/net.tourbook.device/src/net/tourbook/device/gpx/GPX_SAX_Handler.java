@@ -691,17 +691,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER_CLOUDS)) {
 
-         _tourData.setWeatherClouds(charData);
+         _tourData.setWeather_Clouds(charData);
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER_WIND_DIR)) {
 
-         _tourData.setWeatherWindDir(getIntValue(charData));
+         _tourData.setWeather_Wind_Direction(getIntValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER_WIND_SPEED)) {
 
-         _tourData.setWeatherWindSpeed(getIntValue(charData));
+         _tourData.setWeather_Wind_Speed(getIntValue(charData));
          _isInMT_Tour = false;
       }
    }

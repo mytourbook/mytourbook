@@ -204,70 +204,76 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, they are needed to drop them
-   private static final String TABLE_TOUR_CATEGORY                      = "TourCategory";                                         //$NON-NLS-1$
-   private static final String TABLE_TOURCATEGORY__TOURDATA             = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
+   private static final String TABLE_TOUR_CATEGORY                        = "TourCategory";                                         //$NON-NLS-1$
+   private static final String TABLE_TOURCATEGORY__TOURDATA               = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
     */
-   public static final int     ENTITY_IS_NOT_SAVED                      = -1;
+   public static final int     ENTITY_IS_NOT_SAVED                        = -1;
    //
-   public static final String  ENTITY_ID_BIKE                           = "BikeID";                                               //$NON-NLS-1$
-   public static final String  ENTITY_ID_COMPARED                       = "ComparedID";                                           //$NON-NLS-1$
-   public static final String  ENTITY_ID_DEVICE_SENSOR                  = "SensorId";                                             //$NON-NLS-1$
-   public static final String  ENTITY_ID_DEVICE_SENSOR_VALUE            = "SensorValueId";                                        //$NON-NLS-1$
-   public static final String  ENTITY_ID_HR_ZONE                        = "HrZoneID";                                             //$NON-NLS-1$
-   public static final String  ENTITY_ID_MARKER                         = "MarkerID";                                             //$NON-NLS-1$
-   public static final String  ENTITY_ID_PERSON                         = "PersonID";                                             //$NON-NLS-1$
-   public static final String  ENTITY_ID_PHOTO                          = "PhotoID";                                              //$NON-NLS-1$
-   public static final String  ENTITY_ID_REF                            = "RefID";                                                //$NON-NLS-1$
-   public static final String  ENTITY_ID_TAG                            = "TagID";                                                //$NON-NLS-1$
-   public static final String  ENTITY_ID_TAG_CATEGORY                   = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String  ENTITY_ID_TOUR                           = "TourID";                                               //$NON-NLS-1$
-   public static final String  ENTITY_ID_TYPE                           = "TypeID";                                               //$NON-NLS-1$
-   public static final String  ENTITY_ID_WAY_POINT                      = "WayPointID";                                           //$NON-NLS-1$
+   public static final String  ENTITY_ID_BIKE                             = "BikeID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_COMPARED                         = "ComparedID";                                           //$NON-NLS-1$
+   public static final String  ENTITY_ID_DEVICE_SENSOR                    = "SensorId";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_DEVICE_SENSOR_VALUE              = "SensorValueId";                                        //$NON-NLS-1$
+   public static final String  ENTITY_ID_HR_ZONE                          = "HrZoneID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_MARKER                           = "MarkerID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_PERSON                           = "PersonID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_PHOTO                            = "PhotoID";                                              //$NON-NLS-1$
+   public static final String  ENTITY_ID_REF                              = "RefID";                                                //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG                              = "TagID";                                                //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG_CATEGORY                     = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String  ENTITY_ID_TOUR                             = "TourID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_TYPE                             = "TypeID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_WAY_POINT                        = "WayPointID";                                           //$NON-NLS-1$
    //
-   private static final String KEY_BIKE                                 = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
-   private static final String KEY_DEVICE_SENSOR                        = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
-   private static final String KEY_PERSON                               = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   public static final String  KEY_TAG                                  = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
-   private static final String KEY_TAG_CATEGORY                         = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
-   public static final String  KEY_TOUR                                 = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
-   private static final String KEY_TYPE                                 = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
+   private static final String KEY_BIKE                                   = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
+   private static final String KEY_DEVICE_SENSOR                          = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
+   private static final String KEY_PERSON                                 = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
+   public static final String  KEY_TAG                                    = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   private static final String KEY_TAG_CATEGORY                           = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
+   public static final String  KEY_TOUR                                   = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
+   private static final String KEY_TYPE                                   = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
 
    /**
     * Renaming existing fields in the tour database causes lots of troubles and additional work to
     * fix and test it for ALL possible cases -> It is not a good idea to rename fields
     */
-   private static final String RENAMED__BIKER_WEIGHT__FROM              = "bikerWeight";                                          //$NON-NLS-1$
-   private static final String RENAMED__BIKER_WEIGHT__INTO              = "BodyWeight";                                           //$NON-NLS-1$
-   private static final String RENAMED__TOUR_DRIVING_TIME__FROM         = "tourDrivingTime";                                      //$NON-NLS-1$
-   private static final String RENAMED__TOUR_DRIVING_TIME__INTO         = "TourComputedTime_Moving";                              //$NON-NLS-1$
-   private static final String RENAMED__TOUR_RECORDING_TIME__FROM       = "tourRecordingTime";                                    //$NON-NLS-1$
-   private static final String RENAMED__TOUR_RECORDING_TIME__INTO       = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
-   private static final String RENAMED__TOUR_AVG_TEMPERATURE__FROM      = "avgTemperature";                                       //$NON-NLS-1$
-   private static final String RENAMED__TOUR_AVG_TEMPERATURE__INTO      = "weather_Temperature_Average_Device";                   //$NON-NLS-1$
-   private static final String RENAMED__TOUR_MAX_TEMPERATURE__FROM      = "weather_Temperature_Max";                              //$NON-NLS-1$
-   private static final String RENAMED__TOUR_MAX_TEMPERATURE__INTO      = "weather_Temperature_Max_Device";                       //$NON-NLS-1$
-   private static final String RENAMED__TOUR_MIN_TEMPERATURE__FROM      = "weather_Temperature_Min";                              //$NON-NLS-1$
-   private static final String RENAMED__TOUR_MIN_TEMPERATURE__INTO      = "weather_Temperature_Min_Device";                       //$NON-NLS-1$
-   private static final String RENAMED__TOUR_ISWEATHERDATAFROMAPI__FROM = "isWeatherDataFromApi";                                 //$NON-NLS-1$
-   private static final String RENAMED__TOUR_ISWEATHERDATAFROMAPI__INTO = "isWeatherDataFromProvider";                            //$NON-NLS-1$
+   private static final String RENAMED__BIKER_WEIGHT__FROM                = "bikerWeight";                                          //$NON-NLS-1$
+   private static final String RENAMED__BIKER_WEIGHT__INTO                = "BodyWeight";                                           //$NON-NLS-1$
+   private static final String RENAMED__TOUR_DRIVING_TIME__FROM           = "tourDrivingTime";                                      //$NON-NLS-1$
+   private static final String RENAMED__TOUR_DRIVING_TIME__INTO           = "TourComputedTime_Moving";                              //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__FROM         = "tourRecordingTime";                                    //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__INTO         = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
+   private static final String RENAMED__TOUR_AVG_TEMPERATURE__FROM        = "avgTemperature";                                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_AVG_TEMPERATURE__INTO        = "weather_Temperature_Average_Device";                   //$NON-NLS-1$
+   private static final String RENAMED__TOUR_MAX_TEMPERATURE__FROM        = "weather_Temperature_Max";                              //$NON-NLS-1$
+   private static final String RENAMED__TOUR_MAX_TEMPERATURE__INTO        = "weather_Temperature_Max_Device";                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_MIN_TEMPERATURE__FROM        = "weather_Temperature_Min";                              //$NON-NLS-1$
+   private static final String RENAMED__TOUR_MIN_TEMPERATURE__INTO        = "weather_Temperature_Min_Device";                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_ISWEATHERDATAFROMAPI__FROM   = "isWeatherDataFromApi";                                 //$NON-NLS-1$
+   private static final String RENAMED__TOUR_ISWEATHERDATAFROMAPI__INTO   = "isWeatherDataFromProvider";                            //$NON-NLS-1$
+   private static final String RENAMED__TOUR_WEATHER_CLOUDS__FROM         = "weatherClouds";                                        //$NON-NLS-1$
+   private static final String RENAMED__TOUR_WEATHER_CLOUDS__INTO         = "weather_Clouds";                                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_WEATHER_WIND_DIRECTION__FROM = "weatherWindDir";                                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_WEATHER_WIND_DIRECTION__INTO = "weather_Wind_Direction";                               //$NON-NLS-1$
+   private static final String RENAMED__TOUR_WEATHER_WIND_SPEED__FROM     = "weatherWindSpd";                                       //$NON-NLS-1$
+   private static final String RENAMED__TOUR_WEATHER_WIND_SPEED__INTO     = "weather_Wind_Speed";                                   //$NON-NLS-1$
 
-   private static final String DEFAULT_0                                = "0";                                                    //$NON-NLS-1$
-   private static final String DEFAULT_1_0                              = "1.0";                                                  //$NON-NLS-1$
-   private static final String DEFAULT_FALSE                            = "false";                                                //$NON-NLS-1$
-   private static final String DEFAULT_IGNORED                          = "-1";                                                   //$NON-NLS-1$
+   private static final String DEFAULT_0                                  = "0";                                                    //$NON-NLS-1$
+   private static final String DEFAULT_1_0                                = "1.0";                                                  //$NON-NLS-1$
+   private static final String DEFAULT_FALSE                              = "false";                                                //$NON-NLS-1$
+   private static final String DEFAULT_IGNORED                            = "-1";                                                   //$NON-NLS-1$
 
-   private static final String PERSISTENCE_UNIT_NAME                    = "tourdatabase";                                         //$NON-NLS-1$
+   private static final String PERSISTENCE_UNIT_NAME                      = "tourdatabase";                                         //$NON-NLS-1$
 
-   private static final String DERBY_DATABASE                           = "derby-database";                                       //$NON-NLS-1$
-   private static final String DERBY_DB_TOURBOOK                        = "tourbook";                                             //$NON-NLS-1$
+   private static final String DERBY_DATABASE                             = "derby-database";                                       //$NON-NLS-1$
+   private static final String DERBY_DB_TOURBOOK                          = "tourbook";                                             //$NON-NLS-1$
    private static String       DERBY_DRIVER_CLASS;
    private static String       DERBY_URL;
-   private static final String DERBY_URL_COMMAND_CREATE_TRUE            = ";create=true";                                         //$NON-NLS-1$
-   private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE          = ";shutdown=true";                                       //$NON-NLS-1$
-   private static final String DERBY_URL_COMMAND_UPGRADE_TRUE           = ";upgrade=true";                                        //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_CREATE_TRUE              = ";create=true";                                         //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE            = ";shutdown=true";                                       //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_UPGRADE_TRUE             = ";upgrade=true";                                        //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
@@ -3877,9 +3883,9 @@ public class TourDatabase {
 
             // version 8 start
 
-            + " weatherWindDir         INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " weatherWindSpd         INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weatherClouds          VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " weather_Wind_Direction INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
+            + " weather_Wind_Speed     INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weather_Clouds         VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + " restPulse              INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
             + " isDistanceFromSensor   SMALLINT DEFAULT 0,                                   " + NL //$NON-NLS-1$
 
@@ -8982,6 +8988,9 @@ public class TourDatabase {
             SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_MAX_TEMPERATURE__FROM,    RENAMED__TOUR_MAX_TEMPERATURE__INTO);
             SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_MIN_TEMPERATURE__FROM,    RENAMED__TOUR_MIN_TEMPERATURE__INTO);
             SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_ISWEATHERDATAFROMAPI__FROM,    RENAMED__TOUR_ISWEATHERDATAFROMAPI__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_CLOUDS__FROM,    RENAMED__TOUR_WEATHER_CLOUDS__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_DIRECTION__FROM,    RENAMED__TOUR_WEATHER_WIND_DIRECTION__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_SPEED__FROM,    RENAMED__TOUR_WEATHER_WIND_SPEED__INTO);
 
             // Add new columns
             SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Average", DEFAULT_0);                   //$NON-NLS-1$

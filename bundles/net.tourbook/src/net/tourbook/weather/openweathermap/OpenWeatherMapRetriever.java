@@ -97,10 +97,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       _tour.setIsWeatherDataFromApi(true);
       _tour.setWeather(timeMachineResult.getWeatherDescription());
-      _tour.setWeatherClouds(timeMachineResult.getWeatherType());
+      _tour.setWeather_Clouds(timeMachineResult.getWeatherType());
       _tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage());
-      _tour.setWeatherWindSpeed(timeMachineResult.getWindSpeed());
-      _tour.setWeatherWindDir(timeMachineResult.getWindDirection());
+      _tour.setWeather_Wind_Speed(timeMachineResult.getWindSpeed());
+      _tour.setWeather_Wind_Direction(timeMachineResult.getWindDirection());
       _tour.setWeather_Humidity((short) timeMachineResult.getAverageHumidity());
       _tour.setWeather_Precipitation(timeMachineResult.getPrecipitation());
       _tour.setWeather_Pressure((short) timeMachineResult.getAveragePressure());

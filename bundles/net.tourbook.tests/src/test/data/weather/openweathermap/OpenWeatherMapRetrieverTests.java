@@ -70,13 +70,12 @@ public class OpenWeatherMapRetrieverTests {
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
 //      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
 
-
       //todo fb is that normal to have lots of decimals???
       assertEquals("clear sky", tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-sunny", tour.getWeatherClouds()); //$NON-NLS-1$
       assertEquals(-5.788750171661377, tour.getWeather_Temperature_Average());
       assertEquals(4.0, tour.getWeatherWindSpeed());
-      assertEquals(268.0, tour.getWeatherWindDir());
+      assertEquals(268.0, tour.getWeatherWindDirection());
       assertEquals(56.0, tour.getWeather_Humidity());
       assertEquals(0, tour.getWeather_Precipitation());
       assertEquals(1025.0, tour.getWeather_Pressure());
