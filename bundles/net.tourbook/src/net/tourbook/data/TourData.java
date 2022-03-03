@@ -542,19 +542,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private float                 weather_Pressure;                                     // db-version 39
 
-   private float                 weather_Temperature_Average;                                          // db-version 47
+   private float                 weather_Temperature_Average;                          // db-version 47
    /**
     * Average temperature with metric system (measured from the device)
     *
     * @since Is float since db version 21, before it was int. In db version 20 this field was
     *        already float but not the database field.
     */
-   private float                 weather_Temperature_Average_Device;                                   // db-version 4
+   private float                 weather_Temperature_Average_Device;                   // db-version 4
 
    private float                 weather_Temperature_Min;                              // db-version 47
-   private float                 weather_Temperature_Min_Device;                              // db-version 39
+   private float                 weather_Temperature_Min_Device;                       // db-version 39
    private float                 weather_Temperature_Max;                              // db-version 47
-   private float                 weather_Temperature_Max_Device;                              // db-version 39
+   private float                 weather_Temperature_Max_Device;                       // db-version 39
 
    private float                 weather_Temperature_WindChill;                        // db-version 39
    /** Unit is Watt */
@@ -9692,6 +9692,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
+    *         set.
+    */
+   public String getWeather_Clouds() {
+      return weather_Clouds;
+   }
+
+   /**
     * @return {@link #weather_Humidity}
     */
    public int getWeather_Humidity() {
@@ -9743,12 +9751,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weather_Temperature_WindChill;
    }
 
-   /**
-    * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
-    *         set.
-    */
-   public String getWeather_Clouds() {
-      return weather_Clouds;
+   public int getWeather_Wind_Direction() {
+      return weather_Wind_Direction;
+   }
+
+   public int getWeather_Wind_Speed() {
+      return weather_Wind_Speed;
    }
 
    /**
@@ -9758,14 +9766,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public int getWeatherIndex() {
 
       return WeatherUtils.getWeatherIndex(weather_Clouds);
-   }
-
-   public int getWeather_Wind_Direction() {
-      return weather_Wind_Direction;
-   }
-
-   public int getWeather_Wind_Speed() {
-      return weather_Wind_Speed;
    }
 
    /**
