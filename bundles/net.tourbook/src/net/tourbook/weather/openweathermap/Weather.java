@@ -13,22 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.weather.openweathermap;
 
-import java.net.http.HttpClient;
-import java.time.Duration;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import net.tourbook.data.TourData;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Weather {
 
-public abstract class HistoricalWeatherRetriever {
-
-   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
-
-   public TourData _tour;
-
-   protected HistoricalWeatherRetriever(final TourData tourData) {
-      _tour = tourData;
-   }
-
-   public abstract boolean retrieveHistoricalWeatherData();
+   public int    id;
+   public String main;
+   public String description;
 }

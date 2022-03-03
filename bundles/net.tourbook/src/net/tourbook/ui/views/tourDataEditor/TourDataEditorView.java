@@ -229,6 +229,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //todo fb verify that WWO and OWM take the actual hour of the tour since I think i saw temperatures that were so low they could have been
    //the same day but at night
 
+   //todo fb
+   //when in metric system in MT and entering -5.8 in the average temp spinner
+   //after I save, it displays -6.0, why ?? can I fix it?
+   //i checked on 22.2.1 and it doesn't have that bug, did I break something ?
+
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
@@ -8977,8 +8982,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       displayCloudIcon();
 
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 &&
-            _tourData.getWeather_Temperature_Max() != 0 &&
+      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 ||
+            _tourData.getWeather_Temperature_Max() != 0 ||
             _tourData.getWeather_Temperature_Min() != 0;
       /*
        * Avg temperature from Device
