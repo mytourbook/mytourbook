@@ -20,7 +20,7 @@
    
 # MyTourbook
 
-All documentations for this project are available on the website <http://mytourbook.sourceforge.net>
+All documentations for this project are available on the website <https://mytourbook.sourceforge.io/>
 
 **Some contributor links**
 
