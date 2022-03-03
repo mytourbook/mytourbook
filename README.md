@@ -13,13 +13,9 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
    
 <div>
-   <a href="https://github.com/mytourbook/mytourbook/issues/480">
-      <img src="/info/community/oss-open-source-excellence-black.svg" width="150" height="150" />
-   </a>
+   <a href="https://github.com/mytourbook/mytourbook/issues/480"><img src="/info/community/oss-open-source-excellence-black.svg" width="150" height="150" /></a>
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-   <a href="https://github.com/mytourbook/mytourbook/issues/480">
-      <img src="/info/community/oss-community-choice-black.svg" width="150" height="150" />
-   </a>
+   <a href="https://github.com/mytourbook/mytourbook/issues/480"><img src="/info/community/oss-community-choice-black.svg" width="150" height="150" /></a>
 </div>
    
 # MyTourbook
