@@ -60,7 +60,7 @@ _This document will not repeat already written text in the documentation._
 
 **Scramble content/values**
 
-It is scrambeling text and values. This is used to create anynymous screenshots
+It is scrambling text and values. This is used to create anonymous screenshots
 
 -DscrambleData
 
