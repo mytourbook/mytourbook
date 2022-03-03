@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -146,9 +146,9 @@ public class TourBook_ColumnFactory {
 
       // Weather
       defineColumn_Weather_Clouds();
-      defineColumn_Weather_Temperature_Avg();
-      defineColumn_Weather_Temperature_Min();
-      defineColumn_Weather_Temperature_Max();
+      defineColumn_Weather_Temperature_Avg_Device();
+      defineColumn_Weather_Temperature_Min_Device();
+      defineColumn_Weather_Temperature_Max_Device();
       defineColumn_Weather_WindSpeed();
       defineColumn_Weather_WindDirection();
 
@@ -3602,17 +3602,17 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Avg temperature
+    * Column: Weather - Avg temperature (measured from the device)
     */
-   private void defineColumn_Weather_Temperature_Avg() {
+   private void defineColumn_Weather_Temperature_Avg_Device() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3625,7 +3625,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3635,17 +3635,17 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Max temperature
+    * Column: Weather - Max temperature (measured from the device)
     */
-   private void defineColumn_Weather_Temperature_Max() {
+   private void defineColumn_Weather_Temperature_Max_Device() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MAX.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max_Device);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3658,7 +3658,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3668,17 +3668,17 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Min temperature
+    * Column: Weather - Min temperature (measured from the device)
     */
-   private void defineColumn_Weather_Temperature_Min() {
+   private void defineColumn_Weather_Temperature_Min_Device() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MIN.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min_Device);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3691,7 +3691,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3711,7 +3711,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final int windDir = ((TVITourBookItem) element).colWindDir;
+            final int windDir = ((TVITourBookItem) element).colWindDirection;
 
             if (windDir == 0) {
                return UI.EMPTY_STRING;
@@ -3728,7 +3728,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int windDir = ((TVITourBookItem) element).colWindDir;
+            final int windDir = ((TVITourBookItem) element).colWindDirection;
 
             if (windDir == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -3752,7 +3752,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpeed / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                return UI.EMPTY_STRING;
@@ -3769,7 +3769,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpeed / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                cell.setText(UI.EMPTY_STRING);

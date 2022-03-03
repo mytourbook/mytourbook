@@ -351,12 +351,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float        colAvgPulse;
    float        colAvgCadence;
    //
-   float        colTemperature_Avg;
-   float        colTemperature_Min;
-   float        colTemperature_Max;
+   float        colTemperature_Average_Device;
+   float        colTemperature_Min_Device;
+   float        colTemperature_Max_Device;
    //
-   int          colWindSpd;
-   int          colWindDir;
+   int          colWindSpeed;
+   int          colWindDirection;
    String       colClouds;
    //
    int          colWeekNo;
@@ -494,8 +494,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colWeekNo                  = result.getInt(22);
       tourItem.colWeekYear                = result.getInt(23);
 
-      tourItem.colWindDir                 = result.getInt(24);
-      tourItem.colWindSpd                 = result.getInt(25);
+      tourItem.colWindDirection                 = result.getInt(24);
+      tourItem.colWindSpeed                 = result.getInt(25);
       tourItem.colClouds                  = result.getString(26);
       tourItem.colRestPulse               = result.getInt(27);
 
@@ -588,8 +588,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // ---------- WEATHER -------------
 
-      tourItem.colTemperature_Min                     = result.getFloat(80);
-      tourItem.colTemperature_Max                     = result.getFloat(81);
+      tourItem.colTemperature_Min_Device                     = result.getFloat(80);
+      tourItem.colTemperature_Max_Device                     = result.getFloat(81);
       final int dbTemperatureScale                    = result.getInt(82);
 
       // ---------- TOUR START LOCATION -------------
@@ -624,7 +624,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       tourItem.colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
 
-      tourItem.colTemperature_Avg = dbAvgTemperature / dbTemperatureScale;
+      tourItem.colTemperature_Average_Device = dbAvgTemperature / dbTemperatureScale;
 
       // -----------------------------------------------
 
@@ -703,10 +703,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colAvgPulse                      = result.getFloat(startIndex + 9);
       colAvgCadence                    = result.getFloat(startIndex + 10);
-      colTemperature_Avg               = result.getFloat(startIndex + 11);
+      colTemperature_Average_Device               = result.getFloat(startIndex + 11);
 
-      colWindDir                       = result.getInt(startIndex + 12);
-      colWindSpd                       = result.getInt(startIndex + 13);
+      colWindDirection                       = result.getInt(startIndex + 12);
+      colWindSpeed                       = result.getInt(startIndex + 13);
       colRestPulse                     = result.getInt(startIndex + 14);
 
       colCalories                      = result.getLong(startIndex + 15);
@@ -724,8 +724,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final int cadenceZone_FastTime   = result.getInt(startIndex + 23);
       colCadenceZonesDelimiter         = result.getInt(startIndex + 24);
 
-      colTemperature_Min               = result.getFloat(startIndex + 25);
-      colTemperature_Max               = result.getFloat(startIndex + 26);
+      colTemperature_Min_Device        = result.getFloat(startIndex + 25);
+      colTemperature_Max_Device        = result.getFloat(startIndex + 26);
 
       colTourDeviceTime_Recorded       = result.getLong(startIndex + 27);
       colTourDeviceTime_Paused         = result.getLong(startIndex + 28);

@@ -73,7 +73,7 @@ public class ActionComputeMinMaxTemperature extends Action {
 
       if (selectedTours == null || selectedTours.isEmpty()) {
 
-         // tours are not selected -> this can occure when loading tour data is canceled
+         // tours are not selected -> this can occur when loading tour data is canceled
 
          return;
       }
@@ -155,8 +155,8 @@ public class ActionComputeMinMaxTemperature extends Action {
 
             + " SET" //                                     //$NON-NLS-1$
 
-            + " weather_Temperature_Min=?, " //             //$NON-NLS-1$
-            + " weather_Temperature_Max=? " //              //$NON-NLS-1$
+            + " weather_Temperature_Min_Device=?, " //             //$NON-NLS-1$
+            + " weather_Temperature_Max_Device=? " //              //$NON-NLS-1$
 
             + " WHERE tourId=?"); //                        //$NON-NLS-1$
 

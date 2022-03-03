@@ -340,15 +340,15 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory WEATHER_CLOUDS;
    public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";                                  //$NON-NLS-1$
-   public static final TableColumnFactory WEATHER_TEMPERATURE_AVG;
-   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG";                         //$NON-NLS-1$
-   public static final TableColumnFactory WEATHER_TEMPERATURE_MIN;
-   public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN";                         //$NON-NLS-1$
-   public static final TableColumnFactory WEATHER_TEMPERATURE_MAX;
-   public static final String             WEATHER_TEMPERATURE_MAX_ID                         = "WEATHER_TEMPERATURE_MAX";                         //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
+   public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG";                         //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_DEVICE;
+   public static final String             WEATHER_TEMPERATURE_MIN_DEVICE_ID                  = "WEATHER_TEMPERATURE_MIN";                         //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MAX_DEVICE;
+   public static final String             WEATHER_TEMPERATURE_MAX_DEVICE_ID                  = "WEATHER_TEMPERATURE_MAX";                         //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_TIME_SLICE;
    public static final TableColumnFactory WEATHER_WIND_DIR;
-   public static final String             WEATHER_WIND_DIR_ID                                = "WEATHER_WIND_DIR";                                //$NON-NLS-1$
+   public static final String             WEATHER_WIND_DIRECTION_ID                          = "WEATHER_WIND_DIR";                                //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_WIND_SPEED;
    public static final String             WEATHER_WIND_SPEED_ID                              = "WEATHER_WIND_SPEED";                              //$NON-NLS-1$
 
@@ -4420,12 +4420,12 @@ public abstract class TableColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_AVG = new TableColumnFactory() {
+      WEATHER_TEMPERATURE_AVG_DEVICE = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_AVG_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_AVG_DEVICE_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -4447,12 +4447,12 @@ public abstract class TableColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_MIN = new TableColumnFactory() {
+      WEATHER_TEMPERATURE_MIN_DEVICE = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MIN_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MIN_DEVICE_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -4474,12 +4474,12 @@ public abstract class TableColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_MAX = new TableColumnFactory() {
+      WEATHER_TEMPERATURE_MAX_DEVICE = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MAX_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MAX_DEVICE_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -4528,7 +4528,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_WIND_DIR_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_WIND_DIRECTION_ID, SWT.TRAIL);
 
             final String unitLabel = UI.UNIT_LABEL_DIRECTION;
 

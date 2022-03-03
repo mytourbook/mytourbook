@@ -125,18 +125,14 @@ public class NatTable_DataLoader {
 
    private static ExecutorService createExecuter_TourId_RowIndex() {
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "NatTable_DataLoader: Loading row indices");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "NatTable_DataLoader: Loading row indices");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
       return Executors.newSingleThreadExecutor(threadFactory);
@@ -144,18 +140,14 @@ public class NatTable_DataLoader {
 
    private static ExecutorService createExecuter_TourLoading() {
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "NatTable_DataLoader: Loading tours");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "NatTable_DataLoader: Loading tours");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
 // !!! newCachedThreadPool is not working, part of the view is not updated !!!
@@ -899,10 +891,10 @@ public class NatTable_DataLoader {
        * WEATHER
        */
       case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale)"; //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min_Device";                     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max_Device";                     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_DIR_ID:                   return "weather_Wind_Direction";                              //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE_ID:     return "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE_ID:     return "weather_Temperature_Min_Device";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE_ID:     return "weather_Temperature_Max_Device";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_DIRECTION_ID:             return "weather_Wind_Direction";                              //$NON-NLS-1$
       case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weather_Wind_Speed";                              //$NON-NLS-1$
 
       default:
@@ -963,40 +955,37 @@ public class NatTable_DataLoader {
 
       _loaderWaitingQueue.add(loaderItem);
 
-      _loadingExecutor.submit(new Runnable() {
-         @Override
-         public void run() {
+      _loadingExecutor.submit(() -> {
 
-            // get last added loader item
-            final LazyTourLoaderItem loaderItem = _loaderWaitingQueue.pollFirst();
+         // get last added loader item
+         final LazyTourLoaderItem loaderItem1 = _loaderWaitingQueue.pollFirst();
 
-            if (loaderItem == null) {
-               return;
-            }
-
-            if (fetchPagedTourItems(loaderItem)) {
-
-               // update UI
-
-               final NatTable tourViewer_NatTable = _tourBookView.getTourViewer_NatTable();
-               final Display display = tourViewer_NatTable.getDisplay();
-
-               display.asyncExec(() -> {
-
-                  if (tourViewer_NatTable.isDisposed()) {
-                     return;
-                  }
-
-                  // do a simple redraw as it retrieves values from the model
-                  tourViewer_NatTable.redraw();
-               });
-            }
-
-            final int loaderItemFetchKey = loaderItem.fetchKey;
-
-            _pageNumbers_Fetched.put(loaderItemFetchKey, loaderItemFetchKey);
-            _pageNumbers_Loading.remove(loaderItemFetchKey);
+         if (loaderItem1 == null) {
+            return;
          }
+
+         if (fetchPagedTourItems(loaderItem1)) {
+
+            // update UI
+
+            final NatTable tourViewer_NatTable = _tourBookView.getTourViewer_NatTable();
+            final Display display = tourViewer_NatTable.getDisplay();
+
+            display.asyncExec(() -> {
+
+               if (tourViewer_NatTable.isDisposed()) {
+                  return;
+               }
+
+               // do a simple redraw as it retrieves values from the model
+               tourViewer_NatTable.redraw();
+            });
+         }
+
+         final int loaderItemFetchKey = loaderItem1.fetchKey;
+
+         _pageNumbers_Fetched.put(loaderItemFetchKey, loaderItemFetchKey);
+         _pageNumbers_Loading.remove(loaderItemFetchKey);
       });
 
       return null;
