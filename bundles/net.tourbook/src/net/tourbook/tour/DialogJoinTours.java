@@ -921,7 +921,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       short joinedDeviceTimeInterval = -1;
       String joinedWeatherClouds = UI.EMPTY_STRING;
       String joinedWeather = UI.EMPTY_STRING;
-      int joinedWeatherWindDir = 0;
+      int joinedWeatherWindDirection = 0;
       int joinedWeatherWindSpeed = 0;
       int joinedRestPulse = 0;
 
@@ -1265,7 +1265,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
             joinedWeather = tourData.getWeather();
             joinedWeatherClouds = tourData.getWeather_Clouds();
-            joinedWeatherWindDir = tourData.getWeather_Wind_Direction();
+            joinedWeatherWindDirection = tourData.getWeather_Wind_Direction();
             joinedWeatherWindSpeed = tourData.getWeather_Wind_Speed();
 
             joinedRestPulse = tourData.getRestPulse();
@@ -1378,7 +1378,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       _joinedTourData.setWeather(joinedWeather);
       _joinedTourData.setWeather_Clouds(joinedWeatherClouds);
-      _joinedTourData.setWeather_Wind_Direction(joinedWeatherWindDir);
+      _joinedTourData.setWeather_Wind_Direction(joinedWeatherWindDirection);
       _joinedTourData.setWeather_Wind_Speed(joinedWeatherWindSpeed);
 
       _joinedTourData.setTourDeviceTime_Elapsed(joinedRecordedTime + joinedPausedTime);

@@ -226,13 +226,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    // Unit tests
 
-   //todo fb verify that WWO and OWM take the actual hour of the tour since I think i saw temperatures that were so low they could have been
+   //todo fb verify that WWO and OWM take the actual hour of the tour since I
+   //think i saw temperatures that were so low they could have been
    //the same day but at night
 
    //todo fb
    //when in metric system in MT and entering -5.8 in the average temp spinner
    //after I save, it displays -6.0, why ?? can I fix it?
    //i checked on 22.2.1 and it doesn't have that bug, did I break something ?
+
+   //todo fb
+   //make sure i renamed all the avgtemperature to _device
 
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -8957,15 +8961,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDir = _tourData.getWeather_Wind_Direction();
-      if (weatherWindDir == -1) {
+      final int weatherWindDirection = _tourData.getWeather_Wind_Direction();
+      if (weatherWindDirection == -1) {
          _spinWeather_Wind_DirectionValue.setSelection(0);
          _spinWeather_Wind_DirectionValue.setEnabled(false);
          _comboWeather_WindDirectionText.select(0);
       } else {
-         final int weatherWindDirDegree = weatherWindDir * 10;
-         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
-         _comboWeather_WindDirectionText.select(WeatherUtils.getWindDirectionTextIndex((int) (weatherWindDirDegree / 10.0f)));
+         final int weatherWindDirectionDegree = weatherWindDirection * 10;
+         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
+         _comboWeather_WindDirectionText.select(WeatherUtils.getWindDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
          _spinWeather_Wind_DirectionValue.setEnabled(true);
       }
 

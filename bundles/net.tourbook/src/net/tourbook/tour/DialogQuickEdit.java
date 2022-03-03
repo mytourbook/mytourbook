@@ -56,7 +56,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
-   //todo fb also adapt the UI here for the weather ??
+   //todo fb also adapt the UI here for the weather (refactor code in 1 function ??)
 
    private static final String      GRAPH_LABEL_HEARTBEAT_UNIT     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String      VALUE_UNIT_K_CALORIES          = net.tourbook.ui.Messages.Value_Unit_KCalories;
@@ -985,9 +985,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _txtWeather.setText(_tourData.getWeather());
 
          // wind direction
-         final int weatherWindDirDegree = _tourData.getWeather_Wind_Direction() * 10;
-         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
-         _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
+         final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction() * 10;
+         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
+         _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirectionDegree));
 
          // wind speed
          final int windSpeed = _tourData.getWeather_Wind_Speed();

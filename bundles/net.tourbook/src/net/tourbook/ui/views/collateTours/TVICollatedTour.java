@@ -54,9 +54,9 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN AVGPULSE = 0         THEN NULL ELSE AVGPULSE END)," + NL //                                     10 //$NON-NLS-1$
             + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," + NL //                                  11 //$NON-NLS-1$
             + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," //$NON-NLS-1$
-            + NL //   12 
-            + "AVG( CASE WHEN WEATHERWINDDIR = 0   THEN NULL ELSE WEATHERWINDDIR END )," + NL //                              13 //$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDSPD = 0   THEN NULL ELSE WEATHERWINDSPD END )," + NL //                              14 //$NON-NLS-1$
+            + NL //   12
+            + "AVG( CASE WHEN WEATHER_WIND_DIRECTION = 0 THEN NULL ELSE WEATHER_WIND_DIRECTION END )," + NL //                              13 //$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHER_WIND_SPEED = 0   THEN NULL ELSE WEATHER_WIND_SPEED END )," + NL //                              14 //$NON-NLS-1$
             + "AVG( CASE WHEN RESTPULSE = 0        THEN NULL ELSE RESTPULSE END )," + NL //                                   15 //$NON-NLS-1$
 
             + "SUM( CAST(CALORIES                  AS BIGINT))," + NL //         16 //$NON-NLS-1$

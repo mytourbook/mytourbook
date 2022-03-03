@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -898,12 +898,12 @@ public class NatTable_DataLoader {
       /*
        * WEATHER
        */
-      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weatherClouds";   // an icon is displayed     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(avgTemperature) / temperatureScale)"; //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_DIR_ID:                   return "weatherWindDir";                              //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weatherWindSpd";                              //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min_Device";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max_Device";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_DIR_ID:                   return "weather_Wind_Direction";                              //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weather_Wind_Speed";                              //$NON-NLS-1$
 
       default:
 

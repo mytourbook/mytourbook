@@ -1747,11 +1747,11 @@ public class TourInfoUI {
                   IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeather_Wind_Direction();
-      _lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
+      final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
+      _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
       _lblWindDirectionUnit.setText(String.format(
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
-            UI.getCardinalDirectionText(weatherWindDirDegree * 10)));
+            UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
 
       // temperature
       final float temperature = UI.convertTemperatureFromMetric(

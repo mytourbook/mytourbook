@@ -81,9 +81,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "startWeek, " //                                    22    //$NON-NLS-1$
             + "startWeekYear, " //                                23    //$NON-NLS-1$
             //
-            + "weatherWindDir, " //                               24    //$NON-NLS-1$
-            + "weatherWindSpd, " //                               25    //$NON-NLS-1$
-            + "weatherClouds, " //                                26    //$NON-NLS-1$
+            + "weather_Wind_Direction, " //                       24    //$NON-NLS-1$
+            + "weather_Wind_Speed, " //                           25    //$NON-NLS-1$
+            + "weather_Clouds, " //                               26    //$NON-NLS-1$
             //
             + "restPulse, " //                                    27    //$NON-NLS-1$
             + "calories, " //                                     28    //$NON-NLS-1$
@@ -172,8 +172,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "cadenceZones_DelimiterValue, " //                  79    //$NON-NLS-1$
 
             // ---------- WEATHER -------------
-            + "weather_Temperature_Min, " //                      80    //$NON-NLS-1$
-            + "weather_Temperature_Max, " //                      81    //$NON-NLS-1$
+            + "weather_Temperature_Min_Device, " //                      80    //$NON-NLS-1$
+            + "weather_Temperature_Max_Device, " //                      81    //$NON-NLS-1$
             + "temperatureScale, " //                             82    //$NON-NLS-1$
 
             // ---------- TOUR START LOCATION -------------
@@ -224,8 +224,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "weather_Temperature_Average_Device," + NL //                                    //$NON-NLS-1$
             + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
             + "TemperatureScale," + NL //                                  //$NON-NLS-1$
-            + "WeatherWindDir," + NL //                                    //$NON-NLS-1$
-            + "WeatherWindSpd," + NL //                                    //$NON-NLS-1$
+            + "Weather_Wind_Direction," + NL //                            //$NON-NLS-1$
+            + "Weather_Wind_Speed," + NL //                                //$NON-NLS-1$
 
             + "Calories," + NL //                                          //$NON-NLS-1$
             + "RestPulse," + NL //                                         //$NON-NLS-1$
@@ -244,8 +244,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
             + "cadenceZones_DelimiterValue," + NL //                       //$NON-NLS-1$
 
-            + "weather_Temperature_Min," + NL //                           //$NON-NLS-1$
-            + "weather_Temperature_Max," + NL //                           //$NON-NLS-1$
+            + "weather_Temperature_Min_Device," + NL //                           //$NON-NLS-1$
+            + "weather_Temperature_Max_Device," + NL //                           //$NON-NLS-1$
 
             + "tourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
             + "tourDeviceTime_Paused" + NL //                              //$NON-NLS-1$
@@ -268,8 +268,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
             + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
             + NL //    11
-            + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END), " + NL //                              12    //$NON-NLS-1$
-            + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END), " + NL //                              13    //$NON-NLS-1$
+            + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END), " + NL //                              12    //$NON-NLS-1$
+            + "AVG( CASE WHEN Weather_Wind_Speed = 0 THEN NULL ELSE Weather_Wind_Speed END), " + NL //                              13    //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END), " + NL //                                   14    //$NON-NLS-1$
             //
             + "SUM( CAST(Calories AS BIGINT))," + NL //                 15 //$NON-NLS-1$
@@ -287,8 +287,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "SUM( CAST(cadenceZone_FastTime AS BIGINT))," + NL //     23 //$NON-NLS-1$
             + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END)," + NL //       24 //$NON-NLS-1$
 
-            + "MIN( CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END)," + NL //               25 //$NON-NLS-1$
-            + "MAX( CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)," + NL //               26 //$NON-NLS-1$
+            + "MIN( CASE WHEN weather_Temperature_Min_Device = 0 THEN NULL ELSE weather_Temperature_Min_Device END)," + NL //               25 //$NON-NLS-1$
+            + "MAX( CASE WHEN weather_Temperature_Max_Device = 0 THEN NULL ELSE weather_Temperature_Max_Device END)," + NL //               26 //$NON-NLS-1$
 
             + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))," + NL //  27 //$NON-NLS-1$
             + "SUM( CAST(tourDeviceTime_Paused AS BIGINT))" + NL //     28 //$NON-NLS-1$

@@ -468,7 +468,7 @@ public class CalendarTourDataProvider {
                + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
                + "   Power_Avg," + NL //                          20 //$NON-NLS-1$
                + "   TourDeviceTime_Recorded," + NL //             21 //$NON-NLS-1$
-               + "   weatherClouds" + NL //                        22 //$NON-NLS-1$
+               + "   weather_Clouds" + NL //                        22 //$NON-NLS-1$
 
                + NL
 
