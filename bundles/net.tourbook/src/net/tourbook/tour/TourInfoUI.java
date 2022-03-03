@@ -1736,7 +1736,7 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
-      int windSpeed = _tourData.getWeatherWindSpeed();
+      int windSpeed = _tourData.getWeather_Wind_Speed();
       windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
 
       _lblWindSpeed.setText(Integer.toString(windSpeed));
@@ -1747,7 +1747,7 @@ public class TourInfoUI {
                   IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDirection();
+      final int weatherWindDirDegree = _tourData.getWeather_Wind_Direction();
       _lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
       _lblWindDirectionUnit.setText(String.format(
             Messages.Tour_Tooltip_Format_WindDirectionUnit,

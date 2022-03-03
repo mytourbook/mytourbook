@@ -985,12 +985,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _txtWeather.setText(_tourData.getWeather());
 
          // wind direction
-         final int weatherWindDirDegree = _tourData.getWeatherWindDirection() * 10;
+         final int weatherWindDirDegree = _tourData.getWeather_Wind_Direction() * 10;
          _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
          _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
 
          // wind speed
-         final int windSpeed = _tourData.getWeatherWindSpeed();
+         final int windSpeed = _tourData.getWeather_Wind_Speed();
          final int speed = (int) (windSpeed / _unitValueDistance);
          _spinWeather_Wind_SpeedValue.setSelection(speed);
          _comboWeather_Wind_SpeedText.select(getWindSpeedTextIndex(speed));

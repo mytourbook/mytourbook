@@ -148,7 +148,7 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       for (final TourData tourData : selectedTours) {
 
-         if (Objects.equals(tourData.getWeatherClouds(), weatherDescription)) {
+         if (Objects.equals(tourData.getWeather_Clouds(), weatherDescription)) {
             continue;
          }
 

@@ -9747,7 +9747,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
     *         set.
     */
-   public String getWeatherClouds() {
+   public String getWeather_Clouds() {
       return weather_Clouds;
    }
 
@@ -9760,11 +9760,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return WeatherUtils.getWeatherIndex(weather_Clouds);
    }
 
-   public int getWeatherWindDirection() {
+   public int getWeather_Wind_Direction() {
       return weather_Wind_Direction;
    }
 
-   public int getWeatherWindSpeed() {
+   public int getWeather_Wind_Speed() {
       return weather_Wind_Speed;
    }
 

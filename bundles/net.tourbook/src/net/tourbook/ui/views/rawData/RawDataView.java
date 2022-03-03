@@ -3498,7 +3498,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final String weatherCloudId = ((TourData) cell.getElement()).getWeatherClouds();
+            final String weatherCloudId = ((TourData) cell.getElement()).getWeather_Clouds();
             if (weatherCloudId == null) {
                cell.setText(UI.EMPTY_STRING);
             } else {

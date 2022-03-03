@@ -67,10 +67,10 @@ public class WorldWeatherOnlineRetrieverTests {
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
 
       assertEquals(16, tour.getWeather_Temperature_Average());
-      assertEquals(9, tour.getWeatherWindSpeed());
-      assertEquals(136, tour.getWeatherWindDirection());
+      assertEquals(9, tour.getWeather_Wind_Speed());
+      assertEquals(136, tour.getWeather_Wind_Direction());
       assertEquals("Partly cloudy", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy", tour.getWeatherClouds()); //$NON-NLS-1$
+      assertEquals("weather-cloudy", tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(50, tour.getWeather_Humidity());
       assertEquals(1.6, Math.round(tour.getWeather_Precipitation() * 10.0) / 10.0);
       assertEquals(1017, tour.getWeather_Pressure());

@@ -8957,7 +8957,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDir = _tourData.getWeatherWindDirection();
+      final int weatherWindDir = _tourData.getWeather_Wind_Direction();
       if (weatherWindDir == -1) {
          _spinWeather_Wind_DirectionValue.setSelection(0);
          _spinWeather_Wind_DirectionValue.setEnabled(false);
@@ -8970,7 +8970,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       // wind speed
-      final int windSpeed = _tourData.getWeatherWindSpeed();
+      final int windSpeed = _tourData.getWeather_Wind_Speed();
       final int speed = Math.round(windSpeed / _unitValueDistance);
       _spinWeather_Wind_SpeedValue.setSelection(speed);
       _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(speed));

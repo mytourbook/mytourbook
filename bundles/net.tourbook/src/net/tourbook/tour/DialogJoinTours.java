@@ -1264,9 +1264,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             joinedDeviceTimeInterval = tourData.getDeviceTimeInterval();
 
             joinedWeather = tourData.getWeather();
-            joinedWeatherClouds = tourData.getWeatherClouds();
-            joinedWeatherWindDir = tourData.getWeatherWindDirection();
-            joinedWeatherWindSpeed = tourData.getWeatherWindSpeed();
+            joinedWeatherClouds = tourData.getWeather_Clouds();
+            joinedWeatherWindDir = tourData.getWeather_Wind_Direction();
+            joinedWeatherWindSpeed = tourData.getWeather_Wind_Speed();
 
             joinedRestPulse = tourData.getRestPulse();
 
