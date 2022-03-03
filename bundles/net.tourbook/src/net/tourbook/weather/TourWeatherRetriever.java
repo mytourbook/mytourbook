@@ -39,11 +39,11 @@ public final class TourWeatherRetriever {
          break;
       }
 
-      if (historicalWeatherRetriever != null) {
-         return historicalWeatherRetriever.retrieveHistoricalWeatherData();
+      if (historicalWeatherRetriever == null) {
+         return false;
       }
 
-      return false;
+      return historicalWeatherRetriever.retrieveHistoricalWeatherData();
    }
 
 }

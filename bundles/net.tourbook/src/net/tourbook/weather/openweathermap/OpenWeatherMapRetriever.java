@@ -40,7 +40,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    // that will work for most of the activities but not 100milers ....
 
    //todo fb this will be replaced by HEROKU
-   private static final String baseApiUrl = "https://api.openweathermap.org/data/2.5/onecall/timemachine?units=metric"; //$NON-NLS-1$
+   private static final String baseApiUrl = "https://api.openweathermap.org/data/2.5/onecall/timemachine?"; //$NON-NLS-1$
    private LatLng              searchAreaCenter;
    private long                startDate;
 
@@ -60,6 +60,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private void logVendorError(final String weatherRequestWithParameters,
                                final int statusCode,
                                final String exceptionMessage) {
+
       final StringBuilder error = new StringBuilder();
 
       error.append(
@@ -165,16 +166,13 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       TimeMachineResult timeMachineResult = new TimeMachineResult();
       try {
          final ObjectMapper mapper = new ObjectMapper();
-         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class)
-//               .get("data") //$NON-NLS-1$
-//               .get("weather") //$NON-NLS-1$
-//               .get(0)
-//               .get("hourly") //$NON-NLS-1$
+         final String weatherResults = mapper
+               .readValue(weatherDataResponse, JsonNode.class)
                .toString();
 
-         timeMachineResult = mapper.readValue(weatherResults, new TypeReference<TimeMachineResult>() {});
-
-         // computeFinalWeatherData(weatherData, rawWeatherData);
+         timeMachineResult = mapper.readValue(
+               weatherResults,
+               new TypeReference<TimeMachineResult>() {});
 
       } catch (final Exception e) {
 
